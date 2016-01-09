@@ -7,4 +7,35 @@
     <dimen name="tab_label">14sp</dimen>
     <dimen name="custom_tab_layout_height">72dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="card_corner_radius">2dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+
+    <dimen name="event_card_ll_marginTop">5dp</dimen>
+    <dimen name="event_card_height">250dp</dimen>
+    <dimen name="event_card_paddingBottom">10dp</dimen>
+    <dimen name="event_card_image_height">160dp</dimen>
+    <dimen name="event_card_margins">10dp</dimen>
+    <dimen name="event_card_name_size">15sp</dimen>
+    <dimen name="event_card_ad_size">12sp</dimen>
+    <dimen name="event_card_by_size">12sp</dimen>
+    <dimen name="event_card_date_size">32sp</dimen>
+    <dimen name="event_card_month_size">15sp</dimen>
+    <dimen name="event_card_tv_size">60dp</dimen>
+    <dimen name="event_card_tv_marginTop">2dp</dimen>
+    <dimen name="event_card_ll_marginStart">20dp</dimen>
+    <dimen name="event_card_container_height">70dp</dimen>
+    <dimen name="event_card_title_view_width">220dp</dimen>
+
+    <dimen name="event_detail_image_height">200dp</dimen>
+    <dimen name="event_detail_button_height">55dp</dimen>
+    <dimen name="event_detail_image_text1_marginTop">60dp</dimen>
+    <dimen name="event_detail_image_text2_marginTop">120dp</dimen>
+    <dimen name="event_detail_image_text1_size">22sp</dimen>
+    <dimen name="event_detail_image_text2_size">13sp</dimen>
+    <dimen name="event_detail_share_margins">5dp</dimen>
+    <dimen name="event_detail_padding">10dp</dimen>
+    <dimen name="event_detail_text_size">14sp</dimen>
+    <dimen name="event_detail_margin_gap">7.5dp</dimen>
+    <dimen name="event_detail_button_text_size">15sp</dimen>
+
 </resources>

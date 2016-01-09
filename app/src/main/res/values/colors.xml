@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">@color/bright_sky_blue</color>
+    <color name="colorPrimaryDark">@color/dark_sky_blue</color>
     <color name="colorAccent">#FF4081</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
+
+    <color name="dark_sky_blue">#0099ff</color>
+    <color name="bright_sky_blue">#00b9ff</color>
+    <color name="white">#ffffff</color>
+    <color name="greyish_brown">#454545</color>
+    <color name="pale_magenta">#d667cd</color>
+    <color name="slate_blue">#6563a4</color>
 </resources>

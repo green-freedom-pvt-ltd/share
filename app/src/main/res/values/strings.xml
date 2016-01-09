@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Share</string>
     <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="event_fragment_title">Events goes here</string>
+    <string name="news_fragment_title">News goes here</string>
+    <string name="run_fragment_title">Run for a cause</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
