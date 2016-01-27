@@ -2,8 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/price_trend_card"
-    style="@style/listBaseCardStyle"
+    style="@style/listEventCardStyle"
     card_view:cardUseCompatPadding="true">
 
     <RelativeLayout
