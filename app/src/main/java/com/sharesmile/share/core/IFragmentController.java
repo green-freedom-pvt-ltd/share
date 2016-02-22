@@ -7,6 +7,14 @@ public interface IFragmentController {
 
     static final String TAG = "IFragmentController";
 
-    void loadFragment(BaseFragment fragment);
+    void addFragment(BaseFragment fragment);
+
+    void replaceFragment(BaseFragment fragment);
+
+    void loadInitialFragment();
+
+    int getFrameLayoutId();
+
+    String getName();
 
 }

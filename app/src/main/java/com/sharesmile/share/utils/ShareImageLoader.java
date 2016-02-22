@@ -165,7 +165,7 @@ public class ShareImageLoader {
         try {
             bitmap = picasso.load(imageUrl).get();
         } catch (IOException e) {
-            Log.e(TAG, "IOException during synchronous image download from URL");
+            Logger.e(TAG, "IOException during synchronous image download from URL");
             e.printStackTrace();
         }
         return bitmap;
@@ -179,7 +179,7 @@ public class ShareImageLoader {
         long used = Runtime.getRuntime().totalMemory();
         float percentAvailable = 100f * (1f - ((float) used / total));
         if (percentAvailable <= LOW_MEMORY_THRESHOLD_PERCENTAGE) {
-            Log.e(TAG, "LOW MEMORY, ONLY " + percentAvailable + "% AVAILABLE!");
+            Logger.e(TAG, "LOW MEMORY, ONLY " + percentAvailable + "% AVAILABLE!");
             isAdequateMemoryAvailable = false;
             handleLowMemory();
         }
@@ -189,7 +189,7 @@ public class ShareImageLoader {
 
     private void handleLowMemory() {
         // handle low memory
-        Log.d(TAG,"HANDLING LOW MEMORY");
+        Logger.d(TAG,"HANDLING LOW MEMORY");
         System.gc();
     }
 

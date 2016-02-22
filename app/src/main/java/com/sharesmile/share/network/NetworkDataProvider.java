@@ -2,9 +2,9 @@ package com.sharesmile.share.network;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.NameValuePair;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Call;
@@ -122,7 +122,7 @@ public class NetworkDataProvider {
         if (TextUtils.isEmpty(url)) {
             throw new IllegalArgumentException("Empty URL " + url);
         }
-        Log.d(TAG, "Url for POST request: " + url);
+        Logger.d(TAG, "Url for POST request: " + url);
         Response response = getResponseForPostCall(url, body);
         T responseObject = NetworkUtils.handleResponse(response, responseClass);
         return responseObject;
@@ -133,7 +133,7 @@ public class NetworkDataProvider {
         if (TextUtils.isEmpty(url)) {
             throw new IllegalArgumentException("Empty URL " + url);
         }
-        Log.d(TAG, "Url for POST request: " + url);
+        Logger.d(TAG, "Url for POST request: " + url);
         Response response = getResponseForPostCall(url, body);
         T responseObject = NetworkUtils.handleResponse(response, typeOfT);
         return responseObject;
@@ -210,7 +210,7 @@ public class NetworkDataProvider {
         Request.Builder requestBuilder = new Request.Builder().url(url);
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
-        Log.d(TAG, "Url for GET request: " + url);
+        Logger.d(TAG, "Url for GET request: " + url);
         try {
             return call.execute();
         } catch (IOException e) {
@@ -225,7 +225,7 @@ public class NetworkDataProvider {
                 .post(body);
         Request request = builder.build();
         Call call = getSingleOkHttpClient().newCall(request);
-        Log.d(TAG, "Url for POST request: " + url);
+        Logger.d(TAG, "Url for POST request: " + url);
         try{
             return call.execute();
         } catch (IOException ioe) {

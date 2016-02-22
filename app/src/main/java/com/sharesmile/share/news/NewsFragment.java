@@ -8,13 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link NewsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewsFragment extends Fragment {
+public class NewsFragment extends BaseFragment {
 
     private static final String PARAM_TITLE = "param_title";
     private String title;
@@ -23,10 +24,9 @@ public class NewsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static NewsFragment newInstance(String title) {
+    public static NewsFragment newInstance() {
         NewsFragment fragment = new NewsFragment();
         Bundle args = new Bundle();
-        args.putString(PARAM_TITLE, title);
         fragment.setArguments(args);
         return fragment;
     }

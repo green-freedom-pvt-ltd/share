@@ -12,8 +12,8 @@ public class DrawerMenuAdapter extends ArrayAdapter<String>{
 
     private static final String TAG = "DrawerMenuAdapter";
 
-    public DrawerMenuAdapter(Context context, int resource, ArrayList<String> menuItems) {
-        super(context, resource, menuItems);
+    public DrawerMenuAdapter(Context context, int layoutResource, int textViewResource, ArrayList<String> menuItems) {
+        super(context, layoutResource, textViewResource, menuItems);
     }
 
 

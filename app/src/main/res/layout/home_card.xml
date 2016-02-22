@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/goodnews"
-        android:alpha="0.82">
+        android:alpha="0.80">
 
         <TextView
             android:id="@+id/tv_title"

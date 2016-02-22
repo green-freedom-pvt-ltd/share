@@ -5,8 +5,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
+
+import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
@@ -29,7 +31,7 @@ public class MainApplication extends Application {
 
     public static MainApplication getInstance() {
         if (instance == null) {
-            Log.e(TAG, "Main application instance should never be null");
+            Logger.e(TAG, "Main application instance should never be null");
         }
         return instance;
     }
@@ -121,6 +123,7 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //Initialization code
+        SharedPrefsManager.initialize(getApplicationContext());
     }
 
 }

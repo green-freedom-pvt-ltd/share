@@ -1,12 +1,20 @@
 package com.sharesmile.share;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
+import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -14,24 +22,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.IFragmentController;
+import com.google.android.gms.common.api.Status;
+import com.sharesmile.share.core.BaseActivity;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.drawer.DrawerMenuAdapter;
-import com.sharesmile.share.events.EventsFragment;
-import com.sharesmile.share.news.NewsFragment;
+import com.sharesmile.share.gps.LocationService;
+import com.sharesmile.share.gps.RunTracker;
+import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.orgs.RunFragment;
+import com.sharesmile.share.utils.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements IFragmentController{
+public class MainActivity extends BaseActivity {
 
-    private Toolbar toolbar;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
 
+    private static final String TAG = "MainActivity";
     private DrawerLayout drawerLayout;
     private ListView drawerList;
+    private LocationService locationService;
+    private RunFragment runFragment;
 
     private static final ArrayList<String> MENU_ITEMS = new ArrayList<String>(){
         {
@@ -51,31 +67,56 @@ public class MainActivity extends AppCompatActivity implements IFragmentControll
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.activity_toolbar);
-        setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.activity_toolbar);
+//        setSupportActionBar(toolbar);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//
+//        viewPager = (ViewPager) findViewById(R.id.viewpager);
+//        setupViewPager(viewPager);
+//
+//        tabLayout = (TabLayout) findViewById(R.id.tabs);
+//        tabLayout.setupWithViewPager(viewPager);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerList = (ListView) findViewById(R.id.drawer_list_view);
-        drawerList.setAdapter(new DrawerMenuAdapter(this, R.layout.drawer_list_item, MENU_ITEMS));
+        drawerList.setAdapter(new DrawerMenuAdapter(this, R.layout.drawer_list_item,
+                R.id.list_item_text_view, MENU_ITEMS));
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        loadInitialFragment();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(locationServiceReceiver,
+                new IntentFilter(Constants.LOCATION_SERVICE_BROADCAST_ACTION));
+
+        if (isWorkoutActive()){
+            // If workout sesion going on then bind to service
+            invokeLocationService();
+        }
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        TabViewPagerAdapter adapter = new TabViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(EventsFragment.newInstance("Participate in Events"), "EVENTS");
-        adapter.addFragment(NewsFragment.newInstance("Read good stuff"), "NEWS");
-        adapter.addFragment(RunFragment.newInstance("Run for a cause"), "RUN");
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(adapter);
+    public boolean isWorkoutActive(){
+        return RunTracker.isActive();
     }
+
+    @Override
+    public void loadInitialFragment(){
+        runFragment = RunFragment.newInstance();
+        addFragment(runFragment);
+    }
+
+    @Override
+    public int getFrameLayoutId() {
+        return R.id.mainFrameLayout;
+    }
+
+    @Override
+    public String getName() {
+        return TAG;
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -99,73 +140,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentControll
         return super.onOptionsItemSelected(item);
     }
 
-    public void addFragmentInDefaultLayout(BaseFragment fragmentToBeLoaded) {
-        // Allow state loss by default
-        addFragmentInDefaultLayout(fragmentToBeLoaded, true, true);
-    }
 
-    public void addFragmentInDefaultLayout(BaseFragment fragmentToBeLoaded,
-                                           boolean addToBackStack) {
-        // Allow state loss by default
-        addFragmentInDefaultLayout(fragmentToBeLoaded, addToBackStack, true);
-    }
-
-    public void addFragmentInDefaultLayout(BaseFragment fragmentToBeLoaded, boolean addToBackStack,
-                                           boolean allowStateLoss) {
-        if (!getSupportFragmentManager().isDestroyed()) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction
-                    .add(R.id.mainFrameLayout, fragmentToBeLoaded, fragmentToBeLoaded.getName());
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
-            }
-
-            if (allowStateLoss) {
-                fragmentTransaction.commitAllowingStateLoss();
-            } else {
-                fragmentTransaction.commit();
-            }
-        } else {
-            Log.e(TAG, "addFragmentInDefaultLayout: Actvity Destroyed, won't perform FT to load" +
-                    " Fragment " + fragmentToBeLoaded.getName());
-        }
-    }
-
-    public void replaceFragmentInDefaultLayout(BaseFragment fragmentToBeLoaded) {
-        // Allow state loss by default
-        replaceFragmentInDefaultLayout(fragmentToBeLoaded, true, true);
-    }
-
-    public void replaceFragmentInDefaultLayout(BaseFragment fragmentToBeLoaded,
-                                               boolean addToBackStack) {
-        // Allow state loss by default
-        replaceFragmentInDefaultLayout(fragmentToBeLoaded, addToBackStack, true);
-    }
-
-    public void replaceFragmentInDefaultLayout(BaseFragment fragmentToBeLoaded,
-                                               boolean addToBackStack, boolean allowStateLoss) {
-        if (!getSupportFragmentManager().isDestroyed()) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.mainFrameLayout, fragmentToBeLoaded,
-                    fragmentToBeLoaded.getName());
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
-            }
-            if (allowStateLoss) {
-                fragmentTransaction.commitAllowingStateLoss();
-            } else {
-                fragmentTransaction.commit();
-            }
-        } else {
-            Log.e(TAG, "replaceFragmentInDefaultLayout: Actvity Destroyed, won't perform FT to load" +
-                    " Fragment " + fragmentToBeLoaded.getName());
-        }
-    }
-
-    @Override
-    public void loadFragment(BaseFragment fragment) {
-
-    }
 
     public class DrawerItemClickListener implements ListView.OnItemClickListener {
 
@@ -193,4 +168,197 @@ public class MainActivity extends AppCompatActivity implements IFragmentControll
             }
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (isBoundToLocationService()) {
+            locationService.onActivityResult(requestCode, resultCode, data);
+
+        }
+    }
+
+    public File writeLogsToFile(Context context){
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED){
+            // All required permissions available
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM");
+            String month = sdf.format(cal.getTime());
+
+            int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+            int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
+            int minsOfHour = cal.get(Calendar.MINUTE);
+
+            String fileName = "RFAC_log_" + dayOfMonth + "_" + month
+                    + "_" + hourOfDay + ":" + minsOfHour + ".log";
+
+            Logger.d(TAG, "writeLogsToFile " + fileName);
+
+            File outputFile = new File(getLogsFileDir(),fileName);
+            String filePath = outputFile.getAbsolutePath();
+            try {
+                Logger.d(TAG, "filePath " + filePath);
+                @SuppressWarnings("unused")
+                Process process = Runtime.getRuntime().exec("logcat -f "+ filePath);
+            }catch (IOException ioe){
+                Logger.e(TAG, "IOException while writing logs to file", ioe);
+            }
+            return outputFile;
+
+        }else{
+            //Need to get permissions
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    Constants.CODE_REQUEST_WRITE_PERMISSION);
+        }
+
+        return null;
+
+    }
+
+    public static File getLogsFileDir() {
+        File root = android.os.Environment.getExternalStorageDirectory();
+        File dir = new File (root.getAbsolutePath() + "/data/share");
+        dir.mkdirs();
+        return dir;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindLocationService();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locationServiceReceiver);
+    }
+
+    public void beginLocationTracking(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED){
+            // All required permissions available
+            invokeLocationService();
+        }else{
+            //Need to get permissions
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.CODE_REQUEST_LOCATION_PERMISSION);
+        }
+    }
+
+    public void endLocationTracking(){
+        if (isBoundToLocationService()){
+            locationService.stopLocationUpdates();
+        }
+    }
+
+    private void unbindLocationService(){
+        unbindService(locationServiceConnection);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == Constants.CODE_REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                invokeLocationService();
+            } else {
+                // Permission was denied or request was cancelled
+                Logger.i(TAG, "Location Permission denied, could'nt update the UI");
+                Toast.makeText(this, "Please give permission to get Weather", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        if (requestCode == Constants.CODE_REQUEST_WRITE_PERMISSION) {
+            if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Can re-capture logs
+            } else {
+                // Permission was denied or request was cancelled
+                Logger.i(TAG, "Location Permission denied, could'nt update the UI");
+                Toast.makeText(this, "Please give permission to get Weather", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public void invokeLocationService(){
+        Log.d(TAG, "invokeLocationService");
+        Bundle bundle = new Bundle();
+        Intent intent = new Intent(this, LocationService.class);
+        intent.putExtras(bundle);
+        startService(intent);
+        bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     Defines callbacks for service binding, passed to bindService()
+     */
+    private ServiceConnection locationServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to LocationService, cast the IBinder and get LocationService instance
+            LocationService.MyBinder binder = (LocationService.MyBinder) service;
+            locationService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            locationService = null;
+        }
+    };
+
+    public boolean isBoundToLocationService(){
+        return (locationService != null);
+    }
+
+
+    private BroadcastReceiver locationServiceReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Logger.i(TAG, "onReceive of locationServiceReceiver, action: " + action);
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                int broadcastCategory = bundle
+                        .getInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY);
+                Logger.i(TAG, "onReceive of locationServiceReceiver, category: " + broadcastCategory);
+                switch (broadcastCategory){
+                    case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
+                        Status status = (Status) bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(MainActivity.this,
+                                    Constants.CODE_LOCATION_SETTINGS_RESOLUTION);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+
+                    case Constants.BROADCAST_WORKOUT_RESULT_CODE:
+                        WorkoutData result = (WorkoutData) bundle.getSerializable(Constants.KEY_WORKOUT_RESULT);
+                        //TODO: Display Result on UI
+                        runFragment.showRunData(result);
+                        break;
+
+                    case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
+                        float currentSpeed = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_SPEED);
+                        float currentTotalDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
+                        //TODO: Display Result on UI
+                        runFragment.showUpdate(currentSpeed, currentTotalDistanceCovered);
+                        break;
+
+                    case Constants.BROADCAST_UNBIND_SERVICE_CODE:
+                        if (isBoundToLocationService()){
+                            unbindLocationService();
+                            locationService = null;
+                        }
+                        break;
+                }
+            }
+        }
+    };
+
 }

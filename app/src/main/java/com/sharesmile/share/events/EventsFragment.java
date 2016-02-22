@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import com.sharesmile.share.events.models.EventsPageData;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.utils.Logger;
 
 /**
  * Use the {@link EventsFragment#newInstance} factory method to
@@ -84,18 +84,18 @@ public class EventsFragment extends Fragment {
     }
 
     private void fetchPageData(int pgNum){
-        Log.d(TAG, "Fetching Events Data");
+        Logger.d(TAG, "Fetching Events Data");
         NetworkDataProvider.doGetCallAsync(FETCH_EVENT_URL, new NetworkAsyncCallback<EventsPageData>(){
             @Override
             public void onNetworkFailure(NetworkException ne) {
-                Log.e(TAG, "onNetworkFailure: Can't fetch events page data: " + ne.getMessageFromServer(), ne);
+                Logger.e(TAG, "onNetworkFailure: Can't fetch events page data: " + ne.getMessageFromServer(), ne);
                 MainApplication.showToast("Unable to fetch events");
                 progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onNetworkSuccess(EventsPageData eventsPageData) {
-                Log.d(TAG, "onNetworkSuccess");
+                Logger.d(TAG, "onNetworkSuccess");
                 editDataSet(eventsPageData);
                 initAdapter();
                 progressBar.setVisibility(View.GONE);

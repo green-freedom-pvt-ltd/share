@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/singleNewsCardStyle">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/purple_beach"
+        android:alpha="0.80"
+        android:gravity="bottom">
+
+        <LinearLayout
+            android:id="@+id/cta_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="12dp">
+
+            <com.sharesmile.share.views.MULTextView
+                android:id="@+id/cta_read_more"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:text="@string/news_read_more"/>
+
+            <com.sharesmile.share.views.MULTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:text="@string/news_pipe_separator"/>
+
+            <com.sharesmile.share.views.MULTextView
+                android:id="@+id/cta_share_now"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:text="@string/news_share_now"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="12dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="14dp"
+            android:layout_above="@id/cta_container">
+
+            <com.sharesmile.share.views.MULTextView
+                android:id="@+id/tv_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_gravity="start"
+                android:textSize="14sp"
+                android:paddingBottom="5dp"
+                android:text="@string/news_dummy_date"/>
+
+            <com.sharesmile.share.views.MLTextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:paddingBottom="10dp"
+                android:text="@string/news_dummy_title"/>
+
+            <com.sharesmile.share.views.MULTextView
+                android:id="@+id/tv_brief"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:text="@string/news_dummy_brief"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
