@@ -140,8 +140,6 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
     public class DrawerItemClickListener implements ListView.OnItemClickListener {
 
         @Override
@@ -228,7 +226,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindLocationService();
+        if (isBoundToLocationService()){
+            unbindLocationService();
+        }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationServiceReceiver);
     }
 
@@ -338,7 +338,7 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
-                        WorkoutData result = (WorkoutData) bundle.getSerializable(Constants.KEY_WORKOUT_RESULT);
+                        WorkoutData result = (WorkoutData) bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         //TODO: Display Result on UI
                         runFragment.showRunData(result);
                         break;
@@ -354,6 +354,22 @@ public class MainActivity extends BaseActivity {
                         if (isBoundToLocationService()){
                             unbindLocationService();
                             locationService = null;
+                        }
+                        break;
+                    case Constants.BROADCAST_STOP_WORKOUT_CODE:
+                        int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
+                        switch (problem){
+                            case Constants.PROBELM_TOO_FAST:
+                                Toast.makeText(getApplicationContext(), "Oops! Looks like you are Usain Bolt, will stop workout",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                            case Constants.PROBELM_TOO_SLOW:
+                                Toast.makeText(getApplicationContext(), "Oops! Looks like you have stopped Running, will stop workout",
+                                        Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                        if (runFragment != null){
+                            runFragment.endRun();
                         }
                         break;
                 }

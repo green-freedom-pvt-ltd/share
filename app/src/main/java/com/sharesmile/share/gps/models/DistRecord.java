@@ -1,6 +1,7 @@
 package com.sharesmile.share.gps.models;
 
 import android.location.Location;
+import android.os.Build;
 
 import com.sharesmile.share.core.UnObfuscable;
 
@@ -13,33 +14,55 @@ public class DistRecord implements UnObfuscable, Serializable{
 
     private static final String TAG = "DistRecord";
 
-    private Location point;
-    private DistRecord prevRecord;
+    private Location location;
+    private Location prevLocation;
     private float dist; // in meters
     private float interval; // in secs
     private float speed; // in m/s
-    private float bearing; // bearing of point in degrees, irrespective of the prevRecord
+    private float bearing; // bearing of location in degrees, irrespective of the prevLocation
 
 
-    public DistRecord(Location point){
-        this.point = point;
+    public DistRecord(Location location){
+        this.location = location;
     }
 
-    public DistRecord(Location point, DistRecord prevRecord, float dist){
-        this.point = point;
-        this.prevRecord = prevRecord;
-        bearing = point.getBearing();
+    /**
+     * Constructor which uses speed from location objects to calculate distance
+     * @param location
+     * @param prevLocation
+     */
+    public DistRecord(Location location, Location prevLocation){
+        this.location = location;
+        this.prevLocation = prevLocation;
+        bearing = location.getBearing();
+        this.speed = (location.getSpeed() + prevLocation.getSpeed()) / 2;
+        interval = ((float) (getElapsedTimeMs())) / 1000;
+        this.dist = speed*interval;
+    }
+
+    public DistRecord(Location location, Location prevLocation, float dist){
+        this.location = location;
+        this.prevLocation = prevLocation;
+        bearing = location.getBearing();
         // distanceTo() method, though not blocking but is very computationally intensive
         this.dist = dist;
-        interval = ((float) (point.getTime() - prevRecord.getPoint().getTime())) / 1000;
+        interval = ((float) (getElapsedTimeMs())) / 1000;
         speed = dist / interval;
+    }
+
+    private long getElapsedTimeMs(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
+            return (location.getElapsedRealtimeNanos() - prevLocation.getElapsedRealtimeNanos()) / 1000000;
+        }else{
+            return (location.getTime() - prevLocation.getTime());
+        }
     }
 
     @Override
     public String toString() {
         return "DistRecord{" +
-                "point=" + point +
-                ", prevRecord=" + prevRecord +
+                "  location=" + location +
+                ", prevLocation=" + prevLocation +
                 ", dist=" + dist +
                 ", interval=" + interval +
                 ", speed=" + speed +
@@ -48,14 +71,14 @@ public class DistRecord implements UnObfuscable, Serializable{
     }
 
     public boolean isSource(){
-        if (prevRecord == null){
+        if (prevLocation == null){
             return true;
         }
         return false;
     }
 
-    public Location getPoint() {
-        return point;
+    public Location getLocation() {
+        return location;
     }
 
     public float getDist() {
@@ -74,7 +97,7 @@ public class DistRecord implements UnObfuscable, Serializable{
         return bearing;
     }
 
-    public DistRecord getPrevRecord() {
-        return prevRecord;
+    public Location getPrevLocation() {
+        return prevLocation;
     }
 }

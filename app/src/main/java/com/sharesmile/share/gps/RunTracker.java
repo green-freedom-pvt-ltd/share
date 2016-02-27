@@ -1,5 +1,6 @@
 package com.sharesmile.share.gps;
 
+import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -21,18 +22,16 @@ public class RunTracker {
     private static final String TAG = "RunTracker";
 
     private static final String WORKER_THREAD_NAME = "LocationPersistorWorkerHandler";
-    private static final HandlerThread sWorkerThread = new HandlerThread(WORKER_THREAD_NAME);
+    private final HandlerThread sWorkerThread = new HandlerThread(WORKER_THREAD_NAME);
     private final WorkerHandler mWorkerHandler;
 
     public static final int MSG_PROCESS_LOCATION = 1;
+    public static final int MSG_PROCESS_STEPS_EVENT = 2;
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
 
-
     public RunTracker(UpdateListner listener){
-        if (!sWorkerThread.isAlive() && sWorkerThread.getState() == Thread.State.NEW){
-            sWorkerThread.start();
-        }
+        sWorkerThread.start();
         mWorkerHandler = new WorkerHandler(this, sWorkerThread.getLooper());
         this.listener = listener;
         if (isActive()){
@@ -59,17 +58,41 @@ public class RunTracker {
         return workoutData;
     }
 
+    public long getBeginTimeStamp(){
+        if (isActive() && dataStore != null){
+            return dataStore.getBeginTimeStamp();
+        }
+        return 0;
+    }
+
+    public int getTotalSteps(){
+        if (isActive() && dataStore != null){
+            return dataStore.getTotalSteps();
+        }
+        return 0;
+    }
+
     public void feedLocation(Location point){
-        Logger.d(TAG, "feedLocation");
         if (!isActive()){
             throw new IllegalStateException("Can't feed locations without beginning run");
         }
         mWorkerHandler.obtainMessage(MSG_PROCESS_LOCATION, point).sendToTarget();
     }
 
+    public void feedSteps(SensorEvent event){
+        mWorkerHandler.obtainMessage(MSG_PROCESS_STEPS_EVENT, event).sendToTarget();
+    }
+
+    private void processStepsEvent(SensorEvent event){
+        int numSteps = event.values.length;
+        long reportimeStamp = System.currentTimeMillis();
+        long recordTimeStamp = event.timestamp / 1000000;
+        Logger.i(TAG, "processStepsEvent: numSteps = " + numSteps + ", recordTime = " + recordTimeStamp);
+        dataStore.addSteps(numSteps);
+        listener.updateStepsRecord(reportimeStamp, numSteps);
+    }
 
     private void processLocation(Location point){
-        Logger.d(TAG, "processLocation");
         if (dataStore.getRecordsCount() <= 0){
             // This is the source location
             Logger.d(TAG,"Source Location Fetched:\n " + point.toString());
@@ -78,31 +101,40 @@ public class RunTracker {
             Logger.d(TAG,"Processing Location:\n " + point.toString());
             long ts = point.getTime();
             DistRecord prevRecord = dataStore.getLastRecord();
-            Location prevLocation = prevRecord.getPoint();
+            Location prevLocation = prevRecord.getLocation();
             long prevTs = prevLocation.getTime();
             float interval = ((float) (ts - prevTs)) / 1000;
             float dist = prevLocation.distanceTo(point);
-            boolean toRecord = false;
+
             // Step 1: Check whether threshold interval for recording has elapsed
             if (interval > Config.THRESHOLD_INTEVAL){
-                float accuracy = point.getAccuracy();
-                /*
-                 Step 2: Record if point is accurate, i.e. accuracy better/lower than our threshold
-                         Else
-                         Apply formula to check whether to record the point or not
-                  */
-                if (accuracy < Config.THRESHOLD_ACCURACY){
-                    toRecord = true;
+
+                if (Config.SPEED_TRACKING){
+                    DistRecord record = new DistRecord(point, prevLocation);
+                    Logger.d(TAG,"Speed Recording: " + record.toString());
+                    dataStore.addRecord(record);
+                    listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
                 }else{
-                    toRecord = checkUsingFormula(dist, point.getAccuracy());
+                    boolean toRecord = false;
+                    float accuracy = point.getAccuracy();
+                    /*
+                     Step 2: Record if point is accurate, i.e. accuracy better/lower than our threshold
+                             Else
+                             Apply formula to check whether to record the point or not
+                      */
+                    if (accuracy < Config.THRESHOLD_ACCURACY){
+                        toRecord = true;
+                    }else{
+                        toRecord = checkUsingFormula(dist, point.getAccuracy());
+                    }
+                    // Step 3: Record if needed, else wait for next location
+                    if (toRecord){
+                        DistRecord record = new DistRecord(point, prevLocation, dist);
+                        Logger.d(TAG,"Distance Recording: " + record.toString());
+                        dataStore.addRecord(record);
+                        listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
+                    }
                 }
-            }
-            // Step 3: Record if needed, else wait for next location
-            if (toRecord){
-                DistRecord record = new DistRecord(point, prevRecord, dist);
-                Logger.d(TAG,"Recording:\n " + record.toString());
-                dataStore.addRecord(record);
-                listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
             }
         }
     }
@@ -140,6 +172,11 @@ public class RunTracker {
                         mTracker.processLocation((Location) object);
                     }
                     break;
+                case MSG_PROCESS_STEPS_EVENT:
+                    if (object instanceof SensorEvent){
+                        mTracker.processStepsEvent((SensorEvent) object);
+                    }
+                    break;
             }
         }
     }
@@ -147,6 +184,8 @@ public class RunTracker {
     interface UpdateListner {
 
         void updateWorkoutRecord(float totalDistance, float currentSpeed);
+
+        void updateStepsRecord(long timeStampMillis, int numSteps);
 
     }
 

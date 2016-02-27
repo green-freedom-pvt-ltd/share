@@ -45,4 +45,6 @@
     <string name="rfac_desc">Your meters will get converted to charity</string>
     <string name="title_activity_news">NewsActivity</string>
 
+    <string name="google_maps_api_key">AIzaSyALJg75UAhncT-_KlKP5stZGmADFqkQBYg</string>
+
 </resources>

@@ -62,6 +62,7 @@ public class WorkoutDataStore {
     public void setSource(Location point) {
         this.source = new DistRecord(point);
         this.lastRecord = source;
+        workoutData.setSource(point);
         recordsCount++;
         SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, lastRecord);
         SharedPrefsManager.getInstance().setObject(Constants.PREF_RUN_SOURCE, source);
@@ -83,8 +84,8 @@ public class WorkoutDataStore {
             // Need to extrapolate the distance for time elapsed since begin run and source detection
 
         }
-        workoutData.addDistance(record.getDist());
-        float totalTime = ((float) (record.getPoint().getTime() - beginTimeStamp)) / 1000;
+        workoutData.addRecord(record);
+        float totalTime = ((float) (record.getLocation().getTime() - beginTimeStamp)) / 1000;
         workoutData.setTime(totalTime);
         this.lastRecord = record;
         recordsCount++;
@@ -92,6 +93,16 @@ public class WorkoutDataStore {
         SharedPrefsManager.getInstance().setInt(Constants.PREF_NUM_RECORDS, recordsCount);
         SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA, workoutData);
     }
+
+    public void addSteps(int numSteps){
+        workoutData.addSteps(numSteps);
+        SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA, workoutData);
+    }
+
+    public int getTotalSteps(){
+        return workoutData.getTotalSteps();
+    }
+
 
     public WorkoutData clear(){
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);

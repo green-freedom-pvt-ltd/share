@@ -1,13 +1,19 @@
 package com.sharesmile.share.gps;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -37,14 +43,17 @@ import com.sharesmile.share.utils.Logger;
 public class LocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, RunTracker.UpdateListner {
+        LocationListener, RunTracker.UpdateListner, SensorEventListener {
 
     private static final String TAG = "LocationService";
 
     private boolean currentlyProcessingLocation = false;
+    private boolean currentlyProcessingSteps = false;
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
+    private SensorManager sensorManager;
+    private long lastMovementValidatedTime; // in millisecs
 
     private RunTracker tracker;
 
@@ -71,6 +80,8 @@ public class LocationService extends Service implements
         if (!tracker.isActive()){
             tracker.beginRun();
         }
+        lastMovementValidatedTime = tracker.getBeginTimeStamp();
+        vigilanceTimer.start();
     }
 
 
@@ -80,9 +91,10 @@ public class LocationService extends Service implements
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_WORKOUT_RESULT_CODE);
-        bundle.putSerializable(Constants.KEY_WORKOUT_RESULT,result);
+        bundle.putParcelable(Constants.KEY_WORKOUT_RESULT,result);
         Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
+        vigilanceTimer.cancel();
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
@@ -95,12 +107,53 @@ public class LocationService extends Service implements
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
-
             if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
                 googleApiClient.connect();
             }
         } else {
             Logger.e(TAG, "unable to connect to google play services.");
+        }
+        if (isKitkatWithStepSensor() && !currentlyProcessingSteps){
+            Logger.d(TAG, "Step Detector present! Will register");
+            registerStepDetector();
+        }
+    }
+
+    /**
+     * Returns true if this device is supported. It needs to be running Android KitKat (4.4) or
+     * higher and has a step counter and step detector sensor.
+     * This check is useful when an app provides an alternative implementation or different
+     * functionality if the step sensors are not available or this code runs on a platform version
+     * below Android KitKat. If this functionality is required, then the minSDK parameter should
+     * be specified appropriately in the AndroidManifest.
+     *
+     * @return True iff the device can run this sample
+     */
+    public boolean isKitkatWithStepSensor() {
+        // Require at least Android KitKat
+        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        // Check that the device supports the step counter and detector sensors
+        PackageManager packageManager = getPackageManager();
+        return currentApiVersion >= android.os.Build.VERSION_CODES.KITKAT
+                && packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+    }
+
+    @TargetApi(19)
+    private void registerStepDetector(){
+        // Get the default sensor for the sensor type from the SenorManager
+        sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
+        // sensorType is either Sensor.TYPE_STEP_COUNTER or Sensor.TYPE_STEP_DETECTOR
+        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+
+        // Register the listener for this sensor in batch mode.
+        // If the max delay is 0, events will be delivered in continuous mode without batching.
+        final boolean batchMode = sensorManager.registerListener(this, sensor,
+                SensorManager.SENSOR_DELAY_NORMAL, Config.STEP_THRESHOLD_INTERVAL);
+
+        if (batchMode) {
+            // batchMode was enabled successfully
+            Logger.d(TAG, "Step Detector registered successfully");
+            currentlyProcessingSteps = true;
         }
     }
 
@@ -115,6 +168,8 @@ public class LocationService extends Service implements
         googleApiClient = null;
         currentLocation = null;
         currentlyProcessingLocation = false;
+        sensorManager.unregisterListener(this);
+        currentlyProcessingSteps = false;
         unBindFromActivityAndStop();
     }
 
@@ -150,6 +205,20 @@ public class LocationService extends Service implements
 
     final IBinder mBinder = new MyBinder();
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Logger.d(TAG, "onSensorChanged");
+        if (tracker != null && tracker.isActive()){
+            Logger.d(TAG, "onSensorChanged: will feed steps to tracker");
+            tracker.feedSteps(event);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     /**
      Class used for the client Binder.  Because we know this service always
      runs in the same process as its clients, we don't need to deal with IPC.
@@ -170,8 +239,8 @@ public class LocationService extends Service implements
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            Logger.i(TAG, "onLocationChanged:: position = " + location.getLatitude() + ", " + location.getLongitude()
-                    + "; accuracy: " + location.getAccuracy());
+            Logger.i(TAG, "onLocationChanged::accuracy: " + location.getAccuracy() + " provider = "
+                    + location.getProvider());
             currentLocation = location;
             tracker.feedLocation(location);
         }
@@ -179,15 +248,60 @@ public class LocationService extends Service implements
 
     @Override
     public void updateWorkoutRecord(float totalDistance, float currentSpeed){
-        Logger.d(TAG, "updateWorkoutRecord: totalDistance = " + totalDistance + " currentSpeed = " + currentSpeed);
+        Logger.d(TAG, "updateWorkoutRecord: totalDistance = " + totalDistance
+                + " currentSpeed = " + currentSpeed);
         Bundle bundle = new Bundle();
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
-                Constants.BROADCAST_WORKOUT_UPDATE_CODE);
-        bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
-        bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
+        if (currentSpeed > Config.UPPER_SPEED_LIMIT){
+            // Looks like the runner is trying to be smart, stop the workout
+            sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
+        }else{
+            // Send an update broadcast to Activity
+            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+                    Constants.BROADCAST_WORKOUT_UPDATE_CODE);
+            bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
+            bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
+        }
+        sendBroadcast(bundle);
+    }
+
+    private void sendBroadcast(Bundle bundle){
         Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
+    @Override
+    public void updateStepsRecord(long timeStampMillis, int numSteps) {
+        Logger.d(TAG, "updateStepsRecord: numSteps = " + numSteps);
+        boolean pauseAndInformUser = false;
+        if (numSteps == 0){
+            // User not walking/running cause of concern, TODO: pause the workout
+            pauseAndInformUser = true;
+            Logger.i(TAG, "User did not walk at all");
+        }else{
+            long delaySinceLastProcessed = timeStampMillis - lastMovementValidatedTime;
+            float delayInSecs = (float)(delaySinceLastProcessed / 1000);
+            if (numSteps < (delayInSecs)*Config.STEPS_PER_SECOND_FACTOR){
+                // User walking very slowly or stopped, TODO: pause the workout
+                pauseAndInformUser = true;
+                Logger.i(TAG, "User walking very slowly, " + numSteps + " steps in " + delayInSecs + " secs");
+            }else{
+                if (tracker != null){
+                    lastMovementValidatedTime = timeStampMillis;
+                }
+            }
+        }
+        if (pauseAndInformUser){
+            sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+        }
+    }
+
+    private void sendStopWorkoutBroadcast(int problem){
+        Bundle bundle = new Bundle();
+        bundle.putInt(Constants.KEY_WORKOUT_STOP_PROBLEM, problem);
+        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+                Constants.BROADCAST_STOP_WORKOUT_CODE);
+        sendBroadcast(bundle);
     }
 
     /**
@@ -201,6 +315,7 @@ public class LocationService extends Service implements
 
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(Config.LOCATION_UPDATE_INTERVAL); // milliseconds
+        locationRequest.setSmallestDisplacement(Config.SMALLEST_DISPLACEMENT);
         locationRequest.setFastestInterval(Config.LOCATION_UPDATE_INTERVAL); // the fastest rate in milliseconds at which your app can handle location updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -289,4 +404,23 @@ public class LocationService extends Service implements
     public void onConnectionSuspended(int i) {
         Logger.e(TAG, "GoogleApiClient connection has been suspend");
     }
+
+    CountDownTimer vigilanceTimer = new CountDownTimer(1000000000, 5000) {
+
+        public void onTick(long millisUntilFinished) {
+            if (tracker != null){
+                if (currentlyProcessingSteps){
+                    long timeElapsedSinceBeginning = System.currentTimeMillis() - tracker.getBeginTimeStamp();
+                    if (timeElapsedSinceBeginning > 50000
+                            && tracker.getTotalSteps() <  (timeElapsedSinceBeginning / 1000)*Config.STEPS_PER_SECOND_FACTOR){
+                        // Not enough steps since the beginning
+                        sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+                    }
+                }
+            }
+        }
+        public void onFinish() {
+
+        }
+    };
 }

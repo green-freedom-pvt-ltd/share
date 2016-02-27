@@ -1,13 +1,19 @@
 package com.sharesmile.share.utils;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.sharesmile.share.core.Constants;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -83,5 +89,61 @@ public class Utils {
 
     }
 
+    public static void setStaticGoogleMap(int width, int height, ImageView staticMapView,
+                                          List<LatLng> points) {
+        if (isCollectionFilled(points) && points.size() >= 2){
 
+            String staticMapUrl = Constants.STATIC_GOOGLE_MAP_BASE_URL + "size=" + width + "x" + height
+                    + Constants.STATIC_GOOGLE_MAP_COMMON_PARAMS
+                    + "&scale=" + (isScreenTooLarge(staticMapView.getContext()) ? 2 : 1)
+                    + getMarkerParams(points.get(0), points.get(points.size() - 1))
+                    + getPathParams(points)
+                    + "&key=" + Constants.STATIC_GOOGLE_MAP_API_KEY;
+            Logger.i(TAG,"Hitting Static Map API with URL: " + staticMapUrl);
+            ShareImageLoader.getInstance().loadImage(staticMapUrl, staticMapView);
+        }
+    }
+
+    public static boolean isScreenTooLarge(Context context){
+        int screenLayoutWithMask = context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_LAYOUTDIR_MASK;
+        switch (screenLayoutWithMask){
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                return true;
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                return true;
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                return false;
+            case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                return false;
+        }
+        return false;
+    }
+
+    public static String getMarkerParams(LatLng startPoint, LatLng endPoint){
+        String firstMarker = "color:blue|label:S|" + startPoint.latitude + "," + startPoint.longitude;
+        String secondMarker = "color:red|label:E|" + endPoint.latitude + "," + endPoint.longitude;
+        try {
+            return "&markers=" + URLEncoder.encode(firstMarker, "UTF-8") + "&markers="
+                    + URLEncoder.encode(secondMarker, "UTF-8");
+        }catch (UnsupportedEncodingException usee){
+            Logger.e(TAG, usee.getMessage(), usee);
+        }
+        return "";
+    }
+
+    public static String getPathParams(List<LatLng> points){
+        String prefix = "&path=";
+        StringBuilder sb = new StringBuilder();
+        sb.append("color:0x00ff0080|weight:6");
+        for (LatLng point : points){
+            sb.append("|").append(point.latitude).append(",").append(point.longitude);
+        }
+        try {
+            return prefix + URLEncoder.encode(sb.toString(), "UTF-8");
+        }catch (UnsupportedEncodingException usee){
+            Logger.e(TAG, usee.getMessage(), usee);
+        }
+        return "";
+    }
 }

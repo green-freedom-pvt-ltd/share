@@ -9,13 +9,22 @@ public class Config {
 
     public static final long LOCATION_UPDATE_INTERVAL = 1000; // in millisecs
 
-    public static float THRESHOLD_INTEVAL = 5; // in secs
+    public static final int STEP_THRESHOLD_INTERVAL = 20000000; // in micro secs, i.e. 20 secs
 
-    public static float THRESHOLD_ACCURACY = 3; // in m
+    public static final float UPPER_SPEED_LIMIT = 5.2f; // in m/s, i.e. 20 km/hr
 
-    public static float THRESHOLD_ACCURACY_OFFSET = 0.5f;
+    public static final float STEPS_PER_SECOND_FACTOR = 1.2f;
 
-    public static float THRESHOLD_FACTOR = 16;
+    public static float THRESHOLD_INTEVAL = 1; // in secs
 
+    public static float THRESHOLD_ACCURACY = 6; // in m
+
+    public static float THRESHOLD_ACCURACY_OFFSET = 1f;
+
+    public static float THRESHOLD_FACTOR = 10;
+
+    public static final float SMALLEST_DISPLACEMENT = 10;// in m
+
+    public static boolean SPEED_TRACKING = false;
 
 }
