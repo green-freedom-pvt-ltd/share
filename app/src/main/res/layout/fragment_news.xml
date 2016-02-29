@@ -5,7 +5,4 @@
     tools:context="com.sharesmile.share.news.NewsFragment"
     tools:showIn="@layout/activity_news">
 
-
-
-
 </RelativeLayout>

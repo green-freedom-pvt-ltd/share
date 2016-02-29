@@ -72,6 +72,14 @@ public class RunTracker {
         return 0;
     }
 
+    public float getDistanceCovered(){
+        if (isActive() && dataStore != null){
+            return dataStore.getTotalDistance();
+        }
+        return 0;
+    }
+
+
     public void feedLocation(Location point){
         if (!isActive()){
             throw new IllegalStateException("Can't feed locations without beginning run");
@@ -86,8 +94,6 @@ public class RunTracker {
     private void processStepsEvent(SensorEvent event){
         int numSteps = event.values.length;
         long reportimeStamp = System.currentTimeMillis();
-        long recordTimeStamp = event.timestamp / 1000000;
-        Logger.i(TAG, "processStepsEvent: numSteps = " + numSteps + ", recordTime = " + recordTimeStamp);
         dataStore.addSteps(numSteps);
         listener.updateStepsRecord(reportimeStamp, numSteps);
     }
@@ -95,8 +101,12 @@ public class RunTracker {
     private void processLocation(Location point){
         if (dataStore.getRecordsCount() <= 0){
             // This is the source location
-            Logger.d(TAG,"Source Location Fetched:\n " + point.toString());
-            dataStore.setSource(point);
+            Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
+            if (point.getAccuracy() < Config.SOURCE_ACCEPTABLE_ACCURACY){
+                // Set has source only when it has acceptable accuracy
+                Logger.d(TAG,"Source Location with good accuracy fetched:\n " + point.toString());
+                dataStore.setSource(point);
+            }
         }else{
             Logger.d(TAG,"Processing Location:\n " + point.toString());
             long ts = point.getTime();
@@ -163,7 +173,6 @@ public class RunTracker {
 
         @Override
         public void handleMessage(Message msg) {
-            Logger.d(TAG, "handleMessage");
             super.handleMessage(msg);
             Object object = msg.obj;
             switch (msg.what) {

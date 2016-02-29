@@ -338,7 +338,7 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
-                        WorkoutData result = (WorkoutData) bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
+                        WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         //TODO: Display Result on UI
                         runFragment.showRunData(result);
                         break;
@@ -350,6 +350,12 @@ public class MainActivity extends BaseActivity {
                         runFragment.showUpdate(currentSpeed, currentTotalDistanceCovered);
                         break;
 
+                    case Constants.BROADCAST_STEPS_UPDATE_CODE:
+                        int totalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
+                        //TODO: Display Result on UI
+                        runFragment.showSteps(totalSteps);
+                        break;
+
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:
                         if (isBoundToLocationService()){
                             unbindLocationService();
@@ -357,18 +363,22 @@ public class MainActivity extends BaseActivity {
                         }
                         break;
                     case Constants.BROADCAST_STOP_WORKOUT_CODE:
-                        int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
-                        switch (problem){
-                            case Constants.PROBELM_TOO_FAST:
-                                Toast.makeText(getApplicationContext(), "Oops! Looks like you are Usain Bolt, will stop workout",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                            case Constants.PROBELM_TOO_SLOW:
-                                Toast.makeText(getApplicationContext(), "Oops! Looks like you have stopped Running, will stop workout",
-                                        Toast.LENGTH_LONG).show();
-                                break;
-                        }
-                        if (runFragment != null){
+                        if (runFragment != null && runFragment.isRunActive()){
+                            int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
+                            switch (problem){
+                                case Constants.PROBELM_TOO_FAST:
+                                    Toast.makeText(getApplicationContext(), "Oops! Looks like you are Usain Bolt, will stop workout",
+                                            Toast.LENGTH_LONG).show();
+                                    break;
+                                case Constants.PROBELM_TOO_SLOW:
+                                    Toast.makeText(getApplicationContext(), "You need to be a little more faster",
+                                            Toast.LENGTH_LONG).show();
+                                    break;
+                                case Constants.PROBELM_NOT_MOVING:
+                                    Toast.makeText(getApplicationContext(), "Don't be too lazy, move your ass!",
+                                            Toast.LENGTH_LONG).show();
+                                    break;
+                            }
                             runFragment.endRun();
                         }
                         break;

@@ -82,7 +82,10 @@ public class WorkoutDataStore {
             // Very first record after source
             float speed = record.getSpeed();
             // Need to extrapolate the distance for time elapsed since begin run and source detection
-
+            float timeToFetchSource = ((float) (source.getLocation().getTime() - beginTimeStamp)) / 1000;
+            float speedForExtrapolation = record.getSpeed();
+            float extraPolatedDistance = timeToFetchSource * speedForExtrapolation;
+            workoutData.addDistance(extraPolatedDistance);
         }
         workoutData.addRecord(record);
         float totalTime = ((float) (record.getLocation().getTime() - beginTimeStamp)) / 1000;

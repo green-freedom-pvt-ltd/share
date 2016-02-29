@@ -63,7 +63,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
         totalSteps = total;
     }
 
-    private void addDistance(float distanceInRecord) {
+    public void addDistance(float distanceInRecord) {
         this.distance = distance + distanceInRecord;
     }
 

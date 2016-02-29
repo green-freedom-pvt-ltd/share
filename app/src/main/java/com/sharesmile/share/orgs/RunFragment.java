@@ -46,8 +46,8 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
     LinearLayout runDataContainer;
     LinearLayout liveDataContainer;
 
-    TextView totalDistanceView, avgSpeedView, totalTimeView;
-    TextView liveDistanceView, liveSpeedView, liveTimeView;
+    TextView totalDistanceView, avgSpeedView, totalTimeView, totalStepsView;
+    TextView liveDistanceView, liveSpeedView, liveTimeView, liveStepsView;
     ImageView staticGoogleMapView;
     WorkoutData workoutData;
 
@@ -106,10 +106,12 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         runDataContainer = (LinearLayout) baseView.findViewById(R.id.run_data_container);
         totalDistanceView = (TextView) baseView.findViewById(R.id.tv_total_distance);
         avgSpeedView = (TextView) baseView.findViewById(R.id.tv_avg_speed);
+        totalStepsView = (TextView) baseView.findViewById(R.id.tv_total_steps);
         totalTimeView = (TextView) baseView.findViewById(R.id.tv_total_time);
 
         liveDataContainer = (LinearLayout) baseView.findViewById(R.id.live_data_container);
         liveDistanceView = (TextView) baseView.findViewById(R.id.tv_live_distance);
+        liveStepsView = (TextView) baseView.findViewById(R.id.tv_live_steps);
         liveSpeedView = (TextView) baseView.findViewById(R.id.tv_live_speed);
         liveTimeView = (TextView) baseView.findViewById(R.id.tv_live_time);
 
@@ -143,9 +145,9 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         totalDistanceView.setText(workoutData.getDistance() + " m");
         avgSpeedView.setText(workoutData.getAvgSpeed() * (18/5) + " km/hr");
         totalTimeView.setText((workoutData.getTime() / 60) + " mins");
+        totalStepsView.setText(workoutData.getTotalSteps() + "");
         int size = (int) Utils.convertDpToPixel(getContext(), 300);
         Utils.setStaticGoogleMap(size, size, staticGoogleMapView, workoutData.getPoints());
-//        Utils.setStaticGoogleMap(size,size,staticGoogleMapView, Constants.SAMPLE_POINTS_LIST);
     }
 
 
@@ -154,6 +156,13 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         if (isRunActive){
             liveDistanceView.setText(distaneCovered + " m");
             liveSpeedView.setText(speed * (18/5) + " km/hr");
+        }
+    }
+
+    public void showSteps(int stepsSoFar){
+        Logger.d(TAG, "showSteps stepsSoFar = " + stepsSoFar);
+        if (isRunActive){
+            liveStepsView.setText(stepsSoFar + "");
         }
     }
 
@@ -167,21 +176,30 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         // Wait for total data to show up
     }
 
+    public boolean isRunActive(){
+        return isRunActive;
+    }
+
+    private void beginRun(){
+        myActivity.beginLocationTracking();
+        runDataContainer.setVisibility(View.GONE);
+        liveDataContainer.setVisibility(View.VISIBLE);
+        speedTracking.setVisibility(View.INVISIBLE);
+        logsFile = null;
+        isRunActive = true;
+        workoutData = null;
+        runStartTime = System.currentTimeMillis();
+        newtimer.start();
+        liveDistanceView.setText("0 m");
+        liveSpeedView.setText("0 km/hr");
+        liveStepsView.setText("0");
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.bt_start_run:
-                myActivity.beginLocationTracking();
-                runDataContainer.setVisibility(View.GONE);
-                liveDataContainer.setVisibility(View.VISIBLE);
-                speedTracking.setVisibility(View.INVISIBLE);
-                logsFile = null;
-                isRunActive = true;
-                workoutData = null;
-                runStartTime = System.currentTimeMillis();
-                newtimer.start();
-                liveDistanceView.setText("0 m");
-                liveSpeedView.setText("0 km/hr");
+                beginRun();
                 break;
 
             case R.id.bt_end_run:

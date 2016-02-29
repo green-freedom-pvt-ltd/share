@@ -41,6 +41,10 @@ public class Constants {
 
     public static final int BROADCAST_STOP_WORKOUT_CODE = 205;
 
+    public static final int BROADCAST_STEPS_UPDATE_CODE = 206;
+
+    public static final int PROBELM_NOT_MOVING = 0;
+
     public static final int PROBELM_TOO_SLOW = 1;
 
     public static final int PROBELM_TOO_FAST = 2;
@@ -50,6 +54,8 @@ public class Constants {
     public static final String KEY_WORKOUT_RESULT = "key_wourkout_result";
 
     public static final String KEY_WORKOUT_UPDATE_SPEED = "key_wourkout_update";
+
+    public static final String KEY_WORKOUT_UPDATE_STEPS = "key_wourkout_steps";
 
     public static final String KEY_WORKOUT_UPDATE_TOTAL_DISTANCE = "key_wourkout_update_total_distance";
 
