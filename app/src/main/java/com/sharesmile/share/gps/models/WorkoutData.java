@@ -21,10 +21,13 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     private float distance; // in m
     private long beginTimeStamp; // in millisecs
     private float recordedTime; // in secs
+    private float elapsedTime; // in secs
     private int totalSteps;
+    private boolean isActive;
     private List<LatLng> points;
 
     public WorkoutData(long beginTimeStamp) {
+        isActive = true;
         this.beginTimeStamp = beginTimeStamp;
         points = new ArrayList<>();
     }
@@ -41,10 +44,17 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     }
 
     /**
-     * @return elapsed time since the beginning of workout in secs
+     * @return elapsed time since the beginning of workout in secs, returns total workout time if it has stopped
      */
     public float getElapsedTime(){
-        return (System.currentTimeMillis() - beginTimeStamp) / 1000;
+        setElapsedTime();
+        return elapsedTime;
+    }
+
+    private void setElapsedTime(){
+        if (isActive){
+            elapsedTime = (System.currentTimeMillis() - beginTimeStamp) / 1000;
+        }
     }
 
     public float getAvgSpeed() {
@@ -96,10 +106,17 @@ public class WorkoutData implements UnObfuscable, Parcelable{
         return "WorkoutData{" +
                 "distance=" + distance +
                 ", recordedTime=" + recordedTime +
+                ", elapsedTime=" + getElapsedTime() +
                 ", avgSpeed=" + getAvgSpeed() +
                 ", totalSteps=" + getTotalSteps() +
                 ", points=" + TextUtils.join("|", points) +
                 '}';
+    }
+
+    public WorkoutData closeWorkout(){
+        setElapsedTime();
+        isActive = false;
+        return this;
     }
 
     protected WorkoutData(Parcel in) {

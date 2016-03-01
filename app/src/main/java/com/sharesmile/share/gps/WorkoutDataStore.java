@@ -106,13 +106,12 @@ public class WorkoutDataStore {
         return workoutData.getTotalSteps();
     }
 
-
     public WorkoutData clear(){
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_RUN_SOURCE);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_NUM_RECORDS);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_RUN_BEGIN_TIMESTAMP);
-        return workoutData;
+        return workoutData.closeWorkout();
     }
 }

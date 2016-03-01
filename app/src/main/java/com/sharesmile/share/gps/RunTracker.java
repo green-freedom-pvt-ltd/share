@@ -40,7 +40,7 @@ public class RunTracker {
         // Else wait for begin run;
     }
 
-    public void beginRun(){
+    public synchronized void beginRun(){
         if (!isActive()){
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, true);
             dataStore = new WorkoutDataStore(System.currentTimeMillis());
@@ -49,7 +49,7 @@ public class RunTracker {
         }
     }
 
-    public WorkoutData endRun(){
+    public synchronized WorkoutData endRun(){
         WorkoutData workoutData = dataStore.clear();
         dataStore = null;
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, false);
@@ -94,14 +94,14 @@ public class RunTracker {
         mWorkerHandler.obtainMessage(MSG_PROCESS_STEPS_EVENT, event).sendToTarget();
     }
 
-    private void processStepsEvent(SensorEvent event){
+    private synchronized void processStepsEvent(SensorEvent event){
         int numSteps = event.values.length;
         long reportimeStamp = System.currentTimeMillis();
         dataStore.addSteps(numSteps);
         listener.updateStepsRecord(reportimeStamp, numSteps);
     }
 
-    private void processLocation(Location point){
+    private synchronized void processLocation(Location point){
         if (dataStore.getRecordsCount() <= 0){
             // This is the source location
             Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());

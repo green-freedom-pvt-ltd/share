@@ -147,7 +147,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
 
     public void showUpdate(float speed, float distaneCovered){
         Logger.d(TAG, "showUpdate: speed = " + speed + ", distanceCovered = " + distaneCovered);
-        if (isRunActive){
+        if (isRunActive()){
             String distance = Math.round(distaneCovered)+ " m";
             String speedDecimal = String.format("%1$,.2f" , speed * 3.6) + " km/hr";
             liveDistanceView.setText(distance);
@@ -157,22 +157,30 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
 
     public void showSteps(int stepsSoFar){
         Logger.d(TAG, "showSteps stepsSoFar = " + stepsSoFar);
-        if (isRunActive){
+        if (isRunActive()){
             liveStepsView.setText(stepsSoFar + "");
         }
     }
 
     public void endRun(){
         myActivity.endLocationTracking();
-        isRunActive = false;
+        setIsRunActive(false);
         runStartTime = 0;
         newtimer.cancel();
         liveDataContainer.setVisibility(View.GONE);
         // Wait for total data to show up
     }
 
+    private void setIsRunActive(boolean b){
+        synchronized (RunFragment.class){
+            isRunActive = b;
+        }
+    }
+
     public boolean isRunActive(){
-        return isRunActive;
+        synchronized (RunFragment.class){
+            return isRunActive;
+        }
     }
 
     private void beginRun(){
@@ -180,7 +188,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         runDataContainer.setVisibility(View.GONE);
         liveDataContainer.setVisibility(View.VISIBLE);
         logsFile = null;
-        isRunActive = true;
+        setIsRunActive(true);
         workoutData = null;
         runStartTime = System.currentTimeMillis();
         newtimer.start();

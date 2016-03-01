@@ -199,7 +199,7 @@ public class MainActivity extends BaseActivity {
             try {
                 Logger.d(TAG, "filePath " + filePath);
                 @SuppressWarnings("unused")
-                Process process = Runtime.getRuntime().exec("logcat -v -f "+ filePath);
+                Process process = Runtime.getRuntime().exec("logcat -v threadtime -f "+ filePath);
             }catch (IOException ioe){
                 Logger.e(TAG, "IOException while writing logs to file", ioe);
             }
@@ -363,23 +363,25 @@ public class MainActivity extends BaseActivity {
                         break;
                     case Constants.BROADCAST_STOP_WORKOUT_CODE:
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_STOP_WORKOUT_CODE");
-                        if (runFragment != null && runFragment.isRunActive()){
-                            int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
-                            switch (problem){
-                                case Constants.PROBELM_TOO_FAST:
-                                    Toast.makeText(getApplicationContext(), "Oops! Looks like you are Usain Bolt, will stop workout",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
-                                case Constants.PROBELM_TOO_SLOW:
-                                    Toast.makeText(getApplicationContext(), "You need to be a little more faster",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
-                                case Constants.PROBELM_NOT_MOVING:
-                                    Toast.makeText(getApplicationContext(), "Don't be too lazy, move your ass!",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
+                        synchronized (this){
+                            if (runFragment != null && runFragment.isRunActive()){
+                                int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
+                                switch (problem){
+                                    case Constants.PROBELM_TOO_FAST:
+                                        Toast.makeText(getApplicationContext(), "Oops! Looks like you are Usain Bolt, will stop workout",
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    case Constants.PROBELM_TOO_SLOW:
+                                        Toast.makeText(getApplicationContext(), "You need to be a little more faster",
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    case Constants.PROBELM_NOT_MOVING:
+                                        Toast.makeText(getApplicationContext(), "Don't be too lazy, move your ass!",
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                }
+                                runFragment.endRun();
                             }
-                            runFragment.endRun();
                         }
                         break;
                 }

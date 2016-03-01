@@ -23,13 +23,13 @@ public class Config {
 
     public static float SOURCE_ACCEPTABLE_ACCURACY = 40; // in m
 
-    public static float THRESHOLD_ACCURACY = 6; // in m
+    public static float THRESHOLD_ACCURACY = 7; // in m
 
     public static float THRESHOLD_ACCURACY_OFFSET = 1f;
 
-    public static float THRESHOLD_FACTOR = 10;
+    public static float THRESHOLD_FACTOR = 9;
 
-    public static final float SMALLEST_DISPLACEMENT = 8;// in m
+    public static final float SMALLEST_DISPLACEMENT = 7;// in m
 
     public static boolean SPEED_TRACKING = false;
 
