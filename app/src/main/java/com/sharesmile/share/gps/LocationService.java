@@ -241,8 +241,6 @@ public class LocationService extends Service implements
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            Logger.i(TAG, "onLocationChanged::accuracy: " + location.getAccuracy() + " provider = "
-                    + location.getProvider());
             currentLocation = location;
             tracker.feedLocation(location);
         }

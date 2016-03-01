@@ -19,11 +19,13 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     private static final String TAG = "WorkoutData";
 
     private float distance; // in m
-    private float time; // in secs
+    private long beginTimeStamp; // in millisecs
+    private float recordedTime; // in secs
     private int totalSteps;
     private List<LatLng> points;
 
-    public WorkoutData() {
+    public WorkoutData(long beginTimeStamp) {
+        this.beginTimeStamp = beginTimeStamp;
         points = new ArrayList<>();
     }
 
@@ -31,13 +33,23 @@ public class WorkoutData implements UnObfuscable, Parcelable{
         return distance;
     }
 
-    public float getTime() {
-        return time;
+    /**
+     * @return time interval for which distance has been recorded
+     */
+    public float getRecordedTime() {
+        return recordedTime;
+    }
+
+    /**
+     * @return elapsed time since the beginning of workout in secs
+     */
+    public float getElapsedTime(){
+        return (System.currentTimeMillis() - beginTimeStamp) / 1000;
     }
 
     public float getAvgSpeed() {
-        if (time > 0){
-            return (distance / time);
+        if (recordedTime > 0){
+            return (distance / recordedTime);
         }else
             return 0;
     }
@@ -75,15 +87,15 @@ public class WorkoutData implements UnObfuscable, Parcelable{
         points.add(new LatLng(point.getLatitude(), point.getLongitude()));
     }
 
-    public void setTime(float time) {
-        this.time = time;
+    public void setRecordedTime(float recordedTime) {
+        this.recordedTime = recordedTime;
     }
 
     @Override
     public String toString() {
         return "WorkoutData{" +
                 "distance=" + distance +
-                ", time=" + time +
+                ", recordedTime=" + recordedTime +
                 ", avgSpeed=" + getAvgSpeed() +
                 ", totalSteps=" + getTotalSteps() +
                 ", points=" + TextUtils.join("|", points) +
@@ -92,7 +104,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
 
     protected WorkoutData(Parcel in) {
         distance = in.readFloat();
-        time = in.readFloat();
+        recordedTime = in.readFloat();
         if (in.readByte() == 0x01) {
             points = new ArrayList<LatLng>();
             in.readList(points, LatLng.class.getClassLoader());
@@ -109,7 +121,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeFloat(distance);
-        dest.writeFloat(time);
+        dest.writeFloat(recordedTime);
         if (points == null) {
             dest.writeByte((byte) (0x00));
         } else {

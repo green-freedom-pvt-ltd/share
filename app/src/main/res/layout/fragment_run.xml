@@ -22,14 +22,6 @@
         android:layout_height="60dp"
         android:orientation="horizontal">
 
-        <CheckBox
-            android:id="@+id/rd_speed_track"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_margin="12dp"
-            android:text="Speed Tracking?"/>
-
         <Button
             android:id="@+id/bt_start_run"
             android:layout_width="0dp"
@@ -58,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="gone">
+            >
 
             <ImageView
                 android:id="@+id/iv_static_google_map"
@@ -71,7 +63,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="90dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -79,12 +71,13 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:text="Total Distance"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:gravity="center"/>
 
                     <TextView
@@ -92,7 +85,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:gravity="center"/>
                 </LinearLayout>
 
@@ -106,7 +99,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:text="Avg Speed"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:gravity="center"/>
 
                     <TextView
@@ -114,7 +107,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:gravity="center"/>
                 </LinearLayout>
 
@@ -128,7 +121,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:text="Total Steps"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:gravity="center"/>
 
                     <TextView
@@ -136,7 +129,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:gravity="center"/>
                 </LinearLayout>
 
@@ -150,7 +143,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="2"
                         android:text="Total Time"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:gravity="center"/>
 
                     <TextView
@@ -158,7 +151,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:gravity="center"/>
                 </LinearLayout>
 

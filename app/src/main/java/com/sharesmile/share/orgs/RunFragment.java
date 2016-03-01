@@ -10,8 +10,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,7 +32,7 @@ import java.util.Date;
  * Use the {@link RunFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RunFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class RunFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String PARAM_TITLE = "param_title";
 
@@ -50,8 +48,6 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
     TextView liveDistanceView, liveSpeedView, liveTimeView, liveStepsView;
     ImageView staticGoogleMapView;
     WorkoutData workoutData;
-
-    CheckBox speedTracking;
 
     File logsFile;
     boolean isRunActive;
@@ -100,9 +96,6 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         baseView.findViewById(R.id.bt_capture_logs).setOnClickListener(this);
         baseView.findViewById(R.id.bt_email_logs).setOnClickListener(this);
 
-        speedTracking = (CheckBox) baseView.findViewById(R.id.rd_speed_track);
-        speedTracking.setOnCheckedChangeListener(this);
-
         runDataContainer = (LinearLayout) baseView.findViewById(R.id.run_data_container);
         totalDistanceView = (TextView) baseView.findViewById(R.id.tv_total_distance);
         avgSpeedView = (TextView) baseView.findViewById(R.id.tv_avg_speed);
@@ -126,9 +119,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         public void onTick(long millisUntilFinished) {
             long elapsed = System.currentTimeMillis() - runStartTime;
             int secs = (int)(elapsed / 1000);
-            int mins = secs / 60;
-            int remainSecs = secs % 60;
-            String time = mins+":"+remainSecs;
+            String time = Utils.secondsToString(secs);
             liveTimeView.setText(time);
         }
         public void onFinish() {
@@ -142,9 +133,12 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         liveDataContainer.setVisibility(View.GONE);
         runDataContainer.setVisibility(View.VISIBLE);
 
-        totalDistanceView.setText(workoutData.getDistance() + " m");
-        avgSpeedView.setText(workoutData.getAvgSpeed() * (18/5) + " km/hr");
-        totalTimeView.setText((workoutData.getTime() / 60) + " mins");
+        String distance = String.format("%1$,.2f", (workoutData.getDistance() / 1000)) + " km";
+        String avgSpeed = String.format("%1$,.2f" , workoutData.getAvgSpeed() * 3.6) + " km/hr";
+        String time = Utils.secondsToString((int) workoutData.getElapsedTime());
+        totalDistanceView.setText(distance);
+        avgSpeedView.setText(avgSpeed);
+        totalTimeView.setText(time);
         totalStepsView.setText(workoutData.getTotalSteps() + "");
         int size = (int) Utils.convertDpToPixel(getContext(), 300);
         Utils.setStaticGoogleMap(size, size, staticGoogleMapView, workoutData.getPoints());
@@ -154,8 +148,10 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
     public void showUpdate(float speed, float distaneCovered){
         Logger.d(TAG, "showUpdate: speed = " + speed + ", distanceCovered = " + distaneCovered);
         if (isRunActive){
-            liveDistanceView.setText(distaneCovered + " m");
-            liveSpeedView.setText(speed * (18/5) + " km/hr");
+            String distance = Math.round(distaneCovered)+ " m";
+            String speedDecimal = String.format("%1$,.2f" , speed * 3.6) + " km/hr";
+            liveDistanceView.setText(distance);
+            liveSpeedView.setText(speedDecimal);
         }
     }
 
@@ -168,7 +164,6 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
 
     public void endRun(){
         myActivity.endLocationTracking();
-        speedTracking.setVisibility(View.VISIBLE);
         isRunActive = false;
         runStartTime = 0;
         newtimer.cancel();
@@ -184,7 +179,6 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         myActivity.beginLocationTracking();
         runDataContainer.setVisibility(View.GONE);
         liveDataContainer.setVisibility(View.VISIBLE);
-        speedTracking.setVisibility(View.INVISIBLE);
         logsFile = null;
         isRunActive = true;
         workoutData = null;
@@ -237,9 +231,14 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
     private String textForMail(){
         StringBuilder sb = new StringBuilder();
         sb.append("\nSPEED_TRACKING : " + Config.SPEED_TRACKING);
-        sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL);
+        sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL + " secs");
         sb.append("\nTHRESHOLD_ACCURACY : " + Config.THRESHOLD_ACCURACY);
         sb.append("\nTHRESHOLD_FACTOR : " + Config.THRESHOLD_FACTOR);
+        sb.append("\nVIGILANCE_START_THRESHOLD : " + (Config.VIGILANCE_START_THRESHOLD / 1000) + " secs");
+        sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT*3.6 + " km/hr");
+        sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT*3.6 + " km/hr");
+        sb.append("\nSTEPS_PER_SECOND_FACTOR : " + Config.STEPS_PER_SECOND_FACTOR);
+        sb.append("\nSMALLEST_DISPLACEMENT : " + Config.SMALLEST_DISPLACEMENT + " m");
         if (workoutData != null){
             sb.append("\nWorkoutData:\n" + workoutData);
         }
@@ -269,8 +268,4 @@ public class RunFragment extends BaseFragment implements View.OnClickListener, C
         }
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        Config.SPEED_TRACKING = isChecked;
-    }
 }

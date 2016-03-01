@@ -23,7 +23,7 @@ public class WorkoutDataStore {
     private WorkoutData workoutData;
 
     public WorkoutDataStore(){
-        this(SharedPrefsManager.getInstance().getLong(Constants.PREF_RUN_BEGIN_TIMESTAMP));
+        this.beginTimeStamp = SharedPrefsManager.getInstance().getLong(Constants.PREF_RUN_BEGIN_TIMESTAMP);
         String sourceAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_RUN_SOURCE);
         String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
         String workoutDataAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_DATA);
@@ -36,14 +36,14 @@ public class WorkoutDataStore {
         if (!TextUtils.isEmpty(workoutDataAsString)){
             workoutData = Utils.createObjectFromJSONString(workoutDataAsString, WorkoutData.class);
         }else{
-            workoutData = new WorkoutData();
+            workoutData = new WorkoutData(beginTimeStamp);
         }
         recordsCount = SharedPrefsManager.getInstance().getInt(Constants.PREF_NUM_RECORDS);
     }
 
     public WorkoutDataStore(long beginTimeStamp){
         this.beginTimeStamp = beginTimeStamp;
-        workoutData = new WorkoutData();
+        workoutData = new WorkoutData(beginTimeStamp);
         SharedPrefsManager.getInstance().setLong(Constants.PREF_RUN_BEGIN_TIMESTAMP, beginTimeStamp);
     }
 
@@ -89,7 +89,7 @@ public class WorkoutDataStore {
         }
         workoutData.addRecord(record);
         float totalTime = ((float) (record.getLocation().getTime() - beginTimeStamp)) / 1000;
-        workoutData.setTime(totalTime);
+        workoutData.setRecordedTime(totalTime);
         this.lastRecord = record;
         recordsCount++;
         SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);

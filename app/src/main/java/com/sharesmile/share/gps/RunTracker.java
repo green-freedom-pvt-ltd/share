@@ -23,7 +23,7 @@ public class RunTracker {
 
     private static final String WORKER_THREAD_NAME = "LocationPersistorWorkerHandler";
     private final HandlerThread sWorkerThread = new HandlerThread(WORKER_THREAD_NAME);
-    private final WorkerHandler mWorkerHandler;
+    private static WorkerHandler mWorkerHandler;
 
     public static final int MSG_PROCESS_LOCATION = 1;
     public static final int MSG_PROCESS_STEPS_EVENT = 2;
@@ -54,7 +54,10 @@ public class RunTracker {
         dataStore = null;
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, false);
         listener = null;
-        sWorkerThread.quit();
+        mWorkerHandler.stopHandling();
+        mWorkerHandler = null;
+        boolean isQuit = sWorkerThread.quit();
+        Logger.d(TAG, "Thread Quit Success = " + isQuit);
         return workoutData;
     }
 
@@ -164,7 +167,7 @@ public class RunTracker {
 
     public static class WorkerHandler extends Handler {
 
-        private final RunTracker mTracker;
+        private RunTracker mTracker;
 
         public WorkerHandler(RunTracker persistor, Looper looper) {
             super(looper);
@@ -177,16 +180,20 @@ public class RunTracker {
             Object object = msg.obj;
             switch (msg.what) {
                 case MSG_PROCESS_LOCATION:
-                    if (object instanceof Location){
+                    if (mTracker != null && object instanceof Location){
                         mTracker.processLocation((Location) object);
                     }
                     break;
                 case MSG_PROCESS_STEPS_EVENT:
-                    if (object instanceof SensorEvent){
+                    if (mTracker != null && object instanceof SensorEvent){
                         mTracker.processStepsEvent((SensorEvent) object);
                     }
                     break;
             }
+        }
+
+        public void stopHandling(){
+            mTracker = null;
         }
     }
 

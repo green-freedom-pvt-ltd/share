@@ -199,7 +199,7 @@ public class MainActivity extends BaseActivity {
             try {
                 Logger.d(TAG, "filePath " + filePath);
                 @SuppressWarnings("unused")
-                Process process = Runtime.getRuntime().exec("logcat -f "+ filePath);
+                Process process = Runtime.getRuntime().exec("logcat -v -f "+ filePath);
             }catch (IOException ioe){
                 Logger.e(TAG, "IOException while writing logs to file", ioe);
             }
@@ -318,12 +318,10 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Logger.i(TAG, "onReceive of locationServiceReceiver, action: " + action);
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 int broadcastCategory = bundle
                         .getInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY);
-                Logger.i(TAG, "onReceive of locationServiceReceiver, category: " + broadcastCategory);
                 switch (broadcastCategory){
                     case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
                         Status status = (Status) bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
@@ -338,6 +336,7 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
+                        Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         //TODO: Display Result on UI
                         runFragment.showRunData(result);
@@ -363,6 +362,7 @@ public class MainActivity extends BaseActivity {
                         }
                         break;
                     case Constants.BROADCAST_STOP_WORKOUT_CODE:
+                        Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_STOP_WORKOUT_CODE");
                         if (runFragment != null && runFragment.isRunActive()){
                             int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
                             switch (problem){
