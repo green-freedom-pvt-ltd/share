@@ -26,6 +26,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     private boolean isActive;
     private List<LatLng> points;
 
+
     public WorkoutData(long beginTimeStamp) {
         isActive = true;
         this.beginTimeStamp = beginTimeStamp;

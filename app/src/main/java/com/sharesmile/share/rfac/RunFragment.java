@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String TAG = "RunFragment";
     private static final String WORKOUT_DATA = "workout_data";
+    private static final String ERROR_MESSAGE = "error_message";
 
     MainActivity myActivity;
     View baseView;
@@ -46,6 +48,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
 
     TextView totalDistanceView, avgSpeedView, totalTimeView, totalStepsView;
     TextView liveDistanceView, liveSpeedView, liveTimeView, liveStepsView;
+    TextView errorMessageView;
     ImageView staticGoogleMapView;
     WorkoutData workoutData;
 
@@ -101,6 +104,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         avgSpeedView = (TextView) baseView.findViewById(R.id.tv_avg_speed);
         totalStepsView = (TextView) baseView.findViewById(R.id.tv_total_steps);
         totalTimeView = (TextView) baseView.findViewById(R.id.tv_total_time);
+        errorMessageView = (TextView) baseView.findViewById(R.id.tv_error_message);
 
         liveDataContainer = (LinearLayout) baseView.findViewById(R.id.live_data_container);
         liveDistanceView = (TextView) baseView.findViewById(R.id.tv_live_distance);
@@ -198,6 +202,12 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         liveStepsView.setText("0");
     }
 
+    public void setErrorMessageView(String text){
+        if (errorMessageView != null){
+            errorMessageView.setText(text);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -262,8 +272,12 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         if (workoutData != null){
             Logger.d(TAG,"onSaveState: workoutData is present");
             outState.putParcelable(WORKOUT_DATA, workoutData);
+            if (errorMessageView != null && !TextUtils.isEmpty(errorMessageView.getText())){
+                outState.putString(ERROR_MESSAGE, String.valueOf(errorMessageView.getText()));
+            }
         }else{
             outState.remove(WORKOUT_DATA);
+            outState.remove(ERROR_MESSAGE);
         }
     }
 
@@ -274,6 +288,10 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         WorkoutData data = savedInstanceState.getParcelable(WORKOUT_DATA);
         if (data != null){
             showRunData(data);
+            String errorMessage = savedInstanceState.getString(ERROR_MESSAGE);
+            if (!TextUtils.isEmpty(errorMessage)){
+                setErrorMessageView(errorMessage);
+            }
         }
     }
 

@@ -15,6 +15,8 @@ public class Config {
 
     public static final long VIGILANCE_START_THRESHOLD = 80000; // in millisecs
 
+    public static final float MIN_DISTANCE_FOR_VIGILANCE = 50; // in meters
+
     public static final float UPPER_SPEED_LIMIT = 8f; // in m/s, i.e. 20 km/hr
 
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s, i.e. 20 km/hr

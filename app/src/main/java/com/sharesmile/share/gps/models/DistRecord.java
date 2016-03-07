@@ -100,4 +100,28 @@ public class DistRecord implements UnObfuscable, Serializable{
     public Location getPrevLocation() {
         return prevLocation;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DistRecord record = (DistRecord) o;
+
+        if (Float.compare(record.dist, dist) != 0) return false;
+        if (Float.compare(record.interval, interval) != 0) return false;
+        if (Double.compare(record.getLocation().getLatitude(), location.getLatitude()) != 0) return false;
+        if (Double.compare(record.getLocation().getLongitude(), location.getLongitude()) != 0) return false;
+
+        return true;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = location.hashCode();
+        result = 31 * result + (dist != +0.0f ? Float.floatToIntBits(dist) : 0);
+        result = 31 * result + (interval != +0.0f ? Float.floatToIntBits(interval) : 0);
+        return result;
+    }
 }

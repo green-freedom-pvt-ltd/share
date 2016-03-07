@@ -79,6 +79,13 @@ public class RunTracker {
         return 0;
     }
 
+    public DistRecord getLastRecord(){
+        if (isActive() && dataStore != null){
+            return dataStore.getLastRecord();
+        }
+        return null;
+    }
+
     public float getDistanceCovered(){
         if (isActive() && dataStore != null){
             return dataStore.getTotalDistance();

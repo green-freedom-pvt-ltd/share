@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 
@@ -53,7 +54,9 @@ public class LocationService extends Service implements
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
     private SensorManager sensorManager;
-    private int stepsTillNow;
+    private int stepsTillNow = -1;
+    private DistRecord lastValidatedRecord;
+    private float lastValidatedDistance;
 
     private RunTracker tracker;
 
@@ -81,7 +84,9 @@ public class LocationService extends Service implements
         if (!tracker.isActive()){
             tracker.beginRun();
         }
-        stepsTillNow = 0;
+        stepsTillNow = -1;
+        lastValidatedRecord = null;
+        lastValidatedDistance = 0;
         vigilanceTimer.start();
     }
 
@@ -172,7 +177,9 @@ public class LocationService extends Service implements
             googleApiClient = null;
             currentLocation = null;
             currentlyProcessingLocation = false;
-            stepsTillNow = 0;
+            stepsTillNow = -1;
+            lastValidatedRecord = null;
+            lastValidatedDistance = 0;
             sensorManager.unregisterListener(this);
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
@@ -252,17 +259,12 @@ public class LocationService extends Service implements
     public void updateWorkoutRecord(float totalDistance, float currentSpeed){
         Logger.d(TAG, "updateWorkoutRecord: totalDistance = " + totalDistance
                 + " currentSpeed = " + currentSpeed);
+        // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
-        if (currentSpeed > Config.UPPER_SPEED_LIMIT){
-            // Looks like the runner is trying to be smart, stop the workout
-            sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
-        }else{
-            // Send an update broadcast to Activity
-            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
-                    Constants.BROADCAST_WORKOUT_UPDATE_CODE);
-            bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
-            bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
-        }
+        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+                Constants.BROADCAST_WORKOUT_UPDATE_CODE);
+        bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
+        bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
         sendBroadcast(bundle);
     }
 
@@ -284,8 +286,6 @@ public class LocationService extends Service implements
     }
 
     private void sendStopWorkoutBroadcast(int problem){
-        //TODO: IMP:
-        // This broadcast is for UI updates only, workout should be stopped from here right now
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_WORKOUT_STOP_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
@@ -400,9 +400,11 @@ public class LocationService extends Service implements
         public void onTick(long millisUntilFinished) {
             if (tracker != null){
                 if (currentlyProcessingLocation){
+
+                    //check for slow speed
                     long timeElapsedSinceBeginning = System.currentTimeMillis() - tracker.getBeginTimeStamp();
                     float inSecs = (float)(timeElapsedSinceBeginning / 1000);
-                    Logger.d(TAG, "onTick, till now steps = " + tracker.getTotalSteps()
+                    Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + tracker.getTotalSteps()
                             + ", timeElapsed in secs = " + inSecs
                             + ", distanceCovered = " +  tracker.getDistanceCovered());
                     if (timeElapsedSinceBeginning > Config.VIGILANCE_START_THRESHOLD
@@ -411,11 +413,43 @@ public class LocationService extends Service implements
                         Logger.d(TAG, "Workout too slow, not enough distance will stop");
                         // Not enough steps/distance since the beginning
                         sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+                        return;
+                    }
+
+                    //check for high speed
+                    if (lastValidatedRecord == null){
+                        // Will wait for next tick
+                        lastValidatedRecord = tracker.getLastRecord();
+                        lastValidatedDistance = tracker.getDistanceCovered();
+                    }else{
+                        DistRecord latestRecord = tracker.getLastRecord();
+                        if (!lastValidatedRecord.equals(latestRecord)){
+                            // We have a new record!
+                            float distanceInSession = tracker.getDistanceCovered() - lastValidatedDistance;
+                            float timeElapsedInSecs = (float)
+                                    ((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
+                            Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
+                                    + ", timeElapsedInSecs = " + timeElapsedInSecs
+                                    + ", distanceCovered = " +  tracker.getDistanceCovered());
+                            if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
+                                // Distance is above the threshold minimum to apply Usain Bolt Filter
+                                float speedInSession = distanceInSession / timeElapsedInSecs;
+                                if (speedInSession > Config.UPPER_SPEED_LIMIT){
+                                    // Running faster than Usain Bolt
+                                    Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will show Usain Bolt");
+                                    sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
+                                    return;
+                                }else{
+                                    lastValidatedRecord = latestRecord;
+                                    lastValidatedDistance = tracker.getDistanceCovered();
+                                }
+                            }
+                        }
                     }
                 }
                 if (currentlyProcessingSteps){
-                    if (stepsTillNow == 0){
-                        //Will wait for the next updation
+                    if (stepsTillNow == -1){
+                        //Will wait for the next tick
                         stepsTillNow = tracker.getTotalSteps();
                     }else{
                         int totalSteps = tracker.getTotalSteps();
@@ -425,6 +459,7 @@ public class LocationService extends Service implements
                             // Not enough steps since the beginning
                             Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");
                             sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
+                            return;
                         }else{
                             stepsTillNow = totalSteps;
                         }

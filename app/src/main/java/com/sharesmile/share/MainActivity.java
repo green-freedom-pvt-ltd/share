@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -366,19 +367,21 @@ public class MainActivity extends BaseActivity {
                         synchronized (this){
                             if (runFragment != null && runFragment.isRunActive()){
                                 int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
+                                String errorMessage = "";
                                 switch (problem){
                                     case Constants.PROBELM_TOO_FAST:
-                                        Toast.makeText(getApplicationContext(), "Oops! Looks like you are Usain Bolt, will stop workout",
-                                                Toast.LENGTH_LONG).show();
+                                        errorMessage = getString(R.string.rfac_usain_bolt_message);
                                         break;
                                     case Constants.PROBELM_TOO_SLOW:
-                                        Toast.makeText(getApplicationContext(), "You need to be a little more faster",
-                                                Toast.LENGTH_LONG).show();
+                                        errorMessage = getString(R.string.rfac_too_slow_message);
                                         break;
                                     case Constants.PROBELM_NOT_MOVING:
-                                        Toast.makeText(getApplicationContext(), "Don't be too lazy, move your ass!",
-                                                Toast.LENGTH_LONG).show();
+                                        errorMessage = getString(R.string.rfac_lazy_ass_message);
                                         break;
+                                }
+                                if (!TextUtils.isEmpty(errorMessage)){
+                                    Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
+                                    runFragment.setErrorMessageView(errorMessage);
                                 }
                                 runFragment.endRun(false);
                             }
