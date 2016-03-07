@@ -27,6 +27,7 @@ public class RunTracker {
 
     public static final int MSG_PROCESS_LOCATION = 1;
     public static final int MSG_PROCESS_STEPS_EVENT = 2;
+    private int stepsSinceReboot = 0;
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
 
@@ -34,6 +35,7 @@ public class RunTracker {
         sWorkerThread.start();
         mWorkerHandler = new WorkerHandler(this, sWorkerThread.getLooper());
         this.listener = listener;
+        stepsSinceReboot = 0;
         if (isActive()){
             dataStore = new WorkoutDataStore();
         }
@@ -44,6 +46,7 @@ public class RunTracker {
         if (!isActive()){
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, true);
             dataStore = new WorkoutDataStore(System.currentTimeMillis());
+            stepsSinceReboot = 0;
         }else{
             throw new IllegalStateException("Can't begin run when one is already active");
         }
@@ -52,6 +55,7 @@ public class RunTracker {
     public synchronized WorkoutData endRun(){
         WorkoutData workoutData = dataStore.clear();
         dataStore = null;
+        stepsSinceReboot = 0;
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, false);
         listener = null;
         mWorkerHandler.stopHandling();
@@ -90,18 +94,30 @@ public class RunTracker {
         mWorkerHandler.obtainMessage(MSG_PROCESS_LOCATION, point).sendToTarget();
     }
 
+
     public void feedSteps(SensorEvent event){
         mWorkerHandler.obtainMessage(MSG_PROCESS_STEPS_EVENT, event).sendToTarget();
     }
 
-    private synchronized void processStepsEvent(SensorEvent event){
-        int numSteps = event.values.length;
+    /**
+     * Feed step counter event, the first index of values array contains the total number of steps since reboot
+     * @param event
+     */
+    private void processStepsEvent(SensorEvent event){
+        if (stepsSinceReboot < 1){
+            //i.e. fresh reading after creation of runtracker
+            stepsSinceReboot = (int) event.values[0];
+            Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
+        }
+        int numSteps = (int) event.values[0] - stepsSinceReboot;
+        stepsSinceReboot = (int) event.values[0];
         long reportimeStamp = System.currentTimeMillis();
+        Logger.d(TAG, "Adding " + numSteps + "steps.");
         dataStore.addSteps(numSteps);
         listener.updateStepsRecord(reportimeStamp, numSteps);
     }
 
-    private synchronized void processLocation(Location point){
+    private void processLocation(Location point){
         if (dataStore.getRecordsCount() <= 0){
             // This is the source location
             Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
@@ -136,6 +152,7 @@ public class RunTracker {
                              Apply formula to check whether to record the point or not
                       */
                     if (accuracy < Config.THRESHOLD_ACCURACY){
+                        Logger.d(TAG, "Accuracy Wins");
                         toRecord = true;
                     }else{
                         toRecord = checkUsingFormula(dist, point.getAccuracy());
@@ -154,7 +171,9 @@ public class RunTracker {
 
     private boolean checkUsingFormula(float dist, float accuracy){
         float deltaAccuracy = accuracy - (Config.THRESHOLD_ACCURACY - Config.THRESHOLD_ACCURACY_OFFSET);
-        if ( (dist / deltaAccuracy) > Config.THRESHOLD_FACTOR){
+        float value = (dist / deltaAccuracy);
+        Logger.d(TAG, "Applying formula, dist = " + dist + " accuracy = " + accuracy + " value = " + value);
+        if ( value > Config.THRESHOLD_FACTOR){
             return true;
         }
         return false;
@@ -176,19 +195,21 @@ public class RunTracker {
 
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Object object = msg.obj;
-            switch (msg.what) {
-                case MSG_PROCESS_LOCATION:
-                    if (mTracker != null && object instanceof Location){
-                        mTracker.processLocation((Location) object);
-                    }
-                    break;
-                case MSG_PROCESS_STEPS_EVENT:
-                    if (mTracker != null && object instanceof SensorEvent){
-                        mTracker.processStepsEvent((SensorEvent) object);
-                    }
-                    break;
+            synchronized (this){
+                super.handleMessage(msg);
+                Object object = msg.obj;
+                switch (msg.what) {
+                    case MSG_PROCESS_LOCATION:
+                        if (mTracker != null && object instanceof Location){
+                            mTracker.processLocation((Location) object);
+                        }
+                        break;
+                    case MSG_PROCESS_STEPS_EVENT:
+                        if (mTracker != null && object instanceof SensorEvent){
+                            mTracker.processStepsEvent((SensorEvent) object);
+                        }
+                        break;
+                }
             }
         }
 

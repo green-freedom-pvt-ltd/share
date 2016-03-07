@@ -53,7 +53,6 @@ public class LocationService extends Service implements
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
     private SensorManager sensorManager;
-    private long lastTimeStepsUpdated; // in millisecs
     private int stepsTillNow;
 
     private RunTracker tracker;
@@ -82,6 +81,7 @@ public class LocationService extends Service implements
         if (!tracker.isActive()){
             tracker.beginRun();
         }
+        stepsTillNow = 0;
         vigilanceTimer.start();
     }
 
@@ -146,7 +146,7 @@ public class LocationService extends Service implements
         // Get the default sensor for the sensor type from the SenorManager
         sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
         // sensorType is either Sensor.TYPE_STEP_COUNTER or Sensor.TYPE_STEP_DETECTOR
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
         // Register the listener for this sensor in batch mode.
         // If the max delay is 0, events will be delivered in continuous mode without batching.
@@ -160,21 +160,23 @@ public class LocationService extends Service implements
         }
     }
 
-    public void stopLocationUpdates() {
+    public synchronized void stopLocationUpdates() {
         Logger.d(TAG, "stopLocationUpdates");
-        stopTracking();
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-            googleApiClient.disconnect();
+        if (currentlyProcessingLocation){
+            stopTracking();
+            if (googleApiClient != null && googleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+                googleApiClient.disconnect();
+            }
+            locationRequest = null;
+            googleApiClient = null;
+            currentLocation = null;
+            currentlyProcessingLocation = false;
+            stepsTillNow = 0;
+            sensorManager.unregisterListener(this);
+            currentlyProcessingSteps = false;
+            unBindFromActivityAndStop();
         }
-        locationRequest = null;
-        googleApiClient = null;
-        currentLocation = null;
-        currentlyProcessingLocation = false;
-        lastTimeStepsUpdated = 0;
-        sensorManager.unregisterListener(this);
-        currentlyProcessingSteps = false;
-        unBindFromActivityAndStop();
     }
 
     private void unBindFromActivityAndStop() {
@@ -272,47 +274,24 @@ public class LocationService extends Service implements
 
     @Override
     public void updateStepsRecord(long timeStampMillis, int numSteps) {
-        if (lastTimeStepsUpdated == 0){
-            //Will wait for the next updation
-            lastTimeStepsUpdated = timeStampMillis;
-            stepsTillNow = tracker.getTotalSteps();
-        }else{
-            long delaySinceLastProcessed = timeStampMillis - lastTimeStepsUpdated;
-            float delayInSecs = (float)(delaySinceLastProcessed / 1000);
-            long thesholdDelay = (Config.STEP_THRESHOLD_INTERVAL / 1000) - 1000;
-
-            Logger.d(TAG, "Time to show steps count, totalSteps = " + tracker.getTotalSteps());
-            // Send an update broadcast to Activity
-            Bundle bundle = new Bundle();
-            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
-                    Constants.BROADCAST_STEPS_UPDATE_CODE);
-            bundle.putInt(Constants.KEY_WORKOUT_UPDATE_STEPS, tracker.getTotalSteps());
-            sendBroadcast(bundle);
-
-            if (delaySinceLastProcessed > thesholdDelay){
-                int totalSteps = tracker.getTotalSteps();
-                int stepsThisSession = totalSteps - stepsTillNow;
-                Logger.d(TAG, "Time to update steps count, totalSteps = " + totalSteps
-                        + ", stepsThisSession = " + stepsThisSession + ", delayInSecs = " + delayInSecs);
-                if (stepsThisSession < delayInSecs*Config.STEPS_PER_SECOND_FACTOR){
-                    //time to pause workout
-                    // Not enough steps since the beginning
-                    Logger.d(TAG, "Not enough Steps, will pause workout");
-                    sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
-                }else{
-                    lastTimeStepsUpdated = timeStampMillis;
-                    stepsTillNow = totalSteps;
-                }
-            }
-        }
+        Logger.d(TAG, "Time to show steps count, totalSteps = " + tracker.getTotalSteps());
+        // Send an update broadcast to Activity
+        Bundle bundle = new Bundle();
+        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+                Constants.BROADCAST_STEPS_UPDATE_CODE);
+        bundle.putInt(Constants.KEY_WORKOUT_UPDATE_STEPS, tracker.getTotalSteps());
+        sendBroadcast(bundle);
     }
 
     private void sendStopWorkoutBroadcast(int problem){
+        //TODO: IMP:
+        // This broadcast is for UI updates only, workout should be stopped from here right now
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_WORKOUT_STOP_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_STOP_WORKOUT_CODE);
         sendBroadcast(bundle);
+        stopLocationUpdates();
     }
 
     /**
@@ -416,7 +395,7 @@ public class LocationService extends Service implements
         Logger.e(TAG, "GoogleApiClient connection has been suspend");
     }
 
-    CountDownTimer vigilanceTimer = new CountDownTimer(1000000000, 10000) {
+    CountDownTimer vigilanceTimer = new CountDownTimer(1000000000, Config.VIGILANCE_TIMER_INTERVAL) {
 
         public void onTick(long millisUntilFinished) {
             if (tracker != null){
@@ -432,6 +411,23 @@ public class LocationService extends Service implements
                         Logger.d(TAG, "Workout too slow, not enough distance will stop");
                         // Not enough steps/distance since the beginning
                         sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+                    }
+                }
+                if (currentlyProcessingSteps){
+                    if (stepsTillNow == 0){
+                        //Will wait for the next updation
+                        stepsTillNow = tracker.getTotalSteps();
+                    }else{
+                        int totalSteps = tracker.getTotalSteps();
+                        int stepsThisSession = totalSteps - stepsTillNow;
+                        if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.STEPS_PER_SECOND_FACTOR){
+                            //time to pause workout
+                            // Not enough steps since the beginning
+                            Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");
+                            sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
+                        }else{
+                            stepsTillNow = totalSteps;
+                        }
                     }
                 }
             }

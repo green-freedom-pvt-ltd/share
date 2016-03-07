@@ -31,7 +31,7 @@ import com.sharesmile.share.drawer.DrawerMenuAdapter;
 import com.sharesmile.share.gps.LocationService;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.orgs.RunFragment;
+import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.utils.Logger;
 
 import java.io.File;
@@ -380,7 +380,7 @@ public class MainActivity extends BaseActivity {
                                                 Toast.LENGTH_LONG).show();
                                         break;
                                 }
-                                runFragment.endRun();
+                                runFragment.endRun(false);
                             }
                         }
                         break;

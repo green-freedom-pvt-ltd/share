@@ -45,6 +45,8 @@
     <string name="rfac_desc">Your meters will get converted to charity</string>
     <string name="title_activity_news">NewsActivity</string>
 
+    <string name="rfac_begin_run">BEGIN RUN</string>
+
     <string name="google_maps_api_key">AIzaSyALJg75UAhncT-_KlKP5stZGmADFqkQBYg</string>
 
     <string name="cause_brief">We teach kids every day for two hours. Our focus is value based education which includes teaching and manners, inculcating sense of hygeine and helping attitude and help them realise and achieve their dreams.</string>

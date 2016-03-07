@@ -1,4 +1,4 @@
-package com.sharesmile.share.orgs;
+package com.sharesmile.share.rfac;
 
 
 import android.content.Context;
@@ -156,14 +156,15 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
     }
 
     public void showSteps(int stepsSoFar){
-        Logger.d(TAG, "showSteps stepsSoFar = " + stepsSoFar);
         if (isRunActive()){
             liveStepsView.setText(stepsSoFar + "");
         }
     }
 
-    public void endRun(){
-        myActivity.endLocationTracking();
+    public void endRun(boolean userEnded){
+        if (userEnded){
+            myActivity.endLocationTracking();
+        }
         setIsRunActive(false);
         runStartTime = 0;
         newtimer.cancel();
@@ -205,7 +206,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
                 break;
 
             case R.id.bt_end_run:
-                endRun();
+                endRun(true);
                 break;
 
             case R.id.bt_capture_logs:
