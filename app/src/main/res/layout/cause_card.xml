@@ -4,9 +4,19 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
+    <com.sharesmile.share.views.MLTextView
+        android:id="@+id/tv_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:gravity="start|center_vertical"
+        android:text="Education">
+    </com.sharesmile.share.views.MLTextView>
+
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/tv_tag"
         style="@style/baseCardStyle">
 
         <LinearLayout
@@ -62,6 +72,5 @@
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
-
 
 </RelativeLayout>

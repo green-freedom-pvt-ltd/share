@@ -253,6 +253,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void unbindLocationService(){
+        Logger.d(TAG, "unbindLocationService");
         unbindService(locationServiceConnection);
     }
 
@@ -357,6 +358,7 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:
+                        Logger.i(TAG, "onReceive of locationServiceReceiver, BROADCAST_UNBIND_SERVICE_CODE");
                         if (isBoundToLocationService()){
                             unbindLocationService();
                             locationService = null;

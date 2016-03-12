@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <com.sharesmile.share.views.MRTextView
+        android:id="@+id/tv_threshold_accuracy"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:gravity="start"
+        android:layout_alignParentTop="true"
+        android:text="THRESHOLD ACCURACY"/>
+
+    <EditText
+        android:id="@+id/et_threshold_accuracy"
+        style="@style/configEditText"
+        android:layout_below="@id/tv_threshold_accuracy"/>
+
+    <EditText
+        android:id="@+id/et_threshold_factor"
+        style="@style/configEditText"
+        android:inputType="numberDecimal"
+        android:layout_below="@id/et_threshold_accuracy"/>
+
+</RelativeLayout>

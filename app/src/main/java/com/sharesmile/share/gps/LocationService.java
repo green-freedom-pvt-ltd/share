@@ -13,7 +13,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -87,7 +87,7 @@ public class LocationService extends Service implements
         stepsTillNow = -1;
         lastValidatedRecord = null;
         lastValidatedDistance = 0;
-        vigilanceTimer.start();
+        startTimer();
     }
 
 
@@ -103,7 +103,7 @@ public class LocationService extends Service implements
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
-        vigilanceTimer.cancel();
+        stopTimer();
     }
 
 
@@ -187,11 +187,11 @@ public class LocationService extends Service implements
     }
 
     private void unBindFromActivityAndStop() {
+        Logger.d(TAG, "unBindFromActivityAndStop");
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_UNBIND_SERVICE_CODE);
-        Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        sendBroadcast(bundle);
         stopSelf();
     }
 
@@ -203,9 +203,11 @@ public class LocationService extends Service implements
 
     @Override
     public boolean onUnbind(Intent intent) {
+        Logger.d(TAG, "onUnbind");
         super.onUnbind(intent);
         if (!RunTracker.isActive()){
             // Stop service only when workout session is not going on
+            Logger.d(TAG, "onUnbind: Will stop service");
             stopSelf();
         }
         return false;
@@ -213,6 +215,7 @@ public class LocationService extends Service implements
 
     @Override
     public void onDestroy() {
+        Logger.d(TAG, "onDestroy");
         super.onDestroy();
     }
 
@@ -244,6 +247,7 @@ public class LocationService extends Service implements
 
     @Override
     public IBinder onBind(Intent intent) {
+        Logger.d(TAG, "onBind");
         return mBinder;
     }
 
@@ -395,80 +399,116 @@ public class LocationService extends Service implements
         Logger.e(TAG, "GoogleApiClient connection has been suspend");
     }
 
-    CountDownTimer vigilanceTimer = new CountDownTimer(1000000000, Config.VIGILANCE_TIMER_INTERVAL) {
+    //runs without a timer by reposting this handler at the end of the runnable
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            onTimerTick();
+            timerHandler.postDelayed(this, Config.VIGILANCE_TIMER_INTERVAL);
+        }
+    };
 
-        public void onTick(long millisUntilFinished) {
-            if (tracker != null){
-                if (currentlyProcessingLocation){
+    private synchronized void startTimer(){
+        timerHandler.removeCallbacks(timerRunnable);
+        timerHandler.post(timerRunnable);
+    }
 
-                    //check for slow speed
-                    long timeElapsedSinceBeginning = System.currentTimeMillis() - tracker.getBeginTimeStamp();
-                    float inSecs = (float)(timeElapsedSinceBeginning / 1000);
-                    Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + tracker.getTotalSteps()
-                            + ", timeElapsed in secs = " + inSecs
-                            + ", distanceCovered = " +  tracker.getDistanceCovered());
-                    if (timeElapsedSinceBeginning > Config.VIGILANCE_START_THRESHOLD
-                            && tracker.getDistanceCovered() < inSecs*Config.LOWER_SPEED_LIMIT
-                            ){
-                        Logger.d(TAG, "Workout too slow, not enough distance will stop");
-                        // Not enough steps/distance since the beginning
-                        sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
-                        return;
-                    }
+    private synchronized void stopTimer(){
+        timerHandler.removeCallbacks(timerRunnable);
+    }
 
-                    //check for high speed
-                    if (lastValidatedRecord == null){
-                        // Will wait for next tick
-                        lastValidatedRecord = tracker.getLastRecord();
-                        lastValidatedDistance = tracker.getDistanceCovered();
-                    }else{
-                        DistRecord latestRecord = tracker.getLastRecord();
-                        if (!lastValidatedRecord.equals(latestRecord)){
-                            // We have a new record!
-                            float distanceInSession = tracker.getDistanceCovered() - lastValidatedDistance;
-                            float timeElapsedInSecs = (float)
-                                    ((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
-                            Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
-                                    + ", timeElapsedInSecs = " + timeElapsedInSecs
-                                    + ", distanceCovered = " +  tracker.getDistanceCovered());
-                            if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
-                                // Distance is above the threshold minimum to apply Usain Bolt Filter
-                                float speedInSession = distanceInSession / timeElapsedInSecs;
-                                if (speedInSession > Config.UPPER_SPEED_LIMIT){
-                                    // Running faster than Usain Bolt
-                                    Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will show Usain Bolt");
-                                    sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
-                                    return;
-                                }else{
-                                    lastValidatedRecord = latestRecord;
-                                    lastValidatedDistance = tracker.getDistanceCovered();
-                                }
-                            }
-                        }
-                    }
+    private synchronized void onTimerTick(){
+
+        if (tracker != null){
+            if (currentlyProcessingLocation){
+                //check for slow speed
+                if (checkForTooSlow()){
+                    Logger.d(TAG, "Workout too slow, not enough distance will stop");
+                    // Not enough steps/distance since the beginning
+                    sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+                    return;
                 }
-                if (currentlyProcessingSteps){
-                    if (stepsTillNow == -1){
-                        //Will wait for the next tick
-                        stepsTillNow = tracker.getTotalSteps();
+
+                //check for high speed
+                if (checkForTooFast()){
+                    sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
+                    return;
+                }
+            }
+            if (currentlyProcessingSteps){
+                // Check if user is actually running/moving
+                if (checkForLackOfMovement()){
+                    sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
+                    return;
+                }
+            }
+        }
+    }
+
+    private boolean checkForTooSlow(){
+        long timeElapsedSinceBeginning = System.currentTimeMillis() - tracker.getBeginTimeStamp();
+        float inSecs = (float)(timeElapsedSinceBeginning / 1000);
+        Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + tracker.getTotalSteps()
+                + ", timeElapsed in secs = " + inSecs
+                + ", distanceCovered = " +  tracker.getDistanceCovered());
+        if (timeElapsedSinceBeginning > Config.VIGILANCE_START_THRESHOLD
+                && tracker.getDistanceCovered() < inSecs*Config.LOWER_SPEED_LIMIT
+                ){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkForTooFast(){
+        if (lastValidatedRecord == null){
+            // Will wait for next tick
+            lastValidatedRecord = tracker.getLastRecord();
+            lastValidatedDistance = tracker.getDistanceCovered();
+        }else{
+            DistRecord latestRecord = tracker.getLastRecord();
+            if (!lastValidatedRecord.equals(latestRecord)){
+                // We have a new record!
+                float distanceInSession = tracker.getDistanceCovered() - lastValidatedDistance;
+                float timeElapsedInSecs = (float)
+                        ((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
+                Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
+                        + ", timeElapsedInSecs = " + timeElapsedInSecs
+                        + ", distanceCovered = " +  tracker.getDistanceCovered());
+                if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
+                    // Distance is above the threshold minimum to apply Usain Bolt Filter
+                    float speedInSession = distanceInSession / timeElapsedInSecs;
+                    if (speedInSession > Config.UPPER_SPEED_LIMIT){
+                        // Running faster than Usain Bolt
+                        Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will show Usain Bolt");
+                        return true;
                     }else{
-                        int totalSteps = tracker.getTotalSteps();
-                        int stepsThisSession = totalSteps - stepsTillNow;
-                        if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.STEPS_PER_SECOND_FACTOR){
-                            //time to pause workout
-                            // Not enough steps since the beginning
-                            Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");
-                            sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
-                            return;
-                        }else{
-                            stepsTillNow = totalSteps;
-                        }
+                        lastValidatedRecord = latestRecord;
+                        lastValidatedDistance = tracker.getDistanceCovered();
                     }
                 }
             }
         }
-        public void onFinish() {
+        return false;
+    }
 
+    private boolean checkForLackOfMovement(){
+        if (stepsTillNow == -1){
+            //Will wait for the next tick
+            stepsTillNow = tracker.getTotalSteps();
+        }else{
+            int totalSteps = tracker.getTotalSteps();
+            int stepsThisSession = totalSteps - stepsTillNow;
+            if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.STEPS_PER_SECOND_FACTOR){
+                //time to pause workout
+                // Not enough steps since the beginning
+                Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");
+                return true;
+            }else{
+                stepsTillNow = totalSteps;
+            }
         }
-    };
+        return false;
+    }
+
 }

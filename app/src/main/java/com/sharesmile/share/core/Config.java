@@ -9,7 +9,7 @@ public class Config {
 
     public static final long LOCATION_UPDATE_INTERVAL = 1000; // in millisecs
 
-    public static final int STEP_THRESHOLD_INTERVAL = 5000000; // in micro secs, i.e. 20 secs
+    public static final int STEP_THRESHOLD_INTERVAL = 5000000; // in micro secs
 
     public static final long VIGILANCE_TIMER_INTERVAL = 20000; // in millisecs
 
@@ -27,11 +27,11 @@ public class Config {
 
     public static float SOURCE_ACCEPTABLE_ACCURACY = 30; // in m
 
-    public static float THRESHOLD_ACCURACY = 7; // in m
+    public static float THRESHOLD_ACCURACY = 16; // in m
 
     public static float THRESHOLD_ACCURACY_OFFSET = 1f;
 
-    public static float THRESHOLD_FACTOR = 6;
+    public static float THRESHOLD_FACTOR = 5;
 
     public static final float SMALLEST_DISPLACEMENT = 7;// in m
 

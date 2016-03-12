@@ -14,13 +14,14 @@ public class Cause implements UnObfuscable {
 
     @SerializedName("cause_id")
     private int id;
-    @SerializedName("cause_name")
+    @SerializedName("cause_title")
     private String title;
 
     private String category;
 
-    @SerializedName("executors")
-    private List<CauseExecutor> executors;
+    private List<Partner> executors;
+
+    private List<Sponsor> sponsors;
 
     @SerializedName("cause_brief")
     private String briefText;
@@ -30,6 +31,9 @@ public class Cause implements UnObfuscable {
 
     @SerializedName("cause_image_url")
     private String imageUrl;
+
+    @SerializedName("conversion_rate")
+    private float conversionRate;
 
     @SerializedName("cause_is_active")
     private boolean isActive;
@@ -46,15 +50,30 @@ public class Cause implements UnObfuscable {
         return category;
     }
 
-    public List<CauseExecutor> getExecutors() {
+    public List<Partner> getExecutors() {
         return executors;
     }
 
-    public CauseExecutor getExecutor(){
+    public Partner getExecutor(){
         if (executors != null && !executors.isEmpty()){
             return executors.get(0);
         }
         return null;
+    }
+
+    public List<Sponsor> getSponsors() {
+        return sponsors;
+    }
+
+    public Sponsor getSponsor(){
+        if (sponsors != null && !sponsors.isEmpty()){
+            return sponsors.get(0);
+        }
+        return null;
+    }
+
+    public float getConversionRate() {
+        return conversionRate;
     }
 
     public String getBriefText() {
