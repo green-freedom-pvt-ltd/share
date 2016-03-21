@@ -13,7 +13,6 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -33,30 +32,32 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 /**
  * Created by ankitmaheshwari1 on 20/02/16.
  */
-public class LocationService extends Service implements
-        GoogleApiClient.ConnectionCallbacks,
+public class WorkoutService extends Service implements
+        IWorkoutService, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, RunTracker.UpdateListner, SensorEventListener {
 
-    private static final String TAG = "LocationService";
+    private static final String TAG = "WorkoutService";
 
-    private boolean currentlyProcessingLocation = false;
+    private boolean currentlyTracking = false;
     private boolean currentlyProcessingSteps = false;
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
     private SensorManager sensorManager;
-    private int stepsTillNow = -1;
-    private DistRecord lastValidatedRecord;
-    private float lastValidatedDistance;
+    private VigilanceTimer vigilanceTimer;
+
+    private ScheduledExecutorService backgroundExecutorService;
 
     private RunTracker tracker;
 
@@ -69,10 +70,11 @@ public class LocationService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Logger.d(TAG, "onStartCommand");
+        startWorkout();
         //If location fetching is already in process then no need to setup again
-        if (!currentlyProcessingLocation) {
-            currentlyProcessingLocation = true;
-            startLocationUpdatess();
+        if (backgroundExecutorService == null){
+            backgroundExecutorService = Executors.newScheduledThreadPool(5);
+
         }
         return START_STICKY;
     }
@@ -84,10 +86,7 @@ public class LocationService extends Service implements
         if (!tracker.isActive()){
             tracker.beginRun();
         }
-        stepsTillNow = -1;
-        lastValidatedRecord = null;
-        lastValidatedDistance = 0;
-        startTimer();
+        vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService, tracker);
     }
 
 
@@ -103,29 +102,8 @@ public class LocationService extends Service implements
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
-        stopTimer();
     }
 
-
-    private void startLocationUpdatess() {
-        Logger.d(TAG, "startLocationUpdates");
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
-            googleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-            if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
-                googleApiClient.connect();
-            }
-        } else {
-            Logger.e(TAG, "unable to connect to google play services.");
-        }
-        if (isKitkatWithStepSensor() && !currentlyProcessingSteps){
-            Logger.d(TAG, "Step Detector present! Will register");
-            registerStepDetector();
-        }
-    }
 
     /**
      * Returns true if this device is supported. It needs to be running Android KitKat (4.4) or
@@ -165,9 +143,10 @@ public class LocationService extends Service implements
         }
     }
 
-    public synchronized void stopLocationUpdates() {
-        Logger.d(TAG, "stopLocationUpdates");
-        if (currentlyProcessingLocation){
+    @Override
+    public synchronized void stopWorkout() {
+        Logger.d(TAG, "stopWorkout");
+        if (currentlyTracking){
             stopTracking();
             if (googleApiClient != null && googleApiClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
@@ -176,11 +155,10 @@ public class LocationService extends Service implements
             locationRequest = null;
             googleApiClient = null;
             currentLocation = null;
-            currentlyProcessingLocation = false;
-            stepsTillNow = -1;
-            lastValidatedRecord = null;
-            lastValidatedDistance = 0;
-            sensorManager.unregisterListener(this);
+            currentlyTracking = false;
+            if (sensorManager != null){
+                sensorManager.unregisterListener(this);
+            }
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
         }
@@ -205,9 +183,9 @@ public class LocationService extends Service implements
     public boolean onUnbind(Intent intent) {
         Logger.d(TAG, "onUnbind");
         super.onUnbind(intent);
-        if (!RunTracker.isActive()){
+        if (!RunTracker.isWorkoutActive()){
             // Stop service only when workout session is not going on
-            Logger.d(TAG, "onUnbind: Will stop service");
+            Logger.d(TAG, "onUnbind: Will stopWorkout service");
             stopSelf();
         }
         return false;
@@ -217,6 +195,8 @@ public class LocationService extends Service implements
     public void onDestroy() {
         Logger.d(TAG, "onDestroy");
         super.onDestroy();
+        backgroundExecutorService.shutdownNow();
+        backgroundExecutorService = null;
     }
 
     final IBinder mBinder = new MyBinder();
@@ -239,9 +219,9 @@ public class LocationService extends Service implements
      */
     public class MyBinder extends Binder {
 
-        public LocationService getService() {
+        public WorkoutService getService() {
             // Return this instance of LocalService so clients can call public methods
-            return LocationService.this;
+            return WorkoutService.this;
         }
     }
 
@@ -289,19 +269,61 @@ public class LocationService extends Service implements
         sendBroadcast(bundle);
     }
 
-    private void sendStopWorkoutBroadcast(int problem){
+    @Override
+    public void startWorkout() {
+        if (!currentlyTracking) {
+            currentlyTracking = true;
+            Logger.d(TAG, "startLocationUpdates");
+            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+                googleApiClient = new GoogleApiClient.Builder(this)
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+                if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
+                    googleApiClient.connect();
+                }
+            } else {
+                Logger.e(TAG, "unable to connect to google play services.");
+            }
+            if (isKitkatWithStepSensor() && !currentlyProcessingSteps){
+                Logger.d(TAG, "Step Detector present! Will register");
+                registerStepDetector();
+            }
+        }
+    }
+
+    @Override
+    public void pause() {
+        if (vigilanceTimer != null){
+            vigilanceTimer.pauseTimer();
+        }
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void sendStopWorkoutBroadcast(int problem){
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_WORKOUT_STOP_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_STOP_WORKOUT_CODE);
         sendBroadcast(bundle);
-        stopLocationUpdates();
+        stopWorkout();
+    }
+
+    @Override
+    public boolean isCountingSteps() {
+        return currentlyProcessingSteps;
     }
 
     /**
      * Called by Location Services when the request to connect the
      * client finishes successfully. At this point, you can
-     * request the current location or start periodic updates
+     * request the current location or startWorkout periodic updates
      */
     @Override
     public void onConnected(Bundle bundle) {
@@ -337,7 +359,7 @@ public class LocationService extends Service implements
         switch (requestCode){
             case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
                 if (resultCode == Activity.RESULT_OK){
-                    // Can start with location requests
+                    // Can startWorkout with location requests
                     initiateLocationFetching();
                 }else{
                     // Can't do nothing, retry for enabling Location Settings
@@ -390,7 +412,7 @@ public class LocationService extends Service implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Logger.e(TAG, "onConnectionFailed");
-        stopLocationUpdates();
+        stopWorkout();
         stopSelf();
     }
 
@@ -399,116 +421,5 @@ public class LocationService extends Service implements
         Logger.e(TAG, "GoogleApiClient connection has been suspend");
     }
 
-    //runs without a timer by reposting this handler at the end of the runnable
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            onTimerTick();
-            timerHandler.postDelayed(this, Config.VIGILANCE_TIMER_INTERVAL);
-        }
-    };
-
-    private synchronized void startTimer(){
-        timerHandler.removeCallbacks(timerRunnable);
-        timerHandler.post(timerRunnable);
-    }
-
-    private synchronized void stopTimer(){
-        timerHandler.removeCallbacks(timerRunnable);
-    }
-
-    private synchronized void onTimerTick(){
-
-        if (tracker != null){
-            if (currentlyProcessingLocation){
-                //check for slow speed
-                if (checkForTooSlow()){
-                    Logger.d(TAG, "Workout too slow, not enough distance will stop");
-                    // Not enough steps/distance since the beginning
-                    sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
-                    return;
-                }
-
-                //check for high speed
-                if (checkForTooFast()){
-                    sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
-                    return;
-                }
-            }
-            if (currentlyProcessingSteps){
-                // Check if user is actually running/moving
-                if (checkForLackOfMovement()){
-                    sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
-                    return;
-                }
-            }
-        }
-    }
-
-    private boolean checkForTooSlow(){
-        long timeElapsedSinceBeginning = System.currentTimeMillis() - tracker.getBeginTimeStamp();
-        float inSecs = (float)(timeElapsedSinceBeginning / 1000);
-        Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + tracker.getTotalSteps()
-                + ", timeElapsed in secs = " + inSecs
-                + ", distanceCovered = " +  tracker.getDistanceCovered());
-        if (timeElapsedSinceBeginning > Config.VIGILANCE_START_THRESHOLD
-                && tracker.getDistanceCovered() < inSecs*Config.LOWER_SPEED_LIMIT
-                ){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkForTooFast(){
-        if (lastValidatedRecord == null){
-            // Will wait for next tick
-            lastValidatedRecord = tracker.getLastRecord();
-            lastValidatedDistance = tracker.getDistanceCovered();
-        }else{
-            DistRecord latestRecord = tracker.getLastRecord();
-            if (!lastValidatedRecord.equals(latestRecord)){
-                // We have a new record!
-                float distanceInSession = tracker.getDistanceCovered() - lastValidatedDistance;
-                float timeElapsedInSecs = (float)
-                        ((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
-                Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
-                        + ", timeElapsedInSecs = " + timeElapsedInSecs
-                        + ", distanceCovered = " +  tracker.getDistanceCovered());
-                if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
-                    // Distance is above the threshold minimum to apply Usain Bolt Filter
-                    float speedInSession = distanceInSession / timeElapsedInSecs;
-                    if (speedInSession > Config.UPPER_SPEED_LIMIT){
-                        // Running faster than Usain Bolt
-                        Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will show Usain Bolt");
-                        return true;
-                    }else{
-                        lastValidatedRecord = latestRecord;
-                        lastValidatedDistance = tracker.getDistanceCovered();
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean checkForLackOfMovement(){
-        if (stepsTillNow == -1){
-            //Will wait for the next tick
-            stepsTillNow = tracker.getTotalSteps();
-        }else{
-            int totalSteps = tracker.getTotalSteps();
-            int stepsThisSession = totalSteps - stepsTillNow;
-            if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.STEPS_PER_SECOND_FACTOR){
-                //time to pause workout
-                // Not enough steps since the beginning
-                Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");
-                return true;
-            }else{
-                stepsTillNow = totalSteps;
-            }
-        }
-        return false;
-    }
 
 }

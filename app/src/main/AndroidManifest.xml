@@ -48,7 +48,7 @@
         </activity>
 
         <service
-            android:name=".gps.LocationService"
+            android:name=".gps.WorkoutService"
             android:exported="false"></service>
 
         <meta-data

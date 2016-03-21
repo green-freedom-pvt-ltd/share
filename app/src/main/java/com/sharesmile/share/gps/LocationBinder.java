@@ -9,13 +9,13 @@ public class LocationBinder extends Binder {
 
     private static final String TAG = "LocationBinder";
 
-    private LocationService service;
+    private WorkoutService service;
 
-    public LocationBinder(LocationService service){
+    public LocationBinder(WorkoutService service){
         this.service = service;
     }
 
-    public LocationService getService(){
+    public WorkoutService getService(){
         return service;
     }
 

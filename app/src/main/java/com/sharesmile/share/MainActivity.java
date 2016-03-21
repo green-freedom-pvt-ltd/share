@@ -29,7 +29,7 @@ import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.drawer.DrawerMenuAdapter;
-import com.sharesmile.share.gps.LocationService;
+import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RunFragment;
@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     private DrawerLayout drawerLayout;
     private ListView drawerList;
-    private LocationService locationService;
+    private WorkoutService locationService;
     private RunFragment runFragment;
 
     private static final ArrayList<String> MENU_ITEMS = new ArrayList<String>(){
@@ -99,7 +99,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public boolean isWorkoutActive(){
-        return RunTracker.isActive();
+        return RunTracker.isWorkoutActive();
     }
 
     @Override
@@ -248,7 +248,7 @@ public class MainActivity extends BaseActivity {
 
     public void endLocationTracking(){
         if (isBoundToLocationService()){
-            locationService.stopLocationUpdates();
+            locationService.stopWorkout();
         }
     }
 
@@ -287,7 +287,7 @@ public class MainActivity extends BaseActivity {
     public void invokeLocationService(){
         Log.d(TAG, "invokeLocationService");
         Bundle bundle = new Bundle();
-        Intent intent = new Intent(this, LocationService.class);
+        Intent intent = new Intent(this, WorkoutService.class);
         intent.putExtras(bundle);
         startService(intent);
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
@@ -300,8 +300,8 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            // We've bound to LocationService, cast the IBinder and get LocationService instance
-            LocationService.MyBinder binder = (LocationService.MyBinder) service;
+            // We've bound to WorkoutService, cast the IBinder and get WorkoutService instance
+            WorkoutService.MyBinder binder = (WorkoutService.MyBinder) service;
             locationService = binder.getService();
         }
 

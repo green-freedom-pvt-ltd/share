@@ -17,7 +17,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
-public class RunTracker {
+public class RunTracker implements Tracker{
 
     private static final String TAG = "RunTracker";
 
@@ -65,6 +65,40 @@ public class RunTracker {
         return workoutData;
     }
 
+    //TODO: Need to implement these methods
+
+    @Override
+    public void pauseRun() {
+
+    }
+
+    @Override
+    public void resumeRun() {
+
+    }
+
+    @Override
+    public long getResumeTimeStamp() {
+        return 0;
+    }
+
+
+    @Override
+    public float getDistanceCoveredSinceLastResume() {
+        return 0;
+    }
+
+    @Override
+    public boolean isPaused() {
+        return false;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return false;
+    }
+
+    @Override
     public long getBeginTimeStamp(){
         if (isActive() && dataStore != null){
             return dataStore.getBeginTimeStamp();
@@ -72,6 +106,7 @@ public class RunTracker {
         return 0;
     }
 
+    @Override
     public int getTotalSteps(){
         if (isActive() && dataStore != null){
             return dataStore.getTotalSteps();
@@ -79,6 +114,7 @@ public class RunTracker {
         return 0;
     }
 
+    @Override
     public DistRecord getLastRecord(){
         if (isActive() && dataStore != null){
             return dataStore.getLastRecord();
@@ -86,14 +122,15 @@ public class RunTracker {
         return null;
     }
 
-    public float getDistanceCovered(){
+    @Override
+    public float getTotalDistanceCovered(){
         if (isActive() && dataStore != null){
             return dataStore.getTotalDistance();
         }
         return 0;
     }
 
-
+    @Override
     public void feedLocation(Location point){
         if (!isActive()){
             throw new IllegalStateException("Can't feed locations without beginning run");
@@ -102,6 +139,7 @@ public class RunTracker {
     }
 
 
+    @Override
     public void feedSteps(SensorEvent event){
         mWorkerHandler.obtainMessage(MSG_PROCESS_STEPS_EVENT, event).sendToTarget();
     }
@@ -187,7 +225,12 @@ public class RunTracker {
     }
 
 
-    public static boolean isActive(){
+    @Override
+    public boolean isActive(){
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_ACTIVE);
+    }
+
+    public static boolean isWorkoutActive(){
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_ACTIVE);
     }
 
