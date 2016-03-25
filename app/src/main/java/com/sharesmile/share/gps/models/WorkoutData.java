@@ -59,8 +59,8 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     }
 
     public float getAvgSpeed() {
-        if (recordedTime > 0){
-            return (distance / recordedTime);
+        if (getRecordedTime() > 0){
+            return (distance / getRecordedTime());
         }else
             return 0;
     }
@@ -106,7 +106,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     public String toString() {
         return "WorkoutData{" +
                 "distance=" + distance +
-                ", recordedTime=" + recordedTime +
+                ", recordedTime=" + getRecordedTime() +
                 ", elapsedTime=" + getElapsedTime() +
                 ", avgSpeed=" + getAvgSpeed() +
                 ", totalSteps=" + getTotalSteps() +
@@ -122,7 +122,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
 
     protected WorkoutData(Parcel in) {
         distance = in.readFloat();
-        recordedTime = in.readFloat();
+        setRecordedTime(in.readFloat());
         if (in.readByte() == 0x01) {
             points = new ArrayList<LatLng>();
             in.readList(points, LatLng.class.getClassLoader());
@@ -139,7 +139,7 @@ public class WorkoutData implements UnObfuscable, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeFloat(distance);
-        dest.writeFloat(recordedTime);
+        dest.writeFloat(getRecordedTime());
         if (points == null) {
             dest.writeByte((byte) (0x00));
         } else {

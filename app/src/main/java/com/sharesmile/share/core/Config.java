@@ -35,6 +35,4 @@ public class Config {
 
     public static final float SMALLEST_DISPLACEMENT = 7;// in m
 
-    public static boolean SPEED_TRACKING = false;
-
 }

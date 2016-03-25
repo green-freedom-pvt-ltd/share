@@ -11,7 +11,6 @@ import com.sharesmile.share.gps.models.WorkoutData;
  */
 public interface Tracker {
 
-	void beginRun();
 	WorkoutData endRun();
 	void pauseRun();
 	void resumeRun();
@@ -26,6 +25,7 @@ public interface Tracker {
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();
 	DistRecord getLastRecord();
+	State getState();
 
 	enum State{
 		IDLE,

@@ -3,7 +3,6 @@ package com.sharesmile.share.gps;
 import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
@@ -14,6 +13,8 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
@@ -21,34 +22,28 @@ public class RunTracker implements Tracker{
 
     private static final String TAG = "RunTracker";
 
-    private static final String WORKER_THREAD_NAME = "LocationPersistorWorkerHandler";
-    private final HandlerThread sWorkerThread = new HandlerThread(WORKER_THREAD_NAME);
-    private static WorkerHandler mWorkerHandler;
-
-    public static final int MSG_PROCESS_LOCATION = 1;
-    public static final int MSG_PROCESS_STEPS_EVENT = 2;
-    private int stepsSinceReboot = 0;
+    private volatile int stepsSinceReboot = 0;
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
+    private ScheduledExecutorService executorService;
 
-    public RunTracker(UpdateListner listener){
-        sWorkerThread.start();
-        mWorkerHandler = new WorkerHandler(this, sWorkerThread.getLooper());
-        this.listener = listener;
-        stepsSinceReboot = 0;
-        if (isActive()){
-            dataStore = new WorkoutDataStore();
-        }
-        // Else wait for begin run;
-    }
-
-    public synchronized void beginRun(){
-        if (!isActive()){
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, true);
-            dataStore = new WorkoutDataStore(System.currentTimeMillis());
+    public RunTracker(ScheduledExecutorService executorService, UpdateListner listener){
+        synchronized (RunTracker.class){
+            this.executorService = executorService;
+            this.listener = listener;
             stepsSinceReboot = 0;
-        }else{
-            throw new IllegalStateException("Can't begin run when one is already active");
+            if (isActive()){
+                dataStore = new WorkoutDataStore();
+                setState(State.valueOf(
+                                SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.PAUSED.name()))
+                );
+            }else{
+                // User started workout
+                setState(State.RUNNING);
+                dataStore = new WorkoutDataStore(System.currentTimeMillis());
+                resumeRun();
+                stepsSinceReboot = 0;
+            }
         }
     }
 
@@ -56,46 +51,60 @@ public class RunTracker implements Tracker{
         WorkoutData workoutData = dataStore.clear();
         dataStore = null;
         stepsSinceReboot = 0;
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_ACTIVE, false);
+        setState(State.IDLE);
         listener = null;
-        mWorkerHandler.stopHandling();
-        mWorkerHandler = null;
-        boolean isQuit = sWorkerThread.quit();
-        Logger.d(TAG, "Thread Quit Success = " + isQuit);
         return workoutData;
     }
 
-    //TODO: Need to implement these methods
-
     @Override
-    public void pauseRun() {
+    public Tracker.State getState() {
+        return State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()));
+    }
 
+    private void setState(Tracker.State state){
+        SharedPrefsManager.getInstance().setString(Constants.PREF_WORKOUT_STATE, state.name());
     }
 
     @Override
-    public void resumeRun() {
+    public synchronized void pauseRun() {
+        setState(State.PAUSED);
+        stepsSinceReboot = 0;
+    }
 
+    @Override
+    public synchronized void resumeRun() {
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LAST_RESUME_TIMESTAMP, System.currentTimeMillis());
+        SharedPrefsManager.getInstance().setFloat(Constants.PREF_DISTANCE_AT_LAST_RESUME, getTotalDistanceCovered());
+        setState(State.RUNNING);
     }
 
     @Override
     public long getResumeTimeStamp() {
-        return 0;
+        return SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LAST_RESUME_TIMESTAMP);
     }
 
 
     @Override
     public float getDistanceCoveredSinceLastResume() {
-        return 0;
+        return getTotalDistanceCovered() - SharedPrefsManager.getInstance().getFloat(Constants.PREF_DISTANCE_AT_LAST_RESUME);
     }
 
+    /**
+     * Returns true iff state is PAUSED
+     * @return
+     */
     @Override
     public boolean isPaused() {
-        return false;
+        return State.PAUSED.equals(getState());
     }
 
+    /**
+     * Returns true iff state is RUNNING
+     * @return
+     */
     @Override
     public boolean isRunning() {
-        return false;
+        return State.RUNNING.equals(getState());
     }
 
     @Override
@@ -131,24 +140,43 @@ public class RunTracker implements Tracker{
     }
 
     @Override
-    public void feedLocation(Location point){
+    public void feedLocation(final Location point){
         if (!isActive()){
             throw new IllegalStateException("Can't feed locations without beginning run");
         }
-        mWorkerHandler.obtainMessage(MSG_PROCESS_LOCATION, point).sendToTarget();
+        if (isPaused()){
+            Logger.d(TAG, "Wont process location, as the workout is paused");
+        }else{
+            // state must be running
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    processLocation(point);
+                }
+            });
+        }
     }
 
 
     @Override
-    public void feedSteps(SensorEvent event){
-        mWorkerHandler.obtainMessage(MSG_PROCESS_STEPS_EVENT, event).sendToTarget();
+    public void feedSteps(final SensorEvent event){
+        if (isPaused()){
+            Logger.d(TAG, "Wont process steps, as the workout is paused");
+        }else if (isRunning()){
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    processStepsEvent(event);
+                }
+            });
+        }
     }
 
     /**
      * Feed step counter event, the first index of values array contains the total number of steps since reboot
      * @param event
      */
-    private void processStepsEvent(SensorEvent event){
+    private synchronized void processStepsEvent(SensorEvent event){
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
             stepsSinceReboot = (int) event.values[0];
@@ -159,10 +187,12 @@ public class RunTracker implements Tracker{
         long reportimeStamp = System.currentTimeMillis();
         Logger.d(TAG, "Adding " + numSteps + "steps.");
         dataStore.addSteps(numSteps);
-        listener.updateStepsRecord(reportimeStamp, numSteps);
+        listener.updateStepsRecord(reportimeStamp);
     }
 
-    private void processLocation(Location point){
+
+    //TODO: revise this method to handle pause resume
+    private synchronized void processLocation(Location point){
         if (dataStore.getRecordsCount() <= 0){
             // This is the source location
             Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
@@ -183,32 +213,25 @@ public class RunTracker implements Tracker{
             // Step 1: Check whether threshold interval for recording has elapsed
             if (interval > Config.THRESHOLD_INTEVAL){
 
-                if (Config.SPEED_TRACKING){
-                    DistRecord record = new DistRecord(point, prevLocation);
-                    Logger.d(TAG,"Speed Recording: " + record.toString());
-                    dataStore.addRecord(record);
-                    listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
-                }else{
-                    boolean toRecord = false;
-                    float accuracy = point.getAccuracy();
+                boolean toRecord = false;
+                float accuracy = point.getAccuracy();
                     /*
                      Step 2: Record if point is accurate, i.e. accuracy better/lower than our threshold
                              Else
                              Apply formula to check whether to record the point or not
                       */
-                    if (accuracy < Config.THRESHOLD_ACCURACY){
-                        Logger.d(TAG, "Accuracy Wins");
-                        toRecord = true;
-                    }else{
-                        toRecord = checkUsingFormula(dist, point.getAccuracy());
-                    }
-                    // Step 3: Record if needed, else wait for next location
-                    if (toRecord){
-                        DistRecord record = new DistRecord(point, prevLocation, dist);
-                        Logger.d(TAG,"Distance Recording: " + record.toString());
-                        dataStore.addRecord(record);
-                        listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
-                    }
+                if (accuracy < Config.THRESHOLD_ACCURACY){
+                    Logger.d(TAG, "Accuracy Wins");
+                    toRecord = true;
+                }else{
+                    toRecord = checkUsingFormula(dist, point.getAccuracy());
+                }
+                // Step 3: Record if needed, else wait for next location
+                if (toRecord){
+                    DistRecord record = new DistRecord(point, prevLocation, dist);
+                    Logger.d(TAG,"Distance Recording: " + record.toString());
+                    dataStore.addRecord(record);
+                    listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
                 }
             }
         }
@@ -225,54 +248,25 @@ public class RunTracker implements Tracker{
     }
 
 
+    /**
+     * Returns true if a workout session is currently in progress, could be in paused OR running state
+     * @return
+     */
     @Override
     public boolean isActive(){
-        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_ACTIVE);
+        return (getState() != State.IDLE);
     }
 
     public static boolean isWorkoutActive(){
-        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_ACTIVE);
-    }
-
-    public static class WorkerHandler extends Handler {
-
-        private RunTracker mTracker;
-
-        public WorkerHandler(RunTracker persistor, Looper looper) {
-            super(looper);
-            this.mTracker = persistor;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            synchronized (this){
-                super.handleMessage(msg);
-                Object object = msg.obj;
-                switch (msg.what) {
-                    case MSG_PROCESS_LOCATION:
-                        if (mTracker != null && object instanceof Location){
-                            mTracker.processLocation((Location) object);
-                        }
-                        break;
-                    case MSG_PROCESS_STEPS_EVENT:
-                        if (mTracker != null && object instanceof SensorEvent){
-                            mTracker.processStepsEvent((SensorEvent) object);
-                        }
-                        break;
-                }
-            }
-        }
-
-        public void stopHandling(){
-            mTracker = null;
-        }
+        return (State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()))
+                != State.IDLE);
     }
 
     interface UpdateListner {
 
         void updateWorkoutRecord(float totalDistance, float currentSpeed);
 
-        void updateStepsRecord(long timeStampMillis, int numSteps);
+        void updateStepsRecord(long timeStampMillis);
 
     }
 

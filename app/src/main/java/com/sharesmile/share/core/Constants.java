@@ -61,7 +61,15 @@ public class Constants {
 
     public static final String KEY_WORKOUT_STOP_PROBLEM = "key_workout_stop_reason";
 
-    public static final String PREF_IS_WORKOUT_ACTIVE = "pref_is_workout_active";
+//    public static final String PREF_IS_WORKOUT_ACTIVE = "pref_is_workout_active";
+//
+//    public static final String PREF_IS_USER_RUNNING = "pref_is_user_running";
+
+    public static final String PREF_WORKOUT_STATE = "pref_workout_state";
+
+    public static final String PREF_WORKOUT_LAST_RESUME_TIMESTAMP = "pref_last_workout_resume_timestamp";
+
+    public static final String PREF_DISTANCE_AT_LAST_RESUME = "pref_distance_since_last_resume";
 
     public static final String PREF_RUN_SOURCE  = "pref_run_source";
 

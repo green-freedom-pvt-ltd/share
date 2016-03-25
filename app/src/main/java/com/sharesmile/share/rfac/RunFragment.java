@@ -249,7 +249,6 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
 
     private String textForMail(){
         StringBuilder sb = new StringBuilder();
-        sb.append("\nSPEED_TRACKING : " + Config.SPEED_TRACKING);
         sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL + " secs");
         sb.append("\nTHRESHOLD_ACCURACY : " + Config.THRESHOLD_ACCURACY);
         sb.append("\nTHRESHOLD_FACTOR : " + Config.THRESHOLD_FACTOR);

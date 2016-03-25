@@ -135,11 +135,11 @@ public class SharedPrefsManager {
         editor.apply();
     }
 
-    public boolean getFloat(String key) {
+    public float getFloat(String key) {
         return getFloat(key, 0f);
     }
 
-    public boolean getFloat(String key, float defValue) {
+    public float getFloat(String key, float defValue) {
         return getFloat(key, defValue);
     }
 

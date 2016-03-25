@@ -259,7 +259,7 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void updateStepsRecord(long timeStampMillis, int numSteps) {
+    public void updateStepsRecord(long timeStampMillis) {
         Logger.d(TAG, "Time to show steps count, totalSteps = " + tracker.getTotalSteps());
         // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
