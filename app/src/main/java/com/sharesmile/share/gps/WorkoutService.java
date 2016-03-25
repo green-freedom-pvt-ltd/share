@@ -70,21 +70,16 @@ public class WorkoutService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Logger.d(TAG, "onStartCommand");
-        startWorkout();
-        //If location fetching is already in process then no need to setup again
         if (backgroundExecutorService == null){
             backgroundExecutorService = Executors.newScheduledThreadPool(5);
-
         }
+        startWorkout();
         return START_STICKY;
     }
 
     private void startTracking(){
         if (tracker == null){
-            tracker = new RunTracker(this);
-        }
-        if (!tracker.isActive()){
-            tracker.beginRun();
+            tracker = new RunTracker(backgroundExecutorService, this);
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService, tracker);
     }
@@ -271,9 +266,10 @@ public class WorkoutService extends Service implements
 
     @Override
     public void startWorkout() {
+        //If tracking is already in progress then no need to setup again
         if (!currentlyTracking) {
             currentlyTracking = true;
-            Logger.d(TAG, "startLocationUpdates");
+            Logger.d(TAG, "startWorkout");
             if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
                 googleApiClient = new GoogleApiClient.Builder(this)
                         .addApi(LocationServices.API)
@@ -295,24 +291,42 @@ public class WorkoutService extends Service implements
 
     @Override
     public void pause() {
+        Logger.i(TAG, "pause");
         if (vigilanceTimer != null){
             vigilanceTimer.pauseTimer();
+        }
+        if (tracker != null && tracker.isRunning()){
+            //TODO: Put stopping locationServices code over here
+            tracker.pauseRun();
         }
     }
 
     @Override
     public void resume() {
-
+        Logger.i(TAG, "resume");
+        if (tracker != null && tracker.getState() != Tracker.State.RUNNING){
+            //TODO: Put resuming locationServices code over here
+            tracker.resumeRun();
+        }
     }
 
-    @Override
     public void sendStopWorkoutBroadcast(int problem){
         Bundle bundle = new Bundle();
-        bundle.putInt(Constants.KEY_WORKOUT_STOP_PROBLEM, problem);
+        bundle.putInt(Constants.KEY_STOP_WORKOUT_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_STOP_WORKOUT_CODE);
         sendBroadcast(bundle);
         stopWorkout();
+    }
+
+    @Override
+    public void sendPauseWorkoutBroadcast(int problem) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
+        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+                Constants.BROADCAST_PAUSE_WORKOUT_CODE);
+        sendBroadcast(bundle);
+        pause();
     }
 
     @Override

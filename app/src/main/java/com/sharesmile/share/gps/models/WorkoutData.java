@@ -1,164 +1,119 @@
 package com.sharesmile.share.gps.models;
 
 import android.location.Location;
-import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.core.UnObfuscable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ankitmaheshwari1 on 21/02/16.
+ * Created by ankitm on 25/03/16.
  */
-public class WorkoutData implements UnObfuscable, Parcelable{
+public interface WorkoutData extends UnObfuscable, Parcelable{
 
-    private static final String TAG = "WorkoutData";
+	/**
+	 * gets total distance ran in workout
+	 * @return
+	 */
+	float getDistance();
 
-    private float distance; // in m
-    private long beginTimeStamp; // in millisecs
-    private float recordedTime; // in secs
-    private float elapsedTime; // in secs
-    private int totalSteps;
-    private boolean isActive;
-    private List<LatLng> points;
+	/**
+	 * @return time interval for which distance has been recorded
+	 */
+	float getRecordedTime();
 
+	/**
+	 * @return elapsed time interval for which the workout was in running state( i.e. not paused)
+	 * since the beginning
+	 *
+	 */
+	float getElapsedTime();
 
-    public WorkoutData(long beginTimeStamp) {
-        isActive = true;
-        this.beginTimeStamp = beginTimeStamp;
-        points = new ArrayList<>();
-    }
+	/**
+	 * @return Avg speed of the workout
+	 */
+	float getAvgSpeed();
 
-    public float getDistance() {
-        return distance;
-    }
+	/**
+	 * @return total number of steps in the entire workout session
+	 */
+	int getTotalSteps();
 
-    /**
-     * @return time interval for which distance has been recorded
-     */
-    public float getRecordedTime() {
-        return recordedTime;
-    }
+	/**
+	 * @return All the location points marked for this workout session
+	 */
+	List<LatLng> getPoints();
 
-    /**
-     * @return elapsed time since the beginning of workout in secs, returns total workout time if it has stopped
-     */
-    public float getElapsedTime(){
-        setElapsedTime();
-        return elapsedTime;
-    }
+	/**
+	 * @return all the batches of this workout session
+	 */
+	List<WorkoutBatch> getBatches();
 
-    private void setElapsedTime(){
-        if (isActive){
-            elapsedTime = (System.currentTimeMillis() - beginTimeStamp) / 1000;
-        }
-    }
+	/**
+	 * just adds the given distance to the workout and attributes it to the current session
+	 * @param distanceToAdd
+	 */
+	void addDistance(float distanceToAdd);
 
-    public float getAvgSpeed() {
-        if (getRecordedTime() > 0){
-            return (distance / getRecordedTime());
-        }else
-            return 0;
-    }
+	/**
+	 * add given num steps to the workout
+	 * @param stepsToAdd
+	 */
+	void addSteps(int stepsToAdd);
 
-    public int getTotalSteps() {
-        return totalSteps;
-    }
+	/**
+	 * adds given distance record
+	 * @param recordToAdd
+	 */
+	void addRecord(DistRecord recordToAdd);
 
-    public List<LatLng> getPoints() {
-        return points;
-    }
+	/**
+	 * @return epoch at which workout began
+	 */
+	long getBeginTimeStamp();
 
-    public void addRecord(DistRecord record){
-        addDistance(record.getDist());
-        addPoint(record.getLocation());
-    }
+	/**
+	 * @return index of the batch which is currently running OR
+	 * the index of the last batch if the workout is paused
+	 */
+	int getCurrentBatchIndex();
 
-    public void addSteps(int numSteps){
-        totalSteps = totalSteps + numSteps;
-    }
+	/**
+	 * @return the batch which is currently running OR
+	 * the last batch if the workout is paused
+	 */
+	WorkoutBatch getCurrentBatch();
 
-    public void setTotalSteps(int total){
-        totalSteps = total;
-    }
+	/**
+	 * @return true iff workout is paused
+	 */
+	boolean isPaused();
 
-    public void addDistance(float distanceInRecord) {
-        this.distance = distance + distanceInRecord;
-    }
+	/**
+	 * @return true iff workout is running, i.e. active and not paused
+	 */
+	boolean isRunning();
 
-    public void setSource(Location source){
-        points.add(0, new LatLng(source.getLatitude(), source.getLongitude()));
-    }
+	/**
+	 * completes the currently runnning batch
+	 */
+	void workoutPause();
 
-    private void addPoint(Location point){
-        points.add(new LatLng(point.getLatitude(), point.getLongitude()));
-    }
+	/**
+	 * invokes new batch and adds it to the list of batches
+	 */
+	void workoutResume();
 
-    public void setRecordedTime(float recordedTime) {
-        this.recordedTime = recordedTime;
-    }
+	/**
+	 * @return true if start point has not yet been detected after workout started/resumed
+	 */
+	boolean coldStartAfterResume();
 
-    @Override
-    public String toString() {
-        return "WorkoutData{" +
-                "distance=" + distance +
-                ", recordedTime=" + getRecordedTime() +
-                ", elapsedTime=" + getElapsedTime() +
-                ", avgSpeed=" + getAvgSpeed() +
-                ", totalSteps=" + getTotalSteps() +
-                ", points=" + TextUtils.join("|", points) +
-                '}';
-    }
+	/**
+	 * completes workout session and returns this after whatever post processing is required
+	 */
+	WorkoutData close();
 
-    public WorkoutData closeWorkout(){
-        setElapsedTime();
-        isActive = false;
-        return this;
-    }
-
-    protected WorkoutData(Parcel in) {
-        distance = in.readFloat();
-        setRecordedTime(in.readFloat());
-        if (in.readByte() == 0x01) {
-            points = new ArrayList<LatLng>();
-            in.readList(points, LatLng.class.getClassLoader());
-        } else {
-            points = null;
-        }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeFloat(distance);
-        dest.writeFloat(getRecordedTime());
-        if (points == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(points);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<WorkoutData> CREATOR = new Parcelable.Creator<WorkoutData>() {
-        @Override
-        public WorkoutData createFromParcel(Parcel in) {
-            return new WorkoutData(in);
-        }
-
-        @Override
-        public WorkoutData[] newArray(int size) {
-            return new WorkoutData[size];
-        }
-    };
 }
-

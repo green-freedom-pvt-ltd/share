@@ -26,20 +26,6 @@ public class DistRecord implements UnObfuscable, Serializable{
         this.location = location;
     }
 
-    /**
-     * Constructor which uses speed from location objects to calculate distance
-     * @param location
-     * @param prevLocation
-     */
-    public DistRecord(Location location, Location prevLocation){
-        this.location = location;
-        this.prevLocation = prevLocation;
-        bearing = location.getBearing();
-        this.speed = (location.getSpeed() + prevLocation.getSpeed()) / 2;
-        interval = ((float) (getElapsedTimeMs())) / 1000;
-        this.dist = speed*interval;
-    }
-
     public DistRecord(Location location, Location prevLocation, float dist){
         this.location = location;
         this.prevLocation = prevLocation;
@@ -70,8 +56,8 @@ public class DistRecord implements UnObfuscable, Serializable{
                 '}';
     }
 
-    public boolean isSource(){
-        if (prevLocation == null){
+    public boolean isStartRecord(){
+        if (location != null && prevLocation == null){
             return true;
         }
         return false;

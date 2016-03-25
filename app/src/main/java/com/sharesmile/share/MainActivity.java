@@ -368,7 +368,7 @@ public class MainActivity extends BaseActivity {
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_STOP_WORKOUT_CODE");
                         synchronized (this){
                             if (runFragment != null && runFragment.isRunActive()){
-                                int problem = bundle.getInt(Constants.KEY_WORKOUT_STOP_PROBLEM);
+                                int problem = bundle.getInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM);
                                 String errorMessage = "";
                                 switch (problem){
                                     case Constants.PROBELM_TOO_FAST:

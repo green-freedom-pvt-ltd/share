@@ -37,7 +37,6 @@ public class VigilanceTimer implements Runnable {
 		}
 	}
 
-
 	public synchronized void pauseTimer(){
 		resetCounters();
 	}
@@ -52,22 +51,22 @@ public class VigilanceTimer implements Runnable {
 
 		//check for slow speed
 		if (checkForTooSlow()){
-			Logger.d(TAG, "Workout too slow, not enough distance will stopWorkout");
+			Logger.d(TAG, "Workout too slow, not enough distance will pause Workout");
 			// Not enough steps/distance since the beginning
-			workoutService.sendStopWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+			workoutService.sendPauseWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
 			return;
 		}
 
 		//check for high speed
 		if (checkForTooFast()){
-			workoutService.sendStopWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
+			workoutService.sendPauseWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
 			return;
 		}
 
 		if (workoutService.isCountingSteps()){
 			// Check if user is actually running/moving
 			if (checkForLackOfMovement()){
-				workoutService.sendStopWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
+				workoutService.sendPauseWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
 				return;
 			}
 		}
@@ -75,7 +74,10 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	private boolean checkForTooSlow(){
-		long timeElapsedSinceLastResume = System.currentTimeMillis() - tracker.getResumeTimeStamp();
+		if (!Config.TOO_SLOW_CHECK){
+			return false;
+		}
+		long timeElapsedSinceLastResume = System.currentTimeMillis() - tracker.getLastResumeTimeStamp();
 		float inSecs = (float)(timeElapsedSinceLastResume / 1000);
 		Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + tracker.getTotalSteps()
 				+ ", timeElapsed in secs = " + inSecs
@@ -89,6 +91,9 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	private boolean checkForTooFast(){
+		if (!Config.USAIN_BOLT_CHECK){
+			return false;
+		}
 		if (lastValidatedRecord == null){
 			// Will wait for next tick
 			lastValidatedRecord = tracker.getLastRecord();
@@ -121,6 +126,9 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	private boolean checkForLackOfMovement(){
+		if (!Config.LAZY_ASS_CHECK){
+			return false;
+		}
 		if (stepsTillNow == -1){
 			//Will wait for the next tick
 			stepsTillNow = tracker.getTotalSteps();

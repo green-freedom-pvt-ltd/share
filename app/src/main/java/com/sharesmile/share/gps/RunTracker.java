@@ -2,9 +2,7 @@ package com.sharesmile.share.gps;
 
 import android.hardware.SensorEvent;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.text.TextUtils;
 
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
@@ -12,13 +10,14 @@ import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
-public class RunTracker implements Tracker{
+public class RunTracker implements Tracker {
 
     private static final String TAG = "RunTracker";
 
@@ -26,6 +25,7 @@ public class RunTracker implements Tracker{
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
     private ScheduledExecutorService executorService;
+    private DistRecord lastRecord;
 
     public RunTracker(ScheduledExecutorService executorService, UpdateListner listener){
         synchronized (RunTracker.class){
@@ -33,14 +33,17 @@ public class RunTracker implements Tracker{
             this.listener = listener;
             stepsSinceReboot = 0;
             if (isActive()){
-                dataStore = new WorkoutDataStore();
-                setState(State.valueOf(
-                                SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.PAUSED.name()))
-                );
+                dataStore = new WorkoutDataStoreImpl();
+                String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
+                if (!TextUtils.isEmpty(prevRecordAsString)){
+                    lastRecord = Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class);
+                }
+                setState(State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE,
+                                State.PAUSED.name())));
             }else{
                 // User started workout
                 setState(State.RUNNING);
-                dataStore = new WorkoutDataStore(System.currentTimeMillis());
+                dataStore = new WorkoutDataStoreImpl(System.currentTimeMillis());
                 resumeRun();
                 stepsSinceReboot = 0;
             }
@@ -49,6 +52,7 @@ public class RunTracker implements Tracker{
 
     public synchronized WorkoutData endRun(){
         WorkoutData workoutData = dataStore.clear();
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
         dataStore = null;
         stepsSinceReboot = 0;
         setState(State.IDLE);
@@ -69,24 +73,24 @@ public class RunTracker implements Tracker{
     public synchronized void pauseRun() {
         setState(State.PAUSED);
         stepsSinceReboot = 0;
+        dataStore.workoutPause();
     }
 
     @Override
     public synchronized void resumeRun() {
-        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LAST_RESUME_TIMESTAMP, System.currentTimeMillis());
-        SharedPrefsManager.getInstance().setFloat(Constants.PREF_DISTANCE_AT_LAST_RESUME, getTotalDistanceCovered());
         setState(State.RUNNING);
+        dataStore.workoutResume();
     }
 
     @Override
-    public long getResumeTimeStamp() {
-        return SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LAST_RESUME_TIMESTAMP);
+    public long getLastResumeTimeStamp() {
+        return dataStore.getLastResumeTimeStamp();
     }
 
 
     @Override
     public float getDistanceCoveredSinceLastResume() {
-        return getTotalDistanceCovered() - SharedPrefsManager.getInstance().getFloat(Constants.PREF_DISTANCE_AT_LAST_RESUME);
+        return dataStore.getDistanceCoveredSinceLastResume();
     }
 
     /**
@@ -94,7 +98,7 @@ public class RunTracker implements Tracker{
      * @return
      */
     @Override
-    public boolean isPaused() {
+    public synchronized boolean isPaused() {
         return State.PAUSED.equals(getState());
     }
 
@@ -103,7 +107,7 @@ public class RunTracker implements Tracker{
      * @return
      */
     @Override
-    public boolean isRunning() {
+    public synchronized boolean isRunning() {
         return State.RUNNING.equals(getState());
     }
 
@@ -125,8 +129,8 @@ public class RunTracker implements Tracker{
 
     @Override
     public DistRecord getLastRecord(){
-        if (isActive() && dataStore != null){
-            return dataStore.getLastRecord();
+        if (isActive()){
+            return lastRecord;
         }
         return null;
     }
@@ -177,61 +181,70 @@ public class RunTracker implements Tracker{
      * @param event
      */
     private synchronized void processStepsEvent(SensorEvent event){
-        if (stepsSinceReboot < 1){
-            //i.e. fresh reading after creation of runtracker
+        if (isRunning()){
+            if (stepsSinceReboot < 1){
+                //i.e. fresh reading after creation of runtracker
+                stepsSinceReboot = (int) event.values[0];
+                Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
+            }
+            int numSteps = (int) event.values[0] - stepsSinceReboot;
             stepsSinceReboot = (int) event.values[0];
-            Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
+            long reportimeStamp = System.currentTimeMillis();
+            Logger.d(TAG, "Adding " + numSteps + "steps.");
+            dataStore.addSteps(numSteps);
+            listener.updateStepsRecord(reportimeStamp);
         }
-        int numSteps = (int) event.values[0] - stepsSinceReboot;
-        stepsSinceReboot = (int) event.values[0];
-        long reportimeStamp = System.currentTimeMillis();
-        Logger.d(TAG, "Adding " + numSteps + "steps.");
-        dataStore.addSteps(numSteps);
-        listener.updateStepsRecord(reportimeStamp);
     }
 
 
     //TODO: revise this method to handle pause resume
     private synchronized void processLocation(Location point){
-        if (dataStore.getRecordsCount() <= 0){
-            // This is the source location
-            Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
-            if (point.getAccuracy() < Config.SOURCE_ACCEPTABLE_ACCURACY){
-                // Set has source only when it has acceptable accuracy
-                Logger.d(TAG,"Source Location with good accuracy fetched:\n " + point.toString());
-                dataStore.setSource(point);
-            }
-        }else{
-            Logger.d(TAG,"Processing Location:\n " + point.toString());
-            long ts = point.getTime();
-            DistRecord prevRecord = dataStore.getLastRecord();
-            Location prevLocation = prevRecord.getLocation();
-            long prevTs = prevLocation.getTime();
-            float interval = ((float) (ts - prevTs)) / 1000;
-            float dist = prevLocation.distanceTo(point);
+        if (isRunning()){
+            //Check if the start point has been detected since the workout started/resumed
+            if (dataStore.coldStartAfterResume()){
+                // This is the source location
+                Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
+                if (point.getAccuracy() < Config.SOURCE_ACCEPTABLE_ACCURACY){
+                    // Set has source only when it has acceptable accuracy
+                    Logger.d(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
+                    DistRecord startRecord = new DistRecord(point);
+                    dataStore.addRecord(startRecord);
+                    lastRecord = startRecord;
+                    SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, lastRecord);
+                }
+            }else{
+                Logger.d(TAG,"Processing Location:\n " + point.toString());
+                long ts = point.getTime();
+                Location prevLocation = lastRecord.getLocation();
+                long prevTs = prevLocation.getTime();
+                float interval = ((float) (ts - prevTs)) / 1000;
+                float dist = prevLocation.distanceTo(point);
 
-            // Step 1: Check whether threshold interval for recording has elapsed
-            if (interval > Config.THRESHOLD_INTEVAL){
+                // Step 1: Check whether threshold interval for recording has elapsed
+                if (interval > Config.THRESHOLD_INTEVAL){
 
-                boolean toRecord = false;
-                float accuracy = point.getAccuracy();
+                    boolean toRecord = false;
+                    float accuracy = point.getAccuracy();
                     /*
                      Step 2: Record if point is accurate, i.e. accuracy better/lower than our threshold
                              Else
                              Apply formula to check whether to record the point or not
                       */
-                if (accuracy < Config.THRESHOLD_ACCURACY){
-                    Logger.d(TAG, "Accuracy Wins");
-                    toRecord = true;
-                }else{
-                    toRecord = checkUsingFormula(dist, point.getAccuracy());
-                }
-                // Step 3: Record if needed, else wait for next location
-                if (toRecord){
-                    DistRecord record = new DistRecord(point, prevLocation, dist);
-                    Logger.d(TAG,"Distance Recording: " + record.toString());
-                    dataStore.addRecord(record);
-                    listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
+                    if (accuracy < Config.THRESHOLD_ACCURACY){
+                        Logger.d(TAG, "Accuracy Wins");
+                        toRecord = true;
+                    }else{
+                        toRecord = checkUsingFormula(dist, point.getAccuracy());
+                    }
+                    // Step 3: Record if needed, else wait for next location
+                    if (toRecord){
+                        DistRecord record = new DistRecord(point, prevLocation, dist);
+                        Logger.d(TAG,"Distance Recording: " + record.toString());
+                        dataStore.addRecord(record);
+                        lastRecord = record;
+                        SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, lastRecord);
+                        listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
+                    }
                 }
             }
         }

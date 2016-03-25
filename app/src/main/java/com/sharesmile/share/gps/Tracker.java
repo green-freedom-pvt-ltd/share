@@ -20,7 +20,7 @@ public interface Tracker {
 	void feedLocation(Location point);
 	void feedSteps(SensorEvent event);
 	long getBeginTimeStamp();
-	long getResumeTimeStamp();
+	long getLastResumeTimeStamp();
 	int getTotalSteps();
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();

@@ -9,8 +9,7 @@ public interface IWorkoutService {
 	void stopWorkout();
 	void pause();
 	void resume();
-
-	void sendStopWorkoutBroadcast(int problem);
+	void sendPauseWorkoutBroadcast(int problem);
 	boolean isCountingSteps();
 
 }

@@ -43,6 +43,8 @@ public class Constants {
 
     public static final int BROADCAST_STEPS_UPDATE_CODE = 206;
 
+    public static final int BROADCAST_PAUSE_WORKOUT_CODE = 207;
+
     public static final int PROBELM_NOT_MOVING = 0;
 
     public static final int PROBELM_TOO_SLOW = 1;
@@ -59,27 +61,13 @@ public class Constants {
 
     public static final String KEY_WORKOUT_UPDATE_TOTAL_DISTANCE = "key_wourkout_update_total_distance";
 
-    public static final String KEY_WORKOUT_STOP_PROBLEM = "key_workout_stop_reason";
+    public static final String KEY_PAUSE_WORKOUT_PROBLEM = "key_workout_pause_reason";
 
-//    public static final String PREF_IS_WORKOUT_ACTIVE = "pref_is_workout_active";
-//
-//    public static final String PREF_IS_USER_RUNNING = "pref_is_user_running";
+    public static final String KEY_STOP_WORKOUT_PROBLEM = "key_workout_stop_reason";
 
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";
 
-    public static final String PREF_WORKOUT_LAST_RESUME_TIMESTAMP = "pref_last_workout_resume_timestamp";
-
-    public static final String PREF_DISTANCE_AT_LAST_RESUME = "pref_distance_since_last_resume";
-
-    public static final String PREF_RUN_SOURCE  = "pref_run_source";
-
     public static final String PREF_PREV_DIST_RECORD  = "pref_prev_dist_record";
-
-    public static final String PREF_RUN_BEGIN_TIMESTAMP  = "pref_run_begin_time_stamp";
-
-    public static final String PREF_NUM_RECORDS  = "pref_num_records";
-
-    public static final String PREF_NUM_TOTAL_STEPS  = "pref_num_total_steps";
 
     public static final String PREF_WORKOUT_DATA  = "pref_workout_data";
 

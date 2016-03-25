@@ -23,16 +23,22 @@ public class Config {
 
     public static final float STEPS_PER_SECOND_FACTOR = 1f;
 
-    public static float THRESHOLD_INTEVAL = 1; // in secs
+    public static final float THRESHOLD_INTEVAL = 1; // in secs
 
-    public static float SOURCE_ACCEPTABLE_ACCURACY = 30; // in m
+    public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
+
+    public static float SOURCE_ACCEPTABLE_ACCURACY = 25; // in m
 
     public static float THRESHOLD_ACCURACY = 16; // in m
 
-    public static float THRESHOLD_ACCURACY_OFFSET = 1f;
-
     public static float THRESHOLD_FACTOR = 5;
 
-    public static final float SMALLEST_DISPLACEMENT = 7;// in m
+    public static float SMALLEST_DISPLACEMENT = 7;// in m
+
+    public static boolean TOO_SLOW_CHECK = true;
+
+    public static boolean LAZY_ASS_CHECK = true;
+
+    public static boolean USAIN_BOLT_CHECK = true;
 
 }
