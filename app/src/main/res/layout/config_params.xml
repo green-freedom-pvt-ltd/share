@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/edit_source_acceptable_accuracy"
+        layout="@layout/edit_text_config_param"/>
+
+    <include
+        android:id="@+id/edit_threshold_accuracy"
+        layout="@layout/edit_text_config_param"/>
+
+    <include
+        android:id="@+id/edit_threshold_factor"
+        layout="@layout/edit_text_config_param"/>
+
+    <include
+        android:id="@+id/edit_smallest_displacement"
+        layout="@layout/edit_text_config_param"/>
+
+    <include
+        android:id="@+id/edit_too_slow_check"
+        layout="@layout/edit_boolean_config_param"/>
+
+    <include
+        android:id="@+id/edit_lazy_ass_check"
+        layout="@layout/edit_boolean_config_param"/>
+
+    <include
+        android:id="@+id/edit_usain_bolt_check"
+        layout="@layout/edit_boolean_config_param"/>
+
+    <Button
+        android:id="@+id/bt_save"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="20sp"
+        android:text="SAVE"
+        android:padding="5dp"/>
+
+</LinearLayout>

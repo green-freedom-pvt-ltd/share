@@ -238,6 +238,10 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
                 }
                 break;
 
+            case R.id.bt_edit_config:
+                myActivity.replaceFragment(ConfigFragment.newInstance());
+                break;
+
             case R.id.iv_static_google_map:
                 Logger.d(TAG, "onClick: iv_static_google_map");
                 if (workoutData != null){
