@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -110,13 +111,16 @@ public class WorkoutService extends Service implements
      *
      * @return True iff the device can run this sample
      */
-    public boolean isKitkatWithStepSensor() {
+    public static boolean isKitkatWithStepSensor(Context appContext) {
         // Require at least Android KitKat
         int currentApiVersion = android.os.Build.VERSION.SDK_INT;
         // Check that the device supports the step counter and detector sensors
-        PackageManager packageManager = getPackageManager();
+        PackageManager packageManager = appContext.getPackageManager();
+        boolean hasStepDetector = packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+        Logger.i(TAG, "isKitkatWithStepSensor: currentApiVersion = " + currentApiVersion +
+                        ", hasStepDetector = " + hasStepDetector);
         return currentApiVersion >= android.os.Build.VERSION_CODES.KITKAT
-                && packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+                && hasStepDetector;
     }
 
     @TargetApi(19)
@@ -282,7 +286,7 @@ public class WorkoutService extends Service implements
             } else {
                 Logger.e(TAG, "unable to connect to google play services.");
             }
-            if (isKitkatWithStepSensor() && !currentlyProcessingSteps){
+            if (isKitkatWithStepSensor(getApplicationContext()) && !currentlyProcessingSteps){
                 Logger.d(TAG, "Step Detector present! Will register");
                 registerStepDetector();
             }

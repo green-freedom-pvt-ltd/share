@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.RunPathFragment;
+import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -52,8 +54,11 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
     ImageView staticGoogleMapView;
     WorkoutData workoutData;
 
+    Button startPauseResume;
+
     File logsFile;
     boolean isRunActive;
+    boolean isRunnning;
     private long runStartTime;
 
     public RunFragment() {
@@ -94,10 +99,12 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         baseView = inflater.inflate(R.layout.fragment_run, container, false);
 
-        baseView.findViewById(R.id.bt_start_run).setOnClickListener(this);
+        startPauseResume = (Button) baseView.findViewById(R.id.bt_start_run);
+        startPauseResume.setOnClickListener(this);
         baseView.findViewById(R.id.bt_end_run).setOnClickListener(this);
         baseView.findViewById(R.id.bt_capture_logs).setOnClickListener(this);
         baseView.findViewById(R.id.bt_email_logs).setOnClickListener(this);
+        baseView.findViewById(R.id.bt_edit_config).setOnClickListener(this);
 
         runDataContainer = (LinearLayout) baseView.findViewById(R.id.run_data_container);
         totalDistanceView = (TextView) baseView.findViewById(R.id.tv_total_distance);
@@ -143,7 +150,11 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         totalDistanceView.setText(distance);
         avgSpeedView.setText(avgSpeed);
         totalTimeView.setText(time);
-        totalStepsView.setText(workoutData.getTotalSteps() + "");
+        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
+            totalStepsView.setText("N.A.");
+        }else{
+            totalStepsView.setText(workoutData.getTotalSteps() + "");
+        }
         int size = (int) Utils.convertDpToPixel(getContext(), 300);
         Utils.setStaticGoogleMap(size, size, staticGoogleMapView, workoutData.getPoints());
     }
@@ -169,11 +180,30 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         if (userEnded){
             myActivity.endLocationTracking();
         }
+        startPauseResume.setText("START");
         setIsRunActive(false);
+        isRunnning = false;
         runStartTime = 0;
         newtimer.cancel();
         liveDataContainer.setVisibility(View.GONE);
         // Wait for total data to show up
+    }
+
+    public void pauseRun(boolean userPaused){
+        isRunnning = false;
+        startPauseResume.setText("RESUME");
+        newtimer.cancel();
+        if (userPaused){
+            myActivity.pauseWorkout();
+        }
+    }
+
+    public void resumeRun(){
+        // Resume will always be done by the user
+        isRunnning = true;
+        startPauseResume.setText("PAUSE");
+        myActivity.resumeWorkout();
+        newtimer.start();
     }
 
     private void setIsRunActive(boolean b){
@@ -192,14 +222,20 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         myActivity.beginLocationTracking();
         runDataContainer.setVisibility(View.GONE);
         liveDataContainer.setVisibility(View.VISIBLE);
+        startPauseResume.setText("PAUSE");
         logsFile = null;
         setIsRunActive(true);
+        isRunnning = true;
         workoutData = null;
         runStartTime = System.currentTimeMillis();
         newtimer.start();
-        liveDistanceView.setText("0 m");
-        liveSpeedView.setText("0 km/hr");
-        liveStepsView.setText("0");
+        liveDistanceView.setText("0.00 m");
+        liveSpeedView.setText("0.0 km/hr");
+        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
+            liveStepsView.setText("N.A.");
+        }else{
+            liveStepsView.setText("0");
+        }
     }
 
     public void setErrorMessageView(String text){
@@ -208,11 +244,23 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
+    public boolean isRunning(){
+        return isRunnning;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.bt_start_run:
-                beginRun();
+                if (!isRunActive()){
+                    beginRun();
+                }else{
+                    if (isRunning()){
+                        pauseRun(true);
+                    }else{
+                        resumeRun();
+                    }
+                }
                 break;
 
             case R.id.bt_end_run:

@@ -24,7 +24,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private long beginTimeStamp;
 	private boolean isActive;
 	private boolean paused;
-	private List<WorkoutBatch> batches;
+	private List<WorkoutBatchImpl> batches;
 
 	/**
 	 * Constructor to be used for creating a new WorkoutData object
@@ -39,7 +39,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	private void invokeNewBatch(long startTimeStamp){
-		WorkoutBatch newbatch = new WorkoutBatchImpl(startTimeStamp);
+		WorkoutBatchImpl newbatch = new WorkoutBatchImpl(startTimeStamp);
 		batches.add(newbatch);
 	}
 
@@ -83,7 +83,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 
 	@Override
-	public List<WorkoutBatch> getBatches() {
+	public List<WorkoutBatchImpl> getBatches() {
 		return batches;
 	}
 
@@ -212,8 +212,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		isActive = in.readByte() != 0x00;
 		paused = in.readByte() != 0x00;
 		if (in.readByte() == 0x01) {
-			batches = new ArrayList<WorkoutBatch>();
-			in.readList(batches, WorkoutBatch.class.getClassLoader());
+			batches = new ArrayList<>();
+			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
 		} else {
 			batches = null;
 		}

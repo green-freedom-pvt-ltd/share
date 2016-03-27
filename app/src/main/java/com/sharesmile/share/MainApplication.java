@@ -7,8 +7,10 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
@@ -124,6 +126,7 @@ public class MainApplication extends Application {
         super.onCreate();
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
+        Fabric.with(this, new Crashlytics());
     }
 
 }

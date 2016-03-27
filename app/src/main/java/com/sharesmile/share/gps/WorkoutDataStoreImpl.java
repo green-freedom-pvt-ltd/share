@@ -127,7 +127,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     public WorkoutData retrieveFromPersistentStorage() {
         String workoutDataAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_DATA);
         if (!TextUtils.isEmpty(workoutDataAsString)){
-            return Utils.createObjectFromJSONString(workoutDataAsString, WorkoutData.class);
+            return Utils.createObjectFromJSONString(workoutDataAsString, WorkoutDataImpl.class);
         }
         return null;
     }

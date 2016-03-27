@@ -69,18 +69,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.activity_toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//
-//        viewPager = (ViewPager) findViewById(R.id.viewpager);
-//        setupViewPager(viewPager);
-//
-//        tabLayout = (TabLayout) findViewById(R.id.tabs);
-//        tabLayout.setupWithViewPager(viewPager);
-
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerList = (ListView) findViewById(R.id.drawer_list_view);
         drawerList.setAdapter(new DrawerMenuAdapter(this, R.layout.drawer_list_item,
@@ -252,6 +240,18 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    public void pauseWorkout(){
+        if (isBoundToLocationService()){
+            locationService.pause();
+        }
+    }
+
+    public void resumeWorkout(){
+        if (isBoundToLocationService()){
+            locationService.resume();
+        }
+    }
+
     private void unbindLocationService(){
         Logger.d(TAG, "unbindLocationService");
         unbindService(locationServiceConnection);
@@ -364,8 +364,8 @@ public class MainActivity extends BaseActivity {
                             locationService = null;
                         }
                         break;
-                    case Constants.BROADCAST_STOP_WORKOUT_CODE:
-                        Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_STOP_WORKOUT_CODE");
+                    case Constants.BROADCAST_PAUSE_WORKOUT_CODE:
+                        Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_PAUSE_WORKOUT_CODE");
                         synchronized (this){
                             if (runFragment != null && runFragment.isRunActive()){
                                 int problem = bundle.getInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM);
@@ -385,7 +385,7 @@ public class MainActivity extends BaseActivity {
                                     Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
                                     runFragment.setErrorMessageView(errorMessage);
                                 }
-                                runFragment.endRun(false);
+                                runFragment.pauseRun(false);
                             }
                         }
                         break;

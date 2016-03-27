@@ -28,7 +28,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_margin="12dp"
-            android:text="Start"/>
+            android:text="START"/>
 
         <Button
             android:id="@+id/bt_end_run"
@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_margin="12dp"
-            android:text="End"/>
+            android:text="END"/>
 
     </LinearLayout>
 

@@ -49,7 +49,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable{
 	/**
 	 * @return all the batches of this workout session
 	 */
-	List<WorkoutBatch> getBatches();
+	List<WorkoutBatchImpl> getBatches();
 
 	/**
 	 * just adds the given distance to the workout and attributes it to the current session
