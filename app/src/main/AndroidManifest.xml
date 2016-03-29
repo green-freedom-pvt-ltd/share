@@ -27,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".TrackerActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait">
@@ -40,11 +40,11 @@
         <activity
             android:name=".news.NewsActivity"
             android:label="@string/title_activity_news"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".TrackerActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.sharesmile.share.MainActivity" />
+                android:value=".TrackerActivity" />
         </activity>
 
         <service
