@@ -19,9 +19,6 @@ import android.widget.Button;
 
 import com.sharesmile.share.R;
 
-import Fragments.CauseInfoFragment;
-import Fragments.CauseSwipeFragment;
-
 public class OnScreenFragment extends Fragment {
 
     public static TabLayout tabLayout;

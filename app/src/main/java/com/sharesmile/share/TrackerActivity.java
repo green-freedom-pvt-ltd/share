@@ -44,7 +44,6 @@ public class TrackerActivity extends BaseActivity {
 
     private static final String TAG = "TrackerActivity";
     private DrawerLayout drawerLayout;
-    private ListView drawerList;
     private WorkoutService locationService;
     private RunFragment runFragment;
 
@@ -59,7 +58,6 @@ public class TrackerActivity extends BaseActivity {
         setContentView(R.layout.activity_tracker);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        drawerList = (ListView) findViewById(R.id.drawer_list_view);
 
         loadInitialFragment();
 
@@ -100,20 +98,6 @@ public class TrackerActivity extends BaseActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     public class DrawerItemClickListener implements ListView.OnItemClickListener {
 

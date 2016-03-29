@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.sharesmile.share.R;
-import com.example.apurvgandhwani.runforcause.RunProgress;
 
 /**
  * Created by apurvgandhwani on 3/28/2016.
