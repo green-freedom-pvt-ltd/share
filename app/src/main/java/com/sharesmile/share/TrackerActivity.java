@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.drawer.DrawerMenuAdapter;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -38,7 +37,6 @@ import com.sharesmile.share.utils.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TrackerActivity extends BaseActivity {
@@ -49,15 +47,6 @@ public class TrackerActivity extends BaseActivity {
     private ListView drawerList;
     private WorkoutService locationService;
     private RunFragment runFragment;
-
-    private static final ArrayList<String> MENU_ITEMS = new ArrayList<String>(){
-        {
-            add("Home");
-            add("Profile");
-            add("Feedback");
-            add("Logout");
-        }
-    };
 
     private static final int HOME = 0;
     private static final int PROFILE = 1;
@@ -71,9 +60,6 @@ public class TrackerActivity extends BaseActivity {
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerList = (ListView) findViewById(R.id.drawer_list_view);
-        drawerList.setAdapter(new DrawerMenuAdapter(this, R.layout.drawer_list_item,
-                R.id.list_item_text_view, MENU_ITEMS));
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         loadInitialFragment();
 
