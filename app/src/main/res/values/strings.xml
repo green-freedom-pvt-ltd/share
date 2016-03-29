@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Share</string>
+    <string name="app_name">Run For A Cause</string>
     <string name="main_activity">MainActivity</string>
     <string name="news_activity">NewsActivity</string>
     <string name="events_activity">EventsActivity</string>
@@ -56,5 +56,13 @@
     <string name="google_maps_api_key">AIzaSyALJg75UAhncT-_KlKP5stZGmADFqkQBYg</string>
 
     <string name="cause_brief">We teach kids every day for two hours. Our focus is value based education which includes teaching and manners, inculcating sense of hygeine and helping attitude and help them realise and achieve their dreams.</string>
+
+    <string name="Description">SThe horizon was tinged with red, and suddenly the sun appeared. The boy
+thought back to that conversation with his father, and felt happy; he had
+already seen many castles and met many women (but none the equal of the
+one who awaited him several days hence). He owned a jacket, a book that
+he could trade for another, and a flock of sheep. But, most important, he
+was able every day to live out his dream. If he were to tire of the Andalusian
+fields, he could sell his sheep and go to sea</string>
 
 </resources>
