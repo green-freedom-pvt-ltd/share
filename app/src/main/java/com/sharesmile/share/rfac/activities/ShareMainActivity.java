@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -10,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.gps.Tracker;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.LogoutFragment;
@@ -82,10 +85,11 @@ public class ShareMainActivity extends AppCompatActivity {
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_logout) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.shareDrawerLayout,new LogoutFragment()).addToBackStack("tag").commit();
+                    Intent i = new Intent(ShareMainActivity.this, TrackerActivity.class);
+                    startActivity(i);
+//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
+//                    xfragmentTransaction.replace(R.id.shareDrawerLayout,new LogoutFragment()).addToBackStack("tag").commit();
                 }
-
 
                 return false;
             }

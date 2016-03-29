@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
 import com.sharesmile.share.rfac.fragments.CauseInfoFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
@@ -52,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -87,8 +88,10 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_logout) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.drawerLayout, new LogoutFragment()).addToBackStack( "tag" ).commit();
+                    Intent i = new Intent(MainActivity.this, TrackerActivity.class);
+                    startActivity(i);
+//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
+//                    xfragmentTransaction.replace(R.id.drawerLayout, new LogoutFragment()).addToBackStack( "tag" ).commit();
                 }
 
 
