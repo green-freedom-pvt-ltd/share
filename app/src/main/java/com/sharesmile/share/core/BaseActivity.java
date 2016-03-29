@@ -14,7 +14,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     @Override
     public void addFragment(BaseFragment fragmentToBeLoaded) {
-        boolean addToBackStack = true;
+        boolean addToBackStack = false;
         boolean allowStateLoss = true;
 
         if (!getSupportFragmentManager().isDestroyed()) {
