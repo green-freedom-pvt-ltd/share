@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sharesmile.share.MainActivity;
+import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Config;
@@ -43,7 +43,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
     private static final String WORKOUT_DATA = "workout_data";
     private static final String ERROR_MESSAGE = "error_message";
 
-    MainActivity myActivity;
+    TrackerActivity myActivity;
     View baseView;
     LinearLayout runDataContainer;
     LinearLayout liveDataContainer;
@@ -80,7 +80,7 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        myActivity = (MainActivity) getActivity();
+        myActivity = (TrackerActivity) getActivity();
     }
 
     public boolean isFragmentAttachedToActivity(){
