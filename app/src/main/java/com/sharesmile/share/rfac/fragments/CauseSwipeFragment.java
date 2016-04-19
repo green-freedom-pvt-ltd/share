@@ -7,10 +7,10 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-
 
 /**
  * Created by apurvgandhwani on 3/22/2016.
@@ -18,7 +18,9 @@ import com.sharesmile.share.R;
 public class CauseSwipeFragment extends Fragment {
     public static final String ARG_OBJECT = "object";
 
-    FragmentManager mFragmentManager = getFragmentManager();
+    FragmentManager mFragmentManager;
+    TextView tv_description;
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -26,28 +28,14 @@ public class CauseSwipeFragment extends Fragment {
         // properly.
         View rootView = inflater.inflate(
                 R.layout.swipe_layout, container, false);
-        Bundle args = getArguments();
+        tv_description = (TextView) rootView.findViewById(R.id.run_screen_description);
 
-        TextView descriptionTextView = (TextView)rootView.findViewById(R.id.run_screen_description);
+        mFragmentManager = getFragmentManager();
+        TextView descriptionTextView = (TextView) rootView.findViewById(R.id.run_screen_description);
+        ImageView causeImage = (ImageView) rootView.findViewById(R.id.img_run);
         descriptionTextView.setMovementMethod(new ScrollingMovementMethod());
-
-        rootView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v){
-                //this will log the page number that was click
-
-              //  FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-               // fragmentTransaction.replace(R.id.drawerLayout, new CauseInfoFragment()).addToBackStack( "tag" ).commit();
-            }
-        });
-        // ((TextView) rootView.findViewById(R.id.RunList_description)).setText(
-        // Integer.toString(args.getInt(ARG_OBJECT)));
         return rootView;
     }
-
-  /*  public void scaleImage(float scale){
-        rootView.setScaleX(scale);
-//        rootView.setBackgroundColor(Color.BLUE);
-    } */
 
 
 }

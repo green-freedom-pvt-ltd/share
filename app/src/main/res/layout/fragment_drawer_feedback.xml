@@ -1,58 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/white"
-    android:layout_height="match_parent">
+    android:orientation="vertical">
 
-    <TextView
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Feedback"
-        android:gravity="center"
-        android:textSize="18dp"
-        android:background="@color/grey"
-        android:textColor="@color/MontserratLight"/>
+        android:layout_height="53dp"
+        android:background="@color/sky_blue"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+
+        >
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Feedback"
+            android:textColor="@color/white"
+            android:textSize="20dp" />
+    </android.support.v7.widget.Toolbar>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/et_feedback_email"
+        <TextView
+            android:id="@+id/tv_feedback"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:hint="Enter your e-mail id"
-            android:layout_marginTop="36dp"
-            android:layout_marginRight="10dp"
-            android:background="#00000000"
-            />
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="17dp"
+            android:text="@string/feedback"
+            android:textColor="@color/MontserratRegular"
+            android:textSize="14sp" />
 
-        <View
-            android:layout_width="250dp"
-            android:layout_height="1dp"
-            android:layout_alignLeft="@+id/et_feedback_email"
-            android:layout_below="@+id/et_feedback_email"
-            android:background="#c0c0c0"/>
 
         <EditText
             android:id="@+id/et_feedback_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_feedback_email"
-            android:layout_alignLeft="@id/et_feedback_email"
-            android:layout_marginTop="26dp"
-            android:hint="Type your Feedback"
+            android:layout_alignLeft="@id/tv_feedback"
+            android:layout_below="@+id/tv_feedback"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="26dp"
             android:background="#00000000"
-            />
+            android:hint="Enter your feedback here" />
 
         <View
-            android:layout_width="250dp"
+
+            android:layout_width="350dp"
             android:layout_height="1dp"
-            android:layout_alignLeft="@+id/et_feedback_email"
+            android:layout_alignLeft="@+id/tv_feedback"
             android:layout_below="@+id/et_feedback_text"
-            android:background="#c0c0c0"/>
+            android:background="#c0c0c0" />
+
+        <Button
+            android:id="@+id/btn_lets_run"
+            android:layout_width="295dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/et_feedback_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="79dp"
+            android:background="@drawable/rounded_corner"
+            android:text="SUBMIT"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
     </RelativeLayout>
+
 
 </LinearLayout>

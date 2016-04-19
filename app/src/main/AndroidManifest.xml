@@ -34,17 +34,22 @@
         </activity>
 
         <activity
-            android:name=".rfac.activities.ShareMainActivity"
+            android:name=".rfac.activities.ThankYouActivity"
             android:label="@string/app_name"
             />
         <activity
-            android:name=".rfac.activities.MainActivity"
+            android:name=".rfac.activities.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".rfac.activities.MainActivity"
+            android:label="@string/app_name" >
         </activity>
 
         <service

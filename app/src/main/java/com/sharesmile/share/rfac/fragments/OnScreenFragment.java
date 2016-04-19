@@ -3,9 +3,10 @@ package com.sharesmile.share.rfac.fragments;
 /**
  * Created by apurvgandhwani on 3/28/2016.
  */
+
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -21,7 +22,6 @@ import com.sharesmile.share.R;
 
 public class OnScreenFragment extends Fragment {
 
-    public static TabLayout tabLayout;
     public static ViewPager viewPager;
     FragmentManager mFragmentManager;
     android.app.FragmentTransaction mFragmentTransaction;
@@ -29,16 +29,18 @@ public class OnScreenFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      View x = inflater.inflate(R.layout.tab_layout, null);
-        Button lets_run_btn =  (Button) x.findViewById(R.id.btn_lets_run);
+        View v = inflater.inflate(R.layout.tab_layout, null);
+        Button lets_run_btn = (Button) v.findViewById(R.id.btn_lets_run);
 
-            mFragmentManager = getFragmentManager();
-       // tabLayout = (TabLayout) x.findViewById(R.id.tabs);
-        viewPager = (ViewPager) x.findViewById(R.id.viewpager);
+        mFragmentManager = getFragmentManager();
+        // tabLayout = (TabLayout) x.findViewById(R.id.tabs);
+        viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         viewPager.setClipToPadding(false);
-        viewPager.setPageMargin(30);
-        viewPager.setPadding(140, 50, 100, 0);
+        viewPager.setPageMargin(60);
+        viewPager.setPadding(140, 50, 140, 0);
 
+
+// Enable Scrolling by removing the OnTouchListner
 
 
         viewPager.setAdapter(new CollectionPagerAdapter(getChildFragmentManager()));
@@ -47,9 +49,10 @@ public class OnScreenFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.drawerLayout, new CauseInfoFragment()).addToBackStack( "tag" ).commit();
+                fragmentTransaction.replace(R.id.drawerLayout, new CauseInfoFragment()).addToBackStack("tag").commit();
             }
         });
+
 
         viewPager.setPageTransformer(true, new ViewPager.PageTransformer() {
       /*      @Override
@@ -141,7 +144,7 @@ public class OnScreenFragment extends Fragment {
                 }
         );
 
-        return x;
+        return v;
 
     }
 
@@ -163,7 +166,6 @@ public class OnScreenFragment extends Fragment {
             fragment.setArguments(args);
             return fragment;
         }
-
 
 
         @Override

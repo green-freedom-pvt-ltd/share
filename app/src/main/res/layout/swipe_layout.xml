@@ -1,61 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="268.8dp"
-    android:orientation="vertical"
-    android:layout_height="420.8dp"
-    android:background="@color/light_grey"
-    >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cause_type"
+        android:textSize="12sp" />
 
     <ImageView
-        android:id="@+id/image_run"
-        android:layout_width="279dp"
+        android:id="@+id/img_run"
+        android:layout_width="match_parent"
         android:layout_height="185dp"
-        android:src="@drawable/run_item_icon"
-        android:background="@color/light_grey"
-        />
+        android:clickable="true"
+        android:src="@drawable/cause_sample" />
 
     <RelativeLayout
         android:layout_width="279dp"
         android:layout_height="235dp"
-        android:background="@color/white"
-        >
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/run_screen_title"
-            android:layout_width="229.9dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="16.3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5.1dp"
+            android:layout_marginLeft="30.7dp"
             android:layout_marginRight="22.6dp"
             android:layout_marginTop="11dp"
-            android:layout_marginBottom="5.1dp"
-            android:textSize="17.3dp"
-            android:text="Sponser a Child, Foster a Future! "/>
+            android:text="Sponser a Child, Foster a Future!"
+            android:textSize="17.3sp" />
 
         <TextView
             android:id="@+id/run_screen_sponser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/run_screen_title"
-            android:layout_width="119dp"
-            android:layout_height="17dp"
-            android:layout_marginLeft="16.8dp"
-            android:layout_marginRight="133dp"
             android:layout_marginBottom="8.4dp"
+            android:layout_marginLeft="30.7dp"
+            android:text="by Shwas Foundation"
+            android:textSize="12sp" />
 
-            android:text="by Shwas Foundation"/>
-        
-        <TextView
-            android:id="@+id/run_screen_description"
-            android:layout_below="@+id/run_screen_sponser"
-            android:layout_alignLeft="@+id/run_screen_title"
+
+        <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="229.9dp"
             android:layout_height="155.2dp"
-            android:layout_marginLeft="2dp"
+            android:layout_alignLeft="@+id/run_screen_title"
+            android:layout_below="@+id/run_screen_sponser"
             android:layout_marginBottom="6dp"
-            android:text="@string/Description"
-            android:maxLines = "100"
-            android:scrollbars = "vertical"
-            />
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="30dp"
+            android:fillViewport="true"
+
+            >
+
+            <TextView
+                android:id="@+id/run_screen_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isScrollContainer="false"
+                android:maxLines="8"
+                android:text="@string/mini_description"
+
+                />
+        </ScrollView>
     </RelativeLayout>
-
-
 
 </LinearLayout>

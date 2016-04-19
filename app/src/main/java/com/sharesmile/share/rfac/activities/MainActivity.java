@@ -1,98 +1,90 @@
 package com.sharesmile.share.rfac.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
-import com.sharesmile.share.rfac.fragments.CauseInfoFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.LogoutFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
-import com.sharesmile.share.rfac.fragments.PoliciesFragment;
 import com.sharesmile.share.rfac.fragments.ProfileFragment;
-import com.sharesmile.share.rfac.fragments.RunProgress;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
+import com.sharesmile.share.utils.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
-    ViewPager viewPager;
+    private static final String TAG = "MainActivity";
+
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
-    CauseInfoFragment causeInfoFragment = new CauseInfoFragment();
-    RunProgress runProgressFragment ;
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        mNavigationView = (NavigationView) findViewById(R.id.shitstuff) ;
+        mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.replace(R.id.containerView,new OnScreenFragment()).commit();
+        mFragmentTransaction.replace(R.id.containerView, new OnScreenFragment()).commit();
 
-        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout, toolbar,R.string.app_name,
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
                 R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
 
-
+        //getSupportActionBar().setElevation(0);
 
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                mDrawerLayout.closeDrawers();
 
-
-
+                Logger.d(TAG, "onNavigationItemSelected");
 
                 if (menuItem.getItemId() == R.id.nav_item_profile) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.drawerLayout, new ProfileFragment()).addToBackStack("tag").commit();
+                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.drawerLayout, new ProfileFragment()).addToBackStack("tag").commit();
+
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.drawerLayout, new AboutUsFragment()).addToBackStack("tag").commit();
-                }
-
-                if (menuItem.getItemId() == R.id.nav_item_policies) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.drawerLayout, new PoliciesFragment()).addToBackStack("tag").commit();
+                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.drawerLayout, new AboutUsFragment()).addToBackStack("tag").commit();
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_feedback) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.drawerLayout, new FeedbackFragment()).addToBackStack("tag").commit();
+                    Logger.d(TAG, "feedback clicked");
+                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.drawerLayout, new FeedbackFragment()).addToBackStack("tag").commit();
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_settings) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.drawerLayout, new SettingsFragment()).addToBackStack("tag").commit();
+                    Logger.d(TAG, "settings clicked");
+                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.drawerLayout, new SettingsFragment()).addToBackStack("tag").commit();
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_logout) {
-                    Intent i = new Intent(MainActivity.this, TrackerActivity.class);
-                    startActivity(i);
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.drawerLayout, new LogoutFragment()).addToBackStack( "tag" ).commit();
+                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.drawerLayout, new LogoutFragment()).addToBackStack("tag").commit();
                 }
+                mDrawerLayout.closeDrawers();
 
 
                 return false;

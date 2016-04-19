@@ -2,54 +2,60 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    >
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/image_run"
         android:layout_width="match_parent"
         android:layout_height="240dp"
-        android:src="@drawable/run_item_icon"
+        android:src="@drawable/cause_sample"
         android:background="@color/light_grey"
-        android:clickable="true"
-        />
+        android:clickable="true" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="230dp"
-        android:background="@color/white"
-        >
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/run_screen_title"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginLeft="16.3dp"
+            android:layout_marginLeft="16.8dp"
             android:layout_marginRight="22.6dp"
             android:layout_marginTop="6dp"
-            android:textSize="20.3dp"
-            android:text="Sponser a Child, Foster a Future! "/>
+            android:textSize="18sp"
+            android:text="Sponser a Child, Foster a Future! " />
 
         <TextView
             android:id="@+id/run_screen_sponser"
             android:layout_below="@+id/run_screen_title"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginLeft="16.8dp"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/run_screen_title"
             android:layout_marginRight="133dp"
             android:layout_marginBottom="8.4dp"
-            android:text="by Shwas Foundation"/>
+            android:textSize="12sp"
+            android:text="by Shwas Foundation" />
 
-        <TextView
-            android:id="@+id/run_screen_description"
-            android:layout_below="@+id/run_screen_sponser"
-            android:layout_alignLeft="@+id/run_screen_title"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginLeft="2dp"
-            android:text="@string/Description"
-            android:maxLines = "100"
-            />
+            android:layout_height="wrap_content"
+            android:layout_below="@id/run_screen_sponser"
+            android:fillViewport="true">
+
+
+            <TextView
+                android:id="@+id/run_screen_description"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="14sp"
+                android:layout_marginLeft="16.8dp"
+                android:layout_marginRight="22.6dp"
+                android:text="@string/Description"
+                android:maxLines="100" />
+
+        </ScrollView>
     </RelativeLayout>
 
     <Button
@@ -58,8 +64,7 @@
         android:layout_height="50dp"
         android:background="@color/pale_magenta"
         android:text="Begin Run"
-        android:textColor="@color/white"
-        />
+        android:textColor="@color/white" />
 
 
 </LinearLayout>

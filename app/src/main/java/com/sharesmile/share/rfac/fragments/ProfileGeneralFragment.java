@@ -6,24 +6,25 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.sharesmile.share.R;
 
-
 /**
- * Created by apurvgandhwani on 3/26/2016.
+ * Created by apurvgandhwani on 3/29/2016.
  */
-public class FeedbackFragment extends Fragment {
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+public class ProfileGeneralFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_drawer_feedback, null);
+
+        View v = inflater.inflate(R.layout.fragment_profile_general, null);
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+
         return v;
     }
 }
+
+

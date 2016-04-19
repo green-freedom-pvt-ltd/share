@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.sharesmile.share.R;
 
+
 /**
  * Created by apurvgandhwani on 3/26/2016.
  */
@@ -17,6 +18,6 @@ public class AboutUsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_drawer_about_us,null);
+        return inflater.inflate(R.layout.fragment_drawer_about_us, null);
     }
 }
