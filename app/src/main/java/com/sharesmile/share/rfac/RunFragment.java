@@ -6,15 +6,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sharesmile.share.TrackerActivity;
@@ -27,49 +23,29 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
-import java.io.File;
-import java.util.Date;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RunFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class RunFragment extends BaseFragment implements View.OnClickListener {
+public abstract  class RunFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String PARAM_TITLE = "param_title";
 
     private static final String TAG = "RunFragment";
-    private static final String WORKOUT_DATA = "workout_data";
-    private static final String ERROR_MESSAGE = "error_message";
+    public static final long TIMER_TICK = 1000; // in millis
+
 
     TrackerActivity myActivity;
-    View baseView;
-    LinearLayout runDataContainer;
-    LinearLayout liveDataContainer;
+    private View baseView;
 
-    TextView totalDistanceView, avgSpeedView, totalTimeView, totalStepsView;
-    TextView liveDistanceView, liveSpeedView, liveTimeView, liveStepsView;
-    TextView errorMessageView;
-    ImageView staticGoogleMapView;
     WorkoutData workoutData;
 
-    Button startPauseResume;
-
-    File logsFile;
     boolean isRunActive;
     boolean isRunnning;
     private long runStartTime;
+    Handler handler = new Handler();
+
+    private int secsSinceRunBegan = 0;
 
     public RunFragment() {
         // Required empty public constructor
-    }
-
-    public static RunFragment newInstance() {
-        RunFragment fragment = new RunFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -83,10 +59,6 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         myActivity = (TrackerActivity) getActivity();
     }
 
-    public boolean isFragmentAttachedToActivity(){
-        return (myActivity != null);
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -97,113 +69,61 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        baseView = inflater.inflate(R.layout.fragment_run, container, false);
-
-        startPauseResume = (Button) baseView.findViewById(R.id.bt_start_run);
-        startPauseResume.setOnClickListener(this);
-        baseView.findViewById(R.id.bt_end_run).setOnClickListener(this);
-        baseView.findViewById(R.id.bt_capture_logs).setOnClickListener(this);
-        baseView.findViewById(R.id.bt_email_logs).setOnClickListener(this);
-        baseView.findViewById(R.id.bt_edit_config).setOnClickListener(this);
-
-        runDataContainer = (LinearLayout) baseView.findViewById(R.id.run_data_container);
-        totalDistanceView = (TextView) baseView.findViewById(R.id.tv_total_distance);
-        avgSpeedView = (TextView) baseView.findViewById(R.id.tv_avg_speed);
-        totalStepsView = (TextView) baseView.findViewById(R.id.tv_total_steps);
-        totalTimeView = (TextView) baseView.findViewById(R.id.tv_total_time);
-        errorMessageView = (TextView) baseView.findViewById(R.id.tv_error_message);
-
-        liveDataContainer = (LinearLayout) baseView.findViewById(R.id.live_data_container);
-        liveDistanceView = (TextView) baseView.findViewById(R.id.tv_live_distance);
-        liveStepsView = (TextView) baseView.findViewById(R.id.tv_live_steps);
-        liveSpeedView = (TextView) baseView.findViewById(R.id.tv_live_speed);
-        liveTimeView = (TextView) baseView.findViewById(R.id.tv_live_time);
-
-        staticGoogleMapView = (ImageView) baseView.findViewById(R.id.iv_static_google_map);
-        staticGoogleMapView.setOnClickListener(this);
-
+        baseView = inflater.inflate(getLayoutResId(), container, false);
+        populateViews(baseView);
         return baseView;
     }
 
-    CountDownTimer newtimer = new CountDownTimer(1000000000, 1000) {
+    protected abstract void populateViews(View baseView);
 
-        public void onTick(long millisUntilFinished) {
-            long elapsed = System.currentTimeMillis() - runStartTime;
-            int secs = (int)(elapsed / 1000);
-            String time = Utils.secondsToString(secs);
-            liveTimeView.setText(time);
-        }
-        public void onFinish() {
+    protected abstract int getLayoutResId();
 
-        }
-    };
+    public abstract void updateTimeView(String newTime);
 
-    public void showRunData(WorkoutData data){
-        workoutData = data;
-        Logger.d(TAG, "showRunData:\n " + workoutData);
-        liveDataContainer.setVisibility(View.GONE);
-        runDataContainer.setVisibility(View.VISIBLE);
+    public abstract void onWorkoutResult(WorkoutData data);
 
-        String distance = String.format("%1$,.2f", (workoutData.getDistance() / 1000)) + " km";
-        String avgSpeed = String.format("%1$,.2f" , workoutData.getAvgSpeed() * 3.6) + " km/hr";
-        String time = Utils.secondsToString((int) workoutData.getElapsedTime());
-        totalDistanceView.setText(distance);
-        avgSpeedView.setText(avgSpeed);
-        totalTimeView.setText(time);
-        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
-            totalStepsView.setText("N.A.");
-        }else{
-            totalStepsView.setText(workoutData.getTotalSteps() + "");
-        }
-        int size = (int) Utils.convertDpToPixel(getContext(), 300);
-        Utils.setStaticGoogleMap(size, size, staticGoogleMapView, workoutData.getPoints());
-    }
+    public abstract void showUpdate(float speed, float distanceCovered);
 
+    public abstract void showSteps(int stepsSoFar);
 
-    public void showUpdate(float speed, float distaneCovered){
-        Logger.d(TAG, "showUpdate: speed = " + speed + ", distanceCovered = " + distaneCovered);
-        if (isRunActive()){
-            String distance = Math.round(distaneCovered)+ " m";
-            String speedDecimal = String.format("%1$,.2f" , speed * 3.6) + " km/hr";
-            liveDistanceView.setText(distance);
-            liveSpeedView.setText(speedDecimal);
-        }
-    }
+    protected abstract void onEndRun();
 
-    public void showSteps(int stepsSoFar){
-        if (isRunActive()){
-            liveStepsView.setText(stepsSoFar + "");
-        }
-    }
+    protected abstract void onPauseRun();
+
+    protected abstract void onResumeRun();
+
+    protected abstract void onBeginRun();
+
+    public abstract void showErrorMessage(String text);
+
 
     public void endRun(boolean userEnded){
         if (userEnded){
             myActivity.endLocationTracking();
         }
-        startPauseResume.setText("START");
         setIsRunActive(false);
         isRunnning = false;
         runStartTime = 0;
-        newtimer.cancel();
-        liveDataContainer.setVisibility(View.GONE);
-        // Wait for total data to show up
+        handler.removeCallbacks(timer);
+        onEndRun();
     }
+
 
     public void pauseRun(boolean userPaused){
         isRunnning = false;
-        startPauseResume.setText("RESUME");
-        newtimer.cancel();
+        handler.removeCallbacks(timer);
         if (userPaused){
             myActivity.pauseWorkout();
         }
+        onPauseRun();
     }
 
     public void resumeRun(){
         // Resume will always be done by the user
         isRunnning = true;
-        startPauseResume.setText("PAUSE");
         myActivity.resumeWorkout();
-        newtimer.start();
+        handler.postDelayed(timer, TIMER_TICK);
+        onResumeRun();
     }
 
     private void setIsRunActive(boolean b){
@@ -218,132 +138,27 @@ public class RunFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    private void beginRun(){
+    protected void beginRun(){
         myActivity.beginLocationTracking();
-        runDataContainer.setVisibility(View.GONE);
-        liveDataContainer.setVisibility(View.VISIBLE);
-        startPauseResume.setText("PAUSE");
-        logsFile = null;
         setIsRunActive(true);
         isRunnning = true;
         workoutData = null;
         runStartTime = System.currentTimeMillis();
-        newtimer.start();
-        liveDistanceView.setText("0.00 m");
-        liveSpeedView.setText("0.0 km/hr");
-        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
-            liveStepsView.setText("N.A.");
-        }else{
-            liveStepsView.setText("0");
-        }
-    }
-
-    public void setErrorMessageView(String text){
-        if (errorMessageView != null){
-            errorMessageView.setText(text);
-        }
+        secsSinceRunBegan = 0;
+        handler.postDelayed(timer, TIMER_TICK);
+        onBeginRun();
     }
 
     public boolean isRunning(){
         return isRunnning;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.bt_start_run:
-                if (!isRunActive()){
-                    beginRun();
-                }else{
-                    if (isRunning()){
-                        pauseRun(true);
-                    }else{
-                        resumeRun();
-                    }
-                }
-                break;
-
-            case R.id.bt_end_run:
-                endRun(true);
-                break;
-
-            case R.id.bt_capture_logs:
-                logsFile = myActivity.writeLogsToFile(getContext());
-                break;
-
-            case R.id.bt_email_logs:
-                if (logsFile != null){
-                    Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                    // The intent does not have a URI, so declare the "text/plain" MIME type
-                    emailIntent.setType("text/plain");
-                    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"maheshwari.ankit.iitd@gmail.com"}); // recipients
-                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RFAC Logs " + new Date().toString());
-                    emailIntent.putExtra(Intent.EXTRA_TEXT, textForMail());
-                    emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logsFile));
-                    startActivity(Intent.createChooser(emailIntent , "Send email..."));
-                }else{
-                    Toast.makeText(getContext(), "No Logs", Toast.LENGTH_SHORT);
-                }
-                break;
-
-            case R.id.bt_edit_config:
-                myActivity.replaceFragment(ConfigFragment.newInstance());
-                break;
-
-            case R.id.iv_static_google_map:
-                Logger.d(TAG, "onClick: iv_static_google_map");
-                if (workoutData != null){
-                    myActivity.replaceFragment(RunPathFragment.newInstance(workoutData));
-                }
-                break;
+    private Runnable timer = new Runnable() {
+        @Override
+        public void run() {
+            secsSinceRunBegan++;
+            updateTimeView(Utils.secondsToString(secsSinceRunBegan));
         }
-    }
-
-    private String textForMail(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL + " secs");
-        sb.append("\nTHRESHOLD_ACCURACY : " + Config.THRESHOLD_ACCURACY);
-        sb.append("\nTHRESHOLD_FACTOR : " + Config.THRESHOLD_FACTOR);
-        sb.append("\nVIGILANCE_START_THRESHOLD : " + (Config.VIGILANCE_START_THRESHOLD / 1000) + " secs");
-        sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT*3.6 + " km/hr");
-        sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT*3.6 + " km/hr");
-        sb.append("\nSTEPS_PER_SECOND_FACTOR : " + Config.STEPS_PER_SECOND_FACTOR);
-        sb.append("\nSMALLEST_DISPLACEMENT : " + Config.SMALLEST_DISPLACEMENT + " m");
-        if (workoutData != null){
-            sb.append("\nWorkoutData:\n" + workoutData);
-        }
-
-        return sb.toString();
-    }
-
-    @Override
-    protected void onSaveState(Bundle outState) {
-        Logger.d(TAG,"onSaveState");
-        super.onSaveState(outState);
-        if (workoutData != null){
-            Logger.d(TAG,"onSaveState: workoutData is present");
-            outState.putParcelable(WORKOUT_DATA, workoutData);
-            if (errorMessageView != null && !TextUtils.isEmpty(errorMessageView.getText())){
-                outState.putString(ERROR_MESSAGE, String.valueOf(errorMessageView.getText()));
-            }
-        }else{
-            outState.remove(WORKOUT_DATA);
-            outState.remove(ERROR_MESSAGE);
-        }
-    }
-
-    @Override
-    protected void onRestoreState(Bundle savedInstanceState) {
-        Logger.d(TAG,"onRestoreState");
-        super.onRestoreState(savedInstanceState);
-        WorkoutData data = savedInstanceState.getParcelable(WORKOUT_DATA);
-        if (data != null){
-            showRunData(data);
-            String errorMessage = savedInstanceState.getString(ERROR_MESSAGE);
-            if (!TextUtils.isEmpty(errorMessage)){
-                setErrorMessageView(errorMessage);
-            }
-        }
-    }
+    };
 
 }

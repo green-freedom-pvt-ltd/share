@@ -12,11 +12,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.IFragmentController;
 
 /**
  * Created by apurvgandhwani on 3/28/2016.
  */
-public class CauseInfoFragment extends Fragment {
+public class CauseInfoFragment extends BaseFragment {
 
 
     FragmentManager mFragmentManager;
@@ -33,8 +35,9 @@ public class CauseInfoFragment extends Fragment {
         beginRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.drawerLayout, new StartRunFragment()).addToBackStack("tag").commit();
+
+                //TODO: Start Tracker Activity here
+                getFragmentController().performOperation(IFragmentController.START_RUN, null);
             }
         });
         return v;

@@ -8,12 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
 
 
 /**
  * Created by apurvgandhwani on 3/26/2016.
  */
-public class FeedbackFragment extends Fragment {
+public class FeedbackFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

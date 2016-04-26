@@ -8,12 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
 
 
 /**
  * Created by apurvgandhwani on 3/26/2016.
  */
-public class AboutUsFragment extends Fragment {
+public class AboutUsFragment extends BaseFragment {
 
     @Nullable
     @Override

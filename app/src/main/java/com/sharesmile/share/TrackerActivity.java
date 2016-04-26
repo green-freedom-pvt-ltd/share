@@ -19,7 +19,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -28,10 +27,13 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
+import com.sharesmile.share.rfac.fragments.StartRunFragment;
 import com.sharesmile.share.utils.Logger;
 
 import java.io.File;
@@ -76,8 +78,12 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void loadInitialFragment(){
-        runFragment = RunFragment.newInstance();
-        addFragment(runFragment);
+        if (isWorkoutActive()){
+            runFragment = RealRunFragment.newInstance();
+            addFragment(runFragment, false);
+        }else{
+            addFragment(StartRunFragment.newInstance(), false);
+        }
     }
 
     @Override
@@ -88,6 +94,31 @@ public class TrackerActivity extends BaseActivity {
     @Override
     public String getName() {
         return TAG;
+    }
+
+    @Override
+    public void performOperation(int operationId, Object input) {
+        switch (operationId){
+            case END_RUN_START_COUNTDOWN:
+                replaceFragment(RealRunFragment.newInstance(), false);
+                break;
+        }
+
+    }
+
+    @Override
+    public void exit() {
+
+    }
+
+    @Override
+    public void requestPermission(int requestCode, PermissionCallback permissionsCallback) {
+
+    }
+
+    @Override
+    public void unregisterForPermissionRequest(int requestCode) {
+
     }
 
 
@@ -311,7 +342,7 @@ public class TrackerActivity extends BaseActivity {
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         //TODO: Display Result on UI
-                        runFragment.showRunData(result);
+                        runFragment.onWorkoutResult(result);
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
@@ -353,7 +384,7 @@ public class TrackerActivity extends BaseActivity {
                                 }
                                 if (!TextUtils.isEmpty(errorMessage)){
                                     Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
-                                    runFragment.setErrorMessageView(errorMessage);
+                                    runFragment.showErrorMessage(errorMessage);
                                 }
                                 runFragment.pauseRun(false);
                             }

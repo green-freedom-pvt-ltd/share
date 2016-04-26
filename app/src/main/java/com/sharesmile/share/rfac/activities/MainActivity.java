@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseActivity;
+import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.LogoutFragment;
@@ -20,26 +22,20 @@ import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.utils.Logger;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
-    FragmentManager mFragmentManager;
-    FragmentTransaction mFragmentTransaction;
     Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.replace(R.id.containerView, new OnScreenFragment()).commit();
+        loadInitialFragment();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         final ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
@@ -58,34 +54,27 @@ public class MainActivity extends AppCompatActivity {
                 Logger.d(TAG, "onNavigationItemSelected");
 
                 if (menuItem.getItemId() == R.id.nav_item_profile) {
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.drawerLayout, new ProfileFragment()).addToBackStack("tag").commit();
-
+                    replaceFragment(new ProfileFragment(), true);
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.drawerLayout, new AboutUsFragment()).addToBackStack("tag").commit();
+                    replaceFragment(new AboutUsFragment(), true);
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_feedback) {
                     Logger.d(TAG, "feedback clicked");
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.drawerLayout, new FeedbackFragment()).addToBackStack("tag").commit();
+                    replaceFragment(new FeedbackFragment(), true);
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_settings) {
                     Logger.d(TAG, "settings clicked");
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.drawerLayout, new SettingsFragment()).addToBackStack("tag").commit();
+                    replaceFragment(new SettingsFragment(), true);
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_logout) {
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.drawerLayout, new LogoutFragment()).addToBackStack("tag").commit();
+                    replaceFragment(new LogoutFragment(), true);
                 }
                 mDrawerLayout.closeDrawers();
-
 
                 return false;
             }
@@ -113,5 +102,40 @@ public class MainActivity extends AppCompatActivity {
         // }
 
         //return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void loadInitialFragment() {
+        addFragment(new OnScreenFragment(), false);
+    }
+
+    @Override
+    public int getFrameLayoutId() {
+        return R.id.containerView;
+    }
+
+    @Override
+    public String getName() {
+        return TAG;
+    }
+
+    @Override
+    public void performOperation(int operationId, Object input) {
+
+    }
+
+    @Override
+    public void exit() {
+        finish();
+    }
+
+    @Override
+    public void requestPermission(int requestCode, PermissionCallback permissionsCallback) {
+
+    }
+
+    @Override
+    public void unregisterForPermissionRequest(int requestCode) {
+
     }
 }

@@ -19,8 +19,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
 
-public class OnScreenFragment extends Fragment {
+public class OnScreenFragment extends BaseFragment {
 
     public static ViewPager viewPager;
     FragmentManager mFragmentManager;

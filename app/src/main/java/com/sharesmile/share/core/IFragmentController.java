@@ -7,14 +7,26 @@ public interface IFragmentController {
 
     static final String TAG = "IFragmentController";
 
-    void addFragment(BaseFragment fragment);
+    int END_RUN_START_COUNTDOWN = 100;
 
-    void replaceFragment(BaseFragment fragment);
+    int START_RUN = 101;
+
+    void addFragment(BaseFragment fragment, boolean addToBackStack);
+
+    void replaceFragment(BaseFragment fragment, boolean addToBackStack);
 
     void loadInitialFragment();
 
     int getFrameLayoutId();
 
     String getName();
+
+    void performOperation(int operationId, Object input);
+
+    void exit();
+
+    void requestPermission(int requestCode, PermissionCallback permissionsCallback);
+
+    void unregisterForPermissionRequest(int requestCode);
 
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -55,7 +56,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/tv_rup"
+                android:id="@+id/tv_run_progress_impact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -66,7 +67,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_rup"
+                android:layout_below="@+id/tv_run_progress_impact"
                 android:layout_centerHorizontal="true"
                 android:text="RUPEES"
                 android:textSize="10dp" />
@@ -88,7 +89,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:background="@color/sky_blue"
-            android:text="PAUSE"
+            android:text="@string/pause"
             android:textColor="@color/white" />
 
         <Button
@@ -97,7 +98,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:background="@color/pale_magenta"
-            android:text="STOP"
+            android:text="@string/stop"
             android:textColor="@color/white" />
 
     </LinearLayout>
@@ -118,7 +119,7 @@
             android:src="@drawable/timer" />
 
         <TextView
-            android:id="@+id/timer"
+            android:id="@+id/tv_run_progress_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_timer_icon"
@@ -142,10 +143,10 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/timer" />
+            app:srcCompat="@drawable/ic_directions_run_black_24px"/>
 
         <TextView
-            android:id="@+id/tv_distance"
+            android:id="@+id/tv_run_progress_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_distance_icon"

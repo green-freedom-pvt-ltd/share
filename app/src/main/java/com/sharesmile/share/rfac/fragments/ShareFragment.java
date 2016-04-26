@@ -11,12 +11,25 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.activities.ThankYouActivity;
 
 /**
  * Created by apurvgandhwani on 4/5/2016.
  */
-public class ShareFragment extends Fragment {
+public class ShareFragment extends BaseFragment {
+
+    public static final String WORKOUT_DATA = "workout_data";
+
+    public static ShareFragment newInstance(WorkoutData data) {
+        ShareFragment fragment = new ShareFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(WORKOUT_DATA, data);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
