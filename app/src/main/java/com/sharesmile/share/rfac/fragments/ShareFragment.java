@@ -12,6 +12,7 @@ import android.widget.Button;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.activities.ThankYouActivity;
@@ -22,6 +23,7 @@ import com.sharesmile.share.rfac.activities.ThankYouActivity;
 public class ShareFragment extends BaseFragment {
 
     public static final String WORKOUT_DATA = "workout_data";
+    private static final String TAG = "ShareFragment";
 
     public static ShareFragment newInstance(WorkoutData data) {
         ShareFragment fragment = new ShareFragment();
@@ -42,20 +44,18 @@ public class ShareFragment extends BaseFragment {
         btn_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(getActivity(), ThankYouActivity.class);
-                startActivity(intent);
+                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, null);
             }
         });
 
         btn_share_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(getActivity(), ThankYouActivity.class);
-                startActivity(intent);
+                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, null);
             }
         });
+
+        //TODO: Populate all textViews using workout data
 
         return v;
     }

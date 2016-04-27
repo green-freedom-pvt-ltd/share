@@ -27,6 +27,8 @@ public class RealRunFragment extends RunFragment{
     Button pauseButton;
     Button stopButton;
 
+    public static final float IMPACT_CONVERSION_FACTOR = 10.0f; // Rs per km
+
     public static RealRunFragment newInstance() {
         RealRunFragment fragment = new RealRunFragment();
         Bundle args = new Bundle();
@@ -47,6 +49,15 @@ public class RealRunFragment extends RunFragment{
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Will begin workout if not already active
+        if (!isRunActive()){
+            beginRun();
+        }
+    }
+
+    @Override
     protected int getLayoutResId() {
         return R.layout.run_progress;
     }
@@ -60,7 +71,7 @@ public class RealRunFragment extends RunFragment{
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()){
-            getFragmentController().replaceFragment(ShareFragment.newInstance(data));
+            getFragmentController().replaceFragment(ShareFragment.newInstance(data), false);
         }
     }
 
@@ -68,6 +79,8 @@ public class RealRunFragment extends RunFragment{
     public void showUpdate(float speed, float distanceCovered) {
         String distDecimal = String.format("%1$,.2f" , (distanceCovered / 1000) );
         distance.setText(distDecimal);
+        int rupees = (int) (IMPACT_CONVERSION_FACTOR*distanceCovered);
+        impact.setText(rupees);
     }
 
     @Override
@@ -77,22 +90,25 @@ public class RealRunFragment extends RunFragment{
 
     @Override
     protected void onEndRun() {
-
+        // Will wait for workout result broadcast
     }
 
     @Override
     protected void onPauseRun() {
         pauseButton.setText(R.string.resume);
+        runProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
     protected void onResumeRun() {
         pauseButton.setText(R.string.pause);
+        runProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onBeginRun() {
-
+        impact.setText("0");
+        distance.setText("0.00");
     }
 
     @Override
@@ -104,7 +120,13 @@ public class RealRunFragment extends RunFragment{
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_pause:
-                pauseRun(true);
+                if (isRunActive()){
+                    if (isRunning()){
+                        pauseRun(true);
+                    }else{
+                        resumeRun();
+                    }
+                }
                 break;
 
             case R.id.btn_stop:

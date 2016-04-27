@@ -202,13 +202,13 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
                 break;
 
             case R.id.bt_edit_config:
-                getFragmentController().replaceFragment(ConfigFragment.newInstance());
+                getFragmentController().replaceFragment(ConfigFragment.newInstance(), true);
                 break;
 
             case R.id.iv_static_google_map:
                 Logger.d(TAG, "onClick: iv_static_google_map");
                 if (workoutData != null){
-                    getFragmentController().replaceFragment(RunPathFragment.newInstance(workoutData));
+                    getFragmentController().replaceFragment(RunPathFragment.newInstance(workoutData), true);
                 }
                 break;
         }

@@ -24,8 +24,6 @@ import com.sharesmile.share.core.BaseFragment;
 public class OnScreenFragment extends BaseFragment {
 
     public static ViewPager viewPager;
-    FragmentManager mFragmentManager;
-    android.app.FragmentTransaction mFragmentTransaction;
 
     @Nullable
     @Override
@@ -33,10 +31,10 @@ public class OnScreenFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.tab_layout, null);
         Button lets_run_btn = (Button) v.findViewById(R.id.btn_lets_run);
 
-        mFragmentManager = getFragmentManager();
         // tabLayout = (TabLayout) x.findViewById(R.id.tabs);
         viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         viewPager.setClipToPadding(false);
+        //TODO: Change these padding and margin values to DP
         viewPager.setPageMargin(60);
         viewPager.setPadding(140, 50, 140, 0);
 
@@ -49,8 +47,7 @@ public class OnScreenFragment extends BaseFragment {
         lets_run_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.drawerLayout, new CauseInfoFragment()).addToBackStack("tag").commit();
+                getFragmentController().replaceFragment(new CauseInfoFragment(), true);
             }
         });
 

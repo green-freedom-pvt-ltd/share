@@ -2,25 +2,15 @@ package com.sharesmile.share.rfac;
 
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.sharesmile.share.TrackerActivity;
-import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.Config;
-import com.sharesmile.share.gps.RunPathFragment;
-import com.sharesmile.share.gps.WorkoutService;
-import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.gps.models.WorkoutData;;
 import com.sharesmile.share.utils.Utils;
 
 
@@ -158,6 +148,7 @@ public abstract  class RunFragment extends BaseFragment implements View.OnClickL
         public void run() {
             secsSinceRunBegan++;
             updateTimeView(Utils.secondsToString(secsSinceRunBegan));
+            handler.postDelayed(this, TIMER_TICK);
         }
     };
 

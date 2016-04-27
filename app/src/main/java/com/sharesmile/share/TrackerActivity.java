@@ -33,6 +33,8 @@ import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
+import com.sharesmile.share.rfac.TestRunFragment;
+import com.sharesmile.share.rfac.activities.ThankYouActivity;
 import com.sharesmile.share.rfac.fragments.StartRunFragment;
 import com.sharesmile.share.utils.Logger;
 
@@ -48,11 +50,14 @@ public class TrackerActivity extends BaseActivity {
     private DrawerLayout drawerLayout;
     private WorkoutService locationService;
     private RunFragment runFragment;
+    private boolean runInTestMode;
 
     private static final int HOME = 0;
     private static final int PROFILE = 1;
     private static final int FEEDBACK = 2;
     private static final int LOGOUT = 3;
+
+    public static final String RUN_IN_TEST_MODE = "run_in_test_mode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,8 @@ public class TrackerActivity extends BaseActivity {
         setContentView(R.layout.activity_tracker);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+
+        runInTestMode = getIntent().getBooleanExtra(RUN_IN_TEST_MODE, false);
 
         loadInitialFragment();
 
@@ -79,10 +86,18 @@ public class TrackerActivity extends BaseActivity {
     @Override
     public void loadInitialFragment(){
         if (isWorkoutActive()){
-            runFragment = RealRunFragment.newInstance();
+            runFragment = createRunFragment();
             addFragment(runFragment, false);
         }else{
             addFragment(StartRunFragment.newInstance(), false);
+        }
+    }
+
+    private RunFragment createRunFragment(){
+        if (runInTestMode){
+            return TestRunFragment.newInstance();
+        }else{
+            return RealRunFragment.newInstance();
         }
     }
 
@@ -98,12 +113,18 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void performOperation(int operationId, Object input) {
+        super.performOperation(operationId, input);
         switch (operationId){
             case END_RUN_START_COUNTDOWN:
-                replaceFragment(RealRunFragment.newInstance(), false);
+                runFragment = createRunFragment();
+                replaceFragment(runFragment, false);
+                break;
+            case SAY_THANK_YOU:
+                Intent intent = new Intent(this, ThankYouActivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
-
     }
 
     @Override
@@ -127,34 +148,6 @@ public class TrackerActivity extends BaseActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-
-    public class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            handleItemClick(position);
-        }
-
-        public void handleItemClick(int position){
-            drawerLayout.closeDrawer(Gravity.LEFT);
-            switch (position){
-                case HOME:
-                    MainApplication.showToast("HOME");
-                    break;
-                case PROFILE:
-                    MainApplication.showToast("PROFILE");
-                    break;
-                case FEEDBACK:
-                    MainApplication.showToast("FEEDBACK");
-                    break;
-                case LOGOUT:
-                    MainApplication.showToast("LOGOUT");
-                    break;
-
-            }
-        }
     }
 
     @Override

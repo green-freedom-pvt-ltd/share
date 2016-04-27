@@ -121,7 +121,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void performOperation(int operationId, Object input) {
-
+        super.performOperation(operationId, input);
     }
 
     @Override

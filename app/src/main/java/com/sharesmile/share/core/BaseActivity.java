@@ -64,8 +64,13 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     public void performOperation(int operationId, Object input) {
         switch (operationId){
             case START_RUN:
-                Intent intent = new Intent(this, TrackerActivity.class);
-                startActivity(intent);
+                if (input instanceof Boolean){
+                    Intent intent = new Intent(this, TrackerActivity.class);
+                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, (Boolean) input);
+                    startActivity(intent);
+                }else{
+                    throw new IllegalArgumentException();
+                }
                 break;
         }
 

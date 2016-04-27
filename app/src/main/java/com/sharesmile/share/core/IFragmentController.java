@@ -11,6 +11,8 @@ public interface IFragmentController {
 
     int START_RUN = 101;
 
+    int SAY_THANK_YOU = 102;
+
     void addFragment(BaseFragment fragment, boolean addToBackStack);
 
     void replaceFragment(BaseFragment fragment, boolean addToBackStack);

@@ -14,12 +14,14 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.utils.Logger;
 
 /**
  * Created by apurvgandhwani on 3/28/2016.
  */
 public class CauseInfoFragment extends BaseFragment {
 
+    private static final String TAG = "CauseInfoFragment";
 
     FragmentManager mFragmentManager;
     Button beginRun;
@@ -35,9 +37,16 @@ public class CauseInfoFragment extends BaseFragment {
         beginRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //TODO: Start Tracker Activity here
-                getFragmentController().performOperation(IFragmentController.START_RUN, null);
+                Logger.d(TAG, "onClick of Begin Run, will start Tracker Activity flow");
+                getFragmentController().performOperation(IFragmentController.START_RUN, false);
+            }
+        });
+        beginRun.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Logger.d(TAG, "onClick of Begin Run, will start Tracker Activity flow");
+                getFragmentController().performOperation(IFragmentController.START_RUN, true);
+                return true;
             }
         });
         return v;
