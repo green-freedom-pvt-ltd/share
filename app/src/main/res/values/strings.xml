@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Share</string>
+    <string name="main_activity">MainActivity</string>
+    <string name="news_activity">NewsActivity</string>
+    <string name="events_activity">EventsActivity</string>
+    <string name="rfac_activity">RfacActivity</string>
     <string name="action_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -7,6 +11,50 @@
     <string name="news_fragment_title">News goes here</string>
     <string name="run_fragment_title">Run for a cause</string>
 
+    <string name="main_title">SHARE</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="news_title">Good NEws</string>
+    <string name="news_sub_title">Sharing Smiles</string>
+    <string name="news_desc">See the good happening out there</string>
+
+    <string name="news_read_more">Read More</string>
+    <string name="news_share_now">Share Now</string>
+    <string name="news_pipe_separator">|</string>
+    <string name="news_dummy_brief">Aren\'t you tired of watching filth every recordedTime you visit your favourite Juhu beach. A bunch of enthusiastic students of Mumbai University and some working prfessionals from Bandra came together last Sunday to clean up the filth around the Chowpatty area of Juhu beach. And they have done a commendable job, you have to see it to believe it.</string>
+    <string name="news_dummy_title">Successful cleanliness drive by Share, boon to our future.</string>
+    <string name="news_dummy_date">22nd Jan</string>
+
+    <string name="event_title">Events</string>
+    <string name="event_sub_title">Do good Feel good</string>
+    <string name="event_desc">It\'s your turn to start doing</string>
+
+    <string name="event_detail_description">Description</string>
+    <string name="event_detail_location">Description</string>
+    <string name="event_detail_from">From</string>
+    <string name="event_detail_to">To</string>
+    <string name="event_navigate">Navigate</string>
+
+    <string name="event_detail_dummy_text">Every year, Indian Development Foundation (IDF) has been joining hands with volunteers from various sectors in the beach clean-up drive the morning after the Ganpati immersion. Let\'s make it this year too. ( expandable text field )</string>
+    <string name="event_detail_dummy_address">Lake Homes Club\nLake Homes\nPowai Vihar\nPowai\nMumbai-400076</string>
+
+    <string name="rfac_title">Run For A Cause</string>
+    <string name="rfac_sub_title">You Run, We Contribute</string>
+    <string name="rfac_desc">Your meters will get converted to charity</string>
+    <string name="title_activity_news">NewsActivity</string>
+
+    <string name="rfac_begin_run">BEGIN RUN</string>
+
+    <string name="rfac_usain_bolt_message">Oops! Looks like you are Usain Bolt, will pause workout</string>
+    <string name="rfac_lazy_ass_message">Don\'t be too lazy, move your ass!</string>
+    <string name="rfac_too_slow_message">You need to be a little more faster!</string>
+
+
+
+    <string name="google_maps_api_key">AIzaSyALJg75UAhncT-_KlKP5stZGmADFqkQBYg</string>
+
+    <string name="cause_brief">We teach kids every day for two hours. Our focus is value based education which includes teaching and manners, inculcating sense of hygeine and helping attitude and help them realise and achieve their dreams.</string>
+
 </resources>

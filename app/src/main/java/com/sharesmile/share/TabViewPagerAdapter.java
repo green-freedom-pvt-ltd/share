@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by ankitmaheshwari1 on 26/12/15.
  */
-public class TabViewPagerAdapter extends FragmentPagerAdapter{
+public class TabViewPagerAdapter extends FragmentPagerAdapter {
 
     private static final String TAG = "TabViewPagerAdapter";
     private final List<Fragment> mFragmentList = new ArrayList<>();

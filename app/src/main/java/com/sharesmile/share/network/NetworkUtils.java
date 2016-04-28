@@ -4,10 +4,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.sharesmile.share.utils.Logger;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -91,7 +91,7 @@ public class NetworkUtils {
             return response.body().string();
         }catch (IOException ioe){
             String message = "IOException while converting response body to string: " + ioe.getMessage();
-            Log.e(TAG, message, ioe);
+            Logger.e(TAG, message, ioe);
             throw new NetworkException.Builder().cause(ioe).httpStatusCode(response.code())
                     .errorMessage(message).build();
         }
@@ -102,13 +102,13 @@ public class NetworkUtils {
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
 
-        Log.d(TAG, "Response obtained from network is: \n" + responseString);
+        Logger.d(TAG, "Response obtained from network is: \n" + responseString);
 
         try{
             return gson.fromJson(responseString, tClass);
         }catch(JsonSyntaxException jse){
             String message = "JsonSyntaxException while parsing response string to " + tClass.getSimpleName();
-            Log.e(TAG, message, jse);
+            Logger.e(TAG, message, jse);
             throw new NetworkException.Builder().cause(jse)
                     .httpStatusCode(response.code())
                     .errorMessage(message).build();
@@ -120,13 +120,13 @@ public class NetworkUtils {
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
 
-        Log.d(TAG, "Response obtained from network is: \n" + responseString);
+        Logger.d(TAG, "Response obtained from network is: \n" + responseString);
 
         try{
             return gson.fromJson(responseString, typeOfT);
         }catch(JsonSyntaxException jse){
             String message = "JsonSyntaxException while parsing response string to " + typeOfT.toString();
-            Log.e(TAG, message, jse);
+            Logger.e(TAG, message, jse);
             throw new NetworkException.Builder().cause(jse).httpStatusCode(response.code()).errorMessage(message).build();
         }
     }
@@ -140,7 +140,7 @@ public class NetworkUtils {
                 messageFromServer = errorObject.getMessage();
             }
         }catch (NetworkException ne){
-            Log.e(TAG, "Can't fetch server error message from response");
+            Logger.e(TAG, "Can't fetch server error message from response");
         }
 
         String why = null;

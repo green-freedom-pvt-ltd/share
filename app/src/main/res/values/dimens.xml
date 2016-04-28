@@ -19,7 +19,7 @@
     <dimen name="event_card_ad_size">12sp</dimen>
     <dimen name="event_card_by_size">12sp</dimen>
     <dimen name="event_card_date_size">32sp</dimen>
-    <dimen name="event_card_month_size">15sp</dimen>
+    <dimen name="event_card_month_size">18sp</dimen>
     <dimen name="event_card_tv_size">60dp</dimen>
     <dimen name="event_card_tv_marginTop">2dp</dimen>
     <dimen name="event_card_ll_marginStart">20dp</dimen>
@@ -37,5 +37,7 @@
     <dimen name="event_detail_text_size">14sp</dimen>
     <dimen name="event_detail_margin_gap">7.5dp</dimen>
     <dimen name="event_detail_button_text_size">15sp</dimen>
+
+    <dimen name="footer_button_height">56dp</dimen>
 
 </resources>
