@@ -138,4 +138,9 @@ public class MainActivity extends BaseActivity {
     public void unregisterForPermissionRequest(int requestCode) {
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

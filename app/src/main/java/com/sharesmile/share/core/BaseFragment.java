@@ -44,7 +44,7 @@ public class BaseFragment extends Fragment {
     }
 
     public String getName(){
-        return this.getClass().getCanonicalName();
+        return getClass().getCanonicalName();
     }
 
 }

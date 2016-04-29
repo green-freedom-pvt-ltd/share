@@ -24,4 +24,7 @@
     <color name="sky_blue">#00b9ff</color>
     <color name="MontserratRegular">#4a4a4a</color>
 
+    <color name="white_50">#7fffffff</color>
+    <color name="white_dark">#eeeeee</color>
+
 </resources>

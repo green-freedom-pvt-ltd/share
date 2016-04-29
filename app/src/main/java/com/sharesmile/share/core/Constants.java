@@ -71,6 +71,13 @@ public class Constants {
 
     public static final String PREF_WORKOUT_DATA  = "pref_workout_data";
 
+    public static final String PREF_IS_LOGIN  = "pref_user_login";
+
+
+    //User Data
+    public static final String PREF_USER_NAME  = "pref_user_name";
+    public static final String PREF_USER_EMAIL  = "pref_user_email";
+
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{
         add(new LatLng(19.118394,72.914196));

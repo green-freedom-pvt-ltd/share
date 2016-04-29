@@ -126,7 +126,7 @@ public class MainApplication extends Application {
         super.onCreate();
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
-        Fabric.with(this, new Crashlytics());
+        //Fabric.with(this, new Crashlytics());
     }
 
 }

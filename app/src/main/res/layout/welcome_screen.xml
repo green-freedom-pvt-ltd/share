@@ -5,64 +5,66 @@
     android:background="@drawable/login_background"
     android:orientation="vertical">
 
-    <TextView
+    <com.sharesmile.share.views.MSBTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="150dp"
-        android:text="RunFC"
+        android:text="@string/impact_run"
+        android:textAllCaps="true"
+        android:shadowColor="@color/white_50"
+        android:shadowDy="2"
         android:textColor="@color/white"
         android:textSize="36sp" />
 
-    <Button
-        android:id="@+id/btn_login_fb"
-        android:layout_width="250dp"
-        android:layout_height="53dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="100dp"
-        android:background="@drawable/g_background"
-        android:textColor="@color/white" />
-
-    <Button
-        android:id="@+id/btn_login_google"
-        android:layout_width="250dp"
-        android:layout_height="53dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/g_background"
-        android:textColor="@color/white" />
-
-    <Button
-        android:id="@+id/btn_login_twitter"
-        android:layout_width="250dp"
-        android:layout_height="53dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/twitter_button"
-        android:textColor="@color/white" />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="95dp"
-            android:layout_marginTop="25dp"
-            android:text="@string/login_skip"
-            android:textColor="#80000000" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:orientation="vertical">
 
         <Button
-            android:id="@+id/tv_welcome_skip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:clickable="true"
-            android:background="@android:color/transparent"
-            android:text="SKIP"
-            android:textColor="@color/black" />
-    </LinearLayout>
+            android:id="@+id/btn_login_fb"
+            android:layout_width="250dp"
+            android:layout_height="53dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/fb_background"
+            android:textColor="@color/white" />
 
+        <Button
+            android:id="@+id/btn_login_google"
+            android:layout_width="250dp"
+            android:layout_height="53dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/g_background"
+            android:textColor="@color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login_skip"
+                android:textColor="@color/white_50"
+                android:textSize="12.5sp" />
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/tv_welcome_skip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:clickable="true"
+                android:text="SKIP"
+                android:textColor="@color/white_dark"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
