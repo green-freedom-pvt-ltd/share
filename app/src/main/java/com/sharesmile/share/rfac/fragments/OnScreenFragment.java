@@ -7,177 +7,112 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.network.NetworkAsyncCallback;
+import com.sharesmile.share.network.NetworkDataProvider;
+import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.adapters.CausePageAdapter;
+import com.sharesmile.share.rfac.models.CauseList;
+import com.sharesmile.share.rfac.models.CausesPage;
+import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.views.MRButton;
 
-public class OnScreenFragment extends BaseFragment {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    public static ViewPager viewPager;
+public class OnScreenFragment extends BaseFragment implements View.OnClickListener {
+
+    private static final String TAG = OnScreenFragment.class.getSimpleName();
+    @BindView(R.id.viewpager)
+    ViewPager viewPager;
+
+    @BindView(R.id.btn_lets_run)
+    MRButton mRunButton;
+
+    @BindView(R.id.content_view)
+    LinearLayout mContentView;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
+
+    private CausePageAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.tab_layout, null);
-        Button lets_run_btn = (Button) v.findViewById(R.id.btn_lets_run);
-
-        // tabLayout = (TabLayout) x.findViewById(R.id.tabs);
-        viewPager = (ViewPager) v.findViewById(R.id.viewpager);
+        View view = inflater.inflate(R.layout.fragment_cause, container, false);
+        ButterKnife.bind(this, view);
+        mRunButton.setOnClickListener(this);
+        getFragmentController().setActionBarTitle(getString(R.string.impactrun));
         viewPager.setClipToPadding(false);
-        //TODO: Change these padding and margin values to DP
-        viewPager.setPageMargin(60);
-        viewPager.setPadding(140, 50, 140, 0);
+        viewPager.setPageTransformer(false, new ViewPagerTransformer());
+        viewPager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.view_pager_page_margin));
+        viewPager.setPadding(getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_left), 0, getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_right), 0);
+        mAdapter = new CausePageAdapter(getChildFragmentManager());
+        viewPager.setAdapter(mAdapter);
+        fetchPageData(0);
+        return view;
 
+    }
 
-// Enable Scrolling by removing the OnTouchListner
-
-
-        viewPager.setAdapter(new CollectionPagerAdapter(getChildFragmentManager()));
-
-        lets_run_btn.setOnClickListener(new View.OnClickListener() {
+    private void fetchPageData(int pgNum) {
+        Logger.d(TAG, "Fetching Causes Data");
+        showProgressDialog();
+        NetworkDataProvider.doGetCallAsync(Urls.getCauseListUrl(), new NetworkAsyncCallback<CauseList>() {
             @Override
-            public void onClick(View v) {
-                getFragmentController().replaceFragment(new CauseInfoFragment(), true);
+            public void onNetworkFailure(NetworkException ne) {
+                Logger.e(TAG, "onNetworkFailure: Can't fetch events page data: " + ne.getMessageFromServer(), ne);
+                MainApplication.showToast("Unable to fetch events");
+                hideProgressDialog();
             }
+
+            @Override
+            public void onNetworkSuccess(CauseList causesList) {
+                Logger.d(TAG, "onNetworkSuccess");
+                //  editDataSet(causesPage);
+                AddCauseList(causesList);
+                hideProgressDialog();
+            }
+
+
         });
-
-
-        viewPager.setPageTransformer(true, new ViewPager.PageTransformer() {
-      /*      @Override
-            public void transformPage(View page, float position) {
-                final float normalizedposition = Math.abs(Math.abs(position) - 1);
-                //  page.setAlpha(normalizedposition);
-                page.setScaleX(normalizedposition / 2 + 0.5f);
-                page.setScaleY(normalizedposition / 2 + 0.5f);
-                } */
-
-       /*     @Override
-            public void transformPage(View page, float position) {
-              //  Log.e("pos",new Gson().toJson(position));
-                if (position < -1) {
-                    page.setScaleY(0.7f);
-                    page.setAlpha(1);
-                } else if (position <= 1 && position >-1) {
-                    float scaleFactor = Math.max(0.7f, 1 - Math.abs(position - 0.14285715f));
-                    page.setScaleX(scaleFactor);
-                //    Log.e("scale",new Gson().toJson(scaleFactor));
-                    page.setScaleY(scaleFactor);
-                    page.setAlpha(scaleFactor);
-                } else {
-                    page.setScaleY(0.7f);
-                    page.setAlpha(1);
-                }
-            } */
-
-            /*        private static final float MIN_SCALE_DEPTH = 0.75f;
-
-                    @Override
-                    public void transformPage(View page, float position) {
-                        final float alpha;
-                        final float scale;
-                        final float translationX;
-
-
-                        if (position > 0 && position < 1) {
-                            alpha = (1 - position);
-                            scale = MIN_SCALE_DEPTH + (1 - MIN_SCALE_DEPTH) * (1 - Math.abs(position));
-                            translationX = (page.getWidth() * -position);
-                        } else {
-                            alpha = 1;
-                            scale = 1;
-                            translationX = 0;
-                        }
-
-                        page.setAlpha(alpha);
-                        page.setTranslationX(translationX);
-                        page.setScaleX(scale);
-                        page.setScaleY(scale);
-
-
-                    } */
-
-                    @Override
-                    public void transformPage(View page, float position) {
-                        int pageWidth = viewPager.getMeasuredWidth() - viewPager.getPaddingLeft() - viewPager.getPaddingRight();
-                        int pageHeight = viewPager.getHeight();
-                        int paddingLeft = viewPager.getPaddingLeft();
-                        float transformPos = (float) (page.getLeft() - (viewPager.getScrollX() + paddingLeft)) / pageWidth;
-
-                        final float normalizedposition = Math.abs(Math.abs(transformPos) - 1);
-                        page.setAlpha(normalizedposition + 0.5f);
-
-                        int max = -pageHeight / 10;
-
-                        if (transformPos < -1) { // [-Infinity,-1)
-                            // This page is way off-screen to the left.
-                            ;
-                            // ObjectAnimator anim = ObjectAnimator.ofFloat(this,"translationX", 0,400);
-                            //anim.start();
-
-
-                        } else if (transformPos <= 1) { // [-1,1]
-                            page.setTranslationY(0);
-
-
-                        } else { // (1,+Infinity]
-                            // This page is way off-screen to the right.
-                            //ObjectAnimator anim = ObjectAnimator.ofFloat(this,"translationX", 0,400);
-                            //anim.start();
-
-
-                        }
-
-
-                    }
-                }
-        );
-
-        return v;
-
     }
 
-    class CollectionPagerAdapter extends FragmentStatePagerAdapter {
+    private void AddCauseList(CauseList causesList) {
+        mAdapter.addData(causesList);
+    }
 
+    private void showProgressDialog() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        mContentView.setVisibility(View.GONE);
+    }
 
-        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+    private void hideProgressDialog() {
+        mProgressBar.setVisibility(View.GONE);
+        mContentView.setVisibility(View.VISIBLE);
+    }
 
-        public CollectionPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_lets_run:
+                getFragmentController().performOperation(IFragmentController.START_RUN, false);
+                break;
+            default:
 
-        @Override
-        public Fragment getItem(int i) {
-            Fragment fragment = new CauseSwipeFragment();
-            Bundle args = new Bundle();
-            // Our object is just an integer :-P
-            args.putInt(CauseSwipeFragment.ARG_OBJECT, i + 1);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-
-        @Override
-        public int getCount() {
-            return 10;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
-        }
-
-        public Fragment getRegisteredFragment(int position) {
-            return registeredFragments.get(position);
         }
     }
+
 }

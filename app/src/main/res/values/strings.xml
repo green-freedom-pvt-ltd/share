@@ -84,5 +84,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="login_error">error in login.</string>
     <string name="email_id_required">Email id require for login.</string>
 
-    <string name="impact_run">impact run.</string>
+    <string name="impact_run">impact run</string>
+    <string name="impactrun">ImpactRun</string>
 </resources>

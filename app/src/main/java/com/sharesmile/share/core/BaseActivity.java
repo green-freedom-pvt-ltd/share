@@ -2,6 +2,7 @@ package com.sharesmile.share.core;
 
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
 import com.sharesmile.share.TrackerActivity;
@@ -73,6 +74,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 }
                 break;
         }
-
+    }
+    @Override
+    public void setActionBarTitle(String title) {
+       ActionBar actionBar= getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setTitle(title);
+        }
     }
 }

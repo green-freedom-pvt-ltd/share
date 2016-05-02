@@ -40,4 +40,10 @@
 
     <dimen name="footer_button_height">56dp</dimen>
 
+    <!--Screen-Fragment-->
+
+    <dimen name="view_pager_page_margin">20dp</dimen>
+    <dimen name="view_pager_margin_left">40dp</dimen>
+    <dimen name="view_pager_margin_right">40dp</dimen>
+    <dimen name="view_pager_margin_top">40dp</dimen>
 </resources>

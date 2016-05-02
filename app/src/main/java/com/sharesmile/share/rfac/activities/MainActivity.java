@@ -25,19 +25,22 @@ import com.sharesmile.share.utils.Logger;
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
-
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
-        loadInitialFragment();
+        if (savedInstanceState == null) {
+            loadInitialFragment();
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         final ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
                 R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -134,10 +137,10 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    @Override
-    public void unregisterForPermissionRequest(int requestCode) {
+    @Override public void unregisterForPermissionRequest(int requestCode) {
 
     }
+
 
     @Override
     public void onBackPressed() {

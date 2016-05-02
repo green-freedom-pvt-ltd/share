@@ -27,4 +27,12 @@
     <color name="white_50">#7fffffff</color>
     <color name="white_dark">#eeeeee</color>
 
+
+    <color name="black_one">#030303</color>
+    <color name="black_two">#262626</color>
+    <color name="black_three">#212121</color>
+    <color name="greyish_brown_two">#4a4a4a</color>
+    <color name="seafoam_blue">#50d2c2</color>
+    <color name="ice_blue">#e6f8ff</color>
+
 </resources>

@@ -3,10 +3,12 @@ package com.sharesmile.share.rfac.models;
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.UnObfuscable;
 
+import java.io.Serializable;
+
 /**
  * Created by ankitmaheshwari1 on 09/03/16.
  */
-public class Sponsor implements UnObfuscable {
+public class Sponsor implements UnObfuscable ,Serializable {
 
     private static final String TAG = "Sponsor";
 
@@ -16,7 +18,7 @@ public class Sponsor implements UnObfuscable {
     @SerializedName("sponsor_id")
     private int id;
 
-    @SerializedName("sponsor_name")
+    @SerializedName("sponsor_company")
     private String name;
 
     @SerializedName("sponsor_logo")

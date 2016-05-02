@@ -1,70 +1,87 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/image_run"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:src="@drawable/cause_sample"
-        android:background="@color/light_grey"
-        android:clickable="true" />
+        android:layout_height="240dp">
+
+        <ImageView
+            android:id="@+id/image_run"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:background="@color/light_grey"
+            android:clickable="true"
+            android:src="@drawable/cause_sample" />
+
+        <com.sharesmile.share.views.MLTextView
+            android:id="@+id/category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="16dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            tools:text="Education" />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:background="@color/white">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingBottom="20dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
-        <TextView
+        <com.sharesmile.share.views.MRTextView
             android:id="@+id/run_screen_title"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="16.8dp"
-            android:layout_marginRight="22.6dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textSize="18sp"
-            android:text="Sponser a Child, Foster a Future! " />
+            android:singleLine="true"
+            android:text="Sponser a Child, Foster a Future! "
+            android:textColor="@color/greyish_brown_two"
+            android:textSize="18sp" />
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:id="@+id/run_screen_sponser"
-            android:layout_below="@+id/run_screen_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/run_screen_title"
-            android:layout_marginRight="133dp"
-            android:layout_marginBottom="8.4dp"
-            android:textSize="12sp"
-            android:text="by Shwas Foundation" />
+            android:layout_below="@+id/run_screen_title"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
+            android:text="by Shwas Foundation"
+            android:textColor="@color/black_two"
+            android:textSize="12sp" />
 
-        <ScrollView
+        <com.sharesmile.share.views.MLTextView
+            android:id="@+id/run_screen_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/run_screen_sponser"
-            android:fillViewport="true">
+            android:layout_below="@+id/run_screen_sponser"
+            android:text="@string/Description"
+            android:textColor="@color/black_two"
+            android:textSize="14sp" />
 
-
-            <TextView
-                android:id="@+id/run_screen_description"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textSize="14sp"
-                android:layout_marginLeft="16.8dp"
-                android:layout_marginRight="22.6dp"
-                android:text="@string/Description"
-                android:maxLines="100" />
-
-        </ScrollView>
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="bottom">
     <Button
         android:id="@+id/begin_run"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
         android:background="@color/pale_magenta"
         android:text="Begin Run"
         android:textColor="@color/white" />
-
+    </LinearLayout>
 
 </LinearLayout>

@@ -31,4 +31,6 @@ public interface IFragmentController {
 
     void unregisterForPermissionRequest(int requestCode);
 
+    void setActionBarTitle(String title);
+
 }
