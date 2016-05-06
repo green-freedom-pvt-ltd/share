@@ -71,7 +71,6 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         View view = inflater.inflate(
                 R.layout.swipe_layout, container, false);
         ButterKnife.bind(this, view);
-
         init();
         return view;
     }

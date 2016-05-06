@@ -2,14 +2,18 @@ package com.sharesmile.share.rfac.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
@@ -28,6 +32,7 @@ public class MainActivity extends BaseActivity {
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +46,10 @@ public class MainActivity extends BaseActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
                 R.string.app_name);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
-
-        //getSupportActionBar().setElevation(0);
-
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -137,13 +138,48 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    @Override public void unregisterForPermissionRequest(int requestCode) {
+    @Override
+    public void unregisterForPermissionRequest(int requestCode) {
 
     }
 
+    @Override
+    public void updateToolBar(String title, boolean showAsUpEnable) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        }
+        showHomeAsUpEnable(showAsUpEnable);
+    }
+
+    public void showHomeAsUpEnable(boolean showUp) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            if (showUp) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeButtonEnabled(true);
+                actionBar.setDisplayShowHomeEnabled(true);
+                mDrawerToggle.setDrawerIndicatorEnabled(false);
+                mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onBackPressed();
+                    }
+                });
+            } else {
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
+                mDrawerLayout.addDrawerListener(mDrawerToggle);
+            }
+            mDrawerToggle.syncState();
+        }
+    }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (getFragmentManager().getBackStackEntryCount() == 1) {
+            ActivityCompat.finishAffinity(this);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

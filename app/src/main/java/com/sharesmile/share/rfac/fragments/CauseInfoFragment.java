@@ -97,6 +97,12 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
 
         //load image
         Picasso.with(getContext()).load(cause.getImageUrl()).into(mCauseImage);
+
+        updateActionbar();
+    }
+
+    private void updateActionbar() {
+        getFragmentController().updateToolBar(getString(R.string.overview),true);
     }
 
 

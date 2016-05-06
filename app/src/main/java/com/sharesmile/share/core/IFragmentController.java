@@ -31,6 +31,6 @@ public interface IFragmentController {
 
     void unregisterForPermissionRequest(int requestCode);
 
-    void setActionBarTitle(String title);
+    void updateToolBar(String title,boolean showAsUpEnable);
 
 }

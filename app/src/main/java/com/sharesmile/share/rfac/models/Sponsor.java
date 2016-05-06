@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by ankitmaheshwari1 on 09/03/16.
  */
-public class Sponsor implements UnObfuscable ,Serializable {
+public class Sponsor implements UnObfuscable, Serializable {
 
     private static final String TAG = "Sponsor";
 

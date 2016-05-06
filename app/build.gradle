@@ -77,4 +77,8 @@ dependencies {
 
 
     compile 'com.google.android.gms:play-services-auth:8.3.0'
+
+    compile 'de.greenrobot:greendao:2.1.0'
+    compile 'de.greenrobot:greendao-generator:2.1.0'
+
 }

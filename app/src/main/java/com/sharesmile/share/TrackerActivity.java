@@ -142,6 +142,11 @@ public class TrackerActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void updateToolBar(String title,boolean showAsUpEnable) {
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

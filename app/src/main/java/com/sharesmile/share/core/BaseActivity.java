@@ -75,11 +75,5 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 break;
         }
     }
-    @Override
-    public void setActionBarTitle(String title) {
-       ActionBar actionBar= getSupportActionBar();
-        if(actionBar!=null){
-            actionBar.setTitle(title);
-        }
-    }
+
 }
