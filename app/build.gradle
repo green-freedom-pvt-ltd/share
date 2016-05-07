@@ -32,6 +32,15 @@ android {
         versionName "1.1.0"
         generatedDensities = []
     }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java', 'src/main/java-gen']
+            res.srcDirs = ['src/main/res']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -79,6 +88,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:8.3.0'
 
     compile 'de.greenrobot:greendao:2.1.0'
-    compile 'de.greenrobot:greendao-generator:2.1.0'
+
 
 }

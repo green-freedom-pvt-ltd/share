@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 
@@ -118,12 +120,12 @@ public class RealRunFragment extends RunFragment{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_pause:
-                if (isRunActive()){
-                    if (isRunning()){
+                if (isRunActive()) {
+                    if (isRunning()) {
                         pauseRun(true);
-                    }else{
+                    } else {
                         resumeRun();
                     }
                 }
@@ -131,6 +133,17 @@ public class RealRunFragment extends RunFragment{
 
             case R.id.btn_stop:
                 showEndConfirmationDialog();
+
+                //Dummy data for testing
+                WorkoutDao wd = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+                Workout workout = new Workout();
+                workout.setAvgSpeed(10);
+                workout.setDistance(100);
+                workout.setElapsedTime(120);
+                workout.setRecordedTime(110);
+                workout.setSteps(10000);
+                wd.insertOrReplace(workout);
+
                 break;
         }
     }
