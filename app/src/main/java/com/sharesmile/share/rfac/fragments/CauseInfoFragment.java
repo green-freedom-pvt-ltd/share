@@ -70,7 +70,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragmant_cause_info, null);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
         init();
         return view;
     }
@@ -102,7 +102,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void updateActionbar() {
-        getFragmentController().updateToolBar(getString(R.string.overview),true);
+        getFragmentController().updateToolBar(getString(R.string.overview), true);
     }
 
 
@@ -110,7 +110,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.begin_run:
-                getFragmentController().performOperation(IFragmentController.START_RUN, false);
+                getFragmentController().performOperation(IFragmentController.START_RUN, cause);
                 break;
             default:
         }

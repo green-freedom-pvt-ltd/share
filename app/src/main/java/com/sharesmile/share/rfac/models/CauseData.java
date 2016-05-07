@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Shine on 01/05/16..
  */
-public class CauseData implements UnObfuscable,Serializable {
+public class CauseData implements UnObfuscable, Serializable {
 
     private static final String TAG = "Cause";
 

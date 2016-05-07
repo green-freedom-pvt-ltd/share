@@ -1,6 +1,5 @@
 package com.sharesmile.share.rfac.adapters;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -47,5 +46,9 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
     public void addData(CauseList causesList) {
         mData.addAll(causesList.getCauses());
         notifyDataSetChanged();
+    }
+
+    public CauseData getItemAtPosition(int position) {
+        return mData.get(position);
     }
 }

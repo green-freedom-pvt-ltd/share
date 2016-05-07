@@ -55,7 +55,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         View view = inflater.inflate(R.layout.fragment_cause, container, false);
         ButterKnife.bind(this, view);
         mRunButton.setOnClickListener(this);
-        getFragmentController().updateToolBar(getString(R.string.impactrun),false);
+        getFragmentController().updateToolBar(getString(R.string.impactrun), false);
         viewPager.setClipToPadding(false);
         viewPager.setPageTransformer(false, new ViewPagerTransformer());
         viewPager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.view_pager_page_margin));
@@ -109,7 +109,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_lets_run:
-                getFragmentController().performOperation(IFragmentController.START_RUN, false);
+                getFragmentController().performOperation(IFragmentController.START_RUN, mAdapter.getItemAtPosition(viewPager.getCurrentItem()));
                 break;
             default:
 

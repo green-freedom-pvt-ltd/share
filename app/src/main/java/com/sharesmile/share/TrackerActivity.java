@@ -36,6 +36,7 @@ import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.rfac.TestRunFragment;
 import com.sharesmile.share.rfac.activities.ThankYouActivity;
 import com.sharesmile.share.rfac.fragments.StartRunFragment;
+import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 
 import java.io.File;
@@ -58,6 +59,8 @@ public class TrackerActivity extends BaseActivity {
     private static final int LOGOUT = 3;
 
     public static final String RUN_IN_TEST_MODE = "run_in_test_mode";
+    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
+    private CauseData mCauseData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,37 +70,38 @@ public class TrackerActivity extends BaseActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
         runInTestMode = getIntent().getBooleanExtra(RUN_IN_TEST_MODE, false);
+        mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
 
         loadInitialFragment();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(locationServiceReceiver,
                 new IntentFilter(Constants.LOCATION_SERVICE_BROADCAST_ACTION));
 
-        if (isWorkoutActive()){
+        if (isWorkoutActive()) {
             // If workout sesion going on then bind to service
             invokeLocationService();
         }
     }
 
-    public boolean isWorkoutActive(){
+    public boolean isWorkoutActive() {
         return RunTracker.isWorkoutActive();
     }
 
     @Override
-    public void loadInitialFragment(){
-        if (isWorkoutActive()){
+    public void loadInitialFragment() {
+        if (isWorkoutActive()) {
             runFragment = createRunFragment();
             addFragment(runFragment, false);
-        }else{
-            addFragment(StartRunFragment.newInstance(), false);
+        } else {
+            addFragment(StartRunFragment.newInstance(mCauseData), false);
         }
     }
 
-    private RunFragment createRunFragment(){
-        if (runInTestMode){
+    private RunFragment createRunFragment() {
+        if (runInTestMode) {
             return TestRunFragment.newInstance();
-        }else{
-            return RealRunFragment.newInstance();
+        } else {
+            return RealRunFragment.newInstance(mCauseData);
         }
     }
 
@@ -114,7 +118,7 @@ public class TrackerActivity extends BaseActivity {
     @Override
     public void performOperation(int operationId, Object input) {
         super.performOperation(operationId, input);
-        switch (operationId){
+        switch (operationId) {
             case END_RUN_START_COUNTDOWN:
                 runFragment = createRunFragment();
                 replaceFragment(runFragment, false);
@@ -143,7 +147,7 @@ public class TrackerActivity extends BaseActivity {
     }
 
     @Override
-    public void updateToolBar(String title,boolean showAsUpEnable) {
+    public void updateToolBar(String title, boolean showAsUpEnable) {
 
     }
 
@@ -164,10 +168,10 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public File writeLogsToFile(Context context){
+    public File writeLogsToFile(Context context) {
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED){
+                == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("MMM");
@@ -182,18 +186,18 @@ public class TrackerActivity extends BaseActivity {
 
             Logger.d(TAG, "writeLogsToFile " + fileName);
 
-            File outputFile = new File(getLogsFileDir(),fileName);
+            File outputFile = new File(getLogsFileDir(), fileName);
             String filePath = outputFile.getAbsolutePath();
             try {
                 Logger.d(TAG, "filePath " + filePath);
                 @SuppressWarnings("unused")
-                Process process = Runtime.getRuntime().exec("logcat -v threadtime -f "+ filePath);
-            }catch (IOException ioe){
+                Process process = Runtime.getRuntime().exec("logcat -v threadtime -f " + filePath);
+            } catch (IOException ioe) {
                 Logger.e(TAG, "IOException while writing logs to file", ioe);
             }
             return outputFile;
 
-        }else{
+        } else {
             //Need to get permissions
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -206,7 +210,7 @@ public class TrackerActivity extends BaseActivity {
 
     public static File getLogsFileDir() {
         File root = android.os.Environment.getExternalStorageDirectory();
-        File dir = new File (root.getAbsolutePath() + "/data/share");
+        File dir = new File(root.getAbsolutePath() + "/data/share");
         dir.mkdirs();
         return dir;
     }
@@ -214,18 +218,18 @@ public class TrackerActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (isBoundToLocationService()){
+        if (isBoundToLocationService()) {
             unbindLocationService();
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationServiceReceiver);
     }
 
-    public void beginLocationTracking(){
+    public void beginLocationTracking() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED){
+                == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
             invokeLocationService();
-        }else{
+        } else {
             //Need to get permissions
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -233,25 +237,25 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public void endLocationTracking(){
-        if (isBoundToLocationService()){
+    public void endLocationTracking() {
+        if (isBoundToLocationService()) {
             locationService.stopWorkout();
         }
     }
 
-    public void pauseWorkout(){
-        if (isBoundToLocationService()){
+    public void pauseWorkout() {
+        if (isBoundToLocationService()) {
             locationService.pause();
         }
     }
 
-    public void resumeWorkout(){
-        if (isBoundToLocationService()){
+    public void resumeWorkout() {
+        if (isBoundToLocationService()) {
             locationService.resume();
         }
     }
 
-    private void unbindLocationService(){
+    private void unbindLocationService() {
         Logger.d(TAG, "unbindLocationService");
         unbindService(locationServiceConnection);
     }
@@ -283,7 +287,7 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public void invokeLocationService(){
+    public void invokeLocationService() {
         Log.d(TAG, "invokeLocationService");
         Bundle bundle = new Bundle();
         Intent intent = new Intent(this, WorkoutService.class);
@@ -293,7 +297,7 @@ public class TrackerActivity extends BaseActivity {
     }
 
     /**
-     Defines callbacks for service binding, passed to bindService()
+     * Defines callbacks for service binding, passed to bindService()
      */
     private ServiceConnection locationServiceConnection = new ServiceConnection() {
 
@@ -310,7 +314,7 @@ public class TrackerActivity extends BaseActivity {
         }
     };
 
-    public boolean isBoundToLocationService(){
+    public boolean isBoundToLocationService() {
         return (locationService != null);
     }
 
@@ -323,7 +327,7 @@ public class TrackerActivity extends BaseActivity {
             if (bundle != null) {
                 int broadcastCategory = bundle
                         .getInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY);
-                switch (broadcastCategory){
+                switch (broadcastCategory) {
                     case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
                         Status status = (Status) bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
                         try {
@@ -358,18 +362,18 @@ public class TrackerActivity extends BaseActivity {
 
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:
                         Logger.i(TAG, "onReceive of locationServiceReceiver, BROADCAST_UNBIND_SERVICE_CODE");
-                        if (isBoundToLocationService()){
+                        if (isBoundToLocationService()) {
                             unbindLocationService();
                             locationService = null;
                         }
                         break;
                     case Constants.BROADCAST_PAUSE_WORKOUT_CODE:
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_PAUSE_WORKOUT_CODE");
-                        synchronized (this){
-                            if (runFragment != null && runFragment.isRunActive()){
+                        synchronized (this) {
+                            if (runFragment != null && runFragment.isRunActive()) {
                                 int problem = bundle.getInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM);
                                 String errorMessage = "";
-                                switch (problem){
+                                switch (problem) {
                                     case Constants.PROBELM_TOO_FAST:
                                         errorMessage = getString(R.string.rfac_usain_bolt_message);
                                         break;
@@ -380,7 +384,7 @@ public class TrackerActivity extends BaseActivity {
                                         errorMessage = getString(R.string.rfac_lazy_ass_message);
                                         break;
                                 }
-                                if (!TextUtils.isEmpty(errorMessage)){
+                                if (!TextUtils.isEmpty(errorMessage)) {
                                     Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
                                     runFragment.showErrorMessage(errorMessage);
                                 }

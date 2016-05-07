@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -14,13 +15,19 @@ import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
+import com.sharesmile.share.rfac.models.CauseData;
+import com.squareup.picasso.Picasso;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by ankitm on 22/04/16.
  */
-public class RealRunFragment extends RunFragment{
+public class RealRunFragment extends RunFragment {
 
     private static final String TAG = "RealRunFragment";
+    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
     TextView time;
     TextView distance;
@@ -29,17 +36,28 @@ public class RealRunFragment extends RunFragment{
     Button pauseButton;
     Button stopButton;
 
-    public static final float IMPACT_CONVERSION_FACTOR = 10.0f; // Rs per km
+    @BindView(R.id.img_sponsor_logo)
+    ImageView mSponsorLogo;
+    private CauseData mCauseData;
 
-    public static RealRunFragment newInstance() {
+    public static RealRunFragment newInstance(CauseData causeData) {
         RealRunFragment fragment = new RealRunFragment();
         Bundle args = new Bundle();
+        args.putSerializable(BUNDLE_CAUSE_DATA, causeData);
         fragment.setArguments(args);
         return fragment;
     }
-    
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle arg = getArguments();
+        mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
+    }
+
     @Override
     protected void populateViews(View baseView) {
+        ButterKnife.bind(this, baseView);
         time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
         distance = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
         impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
@@ -48,13 +66,15 @@ public class RealRunFragment extends RunFragment{
         stopButton = (Button) baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
+        Picasso.with(getContext()).load(mCauseData.getSponsor().getLogoUrl()).into(mSponsorLogo);
+
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Will begin workout if not already active
-        if (!isRunActive()){
+        if (!isRunActive()) {
             beginRun();
         }
     }
@@ -72,16 +92,16 @@ public class RealRunFragment extends RunFragment{
     @Override
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
-        if (isAttachedToActivity()){
+        if (isAttachedToActivity()) {
             getFragmentController().replaceFragment(ShareFragment.newInstance(data), false);
         }
     }
 
     @Override
     public void showUpdate(float speed, float distanceCovered) {
-        String distDecimal = String.format("%1$,.2f" , (distanceCovered / 1000) );
+        String distDecimal = String.format("%1$,.2f", (distanceCovered / 1000));
         distance.setText(distDecimal);
-        int rupees = (int) (IMPACT_CONVERSION_FACTOR*distanceCovered);
+        int rupees = (int) (getConversionFactor() * distanceCovered);
         impact.setText(rupees);
     }
 
@@ -148,7 +168,7 @@ public class RealRunFragment extends RunFragment{
         }
     }
 
-    private void showEndConfirmationDialog(){
+    private void showEndConfirmationDialog() {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
 
         // Setting Dialog Title
@@ -178,5 +198,10 @@ public class RealRunFragment extends RunFragment{
 
         // Showing Alert Message
         alertDialog.show();
+    }
+
+    /*  Rs per Km*/
+    public float getConversionFactor() {
+        return mCauseData.getConversionRate();
     }
 }
