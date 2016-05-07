@@ -24,7 +24,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
@@ -58,13 +60,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)) {
+        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN) && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false)) {
             initializeFbLogin();
             initializeGoogleLogin();
             setContentView(R.layout.welcome_screen);
             ButterKnife.bind(this);
             initUi();
-        } else {
+        } else if(RunTracker.isWorkoutActive()) {
+            Intent intent = new Intent(this, TrackerActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+           // intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, (Boolean) input);
+            startActivity(intent);
+        }else{
             startMainActivity();
         }
 
@@ -76,7 +83,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
@@ -144,6 +151,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 performFbLogin();
                 break;
             case R.id.tv_welcome_skip:
+                SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
+                prefsManager.setBoolean(Constants.PREF_LOGIN_SKIP, true);
                 startMainActivity();
                 break;
             case R.id.btn_login_google:
@@ -199,7 +208,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        //  intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
