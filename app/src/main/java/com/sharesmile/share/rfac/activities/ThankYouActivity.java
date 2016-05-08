@@ -24,7 +24,7 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
     public static final String BUNDLE_THANKYOU_IMAGE_URL = "bundle_thanks_image_url";
 
     @BindView(R.id.thank_you_layout)
-    private RelativeLayout mThankYouLayout;
+    RelativeLayout mThankYouLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

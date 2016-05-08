@@ -35,5 +35,10 @@
     <color name="seafoam_blue">#50d2c2</color>
     <color name="ice_blue">#e6f8ff</color>
     <color name="black_50">#7f000000</color>
+    <color name="black_four">#141414</color>
+    <color name="dark_blue">#55acee</color>
+    <color name="denim_blue">#3c55a2</color>
+    <color name="fresh_green">#42d54a</color>
+    <color name="pale_red">#d84c30</color>
 
 </resources>
