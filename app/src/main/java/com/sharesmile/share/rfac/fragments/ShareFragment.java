@@ -1,9 +1,7 @@
 package com.sharesmile.share.rfac.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +12,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.rfac.RealRunFragment;
-import com.sharesmile.share.rfac.activities.ThankYouActivity;
+import com.sharesmile.share.rfac.models.CauseData;
 
 /**
  * Created by apurvgandhwani on 4/5/2016.
@@ -23,14 +20,25 @@ import com.sharesmile.share.rfac.activities.ThankYouActivity;
 public class ShareFragment extends BaseFragment {
 
     public static final String WORKOUT_DATA = "workout_data";
+    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private static final String TAG = "ShareFragment";
+    private CauseData mCauseData;
 
-    public static ShareFragment newInstance(WorkoutData data) {
+    public static ShareFragment newInstance(WorkoutData data, CauseData causeData) {
         ShareFragment fragment = new ShareFragment();
         Bundle args = new Bundle();
         args.putParcelable(WORKOUT_DATA, data);
+        args.putSerializable(BUNDLE_CAUSE_DATA, causeData);
+
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle arg = getArguments();
+        mCauseData=(CauseData)arg.getSerializable(BUNDLE_CAUSE_DATA);
     }
 
     @Nullable
@@ -44,14 +52,14 @@ public class ShareFragment extends BaseFragment {
         btn_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, null);
+                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, mCauseData.getCauseThankYouImage());
             }
         });
 
         btn_share_skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, null);
+                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, mCauseData.getCauseThankYouImage());
             }
         });
 

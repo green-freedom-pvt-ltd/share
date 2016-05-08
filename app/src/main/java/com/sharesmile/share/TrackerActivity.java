@@ -124,9 +124,12 @@ public class TrackerActivity extends BaseActivity {
                 replaceFragment(runFragment, false);
                 break;
             case SAY_THANK_YOU:
-                Intent intent = new Intent(this, ThankYouActivity.class);
-                startActivity(intent);
-                finish();
+                if(input instanceof String) {
+                    Intent intent = new Intent(this, ThankYouActivity.class);
+                    intent.putExtra(ThankYouActivity.BUNDLE_THANKYOU_IMAGE_URL,(String) input);
+                    startActivity(intent);
+                    finish();
+                }
                 break;
         }
     }

@@ -34,5 +34,6 @@
     <color name="greyish_brown_two">#4a4a4a</color>
     <color name="seafoam_blue">#50d2c2</color>
     <color name="ice_blue">#e6f8ff</color>
+    <color name="black_50">#7f000000</color>
 
 </resources>

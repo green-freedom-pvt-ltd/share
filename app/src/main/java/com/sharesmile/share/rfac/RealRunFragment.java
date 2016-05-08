@@ -53,6 +53,7 @@ public class RealRunFragment extends RunFragment {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
         mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
+        loadThankYouImage();
     }
 
     @Override
@@ -93,7 +94,15 @@ public class RealRunFragment extends RunFragment {
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
-            getFragmentController().replaceFragment(ShareFragment.newInstance(data), false);
+            getFragmentController().replaceFragment(ShareFragment.newInstance(data,mCauseData), false);
+            WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            Workout workout = new Workout();
+            workout.setAvgSpeed(data.getAvgSpeed());
+            workout.setDistance(data.getAvgSpeed());
+            workout.setElapsedTime(data.getElapsedTime());
+            workout.setRecordedTime(data.getRecordedTime());
+            workout.setSteps(data.getTotalSteps());
+            workoutDao.insertOrReplace(workout);
         }
     }
 
@@ -153,17 +162,6 @@ public class RealRunFragment extends RunFragment {
 
             case R.id.btn_stop:
                 showEndConfirmationDialog();
-
-                //Dummy data for testing
-                WorkoutDao wd = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-                Workout workout = new Workout();
-                workout.setAvgSpeed(10);
-                workout.setDistance(100);
-                workout.setElapsedTime(120);
-                workout.setRecordedTime(110);
-                workout.setSteps(10000);
-                wd.insertOrReplace(workout);
-
                 break;
         }
     }
@@ -203,5 +201,11 @@ public class RealRunFragment extends RunFragment {
     /*  Rs per Km*/
     public float getConversionFactor() {
         return mCauseData.getConversionRate();
+    }
+
+    private void loadThankYouImage() {
+        if (mCauseData != null) {
+            Picasso.with(getActivity()).load(mCauseData.getCauseThankYouImage()).fetch();
+        }
     }
 }
