@@ -15,25 +15,15 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer {
 
     @Override
     public void transformPage(View page, float position) {
-        Logger.d("Anshul","Position"+" "+position);
-
-            Log.e("pos",new Gson().toJson(position));
-            if (position < -1) {
-            //    float scaleFactor = Math.min(MIN_SCALE, 1 - Math.abs(p
-                page.setScaleY(0.9f);
-             //   page.setAlpha(1);
-            } else if (position <= 1) {
-                float scaleFactor = Math.max(0.9f, 1 - Math.abs(position - 0.14285715f));
-              //  page.setScaleX(scaleFactor);
-                Log.e("scale",new Gson().toJson(scaleFactor));
-                page.setScaleY(scaleFactor);
-               // page.setAlpha(scaleFactor);
-            } else {
-                page.setScaleY(0.9f);
-                //page.setAlpha(1);
-            }
-
-
+        if (position < -1) {
+            page.setScaleY(0.9f);
+        } else if (position <= 1) {
+            float scaleFactor = Math.max(0.9f, 1 - Math.abs(position - 0.14285715f));
+            Log.e("scale", new Gson().toJson(scaleFactor));
+            page.setScaleY(scaleFactor);
+        } else {
+            page.setScaleY(0.9f);
+        }
 
     }
 }

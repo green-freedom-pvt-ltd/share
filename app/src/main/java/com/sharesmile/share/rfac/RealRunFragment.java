@@ -94,7 +94,7 @@ public class RealRunFragment extends RunFragment {
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
-            getFragmentController().replaceFragment(ShareFragment.newInstance(data,mCauseData), false);
+            getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData), false);
             WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             Workout workout = new Workout();
             workout.setAvgSpeed(data.getAvgSpeed());
@@ -111,7 +111,7 @@ public class RealRunFragment extends RunFragment {
         String distDecimal = String.format("%1$,.2f", (distanceCovered / 1000));
         distance.setText(distDecimal);
         int rupees = (int) (getConversionFactor() * distanceCovered);
-        impact.setText(rupees);
+        impact.setText(String.valueOf(rupees));
     }
 
     @Override

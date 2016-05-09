@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +27,7 @@ import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.utils.Logger;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
     DrawerLayout mDrawerLayout;
@@ -51,49 +52,17 @@ public class MainActivity extends BaseActivity {
 
         mDrawerToggle.syncState();
 
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-
-                Logger.d(TAG, "onNavigationItemSelected");
-
-                if (menuItem.getItemId() == R.id.nav_item_profile) {
-                    replaceFragment(new ProfileFragment(), true);
-                }
-
-                if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
-                    replaceFragment(new AboutUsFragment(), true);
-                }
-
-                if (menuItem.getItemId() == R.id.nav_item_feedback) {
-                    Logger.d(TAG, "feedback clicked");
-                    replaceFragment(new FeedbackFragment(), true);
-                }
-
-                if (menuItem.getItemId() == R.id.nav_item_settings) {
-                    Logger.d(TAG, "settings clicked");
-                    replaceFragment(new SettingsFragment(), true);
-                }
-
-                if (menuItem.getItemId() == R.id.nav_item_logout) {
-                    replaceFragment(new LogoutFragment(), true);
-                }
-                mDrawerLayout.closeDrawers();
-
-                return false;
-            }
-
-        });
+        mNavigationView.setNavigationItemSelectedListener(this);
     }
 
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
+    }*/
 
-    @Override
+   /* @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -106,7 +75,7 @@ public class MainActivity extends BaseActivity {
         // }
 
         //return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @Override
     public void loadInitialFragment() {
@@ -176,10 +145,46 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+            return;
+        }
+
         if (getFragmentManager().getBackStackEntryCount() == 1) {
             ActivityCompat.finishAffinity(this);
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+        Logger.d(TAG, "onNavigationItemSelected");
+
+        if (menuItem.getItemId() == R.id.nav_item_profile) {
+            replaceFragment(new ProfileFragment(), true);
+        }
+
+        if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
+            replaceFragment(new AboutUsFragment(), true);
+        }
+
+        if (menuItem.getItemId() == R.id.nav_item_feedback) {
+            Logger.d(TAG, "feedback clicked");
+            replaceFragment(new FeedbackFragment(), true);
+        }
+
+        if (menuItem.getItemId() == R.id.nav_item_settings) {
+            Logger.d(TAG, "settings clicked");
+            replaceFragment(new SettingsFragment(), true);
+        }
+
+               /* if (menuItem.getItemId() == R.id.nav_item_logout) {
+                    replaceFragment(new LogoutFragment(), true);
+                }*/
+        mDrawerLayout.closeDrawers();
+
+        return false;
     }
 }
