@@ -1,16 +1,10 @@
 package com.sharesmile.share.gps;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
@@ -46,7 +40,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class WorkoutService extends Service implements
         IWorkoutService, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, RunTracker.UpdateListner, SensorEventListener {
+        LocationListener, RunTracker.UpdateListner, StepCounter.Listener{
 
     private static final String TAG = "WorkoutService";
 
@@ -55,12 +49,13 @@ public class WorkoutService extends Service implements
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
-    private SensorManager sensorManager;
     private VigilanceTimer vigilanceTimer;
+
+    private StepCounter stepCounter;
 
     private ScheduledExecutorService backgroundExecutorService;
 
-    private RunTracker tracker;
+    private Tracker tracker;
 
     @Override
     public void onCreate() {
@@ -71,81 +66,39 @@ public class WorkoutService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Logger.d(TAG, "onStartCommand");
-        if (backgroundExecutorService == null){
+        if (backgroundExecutorService == null) {
             backgroundExecutorService = Executors.newScheduledThreadPool(5);
         }
         startWorkout();
         return START_STICKY;
     }
 
-    private void startTracking(){
-        if (tracker == null){
+    private void startTracking() {
+        if (tracker == null) {
             tracker = new RunTracker(backgroundExecutorService, this);
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService, tracker);
     }
 
 
-    private void stopTracking(){
-        if (tracker != null){
+    private void stopTracking() {
+        if (tracker != null) {
             WorkoutData result = tracker.endRun();
             tracker = null;
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_WORKOUT_RESULT_CODE);
-            bundle.putParcelable(Constants.KEY_WORKOUT_RESULT,result);
+            bundle.putParcelable(Constants.KEY_WORKOUT_RESULT, result);
             Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
     }
 
-
-    /**
-     * Returns true if this device is supported. It needs to be running Android KitKat (4.4) or
-     * higher and has a step counter and step detector sensor.
-     * This check is useful when an app provides an alternative implementation or different
-     * functionality if the step sensors are not available or this code runs on a platform version
-     * below Android KitKat. If this functionality is required, then the minSDK parameter should
-     * be specified appropriately in the AndroidManifest.
-     *
-     * @return True iff the device can run this sample
-     */
-    public static boolean isKitkatWithStepSensor(Context appContext) {
-        // Require at least Android KitKat
-        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
-        // Check that the device supports the step counter and detector sensors
-        PackageManager packageManager = appContext.getPackageManager();
-        boolean hasStepDetector = packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
-        Logger.i(TAG, "isKitkatWithStepSensor: currentApiVersion = " + currentApiVersion +
-                        ", hasStepDetector = " + hasStepDetector);
-        return currentApiVersion >= android.os.Build.VERSION_CODES.KITKAT
-                && hasStepDetector;
-    }
-
-    @TargetApi(19)
-    private void registerStepDetector(){
-        // Get the default sensor for the sensor type from the SenorManager
-        sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
-        // sensorType is either Sensor.TYPE_STEP_COUNTER or Sensor.TYPE_STEP_DETECTOR
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-
-        // Register the listener for this sensor in batch mode.
-        // If the max delay is 0, events will be delivered in continuous mode without batching.
-        final boolean batchMode = sensorManager.registerListener(this, sensor,
-                SensorManager.SENSOR_DELAY_NORMAL, Config.STEP_THRESHOLD_INTERVAL);
-
-        if (batchMode) {
-            // batchMode was enabled successfully
-            Logger.d(TAG, "Step Detector registered successfully");
-            currentlyProcessingSteps = true;
-        }
-    }
-
     @Override
     public synchronized void stopWorkout() {
         Logger.d(TAG, "stopWorkout");
-        if (currentlyTracking){
+        if (currentlyTracking) {
             stopTracking();
             if (googleApiClient != null && googleApiClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
@@ -155,8 +108,8 @@ public class WorkoutService extends Service implements
             googleApiClient = null;
             currentLocation = null;
             currentlyTracking = false;
-            if (sensorManager != null){
-                sensorManager.unregisterListener(this);
+            if (stepCounter != null){
+                stepCounter.stopCounting();
             }
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
@@ -172,8 +125,14 @@ public class WorkoutService extends Service implements
         stopSelf();
     }
 
-    private void initiateLocationFetching(){
+    private void initiateLocationFetching() {
         Logger.d(TAG, "initiateLocationFetching");
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //This check is redundant as permissions are already granted in TrackerActivity
+            return;
+        }
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         startTracking();
     }
@@ -201,15 +160,22 @@ public class WorkoutService extends Service implements
     final IBinder mBinder = new MyBinder();
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (tracker != null && tracker.isActive()){
-            tracker.feedSteps(event);
-        }
+    public void notAvailable(int reasonCode) {
+        currentlyProcessingSteps = false;
+        //TODO: Do something with the reasonCode
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void isReady() {
+        stepCounter.startCounting();
+        currentlyProcessingSteps = true;
+    }
 
+    @Override
+    public void onStepCount(int cumulativeSteps) {
+        if (tracker != null && tracker.isActive()){
+            tracker.feedSteps(cumulativeSteps);
+        }
     }
 
     /**
@@ -286,9 +252,9 @@ public class WorkoutService extends Service implements
             } else {
                 Logger.e(TAG, "unable to connect to google play services.");
             }
-            if (isKitkatWithStepSensor(getApplicationContext()) && !currentlyProcessingSteps){
-                Logger.d(TAG, "Step Detector present! Will register");
-                registerStepDetector();
+            if (!currentlyProcessingSteps){
+                Logger.d(TAG, "Will try and initiate StepCounter");
+                stepCounter = new GoogleFitStepCounter(this, this);
             }
         }
     }
@@ -383,6 +349,10 @@ public class WorkoutService extends Service implements
                     // Can't do nothing, retry for enabling Location Settings
                     checkForLocationSettings();
                 }
+                break;
+            case GoogleFitStepCounter.REQUEST_OAUTH:
+                stepCounter.onActivityResult(requestCode, resultCode, data);
+                break;
         }
     }
 

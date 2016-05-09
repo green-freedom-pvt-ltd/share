@@ -163,32 +163,28 @@ public class RunTracker implements Tracker {
 
 
     @Override
-    public void feedSteps(final SensorEvent event){
+    public void feedSteps(final int cumulativeSteps){
         if (isPaused()){
             Logger.d(TAG, "Wont process steps, as the workout is paused");
         }else if (isRunning()){
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    processStepsEvent(event);
+                    processSteps(cumulativeSteps);
                 }
             });
         }
     }
 
-    /**
-     * Feed step counter event, the first index of values array contains the total number of steps since reboot
-     * @param event
-     */
-    private synchronized void processStepsEvent(SensorEvent event){
+    private synchronized void processSteps(int cumulativeSteps){
         if (isRunning()){
             if (stepsSinceReboot < 1){
                 //i.e. fresh reading after creation of runtracker
-                stepsSinceReboot = (int) event.values[0];
+                stepsSinceReboot = cumulativeSteps;
                 Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
             }
-            int numSteps = (int) event.values[0] - stepsSinceReboot;
-            stepsSinceReboot = (int) event.values[0];
+            int numSteps = cumulativeSteps - stepsSinceReboot;
+            stepsSinceReboot = cumulativeSteps;
             long reportimeStamp = System.currentTimeMillis();
             Logger.d(TAG, "Adding " + numSteps + "steps.");
             dataStore.addSteps(numSteps);

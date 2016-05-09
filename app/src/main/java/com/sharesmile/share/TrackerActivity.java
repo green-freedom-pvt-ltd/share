@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
+import android.telecom.ConnectionRequest;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,16 +25,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
+import com.sharesmile.share.gps.GoogleFitStepCounter;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.rfac.TestRunFragment;
+import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.activities.ThankYouActivity;
 import com.sharesmile.share.rfac.fragments.StartRunFragment;
 import com.sharesmile.share.utils.Logger;
@@ -155,7 +159,6 @@ public class TrackerActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (isBoundToLocationService()) {
             locationService.onActivityResult(requestCode, resultCode, data);
-
         }
     }
 
@@ -320,6 +323,7 @@ public class TrackerActivity extends BaseActivity {
                         .getInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY);
                 switch (broadcastCategory){
                     case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
+
                         Status status = (Status) bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
                         try {
                             // Show the dialog by calling startResolutionForResult(),
@@ -329,6 +333,22 @@ public class TrackerActivity extends BaseActivity {
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }
+
+                        break;
+
+                    case Constants.BROADCAST_GOOGLE_FIT_READ_PERMISSION:
+
+                        ConnectionResult connectionResult =
+                                bundle.getParcelable(Constants.KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE);
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            connectionResult.startResolutionForResult(TrackerActivity.this,
+                                    GoogleFitStepCounter.REQUEST_OAUTH);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+
                         break;
 
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:

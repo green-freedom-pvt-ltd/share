@@ -45,6 +45,8 @@ public class Constants {
 
     public static final int BROADCAST_PAUSE_WORKOUT_CODE = 207;
 
+    public static final int BROADCAST_GOOGLE_FIT_READ_PERMISSION = 208;
+
     public static final int PROBELM_NOT_MOVING = 0;
 
     public static final int PROBELM_TOO_SLOW = 1;
@@ -52,6 +54,8 @@ public class Constants {
     public static final int PROBELM_TOO_FAST = 2;
 
     public static final String KEY_LOCATION_SETTINGS_PARCELABLE = "location_settings_parcelable";
+
+    public static final String KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE = "google_fit_resolution_parcelable";
 
     public static final String KEY_WORKOUT_RESULT = "key_wourkout_result";
 
