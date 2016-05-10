@@ -49,6 +49,12 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     private CausePageAdapter mAdapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAdapter = new CausePageAdapter(getChildFragmentManager());
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,14 +67,15 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         viewPager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.view_pager_page_margin));
         viewPager.setPadding(getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_left), 0, getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_right), 0);
         viewPager.setOffscreenPageLimit(5);
-        mAdapter = new CausePageAdapter(getChildFragmentManager());
         viewPager.setAdapter(mAdapter);
-        fetchPageData(0);
+        if (mAdapter.getCount() <= 0) {
+            fetchPageData();
+        }
         return view;
 
     }
 
-    private void fetchPageData(int pgNum) {
+    private void fetchPageData() {
         Logger.d(TAG, "Fetching Causes Data");
         showProgressDialog();
         NetworkDataProvider.doGetCallAsync(Urls.getCauseListUrl(), new NetworkAsyncCallback<CauseList>() {
@@ -82,7 +89,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
             @Override
             public void onNetworkSuccess(CauseList causesList) {
                 Logger.d(TAG, "onNetworkSuccess");
-                //  editDataSet(causesPage);
                 AddCauseList(causesList);
                 hideProgressDialog();
             }
