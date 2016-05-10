@@ -224,14 +224,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
         prefsManager.setString(Constants.PREF_USER_EMAIL, userEmail);
         prefsManager.setString(Constants.PREF_USER_NAME, name);
-        if (profilePictureUri != null) {
-            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri.toString());
-        }
+
         prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
         User user = new User(1L);
         user.setName(name);
         user.setEmailId(userEmail);
-        user.setProfileImageUrl(profilePictureUri.toString());
+        if (profilePictureUri != null) {
+            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri.toString());
+            user.setProfileImageUrl(profilePictureUri.toString());
+        }
+
         UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
         userDao.insertOrReplace(user);
         startMainActivity();

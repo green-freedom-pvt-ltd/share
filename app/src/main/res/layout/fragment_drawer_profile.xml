@@ -19,7 +19,7 @@
             android:layout_marginTop="10dp"
             android:scaleType="centerInside" />
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:id="@+id/tv_profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
