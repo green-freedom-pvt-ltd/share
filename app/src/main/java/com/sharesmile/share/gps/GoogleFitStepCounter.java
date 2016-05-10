@@ -24,6 +24,7 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
 
@@ -94,7 +95,7 @@ public class GoogleFitStepCounter implements StepCounter,
     public void onConnected(Bundle bundle) {
         Logger.d(TAG, "onConnected");
         DataSourcesRequest dataSourceRequest = new DataSourcesRequest.Builder()
-                .setDataTypes( DataType.AGGREGATE_STEP_COUNT_DELTA )
+                .setDataTypes( DataType.TYPE_STEP_COUNT_DELTA)
                 .setDataSourceTypes(DataSource.TYPE_DERIVED)
                 .build();
 
@@ -105,9 +106,9 @@ public class GoogleFitStepCounter implements StepCounter,
                 for( DataSource dataSource : dataSourcesResult.getDataSources() ) {
                     Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: " + dataSource.toDebugString());
                     Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource type: " + dataSource.getDataType().getName());
-                    if( DataType.AGGREGATE_STEP_COUNT_DELTA.equals( dataSource.getDataType() ) ) {
+                    if( DataType.TYPE_STEP_COUNT_DELTA.equals(dataSource.getDataType()) ) {
                         Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
-                        registerFitnessDataListener(dataSource, DataType.AGGREGATE_STEP_COUNT_DELTA);
+                        registerFitnessDataListener(dataSource, dataSource.getDataType());
                     }
                 }
             }
@@ -117,12 +118,12 @@ public class GoogleFitStepCounter implements StepCounter,
                 .setResultCallback(dataSourcesResultCallback);
     }
 
-    private void registerFitnessDataListener(DataSource dataSource, DataType dataType) {
+    private void registerFitnessDataListener(final DataSource dataSource, final DataType dataType) {
 
         SensorRequest request = new SensorRequest.Builder()
                 .setDataSource( dataSource )
                 .setDataType( dataType )
-                .setSamplingRate( 3, TimeUnit.SECONDS )
+                .setSamplingRate( 1, TimeUnit.SECONDS )
                 .build();
 
         Fitness.SensorsApi.add(mApiClient, request, this)
@@ -130,10 +131,10 @@ public class GoogleFitStepCounter implements StepCounter,
                     @Override
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
-                            Logger.i(TAG, "SensorApi successfully added");
+                            Logger.i(TAG, "SensorApi successfully added for " + dataType.getName());
                             listener.isReady();
                         }else{
-                            Logger.e(TAG, "SensorApi couldn't be added");
+                            Logger.e(TAG, "SensorApi couldn't be added for " + dataType.getName());
                             listener.notAvailable(SENSOR_API_NOT_ADDED);
                         }
                     }
@@ -165,7 +166,8 @@ public class GoogleFitStepCounter implements StepCounter,
         Logger.d(TAG, "onDataPoint");
         for( Field field : dataPoint.getDataType().getFields() ) {
             Value value = dataPoint.getValue( field );
-            Logger.d(TAG, "Field: " + field.getName() + " Value: " + value);
+            String message = "Field: " + field.getName() + " Value: " + value;
+            Logger.d(TAG, message);
             listener.onStepCount(Integer.parseInt(value.toString()));
         }
     }

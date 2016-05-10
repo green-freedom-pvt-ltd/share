@@ -163,31 +163,34 @@ public class RunTracker implements Tracker {
 
 
     @Override
-    public void feedSteps(final int cumulativeSteps){
+    public void feedSteps(final int deltaSteps){
         if (isPaused()){
             Logger.d(TAG, "Wont process steps, as the workout is paused");
         }else if (isRunning()){
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    processSteps(cumulativeSteps);
+                    processSteps(deltaSteps);
                 }
             });
         }
     }
 
-    private synchronized void processSteps(int cumulativeSteps){
+    private synchronized void processSteps(int deltaSteps){
         if (isRunning()){
-            if (stepsSinceReboot < 1){
-                //i.e. fresh reading after creation of runtracker
-                stepsSinceReboot = cumulativeSteps;
-                Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
-            }
-            int numSteps = cumulativeSteps - stepsSinceReboot;
-            stepsSinceReboot = cumulativeSteps;
+            // Below logic was required when we were getting cumulative steps, with google fit, it is not required
+
+//            if (stepsSinceReboot < 1){
+//                //i.e. fresh reading after creation of runtracker
+//                stepsSinceReboot = deltaSteps;
+//                Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
+//            }
+//            int numSteps = deltaSteps - stepsSinceReboot;
+//            stepsSinceReboot = deltaSteps;
+
             long reportimeStamp = System.currentTimeMillis();
-            Logger.d(TAG, "Adding " + numSteps + "steps.");
-            dataStore.addSteps(numSteps);
+            Logger.d(TAG, "Adding " + deltaSteps + "steps.");
+            dataStore.addSteps(deltaSteps);
             listener.updateStepsRecord(reportimeStamp);
         }
     }

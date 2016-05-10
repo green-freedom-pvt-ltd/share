@@ -18,7 +18,7 @@ public interface StepCounter {
 
         void notAvailable(int reasonCode);
         void isReady();
-        void onStepCount(int cumulativeSteps);
+        void onStepCount(int deltaSteps);
 
     }
 }

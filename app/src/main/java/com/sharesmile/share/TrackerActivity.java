@@ -15,14 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
-import android.telecom.ConnectionRequest;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,7 +32,6 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.rfac.TestRunFragment;
-import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.activities.ThankYouActivity;
 import com.sharesmile.share.rfac.fragments.StartRunFragment;
 import com.sharesmile.share.utils.Logger;
@@ -120,8 +114,6 @@ public class TrackerActivity extends BaseActivity {
         super.performOperation(operationId, input);
         switch (operationId){
             case END_RUN_START_COUNTDOWN:
-                String ankit = null;
-                Logger.d(TAG, ankit.toString());
                 runFragment = createRunFragment();
                 replaceFragment(runFragment, false);
                 break;

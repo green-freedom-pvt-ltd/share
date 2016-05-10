@@ -174,9 +174,9 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void onStepCount(int cumulativeSteps) {
+    public void onStepCount(int deltaSteps) {
         if (tracker != null && tracker.isActive()){
-            tracker.feedSteps(cumulativeSteps);
+            tracker.feedSteps(deltaSteps);
         }
     }
 
