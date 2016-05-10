@@ -31,20 +31,28 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".rfac.activities.ThankYouActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".rfac.activities.LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".news.NewsActivity"
-            android:label="@string/title_activity_news"
-            android:parentActivityName=".TrackerActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".TrackerActivity" />
+            android:name=".rfac.activities.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
 
         <service

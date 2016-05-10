@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Share</string>
+    <string name="app_name">Run For A Cause</string>
     <string name="main_activity">MainActivity</string>
     <string name="news_activity">NewsActivity</string>
     <string name="events_activity">EventsActivity</string>
@@ -50,11 +50,31 @@
     <string name="rfac_usain_bolt_message">Oops! Looks like you are Usain Bolt, will pause workout</string>
     <string name="rfac_lazy_ass_message">Don\'t be too lazy, move your ass!</string>
     <string name="rfac_too_slow_message">You need to be a little more faster!</string>
-
-
+    <string name="pause">PAUSE</string>
+    <string name="resume">RESUME</string>
+    <string name="stop">STOP</string>
 
     <string name="google_maps_api_key">AIzaSyALJg75UAhncT-_KlKP5stZGmADFqkQBYg</string>
 
     <string name="cause_brief">We teach kids every day for two hours. Our focus is value based education which includes teaching and manners, inculcating sense of hygeine and helping attitude and help them realise and achieve their dreams.</string>
+
+    <string name="feedback">Help us improve by your valuable feedback.</string>
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
+    <string name="whatsapp">Whatsapp</string>
+    <string name="google_plus">Google</string>
+    <string name="share">SHARE</string>
+    <string name="share_skip">DON’T WANT TO SHARE?</string>
+    <string name="login_skip">DON’T WANT TO LOGIN?</string>
+    <string name="cause_type">Education</string>
+    <string name="tap_to_continue">Tap to continue</string>
+    <string name="tap_to_start">Tap to start</string>
+
+    <string name="Profile">You are awesome! You have impacted life of 12 children uptill now</string>
+     <string name="Description">Shwas is an effort started by a group of volunteers to educate the underprivileged kids of Gulbai Tekra, Ahmedabad since year 2009. We attempt to provide safe and healthy environment to children coming from disadvantaged families, so that they can openly share with us the challenges they face that hold them back from aspiring their dreams
+We teach kids every day for two hours. Our focus is value based education which includes teaching manners, inculcating sense of hygiene and helping them to follow and fulfil their dreams.</string>
+    <string name="mini_description">Shwas is an effort started by a group of volunteers to educate the underprivileged kids of Gulbai Tekra, Ahmedabad since year 2009. We attempt to provide safe and healthy environment to children coming from disadvantaged families, so that they can openly</string>
+
+    <string name="share_screen_description">I just created impact by running  12Kms for the cause. Nike is proud to sponsor the cause. </string>
 
 </resources>

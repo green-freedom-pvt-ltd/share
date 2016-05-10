@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_background"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="150dp"
+        android:text="RunFC"
+        android:textColor="@color/white"
+        android:textSize="36sp" />
+
+    <Button
+        android:id="@+id/btn_login_fb"
+        android:layout_width="250dp"
+        android:layout_height="53dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="100dp"
+        android:background="@drawable/g_background"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/btn_login_google"
+        android:layout_width="250dp"
+        android:layout_height="53dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/g_background"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/btn_login_twitter"
+        android:layout_width="250dp"
+        android:layout_height="53dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/twitter_button"
+        android:textColor="@color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="95dp"
+            android:layout_marginTop="25dp"
+            android:text="@string/login_skip"
+            android:textColor="#80000000" />
+
+        <Button
+            android:id="@+id/tv_welcome_skip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:clickable="true"
+            android:background="@android:color/transparent"
+            android:text="SKIP"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+</LinearLayout>

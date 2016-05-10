@@ -19,7 +19,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -28,10 +27,15 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
+import com.sharesmile.share.rfac.TestRunFragment;
+import com.sharesmile.share.rfac.activities.ThankYouActivity;
+import com.sharesmile.share.rfac.fragments.StartRunFragment;
 import com.sharesmile.share.utils.Logger;
 
 import java.io.File;
@@ -44,14 +48,16 @@ public class TrackerActivity extends BaseActivity {
 
     private static final String TAG = "TrackerActivity";
     private DrawerLayout drawerLayout;
-    private ListView drawerList;
     private WorkoutService locationService;
     private RunFragment runFragment;
+    private boolean runInTestMode;
 
     private static final int HOME = 0;
     private static final int PROFILE = 1;
     private static final int FEEDBACK = 2;
     private static final int LOGOUT = 3;
+
+    public static final String RUN_IN_TEST_MODE = "run_in_test_mode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +65,8 @@ public class TrackerActivity extends BaseActivity {
         setContentView(R.layout.activity_tracker);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        drawerList = (ListView) findViewById(R.id.drawer_list_view);
+
+        runInTestMode = getIntent().getBooleanExtra(RUN_IN_TEST_MODE, false);
 
         loadInitialFragment();
 
@@ -78,8 +85,20 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void loadInitialFragment(){
-        runFragment = RunFragment.newInstance();
-        addFragment(runFragment);
+        if (isWorkoutActive()){
+            runFragment = createRunFragment();
+            addFragment(runFragment, false);
+        }else{
+            addFragment(StartRunFragment.newInstance(), false);
+        }
+    }
+
+    private RunFragment createRunFragment(){
+        if (runInTestMode){
+            return TestRunFragment.newInstance();
+        }else{
+            return RealRunFragment.newInstance();
+        }
     }
 
     @Override
@@ -92,54 +111,43 @@ public class TrackerActivity extends BaseActivity {
         return TAG;
     }
 
+    @Override
+    public void performOperation(int operationId, Object input) {
+        super.performOperation(operationId, input);
+        switch (operationId){
+            case END_RUN_START_COUNTDOWN:
+                runFragment = createRunFragment();
+                replaceFragment(runFragment, false);
+                break;
+            case SAY_THANK_YOU:
+                Intent intent = new Intent(this, ThankYouActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+        }
+    }
+
+    @Override
+    public void exit() {
+
+    }
+
+    @Override
+    public void requestPermission(int requestCode, PermissionCallback permissionsCallback) {
+
+    }
+
+    @Override
+    public void unregisterForPermissionRequest(int requestCode) {
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public class DrawerItemClickListener implements ListView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            handleItemClick(position);
-        }
-
-        public void handleItemClick(int position){
-            drawerLayout.closeDrawer(Gravity.LEFT);
-            switch (position){
-                case HOME:
-                    MainApplication.showToast("HOME");
-                    break;
-                case PROFILE:
-                    MainApplication.showToast("PROFILE");
-                    break;
-                case FEEDBACK:
-                    MainApplication.showToast("FEEDBACK");
-                    break;
-                case LOGOUT:
-                    MainApplication.showToast("LOGOUT");
-                    break;
-
-            }
-        }
     }
 
     @Override
@@ -327,7 +335,7 @@ public class TrackerActivity extends BaseActivity {
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         //TODO: Display Result on UI
-                        runFragment.showRunData(result);
+                        runFragment.onWorkoutResult(result);
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
@@ -369,7 +377,7 @@ public class TrackerActivity extends BaseActivity {
                                 }
                                 if (!TextUtils.isEmpty(errorMessage)){
                                     Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
-                                    runFragment.setErrorMessageView(errorMessage);
+                                    runFragment.showErrorMessage(errorMessage);
                                 }
                                 runFragment.pauseRun(false);
                             }

@@ -31,7 +31,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="5"
                 android:scaleType="centerCrop"
-                android:src="@drawable/hope_girl"/>
+                android:src="@drawable/cause_sample"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
