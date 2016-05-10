@@ -78,7 +78,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="share_screen_description">I just created impact by running  12Kms for the cause. Nike is proud to sponsor the cause. </string>
 
 
-   <!-- Facebook key-->
+    <!-- Facebook key-->
 
     <string name="facebook_app_id">1568874130027114</string>
     <string name="login_error">error in login.</string>
@@ -90,4 +90,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="impact">impact</string>
     <string name="tell_about_us">Tell your friends about it</string>
     <string name="submit">submit</string>
+    <string name="twitter_comsumer_key">gQYNGkCG72kY2iTUNGLkGEzZF</string>
+    <string name="twitter_comsumer_secret">OwhqBKJL3eLYdmRtIa4KZuMQAWxAAGEJxSYeZuWFC3uShcCQhS</string>
 </resources>

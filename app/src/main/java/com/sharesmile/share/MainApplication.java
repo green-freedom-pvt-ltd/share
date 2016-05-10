@@ -11,6 +11,9 @@ import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -129,6 +132,9 @@ public class MainApplication extends Application {
         super.onCreate();
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer());
+
         //Fabric.with(this, new Crashlytics());
         mDbWrapper = new DbWrapper(this);
     }

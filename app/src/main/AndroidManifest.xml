@@ -91,6 +91,10 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <provider android:authorities="com.facebook.app.FacebookContentProvider1568874130027114"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
         <!--Facebook login END-->
     </application>
 

@@ -15,11 +15,16 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
+import com.google.android.gms.plus.PlusShare;
 
 import java.util.concurrent.TimeUnit;
 
@@ -144,12 +149,11 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
                 if (mSelectedShareMedium == SHARE_MEDIUM.WHATS_APP) {
                     shareOnWhatsApp();
                 } else if (mSelectedShareMedium == SHARE_MEDIUM.GOOGLE) {
-
                     shareOnGooglePlus();
                 } else if (mSelectedShareMedium == SHARE_MEDIUM.TWITTER) {
-
+                    shareOnTwitter();
                 } else {
-
+                    shareOnFb();
                 }
                 break;
             default:
@@ -158,13 +162,11 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
     }
 
     private void shareOnGooglePlus() {
-        /*Intent shareIntent = new PlusShare.Builder(this)
+        Intent shareIntent = new PlusShare.Builder(getActivity())
                 .setType("text/plain")
-                .setText("Welcome to the Google+ platform.")
-                .setContentUrl(Uri.parse("https://developers.google.com/+/"))
+                .setText(mCauseData.getCauseShareMessageTemplate())
                 .getIntent();
-
-        startActivityForResult(shareIntent, 0);*/
+        startActivity(shareIntent);
     }
 
     private void shareOnWhatsApp() {
@@ -182,10 +184,27 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
 
     }
 
+    private void shareOnTwitter() {
+
+        TweetComposer.Builder builder = new TweetComposer.Builder(getActivity())
+                .text(mCauseData.getCauseShareMessageTemplate());
+        builder.show();
+    }
+
+    private void shareOnFb() {
+
+        FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentDescription(mCauseData.getCauseShareMessageTemplate())
+                .build();
+
+        ShareDialog shareDialog = new ShareDialog(this);
+        shareDialog.show(content);
+    }
+
     private String getTimeInHHMMFormat(long millis) {
         return String.format("%02dhr %02dmins", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1)/*,
-                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1)*/);
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
     }
 }
 
