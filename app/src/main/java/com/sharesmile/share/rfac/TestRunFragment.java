@@ -98,7 +98,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         totalDistanceView.setText(distance);
         avgSpeedView.setText(avgSpeed);
         totalTimeView.setText(time);
-        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
+        if (!WorkoutService.isCurrentlyProcessingSteps()){
             totalStepsView.setText("N.A.");
         }else{
             totalStepsView.setText(workoutData.getTotalSteps() + "");
@@ -149,7 +149,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         logsFile = null;
         liveDistanceView.setText("0.00 m");
         liveSpeedView.setText("0.0 km/hr");
-        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
+        if (!WorkoutService.isCurrentlyProcessingSteps()){
             liveStepsView.setText("N.A.");
         }else{
             liveStepsView.setText("0");

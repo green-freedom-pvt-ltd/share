@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
@@ -46,12 +48,12 @@ public class GoogleFitStepCounter implements StepCounter,
     public GoogleFitStepCounter(Context context, Listener listener) {
         this.context = context;
         this.listener = listener;
-
         startCounting();
     }
 
     @Override
     public void startCounting() {
+        Logger.d(TAG, "startCounting");
         mApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Fitness.SENSORS_API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
@@ -63,6 +65,7 @@ public class GoogleFitStepCounter implements StepCounter,
 
     @Override
     public void stopCounting() {
+        Logger.d(TAG, "stopCounting");
         Fitness.SensorsApi.remove( mApiClient, this )
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
@@ -89,17 +92,22 @@ public class GoogleFitStepCounter implements StepCounter,
 
     @Override
     public void onConnected(Bundle bundle) {
+        Logger.d(TAG, "onConnected");
         DataSourcesRequest dataSourceRequest = new DataSourcesRequest.Builder()
-                .setDataTypes( DataType.TYPE_STEP_COUNT_CUMULATIVE )
-                .setDataSourceTypes( DataSource.TYPE_RAW )
+                .setDataTypes( DataType.AGGREGATE_STEP_COUNT_DELTA )
+                .setDataSourceTypes(DataSource.TYPE_DERIVED)
                 .build();
 
         ResultCallback<DataSourcesResult> dataSourcesResultCallback = new ResultCallback<DataSourcesResult>() {
             @Override
             public void onResult(DataSourcesResult dataSourcesResult) {
+                Log.i(TAG, "onResult of dataSourcesResultCallback, Status: " + dataSourcesResult.getStatus().toString());
                 for( DataSource dataSource : dataSourcesResult.getDataSources() ) {
-                    if( DataType.TYPE_STEP_COUNT_CUMULATIVE.equals( dataSource.getDataType() ) ) {
-                        registerFitnessDataListener(dataSource, DataType.TYPE_STEP_COUNT_CUMULATIVE);
+                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: " + dataSource.toDebugString());
+                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource type: " + dataSource.getDataType().getName());
+                    if( DataType.AGGREGATE_STEP_COUNT_DELTA.equals( dataSource.getDataType() ) ) {
+                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
+                        registerFitnessDataListener(dataSource, DataType.AGGREGATE_STEP_COUNT_DELTA);
                     }
                 }
             }
@@ -134,23 +142,27 @@ public class GoogleFitStepCounter implements StepCounter,
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Logger.e(TAG, "onConnectionSuspended");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
-                Constants.BROADCAST_GOOGLE_FIT_READ_PERMISSION);
-        Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
-        bundle.putParcelable(Constants.KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE,
-                connectionResult);
-        intent.putExtras(bundle);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        Logger.e(TAG, "onConnectionFailed, hasResolution = " + connectionResult.hasResolution());
+        if (connectionResult.hasResolution()){
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+                    Constants.BROADCAST_GOOGLE_FIT_READ_PERMISSION);
+            Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
+            bundle.putParcelable(Constants.KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE,
+                    connectionResult);
+            intent.putExtras(bundle);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        }
     }
 
     @Override
     public void onDataPoint(DataPoint dataPoint) {
+        Logger.d(TAG, "onDataPoint");
         for( Field field : dataPoint.getDataType().getFields() ) {
             Value value = dataPoint.getValue( field );
             Logger.d(TAG, "Field: " + field.getName() + " Value: " + value);

@@ -120,6 +120,8 @@ public class TrackerActivity extends BaseActivity {
         super.performOperation(operationId, input);
         switch (operationId){
             case END_RUN_START_COUNTDOWN:
+                String ankit = null;
+                Logger.d(TAG, ankit.toString());
                 runFragment = createRunFragment();
                 replaceFragment(runFragment, false);
                 break;

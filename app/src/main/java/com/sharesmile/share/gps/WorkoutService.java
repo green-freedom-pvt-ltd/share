@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -44,8 +45,8 @@ public class WorkoutService extends Service implements
 
     private static final String TAG = "WorkoutService";
 
-    private boolean currentlyTracking = false;
-    private boolean currentlyProcessingSteps = false;
+    private static boolean currentlyTracking = false;
+    private static boolean currentlyProcessingSteps = false;
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
@@ -161,13 +162,14 @@ public class WorkoutService extends Service implements
 
     @Override
     public void notAvailable(int reasonCode) {
+        Logger.d(TAG, "notAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
         //TODO: Do something with the reasonCode
     }
 
     @Override
     public void isReady() {
-        stepCounter.startCounting();
+        Logger.d(TAG, "isReady");
         currentlyProcessingSteps = true;
     }
 
@@ -176,6 +178,14 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isActive()){
             tracker.feedSteps(cumulativeSteps);
         }
+    }
+
+    public static boolean isCurrentlyTracking(){
+        return currentlyTracking;
+    }
+
+    public static boolean isCurrentlyProcessingSteps(){
+        return currentlyProcessingSteps;
     }
 
     /**
