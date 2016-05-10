@@ -11,6 +11,7 @@ public class SchemaGenerator {
     public static void main(String[] args) throws IOException, Exception {
         Schema schema = new Schema(1, "com.sharesmile.share");
         addWorkoutData(schema);
+        addUserData(schema);
         new DaoGenerator().generateAll(schema, "../app/src/main/java-gen");
     }
 
@@ -23,6 +24,17 @@ public class SchemaGenerator {
         workout.addFloatProperty("recordedTime").notNull();
         workout.addFloatProperty("avgSpeed").notNull();
         workout.addDateProperty("date");
+    }
+
+    private static void addUserData(Schema schema) {
+        Entity user = schema.addEntity("User");
+        user.addIdProperty();
+        user.addStringProperty("name");
+        user.addStringProperty("emailId").notNull();
+        user.addStringProperty("birthday");
+        user.addStringProperty("mobileNO");
+        user.addStringProperty("gender");
+        user.addStringProperty("profileImageUrl");
     }
 
 }

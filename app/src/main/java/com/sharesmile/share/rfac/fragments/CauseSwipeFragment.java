@@ -86,7 +86,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         mCardView.setOnClickListener(this);
 
         //load image
-        Picasso.with(getContext()).load(cause.getImageUrl()).into(mCauseImage);
+        Picasso.with(getContext()).load(cause.getImageUrl()).placeholder(R.drawable.cause_image_placeholder).into(mCauseImage);
     }
 
 

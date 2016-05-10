@@ -178,13 +178,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (menuItem.getItemId() == R.id.nav_item_settings) {
             Logger.d(TAG, "settings clicked");
             replaceFragment(new SettingsFragment(), true);
+        } else if (menuItem.getItemId() == R.id.nav_item_home) {
+            showHome();
         }
 
-               /* if (menuItem.getItemId() == R.id.nav_item_logout) {
-                    replaceFragment(new LogoutFragment(), true);
-                }*/
+
         mDrawerLayout.closeDrawers();
 
         return false;
+    }
+
+    public void showHome() {
+        replaceFragment(new OnScreenFragment(), true);
     }
 }

@@ -38,6 +38,7 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         View view = inflater.inflate(R.layout.fragment_drawer_feedback, null);
         ButterKnife.bind(this, view);
         mSubmitButton.setOnClickListener(this);
+        getFragmentController().updateToolBar(getString(R.string.feedback), true);
         return view;
     }
 
@@ -45,5 +46,7 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
 
         //submit feedback to server
+
+        getFragmentController().addFragment(new OnScreenFragment(),true);
     }
 }

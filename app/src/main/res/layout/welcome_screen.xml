@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_background"
+    android:background="@drawable/background_splash_screen"
     android:orientation="vertical">
 
     <com.sharesmile.share.views.MSBTextView
@@ -10,10 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="150dp"
-        android:text="@string/impact_run"
-        android:textAllCaps="true"
         android:shadowColor="@color/white_50"
         android:shadowDy="2"
+        android:text="@string/impact_run"
+        android:textAllCaps="true"
         android:textColor="@color/white"
         android:textSize="36sp" />
 
@@ -21,25 +21,22 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="bottom"
+        android:gravity="bottom|center_horizontal"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_login_fb"
-            android:layout_width="250dp"
-            android:layout_height="53dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/fb_background"
-            android:textColor="@color/white" />
 
-        <Button
+        <include
+            android:id="@+id/btn_login_fb"
+            layout="@layout/login_button"
+            android:layout_width="250dp"
+            android:layout_height="53dp" />
+
+        <include
             android:id="@+id/btn_login_google"
+            layout="@layout/login_button"
             android:layout_width="250dp"
             android:layout_height="53dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/g_background"
-            android:textColor="@color/white" />
+            android:layout_marginTop="15dp" />
 
         <LinearLayout
             android:layout_width="match_parent"

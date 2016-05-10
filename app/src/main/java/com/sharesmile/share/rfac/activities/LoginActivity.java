@@ -1,11 +1,14 @@
 package com.sharesmile.share.rfac.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -24,9 +27,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.User;
+import com.sharesmile.share.UserDao;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
@@ -46,10 +49,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private static final int REQUEST_GOOGLE_SIGN_IN = 1001;
     @BindView(R.id.btn_login_fb)
-    Button mFbLoginButton;
+    LinearLayout mFbLoginButton;
 
     @BindView(R.id.btn_login_google)
-    Button mGoogleLoginButton;
+    LinearLayout mGoogleLoginButton;
 
     @BindView(R.id.tv_welcome_skip)
     MRTextView tv_skip;
@@ -72,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
            // intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, (Boolean) input);
             startActivity(intent);
-        }*/else{
+        }*/ else {
             startMainActivity();
         }
     }
@@ -113,7 +116,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 }
                                 if (!TextUtils.isEmpty(userEmail)) {
                                     Profile profile = Profile.getCurrentProfile();
-                                    userLoginSuccess(profile.getName(), userEmail);
+                                    userLoginSuccess(profile.getName(), userEmail, profile.getProfilePictureUri(320, 320));
+
                                 } else {
                                     MainApplication.getInstance().showToast(R.string.email_id_required);
                                 }
@@ -142,7 +146,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         tv_skip.setOnClickListener(this);
         mFbLoginButton.setOnClickListener(this);
         mGoogleLoginButton.setOnClickListener(this);
+
+        //init fb login
+        TextView mFbText = (TextView) mFbLoginButton.findViewById(R.id.title);
+        mFbText.setText(getString(R.string.logn_with_fb));
+        mFbText.setTextColor(getResources().getColor(R.color.denim_blue));
+
+        ImageView mFbImage = (ImageView) mFbLoginButton.findViewById(R.id.login_image);
+        mFbImage.setImageResource(R.drawable.logo_fb);
+
+
+        //init Google login
+        TextView mGText = (TextView) mGoogleLoginButton.findViewById(R.id.title);
+        mGText.setText(getString(R.string.logn_with_google));
+        mGText.setTextColor(getResources().getColor(R.color.pale_red));
+
+        ImageView mGImage = (ImageView) mGoogleLoginButton.findViewById(R.id.login_image);
+        mGImage.setImageResource(R.drawable.login_google);
     }
+
 
     @Override
     public void onClick(View v) {
@@ -191,18 +213,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName());
-            userLoginSuccess(acct.getDisplayName(), acct.getEmail());
+            userLoginSuccess(acct.getDisplayName(), acct.getEmail(), acct.getPhotoUrl());
         } else {
             Logger.d("google", "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
         }
     }
 
-    private void userLoginSuccess(String name, String userEmail) {
+    private void userLoginSuccess(String name, String userEmail, Uri profilePictureUri) {
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
         prefsManager.setString(Constants.PREF_USER_EMAIL, userEmail);
         prefsManager.setString(Constants.PREF_USER_NAME, name);
+        if (profilePictureUri != null) {
+            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri.toString());
+        }
         prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
+        User user = new User(1L);
+        user.setName(name);
+        user.setEmailId(userEmail);
+        user.setProfileImageUrl(profilePictureUri.toString());
+        UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
+        userDao.insertOrReplace(user);
         startMainActivity();
     }
 

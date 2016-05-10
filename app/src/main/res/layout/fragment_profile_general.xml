@@ -10,7 +10,7 @@
         android:background="#fafafa"
         android:orientation="vertical">
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -36,7 +36,7 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -52,6 +52,7 @@
             android:layout_marginTop="14dp"
             android:background="#00000000"
             android:hint="xyz@abc.com"
+            android:editable="false"
             android:textSize="14sp" />
 
         <View
@@ -62,7 +63,7 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -90,7 +91,7 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -116,7 +117,7 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <TextView
+        <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -150,13 +151,6 @@
                 android:text="Female" />
         </RadioGroup>
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="47dp"
-            android:background="@color/pale_magenta"
-            android:text="SUBMIT"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
 
     </LinearLayout>
 

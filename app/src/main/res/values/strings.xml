@@ -93,4 +93,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="twitter_comsumer_key">gQYNGkCG72kY2iTUNGLkGEzZF</string>
     <string name="twitter_comsumer_secret">OwhqBKJL3eLYdmRtIa4KZuMQAWxAAGEJxSYeZuWFC3uShcCQhS</string>
     <string name="error">Error</string>
+    <string name="logn_with_fb">LOGIN WITH FACEBOOK</string>
+    <string name="logn_with_google">login with google</string>
+    <string name="profile">Profile</string>
 </resources>

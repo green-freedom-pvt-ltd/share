@@ -33,4 +33,5 @@ public interface IFragmentController {
 
     void updateToolBar(String title,boolean showAsUpEnable);
 
+
 }
