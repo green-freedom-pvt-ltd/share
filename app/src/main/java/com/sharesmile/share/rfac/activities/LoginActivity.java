@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN) && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false)) {
             initializeFbLogin();
             initializeGoogleLogin();
@@ -74,7 +75,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }*/else{
             startMainActivity();
         }
-
     }
 
     private void initializeGoogleLogin() {
