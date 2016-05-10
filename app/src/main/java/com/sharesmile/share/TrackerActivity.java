@@ -17,19 +17,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.RunTracker;
+import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
@@ -124,11 +120,15 @@ public class TrackerActivity extends BaseActivity {
                 replaceFragment(runFragment, false);
                 break;
             case SAY_THANK_YOU:
-                if(input instanceof String) {
+                if (input instanceof String) {
                     Intent intent = new Intent(this, ThankYouActivity.class);
-                    intent.putExtra(ThankYouActivity.BUNDLE_THANKYOU_IMAGE_URL,(String) input);
+                    intent.putExtra(ThankYouActivity.BUNDLE_THANKYOU_IMAGE_URL, (String) input);
                     startActivity(intent);
                     finish();
+                } else {
+                    if (BuildConfig.DEBUG) {
+                        Toast.makeText(this, "Thankyou image URL is missing", Toast.LENGTH_LONG).show();
+                    }
                 }
                 break;
         }
@@ -400,4 +400,12 @@ public class TrackerActivity extends BaseActivity {
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        if(RunTracker.isWorkoutActive()){
+            runFragment.showStopDialog();
+            return;
+        }
+        super.onBackPressed();
+    }
 }

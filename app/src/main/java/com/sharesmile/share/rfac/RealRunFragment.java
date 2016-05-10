@@ -143,8 +143,8 @@ public class RealRunFragment extends RunFragment {
     }
 
     @Override
-    public void showErrorMessage(String text) {
-        MainApplication.showToast(text);
+    public void showErrorMessage(String msg) {
+        showErrorDialog(msg);
     }
 
     @Override
@@ -161,12 +161,13 @@ public class RealRunFragment extends RunFragment {
                 break;
 
             case R.id.btn_stop:
-                showEndConfirmationDialog();
+                showStopDialog();
                 break;
         }
     }
 
-    private void showEndConfirmationDialog() {
+    @Override
+    public void showStopDialog() {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
 
         // Setting Dialog Title
@@ -207,5 +208,28 @@ public class RealRunFragment extends RunFragment {
         if (mCauseData != null) {
             Picasso.with(getActivity()).load(mCauseData.getCauseThankYouImage()).fetch();
         }
+    }
+
+    private void showErrorDialog(String msg) {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        View view = getLayoutInflater(null).inflate(R.layout.alert_dialog_title, null);
+        view.setBackgroundColor(getResources().getColor(R.color.neon_red));
+        TextView titleView = (TextView) view.findViewById(R.id.title);
+        titleView.setText(getString(R.string.error));
+        alertDialog.setCustomTitle(view);
+        alertDialog.setMessage(msg);
+        alertDialog.setPositiveButton(getString(R.string.resume), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                resumeRun();
+
+            }
+        });
+        alertDialog.setNegativeButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                endRun(true);
+            }
+        });
+
+        alertDialog.show();
     }
 }

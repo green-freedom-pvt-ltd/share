@@ -66,12 +66,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             setContentView(R.layout.welcome_screen);
             ButterKnife.bind(this);
             initUi();
-        } else if(RunTracker.isWorkoutActive()) {
+        } /*else if(RunTracker.isWorkoutActive()) {
             Intent intent = new Intent(this, TrackerActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
            // intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, (Boolean) input);
             startActivity(intent);
-        }else{
+        }*/else{
             startMainActivity();
         }
 

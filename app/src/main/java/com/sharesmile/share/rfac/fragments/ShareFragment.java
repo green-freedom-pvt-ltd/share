@@ -2,7 +2,6 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -18,13 +17,13 @@ import android.widget.Toast;
 import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.google.android.gms.plus.PlusShare;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
-import com.google.android.gms.plus.PlusShare;
 
 import java.util.concurrent.TimeUnit;
 
@@ -142,7 +141,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
         switch (v.getId()) {
 
             case R.id.skip_layout:
-
                 getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, mCauseData.getCauseThankYouImage());
                 break;
             case R.id.btn_share_screen:
