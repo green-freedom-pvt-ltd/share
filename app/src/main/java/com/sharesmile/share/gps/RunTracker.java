@@ -21,7 +21,6 @@ public class RunTracker implements Tracker {
 
     private static final String TAG = "RunTracker";
 
-    private volatile int stepsSinceReboot = 0;
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
     private ScheduledExecutorService executorService;
@@ -31,7 +30,6 @@ public class RunTracker implements Tracker {
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
-            stepsSinceReboot = 0;
             if (isActive()){
                 dataStore = new WorkoutDataStoreImpl();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
@@ -45,7 +43,6 @@ public class RunTracker implements Tracker {
                 setState(State.RUNNING);
                 dataStore = new WorkoutDataStoreImpl(System.currentTimeMillis());
                 resumeRun();
-                stepsSinceReboot = 0;
             }
         }
     }
@@ -54,7 +51,6 @@ public class RunTracker implements Tracker {
         WorkoutData workoutData = dataStore.clear();
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
         dataStore = null;
-        stepsSinceReboot = 0;
         setState(State.IDLE);
         listener = null;
         return workoutData;
@@ -72,7 +68,6 @@ public class RunTracker implements Tracker {
     @Override
     public synchronized void pauseRun() {
         setState(State.PAUSED);
-        stepsSinceReboot = 0;
         dataStore.workoutPause();
     }
 
@@ -163,35 +158,36 @@ public class RunTracker implements Tracker {
 
 
     @Override
-    public void feedSteps(final SensorEvent event){
+    public void feedSteps(final int deltaSteps){
         if (isPaused()){
             Logger.d(TAG, "Wont process steps, as the workout is paused");
         }else if (isRunning()){
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    processStepsEvent(event);
+                    processSteps(deltaSteps);
                 }
             });
         }
     }
 
-    /**
-     * Feed step counter event, the first index of values array contains the total number of steps since reboot
-     * @param event
-     */
-    private synchronized void processStepsEvent(SensorEvent event){
+    @Override
+    public void approveWorkoutData() {
+        dataStore.approveWorkoutData();
+    }
+
+    @Override
+    public void discardApprovalQueue() {
+        dataStore.discardApprovalQueue();
+    }
+
+    private synchronized void processSteps(int deltaSteps){
         if (isRunning()){
-            if (stepsSinceReboot < 1){
-                //i.e. fresh reading after creation of runtracker
-                stepsSinceReboot = (int) event.values[0];
-                Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
-            }
-            int numSteps = (int) event.values[0] - stepsSinceReboot;
-            stepsSinceReboot = (int) event.values[0];
+            // Below logic was required when we were getting cumulative steps, with google fit, it is not required
+
             long reportimeStamp = System.currentTimeMillis();
-            Logger.d(TAG, "Adding " + numSteps + "steps.");
-            dataStore.addSteps(numSteps);
+            Logger.d(TAG, "Adding " + deltaSteps + "steps.");
+            dataStore.addSteps(deltaSteps);
             listener.updateStepsRecord(reportimeStamp);
         }
     }
@@ -202,11 +198,11 @@ public class RunTracker implements Tracker {
         if (isRunning()){
             //Check if the start point has been detected since the workout started/resumed
             if (dataStore.coldStartAfterResume()){
-                // This is the source location
-                Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
+                // This is a potential source location
+                Logger.i(TAG, "Checking for source, accuracy = " + point.getAccuracy());
                 if (point.getAccuracy() < Config.SOURCE_ACCEPTABLE_ACCURACY){
                     // Set has source only when it has acceptable accuracy
-                    Logger.d(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
+                    Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
                     DistRecord startRecord = new DistRecord(point);
                     dataStore.addRecord(startRecord);
                     lastRecord = startRecord;

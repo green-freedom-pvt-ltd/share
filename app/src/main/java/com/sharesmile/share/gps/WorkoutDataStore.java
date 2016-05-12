@@ -30,11 +30,9 @@ public interface WorkoutDataStore {
 
 	boolean isWorkoutRunning();
 
-	void persistWorkoutData();
+	void approveWorkoutData();
 
-	WorkoutData retrieveFromPersistentStorage();
-
-	void clearPersistentStorage();
+	void discardApprovalQueue();
 
 	WorkoutData clear();
 }
