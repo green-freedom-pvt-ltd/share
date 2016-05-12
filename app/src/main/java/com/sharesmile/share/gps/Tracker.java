@@ -19,6 +19,8 @@ public interface Tracker {
 	boolean isRunning();
 	void feedLocation(Location point);
 	void feedSteps(int cumulativeSteps);
+	void approveWorkoutData();
+	void discardApprovalQueue();
 	long getBeginTimeStamp();
 	long getLastResumeTimeStamp();
 	int getTotalSteps();

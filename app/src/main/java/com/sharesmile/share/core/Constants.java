@@ -73,7 +73,9 @@ public class Constants {
 
     public static final String PREF_PREV_DIST_RECORD  = "pref_prev_dist_record";
 
-    public static final String PREF_WORKOUT_DATA  = "pref_workout_data";
+    public static final String PREF_WORKOUT_DATA_DIRTY = "pref_workout_data_dirty";
+
+    public static final String PREF_WORKOUT_DATA_APPROVED = "pref_workout_data_approved";
 
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{

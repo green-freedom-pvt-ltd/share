@@ -3,6 +3,7 @@ package com.sharesmile.share.gps;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -207,7 +207,7 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public synchronized void onLocationChanged(Location location) {
         if (location != null) {
             currentLocation = location;
             tracker.feedLocation(location);
@@ -263,10 +263,39 @@ public class WorkoutService extends Service implements
                 Logger.e(TAG, "unable to connect to google play services.");
             }
             if (!currentlyProcessingSteps){
-                Logger.d(TAG, "Will try and initiate StepCounter");
-                stepCounter = new GoogleFitStepCounter(this, this);
+                if (isKitkatWithStepSensor(getApplicationContext())){
+                    Logger.d(TAG, "Step Detector present! Will register");
+                    stepCounter = new AndroidStepCounter(this, this);
+                }else{
+                    Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
+                    //Toning down the steps per second factor
+                    Config.STEPS_PER_SECOND_FACTOR = Config.STEPS_PER_SECOND_FACTOR*0.6f;
+                    stepCounter = new GoogleFitStepCounter(this, this);
+                }
             }
         }
+    }
+
+    /**
+     * Returns true if this device is supported. It needs to be running Android KitKat (4.4) or
+     * higher and has a step counter and step detector sensor.
+     * This check is useful when an app provides an alternative implementation or different
+     * functionality if the step sensors are not available or this code runs on a platform version
+     * below Android KitKat. If this functionality is required, then the minSDK parameter should
+     * be specified appropriately in the AndroidManifest.
+     *
+     * @return True iff the device can run this sample
+     */
+    public static boolean isKitkatWithStepSensor(Context appContext) {
+        // Require at least Android KitKat
+        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        // Check that the device supports the step counter and detector sensors
+        PackageManager packageManager = appContext.getPackageManager();
+        boolean hasStepDetector = packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+        Logger.i(TAG, "isKitkatWithStepSensor: currentApiVersion = " + currentApiVersion +
+                ", hasStepDetector = " + hasStepDetector);
+        return currentApiVersion >= android.os.Build.VERSION_CODES.KITKAT
+                && hasStepDetector;
     }
 
     @Override
@@ -300,13 +329,23 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void sendPauseWorkoutBroadcast(int problem) {
+    public void workoutVigilanceSessiondefaulted(int problem) {
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_PAUSE_WORKOUT_CODE);
         sendBroadcast(bundle);
+        if (tracker != null && tracker.isActive()){
+            tracker.discardApprovalQueue();
+        }
         pause();
+    }
+
+    @Override
+    public void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime) {
+        if (tracker != null && tracker.isActive()){
+            tracker.approveWorkoutData();
+        }
     }
 
     @Override

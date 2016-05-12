@@ -11,6 +11,10 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.SynchronousQueue;
+
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
@@ -18,29 +22,36 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     private static final String TAG = "WorkoutDataStoreImpl";
 
-    private WorkoutData workoutData;
+    private WorkoutData dirtyWorkoutData;
+    private WorkoutData approvedWorkoutData;
 
-    public WorkoutDataStoreImpl(){
-        workoutData = retrieveFromPersistentStorage();
-        if (workoutData == null){
+    Queue<DistRecord> waitingForApprovalQueue = new ConcurrentLinkedQueue<>();
+    volatile float extraPolatedDistanceToBeApproved = 0f;
+    volatile int numStepsToBeApproved = 0;
+
+    WorkoutDataStoreImpl(){
+        dirtyWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_DIRTY);
+        approvedWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_APPROVED);
+        if (dirtyWorkoutData == null){
             throw new IllegalStateException("Workout is active but Couldn't find workout data in persistent storage");
         }
     }
 
-    public WorkoutDataStoreImpl(long beginTimeStamp){
-        workoutData = new WorkoutDataImpl(beginTimeStamp);
-        //Persist workoutData object over here
-        persistWorkoutData();
+    WorkoutDataStoreImpl(long beginTimeStamp){
+        dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp);
+        approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp);
+        //Persist dirtyWorkoutData object over here
+        persistBothWorkoutData();
     }
 
     @Override
     public float getTotalDistance(){
-        return workoutData.getDistance();
+        return dirtyWorkoutData.getDistance();
     }
 
     @Override
     public long getBeginTimeStamp() {
-        return workoutData.getBeginTimeStamp();
+        return dirtyWorkoutData.getBeginTimeStamp();
     }
 
     @Override
@@ -50,90 +61,130 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             return;
         }
 
-        if (workoutData.getCurrentBatch().getPoints().size() == 1){
+        if (dirtyWorkoutData.getCurrentBatch().getPoints().size() == 1){
             //Start point has been added after start/resume of workout and it is the second record after it
             // Need to extrapolate the distance for time elapsed since start/resume and start point addition
             Location startPoint = record.getPrevLocation();
-            long batchInitiateTimeStamp = workoutData.getCurrentBatch().getStartTimeStamp();
+            long batchInitiateTimeStamp = dirtyWorkoutData.getCurrentBatch().getStartTimeStamp();
             float timeToFetchSource = ((float) (startPoint.getTime() - batchInitiateTimeStamp)) / 1000;
             float speedForExtrapolation = record.getSpeed();
             float extraPolatedDistance = timeToFetchSource * speedForExtrapolation;
-            workoutData.addDistance(extraPolatedDistance);
+            dirtyWorkoutData.addDistance(extraPolatedDistance);
+            extraPolatedDistanceToBeApproved = extraPolatedDistance;
         }
 
-        workoutData.addRecord(record);
+        dirtyWorkoutData.addRecord(record);
+        waitingForApprovalQueue.add(record);
+        // Persist dirtyWorkoutData object
+        persistDirtyWorkoutData();
 
-        // Persist workoutData object
-        persistWorkoutData();
+//        persistBothWorkoutData();
     }
 
     @Override
     public void addSteps(int numSteps){
         if (isWorkoutRunning()){
-            workoutData.addSteps(numSteps);
-            persistWorkoutData();
+            dirtyWorkoutData.addSteps(numSteps);
+            numStepsToBeApproved += numSteps;
+            persistDirtyWorkoutData();
+
+//            persistBothWorkoutData();
         }
     }
 
     @Override
     public int getTotalSteps(){
-        return workoutData.getTotalSteps();
+        return dirtyWorkoutData.getTotalSteps();
     }
 
     @Override
     public float getDistanceCoveredSinceLastResume() {
-        return workoutData.getCurrentBatch().getDistance();
+        return dirtyWorkoutData.getCurrentBatch().getDistance();
     }
 
     @Override
     public long getLastResumeTimeStamp() {
-        return workoutData.getCurrentBatch().getStartTimeStamp();
+        return dirtyWorkoutData.getCurrentBatch().getStartTimeStamp();
     }
 
     @Override
     public boolean coldStartAfterResume() {
-        return workoutData.coldStartAfterResume();
+        return dirtyWorkoutData.coldStartAfterResume();
     }
 
     @Override
     public void workoutPause() {
-        workoutData.workoutPause();
+        dirtyWorkoutData.workoutPause();
+        approvedWorkoutData.workoutPause();
+        // If it was a defaulter scenario then the queue has already been discarded
+        approveWorkoutData();
+        persistBothWorkoutData();
     }
 
     @Override
     public void workoutResume() {
-        workoutData.workoutResume();
+        dirtyWorkoutData.workoutResume();
+        approvedWorkoutData.workoutResume();
+        persistBothWorkoutData();
     }
 
     @Override
     public boolean isWorkoutRunning() {
-        return workoutData.isRunning();
+        return dirtyWorkoutData.isRunning();
+    }
+
+    @Override
+    public synchronized void approveWorkoutData() {
+        if (extraPolatedDistanceToBeApproved > 0){
+            approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
+            extraPolatedDistanceToBeApproved = 0;
+        }
+        while (!waitingForApprovalQueue.isEmpty()){
+            DistRecord record = waitingForApprovalQueue.remove();
+            approvedWorkoutData.addRecord(record);
+        }
+        if (numStepsToBeApproved > 0){
+            approvedWorkoutData.addSteps(numStepsToBeApproved);
+        }
+        persistBothWorkoutData();
+    }
+
+    @Override
+    public synchronized void discardApprovalQueue() {
+        extraPolatedDistanceToBeApproved = 0;
+        waitingForApprovalQueue.clear();
+        numStepsToBeApproved = 0;
     }
 
     @Override
     public WorkoutData clear(){
         clearPersistentStorage();
-        return workoutData.close();
+        return approvedWorkoutData.close();
     }
 
-    @Override
-    public void persistWorkoutData() {
-        if (workoutData != null){
-            SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA, workoutData);
+    private void persistBothWorkoutData() {
+        persistDirtyWorkoutData();
+        if (approvedWorkoutData != null){
+            SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA_APPROVED, approvedWorkoutData);
         }
     }
 
-    @Override
-    public WorkoutData retrieveFromPersistentStorage() {
-        String workoutDataAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_DATA);
+    private void persistDirtyWorkoutData(){
+        if (dirtyWorkoutData != null){
+            SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA_DIRTY, dirtyWorkoutData);
+        }
+    }
+
+    private WorkoutData retrieveFromPersistentStorage(String key) {
+        String workoutDataAsString = SharedPrefsManager.getInstance().getString(key);
         if (!TextUtils.isEmpty(workoutDataAsString)){
             return Utils.createObjectFromJSONString(workoutDataAsString, WorkoutDataImpl.class);
         }
         return null;
     }
 
-    @Override
-    public void clearPersistentStorage() {
-        SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA);
+    private void clearPersistentStorage() {
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_DIRTY);
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_APPROVED);
     }
 }

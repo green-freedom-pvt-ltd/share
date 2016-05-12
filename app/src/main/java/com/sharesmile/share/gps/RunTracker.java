@@ -21,7 +21,6 @@ public class RunTracker implements Tracker {
 
     private static final String TAG = "RunTracker";
 
-    private volatile int stepsSinceReboot = 0;
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
     private ScheduledExecutorService executorService;
@@ -31,7 +30,6 @@ public class RunTracker implements Tracker {
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
-            stepsSinceReboot = 0;
             if (isActive()){
                 dataStore = new WorkoutDataStoreImpl();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
@@ -45,7 +43,6 @@ public class RunTracker implements Tracker {
                 setState(State.RUNNING);
                 dataStore = new WorkoutDataStoreImpl(System.currentTimeMillis());
                 resumeRun();
-                stepsSinceReboot = 0;
             }
         }
     }
@@ -54,7 +51,6 @@ public class RunTracker implements Tracker {
         WorkoutData workoutData = dataStore.clear();
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
         dataStore = null;
-        stepsSinceReboot = 0;
         setState(State.IDLE);
         listener = null;
         return workoutData;
@@ -72,7 +68,6 @@ public class RunTracker implements Tracker {
     @Override
     public synchronized void pauseRun() {
         setState(State.PAUSED);
-        stepsSinceReboot = 0;
         dataStore.workoutPause();
     }
 
@@ -176,17 +171,19 @@ public class RunTracker implements Tracker {
         }
     }
 
+    @Override
+    public void approveWorkoutData() {
+        dataStore.approveWorkoutData();
+    }
+
+    @Override
+    public void discardApprovalQueue() {
+        dataStore.discardApprovalQueue();
+    }
+
     private synchronized void processSteps(int deltaSteps){
         if (isRunning()){
             // Below logic was required when we were getting cumulative steps, with google fit, it is not required
-
-//            if (stepsSinceReboot < 1){
-//                //i.e. fresh reading after creation of runtracker
-//                stepsSinceReboot = deltaSteps;
-//                Logger.d(TAG, "Setting stepsSinceReboot for first time = " + stepsSinceReboot);
-//            }
-//            int numSteps = deltaSteps - stepsSinceReboot;
-//            stepsSinceReboot = deltaSteps;
 
             long reportimeStamp = System.currentTimeMillis();
             Logger.d(TAG, "Adding " + deltaSteps + "steps.");
@@ -201,11 +198,11 @@ public class RunTracker implements Tracker {
         if (isRunning()){
             //Check if the start point has been detected since the workout started/resumed
             if (dataStore.coldStartAfterResume()){
-                // This is the source location
-                Logger.d(TAG, "Checking for source, accuracy = " + point.getAccuracy());
+                // This is a potential source location
+                Logger.i(TAG, "Checking for source, accuracy = " + point.getAccuracy());
                 if (point.getAccuracy() < Config.SOURCE_ACCEPTABLE_ACCURACY){
                     // Set has source only when it has acceptable accuracy
-                    Logger.d(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
+                    Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
                     DistRecord startRecord = new DistRecord(point);
                     dataStore.addRecord(startRecord);
                     lastRecord = startRecord;

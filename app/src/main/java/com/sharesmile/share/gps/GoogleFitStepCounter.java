@@ -45,6 +45,7 @@ public class GoogleFitStepCounter implements StepCounter,
     private Context context;
     private Listener listener;
     private GoogleApiClient mApiClient;
+    boolean isPaused;
 
     public GoogleFitStepCounter(Context context, Listener listener) {
         this.context = context;
@@ -76,6 +77,16 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 });
+    }
+
+    @Override
+    public void pauseCounting() {
+        isPaused = true;
+    }
+
+    @Override
+    public void resumeCounting() {
+        isPaused = false;
     }
 
     @Override
@@ -164,11 +175,13 @@ public class GoogleFitStepCounter implements StepCounter,
     @Override
     public void onDataPoint(DataPoint dataPoint) {
         Logger.d(TAG, "onDataPoint");
-        for( Field field : dataPoint.getDataType().getFields() ) {
-            Value value = dataPoint.getValue( field );
-            String message = "Field: " + field.getName() + " Value: " + value;
-            Logger.d(TAG, message);
-            listener.onStepCount(Integer.parseInt(value.toString()));
+        if (!isPaused){
+            for( Field field : dataPoint.getDataType().getFields() ) {
+                Value value = dataPoint.getValue( field );
+                String message = "Field: " + field.getName() + " Value: " + value;
+                Logger.d(TAG, message);
+                listener.onStepCount(Integer.parseInt(value.toString()));
+            }
         }
     }
 }
