@@ -47,6 +47,6 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
 
         //submit feedback to server
 
-        getFragmentController().addFragment(new OnScreenFragment(),true);
+        getFragmentController().replaceFragment(new OnScreenFragment(),true);
     }
 }
