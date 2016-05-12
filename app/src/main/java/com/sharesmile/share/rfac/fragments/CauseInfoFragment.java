@@ -83,7 +83,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
             @Override
             public boolean onLongClick(View v) {
                 Logger.d(TAG, "onClick of Begin Run, will start Tracker Activity flow");
-                getFragmentController().performOperation(IFragmentController.START_RUN, true);
+                getFragmentController().performOperation(IFragmentController.START_RUN_TEST, cause);
                 return true;
             }
         });

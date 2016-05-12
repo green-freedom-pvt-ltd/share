@@ -66,6 +66,17 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 if (input instanceof CauseData) {
                     Intent intent = new Intent(this, TrackerActivity.class);
                     intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, (CauseData) input);
+                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, false);
+                    startActivity(intent);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            case START_RUN_TEST:
+                if (input instanceof CauseData) {
+                    Intent intent = new Intent(this, TrackerActivity.class);
+                    intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, (CauseData) input);
+                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, true);
                     startActivity(intent);
                 } else {
                     throw new IllegalArgumentException();
