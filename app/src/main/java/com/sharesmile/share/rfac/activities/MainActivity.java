@@ -18,6 +18,7 @@ import android.view.View;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
@@ -51,7 +52,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 R.string.app_name);
 
         mDrawerToggle.syncState();
-
         mNavigationView.setNavigationItemSelectedListener(this);
     }
 

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by ankitm on 25/03/16.
  */
-public interface WorkoutData extends UnObfuscable, Parcelable{
+public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 
 	/**
 	 * gets total distance ran in workout

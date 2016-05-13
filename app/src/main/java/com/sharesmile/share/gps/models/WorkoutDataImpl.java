@@ -83,6 +83,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 
 	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+
+	@Override
 	public List<WorkoutBatchImpl> getBatches() {
 		return batches;
 	}
