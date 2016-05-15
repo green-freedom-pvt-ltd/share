@@ -98,4 +98,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="profile">Profile</string>
     <string name="profile_msg">Let\'s begin your ImpactRuns</string>
     <string name="login">Login</string>
+    <string name="share_msg">Download impact run !</string>
+    <string name="logout">Logout</string>
+    <string name="logout_msg">Are you sure you want to logout?</string>
 </resources>

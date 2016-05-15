@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.UserDao;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.gps.models.WorkoutData;
 
@@ -19,9 +20,9 @@ public class DbWrapper {
 
     private SQLiteDatabase db;
     private DaoMaster.DevOpenHelper mDbHelper;
-    private DaoSession mSaoSession;
     private DaoSession mDaoSession;
     private WorkoutDao mWorkoutDao;
+    private UserDao mUserdao;
 
     public DbWrapper(MainApplication app) {
         application = app;
@@ -40,6 +41,7 @@ public class DbWrapper {
         DaoMaster daoMaster = new DaoMaster(db);
         mDaoSession = daoMaster.newSession();
         mWorkoutDao = mDaoSession.getWorkoutDao();
+        mUserdao = mDaoSession.getUserDao();
 
     }
 
@@ -47,9 +49,6 @@ public class DbWrapper {
         return mDbHelper;
     }
 
-    public DaoSession getSaoSession() {
-        return mSaoSession;
-    }
 
     public DaoSession getDaoSession() {
         return mDaoSession;
@@ -57,5 +56,14 @@ public class DbWrapper {
 
     public WorkoutDao getWorkoutDao() {
         return mWorkoutDao;
+    }
+
+    public UserDao getUserdao() {
+        return mUserdao;
+    }
+
+    public void clearAll() {
+        getWorkoutDao().deleteAll();
+        getUserdao().deleteAll();
     }
 }

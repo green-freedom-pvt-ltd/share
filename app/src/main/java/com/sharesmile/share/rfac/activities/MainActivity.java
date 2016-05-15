@@ -31,7 +31,7 @@ import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CODE_LOGIN = 1001;
@@ -60,7 +60,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         updateNavigationMenu();
     }
 
-    private void updateNavigationMenu() {
+    public void updateNavigationMenu() {
         Menu menu = mNavigationView.getMenu();
         MenuItem loginMenu = menu.findItem(R.id.nav_item_login);
         MenuItem profileMenu = menu.findItem(R.id.nav_item_profile);
@@ -217,7 +217,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==REQUEST_CODE_LOGIN){
+        if (requestCode == REQUEST_CODE_LOGIN) {
             updateNavigationMenu();
         }
     }
