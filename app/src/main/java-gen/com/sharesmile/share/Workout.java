@@ -12,7 +12,9 @@ public class Workout {
     private Integer steps;
     private float recordedTime;
     private float avgSpeed;
+    private String causeBrief;
     private java.util.Date date;
+    private Boolean is_sync;
 
     public Workout() {
     }
@@ -21,14 +23,16 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, float elapsedTime, Integer steps, float recordedTime, float avgSpeed, java.util.Date date) {
+    public Workout(Long id, float distance, float elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Boolean is_sync) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
         this.steps = steps;
         this.recordedTime = recordedTime;
         this.avgSpeed = avgSpeed;
+        this.causeBrief = causeBrief;
         this.date = date;
+        this.is_sync = is_sync;
     }
 
     public Long getId() {
@@ -79,12 +83,28 @@ public class Workout {
         this.avgSpeed = avgSpeed;
     }
 
+    public String getCauseBrief() {
+        return causeBrief;
+    }
+
+    public void setCauseBrief(String causeBrief) {
+        this.causeBrief = causeBrief;
+    }
+
     public java.util.Date getDate() {
         return date;
     }
 
     public void setDate(java.util.Date date) {
         this.date = date;
+    }
+
+    public Boolean getIs_sync() {
+        return is_sync;
+    }
+
+    public void setIs_sync(Boolean is_sync) {
+        this.is_sync = is_sync;
     }
 
 }

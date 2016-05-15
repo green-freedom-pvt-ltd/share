@@ -78,6 +78,7 @@ public class Constants {
     public static final String PREF_WORKOUT_DATA_APPROVED = "pref_workout_data_approved";
 
     public static final String PREF_IS_LOGIN  = "pref_user_login";
+    public static final String PREF_USER_ID = "pref_user_id";
 
 
     //User Data

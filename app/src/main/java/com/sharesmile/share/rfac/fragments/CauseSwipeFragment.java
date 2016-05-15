@@ -76,11 +76,11 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     }
 
     private void init() {
-        mDescription.setText(cause.getCauseDescription());
+        mDescription.setText(cause.getDetailText());
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());
-        if (cause.getSponsor() != null) {
-            mSponsor.setText("by " + cause.getSponsor().getName());
+        if (cause.getExecutor() != null) {
+            mSponsor.setText("by " + cause.getExecutor().getName());
         }
 
         mCardView.setOnClickListener(this);

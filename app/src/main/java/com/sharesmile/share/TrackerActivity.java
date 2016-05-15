@@ -115,7 +115,7 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void performOperation(int operationId, Object input) {
-        super.performOperation(operationId, input);
+
         switch (operationId) {
             case END_RUN_START_COUNTDOWN:
                 runFragment = createRunFragment();
@@ -133,6 +133,8 @@ public class TrackerActivity extends BaseActivity {
                     }
                 }
                 break;
+            default:
+                super.performOperation(operationId, input);
         }
     }
 

@@ -25,11 +25,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gcm.SyncService;
+import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
@@ -48,6 +53,7 @@ import butterknife.ButterKnife;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int REQUEST_GOOGLE_SIGN_IN = 1001;
+    public static final String BUNDLE_FROM_MAINACTIVITY = "is_from_mainactivity";
     @BindView(R.id.btn_login_fb)
     LinearLayout mFbLoginButton;
 
@@ -58,13 +64,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     MRTextView tv_skip;
     private CallbackManager callbackManager;
     private GoogleApiClient mGoogleApiClient;
+    private boolean isFromMainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        isFromMainActivity = getIntent().getBooleanExtra(BUNDLE_FROM_MAINACTIVITY, false);
 
-        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN) && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false)) {
+        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN) && (isFromMainActivity || !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false))) {
             initializeFbLogin();
             initializeGoogleLogin();
             setContentView(R.layout.welcome_screen);
@@ -226,6 +234,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         prefsManager.setString(Constants.PREF_USER_NAME, name);
 
         prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
+        prefsManager.setInt(Constants.PREF_USER_ID, 1);
         User user = new User(1L);
         user.setName(name);
         user.setEmailId(userEmail);
@@ -236,13 +245,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
         userDao.insertOrReplace(user);
+
+        //Sync run data;
+        syncRunData();
+
         startMainActivity();
     }
 
+    private void syncRunData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPDATE_WORKOUT_DATA)
+                .setExecutionWindow(0L, 1L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getApplicationContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
     private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        if (!isFromMainActivity) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } else {
+            finish();
+        }
     }
 
     @Override

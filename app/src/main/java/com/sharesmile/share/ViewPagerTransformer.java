@@ -19,7 +19,6 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer {
             page.setScaleY(0.9f);
         } else if (position <= 1) {
             float scaleFactor = Math.max(0.9f, 1 - Math.abs(position - 0.14285715f));
-            Log.e("scale", new Gson().toJson(scaleFactor));
             page.setScaleY(scaleFactor);
         } else {
             page.setScaleY(0.9f);

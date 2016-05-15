@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -18,6 +19,7 @@ import android.view.View;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
@@ -27,10 +29,12 @@ import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
+    private static final int REQUEST_CODE_LOGIN = 1001;
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
@@ -53,6 +57,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         mDrawerToggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this);
+        updateNavigationMenu();
+    }
+
+    private void updateNavigationMenu() {
+        Menu menu = mNavigationView.getMenu();
+        MenuItem loginMenu = menu.findItem(R.id.nav_item_login);
+        MenuItem profileMenu = menu.findItem(R.id.nav_item_profile);
+        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)) {
+            loginMenu.setVisible(false);
+            profileMenu.setVisible(true);
+        } else {
+            loginMenu.setVisible(true);
+            profileMenu.setVisible(false);
+        }
     }
 
   /*  @Override
@@ -180,6 +198,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             replaceFragment(new SettingsFragment(), true);
         } else if (menuItem.getItemId() == R.id.nav_item_home) {
             showHome();
+        } else if (menuItem.getItemId() == R.id.nav_item_login) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra(LoginActivity.BUNDLE_FROM_MAINACTIVITY, true);
+            startActivityForResult(intent, REQUEST_CODE_LOGIN);
         }
 
 
@@ -190,5 +212,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     public void showHome() {
         replaceFragment(new OnScreenFragment(), true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_CODE_LOGIN){
+            updateNavigationMenu();
+        }
     }
 }

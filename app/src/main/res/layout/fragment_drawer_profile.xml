@@ -29,15 +29,18 @@
             android:text="Apurv"
             android:textSize="25dp" />
 
-        <TextView
-            android:layout_width="300dp"
+        <com.sharesmile.share.views.MLTextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_profile_name"
             android:layout_centerHorizontal="true"
+            android:layout_marginLeft="28dp"
+            android:layout_marginRight="28dp"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="You are awesome! You have impacted life of 12 children uptill now"
-            android:textSize="15dp" />
+            android:text="@string/profile_msg"
+            android:textColor="@color/greyish_brown_two"
+            android:textSize="14dp" />
     </RelativeLayout>
 
     <android.support.design.widget.TabLayout
@@ -47,7 +50,7 @@
         android:background="@color/white"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/sky_blue"
-        app:tabMode="fixed"></android.support.design.widget.TabLayout>
+        app:tabMode="fixed" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/profile_viewpager"

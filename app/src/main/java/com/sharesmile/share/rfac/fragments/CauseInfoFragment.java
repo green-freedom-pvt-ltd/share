@@ -91,8 +91,8 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         mDescription.setText(cause.getCauseDescription());
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());
-        if (cause.getSponsor() != null) {
-            mSponsor.setText("by " + cause.getSponsor().getName());
+        if (cause.getExecutor() != null) {
+            mSponsor.setText("by " + cause.getExecutor().getName());
         }
 
         //load image

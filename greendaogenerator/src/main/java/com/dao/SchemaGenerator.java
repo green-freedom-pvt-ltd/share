@@ -23,7 +23,9 @@ public class SchemaGenerator {
         workout.addIntProperty("steps");
         workout.addFloatProperty("recordedTime").notNull();
         workout.addFloatProperty("avgSpeed").notNull();
+        workout.addStringProperty("causeBrief");
         workout.addDateProperty("date");
+        workout.addBooleanProperty("is_sync");
     }
 
     private static void addUserData(Schema schema) {

@@ -9,14 +9,21 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.gcm.SyncService;
+import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.squareup.picasso.Picasso;
+
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -102,7 +109,20 @@ public class RealRunFragment extends RunFragment {
             workout.setElapsedTime(data.getElapsedTime());
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
+            workout.setCauseBrief(mCauseData.getTitle());
+            workout.setDate(Calendar.getInstance().getTime());
+            workout.setIs_sync(false);
             workoutDao.insertOrReplace(workout);
+
+            OneoffTask task = new OneoffTask.Builder()
+                    .setService(SyncService.class)
+                    .setTag(TaskConstants.UPLOAD_WORKOUT_DATA)
+                    .setExecutionWindow(0L, 3600L)
+                    .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                    .build();
+
+            GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getActivity());
+            mGcmNetworkManager.schedule(task);
         }
     }
 

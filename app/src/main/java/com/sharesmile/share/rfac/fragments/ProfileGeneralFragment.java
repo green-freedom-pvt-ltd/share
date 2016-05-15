@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,16 +9,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,9 +31,9 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 3/29/2016.
  */
-public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
+public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
     @BindView(R.id.et_profile_general_birthday)
-    EditText mBirthday;
+    TextView mBirthday;
 
     @BindView(R.id.et_profile_general_email)
     EditText mEmail;
@@ -75,6 +81,7 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
 
     private void init() {
         mRadioGroup.setOnCheckedChangeListener(this);
+        mBirthday.setOnClickListener(this);
         fillUserDetails();
     }
 
@@ -149,6 +156,58 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
     public void onStop() {
         super.onStop();
 
+    }
+
+    public void showDatePicker() {
+
+        Calendar calendar = Calendar.getInstance();
+        int calender_month = calendar.get(Calendar.MONTH);
+        int calender_year = calendar.get(Calendar.YEAR);
+        int calender_day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            /*if (!TextUtils.isEmpty(filterDate)) {
+                String[] dateArray = filterDate.split("-");
+                if (dateArray.length == 3) {
+                    calender_year = Integer.valueOf(dateArray[0]);
+                    calender_month = Integer.valueOf(dateArray[1]) - 1;
+                    calender_day = Integer.valueOf(dateArray[2]);
+                }
+            }*/
+        DatePickerDialog mDatePickerDialog = new DatePickerDialog(getActivity(), this, calender_year, calender_month, calender_day);
+
+            /*Calendar minSelectedDate = (Calendar) calendar.clone();
+            int month = calendar.get(Calendar.MONTH);
+            minSelectedDate.set(Calendar.MILLISECOND, minSelectedDate.getMaximum(Calendar.MILLISECOND));
+            if (month > 1) {
+                minSelectedDate.set(Calendar.MONTH, month - 2);
+                minSelectedDate.set(Calendar.MILLISECOND, minSelectedDate.getMaximum(Calendar.MILLISECOND));
+            } else {
+                int year = calendar.get(Calendar.YEAR) - 1;
+                minSelectedDate.set(Calendar.YEAR, year);
+                minSelectedDate.set(Calendar.MONTH, 11 - (1 - month));
+                minSelectedDate.set(Calendar.MILLISECOND, minSelectedDate.getMaximum(Calendar.MILLISECOND));
+
+            }
+            mDatePickerDialog.getDatePicker().setMinDate(minSelectedDate.getTimeInMillis());
+            calendar.set(Calendar.MILLISECOND, calendar.getMaximum(Calendar.MILLISECOND));
+            mDatePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());*/
+        mDatePickerDialog.show();
+
+
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+        mBirthday.setText(dayOfMonth + "-" + monthOfYear + "-" + year);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.et_profile_general_birthday:
+                showDatePicker();
+        }
     }
 }
 

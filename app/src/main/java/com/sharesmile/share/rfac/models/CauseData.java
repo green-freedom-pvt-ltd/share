@@ -28,7 +28,7 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("cause_description")
     private String causeDescription;
 
-    @SerializedName("cause_detail")
+    @SerializedName("cause_brief")
     private String detailText;
 
     @SerializedName("cause_image")
