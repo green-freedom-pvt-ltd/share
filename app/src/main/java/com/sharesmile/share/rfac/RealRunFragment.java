@@ -105,7 +105,7 @@ public class RealRunFragment extends RunFragment {
             WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             Workout workout = new Workout();
             workout.setAvgSpeed(data.getAvgSpeed());
-            workout.setDistance(data.getAvgSpeed());
+            workout.setDistance(data.getDistance());
             workout.setElapsedTime(data.getElapsedTime());
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
@@ -130,7 +130,7 @@ public class RealRunFragment extends RunFragment {
     public void showUpdate(float speed, float distanceCovered) {
         String distDecimal = String.format("%1$,.2f", (distanceCovered / 1000));
         distance.setText(distDecimal);
-        int rupees = (int) (getConversionFactor() * distanceCovered);
+        float rupees = getConversionFactor() * distanceCovered;
         impact.setText(String.valueOf(rupees));
     }
 

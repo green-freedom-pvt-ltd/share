@@ -2,6 +2,9 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -23,6 +26,8 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.util.concurrent.TimeUnit;
@@ -58,6 +63,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
     @BindView(R.id.share_layout)
     RadioGroup mShareGroup;
 
+    @BindView(R.id.content)
+    LinearLayout mContentView;
+
     private WorkoutData mWorkoutData;
 
     public enum SHARE_MEDIUM {
@@ -91,9 +99,23 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_share, null);
-        getActivity().getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         ButterKnife.bind(this, view);
+        Picasso.with(getContext()).load(R.drawable.share_background).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                mContentView.setBackgroundDrawable(new BitmapDrawable(bitmap));
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
         return view;
     }
 
@@ -104,7 +126,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
 
         String distanceCovered = String.format("%1$,.2f", (mWorkoutData.getDistance() / 1000));
         mDistance.setText(distanceCovered + "km");
-        int rupees = (int) (mCauseData.getConversionRate() * mWorkoutData.getDistance());
+        float rupees = mCauseData.getConversionRate() * mWorkoutData.getDistance();
         mContributionAmount.setText(rupees + " Rs");
         mTime.setText(getTimeInHHMMFormat((int) (mWorkoutData.getElapsedTime() * 1000)));
 

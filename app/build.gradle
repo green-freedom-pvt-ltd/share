@@ -31,6 +31,7 @@ android {
         versionCode 4
         versionName "1.1.3"
         generatedDensities = []
+        vectorDrawables.useSupportLibrary = true
     }
 
     sourceSets {

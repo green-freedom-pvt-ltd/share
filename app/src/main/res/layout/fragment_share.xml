@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/share_background">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -43,7 +43,7 @@
             android:layout_below="@+id/tv_share_screen_rupee"
             android:layout_marginLeft="72dp"
             android:layout_marginTop="17dp"
-            app:srcCompat="@drawable/ic_directions_run_black_24px"/>
+            app:srcCompat="@drawable/ic_directions_run_black_24px" />
 
         <com.sharesmile.share.views.MRTextView
             android:id="@+id/tv_share_screen_distance"
@@ -111,8 +111,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:button="@null"
-                android:drawablePadding="5dp"
                 android:checked="true"
+                android:drawablePadding="5dp"
                 android:drawableTop="@drawable/selector_fb_radio"
                 android:gravity="bottom|center"
                 android:text="@string/facebook"

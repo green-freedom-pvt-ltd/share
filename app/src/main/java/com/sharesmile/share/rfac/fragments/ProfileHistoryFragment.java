@@ -34,7 +34,7 @@ public class ProfileHistoryFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        mWorkoutList = mWorkoutDao.queryBuilder().orderAsc(WorkoutDao.Properties.Date).list();
+        mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
 
     }
 
