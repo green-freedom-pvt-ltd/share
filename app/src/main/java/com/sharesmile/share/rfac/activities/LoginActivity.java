@@ -33,6 +33,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.utils.Logger;
@@ -50,7 +51,7 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 4/5/2016.
  */
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, LoginImpl.LoginListener {
 
     private static final int REQUEST_GOOGLE_SIGN_IN = 1001;
     public static final String BUNDLE_FROM_MAINACTIVITY = "is_from_mainactivity";
@@ -62,9 +63,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @BindView(R.id.tv_welcome_skip)
     MRTextView tv_skip;
-    private CallbackManager callbackManager;
-    private GoogleApiClient mGoogleApiClient;
+   // private CallbackManager callbackManager;
+    //private GoogleApiClient mGoogleApiClient;
     private boolean isFromMainActivity;
+    private LoginImpl mLoginHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +75,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         isFromMainActivity = getIntent().getBooleanExtra(BUNDLE_FROM_MAINACTIVITY, false);
 
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN) && (isFromMainActivity || !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false))) {
-            initializeFbLogin();
-            initializeGoogleLogin();
+           /* initializeFbLogin();
+            initializeGoogleLogin();*/
             setContentView(R.layout.welcome_screen);
+            mLoginHandler = new LoginImpl(this, this);
             ButterKnife.bind(this);
             initUi();
         } /*else if(RunTracker.isWorkoutActive()) {
@@ -88,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void initializeGoogleLogin() {
+  /*  private void initializeGoogleLogin() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -148,7 +151,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 MainApplication.getInstance().showToast(R.string.login_error);
             }
         });
-    }
+    }*/
 
     private void initUi() {
         tv_skip.setOnClickListener(this);
@@ -178,7 +181,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login_fb:
-                performFbLogin();
+                // performFbLogin();
+                mLoginHandler.performFbLogin();
                 break;
             case R.id.tv_welcome_skip:
                 SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
@@ -186,13 +190,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 startMainActivity();
                 break;
             case R.id.btn_login_google:
-                performGoogleLogin();
+                mLoginHandler.performGoogleLogin();
                 break;
 
         }
     }
 
-    private void performGoogleLogin() {
+    /*private void performGoogleLogin() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
     }
@@ -201,19 +205,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
 
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
+        mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        /*switch (requestCode) {
             case REQUEST_GOOGLE_SIGN_IN:
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                 handleGoogleSignInResult(result);
                 break;
             default:
                 callbackManager.onActivityResult(requestCode, resultCode, data);
-        }
+        }*/
 
     }
 
@@ -274,8 +279,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    @Override
+    public void onLoginSuccess() {
+        startMainActivity();
     }
 }
