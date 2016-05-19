@@ -8,10 +8,9 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
-import com.sharesmile.share.utils.DateUtils;
+import com.sharesmile.share.utils.DateUtil;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,7 +64,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
         public void bindData(Workout workout) {
             if (workout.getDate() != null) {
-                mDate.setText(DateUtils.getDefaultFormattedDate(workout.getDate()));
+                mDate.setText(DateUtil.getDefaultFormattedDate(workout.getDate()));
             }
             mCause.setText(workout.getCauseBrief());
             mDistance.setText(String.valueOf(workout.getDistance()) + (workout.getDistance() > 1 ? " kms" : " km"));

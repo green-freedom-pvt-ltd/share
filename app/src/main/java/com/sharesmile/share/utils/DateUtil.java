@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by Shine on 14/05/16.
  */
-public class DateUtils {
+public class DateUtil {
 
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 

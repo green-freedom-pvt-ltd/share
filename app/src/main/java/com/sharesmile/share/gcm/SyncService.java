@@ -12,7 +12,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.RunList;
-import com.sharesmile.share.utils.DateUtils;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
@@ -89,7 +89,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_id", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
-            jsonObject.put("start_time", DateUtils.getDefaultFormattedDate(workout.getDate()));
+            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
             jsonObject.put("avg_speed", workout.getAvgSpeed());
             //// TODO: 15/05/16 remove Peak speed
             jsonObject.put("peak_speed", 1);

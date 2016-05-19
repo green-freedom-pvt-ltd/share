@@ -2,7 +2,7 @@ package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.UnObfuscable;
-import com.sharesmile.share.utils.DateUtils;
+import com.sharesmile.share.utils.DateUtil;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -67,6 +67,6 @@ public class Run implements UnObfuscable, Serializable {
     }
 
     public Date getData() {
-        return DateUtils.getDefaultFormattedDate(getStartTime());
+        return DateUtil.getDefaultFormattedDate(getStartTime());
     }
 }
