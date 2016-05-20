@@ -37,7 +37,7 @@ public class Config {
 
     public static boolean TOO_SLOW_CHECK = false;
 
-    public static boolean LAZY_ASS_CHECK = true;
+    public static boolean LAZY_ASS_CHECK = false;
 
     public static boolean USAIN_BOLT_CHECK = true;
 
