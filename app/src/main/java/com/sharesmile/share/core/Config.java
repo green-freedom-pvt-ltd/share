@@ -11,8 +11,6 @@ public class Config {
 
     public static final int STEP_THRESHOLD_INTERVAL = 5000000; // in micro secs
 
-    public static final long VIGILANCE_TIMER_INTERVAL = 15000; // in millisecs
-
     public static final long VIGILANCE_START_THRESHOLD = 80000; // in millisecs
 
     public static final float MIN_DISTANCE_FOR_VIGILANCE = 50; // in meters
@@ -24,6 +22,8 @@ public class Config {
     public static final float THRESHOLD_INTEVAL = 1; // in secs
 
     public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
+
+    public static long VIGILANCE_TIMER_INTERVAL = 20000; // in millisecs
 
     public static float STEPS_PER_SECOND_FACTOR = 1f;
 

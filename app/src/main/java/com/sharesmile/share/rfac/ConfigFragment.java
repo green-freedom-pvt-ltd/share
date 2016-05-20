@@ -76,6 +76,12 @@ public class ConfigFragment extends BaseFragment {
 					sd.setText(Config.SMALLEST_DISPLACEMENT + "");
 					configValuesMap.put(viewId, sd);
 					break;
+				case R.id.edit_vigilance_timer_interval:
+					((TextView) v.findViewById(R.id.tv_param_name)).setText("VIGILANCE_TIMER_INTERVAL");
+					EditText vti = (EditText) v.findViewById(R.id.et_param_value);
+					vti.setText(Config.VIGILANCE_TIMER_INTERVAL + "");
+					configValuesMap.put(viewId, vti);
+					break;
 				case R.id.edit_too_slow_check:
 					((TextView) v.findViewById(R.id.tv_param_name)).setText("TOO_SLOW_CHECK");
 					CheckBox tsc = (CheckBox) v.findViewById(R.id.cb_param_value);
@@ -129,6 +135,10 @@ public class ConfigFragment extends BaseFragment {
 					case R.id.edit_smallest_displacement:
 						EditText esd = (EditText) configValuesMap.get(viewId);
 						Config.SMALLEST_DISPLACEMENT = Float.parseFloat(esd.getText().toString());
+						break;
+					case R.id.edit_vigilance_timer_interval:
+						EditText evti = (EditText) configValuesMap.get(viewId);
+						Config.VIGILANCE_TIMER_INTERVAL = Long.parseLong(evti.getText().toString());
 						break;
 					case R.id.edit_too_slow_check:
 						CheckBox etsc = (CheckBox) configValuesMap.get(viewId);

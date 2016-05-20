@@ -73,6 +73,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
         }
 
+        Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
         dirtyWorkoutData.addRecord(record);
         waitingForApprovalQueue.add(record);
         // Persist dirtyWorkoutData object
@@ -114,6 +115,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     @Override
     public void workoutPause() {
+        Logger.d(TAG, "workoutPause");
         dirtyWorkoutData.workoutPause();
         approvedWorkoutData.workoutPause();
         // If it was a defaulter scenario then the queue has already been discarded
@@ -123,6 +125,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     @Override
     public void workoutResume() {
+        Logger.d(TAG, "workoutResume");
         dirtyWorkoutData.workoutResume();
         approvedWorkoutData.workoutResume();
         persistBothWorkoutData();
@@ -135,12 +138,14 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     @Override
     public synchronized void approveWorkoutData() {
+        Logger.d(TAG, "approveWorkoutData");
         if (extraPolatedDistanceToBeApproved > 0){
             approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
             extraPolatedDistanceToBeApproved = 0;
         }
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
+            Logger.d(TAG, "Approving record: " + record.toString());
             approvedWorkoutData.addRecord(record);
         }
         if (numStepsToBeApproved > 0){
