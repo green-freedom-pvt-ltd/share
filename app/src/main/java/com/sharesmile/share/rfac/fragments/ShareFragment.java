@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +65,13 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener 
     RadioGroup mShareGroup;
 
     @BindView(R.id.content)
-    LinearLayout mContentView;
+    RelativeLayout mContentView;
+
+    @BindView(R.id.share_container)
+    RelativeLayout mShare_container;
+
+    @BindView(R.id.login_container)
+    LinearLayout mLoginCotainer;
 
     private WorkoutData mWorkoutData;
 
