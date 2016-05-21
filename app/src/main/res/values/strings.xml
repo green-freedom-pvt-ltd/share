@@ -102,4 +102,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="logout">Logout</string>
     <string name="logout_msg">Are you sure you want to logout?</string>
     <string name="share_login_msg">Please login to \n unleash your impact</string>
+    <string name="login_skip_msg">Your run will not convert into impact,are you sure you dont want to login?</string>
+    <string name="skip_login_title">Your run will be lost!</string>
+    <string name="yes_sure">yes, I\'m sure</string>
 </resources>

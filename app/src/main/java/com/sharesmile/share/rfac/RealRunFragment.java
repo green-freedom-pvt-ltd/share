@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,11 +17,13 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
@@ -101,11 +104,12 @@ public class RealRunFragment extends RunFragment {
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
-            getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData), false);
+            boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
+            getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
             WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             Workout workout = new Workout();
             workout.setAvgSpeed(data.getAvgSpeed());
-            workout.setDistance(data.getDistance());
+            workout.setDistance(data.getDistance()/1000);
             workout.setElapsedTime(data.getElapsedTime());
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
@@ -252,4 +256,5 @@ public class RealRunFragment extends RunFragment {
 
         alertDialog.show();
     }
+
 }

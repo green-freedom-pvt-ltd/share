@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content"
+    android:background="@color/white_50"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="80dp">
+        android:layout_marginTop="60dp">
 
 
         <com.sharesmile.share.views.MRTextView
@@ -174,9 +175,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/btn_share_screen"
-            android:layout_marginBottom="30dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="30dp">
 
             <com.sharesmile.share.views.MRTextView
                 android:layout_width="wrap_content"
@@ -186,7 +187,6 @@
                 android:textSize="12.5sp" />
 
             <com.sharesmile.share.views.MRTextView
-                android:id="@+id/tv_share_skip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
@@ -205,8 +205,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginTop="10dp"
         android:gravity="bottom|center_horizontal"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <com.sharesmile.share.views.MRTextView
             android:layout_width="wrap_content"
@@ -232,6 +232,7 @@
             android:layout_marginTop="15dp" />
 
         <LinearLayout
+            android:id="@+id/tv_welcome_skip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
@@ -243,17 +244,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_skip"
-                android:textColor="@color/white_50"
+                android:textColor="@color/greyish_brown_two"
                 android:textSize="12.5sp" />
 
             <com.sharesmile.share.views.MRTextView
-                android:id="@+id/tv_welcome_skip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:clickable="true"
                 android:text="SKIP"
-                android:textColor="@color/white_dark"
+                android:textColor="@color/black_four"
                 android:textSize="12.5sp" />
         </LinearLayout>
     </LinearLayout>

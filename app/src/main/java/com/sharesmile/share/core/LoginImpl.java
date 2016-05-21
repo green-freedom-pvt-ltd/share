@@ -185,9 +185,9 @@ public class LoginImpl {
 
     private Context getContext() {
 
-        if (activityWeakReference.get() != null && !activityWeakReference.get().isFinishing()) {
+        if (activityWeakReference != null && !activityWeakReference.get().isFinishing()) {
             return activityWeakReference.get();
-        } else if (fragmentWeakReference.get() != null && fragmentWeakReference.get().isVisible()) {
+        } else if (fragmentWeakReference.get() != null) {
             return fragmentWeakReference.get().getContext();
         }
         return null;
@@ -196,7 +196,7 @@ public class LoginImpl {
 
     public void performGoogleLogin() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        if (activityWeakReference.get() != null) {
+        if (activityWeakReference != null) {
             activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
         } else {
             fragmentWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
@@ -206,7 +206,7 @@ public class LoginImpl {
 
     public void performFbLogin() {
         //   LoginManager.getInstance().logInWithReadPermissions(fragmentWeakReference.get(), Arrays.asList("public_profile", "email"));
-        if (activityWeakReference.get() != null) {
+        if (activityWeakReference != null) {
             LoginManager.getInstance().logInWithReadPermissions(activityWeakReference.get(), Arrays.asList("public_profile", "email"));
         } else {
             LoginManager.getInstance().logInWithReadPermissions(fragmentWeakReference.get(), Arrays.asList("public_profile", "email"));
