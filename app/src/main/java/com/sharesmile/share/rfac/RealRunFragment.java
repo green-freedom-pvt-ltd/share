@@ -223,7 +223,7 @@ public class RealRunFragment extends RunFragment {
         alertDialog.show();
     }
 
-    /*  Rs per Km*/
+    /*  Rs per m*/
     public float getConversionFactor() {
         return mCauseData.getConversionRate();
     }

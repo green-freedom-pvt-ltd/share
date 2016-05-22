@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "159550091621",
-    "project_id": "run-for-a-cause"
+    "project_number": "223373939640",
+    "project_id": "rfac-debug"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:159550091621:android:5cc17cbee98983b2",
+        "mobilesdk_app_id": "1:223373939640:android:5cc17cbee98983b2",
         "android_client_info": {
           "package_name": "com.sharesmile.share"
         }
       },
       "oauth_client": [
         {
-          "client_id": "159550091621-j0n4rdjki3sd8j59n9f19eeof6gn8bo4.apps.googleusercontent.com",
+          "client_id": "223373939640-bevg1evkg7mgikr4br5ha2chkuq2s2ir.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.sharesmile.share",
-            "certificate_hash": "7385FAE4EFE5EEB1D23E2DB3B3B3193D2B7C527E"
+            "certificate_hash": "7C73627FAE2B877B042E132A67B3367B2BBCD948"
           }
         },
         {
-          "client_id": "159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com",
+          "client_id": "223373939640-u655p8v3dcpmes74aevqoddp17btbcql.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCuTssVDWVeUcYNx5Q7HSN_ZLRYy8wII_E"
+          "current_key": "AIzaSyCTARvISKW25HCmWAVcW3XPyubTo-jFJpY"
         }
       ],
       "services": {

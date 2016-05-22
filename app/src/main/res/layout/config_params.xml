@@ -21,6 +21,10 @@
         layout="@layout/edit_text_config_param"/>
 
     <include
+        android:id="@+id/edit_vigilance_timer_interval"
+        layout="@layout/edit_text_config_param"/>
+
+    <include
         android:id="@+id/edit_too_slow_check"
         layout="@layout/edit_boolean_config_param"/>
 
