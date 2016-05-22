@@ -11,6 +11,8 @@ public interface IFragmentController {
 
     int START_RUN = 101;
 
+    int START_RUN_TEST = 102;
+
     int SAY_THANK_YOU = 102;
 
     void addFragment(BaseFragment fragment, boolean addToBackStack);
@@ -30,5 +32,8 @@ public interface IFragmentController {
     void requestPermission(int requestCode, PermissionCallback permissionsCallback);
 
     void unregisterForPermissionRequest(int requestCode);
+
+    void updateToolBar(String title,boolean showAsUpEnable);
+
 
 }

@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * Created by ankitm on 22/04/16.
  */
-public class TestRunFragment extends RunFragment implements View.OnClickListener{
+public class TestRunFragment extends RunFragment implements View.OnClickListener {
 
     private static final String TAG = "RawRunFragment";
 
@@ -86,21 +86,21 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
-    public void onWorkoutResult(WorkoutData data){
+    public void onWorkoutResult(WorkoutData data) {
         workoutData = data;
         Logger.d(TAG, "onWorkoutResult:\n " + workoutData);
         liveDataContainer.setVisibility(View.GONE);
         runDataContainer.setVisibility(View.VISIBLE);
 
         String distance = String.format("%1$,.2f", (workoutData.getDistance() / 1000)) + " km";
-        String avgSpeed = String.format("%1$,.2f" , workoutData.getAvgSpeed() * 3.6) + " km/hr";
+        String avgSpeed = String.format("%1$,.2f", workoutData.getAvgSpeed() * 3.6) + " km/hr";
         String time = Utils.secondsToString((int) workoutData.getElapsedTime());
         totalDistanceView.setText(distance);
         avgSpeedView.setText(avgSpeed);
         totalTimeView.setText(time);
-        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
+        if (!WorkoutService.isCurrentlyProcessingSteps()){
             totalStepsView.setText("N.A.");
-        }else{
+        } else {
             totalStepsView.setText(workoutData.getTotalSteps() + "");
         }
         int size = (int) Utils.convertDpToPixel(getContext(), 300);
@@ -108,25 +108,25 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
-    public void showUpdate(float speed, float distaneCovered){
+    public void showUpdate(float speed, float distaneCovered) {
         Logger.d(TAG, "showUpdate: speed = " + speed + ", distanceCovered = " + distaneCovered);
-        if (isRunActive()){
-            String distance = Math.round(distaneCovered)+ " m";
-            String speedDecimal = String.format("%1$,.2f" , speed * 3.6) + " km/hr";
+        if (isRunActive()) {
+            String distance = Math.round(distaneCovered) + " m";
+            String speedDecimal = String.format("%1$,.2f", speed * 3.6) + " km/hr";
             liveDistanceView.setText(distance);
             liveSpeedView.setText(speedDecimal);
         }
     }
 
     @Override
-    public void showSteps(int stepsSoFar){
-        if (isRunActive()){
+    public void showSteps(int stepsSoFar) {
+        if (isRunActive()) {
             liveStepsView.setText(stepsSoFar + "");
         }
     }
 
     @Override
-    protected void onEndRun(){
+    protected void onEndRun() {
         startPauseResume.setText("START");
         liveDataContainer.setVisibility(View.GONE);
     }
@@ -149,30 +149,35 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         logsFile = null;
         liveDistanceView.setText("0.00 m");
         liveSpeedView.setText("0.0 km/hr");
-        if (!WorkoutService.isKitkatWithStepSensor(getContext())){
+        if (!WorkoutService.isCurrentlyProcessingSteps()){
             liveStepsView.setText("N.A.");
-        }else{
+        } else {
             liveStepsView.setText("0");
         }
     }
 
     @Override
     public void showErrorMessage(String text) {
-        if (errorMessageView != null){
+        if (errorMessageView != null) {
             errorMessageView.setText(text);
         }
     }
 
     @Override
+    public void showStopDialog() {
+
+    }
+
+    @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.bt_start_run:
-                if (!isRunActive()){
+                if (!isRunActive()) {
                     beginRun();
-                }else{
-                    if (isRunning()){
+                } else {
+                    if (isRunning()) {
                         pauseRun(true);
-                    }else{
+                    } else {
                         resumeRun();
                     }
                 }
@@ -187,16 +192,16 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
                 break;
 
             case R.id.bt_email_logs:
-                if (logsFile != null){
+                if (logsFile != null) {
                     Intent emailIntent = new Intent(Intent.ACTION_SEND);
                     // The intent does not have a URI, so declare the "text/plain" MIME type
                     emailIntent.setType("text/plain");
-                    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"maheshwari.ankit.iitd@gmail.com"}); // recipients
+                    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"maheshwari.ankit.iitd@gmail.com"}); // recipients
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RFAC Logs " + new Date().toString());
                     emailIntent.putExtra(Intent.EXTRA_TEXT, textForMail());
                     emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logsFile));
-                    startActivity(Intent.createChooser(emailIntent , "Send email..."));
-                }else{
+                    startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                } else {
                     Toast.makeText(getContext(), "No Logs", Toast.LENGTH_SHORT);
                 }
                 break;
@@ -207,7 +212,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
             case R.id.iv_static_google_map:
                 Logger.d(TAG, "onClick: iv_static_google_map");
-                if (workoutData != null){
+                if (workoutData != null) {
                     getFragmentController().replaceFragment(RunPathFragment.newInstance(workoutData), true);
                 }
                 break;
@@ -215,17 +220,17 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
 
-    private String textForMail(){
+    private String textForMail() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL + " secs");
         sb.append("\nTHRESHOLD_ACCURACY : " + Config.THRESHOLD_ACCURACY);
         sb.append("\nTHRESHOLD_FACTOR : " + Config.THRESHOLD_FACTOR);
         sb.append("\nVIGILANCE_START_THRESHOLD : " + (Config.VIGILANCE_START_THRESHOLD / 1000) + " secs");
-        sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT*3.6 + " km/hr");
-        sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT*3.6 + " km/hr");
+        sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT * 3.6 + " km/hr");
+        sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nSTEPS_PER_SECOND_FACTOR : " + Config.STEPS_PER_SECOND_FACTOR);
         sb.append("\nSMALLEST_DISPLACEMENT : " + Config.SMALLEST_DISPLACEMENT + " m");
-        if (workoutData != null){
+        if (workoutData != null) {
             sb.append("\nWorkoutData:\n" + workoutData);
         }
 

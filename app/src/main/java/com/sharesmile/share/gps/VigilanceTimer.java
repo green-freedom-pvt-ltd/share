@@ -42,7 +42,6 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	private void resetCounters(){
-		stepsTillNow = -1;
 		lastValidatedRecord = null;
 		lastValidatedDistance = 0;
 	}
@@ -53,23 +52,28 @@ public class VigilanceTimer implements Runnable {
 		if (checkForTooSlow()){
 			Logger.d(TAG, "Workout too slow, not enough distance will pause Workout");
 			// Not enough steps/distance since the beginning
-			workoutService.sendPauseWorkoutBroadcast(Constants.PROBELM_TOO_SLOW);
+			workoutService.workoutVigilanceSessiondefaulted(Constants.PROBELM_TOO_SLOW);
 			return;
 		}
 
 		//check for high speed
 		if (checkForTooFast()){
-			workoutService.sendPauseWorkoutBroadcast(Constants.PROBELM_TOO_FAST);
+			workoutService.workoutVigilanceSessiondefaulted(Constants.PROBELM_TOO_FAST);
 			return;
 		}
 
 		if (workoutService.isCountingSteps()){
 			// Check if user is actually running/moving
 			if (checkForLackOfMovement()){
-				workoutService.sendPauseWorkoutBroadcast(Constants.PROBELM_NOT_MOVING);
+				workoutService.workoutVigilanceSessiondefaulted(Constants.PROBELM_NOT_MOVING);
 				return;
 			}
 		}
+
+		//Reaching here means everything is alright, vigilance approved
+		long currentTime = System.currentTimeMillis();
+		workoutService.workoutVigilanceSessionApproved(currentTime - Config.VIGILANCE_TIMER_INTERVAL,
+									currentTime);
 
 	}
 

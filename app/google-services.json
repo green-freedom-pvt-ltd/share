@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1022012710714",
+    "project_id": "impactrun-ce703"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022012710714:android:5cc17cbee98983b2",
+        "android_client_info": {
+          "package_name": "com.sharesmile.share"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1022012710714-cloo736t5lp91ne9i347aasdnf9unniq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sharesmile.share",
+            "certificate_hash": "7B4C52711CB3FB0108D95BBDE5FD1D6417CC2410"
+          }
+        },
+        {
+          "client_id": "1022012710714-2oms40q752u60djn3p25371t5n3gdmh5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDykOb2L410aJfl_bDxvnCU5OBQt0rl9N0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

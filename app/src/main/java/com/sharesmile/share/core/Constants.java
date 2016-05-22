@@ -45,6 +45,8 @@ public class Constants {
 
     public static final int BROADCAST_PAUSE_WORKOUT_CODE = 207;
 
+    public static final int BROADCAST_GOOGLE_FIT_READ_PERMISSION = 208;
+
     public static final int PROBELM_NOT_MOVING = 0;
 
     public static final int PROBELM_TOO_SLOW = 1;
@@ -52,6 +54,8 @@ public class Constants {
     public static final int PROBELM_TOO_FAST = 2;
 
     public static final String KEY_LOCATION_SETTINGS_PARCELABLE = "location_settings_parcelable";
+
+    public static final String KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE = "google_fit_resolution_parcelable";
 
     public static final String KEY_WORKOUT_RESULT = "key_wourkout_result";
 
@@ -69,7 +73,19 @@ public class Constants {
 
     public static final String PREF_PREV_DIST_RECORD  = "pref_prev_dist_record";
 
-    public static final String PREF_WORKOUT_DATA  = "pref_workout_data";
+    public static final String PREF_WORKOUT_DATA_DIRTY = "pref_workout_data_dirty";
+
+    public static final String PREF_WORKOUT_DATA_APPROVED = "pref_workout_data_approved";
+
+    public static final String PREF_IS_LOGIN  = "pref_user_login";
+    public static final String PREF_USER_ID = "pref_user_id";
+
+
+    //User Data
+    public static final String PREF_USER_NAME  = "pref_user_name";
+    public static final String PREF_USER_EMAIL  = "pref_user_email";
+    public static final String PREF_USER_IMAGE  = "pref_user_image";
+    public static final String PREF_LOGIN_SKIP  = "pref_login_skip";
 
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{

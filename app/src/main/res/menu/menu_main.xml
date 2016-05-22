@@ -2,41 +2,43 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-
-    <item android:title="Home"
+    <item
         android:id="@+id/nav_item_home"
-        android:icon="@drawable/ic_home"/>
+        android:icon="@drawable/ic_home_black_24_px"
+        android:title="Home" />
 
-    <item android:title="Profile"
+    <item
         android:id="@+id/nav_item_profile"
-        android:icon="@drawable/ic_pages"/>
+        android:icon="@drawable/ic_face_black_24_px"
+        android:title="Profile" />
 
-    <item android:title="About Us"
+    <item
+        android:id="@+id/nav_item_login"
+        android:icon="@drawable/ic_face_black_24_px"
+        android:title="@string/login" />
+    <item
         android:id="@+id/nav_item_aboutUs"
-        android:icon="@drawable/ic_people"/>
+        android:icon="@drawable/ic_supervisor_account_black_24_px"
+        android:title="About Us" />
 
 
+    <item
+        android:id="@+id/nav_item_faq"
+        android:icon="@drawable/ic_help_black_24_px"
+        android:title="FAQ" />
+    <item
+        android:id="@+id/nav_item_feedback"
+        android:icon="@drawable/ic_feedback_black_24_px"
+        android:title="Feedback" />
 
-    <item android:title="Others">
-        <menu>
-            <item
-                android:title="Policies"
-                android:id="@+id/nav_item_policies"
-                android:icon="@drawable/ic_communities"/>
-            <item
-                android:title="Feedback"
-                android:id="@+id/nav_item_feedback"
-                android:icon="@drawable/ic_whats_hot"/>
-        </menu>
-    </item>
 
-    <group android:id="@+id/group_settings_id">
+    <item
+        android:id="@+id/nav_item_settings"
+        android:icon="@drawable/ic_pages"
+        android:title="Settings" />
+    <!--  <item
+          android:id="@+id/nav_item_logout"
+          android:icon="@drawable/ic_photos"
+          android:title="Log Out" />-->
 
-        <item android:title="Settings"
-            android:id="@+id/nav_item_settings"
-            android:icon="@drawable/ic_pages"/>
-        <item android:title="Log Out"
-            android:id="@+id/nav_item_logout"
-            android:icon="@drawable/ic_photos"/>
-    </group>
 </menu>

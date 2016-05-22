@@ -24,4 +24,24 @@
     <color name="sky_blue">#00b9ff</color>
     <color name="MontserratRegular">#4a4a4a</color>
 
+    <color name="white_50">#7fffffff</color>
+    <color name="white_dark">#eeeeee</color>
+
+
+    <color name="black_one">#030303</color>
+    <color name="black_two">#262626</color>
+    <color name="black_three">#212121</color>
+    <color name="greyish_brown_two">#4a4a4a</color>
+    <color name="seafoam_blue">#50d2c2</color>
+    <color name="ice_blue">#e6f8ff</color>
+    <color name="black_50">#7f000000</color>
+    <color name="black_four">#141414</color>
+    <color name="dark_blue">#55acee</color>
+    <color name="denim_blue">#3c55a2</color>
+    <color name="fresh_green">#42d54a</color>
+    <color name="pale_red">#d84c30</color>
+    <color name="neon_red">#ff0439</color>
+    <color name="brownish_grey">#6a6a6a</color>
+    <color name="grey_disable">#C5C5BE</color>
+
 </resources>

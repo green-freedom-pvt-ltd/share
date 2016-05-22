@@ -77,4 +77,33 @@ We teach kids every day for two hours. Our focus is value based education which 
 
     <string name="share_screen_description">I just created impact by running  12Kms for the cause. Nike is proud to sponsor the cause. </string>
 
+
+    <!-- Facebook key-->
+
+    <string name="facebook_app_id">1568874130027114</string>
+    <string name="login_error">error in login.</string>
+    <string name="email_id_required">Email id require for login.</string>
+
+    <string name="impact_run">impact run</string>
+    <string name="impactrun">ImpactRun</string>
+    <string name="overview">Overview</string>
+    <string name="impact">impact</string>
+    <string name="tell_about_us">Tell your friends about it</string>
+    <string name="submit">submit</string>
+    <string name="twitter_comsumer_key">gQYNGkCG72kY2iTUNGLkGEzZF</string>
+    <string name="twitter_comsumer_secret">OwhqBKJL3eLYdmRtIa4KZuMQAWxAAGEJxSYeZuWFC3uShcCQhS</string>
+    <string name="error">Error</string>
+    <string name="logn_with_fb">LOGIN WITH FACEBOOK</string>
+    <string name="logn_with_google">login with google</string>
+    <string name="profile">Profile</string>
+    <string name="profile_msg">Let\'s begin your ImpactRuns</string>
+    <string name="login">Login</string>
+    <string name="share_msg">Download impact run !</string>
+    <string name="logout">Logout</string>
+    <string name="logout_msg">Are you sure you want to logout?</string>
+    <string name="share_login_msg">Please login to \n unleash your impact</string>
+    <string name="login_skip_msg">Your run will not convert into impact,are you sure you dont want to login?</string>
+    <string name="skip_login_title">Your run will be lost!</string>
+    <string name="yes_sure">yes, I\'m sure</string>
+    <string name="retry">Retry</string>
 </resources>

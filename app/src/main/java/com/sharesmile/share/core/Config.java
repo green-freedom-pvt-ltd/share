@@ -11,7 +11,7 @@ public class Config {
 
     public static final int STEP_THRESHOLD_INTERVAL = 5000000; // in micro secs
 
-    public static final long VIGILANCE_TIMER_INTERVAL = 20000; // in millisecs
+    public static final long VIGILANCE_TIMER_INTERVAL = 15000; // in millisecs
 
     public static final long VIGILANCE_START_THRESHOLD = 80000; // in millisecs
 
@@ -21,11 +21,11 @@ public class Config {
 
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s, i.e. 20 km/hr
 
-    public static final float STEPS_PER_SECOND_FACTOR = 1f;
-
     public static final float THRESHOLD_INTEVAL = 1; // in secs
 
     public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
+
+    public static float STEPS_PER_SECOND_FACTOR = 1f;
 
     public static float SOURCE_ACCEPTABLE_ACCURACY = 25; // in m
 
@@ -35,7 +35,7 @@ public class Config {
 
     public static float SMALLEST_DISPLACEMENT = 7;// in m
 
-    public static boolean TOO_SLOW_CHECK = true;
+    public static boolean TOO_SLOW_CHECK = false;
 
     public static boolean LAZY_ASS_CHECK = true;
 

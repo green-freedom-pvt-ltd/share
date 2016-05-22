@@ -2,76 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     android:background="@color/white"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolbar"
+    <com.sharesmile.share.views.MRTextView
+        android:id="@+id/tv_feedback"
         android:layout_width="match_parent"
-        android:layout_height="53dp"
-        android:background="@color/sky_blue"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_height="wrap_content"
+        android:text="@string/feedback"
+        android:textColor="@color/greyish_brown_two"
+        android:textSize="14sp" />
 
-        >
-
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Feedback"
-            android:textColor="@color/white"
-            android:textSize="20dp" />
-    </android.support.v7.widget.Toolbar>
-
-
-    <RelativeLayout
+    <EditText
+        android:id="@+id/et_feedback_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/tv_feedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="25dp"
-            android:layout_marginTop="17dp"
-            android:text="@string/feedback"
-            android:textColor="@color/MontserratRegular"
-            android:textSize="14sp" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:hint="Enter your feedback here"
+        android:maxLines="4"
+        android:textColor="@color/greyish_brown_two"
+        android:textSize="14sp" />
 
 
-        <EditText
-            android:id="@+id/et_feedback_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_feedback"
-            android:layout_below="@+id/tv_feedback"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="26dp"
-            android:background="#00000000"
-            android:hint="Enter your feedback here" />
-
-        <View
-
-            android:layout_width="350dp"
-            android:layout_height="1dp"
-            android:layout_alignLeft="@+id/tv_feedback"
-            android:layout_below="@+id/et_feedback_text"
-            android:background="#c0c0c0" />
-
-        <Button
-            android:id="@+id/btn_lets_run"
-            android:layout_width="295dp"
-            android:layout_height="44dp"
-            android:layout_below="@+id/et_feedback_text"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="79dp"
-            android:background="@drawable/rounded_corner"
-            android:text="SUBMIT"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-    </RelativeLayout>
-
-
+    <com.sharesmile.share.views.MLButton
+        android:id="@+id/btn_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/rounded_corner"
+        android:text="@string/submit"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 </LinearLayout>

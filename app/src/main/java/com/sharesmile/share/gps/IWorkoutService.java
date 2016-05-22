@@ -9,7 +9,8 @@ public interface IWorkoutService {
 	void stopWorkout();
 	void pause();
 	void resume();
-	void sendPauseWorkoutBroadcast(int problem);
+	void workoutVigilanceSessiondefaulted(int problem);
+	void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime);
 	boolean isCountingSteps();
 
 }

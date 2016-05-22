@@ -5,14 +5,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.sharesmile.share.TrackerActivity;
-import com.sharesmile.share.rfac.RealRunFragment;
-import com.sharesmile.share.rfac.activities.ThankYouActivity;
+import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 
 /**
  * Created by ankitmaheshwari1 on 29/01/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements IFragmentController{
+public abstract class BaseActivity extends AppCompatActivity implements IFragmentController {
 
     private static final String TAG = "BaseActivity";
 
@@ -62,17 +61,28 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     @Override
     public void performOperation(int operationId, Object input) {
-        switch (operationId){
+        switch (operationId) {
             case START_RUN:
-                if (input instanceof Boolean){
+                if (input instanceof CauseData) {
                     Intent intent = new Intent(this, TrackerActivity.class);
-                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, (Boolean) input);
+                    intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, (CauseData) input);
+                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, false);
                     startActivity(intent);
-                }else{
+                } else {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            case START_RUN_TEST:
+                if (input instanceof CauseData) {
+                    Intent intent = new Intent(this, TrackerActivity.class);
+                    intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, (CauseData) input);
+                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, true);
+                    startActivity(intent);
+                } else {
                     throw new IllegalArgumentException();
                 }
                 break;
         }
-
     }
+
 }

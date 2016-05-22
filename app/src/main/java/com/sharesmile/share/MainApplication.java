@@ -8,8 +8,13 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -23,6 +28,7 @@ public class MainApplication extends Application {
     private static Handler sMainThreadHandler;
     public static final long MINUTE_INTEVAL = 60000;
     private int visibleActiviesCount = 0;
+    private DbWrapper mDbWrapper;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -39,15 +45,15 @@ public class MainApplication extends Application {
     }
 
     /**
-     A thread safe way to show a Toast. Can be called from any thread. uses resource id of the
-     message string
+     * A thread safe way to show a Toast. Can be called from any thread. uses resource id of the
+     * message string
      */
     public static void showToast(int stringId, final int duration) {
         showToast(getContext().getResources().getString(stringId), duration);
     }
 
     /**
-     A thread safe way to show a Toast. Can be called from any thread.
+     * A thread safe way to show a Toast. Can be called from any thread.
      */
     public static void showToast(final String message, final int duration) {
         getMainThreadHandler().post(new Runnable() {
@@ -61,8 +67,8 @@ public class MainApplication extends Application {
     }
 
     /**
-     A thread safe way to show a Toast. Can be called from any thread. uses resource id of the
-     message string
+     * A thread safe way to show a Toast. Can be called from any thread. uses resource id of the
+     * message string
      */
     public static void showToast(int stringId) {
         showToast(getContext().getResources().getString(stringId));
@@ -74,7 +80,7 @@ public class MainApplication extends Application {
     }
 
     /**
-     @return a {@link Handler} tied to the main thread.
+     * @return a {@link Handler} tied to the main thread.
      */
     public static Handler getMainThreadHandler() {
         if (sMainThreadHandler == null) {
@@ -86,7 +92,7 @@ public class MainApplication extends Application {
     }
 
     /**
-     A thread safe way to show a Toast. Can be called from any thread.
+     * A thread safe way to show a Toast. Can be called from any thread.
      */
     public static void showToast(final String message) {
         showToast(message, Toast.LENGTH_LONG);
@@ -126,7 +132,15 @@ public class MainApplication extends Application {
         super.onCreate();
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
-        Fabric.with(this, new Crashlytics());
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer()/*, new Crashlytics()*/);
+
+        //Fabric.with(this, );
+        mDbWrapper = new DbWrapper(this);
+    }
+
+    public DbWrapper getDbWrapper() {
+        return mDbWrapper;
     }
 
 }

@@ -14,7 +14,7 @@ import com.sharesmile.share.gps.models.WorkoutData;;
 import com.sharesmile.share.utils.Utils;
 
 
-public abstract  class RunFragment extends BaseFragment implements View.OnClickListener {
+public abstract class RunFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String PARAM_TITLE = "param_title";
 
@@ -87,8 +87,8 @@ public abstract  class RunFragment extends BaseFragment implements View.OnClickL
     public abstract void showErrorMessage(String text);
 
 
-    public void endRun(boolean userEnded){
-        if (userEnded){
+    public void endRun(boolean userEnded) {
+        if (userEnded) {
             myActivity.endLocationTracking();
         }
         setIsRunActive(false);
@@ -99,16 +99,16 @@ public abstract  class RunFragment extends BaseFragment implements View.OnClickL
     }
 
 
-    public void pauseRun(boolean userPaused){
+    public void pauseRun(boolean userPaused) {
         isRunnning = false;
         handler.removeCallbacks(timer);
-        if (userPaused){
+        if (userPaused) {
             myActivity.pauseWorkout();
         }
         onPauseRun();
     }
 
-    public void resumeRun(){
+    public void resumeRun() {
         // Resume will always be done by the user
         isRunnning = true;
         myActivity.resumeWorkout();
@@ -116,19 +116,19 @@ public abstract  class RunFragment extends BaseFragment implements View.OnClickL
         onResumeRun();
     }
 
-    private void setIsRunActive(boolean b){
-        synchronized (RunFragment.class){
+    private void setIsRunActive(boolean b) {
+        synchronized (RunFragment.class) {
             isRunActive = b;
         }
     }
 
-    public boolean isRunActive(){
-        synchronized (RunFragment.class){
+    public boolean isRunActive() {
+        synchronized (RunFragment.class) {
             return isRunActive;
         }
     }
 
-    protected void beginRun(){
+    protected void beginRun() {
         myActivity.beginLocationTracking();
         setIsRunActive(true);
         isRunnning = true;
@@ -139,7 +139,7 @@ public abstract  class RunFragment extends BaseFragment implements View.OnClickL
         onBeginRun();
     }
 
-    public boolean isRunning(){
+    public boolean isRunning() {
         return isRunnning;
     }
 
@@ -152,4 +152,5 @@ public abstract  class RunFragment extends BaseFragment implements View.OnClickL
         }
     };
 
+    public abstract void showStopDialog();
 }

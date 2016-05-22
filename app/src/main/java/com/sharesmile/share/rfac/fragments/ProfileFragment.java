@@ -11,9 +11,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.SharedPrefsManager;
+import com.squareup.picasso.Picasso;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 /**
@@ -26,6 +34,12 @@ public class ProfileFragment extends BaseFragment {
     public static ViewPager profile_viewPager;
     public static int int_items = 2;
 
+    @BindView(R.id.img_profile)
+    ImageView mProfileImage;
+
+    @BindView(R.id.tv_profile_name)
+    TextView mName;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,6 +47,7 @@ public class ProfileFragment extends BaseFragment {
          *Inflate tab_layout and setup Views.
          */
         View v = inflater.inflate(R.layout.fragment_drawer_profile, null);
+        ButterKnife.bind(this, v);
         profile_tabLayout = (TabLayout) v.findViewById(R.id.profile_tabs);
         profile_viewPager = (ViewPager) v.findViewById(R.id.profile_viewpager);
         getActivity().getWindow().setSoftInputMode(
@@ -47,8 +62,17 @@ public class ProfileFragment extends BaseFragment {
                 profile_tabLayout.setupWithViewPager(profile_viewPager);
             }
         });
-
+        getFragmentController().updateToolBar(getString(R.string.profile), true);
+        displayUserInfo();
         return v;
+    }
+
+    private void displayUserInfo() {
+        SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
+        String url = prefsManager.getString(Constants.PREF_USER_IMAGE);
+        Picasso.with(getActivity()).load(url).placeholder(R.drawable.placeholder_profile).into(mProfileImage);
+        String name = prefsManager.getString(Constants.PREF_USER_NAME);
+        mName.setText(name);
     }
 
     class MyAdapter extends FragmentPagerAdapter {
