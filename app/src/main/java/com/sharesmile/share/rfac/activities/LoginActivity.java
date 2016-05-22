@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @BindView(R.id.tv_welcome_skip)
     MRTextView tv_skip;
-   // private CallbackManager callbackManager;
+    // private CallbackManager callbackManager;
     //private GoogleApiClient mGoogleApiClient;
     private boolean isFromMainActivity;
     private LoginImpl mLoginHandler;
@@ -75,8 +75,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         isFromMainActivity = getIntent().getBooleanExtra(BUNDLE_FROM_MAINACTIVITY, false);
 
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN) && (isFromMainActivity || !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false))) {
-           /* initializeFbLogin();
-            initializeGoogleLogin();*/
             setContentView(R.layout.welcome_screen);
             mLoginHandler = new LoginImpl(this, this);
             ButterKnife.bind(this);
@@ -90,68 +88,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startMainActivity();
         }
     }
-
-  /*  private void initializeGoogleLogin() {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-    }
-
-    private void initializeFbLogin() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Logger.d("facebook", "success");
-
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                // Application code
-                                String userEmail = "";
-                                try {
-                                    userEmail = object.getString("email");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                if (!TextUtils.isEmpty(userEmail)) {
-                                    Profile profile = Profile.getCurrentProfile();
-                                    userLoginSuccess(profile.getName(), userEmail, profile.getProfilePictureUri(320, 320));
-
-                                } else {
-                                    MainApplication.getInstance().showToast(R.string.email_id_required);
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "email");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                Logger.d("facebook", "cancel");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Logger.d("facebook", "Error");
-                MainApplication.getInstance().showToast(R.string.login_error);
-            }
-        });
-    }*/
 
     private void initUi() {
         tv_skip.setOnClickListener(this);
@@ -196,77 +132,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    /*private void performGoogleLogin() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
-    }
-
-    private void performFbLogin() {
-
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
-
-    }*/
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mLoginHandler.onActivityResult(requestCode, resultCode, data);
-        /*switch (requestCode) {
-            case REQUEST_GOOGLE_SIGN_IN:
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                handleGoogleSignInResult(result);
-                break;
-            default:
-                callbackManager.onActivityResult(requestCode, resultCode, data);
-        }*/
 
-    }
-
-    private void handleGoogleSignInResult(GoogleSignInResult result) {
-        if (result.isSuccess()) {
-            GoogleSignInAccount acct = result.getSignInAccount();
-            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName());
-            userLoginSuccess(acct.getDisplayName(), acct.getEmail(), acct.getPhotoUrl());
-        } else {
-            Logger.d("google", "failed");
-            MainApplication.getInstance().showToast(R.string.login_error);
-        }
-    }
-
-    private void userLoginSuccess(String name, String userEmail, Uri profilePictureUri) {
-        SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
-        prefsManager.setString(Constants.PREF_USER_EMAIL, userEmail);
-        prefsManager.setString(Constants.PREF_USER_NAME, name);
-
-        prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
-        prefsManager.setInt(Constants.PREF_USER_ID, 1);
-        User user = new User(1L);
-        user.setName(name);
-        user.setEmailId(userEmail);
-        if (profilePictureUri != null) {
-            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri.toString());
-            user.setProfileImageUrl(profilePictureUri.toString());
-        }
-
-        UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-        userDao.insertOrReplace(user);
-
-        //Sync run data;
-        syncRunData();
-
-        startMainActivity();
-    }
-
-    private void syncRunData() {
-        OneoffTask task = new OneoffTask.Builder()
-                .setService(SyncService.class)
-                .setTag(TaskConstants.UPDATE_WORKOUT_DATA)
-                .setExecutionWindow(0L, 1L)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getApplicationContext());
-        mGcmNetworkManager.schedule(task);
     }
 
     private void startMainActivity() {

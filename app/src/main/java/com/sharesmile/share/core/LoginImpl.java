@@ -95,7 +95,8 @@ public class LoginImpl {
             LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
-                    Logger.d("facebook", "success");
+                    Logger.d("facebook", "success " + loginResult.getAccessToken().getToken());
+
 
                     GraphRequest request = GraphRequest.newMeRequest(
                             loginResult.getAccessToken(),

@@ -7,6 +7,7 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,8 @@ import com.sharesmile.share.rfac.models.CausesPage;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Urls;
 import com.sharesmile.share.views.MRButton;
+
+import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,6 +87,13 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 Logger.e(TAG, "onNetworkFailure: Can't fetch events page data: " + ne.getMessageFromServer(), ne);
                 MainApplication.showToast("Unable to fetch events");
                 hideProgressDialog();
+                mRunButton.setVisibility(View.GONE);
+                Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fetchPageData();
+                    }
+                }).show();
             }
 
             @Override
@@ -91,9 +101,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 Logger.d(TAG, "onNetworkSuccess");
                 AddCauseList(causesList);
                 hideProgressDialog();
+                mRunButton.setVisibility(View.VISIBLE);
             }
-
-
         });
     }
 
