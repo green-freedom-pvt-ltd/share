@@ -63,8 +63,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @BindView(R.id.tv_welcome_skip)
     MRTextView tv_skip;
-    // private CallbackManager callbackManager;
-    //private GoogleApiClient mGoogleApiClient;
+
+    @BindView(R.id.login_container)
+    LinearLayout mLoginContainer;
+
+    @BindView(R.id.progress_container)
+    LinearLayout mProgressContainer;
     private boolean isFromMainActivity;
     private LoginImpl mLoginHandler;
 
@@ -153,5 +157,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onLoginSuccess() {
         startMainActivity();
+    }
+
+    @Override
+    public void showHideProgress(boolean show, String title) {
+
+        if (show) {
+            mLoginContainer.setVisibility(View.GONE);
+            mProgressContainer.setVisibility(View.VISIBLE);
+        } else {
+            mLoginContainer.setVisibility(View.VISIBLE);
+            mProgressContainer.setVisibility(View.GONE);
+        }
     }
 }

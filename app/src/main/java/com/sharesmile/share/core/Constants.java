@@ -86,6 +86,7 @@ public class Constants {
     public static final String PREF_USER_EMAIL  = "pref_user_email";
     public static final String PREF_USER_IMAGE  = "pref_user_image";
     public static final String PREF_LOGIN_SKIP  = "pref_login_skip";
+    public static final String PREF_AUTH_TOKEN  = "pref_auth_token";
 
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{

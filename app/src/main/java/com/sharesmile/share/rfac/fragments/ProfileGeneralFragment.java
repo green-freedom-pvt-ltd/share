@@ -15,10 +15,17 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gcm.SyncService;
+import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -60,7 +67,8 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUserDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-        List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(1)).list();
+        int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
+        List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(user_id)).list();
         if (userList != null && !userList.isEmpty()) {
             mUser = userList.get(0);
         }
@@ -148,6 +156,7 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
         }
 
         mUserDao.insertOrReplace(mUser);
+        syncUserData();
 
 
     }
@@ -208,6 +217,18 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
             case R.id.et_profile_general_birthday:
                 showDatePicker();
         }
+    }
+
+    private void syncUserData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_USER_DATA)
+                .setExecutionWindow(0L, 3600L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getContext().getApplicationContext());
+        mGcmNetworkManager.schedule(task);
     }
 }
 

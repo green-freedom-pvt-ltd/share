@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -29,6 +30,8 @@ public class MainApplication extends Application {
     public static final long MINUTE_INTEVAL = 60000;
     private int visibleActiviesCount = 0;
     private DbWrapper mDbWrapper;
+    private String mToken;
+    private int mUserId=0;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -141,6 +144,20 @@ public class MainApplication extends Application {
 
     public DbWrapper getDbWrapper() {
         return mDbWrapper;
+    }
+
+    public String getToken() {
+        if (mToken == null) {
+            mToken = SharedPrefsManager.getInstance().getString(Constants.PREF_AUTH_TOKEN);
+        }
+        return mToken;
+    }
+
+    public int getUserID() {
+        if (mUserId == 0) {
+            mUserId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
+        }
+        return mUserId;
     }
 
 }

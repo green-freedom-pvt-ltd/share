@@ -14,7 +14,7 @@ public class Run implements UnObfuscable, Serializable {
 
     @SerializedName("run_id")
     long id;
-    @SerializedName("cause_id")
+    @SerializedName("cause_run_title")
     String causeName;
 
     @SerializedName("start_time")

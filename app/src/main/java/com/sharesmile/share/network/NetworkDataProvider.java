@@ -3,11 +3,13 @@ package com.sharesmile.share.network;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.NameValuePair;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
@@ -47,15 +49,13 @@ public class NetworkDataProvider {
     private static final String TAG = "NetworkDataProvider";
 
     /**
-     Class based get call. Use this when expecting the response as plain array of json
-
-     @param url to be hit
-     @param responseClass class of the response object
-     @param <T> response object type
-
-     @return ServerResponse object wrapping desired object of type T
-
-     @throws NetworkException while handling you must check for httpStatusCode
+     * Class based get call. Use this when expecting the response as plain array of json
+     *
+     * @param url           to be hit
+     * @param responseClass class of the response object
+     * @param <T>           response object type
+     * @return ServerResponse object wrapping desired object of type T
+     * @throws NetworkException while handling you must check for httpStatusCode
      */
 
     public static <T> T doGetCall(String url, Class<T> responseClass)
@@ -67,17 +67,18 @@ public class NetworkDataProvider {
 
 
     public static <T> T doGetCall(String url, Map<String, String> queryParamsMap,
-                                                  Class<T> responseClass) throws NetworkException {
+                                  Class<T> responseClass) throws NetworkException {
         String modifiedUrl = getUrlWithParams(url, queryParamsMap);
         return doGetCall(modifiedUrl, responseClass);
     }
 
     /**
-     Type based get call. Use this when expecting the response as plain array of json
-     @param url to be hit
-     @param typeOfT Custom Type of the response object
-     @param <T> response object generic
-     @return ServerResponse object wrapping desired object of type responseClass
+     * Type based get call. Use this when expecting the response as plain array of json
+     *
+     * @param url     to be hit
+     * @param typeOfT Custom Type of the response object
+     * @param <T>     response object generic
+     * @return ServerResponse object wrapping desired object of type responseClass
      */
     public static <T> T doGetCall(String url, Type typeOfT)
             throws NetworkException {
@@ -87,23 +88,24 @@ public class NetworkDataProvider {
     }
 
     /**
-     Type based get call. Use this when expecting the response as plain array of json
-     @param url to be hit
-     @param typeOfT Custom Type of the response object
-     @param <T> response object type
-     @return ServerResponse object wrapping desired object of type typeOfT
+     * Type based get call. Use this when expecting the response as plain array of json
+     *
+     * @param url     to be hit
+     * @param typeOfT Custom Type of the response object
+     * @param <T>     response object type
+     * @return ServerResponse object wrapping desired object of type typeOfT
      */
     public static <T> T doGetCall(String url, Map<String, String> queryParamsMap,
-                                                  Type typeOfT) throws NetworkException {
+                                  Type typeOfT) throws NetworkException {
         String modifiedUrl = getUrlWithParams(url, queryParamsMap);
         return doGetCall(modifiedUrl, typeOfT);
     }
 
     /**
-     Makes Get request synchronously and return the response as plain JSON string
-
-     @param url to be hit
-     @throws NetworkException while handling you must check for httpStatusCode
+     * Makes Get request synchronously and return the response as plain JSON string
+     *
+     * @param url to be hit
+     * @throws NetworkException while handling you must check for httpStatusCode
      */
     public static String getStringResponseForGetCall(String url) throws NetworkException {
         try {
@@ -140,24 +142,23 @@ public class NetworkDataProvider {
     }
 
     /**
-     Makes post request synchronously using form data
-     @param url baseUrl of the endpoint
-     @param formData list of NameValuePairs containing post data
-     @param responseClass class of the response object
-     @param <T> response object type
-
-     @return ServerResponse object wrapping desired object of type T
-
-     @throws NetworkException while handling you must check for httpStatusCode
+     * Makes post request synchronously using form data
+     *
+     * @param url           baseUrl of the endpoint
+     * @param formData      list of NameValuePairs containing post data
+     * @param responseClass class of the response object
+     * @param <T>           response object type
+     * @return ServerResponse object wrapping desired object of type T
+     * @throws NetworkException while handling you must check for httpStatusCode
      */
     public static <T> T doPostCall(String url, List<NameValuePair> formData,
-                                                   Class<T> responseClass) throws NetworkException {
+                                   Class<T> responseClass) throws NetworkException {
         return doPostCall(url, convertFormDataToBody(formData), responseClass);
     }
 
     public static <T> T doPostCall(String url, JSONObject jsonData,
                                    Class<T> responseClass) throws NetworkException {
-        return  doPostCall(url, convertJSONdataToBody(jsonData), responseClass);
+        return doPostCall(url, convertJSONdataToBody(jsonData), responseClass);
     }
 
     public static <T> T doPostCall(String url, List<NameValuePair> formData,
@@ -167,10 +168,26 @@ public class NetworkDataProvider {
 
     public static <T> T doPostCall(String url, JSONObject jsonData,
                                    Type typeOfT) throws NetworkException {
-        return  doPostCall(url, convertJSONdataToBody(jsonData), typeOfT);
+        return doPostCall(url, convertJSONdataToBody(jsonData), typeOfT);
     }
 
-    private static RequestBody convertFormDataToBody(List<NameValuePair> formData){
+    public static <T> T doPutCall(String url, JSONObject jsonData,
+                                   Class<T> responseClass) throws NetworkException {
+        return doPutCall(url, convertJSONdataToBody(jsonData), responseClass);
+    }
+
+    private static <T> T doPutCall(String url, RequestBody body,
+                                    Class<T> responseClass) throws NetworkException {
+        if (TextUtils.isEmpty(url)) {
+            throw new IllegalArgumentException("Empty URL " + url);
+        }
+        Logger.d(TAG, "Url for put request: " + url);
+        Response response = getResponseForPutCall(url, body);
+        T responseObject = NetworkUtils.handleResponse(response, responseClass);
+        return responseObject;
+    }
+
+    private static RequestBody convertFormDataToBody(List<NameValuePair> formData) {
         RequestBody body = null;
         if (Utils.isCollectionFilled(formData)) {
             MultipartBuilder bodyData = new MultipartBuilder().type(MultipartBuilder.FORM);
@@ -181,26 +198,25 @@ public class NetworkDataProvider {
             body = bodyData.build();
         } else {
             MultipartBuilder bodyData = new MultipartBuilder().type(MultipartBuilder.FORM);
-            bodyData.addFormDataPart("","");
+            bodyData.addFormDataPart("", "");
             body = bodyData.build();
         }
         return body;
     }
 
-    private static RequestBody convertJSONdataToBody(JSONObject jsonData){
+    private static RequestBody convertJSONdataToBody(JSONObject jsonData) {
         RequestBody body;
-        if(jsonData!=null) {
+        if (jsonData != null) {
             body = RequestBody.create(JSON, jsonData.toString());
-        }
-        else {
-            body = RequestBody.create(JSON,"");
+        } else {
+            body = RequestBody.create(JSON, "");
         }
         return body;
     }
 
 
     /**
-     Returns the raw response for GET call
+     * Returns the raw response for GET call
      */
     private static Response getResponseForGetCall(String url)
             throws NetworkException {
@@ -208,6 +224,7 @@ public class NetworkDataProvider {
             throw new IllegalArgumentException("Empty URL " + url);
         }
         Request.Builder requestBuilder = new Request.Builder().url(url);
+        requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for GET request: " + url);
@@ -221,30 +238,61 @@ public class NetworkDataProvider {
     private static Response getResponseForPostCall(String url, RequestBody body)
             throws NetworkException {
         Request.Builder builder = new Request.Builder().url(url)
-                .header(CONTENT_TYPE_TAG, HTTP_HEADER_JSON)
+                .addHeader(CONTENT_TYPE_TAG, HTTP_HEADER_JSON).addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken())
                 .post(body);
         Request request = builder.build();
         Call call = getSingleOkHttpClient().newCall(request);
-        Logger.d(TAG, "Url for POST request: " + url);
-        try{
+        Logger.d(TAG, "Url for POST request: " + url + " Header " + request.headers().toString());
+        try {
             return call.execute();
         } catch (IOException ioe) {
-            throw  NetworkUtils.wrapIOException(request, ioe);
+            throw NetworkUtils.wrapIOException(request, ioe);
+        }
+    }
+
+    private static Response getResponseForPutCall(String url, RequestBody body)
+            throws NetworkException {
+        Request.Builder builder = new Request.Builder().url(url)
+                .addHeader(CONTENT_TYPE_TAG, HTTP_HEADER_JSON).addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken())
+                .put(body);
+        Request request = builder.build();
+        Call call = getSingleOkHttpClient().newCall(request);
+        Logger.d(TAG, "Url for Put request: " + url + " Header " + request.headers().toString());
+        try {
+            return call.execute();
+        } catch (IOException ioe) {
+            throw NetworkUtils.wrapIOException(request, ioe);
         }
     }
 
     public static <R extends UnObfuscable> void doPostCallAsync(String url, JSONObject requestJSON,
                                                                 NetworkAsyncCallback<R> cb) {
         RequestBody body = RequestBody.create(JSON, requestJSON.toString());
-        Request request = new Request.Builder().url(url)
-                .header(CONTENT_TYPE_TAG, HTTP_HEADER_JSON)
-                .post(body).build();
+        Request.Builder requestBuilder = new Request.Builder().url(url)
+                .header(CONTENT_TYPE_TAG, HTTP_HEADER_JSON).addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken())
+                .post(body);
+
+        Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         call.enqueue(cb);
     }
 
     public static <R extends UnObfuscable> void doGetCallAsync(String url, NetworkAsyncCallback<R> cb) {
         Request request = new Request.Builder().url(url).build();
+        Call call = getSingleOkHttpClient().newCall(request);
+        call.enqueue(cb);
+    }
+
+    public static <R extends UnObfuscable> void doGetCallAsync(String url, Map<String, String> header, Callback cb) {
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+
+        if (header != null) {
+            for (Map.Entry<String, String> entry : header.entrySet()) {
+                System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+                requestBuilder.addHeader(entry.getKey(), entry.getValue());
+            }
+        }
+        Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         call.enqueue(cb);
     }
@@ -264,7 +312,7 @@ public class NetworkDataProvider {
     }
 
     public static synchronized OkHttpClient getSingleOkHttpClient() {
-        if (myOkHttpClient == null){
+        if (myOkHttpClient == null) {
             myOkHttpClient = new OkHttpClient();
             myOkHttpClient.setConnectTimeout(CONNECTION_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
             myOkHttpClient.setReadTimeout(READ_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);

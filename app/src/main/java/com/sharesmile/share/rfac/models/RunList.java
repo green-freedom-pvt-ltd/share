@@ -98,7 +98,6 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
 
         @Override
         public Workout next() {
-            Logger.d("Anshul", "next" + remaining + " : " + removalIndex);
             long rem = remaining;
             if (rem == 0) {
                 throw new NoSuchElementException();
@@ -113,7 +112,6 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
 
         @Override
         public void remove() {
-            Logger.d("Anshul", "remove" + remaining + " : " + removalIndex);
         }
     }
 

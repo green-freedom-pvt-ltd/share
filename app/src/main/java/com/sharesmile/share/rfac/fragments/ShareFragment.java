@@ -21,7 +21,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.internal.CallbackManagerImpl;
+import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
@@ -53,6 +58,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private static final String TAG = "ShareFragment";
     private static final String BUNDLE_SHOW_LOGIN = "bundle_show_login";
+    private static final int REQUEST_SHARE = 101;
     private CauseData mCauseData;
 
     @BindView(R.id.skip_layout)
@@ -93,6 +99,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     @BindView(R.id.tv_welcome_skip)
     LinearLayout tv_skip;
+
+    @BindView(R.id.progress_container)
+    LinearLayout mProgressContainer;
     private LoginImpl mLoginHandler;
 
     public enum SHARE_MEDIUM {
@@ -133,17 +142,14 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 mContentView.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
-                Logger.d("anshul","background success");
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Logger.d("anshul","background failed");
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-                Logger.d("anshul","background prepare");
             }
         });
         return view;
@@ -228,7 +234,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         switch (v.getId()) {
 
             case R.id.skip_layout:
-                getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, mCauseData.getCauseThankYouImage());
+                showThankYouFragment();
                 break;
             case R.id.btn_share_screen:
                 if (mSelectedShareMedium == SHARE_MEDIUM.WHATS_APP) {
@@ -256,6 +262,10 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         }
     }
 
+    private void showThankYouFragment() {
+        getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, mCauseData.getCauseThankYouImage());
+    }
+
     private void showLoginSkipDialog() {
 
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
@@ -279,7 +289,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
                 .setType("text/plain")
                 .setText(mCauseData.getCauseShareMessageTemplate())
                 .getIntent();
-        startActivity(shareIntent);
+        startActivityForResult(shareIntent, REQUEST_SHARE);
     }
 
     private void shareOnWhatsApp() {
@@ -290,7 +300,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             sendIntent.putExtra(Intent.EXTRA_TEXT, mCauseData.getCauseShareMessageTemplate());
             sendIntent.setType("text/plain");
             sendIntent.setPackage("com.whatsapp");
-            startActivity(sendIntent);
+            startActivityForResult(sendIntent, REQUEST_SHARE);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(getContext(), "Whats app not installed ", Toast.LENGTH_LONG).show();
         }
@@ -301,7 +311,8 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         TweetComposer.Builder builder = new TweetComposer.Builder(getActivity())
                 .text(mCauseData.getCauseShareMessageTemplate());
-        builder.show();
+        startActivityForResult(builder.createIntent(), REQUEST_SHARE);
+        //  builder.show();
     }
 
     private void shareOnFb() {
@@ -312,6 +323,22 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
                 .build();
 
         ShareDialog shareDialog = new ShareDialog(this);
+        shareDialog.registerCallback(new CallbackManagerImpl(), new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        }, REQUEST_SHARE);
         shareDialog.show(content);
     }
 
@@ -326,9 +353,24 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     }
 
     @Override
+    public void showHideProgress(boolean show, String title) {
+        if (show) {
+            mLoginContainer.setVisibility(View.GONE);
+            mProgressContainer.setVisibility(View.VISIBLE);
+        } else {
+            mLoginContainer.setVisibility(View.VISIBLE);
+            mProgressContainer.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_SHARE) {
+            showThankYouFragment();
+        } else {
+            mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }
 

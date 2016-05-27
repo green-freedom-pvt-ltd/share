@@ -1,30 +1,26 @@
 package com.sharesmile.share.rfac.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.rfac.fragments.AboutUsFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
-import com.sharesmile.share.rfac.fragments.LogoutFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
@@ -39,6 +35,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     NavigationView mNavigationView;
     Toolbar toolbar;
     private ActionBarDrawerToggle mDrawerToggle;
+    private InputMethodManager inputMethodManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +165,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             return;
         }
 
+        hideKeyboard(null);
         if (getFragmentManager().getBackStackEntryCount() == 1) {
             ActivityCompat.finishAffinity(this);
         } else {
@@ -220,5 +218,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (requestCode == REQUEST_CODE_LOGIN) {
             updateNavigationMenu();
         }
+    }
+
+    protected void hideKeyboard(View view) {
+        if (inputMethodManager == null) {
+            inputMethodManager = (InputMethodManager) getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+        }
+
+
+        if (view == null) {
+            view = this.getCurrentFocus();
+        }
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+
     }
 }

@@ -78,7 +78,7 @@ We teach kids every day for two hours. Our focus is value based education which 
 
     <!-- Facebook key-->
 
-    <string name="facebook_app_id">1568874130027114</string>
+    <string name="facebook_app_id">167918020276053</string>
     <string name="login_error">error in login.</string>
     <string name="email_id_required">Email id require for login.</string>
 
@@ -104,4 +104,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="skip_login_title">Your run will be lost!</string>
     <string name="yes_sure">yes, I\'m sure</string>
     <string name="retry">Retry</string>
+    <string name="feedback_thanks">Thankyou for feedback.</string>
+    <string name="google_server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>
 </resources>

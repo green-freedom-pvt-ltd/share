@@ -1,13 +1,12 @@
 package com.sharesmile.share.core;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -15,7 +14,6 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
@@ -27,20 +25,31 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.network.NetworkDataProvider;
+import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Urls;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Shine on 19/05/16.
@@ -48,6 +57,7 @@ import java.util.Arrays;
 public class LoginImpl {
 
     private static final int REQUEST_GOOGLE_SIGN_IN = 1001;
+    private static final String TAG = LoginImpl.class.getSimpleName();
 
     private final LoginListener mListener;
     private WeakReference<AppCompatActivity> activityWeakReference = null;
@@ -74,7 +84,7 @@ public class LoginImpl {
 
     private void initializeGoogleLogin() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
+                .requestEmail().requestIdToken(getContext().getString(R.string.google_server_client_id))
                 .build();
 
         Context context = getContext();
@@ -96,7 +106,7 @@ public class LoginImpl {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
                     Logger.d("facebook", "success " + loginResult.getAccessToken().getToken());
-
+                    final String token = loginResult.getAccessToken().getToken();
 
                     GraphRequest request = GraphRequest.newMeRequest(
                             loginResult.getAccessToken(),
@@ -113,9 +123,7 @@ public class LoginImpl {
                                         e.printStackTrace();
                                     }
                                     if (!TextUtils.isEmpty(userEmail)) {
-                                        Profile profile = Profile.getCurrentProfile();
-                                        userLoginSuccess(profile.getName(), userEmail, profile.getProfilePictureUri(320, 320));
-
+                                        verifyUserDetails(userEmail, token, true);
                                     } else {
                                         MainApplication.getInstance().showToast(R.string.email_id_required);
                                     }
@@ -135,22 +143,88 @@ public class LoginImpl {
                 @Override
                 public void onError(FacebookException error) {
                     Logger.d("facebook", "Error");
+                    error.printStackTrace();
                     MainApplication.getInstance().showToast(R.string.login_error);
                 }
             });
         }
     }
 
-    private void userLoginSuccess(String name, String userEmail, Uri profilePictureUri) {
+    private void verifyUserDetails(String userEmail, String token, boolean isFbLogin) {
+
+        mListener.showHideProgress(true, getContext().getString(R.string.login));
+        Map<String, String> header = new HashMap<>();
+        if (isFbLogin) {
+            header.put("Authorization", "Bearer facebook " + token);
+        } else {
+            header.put("Authorization", "Bearer google-oauth2 " + token);
+        }
+
+        NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(userEmail), header, new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.i("TAG", "Login error ");
+                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.showHideProgress(false, null);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                JsonArray array = JsonHelper.StringToJsonArray(response.body().string());
+                final JsonObject element = array.get(0).getAsJsonObject();
+                Log.i("TAG", "response: " + element.toString());
+                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        userLoginSuccess(element);
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    private void userLoginSuccess(JsonObject response) {
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
+        String name = "";
+        if (response.has("first_name")) {
+            name = response.get("first_name").getAsString();
+            prefsManager.setString(Constants.PREF_USER_NAME, name);
+        }
+        String userEmail = response.get("email").getAsString();
         prefsManager.setString(Constants.PREF_USER_EMAIL, userEmail);
-        prefsManager.setString(Constants.PREF_USER_NAME, name);
 
         prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
-        prefsManager.setInt(Constants.PREF_USER_ID, 1);
-        User user = new User(1L);
+        int user_id = response.get("user_id").getAsInt();
+        prefsManager.setInt(Constants.PREF_USER_ID, user_id);
+
+        String token = response.get("auth_token").getAsString();
+        prefsManager.setString(Constants.PREF_AUTH_TOKEN, token);
+        Logger.i(TAG, "token : " + token);
+
+        String mobile_number = "";
+        if (response.has("phone_number")) {
+            mobile_number = JsonHelper.getValueOrNone(response, "phone_number");
+        }
+        String gender = "";
+        if (response.has("gender_user")) {
+            gender = JsonHelper.getValueOrNone(response, "gender_user");
+        }
+
+        User user = new User((long) user_id);
         user.setName(name);
         user.setEmailId(userEmail);
+        user.setMobileNO(mobile_number);
+        if (!TextUtils.isEmpty(gender)) {
+            user.setGender(gender.equalsIgnoreCase("male") ? "m" : "f");
+        }
+
+        String profilePictureUri = JsonHelper.getValueOrNone(response, "social_thumb");
         if (profilePictureUri != null) {
             prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri.toString());
             user.setProfileImageUrl(profilePictureUri.toString());
@@ -196,6 +270,8 @@ public class LoginImpl {
     }
 
     public void performGoogleLogin() {
+
+        // MainApplication.getInstance().showToast("Google need rest. Try Facebook ");
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         if (activityWeakReference != null) {
             activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
@@ -229,8 +305,8 @@ public class LoginImpl {
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName());
-            userLoginSuccess(acct.getDisplayName(), acct.getEmail(), acct.getPhotoUrl());
+            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken());
+            verifyUserDetails(acct.getEmail(), acct.getIdToken(), false);
         } else {
             Logger.d("google", "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
@@ -240,5 +316,7 @@ public class LoginImpl {
     public interface LoginListener {
 
         void onLoginSuccess();
+
+        void showHideProgress(boolean show, String title);
     }
 }
