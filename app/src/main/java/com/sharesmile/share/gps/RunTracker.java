@@ -48,6 +48,7 @@ public class RunTracker implements Tracker {
     }
 
     public synchronized WorkoutData endRun(){
+        Logger.d(TAG, "endRun");
         WorkoutData workoutData = dataStore.clear();
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
         dataStore = null;
@@ -67,12 +68,14 @@ public class RunTracker implements Tracker {
 
     @Override
     public synchronized void pauseRun() {
+        Logger.d(TAG, "pauseRun");
         setState(State.PAUSED);
         dataStore.workoutPause();
     }
 
     @Override
     public synchronized void resumeRun() {
+        Logger.d(TAG, "resumeRun");
         setState(State.RUNNING);
         dataStore.workoutResume();
     }

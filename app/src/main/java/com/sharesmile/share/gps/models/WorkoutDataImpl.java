@@ -204,7 +204,6 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", isActive=" + isActive +
 				", paused=" + paused +
 				", beginTimeStamp=" + beginTimeStamp +
-				", batches=" + batches +
 				'}';
 	}
 

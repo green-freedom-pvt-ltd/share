@@ -48,6 +48,8 @@ public class VigilanceTimer implements Runnable {
 
 	private synchronized void onTimerTick(){
 
+		Logger.d(TAG, "onTimerTick");
+
 		//check for slow speed
 		if (checkForTooSlow()){
 			Logger.d(TAG, "Workout too slow, not enough distance will pause Workout");

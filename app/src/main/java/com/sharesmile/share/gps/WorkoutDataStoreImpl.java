@@ -71,6 +71,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             float extraPolatedDistance = timeToFetchSource * speedForExtrapolation;
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
+            Logger.d(TAG, "addRecord: Second record after begin/resume, extraPolatedDistanceToBeApproved = " + extraPolatedDistance);
         }
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
@@ -88,8 +89,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             dirtyWorkoutData.addSteps(numSteps);
             numStepsToBeApproved += numSteps;
             persistDirtyWorkoutData();
-
-//            persistBothWorkoutData();
         }
     }
 

@@ -17,7 +17,7 @@ public class Config {
 
     public static final float UPPER_SPEED_LIMIT = 8f; // in m/s, i.e. 20 km/hr
 
-    public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s, i.e. 20 km/hr
+    public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s,
 
     public static final float THRESHOLD_INTEVAL = 1; // in secs
 

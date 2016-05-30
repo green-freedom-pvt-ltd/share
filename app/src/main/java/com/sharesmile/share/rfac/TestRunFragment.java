@@ -1,6 +1,7 @@
 package com.sharesmile.share.rfac;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.RunPathFragment;
@@ -222,9 +224,16 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
     private String textForMail() {
         StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("\nApp Version : " + getContext().getPackageManager()
+                    .getPackageInfo(getContext().getPackageName(), 0).versionName);
+        }catch (PackageManager.NameNotFoundException nnfe){
+            nnfe.printStackTrace();
+        }
         sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL + " secs");
         sb.append("\nTHRESHOLD_ACCURACY : " + Config.THRESHOLD_ACCURACY);
         sb.append("\nTHRESHOLD_FACTOR : " + Config.THRESHOLD_FACTOR);
+        sb.append("\nVIGILANCE_TIMER_INTERVAL : " + Config.VIGILANCE_TIMER_INTERVAL + " milli secs");
         sb.append("\nVIGILANCE_START_THRESHOLD : " + (Config.VIGILANCE_START_THRESHOLD / 1000) + " secs");
         sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT * 3.6 + " km/hr");
