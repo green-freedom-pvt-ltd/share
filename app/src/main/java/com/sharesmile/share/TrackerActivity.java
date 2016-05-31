@@ -422,7 +422,7 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if(RunTracker.isWorkoutActive()){
+        if (RunTracker.isWorkoutActive()) {
             runFragment.showStopDialog();
             return;
         }

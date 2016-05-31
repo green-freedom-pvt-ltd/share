@@ -92,7 +92,11 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());
         if (cause.getExecutor() != null) {
-            mSponsor.setText("by " + cause.getExecutor().getName());
+            if(cause.getExecutor().getType().equalsIgnoreCase("ngo")){
+                mSponsor.setText("by " + cause.getExecutor().getPartnerNgo());
+            }else {
+                mSponsor.setText("by " + cause.getExecutor().getPartnerCompany());
+            }
         }
 
         //load image

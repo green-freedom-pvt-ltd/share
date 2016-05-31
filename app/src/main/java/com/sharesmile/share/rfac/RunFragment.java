@@ -10,8 +10,11 @@ import android.view.ViewGroup;
 
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.gps.models.WorkoutData;;
+import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
+
+;
 
 
 public abstract class RunFragment extends BaseFragment implements View.OnClickListener {
@@ -88,6 +91,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
 
     public void endRun(boolean userEnded) {
+        Logger.d(TAG, "endRun, userEnded = " + userEnded);
         if (userEnded) {
             myActivity.endLocationTracking();
         }
@@ -100,6 +104,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
 
     public void pauseRun(boolean userPaused) {
+        Logger.d(TAG, "pauseRun");
         isRunnning = false;
         handler.removeCallbacks(timer);
         if (userPaused) {
@@ -109,6 +114,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     }
 
     public void resumeRun() {
+        Logger.d(TAG, "resumeRun");
         // Resume will always be done by the user
         isRunnning = true;
         myActivity.resumeWorkout();
@@ -117,6 +123,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     }
 
     private void setIsRunActive(boolean b) {
+        Logger.d(TAG, "setIsRunActive, b = " + b);
         synchronized (RunFragment.class) {
             isRunActive = b;
         }
@@ -129,6 +136,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     }
 
     protected void beginRun() {
+        Logger.d(TAG, "beginRun");
         myActivity.beginLocationTracking();
         setIsRunActive(true);
         isRunnning = true;

@@ -78,7 +78,6 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
             android:background="#00000000"
-            android:hint="9990009999"
             android:phoneNumber="true"
             android:textSize="14sp" />
 
@@ -106,7 +105,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
             android:background="#00000000"
-            android:hint="DD MM YYYY"
+            android:hint="01 Jun 1991"
             android:textSize="14sp" />
 
         <View

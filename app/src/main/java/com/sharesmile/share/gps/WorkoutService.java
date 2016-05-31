@@ -75,6 +75,7 @@ public class WorkoutService extends Service implements
     }
 
     private void startTracking() {
+        Logger.d(TAG, "startTracking");
         if (tracker == null) {
             tracker = new RunTracker(backgroundExecutorService, this);
         }
@@ -83,6 +84,7 @@ public class WorkoutService extends Service implements
 
 
     private void stopTracking() {
+        Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
             tracker = null;
@@ -330,6 +332,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public void workoutVigilanceSessiondefaulted(int problem) {
+        Logger.d(TAG, "workoutVigilanceSessiondefaulted");
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
@@ -343,6 +346,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime) {
+        Logger.d(TAG, "workoutVigilanceSessionApproved");
         if (tracker != null && tracker.isActive()){
             tracker.approveWorkoutData();
         }

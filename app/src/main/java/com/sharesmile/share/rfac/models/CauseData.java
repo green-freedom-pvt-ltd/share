@@ -21,6 +21,7 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("cause_category")
     private String category;
 
+    @SerializedName("partners")
     private List<Partner> executors;
 
     private List<Sponsor> sponsors;
