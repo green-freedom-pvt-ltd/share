@@ -28,10 +28,11 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 7
-        versionName "1.1.6"
+        versionCode 8
+        versionName "1.1.7"
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled false
     }
     signingConfigs{
         release {
@@ -102,4 +103,5 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
     compile 'de.greenrobot:greendao:2.1.0'
 
+    compile 'com.google.android.gms:play-services-appindexing:8.3.0'
 }

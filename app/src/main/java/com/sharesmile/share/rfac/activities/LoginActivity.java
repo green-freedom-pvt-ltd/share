@@ -30,12 +30,14 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
@@ -83,12 +85,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mLoginHandler = new LoginImpl(this, this);
             ButterKnife.bind(this);
             initUi();
-        } /*else if(RunTracker.isWorkoutActive()) {
+        } else if(RunTracker.isWorkoutActive()) {
             Intent intent = new Intent(this, TrackerActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
            // intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, (Boolean) input);
             startActivity(intent);
-        }*/ else {
+        } else {
             startMainActivity();
         }
     }

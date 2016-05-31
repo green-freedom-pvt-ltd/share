@@ -47,6 +47,9 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("cause_share_message_template")
     private String causeShareMessageTemplate;
 
+    @SerializedName("min_distance")
+    private int minDistance;
+
     public int getId() {
         return id;
     }
@@ -155,5 +158,13 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setCauseThankYouImage(String causeThankYouImage) {
         this.causeThankYouImage = causeThankYouImage;
+    }
+
+    public int getMinDistance() {
+        return minDistance;
+    }
+
+    public void setMinDistance(int minDistance) {
+        this.minDistance = minDistance;
     }
 }
