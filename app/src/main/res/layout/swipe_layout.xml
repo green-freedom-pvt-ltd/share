@@ -29,7 +29,7 @@
                 android:id="@+id/img_run"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scaleType="centerInside"
+                android:scaleType="centerCrop"
                 android:src="@drawable/cause_sample" />
 
             <LinearLayout
