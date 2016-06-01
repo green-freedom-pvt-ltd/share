@@ -34,6 +34,7 @@
                     android:layout_height="240dp"
                     android:background="@color/light_grey"
                     android:clickable="true"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/cause_sample" />
 
                 <com.sharesmile.share.views.MLTextView

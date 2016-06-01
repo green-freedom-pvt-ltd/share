@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <com.sharesmile.share.views.MRTextView
@@ -29,7 +30,7 @@
                 android:id="@+id/img_run"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scaleType="centerInside"
+                android:scaleType="centerCrop"
                 android:src="@drawable/cause_sample" />
 
             <LinearLayout
@@ -54,7 +55,7 @@
                     android:id="@+id/run_screen_sponsor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="by Shwas Foundation"
+                    tools:text="by Shwas Foundation"
                     android:textColor="@color/black_two"
                     android:textSize="12sp" />
 

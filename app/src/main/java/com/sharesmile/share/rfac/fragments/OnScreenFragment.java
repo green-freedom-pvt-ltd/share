@@ -24,12 +24,15 @@ import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
+import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.CausesPage;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Urls;
 import com.sharesmile.share.views.MRButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
@@ -99,6 +102,13 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
             @Override
             public void onNetworkSuccess(CauseList causesList) {
                 Logger.d(TAG, "onNetworkSuccess");
+                List<CauseData> causes = new ArrayList<CauseData>();
+                for (CauseData causeData : causesList.getCauses()) {
+                    if (causeData.isActive()) {
+                        causes.add(causeData);
+                    }
+                }
+                causesList.setCauses(causes);
                 AddCauseList(causesList);
                 hideProgressDialog();
                 mRunButton.setVisibility(View.VISIBLE);

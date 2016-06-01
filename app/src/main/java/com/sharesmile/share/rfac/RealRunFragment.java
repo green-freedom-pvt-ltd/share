@@ -49,6 +49,7 @@ public class RealRunFragment extends RunFragment {
     @BindView(R.id.img_sponsor_logo)
     ImageView mSponsorLogo;
     private CauseData mCauseData;
+    private float mDistanceCovered;
 
     public static RealRunFragment newInstance(CauseData causeData) {
         RealRunFragment fragment = new RealRunFragment();
@@ -104,12 +105,16 @@ public class RealRunFragment extends RunFragment {
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
+            if (mCauseData.getMinDistance() > mDistanceCovered) {
+                getActivity().finish();
+                return;
+            }
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
             getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
             WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             Workout workout = new Workout();
             workout.setAvgSpeed(data.getAvgSpeed());
-            workout.setDistance(data.getDistance()/1000);
+            workout.setDistance(data.getDistance() / 1000);
             workout.setElapsedTime(data.getElapsedTime());
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
@@ -132,10 +137,19 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showUpdate(float speed, float distanceCovered) {
-        String distDecimal = String.format("%1$,.2f", (distanceCovered / 1000));
+
+        mDistanceCovered = distanceCovered;
+        String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
         distance.setText(distDecimal);
-        float rupees = getConversionFactor() * distanceCovered;
-        impact.setText(String.valueOf(rupees));
+
+        float rupees = getConversionFactor() * Float.valueOf(distance.getText().toString()) * 1000;
+        String rupeesString = String.format("%1$,.1f", rupees);
+        if (rupees > (int) rupees) {
+            impact.setText(rupeesString);
+        } else {
+            impact.setText(String.valueOf((int) rupees));
+        }
+
     }
 
     @Override
@@ -163,7 +177,7 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void onBeginRun() {
         impact.setText("0");
-        distance.setText("0.00");
+        distance.setText("0.0");
     }
 
     @Override
@@ -185,6 +199,7 @@ public class RealRunFragment extends RunFragment {
                 break;
 
             case R.id.btn_stop:
+
                 showStopDialog();
                 break;
         }
@@ -192,34 +207,46 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
+        if (mCauseData.getMinDistance() > mDistanceCovered) {
+            showMinDistanceDialog();
+        } else {
+            showRunEndDialog();
+        }
+    }
+
+    private void showRunEndDialog() {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-
-        // Setting Dialog Title
         alertDialog.setTitle("Finish Run");
-
-
-        // Setting Dialog Message
         alertDialog.setMessage("Are you sure you want to end the run?");
-
-        // Setting Icon to Dialog
-
-        // Setting Positive "Yes" Button
         alertDialog.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 endRun(true);
-
             }
         });
 
-        // Setting Negative "NO" Button
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                // Write your code here to invoke NO event
+                dialog.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void showMinDistanceDialog() {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle(getString(R.string.dialog_title_min_distance));
+        alertDialog.setMessage(getString(R.string.dialog_msg_min_distance,mCauseData.getMinDistance()));
+        alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
 
-        // Showing Alert Message
+        alertDialog.setNegativeButton(getString(R.string.dialog_negative_button_min_distance), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                endRun(true);
+            }
+        });
         alertDialog.show();
     }
 

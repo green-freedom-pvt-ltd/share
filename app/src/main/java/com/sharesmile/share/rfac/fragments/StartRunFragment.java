@@ -94,12 +94,10 @@ public class StartRunFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Count.start();
     }
 
     @Override
     public void onPause() {
-        Count.cancel();
         super.onPause();
     }
 

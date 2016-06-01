@@ -31,4 +31,8 @@ public class CauseList implements UnObfuscable {
     public List<CauseData> getCauses() {
         return causes;
     }
+
+    public void setCauses(List<CauseData> causes) {
+        this.causes = causes;
+    }
 }

@@ -173,33 +173,7 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
         int calender_month = calendar.get(Calendar.MONTH);
         int calender_year = calendar.get(Calendar.YEAR);
         int calender_day = calendar.get(Calendar.DAY_OF_MONTH);
-
-            /*if (!TextUtils.isEmpty(filterDate)) {
-                String[] dateArray = filterDate.split("-");
-                if (dateArray.length == 3) {
-                    calender_year = Integer.valueOf(dateArray[0]);
-                    calender_month = Integer.valueOf(dateArray[1]) - 1;
-                    calender_day = Integer.valueOf(dateArray[2]);
-                }
-            }*/
         DatePickerDialog mDatePickerDialog = new DatePickerDialog(getActivity(), this, calender_year, calender_month, calender_day);
-
-            /*Calendar minSelectedDate = (Calendar) calendar.clone();
-            int month = calendar.get(Calendar.MONTH);
-            minSelectedDate.set(Calendar.MILLISECOND, minSelectedDate.getMaximum(Calendar.MILLISECOND));
-            if (month > 1) {
-                minSelectedDate.set(Calendar.MONTH, month - 2);
-                minSelectedDate.set(Calendar.MILLISECOND, minSelectedDate.getMaximum(Calendar.MILLISECOND));
-            } else {
-                int year = calendar.get(Calendar.YEAR) - 1;
-                minSelectedDate.set(Calendar.YEAR, year);
-                minSelectedDate.set(Calendar.MONTH, 11 - (1 - month));
-                minSelectedDate.set(Calendar.MILLISECOND, minSelectedDate.getMaximum(Calendar.MILLISECOND));
-
-            }
-            mDatePickerDialog.getDatePicker().setMinDate(minSelectedDate.getTimeInMillis());
-            calendar.set(Calendar.MILLISECOND, calendar.getMaximum(Calendar.MILLISECOND));
-            mDatePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());*/
         mDatePickerDialog.show();
 
 
