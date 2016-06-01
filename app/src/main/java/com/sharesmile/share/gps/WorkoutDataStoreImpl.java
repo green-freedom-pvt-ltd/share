@@ -67,7 +67,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             //Source point fetched for the batch
             int stepsRanWhileSearchingForSource = getTotalSteps() - numStepsWhenBatchBegan;
             float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
-                                            ? 3 : RunTracker.getAverageStrideLength();
+                                            ? 1 : RunTracker.getAverageStrideLength();
             float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
