@@ -42,6 +42,7 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	private void resetCounters(){
+		Logger.d(TAG, "resetCounters");
 		lastValidatedRecord = null;
 		lastValidatedDistance = 0;
 	}

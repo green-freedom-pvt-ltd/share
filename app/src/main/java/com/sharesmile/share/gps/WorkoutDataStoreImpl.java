@@ -7,6 +7,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
+import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -24,6 +25,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     private WorkoutData dirtyWorkoutData;
     private WorkoutData approvedWorkoutData;
+    private int numStepsWhenBatchBegan;
 
     Queue<DistRecord> waitingForApprovalQueue = new ConcurrentLinkedQueue<>();
     volatile float extraPolatedDistanceToBeApproved = 0f;
@@ -61,17 +63,16 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             return;
         }
 
-        if (dirtyWorkoutData.getCurrentBatch().getPoints().size() == 1){
-            //Start point has been added after start/resume of workout and it is the second record after it
-            // Need to extrapolate the distance for time elapsed since start/resume and start point addition
-            Location startPoint = record.getPrevLocation();
-            long batchInitiateTimeStamp = dirtyWorkoutData.getCurrentBatch().getStartTimeStamp();
-            float timeToFetchSource = ((float) (startPoint.getTime() - batchInitiateTimeStamp)) / 1000;
-            float speedForExtrapolation = record.getSpeed();
-            float extraPolatedDistance = timeToFetchSource * speedForExtrapolation;
+        if (record.isStartRecord()){
+            //Source point fetched for the batch
+            int stepsRanWhileSearchingForSource = getTotalSteps() - numStepsWhenBatchBegan;
+            float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
+                                            ? 3 : RunTracker.getAverageStrideLength();
+            float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
-            Logger.d(TAG, "addRecord: Second record after begin/resume, extraPolatedDistanceToBeApproved = " + extraPolatedDistance);
+            Logger.d(TAG, "addRecord: Source record after begin/resume, extraPolatedDistanceToBeApproved = "
+                    + extraPolatedDistance);
         }
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
@@ -79,8 +80,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         waitingForApprovalQueue.add(record);
         // Persist dirtyWorkoutData object
         persistDirtyWorkoutData();
-
-//        persistBothWorkoutData();
     }
 
     @Override
@@ -127,6 +126,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         Logger.d(TAG, "workoutResume");
         dirtyWorkoutData.workoutResume();
         approvedWorkoutData.workoutResume();
+        numStepsWhenBatchBegan = getTotalSteps();
         persistBothWorkoutData();
     }
 
@@ -180,6 +180,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     private WorkoutData retrieveFromPersistentStorage(String key) {
+        Logger.d(TAG, "retrieveFromPersistentStorage, key = " + key);
         String workoutDataAsString = SharedPrefsManager.getInstance().getString(key);
         if (!TextUtils.isEmpty(workoutDataAsString)){
             return Utils.createObjectFromJSONString(workoutDataAsString, WorkoutDataImpl.class);

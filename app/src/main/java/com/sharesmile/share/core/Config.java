@@ -15,7 +15,7 @@ public class Config {
 
     public static final float MIN_DISTANCE_FOR_VIGILANCE = 50; // in meters
 
-    public static final float UPPER_SPEED_LIMIT = 8f; // in m/s, i.e. 20 km/hr
+    public static final float UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s,
 
@@ -27,13 +27,13 @@ public class Config {
 
     public static float STEPS_PER_SECOND_FACTOR = 1f;
 
-    public static float SOURCE_ACCEPTABLE_ACCURACY = 25; // in m
+    public static float SOURCE_ACCEPTABLE_ACCURACY = 60; // in m
 
-    public static float THRESHOLD_ACCURACY = 16; // in m
+    public static float THRESHOLD_ACCURACY = 14; // in m
 
     public static float THRESHOLD_FACTOR = 5;
 
-    public static float SMALLEST_DISPLACEMENT = 7;// in m
+    public static float SMALLEST_DISPLACEMENT = 0.1f;// in m
 
     public static boolean TOO_SLOW_CHECK = false;
 

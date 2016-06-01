@@ -50,11 +50,57 @@ public class RunTracker implements Tracker {
     public synchronized WorkoutData endRun(){
         Logger.d(TAG, "endRun");
         WorkoutData workoutData = dataStore.clear();
+
+        // Update total distance and steps in lifetime
+        updateTrackRecord(workoutData);
+
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
         dataStore = null;
         setState(State.IDLE);
         listener = null;
         return workoutData;
+    }
+
+    private static void updateTrackRecord(WorkoutData workoutData){
+        long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE);
+        long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
+        long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT);
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE, lifetimeDistance
+                + (long) workoutData.getDistance());
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_STEPS, lifetimeSteps
+                + (long) workoutData.getTotalSteps());
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT, lifetimeWorkingOut
+                + (long) workoutData.getRecordedTime());
+    }
+
+    public static float getAverageStrideLength(){
+        long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE);
+        long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
+
+        if (lifetimeDistance == 0 || lifetimeSteps == 0){
+            return 0;
+        }
+        return ((float) lifetimeDistance ) / ((float) lifetimeSteps);
+    }
+
+    public static float getLifetimeAverageSpeed(){
+        long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE);
+        long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT);
+
+        if (lifetimeDistance == 0 || lifetimeWorkingOut == 0){
+            return 0;
+        }
+        return ((float) lifetimeDistance ) / ((float) lifetimeWorkingOut);
+    }
+
+    public static float getLifetimeAverageStepsPerSec(){
+        long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
+        long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT);
+
+        if (lifetimeSteps == 0 || lifetimeWorkingOut == 0){
+            return 0;
+        }
+        return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);
     }
 
     @Override
@@ -189,7 +235,6 @@ public class RunTracker implements Tracker {
             // Below logic was required when we were getting cumulative steps, with google fit, it is not required
 
             long reportimeStamp = System.currentTimeMillis();
-            Logger.d(TAG, "Adding " + deltaSteps + "steps.");
             dataStore.addSteps(deltaSteps);
             listener.updateStepsRecord(reportimeStamp);
         }

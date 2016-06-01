@@ -14,18 +14,18 @@ import java.util.List;
 public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 
 	/**
-	 * gets total distance ran in workout
+	 * gets total distance ran in workout in meters
 	 * @return
 	 */
 	float getDistance();
 
 	/**
-	 * @return time interval for which distance has been recorded
+	 * @return time interval in secs for which distance has been recorded
 	 */
 	float getRecordedTime();
 
 	/**
-	 * @return elapsed time interval for which the workout was in running state( i.e. not paused)
+	 * @return elapsed time interval in secs for which the workout was in running state( i.e. not paused)
 	 * since the beginning
 	 *
 	 */
