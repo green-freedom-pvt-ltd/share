@@ -79,8 +79,9 @@ public class WorkoutService extends Service implements
         if (tracker == null) {
             tracker = new RunTracker(backgroundExecutorService, this);
         }
-        vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService, tracker);
+        vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
     }
+
 
 
     private void stopTracking() {
@@ -355,6 +356,11 @@ public class WorkoutService extends Service implements
     @Override
     public boolean isCountingSteps() {
         return currentlyProcessingSteps;
+    }
+
+    @Override
+    public Tracker getTracker() {
+        return tracker;
     }
 
     /**

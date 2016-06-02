@@ -1,5 +1,6 @@
 package com.sharesmile.share.gps;
 
+import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -15,7 +16,6 @@ public class VigilanceTimer implements Runnable {
 
 	private static final String TAG = "VigilanceTimer";
 	private ScheduledExecutorService scheduledExecutor;
-	private Tracker tracker;
 	private IWorkoutService workoutService;
 
 	private int stepsTillNow = -1;
@@ -23,17 +23,28 @@ public class VigilanceTimer implements Runnable {
 	private float lastValidatedDistance;
 
 	public VigilanceTimer(IWorkoutService workoutService,
-						  ScheduledExecutorService executorService, Tracker tracker){
+						  ScheduledExecutorService executorService){
 		this.scheduledExecutor = executorService;
-		this.tracker = tracker;
 		this.workoutService = workoutService;
 		scheduledExecutor.scheduleAtFixedRate(this, 0, Config.VIGILANCE_TIMER_INTERVAL, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void run() {
-		if (tracker != null && tracker.isActive() && tracker.isRunning()){
-			onTimerTick();
+		try{
+			Logger.d(TAG, "vigilanceTimer fired, tracker is NUll? " + (workoutService.getTracker() == null));
+			if (workoutService.getTracker() != null){
+				Logger.d(TAG, " tracker isActive? " + workoutService.getTracker().isActive()
+						+ " and isRunning? " + workoutService.getTracker().isRunning());
+			}
+			if (workoutService.getTracker() != null && workoutService.getTracker().isActive()
+					&& workoutService.getTracker().isRunning()){
+				onTimerTick();
+			}
+		}catch(Exception e){
+			Logger.d(TAG, "Problem in VigilanceTimer: " + e.getMessage());
+			e.printStackTrace();
+			Crashlytics.logException(e);
 		}
 	}
 
@@ -84,13 +95,13 @@ public class VigilanceTimer implements Runnable {
 		if (!Config.TOO_SLOW_CHECK){
 			return false;
 		}
-		long timeElapsedSinceLastResume = System.currentTimeMillis() - tracker.getLastResumeTimeStamp();
+		long timeElapsedSinceLastResume = System.currentTimeMillis() - workoutService.getTracker().getLastResumeTimeStamp();
 		float inSecs = (float)(timeElapsedSinceLastResume / 1000);
-		Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + tracker.getTotalSteps()
+		Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + workoutService.getTracker().getTotalSteps()
 				+ ", timeElapsed in secs = " + inSecs
-				+ ", distanceCovered = " +  tracker.getTotalDistanceCovered());
+				+ ", distanceCovered = " +  workoutService.getTracker().getTotalDistanceCovered());
 		if (timeElapsedSinceLastResume > Config.VIGILANCE_START_THRESHOLD
-				&& tracker.getDistanceCoveredSinceLastResume() < inSecs*Config.LOWER_SPEED_LIMIT
+				&& workoutService.getTracker().getDistanceCoveredSinceLastResume() < inSecs*Config.LOWER_SPEED_LIMIT
 				){
 			return true;
 		}
@@ -103,18 +114,18 @@ public class VigilanceTimer implements Runnable {
 		}
 		if (lastValidatedRecord == null){
 			// Will wait for next tick
-			lastValidatedRecord = tracker.getLastRecord();
-			lastValidatedDistance = tracker.getTotalDistanceCovered();
+			lastValidatedRecord = workoutService.getTracker().getLastRecord();
+			lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
 		}else{
-			DistRecord latestRecord = tracker.getLastRecord();
+			DistRecord latestRecord = workoutService.getTracker().getLastRecord();
 			if (!lastValidatedRecord.equals(latestRecord)){
 				// We have a new record!
-				float distanceInSession = tracker.getTotalDistanceCovered() - lastValidatedDistance;
+				float distanceInSession = workoutService.getTracker().getTotalDistanceCovered() - lastValidatedDistance;
 				float timeElapsedInSecs = (float)
 						((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
 				Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
 						+ ", timeElapsedInSecs = " + timeElapsedInSecs
-						+ ", distanceCovered = " +  tracker.getTotalDistanceCovered());
+						+ ", distanceCovered = " +  workoutService.getTracker().getTotalDistanceCovered());
 				if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
 					// Distance is above the threshold minimum to apply Usain Bolt Filter
 					float speedInSession = distanceInSession / timeElapsedInSecs;
@@ -124,7 +135,7 @@ public class VigilanceTimer implements Runnable {
 						return true;
 					}else{
 						lastValidatedRecord = latestRecord;
-						lastValidatedDistance = tracker.getTotalDistanceCovered();
+						lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
 					}
 				}
 			}
@@ -138,9 +149,9 @@ public class VigilanceTimer implements Runnable {
 		}
 		if (stepsTillNow == -1){
 			//Will wait for the next tick
-			stepsTillNow = tracker.getTotalSteps();
+			stepsTillNow = workoutService.getTracker().getTotalSteps();
 		}else{
-			int totalSteps = tracker.getTotalSteps();
+			int totalSteps = workoutService.getTracker().getTotalSteps();
 			int stepsThisSession = totalSteps - stepsTillNow;
 			if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.STEPS_PER_SECOND_FACTOR){
 				//time to pause workout

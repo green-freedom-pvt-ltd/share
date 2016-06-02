@@ -12,5 +12,6 @@ public interface IWorkoutService {
 	void workoutVigilanceSessiondefaulted(int problem);
 	void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime);
 	boolean isCountingSteps();
+	Tracker getTracker();
 
 }
