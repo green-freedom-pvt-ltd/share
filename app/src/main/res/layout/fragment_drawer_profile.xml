@@ -11,13 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="200dp">
 
-        <ImageView
+        <com.sharesmile.share.views.CircularImageView
             android:id="@+id/img_profile"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:scaleType="centerInside" />
+            android:scaleType="fitCenter" />
 
         <com.sharesmile.share.views.MLTextView
             android:id="@+id/tv_profile_name"

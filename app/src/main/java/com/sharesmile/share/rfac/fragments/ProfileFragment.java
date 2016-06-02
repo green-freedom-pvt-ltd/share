@@ -18,6 +18,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -35,7 +36,7 @@ public class ProfileFragment extends BaseFragment {
     public static int int_items = 2;
 
     @BindView(R.id.img_profile)
-    ImageView mProfileImage;
+    CircularImageView mProfileImage;
 
     @BindView(R.id.tv_profile_name)
     TextView mName;
