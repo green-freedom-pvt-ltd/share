@@ -116,4 +116,9 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 */
 	WorkoutData close();
 
+	/**
+	 * Creates a Deep copy of this WorkoutData instance
+	 */
+	WorkoutData copy();
+
 }

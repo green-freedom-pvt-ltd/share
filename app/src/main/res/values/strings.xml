@@ -105,7 +105,10 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="yes_sure">yes, I\'m sure</string>
     <string name="retry">Retry</string>
     <string name="feedback_thanks">Thankyou for feedback.</string>
-    <string name="google_server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>
+    <string name="server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>
+
+    <!--<string name="google_server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>-->
+
     <string name="dialog_title_min_distance">That’s too short!</string>
     <string name="dialog_msg_min_distance">You need to run a minimum of %1$sm to convert the distance into impact.</string>
     <string name="dialog_positive_button_min_distance">CONTINUE RUN</string>

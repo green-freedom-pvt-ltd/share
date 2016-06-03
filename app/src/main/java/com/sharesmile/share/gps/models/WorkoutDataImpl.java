@@ -38,6 +38,20 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		invokeNewBatch(beginTimeStamp);
 	}
 
+	private WorkoutDataImpl(WorkoutDataImpl source){
+		distance = source.distance;
+		recordedTime = source.recordedTime;
+		elapsedTime = source.elapsedTime;
+		totalSteps = source.totalSteps;
+		beginTimeStamp = source.beginTimeStamp;
+		isActive = source.isActive;
+		paused = source.paused;
+		batches = new ArrayList<>();
+		for (WorkoutBatch batch : source.batches){
+			batches.add((WorkoutBatchImpl)batch.copy());
+		}
+	}
+
 	private void invokeNewBatch(long startTimeStamp){
 		WorkoutBatchImpl newbatch = new WorkoutBatchImpl(startTimeStamp);
 		batches.add(newbatch);
@@ -113,7 +127,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	@Override
-	public void workoutPause() {
+	public synchronized void workoutPause() {
 		if (!isPaused()){
 			getCurrentBatch().end();
 			paused = true;
@@ -121,7 +135,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	@Override
-	public void workoutResume() {
+	public synchronized void workoutResume() {
 		if (isPaused()){
 			invokeNewBatch(System.currentTimeMillis());
 			paused = false;
@@ -146,7 +160,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	@Override
-	public void addRecord(DistRecord record){
+	public synchronized void addRecord(DistRecord record){
 		if (!isRunning()){
 			Logger.i(TAG, "Won't add add record as user is not running");
 			return;
@@ -192,6 +206,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		setElapsedTime();
 		isActive = false;
 		return this;
+	}
+
+	@Override
+	public synchronized WorkoutData copy() {
+		return new WorkoutDataImpl(this);
 	}
 
 	@Override
