@@ -8,12 +8,14 @@ public class Workout {
 
     private Long id;
     private float distance;
-    private float elapsedTime;
+    /** Not-null value. */
+    private String elapsedTime;
     private Integer steps;
     private float recordedTime;
     private float avgSpeed;
     private String causeBrief;
     private java.util.Date date;
+    private Float runAmount;
     private Boolean is_sync;
 
     public Workout() {
@@ -23,7 +25,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, float elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Boolean is_sync) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -32,6 +34,7 @@ public class Workout {
         this.avgSpeed = avgSpeed;
         this.causeBrief = causeBrief;
         this.date = date;
+        this.runAmount = runAmount;
         this.is_sync = is_sync;
     }
 
@@ -51,11 +54,13 @@ public class Workout {
         this.distance = distance;
     }
 
-    public float getElapsedTime() {
+    /** Not-null value. */
+    public String getElapsedTime() {
         return elapsedTime;
     }
 
-    public void setElapsedTime(float elapsedTime) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setElapsedTime(String elapsedTime) {
         this.elapsedTime = elapsedTime;
     }
 
@@ -97,6 +102,14 @@ public class Workout {
 
     public void setDate(java.util.Date date) {
         this.date = date;
+    }
+
+    public Float getRunAmount() {
+        return runAmount;
+    }
+
+    public void setRunAmount(Float runAmount) {
+        this.runAmount = runAmount;
     }
 
     public Boolean getIs_sync() {

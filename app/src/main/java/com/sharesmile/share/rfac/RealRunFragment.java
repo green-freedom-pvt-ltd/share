@@ -25,6 +25,7 @@ import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
@@ -116,7 +117,8 @@ public class RealRunFragment extends RunFragment {
             Workout workout = new Workout();
             workout.setAvgSpeed(data.getAvgSpeed());
             workout.setDistance(data.getDistance() / 1000);
-            workout.setElapsedTime(data.getElapsedTime());
+            workout.setElapsedTime(Utils.secondsToString((int)data.getElapsedTime()));
+            workout.setRunAmount( workout.getDistance()*mCauseData.getConversionRate());
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());
@@ -143,7 +145,7 @@ public class RealRunFragment extends RunFragment {
         String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
         distance.setText(distDecimal);
 
-        float rupees = getConversionFactor() * Float.valueOf(distance.getText().toString()) * 1000;
+        float rupees = getConversionFactor() * Float.valueOf(distance.getText().toString()) ;
         String rupeesString = String.format("%1$,.1f", rupees);
         if (rupees > (int) rupees) {
             impact.setText(rupeesString);
@@ -251,7 +253,7 @@ public class RealRunFragment extends RunFragment {
         alertDialog.show();
     }
 
-    /*  Rs per m*/
+    /*  Rs per km*/
     public float getConversionFactor() {
         return mCauseData.getConversionRate();
     }

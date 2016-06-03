@@ -31,7 +31,7 @@ public class MainApplication extends Application {
     private int visibleActiviesCount = 0;
     private DbWrapper mDbWrapper;
     private String mToken;
-    private int mUserId=0;
+    private int mUserId = 0;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -135,9 +135,9 @@ public class MainApplication extends Application {
         super.onCreate();
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
-        Fabric.with(this, new Crashlytics());
+        //Fabric.with(this, new Crashlytics());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
-        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer()/*, new Crashlytics()*/);
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
     }
 

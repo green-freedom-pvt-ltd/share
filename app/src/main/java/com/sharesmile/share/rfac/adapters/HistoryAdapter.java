@@ -67,7 +67,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mDate.setText(DateUtil.getDefaultFormattedDate(workout.getDate()));
             }
             mCause.setText(workout.getCauseBrief());
-            mDistance.setText(String.valueOf(workout.getDistance()) + (workout.getDistance() > 1 ? " kms" : " km"));
+            String km = (workout.getDistance() > 1 ? " kms" : " km");
+            String distanceCovered = String.format("%1$,.1f", workout.getDistance());
+            mDistance.setText(distanceCovered + km);
         }
     }
 }

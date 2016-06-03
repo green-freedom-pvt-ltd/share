@@ -136,6 +136,9 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
             jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
+            jsonObject.put("run_amount",workout.getRunAmount());
+            jsonObject.put("run_duration",workout.getElapsedTime());
+
             jsonObject.put("avg_speed", workout.getAvgSpeed());
             //// TODO: 15/05/16 remove Peak speed
             jsonObject.put("peak_speed", 1);
