@@ -19,12 +19,13 @@ public class SchemaGenerator {
         Entity workout = schema.addEntity("Workout");
         workout.addIdProperty();
         workout.addFloatProperty("distance").notNull();
-        workout.addFloatProperty("elapsedTime").notNull();
+        workout.addStringProperty("elapsedTime").notNull();
         workout.addIntProperty("steps");
         workout.addFloatProperty("recordedTime").notNull();
         workout.addFloatProperty("avgSpeed").notNull();
         workout.addStringProperty("causeBrief");
         workout.addDateProperty("date");
+        workout.addFloatProperty("runAmount");
         workout.addBooleanProperty("is_sync");
     }
 
@@ -37,6 +38,10 @@ public class SchemaGenerator {
         user.addStringProperty("mobileNO");
         user.addStringProperty("gender");
         user.addStringProperty("profileImageUrl");
+    }
+
+    private static void addCauseData(Schema schema) {
+        Entity cause = schema.addEntity("Cause");
     }
 
 }

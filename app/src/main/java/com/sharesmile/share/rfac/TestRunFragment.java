@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.RunPathFragment;
@@ -110,7 +109,8 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
-    public void showUpdate(float speed, float distaneCovered) {
+    public void showUpdate(float speed, float distaneCovered, int elapsedTimeInSecs) {
+        super.showUpdate(speed, distaneCovered, elapsedTimeInSecs);
         Logger.d(TAG, "showUpdate: speed = " + speed + ", distanceCovered = " + distaneCovered);
         if (isRunActive()) {
             String distance = Math.round(distaneCovered) + " m";
@@ -121,7 +121,8 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
-    public void showSteps(int stepsSoFar) {
+    public void showSteps(int stepsSoFar, int elapsedTimeInSecs) {
+        super.showSteps(stepsSoFar, elapsedTimeInSecs);
         if (isRunActive()) {
             liveStepsView.setText(stepsSoFar + "");
         }
@@ -148,6 +149,25 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         runDataContainer.setVisibility(View.GONE);
         liveDataContainer.setVisibility(View.VISIBLE);
         startPauseResume.setText("PAUSE");
+        logsFile = null;
+        liveDistanceView.setText("0.00 m");
+        liveSpeedView.setText("0.0 km/hr");
+        if (!WorkoutService.isCurrentlyProcessingSteps()){
+            liveStepsView.setText("N.A.");
+        } else {
+            liveStepsView.setText("0");
+        }
+    }
+
+    @Override
+    protected void onContinuedRun(boolean isPaused) {
+        runDataContainer.setVisibility(View.GONE);
+        liveDataContainer.setVisibility(View.VISIBLE);
+        if(isPaused){
+            startPauseResume.setText("RESUME");
+        }else{
+            startPauseResume.setText("PAUSE");
+        }
         logsFile = null;
         liveDistanceView.setText("0.00 m");
         liveSpeedView.setText("0.0 km/hr");
@@ -237,7 +257,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         sb.append("\nVIGILANCE_START_THRESHOLD : " + (Config.VIGILANCE_START_THRESHOLD / 1000) + " secs");
         sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT * 3.6 + " km/hr");
-        sb.append("\nSTEPS_PER_SECOND_FACTOR : " + Config.STEPS_PER_SECOND_FACTOR);
+        sb.append("\nMIN_STEPS_PER_SECOND_FACTOR : " + Config.MIN_STEPS_PER_SECOND_FACTOR);
         sb.append("\nSMALLEST_DISPLACEMENT : " + Config.SMALLEST_DISPLACEMENT + " m");
         if (workoutData != null) {
             sb.append("\nWorkoutData:\n" + workoutData);

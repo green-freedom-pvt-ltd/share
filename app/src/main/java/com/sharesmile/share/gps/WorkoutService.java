@@ -227,6 +227,7 @@ public class WorkoutService extends Service implements
                 Constants.BROADCAST_WORKOUT_UPDATE_CODE);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
+        bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
     }
 
@@ -244,6 +245,7 @@ public class WorkoutService extends Service implements
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_STEPS_UPDATE_CODE);
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_STEPS, tracker.getTotalSteps());
+        bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
     }
 
@@ -272,7 +274,7 @@ public class WorkoutService extends Service implements
                 }else{
                     Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
                     //Toning down the steps per second factor
-                    Config.STEPS_PER_SECOND_FACTOR = Config.STEPS_PER_SECOND_FACTOR*0.6f;
+                    Config.MIN_STEPS_PER_SECOND_FACTOR = Config.MIN_STEPS_PER_SECOND_FACTOR *0.6f;
                     stepCounter = new GoogleFitStepCounter(this, this);
                 }
             }

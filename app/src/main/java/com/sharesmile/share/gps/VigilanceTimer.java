@@ -153,7 +153,7 @@ public class VigilanceTimer implements Runnable {
 		}else{
 			int totalSteps = workoutService.getTracker().getTotalSteps();
 			int stepsThisSession = totalSteps - stepsTillNow;
-			if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.STEPS_PER_SECOND_FACTOR){
+			if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.MIN_STEPS_PER_SECOND_FACTOR){
 				//time to pause workout
 				// Not enough steps since the beginning
 				Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");

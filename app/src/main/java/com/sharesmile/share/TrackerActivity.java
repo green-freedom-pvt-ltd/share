@@ -57,13 +57,13 @@ public class TrackerActivity extends BaseActivity {
     private WorkoutService locationService;
     private RunFragment runFragment;
     private boolean runInTestMode;
+    private boolean openHomeOnExit;
 
     private static final int HOME = 0;
     private static final int PROFILE = 1;
     private static final int FEEDBACK = 2;
     private static final int LOGOUT = 3;
 
-    public static final String RUN_IN_TEST_MODE = "run_in_test_mode";
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
     /**
@@ -79,12 +79,16 @@ public class TrackerActivity extends BaseActivity {
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
-        runInTestMode = getIntent().getBooleanExtra(RUN_IN_TEST_MODE, false);
+        runInTestMode = SharedPrefsManager.getInstance().getBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
         if (mCauseData != null) {
             SharedPrefsManager.getInstance().setString(Constants.PREF_CAUSE_DATA, new Gson().toJson(mCauseData));
         } else {
             mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA), CauseData.class);
+        }
+
+        if (isTaskRoot()){
+            openHomeOnExit = true;
         }
 
         loadInitialFragment();
@@ -149,7 +153,7 @@ public class TrackerActivity extends BaseActivity {
                     finish();
                 } else {
                     if (BuildConfig.DEBUG) {
-                        Toast.makeText(this, "Thankyou image URL is missing", Toast.LENGTH_LONG).show();
+                        Logger.d(TAG, "Thankyou image URL is missing");
                     }
                 }
                 break;
@@ -160,7 +164,10 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void exit() {
-
+        if (openHomeOnExit){
+            performOperation(START_MAIN_ACTIVITY, null);
+        }
+        finish();
     }
 
     @Override
@@ -281,6 +288,13 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
+    public int getElapsedTimeInSecs(){
+        if (isBoundToLocationService()) {
+            locationService.getTracker().getElapsedTimeInSecs();
+        }
+        return 0;
+    }
+
     private void unbindLocationService() {
         Logger.d(TAG, "unbindLocationService");
         unbindService(locationServiceConnection);
@@ -386,21 +400,20 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
-                        //TODO: Display Result on UI
                         runFragment.onWorkoutResult(result);
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
                         float currentSpeed = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_SPEED);
                         float currentTotalDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
-                        //TODO: Display Result on UI
-                        runFragment.showUpdate(currentSpeed, currentTotalDistanceCovered);
+                        int elapsedTimeInSecs = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
+                        runFragment.showUpdate(currentSpeed, currentTotalDistanceCovered, elapsedTimeInSecs);
                         break;
 
                     case Constants.BROADCAST_STEPS_UPDATE_CODE:
                         int totalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
-                        //TODO: Display Result on UI
-                        runFragment.showSteps(totalSteps);
+                        int elapsedTime = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
+                        runFragment.showSteps(totalSteps, elapsedTime);
                         break;
 
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:

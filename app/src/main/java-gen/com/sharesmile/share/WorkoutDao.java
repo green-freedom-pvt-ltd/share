@@ -25,13 +25,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Distance = new Property(1, float.class, "distance", false, "DISTANCE");
-        public final static Property ElapsedTime = new Property(2, float.class, "elapsedTime", false, "ELAPSED_TIME");
+        public final static Property ElapsedTime = new Property(2, String.class, "elapsedTime", false, "ELAPSED_TIME");
         public final static Property Steps = new Property(3, Integer.class, "steps", false, "STEPS");
         public final static Property RecordedTime = new Property(4, float.class, "recordedTime", false, "RECORDED_TIME");
         public final static Property AvgSpeed = new Property(5, float.class, "avgSpeed", false, "AVG_SPEED");
         public final static Property CauseBrief = new Property(6, String.class, "causeBrief", false, "CAUSE_BRIEF");
         public final static Property Date = new Property(7, java.util.Date.class, "date", false, "DATE");
-        public final static Property Is_sync = new Property(8, Boolean.class, "is_sync", false, "IS_SYNC");
+        public final static Property RunAmount = new Property(8, Float.class, "runAmount", false, "RUN_AMOUNT");
+        public final static Property Is_sync = new Property(9, Boolean.class, "is_sync", false, "IS_SYNC");
     };
 
 
@@ -49,13 +50,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"WORKOUT\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"DISTANCE\" REAL NOT NULL ," + // 1: distance
-                "\"ELAPSED_TIME\" REAL NOT NULL ," + // 2: elapsedTime
+                "\"ELAPSED_TIME\" TEXT NOT NULL ," + // 2: elapsedTime
                 "\"STEPS\" INTEGER," + // 3: steps
                 "\"RECORDED_TIME\" REAL NOT NULL ," + // 4: recordedTime
                 "\"AVG_SPEED\" REAL NOT NULL ," + // 5: avgSpeed
                 "\"CAUSE_BRIEF\" TEXT," + // 6: causeBrief
                 "\"DATE\" INTEGER," + // 7: date
-                "\"IS_SYNC\" INTEGER);"); // 8: is_sync
+                "\"RUN_AMOUNT\" REAL," + // 8: runAmount
+                "\"IS_SYNC\" INTEGER);"); // 9: is_sync
     }
 
     /** Drops the underlying database table. */
@@ -74,7 +76,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindDouble(2, entity.getDistance());
-        stmt.bindDouble(3, entity.getElapsedTime());
+        stmt.bindString(3, entity.getElapsedTime());
  
         Integer steps = entity.getSteps();
         if (steps != null) {
@@ -93,9 +95,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             stmt.bindLong(8, date.getTime());
         }
  
+        Float runAmount = entity.getRunAmount();
+        if (runAmount != null) {
+            stmt.bindDouble(9, runAmount);
+        }
+ 
         Boolean is_sync = entity.getIs_sync();
         if (is_sync != null) {
-            stmt.bindLong(9, is_sync ? 1L: 0L);
+            stmt.bindLong(10, is_sync ? 1L: 0L);
         }
     }
 
@@ -111,13 +118,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         Workout entity = new Workout( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getFloat(offset + 1), // distance
-            cursor.getFloat(offset + 2), // elapsedTime
+            cursor.getString(offset + 2), // elapsedTime
             cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // steps
             cursor.getFloat(offset + 4), // recordedTime
             cursor.getFloat(offset + 5), // avgSpeed
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // causeBrief
             cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // date
-            cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0 // is_sync
+            cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8), // runAmount
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0 // is_sync
         );
         return entity;
     }
@@ -127,13 +135,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
     public void readEntity(Cursor cursor, Workout entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDistance(cursor.getFloat(offset + 1));
-        entity.setElapsedTime(cursor.getFloat(offset + 2));
+        entity.setElapsedTime(cursor.getString(offset + 2));
         entity.setSteps(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
         entity.setRecordedTime(cursor.getFloat(offset + 4));
         entity.setAvgSpeed(cursor.getFloat(offset + 5));
         entity.setCauseBrief(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setDate(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
-        entity.setIs_sync(cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0);
+        entity.setRunAmount(cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8));
+        entity.setIs_sync(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
      }
     
     /** @inheritdoc */

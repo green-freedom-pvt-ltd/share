@@ -125,7 +125,7 @@
             android:layout_below="@+id/img_timer_icon"
             android:layout_centerHorizontal="true"
             android:paddingRight="15dp"
-            android:text="00:00:00"
+            android:text="00:00"
             android:textSize="30dp" />
 
     </RelativeLayout>

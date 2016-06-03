@@ -25,7 +25,7 @@ public class Config {
 
     public static long VIGILANCE_TIMER_INTERVAL = 20000; // in millisecs
 
-    public static float STEPS_PER_SECOND_FACTOR = 1f;
+    public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
 
     public static float SOURCE_ACCEPTABLE_ACCURACY = 60; // in m
 

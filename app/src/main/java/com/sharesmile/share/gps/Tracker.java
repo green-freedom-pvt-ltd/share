@@ -23,6 +23,7 @@ public interface Tracker {
 	void discardApprovalQueue();
 	long getBeginTimeStamp();
 	long getLastResumeTimeStamp();
+	int getElapsedTimeInSecs();
 	int getTotalSteps();
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();

@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,7 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
@@ -32,14 +30,10 @@ import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.views.MRTextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
@@ -194,11 +188,16 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-        String distanceCovered = String.format("%1$,.2f", (mWorkoutData.getDistance() / 1000));
-        mDistance.setText(distanceCovered + "km");
-        float rupees = mCauseData.getConversionRate() * mWorkoutData.getDistance();
-        mContributionAmount.setText(rupees + " Rs");
+        String distanceCovered = String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000));
+        String km = (mWorkoutData.getDistance() > 1000 ? " kms" : " km");
+        mDistance.setText(distanceCovered + km);
+        float rupees = mCauseData.getConversionRate() * Float.valueOf(distanceCovered);
+        String rupeesString = String.format("%1$,.1f", rupees);
+        if (rupees > (int) rupees) {
+            mContributionAmount.setText(rupeesString);
+        } else {
+            mContributionAmount.setText(String.valueOf((int) rupees));
+        }
         mTime.setText(getTimeInHHMMFormat((int) (mWorkoutData.getElapsedTime() * 1000)));
 
         initShareLayout();
@@ -287,7 +286,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     private void shareOnGooglePlus() {
         Intent shareIntent = new PlusShare.Builder(getActivity())
                 .setType("text/plain")
-                .setText(mCauseData.getCauseShareMessageTemplate())
+                .setText(getShareMsg())
                 .getIntent();
         startActivityForResult(shareIntent, REQUEST_SHARE);
     }
@@ -297,7 +296,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         try {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mCauseData.getCauseShareMessageTemplate());
+            sendIntent.putExtra(Intent.EXTRA_TEXT, getShareMsg());
             sendIntent.setType("text/plain");
             sendIntent.setPackage("com.whatsapp");
             startActivityForResult(sendIntent, REQUEST_SHARE);
@@ -310,7 +309,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     private void shareOnTwitter() {
 
         TweetComposer.Builder builder = new TweetComposer.Builder(getActivity())
-                .text(mCauseData.getCauseShareMessageTemplate());
+                .text(getShareMsg());
         startActivityForResult(builder.createIntent(), REQUEST_SHARE);
         //  builder.show();
     }
@@ -319,19 +318,20 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentDescription(mCauseData.getCauseShareMessageTemplate())
+                .setContentDescription(getShareMsg())
                 .build();
+
 
         ShareDialog shareDialog = new ShareDialog(this);
         shareDialog.registerCallback(new CallbackManagerImpl(), new FacebookCallback<Sharer.Result>() {
             @Override
             public void onSuccess(Sharer.Result result) {
-
+                //Toast.makeText(getActivity(),"Success",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancel() {
-
+                //  Toast.makeText(getActivity(),"Failed",Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -340,6 +340,35 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             }
         }, REQUEST_SHARE);
         shareDialog.show(content);
+    }
+
+    private String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
+    private String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
+    private String SHARE_PLACEHOLDER_SPONSOR = "<sponsor_company>";
+    private String SHARE_PLACEHOLDER_PARTNER = "<partner_ngo>";
+
+    /*
+    *
+    * "Ran <distance> km. and raised Rs. <amount> for <partner_ngo> on ImpactRun. Kudos <sponsor_company> for sponsoring my run. #impactrun #nowisthetime"*/
+    private String getShareMsg() {
+        String msg = mCauseData.getCauseShareMessageTemplate();
+
+        if (msg.contains(SHARE_PLACEHOLDER_DISTANCE)) {
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE, String.valueOf(mWorkoutData.getDistance() / 1000));
+        }
+
+        if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000) * mCauseData.getConversionRate()));
+        }
+
+        if (msg.contains(SHARE_PLACEHOLDER_SPONSOR)) {
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_SPONSOR, mCauseData.getSponsor().getName());
+        }
+
+        if (msg.contains(SHARE_PLACEHOLDER_PARTNER)) {
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_PARTNER, mCauseData.getExecutor().getPartnerNgo());
+        }
+        return msg;
     }
 
     private String getTimeInHHMMFormat(long millis) {
@@ -368,6 +397,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SHARE) {
             showThankYouFragment();
+            //      Toast.makeText(getContext(),resultCode== Activity.RESULT_OK?"success":"false",Toast.LENGTH_SHORT).show();
         } else {
             mLoginHandler.onActivityResult(requestCode, resultCode, data);
         }

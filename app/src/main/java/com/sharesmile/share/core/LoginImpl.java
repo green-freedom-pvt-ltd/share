@@ -21,7 +21,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
@@ -50,6 +52,8 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import retrofit.http.HEAD;
 
 /**
  * Created by Shine on 19/05/16.
@@ -83,8 +87,9 @@ public class LoginImpl {
     }
 
     private void initializeGoogleLogin() {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
+                .requestEmail().requestIdToken(getContext().getString(R.string.server_client_id))
+                .requestServerAuthCode(getContext().getString(R.string.server_client_id))
                 .build();
 
         Context context = getContext();
@@ -307,8 +312,8 @@ public class LoginImpl {
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken());
-            verifyUserDetails(acct.getEmail(), acct.getIdToken(), false);
+            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  "+acct.getServerAuthCode());
+            verifyUserDetails(acct.getEmail(), acct.getServerAuthCode(), false);
         } else {
             Logger.d("google", "failed");
             MainApplication.getInstance().showToast(R.string.login_error);

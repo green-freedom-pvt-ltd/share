@@ -33,6 +33,7 @@
         android:layout_marginLeft="16dp"
         android:gravity="center_vertical"
         android:text="Terms Of Services"
+        android:visibility="gone"
         android:textColor="@color/MontserratRegular"
         android:textSize="16sp" />
 

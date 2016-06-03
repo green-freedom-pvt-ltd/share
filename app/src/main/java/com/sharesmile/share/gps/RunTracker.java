@@ -1,6 +1,5 @@
 package com.sharesmile.share.gps;
 
-import android.hardware.SensorEvent;
 import android.location.Location;
 import android.text.TextUtils;
 
@@ -131,6 +130,10 @@ public class RunTracker implements Tracker {
         return dataStore.getLastResumeTimeStamp();
     }
 
+    @Override
+    public int getElapsedTimeInSecs() {
+        return (int)dataStore.getElapsedTime();
+    }
 
     @Override
     public float getDistanceCoveredSinceLastResume() {

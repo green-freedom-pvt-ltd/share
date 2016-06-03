@@ -59,7 +59,11 @@ public class Constants {
 
     public static final String KEY_WORKOUT_RESULT = "key_wourkout_result";
 
-    public static final String KEY_WORKOUT_UPDATE_SPEED = "key_wourkout_update";
+    public static final String KEY_WORKOUT_TEST_MODE_ON = "key_workout_test_mode_on";
+
+    public static final String KEY_WORKOUT_UPDATE_SPEED = "key_wourkout_update_speed";
+
+    public static final String KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS = "key_wourkout_update_elapsed_time_in_secs";
 
     public static final String KEY_WORKOUT_UPDATE_STEPS = "key_wourkout_steps";
 
