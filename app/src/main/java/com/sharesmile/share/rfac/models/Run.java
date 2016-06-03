@@ -23,6 +23,12 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("distance")
     float distance;
 
+    @SerializedName("run_amount")
+    float runAmount;
+
+    @SerializedName("run_duration")
+    String runDuration;
+
     @SerializedName("avg_speed")
     float avgSpeed;
 
@@ -68,5 +74,21 @@ public class Run implements UnObfuscable, Serializable {
 
     public Date getData() {
         return DateUtil.getDefaultFormattedDate(getStartTime());
+    }
+
+    public float getRunAmount() {
+        return runAmount;
+    }
+
+    public void setRunAmount(float runAmount) {
+        this.runAmount = runAmount;
+    }
+
+    public String getRunDuration() {
+        return runDuration;
+    }
+
+    public void setRunDuration(String runDuration) {
+        this.runDuration = runDuration;
     }
 }

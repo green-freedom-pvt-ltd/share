@@ -40,4 +40,8 @@ public class SchemaGenerator {
         user.addStringProperty("profileImageUrl");
     }
 
+    private static void addCauseData(Schema schema) {
+        Entity cause = schema.addEntity("Cause");
+    }
+
 }
