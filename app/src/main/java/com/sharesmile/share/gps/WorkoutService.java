@@ -211,7 +211,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public synchronized void onLocationChanged(Location location) {
-        if (location != null) {
+        if (tracker != null && location != null) {
             currentLocation = location;
             tracker.feedLocation(location);
         }
