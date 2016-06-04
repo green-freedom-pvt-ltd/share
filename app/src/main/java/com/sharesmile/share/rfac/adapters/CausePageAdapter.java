@@ -44,6 +44,7 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
 
 
     public void addData(CauseList causesList) {
+        mData.clear();
         mData.addAll(causesList.getCauses());
         notifyDataSetChanged();
     }

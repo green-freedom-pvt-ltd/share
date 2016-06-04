@@ -1,10 +1,14 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharesmile.share.*;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.sharesmile.share.Cause;
 
 /**
  * Created by Shine on 01/05/16..
@@ -14,7 +18,7 @@ public class CauseData implements UnObfuscable, Serializable {
     private static final String TAG = "Cause";
 
     @SerializedName("pk")
-    private int id;
+    private long id;
     @SerializedName("cause_title")
     private String title;
 
@@ -50,7 +54,7 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("min_distance")
     private int minDistance;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -116,7 +120,7 @@ public class CauseData implements UnObfuscable, Serializable {
         this.causeShareMessageTemplate = causeShareMessageTemplate;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -166,5 +170,51 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setMinDistance(int minDistance) {
         this.minDistance = minDistance;
+    }
+
+    public Cause getCauseDbObject() {
+
+        Cause cause = new Cause((long) getId(), getTitle(), getCauseDescription(), getConversionRate(), getMinDistance(), getCategory(), getDetailText(),
+                getImageUrl(), getCauseThankYouImage(), getCauseShareMessageTemplate(),
+                isActive(), getSponsor().getId(), getSponsor().getName(), getSponsor().getSponsorNgo(), getSponsor().getLogoUrl(), getExecutor().getId(), getExecutor().getPartnerCompany(),
+                getExecutor().getPartnerNgo(), getExecutor().getType());
+        return cause;
+
+    }
+
+    public CauseData(Cause cause) {
+
+        setId(cause.getId());
+        setTitle(cause.getCauseTitle());
+        setCauseDescription(cause.getCauseDescription());
+        setConversionRate(cause.getConversionRate());
+        setMinDistance(cause.getMinDistance());
+        setCategory(cause.getCauseCategory());
+        setDetailText(cause.getCauseBrief());
+        setImageUrl(cause.getCauseImage());
+        setCauseThankYouImage(cause.getCauseThankyouImage());
+        setCauseShareMessageTemplate(cause.getShare_template());
+        setActive(cause.getIsActive());
+
+        //Sponsors
+        Sponsor sponsor = new Sponsor();
+        sponsor.setId(cause.getSponsorId());
+        sponsor.setName(cause.getSponsorCompany());
+        sponsor.setSponsorNgo(cause.getSponsorNgo());
+        sponsor.setLogoUrl(cause.getSponsorLogo());
+        List<Sponsor> sponsors = new ArrayList<>();
+        sponsors.add(sponsor);
+        setSponsors(sponsors);
+
+        //Partners
+        Partner partner = new Partner();
+        partner.setId(cause.getPartnerId());
+        partner.setType(cause.getPartnerType());
+        partner.setPartnerNgo(cause.getPartnerNgo());
+        partner.setPartnerCompany(cause.getPartnerCompany());
+
+        List<Partner> partners = new ArrayList<>();
+        partners.add(partner);
+        setExecutors(partners);
     }
 }

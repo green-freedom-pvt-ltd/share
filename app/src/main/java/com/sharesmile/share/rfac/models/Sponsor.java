@@ -23,6 +23,9 @@ public class Sponsor implements UnObfuscable, Serializable {
 
     @SerializedName("sponsor_logo")
     private String logoUrl;
+    @SerializedName("sponsor_ngo")
+    private String sponsorNgo;
+
 
     public String getType() {
         return type;
@@ -38,5 +41,29 @@ public class Sponsor implements UnObfuscable, Serializable {
 
     public String getLogoUrl() {
         return logoUrl;
+    }
+
+    public String getSponsorNgo() {
+        return sponsorNgo;
+    }
+
+    public void setSponsorNgo(String sponsorNgo) {
+        this.sponsorNgo = sponsorNgo;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 }

@@ -105,4 +105,7 @@ dependencies {
     compile 'de.greenrobot:greendao:2.1.0'
 
     compile 'com.google.android.gms:play-services-appindexing:8.3.0'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
+
 }

@@ -2,6 +2,7 @@ package com.sharesmile.share.core;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
 import com.sharesmile.share.MainApplication;
@@ -23,6 +24,7 @@ public class DbWrapper {
     private DaoSession mDaoSession;
     private WorkoutDao mWorkoutDao;
     private UserDao mUserdao;
+    private CauseDao mCauseDao;
 
     public DbWrapper(MainApplication app) {
         application = app;
@@ -42,6 +44,7 @@ public class DbWrapper {
         mDaoSession = daoMaster.newSession();
         mWorkoutDao = mDaoSession.getWorkoutDao();
         mUserdao = mDaoSession.getUserDao();
+        mCauseDao = mDaoSession.getCauseDao();
 
     }
 
@@ -60,6 +63,10 @@ public class DbWrapper {
 
     public UserDao getUserdao() {
         return mUserdao;
+    }
+
+    public CauseDao getCauseDao() {
+        return mCauseDao;
     }
 
     public void clearAll() {

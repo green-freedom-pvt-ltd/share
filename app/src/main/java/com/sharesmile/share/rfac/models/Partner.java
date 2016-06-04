@@ -52,4 +52,8 @@ public class Partner implements UnObfuscable,Serializable {
     public void setType(String type) {
         this.type = type;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
