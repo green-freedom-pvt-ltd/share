@@ -354,7 +354,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         String msg = mCauseData.getCauseShareMessageTemplate();
 
         if (msg.contains(SHARE_PLACEHOLDER_DISTANCE)) {
-            msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE, String.valueOf(mWorkoutData.getDistance() / 1000));
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE, String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000)));
         }
 
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {

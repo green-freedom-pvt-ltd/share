@@ -135,7 +135,6 @@ public class MainApplication extends Application {
         super.onCreate();
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
-        //Fabric.with(this, new Crashlytics());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
@@ -157,6 +156,10 @@ public class MainApplication extends Application {
             mUserId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
         }
         return mUserId;
+    }
+
+    public static boolean isLogin() {
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
     }
 
 }

@@ -19,11 +19,11 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.rfac.fragments.AboutUsFragment;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
+import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
@@ -183,7 +183,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
         if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
-            replaceFragment(new AboutUsFragment(), true);
+            replaceFragment(WebViewFragment.getInstance(WebViewFragment.DISPLAY_ABOUT_US), true);
         }
 
         if (menuItem.getItemId() == R.id.nav_item_feedback) {
@@ -200,6 +200,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra(LoginActivity.BUNDLE_FROM_MAINACTIVITY, true);
             startActivityForResult(intent, REQUEST_CODE_LOGIN);
+        } else if (menuItem.getItemId() == R.id.nav_item_faq) {
+            replaceFragment(WebViewFragment.getInstance(WebViewFragment.DISPLAY_FAQ), true);
         }
 
 

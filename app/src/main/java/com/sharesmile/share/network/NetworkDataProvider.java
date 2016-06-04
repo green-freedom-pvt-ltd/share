@@ -172,12 +172,12 @@ public class NetworkDataProvider {
     }
 
     public static <T> T doPutCall(String url, JSONObject jsonData,
-                                   Class<T> responseClass) throws NetworkException {
+                                  Class<T> responseClass) throws NetworkException {
         return doPutCall(url, convertJSONdataToBody(jsonData), responseClass);
     }
 
     private static <T> T doPutCall(String url, RequestBody body,
-                                    Class<T> responseClass) throws NetworkException {
+                                   Class<T> responseClass) throws NetworkException {
         if (TextUtils.isEmpty(url)) {
             throw new IllegalArgumentException("Empty URL " + url);
         }
@@ -224,7 +224,9 @@ public class NetworkDataProvider {
             throw new IllegalArgumentException("Empty URL " + url);
         }
         Request.Builder requestBuilder = new Request.Builder().url(url);
-        requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for GET request: " + url);
@@ -238,8 +240,11 @@ public class NetworkDataProvider {
     private static Response getResponseForPostCall(String url, RequestBody body)
             throws NetworkException {
         Request.Builder builder = new Request.Builder().url(url)
-                .addHeader(CONTENT_TYPE_TAG, HTTP_HEADER_JSON).addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken())
+                .addHeader(CONTENT_TYPE_TAG, HTTP_HEADER_JSON)
                 .post(body);
+        if (MainApplication.isLogin()) {
+            builder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
         Request request = builder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for POST request: " + url + " Header " + request.headers().toString());
@@ -253,8 +258,11 @@ public class NetworkDataProvider {
     private static Response getResponseForPutCall(String url, RequestBody body)
             throws NetworkException {
         Request.Builder builder = new Request.Builder().url(url)
-                .addHeader(CONTENT_TYPE_TAG, HTTP_HEADER_JSON).addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken())
+                .addHeader(CONTENT_TYPE_TAG, HTTP_HEADER_JSON)
                 .put(body);
+        if (MainApplication.isLogin()) {
+            builder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
         Request request = builder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for Put request: " + url + " Header " + request.headers().toString());
@@ -269,9 +277,12 @@ public class NetworkDataProvider {
                                                                 NetworkAsyncCallback<R> cb) {
         RequestBody body = RequestBody.create(JSON, requestJSON.toString());
         Request.Builder requestBuilder = new Request.Builder().url(url)
-                .header(CONTENT_TYPE_TAG, HTTP_HEADER_JSON).addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken())
+                .header(CONTENT_TYPE_TAG, HTTP_HEADER_JSON)
                 .post(body);
 
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         call.enqueue(cb);

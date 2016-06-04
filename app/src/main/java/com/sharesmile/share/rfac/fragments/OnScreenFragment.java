@@ -15,25 +15,30 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.sharesmile.share.Cause;
+import com.sharesmile.share.CauseDao;
+import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
-import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
-import com.sharesmile.share.rfac.models.CausesPage;
+import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MRButton;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,8 +63,20 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         mAdapter = new CausePageAdapter(getChildFragmentManager());
+        SyncTaskManger.startCauseSync(getActivity());
+
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Logger.d(TAG, "onstart");
+
+    }
+
 
     @Nullable
     @Override
@@ -74,46 +91,30 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         viewPager.setPadding(getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_left), 0, getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_right), 0);
         viewPager.setOffscreenPageLimit(5);
         viewPager.setAdapter(mAdapter);
-        if (mAdapter.getCount() <= 0) {
-            fetchPageData();
-        }
+        showProgressDialog();
         return view;
 
     }
 
-    private void fetchPageData() {
-        Logger.d(TAG, "Fetching Causes Data");
-        showProgressDialog();
-        NetworkDataProvider.doGetCallAsync(Urls.getCauseListUrl(), new NetworkAsyncCallback<CauseList>() {
-            @Override
-            public void onNetworkFailure(NetworkException ne) {
-                Logger.e(TAG, "onNetworkFailure: Can't fetch events page data: " + ne.getMessageFromServer(), ne);
-                MainApplication.showToast("Unable to fetch events");
-                hideProgressDialog();
-                mRunButton.setVisibility(View.GONE);
-                Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        fetchPageData();
-                    }
-                }).show();
-            }
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (mAdapter.getCount() <= 0) {
+            fetchPageData();
+        } else {
+            hideProgressDialog();
+        }
+    }
 
-            @Override
-            public void onNetworkSuccess(CauseList causesList) {
-                Logger.d(TAG, "onNetworkSuccess");
-                List<CauseData> causes = new ArrayList<CauseData>();
-                for (CauseData causeData : causesList.getCauses()) {
-                    if (causeData.isActive()) {
-                        causes.add(causeData);
-                    }
-                }
-                causesList.setCauses(causes);
-                AddCauseList(causesList);
-                hideProgressDialog();
-                mRunButton.setVisibility(View.VISIBLE);
-            }
-        });
+    @Override
+    public void onStop() {
+        //  EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    private void fetchPageData() {
+        showProgressDialog();
+        EventBus.getDefault().post(new DBEvent.CauseFetchDataFromDb());
     }
 
     private void AddCauseList(CauseList causesList) {
@@ -141,4 +142,64 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
+        List<CauseData> causes = new ArrayList<CauseData>();
+        CauseList causesList = causeDataUpdated.getCauseList();
+        for (CauseData causeData : causesList.getCauses()) {
+            if (causeData.isActive()) {
+                causes.add(causeData);
+            }
+        }
+        setCausedata(causesList);
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(DBEvent.CauseFetchDataFromDb causeFetchDataFromDb) {
+        Logger.d(TAG, "causeFetchDataFromDb");
+        CauseDao causeDao = MainApplication.getInstance().getDbWrapper().getCauseDao();
+        List<Cause> causes = causeDao.queryBuilder().where(CauseDao.Properties.IsActive.eq(true)).list();
+        List<CauseData> causeDataList = new ArrayList<>();
+        for (Cause cause : causes) {
+            causeDataList.add(new CauseData(cause));
+        }
+        EventBus.getDefault().post(causeDataList);
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(List<CauseData> causeDataList) {
+        Logger.d(TAG, "causes");
+        CauseList causeList = new CauseList();
+        causeList.setCauses(causeDataList);
+        setCausedata(causeList);
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+
+    }
+
+    public void setCausedata(CauseList causeList) {
+        AddCauseList(causeList);
+        hideProgressDialog();
+        mRunButton.setVisibility(View.VISIBLE);
+        if (mAdapter.getCount() <= 0) {
+            mRunButton.setVisibility(View.GONE);
+            if (!NetworkUtils.isNetworkConnected(getContext())) {
+
+                Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SyncTaskManger.startCauseSync(getActivity());
+                        showProgressDialog();
+                    }
+                }).show();
+            } else {
+                showProgressDialog();
+            }
+        }
+    }
 }
