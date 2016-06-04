@@ -12,6 +12,8 @@ public class Urls {
 
     private static final String LOGIN_URL = "/api/users/";
     private static final String FEEDBACK_URL = "/api/userFeedback/";
+    private static final String FAQ_URL = "http://impactrun.com/#/faq";
+    private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -41,5 +43,13 @@ public class Urls {
     public static String getUserUrl(int user_id) {
         String url = getBaseUrl() + LOGIN_URL + user_id + "/";
         return url;
+    }
+
+    public static String getFaqUrl() {
+        return FAQ_URL;
+    }
+
+    public static String getAboutUsUrl() {
+        return ABOUT_US_URL;
     }
 }

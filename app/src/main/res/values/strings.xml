@@ -110,4 +110,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="dialog_msg_min_distance">You need to run a minimum of %1$sm to convert the distance into impact.</string>
     <string name="dialog_positive_button_min_distance">CONTINUE RUN</string>
     <string name="dialog_negative_button_min_distance">END RUN</string>
+    <string name="title_about_us">About us</string>
+    <string name="title_faq">Faq</string>
 </resources>

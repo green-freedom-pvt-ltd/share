@@ -158,5 +158,9 @@ public class MainApplication extends Application {
         return mUserId;
     }
 
+    public static boolean isLogin() {
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
+    }
+
 }
 
