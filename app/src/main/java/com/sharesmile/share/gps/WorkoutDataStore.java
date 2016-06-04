@@ -22,6 +22,8 @@ public interface WorkoutDataStore {
 
 	long getLastResumeTimeStamp();
 
+	float getElapsedTime();
+
 	boolean coldStartAfterResume();
 
 	void workoutPause();

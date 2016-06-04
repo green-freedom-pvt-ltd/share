@@ -5,7 +5,7 @@ package com.sharesmile.share.core;
  */
 public interface IFragmentController {
 
-    static final String TAG = "IFragmentController";
+    String TAG = "IFragmentController";
 
     int END_RUN_START_COUNTDOWN = 100;
 
@@ -13,7 +13,9 @@ public interface IFragmentController {
 
     int START_RUN_TEST = 102;
 
-    int SAY_THANK_YOU = 102;
+    int SAY_THANK_YOU = 103;
+
+    int START_MAIN_ACTIVITY = 104;
 
     void addFragment(BaseFragment fragment, boolean addToBackStack);
 

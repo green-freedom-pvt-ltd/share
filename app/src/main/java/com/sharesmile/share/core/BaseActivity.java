@@ -17,8 +17,10 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 /**
  * Created by ankitmaheshwari1 on 29/01/16.
@@ -101,11 +103,16 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 if (input instanceof CauseData) {
                     Intent intent = new Intent(this, TrackerActivity.class);
                     intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, (CauseData) input);
-                    intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, true);
+                    SharedPrefsManager.getInstance().setBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON, true);
                     startActivity(intent);
                 } else {
                     throw new IllegalArgumentException();
                 }
+                break;
+            case START_MAIN_ACTIVITY:
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
                 break;
         }
     }
@@ -176,7 +183,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     private void showTrackingActivity() {
         Intent intent = new Intent(this, TrackerActivity.class);
         intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, mCauseData);
-        intent.putExtra(TrackerActivity.RUN_IN_TEST_MODE, false);
         startActivity(intent);
     }
 

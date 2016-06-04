@@ -28,6 +28,17 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		points = new ArrayList<>();
 	}
 
+	private WorkoutBatchImpl(WorkoutBatchImpl source){
+		distance = source.distance;
+		startTimeStamp = source.startTimeStamp;
+		isRunning = source.isRunning;
+		elapsedTime = source.elapsedTime;
+		points = new ArrayList<>();
+		for (LatLng latLong : points){
+			points.add(new LatLng(latLong.latitude, latLong.longitude));
+		}
+	}
+
 	@Override
 	public void addRecord(DistRecord record) {
 		addDistance(record.getDist());
@@ -76,6 +87,11 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		setElapsedTime();
 		isRunning = false;
 		return this;
+	}
+
+	@Override
+	public WorkoutBatch copy() {
+		return new WorkoutBatchImpl(this);
 	}
 
 	@Override

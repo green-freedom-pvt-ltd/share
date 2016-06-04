@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 ;
@@ -24,6 +26,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     private static final String TAG = "RunFragment";
     public static final long TIMER_TICK = 1000; // in millis
 
+    public static final String SECS_ELAPSED_ON_PAUSE = "secs_elapsed_on_pause";
+
 
     TrackerActivity myActivity;
     private View baseView;
@@ -31,11 +35,9 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     WorkoutData workoutData;
 
     boolean isRunActive;
-    boolean isRunnning;
-    private long runStartTime;
     Handler handler = new Handler();
 
-    private int secsSinceRunBegan = 0;
+    private int secsSinceRunBegan = -1;
 
     public RunFragment() {
         // Required empty public constructor
@@ -75,9 +77,22 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public abstract void onWorkoutResult(WorkoutData data);
 
-    public abstract void showUpdate(float speed, float distanceCovered);
+    public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs){
+        if (secsSinceRunBegan == -1){
+            startTimer(elapsedTimeInSecs);
+        }
+    }
 
-    public abstract void showSteps(int stepsSoFar);
+    public void showSteps(int stepsSoFar, int elapsedTimeInSecs ){
+        if (secsSinceRunBegan == -1){
+            startTimer(elapsedTimeInSecs);
+        }
+    }
+
+    private void startTimer(int initialSecs){
+        secsSinceRunBegan = initialSecs;
+        handler.postDelayed(timer, TIMER_TICK);
+    }
 
     protected abstract void onEndRun();
 
@@ -86,6 +101,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     protected abstract void onResumeRun();
 
     protected abstract void onBeginRun();
+
+    protected abstract void onContinuedRun(boolean isPaused);
 
     public abstract void showErrorMessage(String text);
 
@@ -96,8 +113,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
             myActivity.endLocationTracking();
         }
         setIsRunActive(false);
-        isRunnning = false;
-        runStartTime = 0;
+        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
+        SharedPrefsManager.getInstance().setBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON, false);
         handler.removeCallbacks(timer);
         onEndRun();
     }
@@ -105,8 +122,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public void pauseRun(boolean userPaused) {
         Logger.d(TAG, "pauseRun");
-        isRunnning = false;
         handler.removeCallbacks(timer);
+        SharedPrefsManager.getInstance().setInt(SECS_ELAPSED_ON_PAUSE, secsSinceRunBegan);
         if (userPaused) {
             myActivity.pauseWorkout();
         }
@@ -116,9 +133,9 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     public void resumeRun() {
         Logger.d(TAG, "resumeRun");
         // Resume will always be done by the user
-        isRunnning = true;
         myActivity.resumeWorkout();
-        handler.postDelayed(timer, TIMER_TICK);
+        startTimer(SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE));
+        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
         onResumeRun();
     }
 
@@ -135,20 +152,30 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         }
     }
 
+    protected void continuedRun(){
+        Logger.d(TAG, "continuedRun");
+        myActivity.beginLocationTracking();
+        setIsRunActive(true);
+        workoutData = null;
+        if (!isRunning()){
+            updateTimeView(Utils.secondsToString(SharedPrefsManager
+                    .getInstance().getInt(SECS_ELAPSED_ON_PAUSE)));
+        }
+        onContinuedRun(!isRunning());
+    }
+
     protected void beginRun() {
         Logger.d(TAG, "beginRun");
         myActivity.beginLocationTracking();
         setIsRunActive(true);
-        isRunnning = true;
+        startTimer(0);
+        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
         workoutData = null;
-        runStartTime = System.currentTimeMillis();
-        secsSinceRunBegan = 0;
-        handler.postDelayed(timer, TIMER_TICK);
         onBeginRun();
     }
 
     public boolean isRunning() {
-        return isRunnning;
+        return isRunActive() && !SharedPrefsManager.getInstance().containsKey(SECS_ELAPSED_ON_PAUSE);
     }
 
     private Runnable timer = new Runnable() {

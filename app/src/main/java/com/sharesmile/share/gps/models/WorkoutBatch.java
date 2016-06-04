@@ -55,4 +55,9 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	 *completes this batch and returns this after whatever post processing is required
 	 */
 	WorkoutBatch end();
+
+	/**
+	 * Creates a Deep copy of this batch
+	 */
+	WorkoutBatch copy();
 }

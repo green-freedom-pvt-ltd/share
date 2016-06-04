@@ -2,7 +2,6 @@ package com.sharesmile.share.rfac;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +22,6 @@ import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -52,6 +50,9 @@ public class RealRunFragment extends RunFragment {
     ImageView mSponsorLogo;
     private CauseData mCauseData;
     private float mDistanceCovered;
+
+    public static final String RUPEES_IMPACT_ON_PAUSE = "rupees_impact_on_pause";
+    public static final String DISTANCE_COVERED_ON_PAUSE = "distance_covered_on_pause";
 
     public static RealRunFragment newInstance(CauseData causeData) {
         RealRunFragment fragment = new RealRunFragment();
@@ -88,8 +89,10 @@ public class RealRunFragment extends RunFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Will begin workout if not already active
-        if (!isRunActive()) {
+        if (!myActivity.isWorkoutActive()) {
             beginRun();
+        }else{
+            continuedRun();
         }
     }
 
@@ -108,7 +111,7 @@ public class RealRunFragment extends RunFragment {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
             if (mCauseData.getMinDistance() > mDistanceCovered) {
-                getActivity().finish();
+                myActivity.exit();
                 return;
             }
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
@@ -139,8 +142,8 @@ public class RealRunFragment extends RunFragment {
     }
 
     @Override
-    public void showUpdate(float speed, float distanceCovered) {
-
+    public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
+        super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
         mDistanceCovered = distanceCovered;
         String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
         distance.setText(distDecimal);
@@ -156,12 +159,13 @@ public class RealRunFragment extends RunFragment {
     }
 
     @Override
-    public void showSteps(int stepsSoFar) {
-        // Nothing to do here
+    public void showSteps(int stepsSoFar, int elapsedTimeInSecs) {
+        super.showSteps(stepsSoFar, elapsedTimeInSecs);
     }
 
     @Override
     protected void onEndRun() {
+        clearState();
         // Will wait for workout result broadcast
     }
 
@@ -169,18 +173,44 @@ public class RealRunFragment extends RunFragment {
     protected void onPauseRun() {
         pauseButton.setText(R.string.resume);
         runProgressBar.setVisibility(View.INVISIBLE);
+        persistStateOnPause();
+    }
+
+    private void persistStateOnPause(){
+        SharedPrefsManager.getInstance().setString(DISTANCE_COVERED_ON_PAUSE, distance.getText().toString());
+        SharedPrefsManager.getInstance().setString(RUPEES_IMPACT_ON_PAUSE, impact.getText().toString());
+    }
+
+    private void clearState(){
+        SharedPrefsManager.getInstance().removeKey(DISTANCE_COVERED_ON_PAUSE);
+        SharedPrefsManager.getInstance().removeKey(RUPEES_IMPACT_ON_PAUSE);
     }
 
     @Override
     protected void onResumeRun() {
         pauseButton.setText(R.string.pause);
         runProgressBar.setVisibility(View.VISIBLE);
+        clearState();
     }
 
     @Override
     protected void onBeginRun() {
         impact.setText("0");
         distance.setText("0.0");
+        clearState();
+    }
+
+    @Override
+    protected void onContinuedRun(boolean isPaused) {
+        if (!isRunning()){
+            pauseButton.setText(R.string.resume);
+            runProgressBar.setVisibility(View.INVISIBLE);
+            impact.setText(SharedPrefsManager.getInstance().getString(RUPEES_IMPACT_ON_PAUSE));
+            distance.setText(SharedPrefsManager.getInstance().getString(DISTANCE_COVERED_ON_PAUSE));
+        }else{
+            impact.setText("0");
+            distance.setText("0.0");
+        }
     }
 
     @Override

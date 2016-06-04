@@ -53,6 +53,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit.http.HEAD;
+
 /**
  * Created by Shine on 19/05/16.
  */
@@ -86,7 +88,8 @@ public class LoginImpl {
 
     private void initializeGoogleLogin() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
-                .requestEmail().requestIdToken(getContext().getString(R.string.google_server_client_id)).requestServerAuthCode(getContext().getString(R.string.google_server_client_id))
+                .requestEmail().requestIdToken(getContext().getString(R.string.server_client_id))
+                .requestServerAuthCode(getContext().getString(R.string.server_client_id))
                 .build();
 
         Context context = getContext();
@@ -176,9 +179,11 @@ public class LoginImpl {
 
             @Override
             public void onResponse(Response response) throws IOException {
-                JsonArray array = JsonHelper.StringToJsonArray(response.body().string());
+                String responseString = response.body().string();
+                Logger.d("LoginImpl", "onResponse: " + responseString);
+                JsonArray array = JsonHelper.StringToJsonArray(responseString);
                 final JsonObject element = array.get(0).getAsJsonObject();
-                Log.i("TAG", "response: " + element.toString());
+                Log.i("LoginImpl", "element: " + element.toString());
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                     @Override
                     public void run() {
