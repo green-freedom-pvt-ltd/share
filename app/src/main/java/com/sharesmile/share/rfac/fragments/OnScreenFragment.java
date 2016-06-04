@@ -23,11 +23,14 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.network.NetworkDataProvider;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MRButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -185,13 +188,18 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         mRunButton.setVisibility(View.VISIBLE);
         if (mAdapter.getCount() <= 0) {
             mRunButton.setVisibility(View.GONE);
-            Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SyncTaskManger.startCauseSync(getActivity());
-                    showProgressDialog();
-                }
-            }).show();
+            if (!NetworkUtils.isNetworkConnected(getContext())) {
+
+                Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SyncTaskManger.startCauseSync(getActivity());
+                        showProgressDialog();
+                    }
+                }).show();
+            } else {
+                showProgressDialog();
+            }
         }
     }
 }

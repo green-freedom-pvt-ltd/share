@@ -36,6 +36,7 @@
         <include
             android:id="@+id/btn_login_google"
             layout="@layout/login_button"
+            android:visibility="gone"
             android:layout_width="250dp"
             android:layout_height="53dp"
             android:layout_marginTop="15dp" />

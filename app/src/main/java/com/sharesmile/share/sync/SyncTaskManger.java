@@ -65,14 +65,19 @@ public class SyncTaskManger extends IntentService {
 
             CauseDao mCauseDao = MainApplication.getInstance().getDbWrapper().getCauseDao();
 
+            CauseList activeCauseList = new CauseList();
+            activeCauseList.setCauses(new ArrayList<CauseData>());
             for (CauseData data : causeList.getCauses()) {
                 Picasso.with(this).load(data.getCauseThankYouImage()).fetch();
                 Picasso.with(this).load(data.getSponsor().getLogoUrl()).fetch();
                 Picasso.with(this).load(data.getImageUrl()).fetch();
+                if (data.isActive()) {
+                    activeCauseList.getCauses().add(data);
+                }
                 mCauseDao.insertOrReplace(data.getCauseDbObject());
             }
 
-            EventBus.getDefault().post(new DBEvent.CauseDataUpdated(causeList));
+            EventBus.getDefault().post(new DBEvent.CauseDataUpdated(activeCauseList));
 
         } catch (NetworkException e) {
             e.printStackTrace();
