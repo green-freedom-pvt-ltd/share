@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/start_countdown_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,13 +34,13 @@
         android:layout_centerVertical="true"
         android:clipToPadding="false">
 
-        <ProgressBar
+   <!--     <ProgressBar
             android:id="@+id/run_progress_bar"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:indeterminate="true"
-            android:indeterminateDrawable="@drawable/progress" />
+            android:indeterminateDrawable="@drawable/progress" />-->
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -51,8 +52,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="132"
-                android:textSize="30dp" />
+                tools:text="10"
+                android:textSize="60dp" />
 
         </RelativeLayout>
     </FrameLayout>
