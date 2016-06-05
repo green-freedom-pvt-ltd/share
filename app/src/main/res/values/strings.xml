@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Run For A Cause</string>
+    <string name="app_name">ImpactRun</string>
     <string name="main_activity">MainActivity</string>
     <string name="news_activity">NewsActivity</string>
     <string name="events_activity">EventsActivity</string>
@@ -96,7 +96,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="profile">Profile</string>
     <string name="profile_msg">Let\'s begin your ImpactRuns</string>
     <string name="login">Login</string>
-    <string name="share_msg">Download impact run !</string>
+    <string name="share_msg">I use ImpactRun to track my daily runs and \'do good\' for society with every step. Check it out. It\'s amazing! https://goo.gl/9a0s34</string>
     <string name="logout">Logout</string>
     <string name="logout_msg">Are you sure you want to logout?</string>
     <string name="share_login_msg">Please login to \n unleash your impact</string>
@@ -104,7 +104,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="skip_login_title">Your run will be lost!</string>
     <string name="yes_sure">yes, I\'m sure</string>
     <string name="retry">Retry</string>
-    <string name="feedback_thanks">Thankyou for feedback.</string>
+    <string name="feedback_thanks">Thank you for the feedback. Your ideas helps us grow faster.</string>
     <string name="server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>
 
     <!--<string name="google_server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>-->
@@ -114,5 +114,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="dialog_positive_button_min_distance">CONTINUE RUN</string>
     <string name="dialog_negative_button_min_distance">END RUN</string>
     <string name="title_about_us">About us</string>
-    <string name="title_faq">Faq</string>
+    <string name="title_faq">FAQ</string>
+    <string name="km">km</string>
 </resources>

@@ -48,6 +48,9 @@ public class RealRunFragment extends RunFragment {
 
     @BindView(R.id.img_sponsor_logo)
     ImageView mSponsorLogo;
+
+    @BindView(R.id.timer_indicator)
+    TextView mTimerIndicator;
     private CauseData mCauseData;
     private float mDistanceCovered;
 
@@ -104,6 +107,9 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void updateTimeView(String newTime) {
         time.setText(newTime);
+        if(newTime.length()>5){
+            mTimerIndicator.setText("HR:MIN:SEC");
+        }
     }
 
     @Override

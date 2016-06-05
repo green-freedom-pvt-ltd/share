@@ -109,7 +109,7 @@
         android:layout_above="@+id/linear_btn_layout"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="10dp"
-        android:paddingRight="15dp">
+        android:layout_marginRight="30dp">
 
         <ImageView
             android:id="@+id/img_timer_icon"
@@ -124,9 +124,20 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_timer_icon"
             android:layout_centerHorizontal="true"
-            android:paddingRight="15dp"
             android:text="00:00"
             android:textSize="30dp" />
+
+        <com.sharesmile.share.views.MLTextView
+
+            android:id="@+id/timer_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/greyish_brown_two"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_run_progress_timer"
+            android:textAllCaps="true"
+            android:text="MIN:SEC"/>
 
     </RelativeLayout>
 
@@ -136,7 +147,7 @@
         android:layout_above="@+id/linear_btn_layout"
         android:layout_alignParentLeft="true"
         android:layout_marginBottom="10dp"
-        android:paddingLeft="15dp">
+        android:layout_marginLeft="30dp">
 
         <ImageView
             android:id="@+id/img_distance_icon"
@@ -151,9 +162,18 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_distance_icon"
             android:layout_centerHorizontal="true"
-            android:paddingLeft="15dp"
             android:text="1.27"
             android:textSize="30dp" />
+
+        <com.sharesmile.share.views.MLTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/greyish_brown_two"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_run_progress_distance"
+            android:textAllCaps="true"
+            android:text="@string/km"/>
     </RelativeLayout>
 
 </RelativeLayout>
