@@ -273,8 +273,6 @@ public class WorkoutService extends Service implements
                     stepCounter = new AndroidStepCounter(this, this);
                 }else{
                     Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
-                    //Toning down the steps per second factor
-                    Config.MIN_STEPS_PER_SECOND_FACTOR = Config.MIN_STEPS_PER_SECOND_FACTOR *0.6f;
                     stepCounter = new GoogleFitStepCounter(this, this);
                 }
             }

@@ -3,6 +3,7 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
+import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -67,7 +68,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             //Source point fetched for the batch
             int stepsRanWhileSearchingForSource = getTotalSteps() - numStepsWhenBatchBegan;
             float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
-                                            ? 1 : RunTracker.getAverageStrideLength();
+                                            ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
             float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;

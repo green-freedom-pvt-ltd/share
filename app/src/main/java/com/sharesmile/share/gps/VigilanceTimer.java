@@ -21,6 +21,7 @@ public class VigilanceTimer implements Runnable {
 	private int stepsTillNow = -1;
 	private DistRecord lastValidatedRecord;
 	private float lastValidatedDistance;
+	private int lastValidatedNumSteps;
 
 	public VigilanceTimer(IWorkoutService workoutService,
 						  ScheduledExecutorService executorService){
@@ -56,6 +57,7 @@ public class VigilanceTimer implements Runnable {
 		Logger.d(TAG, "resetCounters");
 		lastValidatedRecord = null;
 		lastValidatedDistance = 0;
+		lastValidatedNumSteps = 0;
 	}
 
 	private synchronized void onTimerTick(){
@@ -116,11 +118,13 @@ public class VigilanceTimer implements Runnable {
 			// Will wait for next tick
 			lastValidatedRecord = workoutService.getTracker().getLastRecord();
 			lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
+			lastValidatedNumSteps = workoutService.getTracker().getTotalSteps();
 		}else{
 			DistRecord latestRecord = workoutService.getTracker().getLastRecord();
 			if (!lastValidatedRecord.equals(latestRecord)){
 				// We have a new record!
 				float distanceInSession = workoutService.getTracker().getTotalDistanceCovered() - lastValidatedDistance;
+				int stepsInSession = workoutService.getTracker().getTotalSteps() - lastValidatedNumSteps;
 				float timeElapsedInSecs = (float)
 						((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
 				Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
@@ -131,12 +135,21 @@ public class VigilanceTimer implements Runnable {
 					float speedInSession = distanceInSession / timeElapsedInSecs;
 					if (speedInSession > Config.UPPER_SPEED_LIMIT){
 						// Running faster than Usain Bolt
-						Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will show Usain Bolt");
-						return true;
-					}else{
-						lastValidatedRecord = latestRecord;
-						lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
+						Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
+						float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
+								? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+						int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
+						Logger.d(TAG, "averageStrideLength = " + averageStrideLength + "meters hence "
+									+ " expectedNumOfSteps = " + expectedNumOfSteps);
+
+						if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
+							Logger.d(TAG, "Not enough steps, must be Usain Bolt");
+							return true;
+						}
 					}
+					lastValidatedRecord = latestRecord;
+					lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
+					lastValidatedNumSteps = workoutService.getTracker().getTotalSteps();
 				}
 			}
 		}
