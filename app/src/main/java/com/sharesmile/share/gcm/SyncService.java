@@ -136,8 +136,9 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
             jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
-            jsonObject.put("run_amount",workout.getRunAmount());
-            jsonObject.put("run_duration",workout.getElapsedTime());
+            jsonObject.put("run_amount", workout.getRunAmount());
+            jsonObject.put("run_duration", workout.getElapsedTime());
+            jsonObject.put("no_of_steps", workout.getSteps());
 
             jsonObject.put("avg_speed", workout.getAvgSpeed());
             //// TODO: 15/05/16 remove Peak speed
@@ -145,11 +146,10 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
-//            JSONObject jsonResponse = new JSONObject(response);
 
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             mWorkoutDao.delete(workout);
-            workout.setId(response.getId()/*jsonObject.getLong("run_id")*/);
+            workout.setId(response.getId());
             mWorkoutDao.insertOrReplace(workout);
             return true;
 
