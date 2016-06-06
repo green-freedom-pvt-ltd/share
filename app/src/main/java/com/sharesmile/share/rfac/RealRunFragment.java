@@ -14,12 +14,15 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -52,7 +55,6 @@ public class RealRunFragment extends RunFragment {
     @BindView(R.id.timer_indicator)
     TextView mTimerIndicator;
     private CauseData mCauseData;
-    private float mDistanceCovered;
 
     public static final String RUPEES_IMPACT_ON_PAUSE = "rupees_impact_on_pause";
     public static final String DISTANCE_COVERED_ON_PAUSE = "distance_covered_on_pause";
@@ -116,14 +118,16 @@ public class RealRunFragment extends RunFragment {
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
-            if (mCauseData.getMinDistance() > mDistanceCovered) {
+            if (mCauseData.getMinDistance() > myActivity.getTotalDistanceInMeters()) {
                 myActivity.exit();
                 return;
             }
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
             getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
+
             WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             Workout workout = new Workout();
+
             workout.setAvgSpeed(data.getAvgSpeed());
             workout.setDistance(data.getDistance() / 1000);
             workout.setElapsedTime(Utils.secondsToString((int)data.getElapsedTime()));
@@ -150,7 +154,6 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
-        mDistanceCovered = distanceCovered;
         String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
         distance.setText(distDecimal);
 
@@ -246,7 +249,7 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
-        if (mCauseData.getMinDistance() > mDistanceCovered) {
+        if (mCauseData.getMinDistance() > myActivity.getTotalDistanceInMeters()) {
             showMinDistanceDialog();
         } else {
             showRunEndDialog();

@@ -188,8 +188,10 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String distanceCovered = String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000));
-        String km = (mWorkoutData.getDistance() > 1000 ? " kms" : " km");
+        float distanceInMeters = mWorkoutData.getDistance();
+        float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
+        String distanceCovered = String.format("%1$,.1f", (distanceInMeters / 1000));
+        String km = (distanceInMeters > 1000 ? " kms" : " km");
         mDistance.setText(distanceCovered + km);
         float rupees = mCauseData.getConversionRate() * Float.valueOf(distanceCovered);
         String rupeesString = String.format("%1$,.1f", rupees);
@@ -198,7 +200,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         } else {
             mContributionAmount.setText(String.valueOf((int) rupees));
         }
-        mTime.setText(getTimeInHHMMFormat((int) (mWorkoutData.getElapsedTime() * 1000)));
+        mTime.setText(getTimeInHHMMFormat((int) (elapsedTimeInSecs * 1000)));
 
         initShareLayout();
     }

@@ -295,6 +295,20 @@ public class TrackerActivity extends BaseActivity {
         return 0;
     }
 
+    public float getTotalDistanceInMeters(){
+        if (isBoundToLocationService()) {
+            locationService.getTracker().getTotalDistanceCovered();
+        }
+        return 0;
+    }
+
+    public float getTotalSteps(){
+        if (isBoundToLocationService()) {
+            locationService.getTracker().getTotalSteps();
+        }
+        return 0;
+    }
+
     private void unbindLocationService() {
         Logger.d(TAG, "unbindLocationService");
         unbindService(locationServiceConnection);

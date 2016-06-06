@@ -32,7 +32,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	float getElapsedTime();
 
 	/**
-	 * @return Avg speed of the workout
+	 * @return Avg speed of the workout in meter/sec
 	 */
 	float getAvgSpeed();
 
