@@ -182,7 +182,7 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
-        mBirthday.setText(dayOfMonth + "-" + monthOfYear + "-" + year);
+        mBirthday.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
     }
 
     @Override
