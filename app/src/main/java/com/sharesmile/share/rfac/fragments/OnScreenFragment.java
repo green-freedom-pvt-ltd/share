@@ -31,6 +31,7 @@ import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
+import com.sharesmile.share.views.MLButton;
 import com.sharesmile.share.views.MRButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -50,7 +51,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     ViewPager viewPager;
 
     @BindView(R.id.btn_lets_run)
-    MRButton mRunButton;
+    MLButton mRunButton;
 
     @BindView(R.id.content_view)
     LinearLayout mContentView;
