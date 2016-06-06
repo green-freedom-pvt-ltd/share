@@ -4,13 +4,14 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <Button
+    <com.sharesmile.share.views.MLButton
         android:id="@+id/begin_run"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:background="@color/pale_magenta"
         android:text="Begin Run"
+        android:textAllCaps="true"
         android:textColor="@color/white" />
 
     <ScrollView
