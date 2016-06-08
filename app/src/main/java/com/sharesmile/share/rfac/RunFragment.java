@@ -114,7 +114,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         }
         setIsRunActive(false);
         SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
-        SharedPrefsManager.getInstance().setBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON, false);
+        SharedPrefsManager.getInstance().removeKey(Constants.KEY_WORKOUT_TEST_MODE_ON);
         handler.removeCallbacks(timer);
         onEndRun();
     }

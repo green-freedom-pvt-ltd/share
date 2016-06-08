@@ -168,6 +168,19 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     @Override
     public WorkoutData clear(){
+        Logger.d(TAG, "clear: approving workoutData one last time because this is the end");
+        if (extraPolatedDistanceToBeApproved > 0){
+            approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
+            extraPolatedDistanceToBeApproved = 0;
+        }
+        while (!waitingForApprovalQueue.isEmpty()){
+            DistRecord record = waitingForApprovalQueue.remove();
+            Logger.d(TAG, "Approving record: " + record.toString());
+            approvedWorkoutData.addRecord(record);
+        }
+        if (numStepsToBeApproved > 0){
+            approvedWorkoutData.addSteps(numStepsToBeApproved);
+        }
         clearPersistentStorage();
         return approvedWorkoutData.close();
     }

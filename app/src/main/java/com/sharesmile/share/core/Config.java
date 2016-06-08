@@ -31,9 +31,9 @@ public class Config {
 
     public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
 
-    public static float SOURCE_ACCEPTABLE_ACCURACY = 60; // in m
+    public static float SOURCE_ACCEPTABLE_ACCURACY = 40; // in m
 
-    public static float THRESHOLD_ACCURACY = 14; // in m
+    public static float THRESHOLD_ACCURACY = 12; // in m
 
     public static float THRESHOLD_FACTOR = 5;
 
