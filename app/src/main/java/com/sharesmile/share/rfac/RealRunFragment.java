@@ -118,7 +118,7 @@ public class RealRunFragment extends RunFragment {
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
-            if (mCauseData.getMinDistance() > myActivity.getTotalDistanceInMeters()) {
+            if (mCauseData.getMinDistance() > data.getDistance()) {
                 myActivity.exit();
                 return;
             }

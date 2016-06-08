@@ -110,7 +110,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     public void endRun(boolean userEnded) {
         Logger.d(TAG, "endRun, userEnded = " + userEnded);
         if (userEnded) {
-            myActivity.endLocationTracking();
+            myActivity.endRun();
         }
         setIsRunActive(false);
         SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
@@ -154,7 +154,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
-        myActivity.beginLocationTracking();
+        myActivity.beginRun();
         setIsRunActive(true);
         workoutData = null;
         if (!isRunning()){
@@ -166,7 +166,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     protected void beginRun() {
         Logger.d(TAG, "beginRun");
-        myActivity.beginLocationTracking();
+        myActivity.beginRun();
         setIsRunActive(true);
         startTimer(0);
         SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);

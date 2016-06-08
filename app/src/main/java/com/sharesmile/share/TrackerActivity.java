@@ -58,6 +58,8 @@ public class TrackerActivity extends BaseActivity {
     private RunFragment runFragment;
     private boolean runInTestMode;
     private boolean openHomeOnExit;
+    private float currentDistanceCovered;
+    private int currentTotalSteps;
 
     private static final int HOME = 0;
     private static final int PROFILE = 1;
@@ -257,10 +259,12 @@ public class TrackerActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationServiceReceiver);
     }
 
-    public void beginLocationTracking() {
+    public void beginRun() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
+            currentDistanceCovered = 0;
+            currentTotalSteps = 0;
             invokeLocationService();
         } else {
             //Need to get permissions
@@ -270,7 +274,7 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public void endLocationTracking() {
+    public void endRun() {
         if (isBoundToLocationService()) {
             locationService.stopWorkout();
         }
@@ -296,17 +300,11 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public float getTotalDistanceInMeters(){
-        if (isBoundToLocationService()) {
-            locationService.getTracker().getTotalDistanceCovered();
-        }
-        return 0;
+        return currentDistanceCovered;
     }
 
     public float getTotalSteps(){
-        if (isBoundToLocationService()) {
-            locationService.getTracker().getTotalSteps();
-        }
-        return 0;
+        return currentTotalSteps;
     }
 
     private void unbindLocationService() {
@@ -414,20 +412,22 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
+                        currentDistanceCovered = result.getDistance();
+                        currentTotalSteps = result.getTotalSteps();
                         runFragment.onWorkoutResult(result);
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
                         float currentSpeed = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_SPEED);
-                        float currentTotalDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
+                        currentDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
                         int elapsedTimeInSecs = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
-                        runFragment.showUpdate(currentSpeed, currentTotalDistanceCovered, elapsedTimeInSecs);
+                        runFragment.showUpdate(currentSpeed, currentDistanceCovered, elapsedTimeInSecs);
                         break;
 
                     case Constants.BROADCAST_STEPS_UPDATE_CODE:
-                        int totalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
+                        currentTotalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
                         int elapsedTime = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
-                        runFragment.showSteps(totalSteps, elapsedTime);
+                        runFragment.showSteps(currentTotalSteps, elapsedTime);
                         break;
 
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:
