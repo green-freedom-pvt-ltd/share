@@ -80,7 +80,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.share:
-                share();
+               // share();
                 break;
             case R.id.rate:
                 rateApp();
@@ -117,14 +117,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         } catch (android.content.ActivityNotFoundException e) {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
         }
-    }
-
-    private void share() {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_msg));
-        startActivity(Intent.createChooser(intent, "Share via"));
     }
 
     public interface FragmentInterface {

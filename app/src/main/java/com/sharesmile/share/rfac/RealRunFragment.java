@@ -96,7 +96,7 @@ public class RealRunFragment extends RunFragment {
         // Will begin workout if not already active
         if (!myActivity.isWorkoutActive()) {
             beginRun();
-        }else{
+        } else {
             continuedRun();
         }
     }
@@ -109,7 +109,7 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void updateTimeView(String newTime) {
         time.setText(newTime);
-        if(newTime.length()>5){
+        if (newTime.length() > 5) {
             mTimerIndicator.setText("HR:MIN:SEC");
         }
     }
@@ -130,8 +130,8 @@ public class RealRunFragment extends RunFragment {
 
             workout.setAvgSpeed(data.getAvgSpeed());
             workout.setDistance(data.getDistance() / 1000);
-            workout.setElapsedTime(Utils.secondsToString((int)data.getElapsedTime()));
-            workout.setRunAmount( workout.getDistance()*mCauseData.getConversionRate());
+            workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
+            workout.setRunAmount((float) Math.ceil(workout.getDistance() * mCauseData.getConversionRate()));
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());
@@ -154,17 +154,12 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
+
         String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
         distance.setText(distDecimal);
 
-        float rupees = getConversionFactor() * Float.valueOf(distance.getText().toString()) ;
-        String rupeesString = String.format("%1$,.1f", rupees);
-        if (rupees > (int) rupees) {
-            impact.setText(rupeesString);
-        } else {
-            impact.setText(String.valueOf((int) rupees));
-        }
-
+        int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distance.getText().toString()));
+        impact.setText(String.valueOf(rupees));
     }
 
     @Override
@@ -185,12 +180,12 @@ public class RealRunFragment extends RunFragment {
         persistStateOnPause();
     }
 
-    private void persistStateOnPause(){
+    private void persistStateOnPause() {
         SharedPrefsManager.getInstance().setString(DISTANCE_COVERED_ON_PAUSE, distance.getText().toString());
         SharedPrefsManager.getInstance().setString(RUPEES_IMPACT_ON_PAUSE, impact.getText().toString());
     }
 
-    private void clearState(){
+    private void clearState() {
         SharedPrefsManager.getInstance().removeKey(DISTANCE_COVERED_ON_PAUSE);
         SharedPrefsManager.getInstance().removeKey(RUPEES_IMPACT_ON_PAUSE);
     }
@@ -211,12 +206,12 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     protected void onContinuedRun(boolean isPaused) {
-        if (!isRunning()){
+        if (!isRunning()) {
             pauseButton.setText(R.string.resume);
             runProgressBar.setVisibility(View.INVISIBLE);
             impact.setText(SharedPrefsManager.getInstance().getString(RUPEES_IMPACT_ON_PAUSE));
             distance.setText(SharedPrefsManager.getInstance().getString(DISTANCE_COVERED_ON_PAUSE));
-        }else{
+        } else {
             impact.setText("0");
             distance.setText("0.0");
         }
@@ -277,7 +272,7 @@ public class RealRunFragment extends RunFragment {
     private void showMinDistanceDialog() {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setTitle(getString(R.string.dialog_title_min_distance));
-        alertDialog.setMessage(getString(R.string.dialog_msg_min_distance,mCauseData.getMinDistance()));
+        alertDialog.setMessage(getString(R.string.dialog_msg_min_distance, mCauseData.getMinDistance()));
         alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

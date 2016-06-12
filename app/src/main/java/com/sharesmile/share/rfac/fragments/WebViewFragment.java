@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
@@ -41,6 +42,8 @@ public class WebViewFragment extends BaseFragment {
     @BindView(R.id.web_view)
     WebView mWebView;
 
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +66,7 @@ public class WebViewFragment extends BaseFragment {
     }
 
     public void loadPage() {
-
+        mProgressBar.setVisibility(View.VISIBLE);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
@@ -90,7 +93,7 @@ public class WebViewFragment extends BaseFragment {
         mWebView.setWebViewClient(new WebViewClient() {
 
             public void onPageFinished(WebView view, String url) {
-
+                mProgressBar.setVisibility(View.GONE);
             }
 
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {

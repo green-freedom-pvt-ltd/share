@@ -15,11 +15,16 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer {
 
     @Override
     public void transformPage(View page, float position) {
+        Log.i("anshul", "position : " + position);
         if (position < -1) {
             page.setScaleY(0.9f);
         } else if (position <= 1) {
-            float scaleFactor = Math.max(0.9f, 1 - Math.abs(position - 0.14285715f));
-            page.setScaleY(scaleFactor);
+            if (position == 0) {
+                page.setScaleY(1);
+            } else {
+                float scaleFactor = Math.max(0.9f, 1 - Math.abs(position - 0.14285715f));
+                page.setScaleY(scaleFactor);
+            }
         } else {
             page.setScaleY(0.9f);
         }

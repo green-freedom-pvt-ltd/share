@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -193,13 +194,11 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         String distanceCovered = String.format("%1$,.1f", (distanceInMeters / 1000));
         String km = (distanceInMeters > 1000 ? " kms" : " km");
         mDistance.setText(distanceCovered + km);
-        float rupees = mCauseData.getConversionRate() * Float.valueOf(distanceCovered);
-        String rupeesString = String.format("%1$,.1f", rupees);
-        if (rupees > (int) rupees) {
-            mContributionAmount.setText(rupeesString);
-        } else {
-            mContributionAmount.setText(String.valueOf((int) rupees));
-        }
+
+        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
+        mContributionAmount.setText(String.valueOf(rupees) + " Rs");
+
+
         mTime.setText(getTimeInHHMMFormat((int) (elapsedTimeInSecs * 1000)));
 
         initShareLayout();
@@ -360,7 +359,8 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         }
 
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
-            msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000) * mCauseData.getConversionRate()));
+            int rs = (int) Math.ceil((mWorkoutData.getDistance() / 1000) * mCauseData.getConversionRate());
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
         }
 
         if (msg.contains(SHARE_PLACEHOLDER_SPONSOR)) {
@@ -374,8 +374,16 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private String getTimeInHHMMFormat(long millis) {
-        return String.format("%02dhr %02dmins", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
+
+        int secs = (int) (millis / 1000);
+        if (secs >= 3600) {
+            return String.format("%02dhr %02dmins", TimeUnit.MILLISECONDS.toHours(millis),
+                    TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
+        } else {
+            return String.format("%02dmins",
+                    TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
+
+        }
     }
 
     @Override
@@ -399,7 +407,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SHARE) {
             showThankYouFragment();
-            //      Toast.makeText(getContext(),resultCode== Activity.RESULT_OK?"success":"false",Toast.LENGTH_SHORT).show();
         } else {
             mLoginHandler.onActivityResult(requestCode, resultCode, data);
         }
