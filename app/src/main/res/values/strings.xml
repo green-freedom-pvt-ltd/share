@@ -118,4 +118,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="km">km</string>
     <string name="url_play_store">https://goo.gl/9a0s34</string>
     <string name="web_address">http://impactrun.com</string>
+
+    <string name="rs_string">%1$d Rs</string>
 </resources>

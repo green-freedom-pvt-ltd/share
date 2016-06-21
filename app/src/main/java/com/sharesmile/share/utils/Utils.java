@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -157,5 +158,19 @@ public class Utils {
         }else{
             return String.format("%02d:%02d", secs/60, secs%60);
         }
+    }
+
+    public static final long stringToSec(String time){
+     String[] timeArray=   time.split(":");
+        int j =1;
+        long sec=0;
+        for(int i= timeArray.length-1;i>=0;i--){
+
+            int duration = Integer.parseInt(timeArray[i]);
+            sec=duration*j+sec;
+            j=j*60;
+
+        }
+        return sec;
     }
 }
