@@ -70,7 +70,7 @@
                 android:layout_below="@+id/tv_run_progress_impact"
                 android:layout_centerHorizontal="true"
                 android:text="RUPEES"
-                android:textSize="10dp" />
+                android:textSize="12sp" />
 
         </RelativeLayout>
     </FrameLayout>

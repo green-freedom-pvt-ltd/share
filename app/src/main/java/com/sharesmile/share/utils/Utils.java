@@ -161,6 +161,7 @@ public class Utils {
     }
 
     public static final long stringToSec(String time){
+        Log.i("anshul",""+time);
      String[] timeArray=   time.split(":");
         int j =1;
         long sec=0;

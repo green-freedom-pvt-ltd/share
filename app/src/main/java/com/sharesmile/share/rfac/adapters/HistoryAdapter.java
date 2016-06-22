@@ -1,6 +1,7 @@
 package com.sharesmile.share.rfac.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
             mImpact.setText(mImpact.getContext().getString(R.string.rs_string, (int) Math.ceil(workout.getRunAmount())));
 
+            Log.i("anshul",""+workout.getId());
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());
             if (timeInSec >= 60) {
                 int timeInMin = (int) (Utils.stringToSec(workout.getElapsedTime()) / 60);

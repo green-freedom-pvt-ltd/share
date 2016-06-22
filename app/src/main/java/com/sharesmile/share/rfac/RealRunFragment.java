@@ -146,6 +146,7 @@ public class RealRunFragment extends RunFragment {
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
                     .build();
 
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN,true);
             GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getActivity());
             mGcmNetworkManager.schedule(task);
         }

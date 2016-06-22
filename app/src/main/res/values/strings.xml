@@ -66,7 +66,7 @@
     <string name="login_skip">DON’T WANT TO LOGIN?</string>
     <string name="cause_type">Education</string>
     <string name="tap_to_continue">Tap to continue</string>
-    <string name="tap_to_start">Tap to start</string>
+    <string name="tap_to_start">Tap to start now</string>
 
     <string name="Profile">You are awesome! You have impacted life of 12 children uptill now</string>
      <string name="Description">Shwas is an effort started by a group of volunteers to educate the underprivileged kids of Gulbai Tekra, Ahmedabad since year 2009. We attempt to provide safe and healthy environment to children coming from disadvantaged families, so that they can openly share with us the challenges they face that hold them back from aspiring their dreams
@@ -120,4 +120,5 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="web_address">http://impactrun.com</string>
 
     <string name="rs_string">%1$d Rs</string>
+    <string name="title_cause">Causes</string>
 </resources>

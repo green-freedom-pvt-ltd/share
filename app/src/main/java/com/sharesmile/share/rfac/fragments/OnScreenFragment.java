@@ -105,6 +105,11 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         } else {
             hideProgressDialog();
         }
+        updateActionbar();
+    }
+
+    private void updateActionbar() {
+        getFragmentController().updateToolBar(getString(R.string.title_cause), false);
     }
 
     @Override
