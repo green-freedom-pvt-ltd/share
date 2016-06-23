@@ -68,6 +68,16 @@ public class ProfileFragment extends BaseFragment {
         return v;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        boolean hasRun = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_HAS_RUN, false);
+        if(hasRun){
+            profile_viewPager.setCurrentItem(1);
+        }
+
+    }
+
     private void displayUserInfo() {
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
         String url = prefsManager.getString(Constants.PREF_USER_IMAGE);

@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
+    android:background="@color/white"
     app:cardElevation="5dp"
     app:cardUseCompatPadding="true">
 
@@ -32,14 +32,40 @@
             android:textSize="16sp"
             tools:text="Sponsor a Child, Foster a Future and something" />
 
-        <com.sharesmile.share.views.MRTextView
-            android:id="@+id/distance"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/greyish_brown_two"
-            android:textSize="16sp"
-            tools:text="5 kms" />
+            android:orientation="horizontal">
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="16sp"
+                tools:text="5 kms" />
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/impact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="16sp"
+                tools:text="50 Rs" />
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="16sp"
+                tools:text="10 mins" />
+        </LinearLayout>
     </LinearLayout>
 
 

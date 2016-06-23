@@ -1,6 +1,7 @@
 package com.sharesmile.share.rfac.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
 
@@ -57,6 +59,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         @BindView(R.id.distance)
         TextView mDistance;
 
+        @BindView(R.id.impact)
+        TextView mImpact;
+
+        @BindView(R.id.duration)
+        TextView mDuration;
+
         public HistoryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -70,6 +78,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             String km = (workout.getDistance() > 1 ? " kms" : " km");
             String distanceCovered = String.format("%1$,.1f", workout.getDistance());
             mDistance.setText(distanceCovered + km);
+
+            mImpact.setText(mImpact.getContext().getString(R.string.rs_string, (int) Math.ceil(workout.getRunAmount())));
+
+            Log.i("anshul",""+workout.getId());
+            long timeInSec = Utils.stringToSec(workout.getElapsedTime());
+            if (timeInSec >= 60) {
+                int timeInMin = (int) (Utils.stringToSec(workout.getElapsedTime()) / 60);
+                mDuration.setText(mImpact.getResources().getQuantityString(R.plurals.time_in_min, timeInMin, timeInMin));
+            } else {
+                mDuration.setText(mImpact.getResources().getQuantityString(R.plurals.time_in_sec, (int) timeInSec, (int) timeInSec));
+            }
+
+
         }
     }
 }

@@ -319,7 +319,10 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse(getString(R.string.web_address)))
+                .setContentTitle(getString(R.string.app_name))
                 .setContentDescription(getShareMsg())
+                .setImageUrl(Uri.parse(mCauseData.getCauseThankYouImage()))
                 .build();
 
 

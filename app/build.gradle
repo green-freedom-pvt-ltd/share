@@ -29,8 +29,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 18
-        versionName "1.2.7"
+        versionCode 19
+        versionName "1.2.8"
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled false
@@ -50,6 +50,10 @@ android {
             java.srcDirs = ['src/main/java', 'src/main/java-gen']
             res.srcDirs = ['src/main/res']
         }
+
+        beta{
+            res.srcDirs = ['src/beta/res']
+        }
     }
 
     buildTypes {
@@ -63,6 +67,15 @@ android {
         }
     }
 
+    productFlavors {
+        prod {
+
+        }
+        beta {
+
+        }
+
+    }
     aaptOptions {
         additionalParameters "--no-version-vectors"
     }

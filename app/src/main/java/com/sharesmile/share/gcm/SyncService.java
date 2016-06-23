@@ -98,6 +98,7 @@ public class SyncService extends GcmTaskService {
             } else {
                 WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
                 mWorkoutDao.insertOrReplaceInTx(runList);
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN,true);
                 Logger.d(TAG, "update success" + runList.toString());
                 if (!TextUtils.isEmpty(runList.getNextUrl())) {
                     updateWorkoutData(runList.getNextUrl(), workoutCount);
