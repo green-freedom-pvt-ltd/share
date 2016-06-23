@@ -391,7 +391,6 @@ public class WorkoutService extends Service implements
                     LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (currentLocation == null){
                 Logger.i(TAG, "Last Known Location could'nt be fetched");
-                Toast.makeText(this, "Couldn't fetch last location", Toast.LENGTH_LONG).show();
             }
         }else {
             //No need to worry about permission unavailability, as it was already granted before service started
