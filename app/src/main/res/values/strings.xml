@@ -121,4 +121,17 @@ We teach kids every day for two hours. Our focus is value based education which 
 
     <string name="rs_string">%1$d Rs</string>
     <string name="title_cause">Causes</string>
+
+    <!--onBoarding-->
+    <string name="title_activity_on_boarding">OnBoardingActivity</string>
+    <string name="onboarding_title_1">pick</string>
+
+    <string name="onboarding_title_2">RUN</string>
+    <string name="onboarding_title_3">RAISE</string>
+    <string name="onboarding_title_4">DONE</string>
+    <string name="onboarding_msg_1">Choose a cause you wish to support.</string>
+    <string name="onboarding_msg_2">Begin your run(or walk) &amp; watch as your steps...</string>
+    <string name="onboarding_msg_3">...raise funds for the cause, thanks to our sponsors.</string>
+    <string name="onboarding_msg_4">Smile. Your efforts made somepne happy :)</string>
+
 </resources>

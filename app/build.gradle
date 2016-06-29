@@ -29,8 +29,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 19
-        versionName "1.2.8"
+        versionCode 20
+        versionName "1.2.9"
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled false
@@ -121,4 +121,6 @@ dependencies {
 
     compile 'org.greenrobot:eventbus:3.0.0'
 
+    //CirclePageIndicator
+    compile 'com.viewpagerindicator:library:2.4.1@aar'
 }
