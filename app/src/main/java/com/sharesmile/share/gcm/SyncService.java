@@ -151,6 +151,7 @@ public class SyncService extends GcmTaskService {
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             mWorkoutDao.delete(workout);
             workout.setId(response.getId());
+            workout.setIs_sync(true);
             mWorkoutDao.insertOrReplace(workout);
             return true;
 

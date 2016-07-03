@@ -19,8 +19,8 @@
 
     <integer-array name="onboarding_image">
         <item>@drawable/pick</item>
-        <item>@drawable/pick</item>
-        <item>@drawable/pick</item>
-        <item>@drawable/pick</item>
+        <item>@drawable/run</item>
+        <item>@drawable/raise</item>
+        <item>@drawable/ty</item>
     </integer-array>
 </resources>
