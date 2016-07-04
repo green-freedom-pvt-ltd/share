@@ -64,9 +64,9 @@ public class OnBoardingFragment extends BaseFragment {
         TypedArray typedArray = getResources().obtainTypedArray(R.array.onboarding_title);
         TypedArray detailsArray = getResources().obtainTypedArray(R.array.onboarding_msg);
         TypedArray drawableArray = getResources().obtainTypedArray(R.array.onboarding_image);
-
         mImage.setImageDrawable(getResources().getDrawable(drawableArray.getResourceId(type, 0)));
         mTitle.setText(getString(typedArray.getResourceId(type, 0)));
         mDetails.setText(getString(detailsArray.getResourceId(type, 0)));
+
     }
 }

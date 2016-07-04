@@ -17,13 +17,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="5dp"
         android:orientation="vertical">
 
         <com.viewpagerindicator.CirclePageIndicator
             android:id="@+id/circularBarPager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:fillColor="@color/warm_grey"
+            app:pageColor="@color/white_three"
+            app:strokeColor="@color/white_three"
             android:padding="10dp" />
 
         <com.sharesmile.share.views.MLTextView

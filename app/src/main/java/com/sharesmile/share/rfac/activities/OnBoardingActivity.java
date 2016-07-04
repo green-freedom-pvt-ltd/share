@@ -3,6 +3,7 @@ package com.sharesmile.share.rfac.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -57,23 +58,32 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
         CirclePageIndicator pageIndicator = (CirclePageIndicator) findViewById(R.id.circularBarPager);
         pageIndicator.setViewPager(mViewPager);
         pageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            public int selectedIndex = 0;
+            public boolean mPageEnd;
+            boolean callHappened;
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position == 3) {
-                    done.setVisibility(View.VISIBLE);
+                if (mPageEnd && position == mViewPager.getAdapter().getCount() - 1 && !callHappened) {
+                    mPageEnd = false;
+                    callHappened = true;
+                    startLoginActivity();
                 } else {
-                    done.setVisibility(View.INVISIBLE);
+                    mPageEnd = false;
                 }
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onPageSelected(int position) {
+                selectedIndex = position;
+                done.setVisibility(position == 3 ? View.VISIBLE : View.INVISIBLE);
+            }
 
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (selectedIndex == mViewPager.getAdapter().getCount() - 1) {
+                    mPageEnd = true;
+                }
             }
         });
         done.setOnClickListener(this);
@@ -88,6 +98,7 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     private void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
         startActivity(intent);
     }
 
@@ -131,7 +142,6 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()) {
 
             case R.id.done:
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
                 startLoginActivity();
                 break;
 

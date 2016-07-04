@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="60dp">
+    tools:context=".rfac.activities.OnBoardingActivity"
+    android:paddingTop="40dp">
 
     <com.sharesmile.share.views.MRTextView
         android:id="@+id/title"
@@ -22,15 +23,16 @@
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="240dp"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="40dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
         android:scaleType="fitCenter"
-        android:src="@drawable/pick" />
+        android:src="@drawable/run" />
 
     <com.sharesmile.share.views.MLTextView
         android:id="@+id/details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:gravity="center"
