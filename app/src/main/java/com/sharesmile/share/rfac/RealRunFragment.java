@@ -142,7 +142,7 @@ public class RealRunFragment extends RunFragment {
             OneoffTask task = new OneoffTask.Builder()
                     .setService(SyncService.class)
                     .setTag(TaskConstants.UPLOAD_WORKOUT_DATA)
-                    .setExecutionWindow(0L, 3600L)
+                    .setExecutionWindow(0L, 60L)
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
                     .build();
 
