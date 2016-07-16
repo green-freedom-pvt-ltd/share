@@ -134,4 +134,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="onboarding_msg_3">...raise funds for the cause, thanks to our sponsors.</string>
     <string name="onboarding_msg_4">Smile. Your efforts made someone happy :)</string>
 
+    <string name="server_secret_id">yLR6TiNCLeMs23w5uYnNJALK</string>
+
 </resources>

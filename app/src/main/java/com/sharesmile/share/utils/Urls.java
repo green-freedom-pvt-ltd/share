@@ -15,6 +15,9 @@ public class Urls {
     private static final String FAQ_URL = "http://impactrun.com/#/faq";
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
+    private static final String GOOGLE_BASE_URL = "https://www.googleapis.com";
+    private static final String GOOGLE_CONVERT_TOKEN_URL = "/oauth2/v4/token";
+
     public static String getBaseUrl() {
         return BASE_URL;
     }
@@ -51,5 +54,10 @@ public class Urls {
 
     public static String getAboutUsUrl() {
         return ABOUT_US_URL;
+    }
+
+    public static String getGoogleConvertTokenUrl(){
+        String url = GOOGLE_BASE_URL + GOOGLE_CONVERT_TOKEN_URL + "/";
+        return url;
     }
 }

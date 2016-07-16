@@ -29,13 +29,16 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sharesmile.share.CustomJSONObject;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
+import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -87,9 +90,9 @@ public class LoginImpl {
     }
 
     private void initializeGoogleLogin() {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getContext().getString(R.string.server_client_id))
-                .requestServerAuthCode(getContext().getString(R.string.server_client_id))
+                .requestServerAuthCode(getContext().getString(R.string.server_client_id),false)
                 .build();
 
         Context context = getContext();
@@ -313,11 +316,77 @@ public class LoginImpl {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  "+acct.getServerAuthCode());
-            verifyUserDetails(acct.getEmail(), acct.getServerAuthCode(), false);
+           // verifyUserDetails(acct.getEmail(), acct.getServerAuthCode(), false);
+            get_google_access_token(acct.getServerAuthCode());
         } else {
             Logger.d("google", "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
         }
+    }
+
+    private String get_google_access_token(String token){
+        Map<String, String> header = new HashMap<>();
+        header.put("code",token);
+        header.put("client_id",getContext().getString(R.string.server_client_id));
+        header.put("client_secret",getContext().getString(R.string.server_secret_id));
+        header.put("access_type","offline");
+        header.put("grant_type","authorization_code");
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("code",token);
+            jsonObject.put("client_id",getContext().getString(R.string.server_client_id));
+            jsonObject.put("client_secret",getContext().getString(R.string.server_secret_id));
+            jsonObject.put("access_type","offline");
+            jsonObject.put("grant_type","authorization_code");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        NetworkDataProvider.doPostCallAsync(Urls.getGoogleConvertTokenUrl(), jsonObject, new NetworkAsyncCallback<CustomJSONObject>() {
+            @Override
+            public void onNetworkFailure(NetworkException ne) {
+                Log.i("Anshul","g failed");
+            }
+
+            @Override
+            public void onNetworkSuccess(CustomJSONObject unObfuscable) {
+
+                Log.i("Anshul","g success");
+            }
+        }
+                /* new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.i("TAG", "Login error ");
+                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.showHideProgress(false, null);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String responseString = response.body().string();
+                Logger.d("LoginImpl", "onResponse: " + responseString);
+                JsonArray array = JsonHelper.StringToJsonArray(responseString);
+                final JsonObject element = array.get(0).getAsJsonObject();
+                Log.i("LoginImpl", "element: " + element.toString());
+                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        userLoginSuccess(element);
+                    }
+                });
+
+            }*/
+    );
+
+
+        return token;
     }
 
     public interface LoginListener {

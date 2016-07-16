@@ -138,7 +138,7 @@ public class MainApplication extends Application {
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
-        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer()/*, new Crashlytics()*/);
         mDbWrapper = new DbWrapper(this);
     }
 
