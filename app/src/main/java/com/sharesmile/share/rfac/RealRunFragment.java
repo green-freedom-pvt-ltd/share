@@ -3,6 +3,7 @@ package com.sharesmile.share.rfac;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -245,7 +246,9 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
-        if (mCauseData.getMinDistance() > myActivity.getTotalDistanceInMeters()) {
+        String rDistance = distance.getText().toString();
+        Float fDistance = Float.parseFloat(rDistance);
+        if (mCauseData.getMinDistance() > fDistance) {
             showMinDistanceDialog();
         } else {
             showRunEndDialog();

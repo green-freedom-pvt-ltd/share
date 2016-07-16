@@ -196,7 +196,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         mDistance.setText(distanceCovered + km);
 
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
-        mContributionAmount.setText(String.valueOf(rupees) + " Rs");
+        mContributionAmount.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
 
 
         mTime.setText(getTimeInHHMMFormat((int) (elapsedTimeInSecs * 1000)));
@@ -362,7 +362,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         }
 
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
-            int rs = (int) Math.ceil((mWorkoutData.getDistance() / 1000) * mCauseData.getConversionRate());
+            String rDistance = String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000));
+            Float fDistance = Float.parseFloat(rDistance);
+            int rs = (int) Math.ceil(fDistance * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
         }
 
