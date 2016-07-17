@@ -2,6 +2,9 @@ package com.sharesmile.share.gps;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +14,8 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
@@ -26,10 +31,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.gson.Gson;
+import com.sharesmile.share.R;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.activities.LoginActivity;
+import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,7 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class WorkoutService extends Service implements
         IWorkoutService, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, RunTracker.UpdateListner, StepCounter.Listener{
+        LocationListener, RunTracker.UpdateListner, StepCounter.Listener {
 
     private static final String TAG = "WorkoutService";
 
@@ -57,11 +67,15 @@ public class WorkoutService extends Service implements
     private ScheduledExecutorService backgroundExecutorService;
 
     private Tracker tracker;
+    private float mDistance;
+    private CauseData mCauseData;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Logger.i(TAG, "onCreate");
+        mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA), CauseData.class);
+        makeForeground();
     }
 
     @Override
@@ -81,7 +95,6 @@ public class WorkoutService extends Service implements
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
     }
-
 
 
     private void stopTracking() {
@@ -112,7 +125,7 @@ public class WorkoutService extends Service implements
             googleApiClient = null;
             currentLocation = null;
             currentlyTracking = false;
-            if (stepCounter != null){
+            if (stepCounter != null) {
                 stepCounter.stopCounting();
             }
             currentlyProcessingSteps = false;
@@ -145,7 +158,7 @@ public class WorkoutService extends Service implements
     public boolean onUnbind(Intent intent) {
         Logger.d(TAG, "onUnbind");
         super.onUnbind(intent);
-        if (!RunTracker.isWorkoutActive()){
+        if (!RunTracker.isWorkoutActive()) {
             // Stop service only when workout session is not going on
             Logger.d(TAG, "onUnbind: Will stopWorkout service");
             stopSelf();
@@ -159,6 +172,7 @@ public class WorkoutService extends Service implements
         super.onDestroy();
         backgroundExecutorService.shutdownNow();
         backgroundExecutorService = null;
+        stopForeground(true);
     }
 
     final IBinder mBinder = new MyBinder();
@@ -178,22 +192,22 @@ public class WorkoutService extends Service implements
 
     @Override
     public void onStepCount(int deltaSteps) {
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             tracker.feedSteps(deltaSteps);
         }
     }
 
-    public static boolean isCurrentlyTracking(){
+    public static boolean isCurrentlyTracking() {
         return currentlyTracking;
     }
 
-    public static boolean isCurrentlyProcessingSteps(){
+    public static boolean isCurrentlyProcessingSteps() {
         return currentlyProcessingSteps;
     }
 
     /**
-     Class used for the client Binder.  Because we know this service always
-     runs in the same process as its clients, we don't need to deal with IPC.
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class MyBinder extends Binder {
 
@@ -218,7 +232,7 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void updateWorkoutRecord(float totalDistance, float currentSpeed){
+    public void updateWorkoutRecord(float totalDistance, float currentSpeed) {
         Logger.d(TAG, "updateWorkoutRecord: totalDistance = " + totalDistance
                 + " currentSpeed = " + currentSpeed);
         // Send an update broadcast to Activity
@@ -227,11 +241,13 @@ public class WorkoutService extends Service implements
                 Constants.BROADCAST_WORKOUT_UPDATE_CODE);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
+        mDistance = totalDistance;
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
+        updateNotification();
     }
 
-    private void sendBroadcast(Bundle bundle){
+    private void sendBroadcast(Bundle bundle) {
         Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
@@ -267,11 +283,11 @@ public class WorkoutService extends Service implements
             } else {
                 Logger.e(TAG, "unable to connect to google play services.");
             }
-            if (!currentlyProcessingSteps){
-                if (isKitkatWithStepSensor(getApplicationContext())){
+            if (!currentlyProcessingSteps) {
+                if (isKitkatWithStepSensor(getApplicationContext())) {
                     Logger.d(TAG, "Step Detector present! Will register");
                     stepCounter = new AndroidStepCounter(this, this);
-                }else{
+                } else {
                     Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
                     stepCounter = new GoogleFitStepCounter(this, this);
                 }
@@ -304,10 +320,10 @@ public class WorkoutService extends Service implements
     @Override
     public void pause() {
         Logger.i(TAG, "pause");
-        if (vigilanceTimer != null){
+        if (vigilanceTimer != null) {
             vigilanceTimer.pauseTimer();
         }
-        if (tracker != null && tracker.isRunning()){
+        if (tracker != null && tracker.isRunning()) {
             //TODO: Put stopping locationServices code over here
             tracker.pauseRun();
         }
@@ -316,13 +332,13 @@ public class WorkoutService extends Service implements
     @Override
     public void resume() {
         Logger.i(TAG, "resume");
-        if (tracker != null && tracker.getState() != Tracker.State.RUNNING){
+        if (tracker != null && tracker.getState() != Tracker.State.RUNNING) {
             //TODO: Put resuming locationServices code over here
             tracker.resumeRun();
         }
     }
 
-    public void sendStopWorkoutBroadcast(int problem){
+    public void sendStopWorkoutBroadcast(int problem) {
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_STOP_WORKOUT_PROBLEM, problem);
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
@@ -339,7 +355,7 @@ public class WorkoutService extends Service implements
         bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_PAUSE_WORKOUT_CODE);
         sendBroadcast(bundle);
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             tracker.discardApprovalQueue();
         }
         pause();
@@ -348,7 +364,7 @@ public class WorkoutService extends Service implements
     @Override
     public void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime) {
         Logger.d(TAG, "workoutVigilanceSessionApproved");
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             tracker.approveWorkoutData();
         }
     }
@@ -384,26 +400,26 @@ public class WorkoutService extends Service implements
     }
 
 
-    private void fetchInitialLocation(){
+    private void fetchInitialLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED){
+                == PackageManager.PERMISSION_GRANTED) {
             currentLocation =
                     LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (currentLocation == null){
+            if (currentLocation == null) {
                 Logger.i(TAG, "Last Known Location could'nt be fetched");
             }
-        }else {
+        } else {
             //No need to worry about permission unavailability, as it was already granted before service started
         }
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        switch (requestCode){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
             case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
-                if (resultCode == Activity.RESULT_OK){
+                if (resultCode == Activity.RESULT_OK) {
                     // Can startWorkout with location requests
                     initiateLocationFetching();
-                }else{
+                } else {
                     // Can't do nothing, retry for enabling Location Settings
                     checkForLocationSettings();
                 }
@@ -414,7 +430,7 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void checkForLocationSettings(){
+    private void checkForLocationSettings() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
 
@@ -467,5 +483,41 @@ public class WorkoutService extends Service implements
         Logger.e(TAG, "GoogleApiClient connection has been suspend");
     }
 
+    private void makeForeground() {
+        Notification notification = getNotificationBuilder().getNotification();
+        startForeground(1000, notification);
+    }
+
+    private void updateNotification() {
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(1000, getNotificationBuilder().build());
+    }
+
+    private NotificationCompat.Builder getNotificationBuilder() {
+        String distDecimal = String.format("%1$,.1f", (mDistance / 1000));
+        float fDistance=Float.parseFloat(distDecimal);
+        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setContentTitle("Running")
+                        .setContentText("Amount raised : " + getString(R.string.rs_symbol) + rupees)
+                        .setSmallIcon(R.mipmap.ic_launcher);
+
+
+        Intent resultIntent = new Intent(this, LoginActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        return mBuilder;
+    }
 
 }
