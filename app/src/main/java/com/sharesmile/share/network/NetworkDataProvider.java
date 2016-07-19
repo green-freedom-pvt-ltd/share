@@ -2,6 +2,7 @@ package com.sharesmile.share.network;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.UnObfuscable;
@@ -20,7 +21,9 @@ import com.squareup.okhttp.Response;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -286,6 +289,40 @@ public class NetworkDataProvider {
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         call.enqueue(cb);
+    }
+
+    public static <R extends UnObfuscable> void doPostCallAsync(String url, List<NameValuePair> data,
+                                                                NetworkAsyncCallback<R> cb) {
+        RequestBody body = RequestBody.create(URLENCODED, convertToData(data));
+        Request.Builder requestBuilder = new Request.Builder().url(url)
+                .post(body);
+
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
+        Request request = requestBuilder.build();
+        Call call = getSingleOkHttpClient().newCall(request);
+        call.enqueue(cb);
+    }
+
+    private static String convertToData(List<NameValuePair> data) {
+
+        String body = "";
+        for (NameValuePair pair : data) {
+            String value = "";
+            try {
+                value = URLEncoder.encode(pair.getValue(), "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                return body;
+            }
+            if (!TextUtils.isEmpty(body)) {
+                body = body + "&";
+            }
+            body = body + pair.getName() + "=" + value;
+
+        }
+        return body;
     }
 
     public static <R extends UnObfuscable> void doGetCallAsync(String url, NetworkAsyncCallback<R> cb) {

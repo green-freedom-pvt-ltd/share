@@ -21,6 +21,10 @@
           }
         },
         {
+          "client_id": "159550091621-tk6o6bqh2r4qf46kikc4bnts4l2knqsd.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
           "client_id": "159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -32,10 +36,7 @@
       ],
       "services": {
         "analytics_service": {
-          "status": 2,
-          "analytics_property": {
-            "tracking_id": "UA-80237688-1"
-          }
+          "status": 1
         },
         "appinvite_service": {
           "status": 1,

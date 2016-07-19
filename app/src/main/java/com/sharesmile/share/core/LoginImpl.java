@@ -29,15 +29,21 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sharesmile.share.CustomJSONObject;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
+import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.GoogleOauthResponse;
+import com.sharesmile.share.utils.BasicNameValuePair;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.NameValuePair;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.squareup.okhttp.Callback;
@@ -49,8 +55,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit.http.HEAD;
@@ -87,9 +95,9 @@ public class LoginImpl {
     }
 
     private void initializeGoogleLogin() {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getContext().getString(R.string.server_client_id))
-                .requestServerAuthCode(getContext().getString(R.string.server_client_id))
+                .requestServerAuthCode(getContext().getString(R.string.server_client_id), false)
                 .build();
 
         Context context = getContext();
@@ -277,8 +285,6 @@ public class LoginImpl {
     }
 
     public void performGoogleLogin() {
-
-        // MainApplication.getInstance().showToast("Google need rest. Try Facebook ");
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         if (activityWeakReference != null) {
             activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
@@ -289,7 +295,6 @@ public class LoginImpl {
     }
 
     public void performFbLogin() {
-        //   LoginManager.getInstance().logInWithReadPermissions(fragmentWeakReference.get(), Arrays.asList("public_profile", "email"));
         if (activityWeakReference != null) {
             LoginManager.getInstance().logInWithReadPermissions(activityWeakReference.get(), Arrays.asList("public_profile", "email"));
         } else {
@@ -312,12 +317,51 @@ public class LoginImpl {
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  "+acct.getServerAuthCode());
-            verifyUserDetails(acct.getEmail(), acct.getServerAuthCode(), false);
+            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  " + acct.getServerAuthCode());
+            get_google_access_token(acct.getEmail(), acct.getServerAuthCode());
         } else {
             Logger.d("google", "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
         }
+    }
+
+    private String get_google_access_token(final String email, String token) {
+
+        List<NameValuePair> data = new ArrayList<>();
+        data.add(new BasicNameValuePair("code", token));
+        data.add(new BasicNameValuePair("client_id", getContext().getString(R.string.server_client_id)));
+        data.add(new BasicNameValuePair("client_secret", getContext().getString(R.string.server_secret_id)));
+        data.add(new BasicNameValuePair("access_type", "offline"));
+        data.add(new BasicNameValuePair("grant_type", "authorization_code"));
+
+        NetworkDataProvider.doPostCallAsync(Urls.getGoogleConvertTokenUrl(), data, new NetworkAsyncCallback<GoogleOauthResponse>() {
+                    @Override
+                    public void onNetworkSuccess(final GoogleOauthResponse googleOauthResponse) {
+                        MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                verifyUserDetails(email, googleOauthResponse.access_token, false);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onNetworkFailure(NetworkException ne) {
+                        MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                MainApplication.getInstance().showToast(R.string.login_error);
+                            }
+                        });
+                    }
+
+
+                }
+        );
+
+
+        return token;
     }
 
     public interface LoginListener {
