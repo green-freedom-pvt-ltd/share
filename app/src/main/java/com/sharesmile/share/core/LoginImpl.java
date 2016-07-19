@@ -39,8 +39,11 @@ import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.GoogleOauthResponse;
+import com.sharesmile.share.utils.BasicNameValuePair;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.NameValuePair;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.squareup.okhttp.Callback;
@@ -52,8 +55,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit.http.HEAD;
@@ -92,7 +97,7 @@ public class LoginImpl {
     private void initializeGoogleLogin() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getContext().getString(R.string.server_client_id))
-                .requestServerAuthCode(getContext().getString(R.string.server_client_id),false)
+                .requestServerAuthCode(getContext().getString(R.string.server_client_id), false)
                 .build();
 
         Context context = getContext();
@@ -280,8 +285,6 @@ public class LoginImpl {
     }
 
     public void performGoogleLogin() {
-
-        // MainApplication.getInstance().showToast("Google need rest. Try Facebook ");
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         if (activityWeakReference != null) {
             activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
@@ -292,7 +295,6 @@ public class LoginImpl {
     }
 
     public void performFbLogin() {
-        //   LoginManager.getInstance().logInWithReadPermissions(fragmentWeakReference.get(), Arrays.asList("public_profile", "email"));
         if (activityWeakReference != null) {
             LoginManager.getInstance().logInWithReadPermissions(activityWeakReference.get(), Arrays.asList("public_profile", "email"));
         } else {
@@ -315,75 +317,48 @@ public class LoginImpl {
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  "+acct.getServerAuthCode());
-           // verifyUserDetails(acct.getEmail(), acct.getServerAuthCode(), false);
-            get_google_access_token(acct.getServerAuthCode());
+            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  " + acct.getServerAuthCode());
+            get_google_access_token(acct.getEmail(), acct.getServerAuthCode());
         } else {
             Logger.d("google", "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
         }
     }
 
-    private String get_google_access_token(String token){
-        Map<String, String> header = new HashMap<>();
-        header.put("code",token);
-        header.put("client_id",getContext().getString(R.string.server_client_id));
-        header.put("client_secret",getContext().getString(R.string.server_secret_id));
-        header.put("access_type","offline");
-        header.put("grant_type","authorization_code");
+    private String get_google_access_token(final String email, String token) {
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("code",token);
-            jsonObject.put("client_id",getContext().getString(R.string.server_client_id));
-            jsonObject.put("client_secret",getContext().getString(R.string.server_secret_id));
-            jsonObject.put("access_type","offline");
-            jsonObject.put("grant_type","authorization_code");
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        List<NameValuePair> data = new ArrayList<>();
+        data.add(new BasicNameValuePair("code", token));
+        data.add(new BasicNameValuePair("client_id", getContext().getString(R.string.server_client_id)));
+        data.add(new BasicNameValuePair("client_secret", getContext().getString(R.string.server_secret_id)));
+        data.add(new BasicNameValuePair("access_type", "offline"));
+        data.add(new BasicNameValuePair("grant_type", "authorization_code"));
 
-        NetworkDataProvider.doPostCallAsync(Urls.getGoogleConvertTokenUrl(), jsonObject, new NetworkAsyncCallback<CustomJSONObject>() {
-            @Override
-            public void onNetworkFailure(NetworkException ne) {
-                Log.i("Anshul","g failed");
-            }
-
-            @Override
-            public void onNetworkSuccess(CustomJSONObject unObfuscable) {
-
-                Log.i("Anshul","g success");
-            }
-        }
-                /* new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-                Log.i("TAG", "Login error ");
-                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+        NetworkDataProvider.doPostCallAsync(Urls.getGoogleConvertTokenUrl(), data, new NetworkAsyncCallback<GoogleOauthResponse>() {
                     @Override
-                    public void run() {
-                        mListener.showHideProgress(false, null);
-                    }
-                });
-            }
+                    public void onNetworkSuccess(final GoogleOauthResponse googleOauthResponse) {
+                        MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                verifyUserDetails(email, googleOauthResponse.access_token, false);
+                            }
+                        });
 
-            @Override
-            public void onResponse(Response response) throws IOException {
-                String responseString = response.body().string();
-                Logger.d("LoginImpl", "onResponse: " + responseString);
-                JsonArray array = JsonHelper.StringToJsonArray(responseString);
-                final JsonObject element = array.get(0).getAsJsonObject();
-                Log.i("LoginImpl", "element: " + element.toString());
-                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                    }
+
                     @Override
-                    public void run() {
-                        userLoginSuccess(element);
+                    public void onNetworkFailure(NetworkException ne) {
+                        MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                MainApplication.getInstance().showToast(R.string.login_error);
+                            }
+                        });
                     }
-                });
 
-            }*/
-    );
+
+                }
+        );
 
 
         return token;

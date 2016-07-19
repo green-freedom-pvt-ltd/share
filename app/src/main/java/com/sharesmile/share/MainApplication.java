@@ -138,7 +138,7 @@ public class MainApplication extends Application {
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
-        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer()/*, new Crashlytics()*/);
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
     }
 
@@ -171,7 +171,7 @@ public class MainApplication extends Application {
      * Gets the default {@link Tracker} for this {@link Application}.
      * @return tracker
      */
-    synchronized public Tracker getDefaultTracker() {
+   /* synchronized public Tracker getDefaultTracker() {
         if (mTracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
@@ -179,7 +179,7 @@ public class MainApplication extends Application {
         }
         return mTracker;
     }
-
+*/
 
 }
 

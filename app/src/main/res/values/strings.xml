@@ -107,7 +107,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="feedback_thanks">Thank you for the feedback. Your ideas help us grow faster.</string>
     <string name="server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>
 
-    <!--<string name="google_server_client_id">159550091621-ja0nfl97se4qeeqcc4950fdqu20b5ipj.apps.googleusercontent.com</string>-->
 
     <string name="dialog_title_min_distance">That’s too short!</string>
     <string name="dialog_msg_min_distance">You need to run a minimum of %1$sm to convert the distance into impact.</string>
@@ -134,6 +133,6 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="onboarding_msg_3">...raise funds for the cause, thanks to our sponsors.</string>
     <string name="onboarding_msg_4">Smile. Your efforts made someone happy :)</string>
 
-    <string name="server_secret_id">yLR6TiNCLeMs23w5uYnNJALK</string>
+    <string name="server_secret_id">F1t8iwOMIfN5eXxGIByKVr5O</string>
 
 </resources>
