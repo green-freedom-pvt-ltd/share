@@ -2,12 +2,23 @@ package adapters
 
 import Models.FaqList
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.sharesmile.share.CustomJSONObject
+import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
 import com.sharesmile.share.core.IFragmentController
+import com.sharesmile.share.network.NetworkAsyncCallback
+import com.sharesmile.share.network.NetworkDataProvider
+import com.sharesmile.share.network.NetworkException
+import com.sharesmile.share.rfac.fragments.OnScreenFragment
+import com.sharesmile.share.utils.Urls
+import kotlinx.android.synthetic.main.faq_item_user_input.view.*
 import kotlinx.android.synthetic.main.faq_list_item.view.*
+import org.json.JSONObject
 import java.util.*
 
 /**
@@ -16,10 +27,10 @@ import java.util.*
 class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     public var dataList: ArrayList<FaqList.Faq>? = null
-        set(value) {
-            dataList = value
-            notifyDataSetChanged()
-        }
+    /* set(value) {
+         dataList = value
+         notifyDataSetChanged()
+     }*/
 
     private var ITEM_FAQ_QUESTION = 1;
     private var ITEM_FAQ_FEEDBACK = 2;
@@ -57,6 +68,11 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
     }
 
+    public fun setData(data: ArrayList<FaqList.Faq>?) {
+        dataList = data
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
 
 
@@ -86,30 +102,30 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
         fun bindData() {
 
-            /*   itemView.submit.setOnClickListener(View.OnClickListener {
-                   if (TextUtils.isEmpty(itemView.user_response.text)) {
-                       Toast.makeText(itemView.context, "Please enter question", Toast.LENGTH_SHORT).show()
-                       return@OnClickListener
-                   }
+            itemView.submit.setOnClickListener(View.OnClickListener {
+                if (TextUtils.isEmpty(itemView.user_response.text)) {
+                    Toast.makeText(itemView.context, "Please enter question", Toast.LENGTH_SHORT).show()
+                    return@OnClickListener
+                }
 
-                   var requestObject: JSONObject = JSONObject();
-                   requestObject.put("question", itemView.user_response.text);
-                   fragmentController.replaceFragment(OnScreenFragment(), true)
+                var requestObject: JSONObject = JSONObject();
+                requestObject.put("question", itemView.user_response.text);
+                fragmentController.replaceFragment(OnScreenFragment(), true)
 
-                   if (MainApplication.isLogin()) {
-                       requestObject.put("user_id", MainApplication.getInstance().userID);
+                if (MainApplication.isLogin()) {
+                    requestObject.put("user_id", MainApplication.getInstance().userID);
 
-                   }
+                }
+                MainApplication.showToast(R.string.faq_thanks)
+                NetworkDataProvider.doPostCallAsync(Urls.getFaqUrl(), requestObject, object : NetworkAsyncCallback<CustomJSONObject>() {
+                    override fun onNetworkFailure(ne: NetworkException?) {
+                    }
 
-                   NetworkDataProvider.doPostCallAsync(Urls.getFaqUrl(), requestObject, object : NetworkAsyncCallback<CustomJSONObject>() {
-                       override fun onNetworkFailure(ne: NetworkException?) {
-                       }
+                    override fun onNetworkSuccess(wrapper: CustomJSONObject?) {
+                    }
 
-                       override fun onNetworkSuccess(wrapper: CustomJSONObject?) {
-                       }
-
-                   })
-               })*/
+                })
+            })
         }
     }
 }

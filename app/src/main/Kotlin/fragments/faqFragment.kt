@@ -54,7 +54,7 @@ class FaqFragment : BaseFragment() {
             override fun onNetworkSuccess(wrapper: FaqList?) {
 
                 view?.progress_bar?.visibility = View.GONE;
-                mAdapter.dataList = wrapper?.faqList;
+                mAdapter.setData(wrapper?.faqList);
 
             }
 

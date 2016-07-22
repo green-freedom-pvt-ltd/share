@@ -10,7 +10,7 @@ import java.util.*
  */
 class FaqList :UnObfuscable, Serializable {
 
-    @SerializedName("faq")
+    @SerializedName("results")
     var faqList: ArrayList<Faq>? = null;
 
     class Faq : Serializable {

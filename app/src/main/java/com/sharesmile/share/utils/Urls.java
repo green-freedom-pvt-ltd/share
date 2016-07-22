@@ -12,7 +12,7 @@ public class Urls {
 
     private static final String LOGIN_URL = "/api/users/";
     private static final String FEEDBACK_URL = "/api/userFeedback/";
-    private static final String FAQ_URL = "/api/faq";
+    private static final String FAQ_URL = "/api/faq/";
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
     private static final String GOOGLE_BASE_URL = "https://www.googleapis.com";
