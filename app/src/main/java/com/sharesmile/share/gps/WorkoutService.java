@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
@@ -498,7 +499,7 @@ public class WorkoutService extends Service implements
 
     private NotificationCompat.Builder getNotificationBuilder() {
         String distDecimal = String.format("%1$,.1f", (mDistance / 1000));
-        float fDistance=Float.parseFloat(distDecimal);
+        float fDistance = Float.parseFloat(distDecimal);
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -506,6 +507,9 @@ public class WorkoutService extends Service implements
                         .setContentText("Amount raised : " + getString(R.string.rs_symbol) + rupees)
                         .setSmallIcon(R.mipmap.ic_launcher);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
 
         Intent resultIntent = new Intent(this, LoginActivity.class);
 

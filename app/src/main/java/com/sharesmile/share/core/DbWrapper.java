@@ -72,5 +72,6 @@ public class DbWrapper {
     public void clearAll() {
         getWorkoutDao().deleteAll();
         getUserdao().deleteAll();
+        mDaoSession.clear();
     }
 }

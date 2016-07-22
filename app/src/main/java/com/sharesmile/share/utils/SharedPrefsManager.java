@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.lang.reflect.Type;
@@ -69,6 +70,7 @@ public class SharedPrefsManager {
         SharedPreferences.Editor editor = getPrefs().edit();
         editor.clear();
         editor.commit();
+        setBoolean(Constants.PREF_FIRST_TIME_USER, false);
     }
 
     public void removeKey(String key) {

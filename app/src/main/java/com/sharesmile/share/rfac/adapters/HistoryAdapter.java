@@ -72,16 +72,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
         public void bindData(Workout workout) {
             if (workout.getDate() != null) {
-                mDate.setText(DateUtil.getDefaultFormattedDate(workout.getDate()));
+                mDate.setText(DateUtil.getUserFormattedDate(workout.getDate()));
             }
             mCause.setText(workout.getCauseBrief());
-            String km = (workout.getDistance() > 1 ? " kms" : " km");
             String distanceCovered = String.format("%1$,.1f", workout.getDistance());
-            mDistance.setText(distanceCovered + km);
+            mDistance.setText(distanceCovered + " km");
 
             mImpact.setText(mImpact.getContext().getString(R.string.rs_string, (int) Math.ceil(workout.getRunAmount())));
+            mImpact.setText (mImpact.getContext().getString(R.string.rs_symbol) +" "+ (int) Math.ceil(workout.getRunAmount()));
 
-            Log.i("anshul",""+workout.getId());
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());
             if (timeInSec >= 60) {
                 int timeInMin = (int) (Utils.stringToSec(workout.getElapsedTime()) / 60);

@@ -35,6 +35,7 @@ import com.sharesmile.share.views.MLTextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fragments.FaqFragment;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
 
@@ -207,7 +208,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             intent.putExtra(LoginActivity.BUNDLE_FROM_MAINACTIVITY, true);
             startActivityForResult(intent, REQUEST_CODE_LOGIN);
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-            replaceFragment(WebViewFragment.getInstance(WebViewFragment.DISPLAY_FAQ), true);
+            replaceFragment(new FaqFragment(), true);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         }

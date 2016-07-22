@@ -8,16 +8,19 @@ buildscript {
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    mavenCentral()
 }
 
 
@@ -47,13 +50,14 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'src/main/AndroidManifest.xml'
-            java.srcDirs = ['src/main/java', 'src/main/java-gen']
+            java.srcDirs = ['src/main/java', 'src/main/java-gen','src/main/Kotlin']
             res.srcDirs = ['src/main/res']
         }
 
         beta{
             res.srcDirs = ['src/beta/res']
         }
+        main.java.srcDirs += 'src/main/kotlin'
     }
 
     buildTypes {
@@ -125,4 +129,5 @@ dependencies {
     compile 'com.viewpagerindicator:library:2.4.1@aar'
 
     compile 'com.google.android.gms:play-services-analytics:8.3.0'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

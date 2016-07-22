@@ -17,6 +17,7 @@ import com.sharesmile.share.UserDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
+import com.sharesmile.share.sync.SyncHelper;
 
 import java.util.List;
 
@@ -33,8 +34,10 @@ public class ProfileHistoryFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SyncHelper.syncRunData();
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
+
 
     }
 

@@ -3,11 +3,11 @@
 
     <plurals name="time_in_min">
         <item quantity="one">%d min</item>
-        <item quantity="other">%d mins</item>
+        <item quantity="other">%d min</item>
     </plurals>
 
     <plurals name="time_in_sec">
         <item quantity="one">%d sec</item>
-        <item quantity="other">%d secs</item>
+        <item quantity="other">%d sec</item>
     </plurals>
 </resources>

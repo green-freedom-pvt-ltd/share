@@ -11,6 +11,7 @@ import java.util.Date;
 public class DateUtil {
 
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    public static String USER_FORMAT_DATE = "dd-MMM-yyyy hh:mm a";
 
     public static String getCurrentDate() {
 
@@ -28,6 +29,12 @@ public class DateUtil {
 
     }
 
+    public static String getUserFormattedDate(Date date) {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(USER_FORMAT_DATE);
+        return simpleDateFormat.format(date);
+
+    }
     public static Date getDefaultFormattedDate(String dateString) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);

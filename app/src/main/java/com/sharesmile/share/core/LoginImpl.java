@@ -40,6 +40,7 @@ import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.GoogleOauthResponse;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.BasicNameValuePair;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Logger;
@@ -248,23 +249,12 @@ public class LoginImpl {
         UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
         userDao.insertOrReplace(user);
 
-        //Sync run data;
-        syncRunData();
+        //Sync run data;o
+        SyncHelper.syncRunData();
 
         mListener.onLoginSuccess();
     }
 
-    private void syncRunData() {
-        OneoffTask task = new OneoffTask.Builder()
-                .setService(SyncService.class)
-                .setTag(TaskConstants.UPDATE_WORKOUT_DATA)
-                .setExecutionWindow(0L, 1L)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getContext().getApplicationContext());
-        mGcmNetworkManager.schedule(task);
-    }
 
     private GoogleApiClient.OnConnectionFailedListener mConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
         @Override

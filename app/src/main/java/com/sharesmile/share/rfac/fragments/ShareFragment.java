@@ -192,11 +192,10 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         float distanceInMeters = mWorkoutData.getDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
         String distanceCovered = String.format("%1$,.1f", (distanceInMeters / 1000));
-        String km = (distanceInMeters > 1000 ? " kms" : " km");
-        mDistance.setText(distanceCovered + km);
+        mDistance.setText(distanceCovered + " km");
 
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
-        mContributionAmount.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
+        mContributionAmount.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
 
 
         mTime.setText(getTimeInHHMMFormat((int) (elapsedTimeInSecs * 1000)));
@@ -382,10 +381,10 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         int secs = (int) (millis / 1000);
         if (secs >= 3600) {
-            return String.format("%02dhr %02dmins", TimeUnit.MILLISECONDS.toHours(millis),
+            return String.format("%02dhr %02dmin", TimeUnit.MILLISECONDS.toHours(millis),
                     TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
         } else {
-            return String.format("%02dmins",
+            return String.format("%02dmin",
                     TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
 
         }

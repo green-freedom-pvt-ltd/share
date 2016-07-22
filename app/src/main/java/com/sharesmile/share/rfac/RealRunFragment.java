@@ -248,7 +248,7 @@ public class RealRunFragment extends RunFragment {
     public void showStopDialog() {
         String rDistance = distance.getText().toString();
         Float fDistance = Float.parseFloat(rDistance);
-        if (mCauseData.getMinDistance() > fDistance) {
+        if (mCauseData.getMinDistance() > (fDistance*1000)) {
             showMinDistanceDialog();
         } else {
             showRunEndDialog();
