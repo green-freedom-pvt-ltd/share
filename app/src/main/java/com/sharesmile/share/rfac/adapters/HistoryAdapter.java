@@ -78,7 +78,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             String distanceCovered = String.format("%1$,.1f", workout.getDistance());
             mDistance.setText(distanceCovered + " km");
 
-            mImpact.setText(mImpact.getContext().getString(R.string.rs_string, (int) Math.ceil(workout.getRunAmount())));
+         //   mImpact.setText(mImpact.getContext().getString(R.string.rs_string, (int) Math.ceil(workout.getRunAmount())));
             mImpact.setText (mImpact.getContext().getString(R.string.rs_symbol) +" "+ (int) Math.ceil(workout.getRunAmount()));
 
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());

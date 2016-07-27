@@ -505,7 +505,7 @@ public class WorkoutService extends Service implements
                 new NotificationCompat.Builder(this)
                         .setContentTitle("Running")
                         .setContentText("Amount raised : " + getString(R.string.rs_symbol) + rupees)
-                        .setSmallIcon(R.mipmap.ic_launcher);
+                        .setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -522,6 +522,11 @@ public class WorkoutService extends Service implements
                 );
         mBuilder.setContentIntent(resultPendingIntent);
         return mBuilder;
+    }
+
+    private int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.notification_icon : R.mipmap.ic_launcher;
     }
 
 }

@@ -24,5 +24,7 @@ public class DBEvent {
         public CauseFetchDataFromDb(){}
     }
 
-    ;
+    public static class RunDataUpdated {
+        public RunDataUpdated(){}
+    }
 }

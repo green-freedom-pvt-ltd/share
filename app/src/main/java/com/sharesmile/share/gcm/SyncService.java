@@ -16,6 +16,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunList;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -42,9 +43,9 @@ public class SyncService extends GcmTaskService {
         if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_WORKOUT_DATA)) {
             return uploadWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPDATE_WORKOUT_DATA)) {
-            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            long count = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
-            return updateWorkoutData(Urls.getRunUrl(), count);
+          //  WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            //long count = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
+            return SyncHelper.updateWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
         }
@@ -89,7 +90,7 @@ public class SyncService extends GcmTaskService {
 
     }
 
-    private int updateWorkoutData(String runUrl, long workoutCount) {
+   /* private int updateWorkoutData(String runUrl, long workoutCount) {
         try {
             RunList runList = NetworkDataProvider.doGetCall(runUrl, RunList.class);
             if (workoutCount >= runList.getTotalRunCount()) {
@@ -109,7 +110,7 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "update NetworkException" + e.getMessageFromServer() + e.getMessage());
         }
         return 0;
-    }
+    }*/
 
     private int uploadWorkoutData() {
 

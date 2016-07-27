@@ -132,7 +132,8 @@ public class RealRunFragment extends RunFragment {
             workout.setAvgSpeed(data.getAvgSpeed());
             workout.setDistance(data.getDistance() / 1000);
             workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
-            workout.setRunAmount((float) Math.ceil(workout.getDistance() * mCauseData.getConversionRate()));
+            int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distance.getText().toString()));
+            workout.setRunAmount((float)rupees);
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());

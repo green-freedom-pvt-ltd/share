@@ -33,6 +33,8 @@ import java.util.List;
  */
 public class SyncTaskManger extends IntentService {
     private static final String ACTION_CAUSE = "com.sharesmile.share.sync.action.cause";
+    private static final String ACTION_UPDATE_RUN = "com.sharesmile.share.sync.action.updaterundata";
+
 
     // TODO: Rename parameters
     private static final String EXTRA_PARAM1 = "com.sharesmile.share.sync.extra.PARAM1";
@@ -48,12 +50,20 @@ public class SyncTaskManger extends IntentService {
         context.startService(intent);
     }
 
+    public static void startRunDataUpdate(Context context) {
+        Intent intent = new Intent(context, SyncTaskManger.class);
+        intent.setAction(ACTION_UPDATE_RUN);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_CAUSE.equals(action)) {
                 updateCauses();
+            }else if(ACTION_UPDATE_RUN.equals(action)){
+                SyncHelper.updateWorkoutData();
             }
         }
     }
@@ -62,7 +72,6 @@ public class SyncTaskManger extends IntentService {
 
         try {
             CauseList causeList = NetworkDataProvider.doGetCall(Urls.getCauseListUrl(), CauseList.class);
-
             CauseDao mCauseDao = MainApplication.getInstance().getDbWrapper().getCauseDao();
 
             CauseList activeCauseList = new CauseList();
