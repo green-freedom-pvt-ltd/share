@@ -19,6 +19,8 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import io.fabric.sdk.android.Fabric;
+import com.onesignal.OneSignal;
+
 
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
@@ -136,6 +138,7 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //Initialization code
+        OneSignal.startInit(this).init();
         SharedPrefsManager.initialize(getApplicationContext());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
