@@ -37,6 +37,9 @@ android {
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled false
+        manifestPlaceholders = [manifestApplicationId: "${applicationId}",
+                                onesignal_app_id: "c6288ab1-1ded-48e4-a980-7e7195c54194",
+                                onesignal_google_project_number: "159550091621"]
     }
     signingConfigs{
         release {
@@ -115,6 +118,9 @@ dependencies {
     compile('com.twitter.sdk.android:tweet-composer:1.0.3@aar') {
         transitive = true;
     }
+
+    compile 'com.onesignal:OneSignal:2.+@aar'
+
 
     compile 'com.facebook.android:facebook-android-sdk:4.+'
     compile 'com.jakewharton:butterknife:8.0.1'
