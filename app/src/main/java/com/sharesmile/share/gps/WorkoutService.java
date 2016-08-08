@@ -76,7 +76,7 @@ public class WorkoutService extends Service implements
         super.onCreate();
         Logger.i(TAG, "onCreate");
         mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA), CauseData.class);
-        makeForeground();
+       // makeForeground();
     }
 
     @Override
@@ -245,7 +245,7 @@ public class WorkoutService extends Service implements
         mDistance = totalDistance;
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
-        updateNotification();
+        //updateNotification();
     }
 
     private void sendBroadcast(Bundle bundle) {
