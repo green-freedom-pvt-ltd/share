@@ -150,6 +150,7 @@ public class SyncService extends GcmTaskService {
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
 
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            //delete row
             mWorkoutDao.delete(workout);
             workout.setId(response.getId());
             workout.setIs_sync(true);

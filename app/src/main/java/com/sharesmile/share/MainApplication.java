@@ -8,10 +8,11 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.onesignal.OneSignal;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -19,7 +20,6 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import io.fabric.sdk.android.Fabric;
-import com.onesignal.OneSignal;
 
 
 /**
@@ -143,6 +143,11 @@ public class MainApplication extends Application {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
+        startSyncTasks();
+    }
+
+    private void startSyncTasks() {
+        SyncHelper.syncRunData();
     }
 
     public DbWrapper getDbWrapper() {

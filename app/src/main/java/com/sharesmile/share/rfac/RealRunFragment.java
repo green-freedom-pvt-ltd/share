@@ -3,29 +3,21 @@ package com.sharesmile.share.rfac;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gcm.SyncService;
-import com.sharesmile.share.gcm.TaskConstants;
-import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -132,8 +124,12 @@ public class RealRunFragment extends RunFragment {
             workout.setAvgSpeed(data.getAvgSpeed());
             workout.setDistance(data.getDistance() / 1000);
             workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
-            int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distance.getText().toString()));
-            workout.setRunAmount((float)rupees);
+
+            //data.getDistance()
+            String distDecimal = String.format("%1$,.1f", (data.getDistance() / 1000));
+            int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distDecimal));
+
+            workout.setRunAmount((float) rupees);
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());
@@ -141,16 +137,8 @@ public class RealRunFragment extends RunFragment {
             workout.setIs_sync(false);
             workoutDao.insertOrReplace(workout);
 
-            OneoffTask task = new OneoffTask.Builder()
-                    .setService(SyncService.class)
-                    .setTag(TaskConstants.UPLOAD_WORKOUT_DATA)
-                    .setExecutionWindow(0L, 60L)
-                    .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
-                    .build();
-
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN,true);
-            GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getActivity());
-            mGcmNetworkManager.schedule(task);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
+            SyncHelper.pushRunData();
         }
     }
 
@@ -249,7 +237,7 @@ public class RealRunFragment extends RunFragment {
     public void showStopDialog() {
         String rDistance = distance.getText().toString();
         Float fDistance = Float.parseFloat(rDistance);
-        if (mCauseData.getMinDistance() > (fDistance*1000)) {
+        if (mCauseData.getMinDistance() > (fDistance * 1000)) {
             showMinDistanceDialog();
         } else {
             showRunEndDialog();

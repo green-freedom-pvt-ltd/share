@@ -21,21 +21,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.Task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.sharesmile.share.CustomJSONObject;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
-import com.sharesmile.share.gcm.SyncService;
-import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
@@ -61,8 +53,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import retrofit.http.HEAD;
 
 /**
  * Created by Shine on 19/05/16.
@@ -249,8 +239,8 @@ public class LoginImpl {
         UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
         userDao.insertOrReplace(user);
 
-        //Sync run data;o
-        SyncHelper.syncRunData();
+        //Sync run data;
+        SyncHelper.fetchRunData();
 
         mListener.onLoginSuccess();
     }

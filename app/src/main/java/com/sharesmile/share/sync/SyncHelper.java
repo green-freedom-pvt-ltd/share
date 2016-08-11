@@ -28,10 +28,27 @@ public class SyncHelper {
     private static final String TAG = SyncHelper.class.getSimpleName();
 
     public static void syncRunData() {
+        fetchRunData();
+        pushRunData();
+    }
+
+    public static void fetchRunData() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPDATE_WORKOUT_DATA)
                 .setExecutionWindow(0L, 1L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
+    public static void pushRunData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_WORKOUT_DATA)
+                .setExecutionWindow(0L, 60L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
                 .build();
 
