@@ -380,6 +380,7 @@ public class WorkoutService extends Service implements
     @Override
     public float getTotalDistanceCoveredInMeters() {
         if (tracker != null && tracker.isActive()){
+            Logger.d(TAG, "getTotalDistanceCoveredInMeters from Tracker");
             return tracker.getTotalDistanceCovered();
         }
         return 0;
@@ -388,7 +389,9 @@ public class WorkoutService extends Service implements
     @Override
     public long getWorkoutElapsedTimeInSecs() {
         if (tracker != null && tracker.isActive()){
-            return tracker.getElapsedTimeInSecs();
+            long elapsedTime = tracker.getElapsedTimeInSecs();
+            Logger.d(TAG, "getElapsedTimeInSecs from Tracker = " + elapsedTime);
+            return elapsedTime;
         }
         return 0;
     }

@@ -292,9 +292,11 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public int getElapsedTimeInSecs(){
+    public long getElapsedTimeInSecs(){
         if (isBoundToLocationService()) {
-            locationService.getTracker().getElapsedTimeInSecs();
+            long elapsedTime = locationService.getWorkoutElapsedTimeInSecs();
+            Logger.d(TAG, "getElapsedTimeInSecs = " + elapsedTime);
+            return elapsedTime;
         }
         return 0;
     }
@@ -369,6 +371,7 @@ public class TrackerActivity extends BaseActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to WorkoutService, cast the IBinder and get WorkoutService instance
+            Logger.d(TAG, "onServiceConnected");
             WorkoutService.MyBinder binder = (WorkoutService.MyBinder) service;
             locationService = binder.getService();
             if (runFragment != null){

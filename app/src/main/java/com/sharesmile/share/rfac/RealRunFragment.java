@@ -203,7 +203,7 @@ public class RealRunFragment extends RunFragment {
             impact.setText(SharedPrefsManager.getInstance().getString(RUPEES_IMPACT_ON_PAUSE));
             distance.setText(SharedPrefsManager.getInstance().getString(DISTANCE_COVERED_ON_PAUSE));
         } else {
-            refreshWorkoutData();
+//            refreshWorkoutData();
         }
     }
 
