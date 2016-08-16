@@ -152,9 +152,14 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         }
     }
 
+    public void refreshWorkoutData(){
+        showUpdate(myActivity.getCurrentSpeed(), myActivity.getTotalDistanceInMeters(),
+                myActivity.getElapsedTimeInSecs());
+    }
+
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
-        myActivity.beginRun();
+        myActivity.continuedRun();
         setIsRunActive(true);
         workoutData = null;
         if (!isRunning()){

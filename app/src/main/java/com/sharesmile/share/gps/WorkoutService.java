@@ -75,8 +75,8 @@ public class WorkoutService extends Service implements
     public void onCreate() {
         super.onCreate();
         Logger.i(TAG, "onCreate");
-        mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA), CauseData.class);
-       // makeForeground();
+        mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
+                CauseData.class);
     }
 
     @Override
@@ -95,6 +95,8 @@ public class WorkoutService extends Service implements
             tracker = new RunTracker(backgroundExecutorService, this);
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
+        mDistance = tracker.getTotalDistanceCovered();
+        makeForeground();
     }
 
 
@@ -245,7 +247,7 @@ public class WorkoutService extends Service implements
         mDistance = totalDistance;
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
-        //updateNotification();
+        updateNotification();
     }
 
     private void sendBroadcast(Bundle bundle) {
@@ -376,6 +378,38 @@ public class WorkoutService extends Service implements
     }
 
     @Override
+    public float getTotalDistanceCoveredInMeters() {
+        if (tracker != null && tracker.isActive()){
+            return tracker.getTotalDistanceCovered();
+        }
+        return 0;
+    }
+
+    @Override
+    public long getWorkoutElapsedTimeInSecs() {
+        if (tracker != null && tracker.isActive()){
+            return tracker.getElapsedTimeInSecs();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getTotalStepsInWorkout() {
+        if (tracker != null && tracker.isActive()){
+            return tracker.getTotalSteps();
+        }
+        return 0;
+    }
+
+    @Override
+    public float getCurrentSpeed() {
+        if (tracker != null && tracker.isActive()){
+            return tracker.getCurrentSpeed();
+        }
+        return 0;
+    }
+
+    @Override
     public Tracker getTracker() {
         return tracker;
     }
@@ -485,7 +519,7 @@ public class WorkoutService extends Service implements
     }
 
     private void makeForeground() {
-        Notification notification = getNotificationBuilder().getNotification();
+        Notification notification = getNotificationBuilder().build();
         startForeground(1000, notification);
     }
 
