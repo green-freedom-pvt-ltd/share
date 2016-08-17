@@ -140,6 +140,14 @@ public class RunTracker implements Tracker {
         return dataStore.getDistanceCoveredSinceLastResume();
     }
 
+    @Override
+    public float getCurrentSpeed() {
+        if (lastRecord != null && !lastRecord.isStartRecord()){
+            return lastRecord.getSpeed();
+        }
+        return 0;
+    }
+
     /**
      * Returns true iff state is PAUSED
      * @return
