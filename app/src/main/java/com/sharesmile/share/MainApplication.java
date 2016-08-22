@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.Tracker;
-import com.onesignal.OneSignal;
+//import com.onesignal.OneSignal;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.sync.SyncHelper;
@@ -18,6 +18,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -36,6 +37,7 @@ public class MainApplication extends Application {
     private DbWrapper mDbWrapper;
     private String mToken;
     private int mUserId = 0;
+    MixpanelAPI mMixpanel;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -138,7 +140,12 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //Initialization code
-        OneSignal.startInit(this).init();
+//        OneSignal.startInit(this).init();
+        mMixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
+        MixpanelAPI.People people = mMixpanel.getPeople();
+//        people.identify(String.valueOf(getUserID()));
+        people.initPushHandling("159550091621");
+
         SharedPrefsManager.initialize(getApplicationContext());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
@@ -164,6 +171,7 @@ public class MainApplication extends Application {
     public int getUserID() {
         if (mUserId == 0) {
             mUserId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
+
         }
         return mUserId;
     }

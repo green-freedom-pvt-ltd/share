@@ -42,6 +42,8 @@ import com.sharesmile.share.utils.Urls;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,6 +69,7 @@ public class LoginImpl {
     private WeakReference<Fragment> fragmentWeakReference = null;
     private CallbackManager callbackManager;
     private GoogleApiClient mGoogleApiClient;
+    MixpanelAPI mMixpanel;
 
     public LoginImpl(AppCompatActivity activity, LoginListener listener) {
         activityWeakReference = new WeakReference<AppCompatActivity>(activity);

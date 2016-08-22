@@ -32,10 +32,14 @@ import com.sharesmile.share.utils.CustomTypefaceSpan;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLTextView;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fragments.FaqFragment;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
 
@@ -44,6 +48,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
+    MixpanelAPI mixpanel;
 
     @BindView(R.id.toolbar_title)
     TextView mToolbarTitle;
@@ -55,6 +60,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
+
+        try {
+            JSONObject props = new JSONObject();
+            props.put("Logged in", false);
+            mixpanel.track("MainActivity - onCreate called", props);
+        } catch (JSONException e) {
+            Logger.e(TAG, "Unable to add properties to JSONObject", e);
+        }
+
         ButterKnife.bind(this);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
@@ -252,5 +268,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
+    }
+
+    public void onDestroy() {
+        mixpanel.flush();
+        super.onDestroy();
     }
 }

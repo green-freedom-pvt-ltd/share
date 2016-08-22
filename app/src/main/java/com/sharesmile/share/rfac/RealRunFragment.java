@@ -18,14 +18,19 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.sync.SyncHelper;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 /**
  * Created by ankitm on 22/04/16.
@@ -48,6 +53,7 @@ public class RealRunFragment extends RunFragment {
     @BindView(R.id.timer_indicator)
     TextView mTimerIndicator;
     private CauseData mCauseData;
+    MixpanelAPI mixpanel;
 
     public static final String RUPEES_IMPACT_ON_PAUSE = "rupees_impact_on_pause";
     public static final String DISTANCE_COVERED_ON_PAUSE = "distance_covered_on_pause";
@@ -136,6 +142,19 @@ public class RealRunFragment extends RunFragment {
             workout.setDate(Calendar.getInstance().getTime());
             workout.setIs_sync(false);
             workoutDao.insertOrReplace(workout);
+
+            mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
+            try {
+                JSONObject props = new JSONObject();
+                props.put("End Run", "Clicked");
+                props.put("RunAmount",rupees);
+                props.put("CauseBrief",mCauseData.getTitle());
+                props.put("Distance Ran",distDecimal);
+
+                mixpanel.track("RealRunFragment - onWorkoutResult called", props);
+            } catch (JSONException e) {
+                Logger.e(TAG, "Unable to add properties to JSONObject", e);
+            }
 
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
             SyncHelper.pushRunData();

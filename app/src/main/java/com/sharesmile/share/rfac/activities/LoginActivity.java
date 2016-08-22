@@ -16,10 +16,15 @@ import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
 
 /**
  * Created by apurvgandhwani on 4/5/2016.
@@ -44,6 +49,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     LinearLayout mProgressContainer;
     private boolean isFromMainActivity;
     private LoginImpl mLoginHandler;
+    MixpanelAPI mixpanel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void initUi() {
+
         tv_skip.setOnClickListener(this);
         mFbLoginButton.setOnClickListener(this);
         mGoogleLoginButton.setOnClickListener(this);
@@ -92,17 +100,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
+        mixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
+
         switch (v.getId()) {
             case R.id.btn_login_fb:
                 // performFbLogin();
+
+                try {
+                    JSONObject props = new JSONObject();
+                    props.put("Perform Login ", "FB");
+                    mixpanel.track("LoginActivity - initUi called", props);
+                } catch (JSONException e) {
+                }
+
                 mLoginHandler.performFbLogin();
                 break;
             case R.id.tv_welcome_skip:
                 SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
                 prefsManager.setBoolean(Constants.PREF_LOGIN_SKIP, true);
+
+                try {
+                    JSONObject props = new JSONObject();
+                    props.put("Perform Login ", "Skipped");
+                    mixpanel.track("LoginActivity - initUi called", props);
+                } catch (JSONException e) {
+                }
+
                 startMainActivity();
                 break;
             case R.id.btn_login_google:
+
+                try {
+                    JSONObject props = new JSONObject();
+                    props.put("Perform Login ", "Google");
+                    mixpanel.track("LoginActivity - initUi called", props);
+                } catch (JSONException e) {
+                }
+
                 mLoginHandler.performGoogleLogin();
                 break;
 

@@ -37,9 +37,9 @@ android {
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled false
-        manifestPlaceholders = [manifestApplicationId: "${applicationId}",
-                                onesignal_app_id: "c6288ab1-1ded-48e4-a980-7e7195c54194",
-                                onesignal_google_project_number: "159550091621"]
+//        manifestPlaceholders = [manifestApplicationId: "${applicationId}",
+//                                onesignal_app_id: "c6288ab1-1ded-48e4-a980-7e7195c54194",
+//                                onesignal_google_project_number: "159550091621"]
     }
     signingConfigs{
         release {
@@ -119,7 +119,8 @@ dependencies {
         transitive = true;
     }
 
-    compile 'com.onesignal:OneSignal:2.+@aar'
+//    compile 'com.onesignal:OneSignal:2.+@aar'
+    compile "com.mixpanel.android:mixpanel-android:4.+"
 
 
     compile 'com.facebook.android:facebook-android-sdk:4.+'

@@ -33,6 +33,8 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLButton;
 import com.sharesmile.share.views.MRButton;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -43,6 +45,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class OnScreenFragment extends BaseFragment implements View.OnClickListener {
 
@@ -60,6 +65,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     ProgressBar mProgressBar;
 
     private CausePageAdapter mAdapter;
+    MixpanelAPI mixpanel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,6 +147,14 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_lets_run:
+                mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
+                try {
+                    JSONObject props = new JSONObject();
+                    props.put("Let's Run", "Clicked");
+                    mixpanel.track("OnScreenFragment - onClick called", props);
+                } catch (JSONException e) {
+                    Logger.e(TAG, "Unable to add properties to JSONObject", e);
+                }
                 getFragmentController().performOperation(IFragmentController.START_RUN, mAdapter.getItemAtPosition(viewPager.getCurrentItem()));
                 break;
             default:
