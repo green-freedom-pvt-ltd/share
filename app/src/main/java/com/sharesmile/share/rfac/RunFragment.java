@@ -78,6 +78,9 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     public abstract void onWorkoutResult(WorkoutData data);
 
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs){
+        Logger.d(TAG, "showUpdate: distanceCovered = " + distanceCovered
+                + ", elapsedTimeInSecs " + elapsedTimeInSecs
+                + ", secsSinceRunBegan = " + secsSinceRunBegan);
         if (secsSinceRunBegan == -1){
             startTimer(elapsedTimeInSecs);
         }
@@ -152,9 +155,14 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         }
     }
 
+    public void refreshWorkoutData(){
+        showUpdate(myActivity.getCurrentSpeed(), myActivity.getTotalDistanceInMeters(),
+                (int) myActivity.getElapsedTimeInSecs());
+    }
+
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
-        myActivity.beginRun();
+        myActivity.continuedRun();
         setIsRunActive(true);
         workoutData = null;
         if (!isRunning()){

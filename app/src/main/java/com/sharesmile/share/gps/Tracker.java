@@ -1,6 +1,5 @@
 package com.sharesmile.share.gps;
 
-import android.hardware.SensorEvent;
 import android.location.Location;
 
 import com.sharesmile.share.gps.models.DistRecord;
@@ -27,6 +26,7 @@ public interface Tracker {
 	int getTotalSteps();
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();
+	float getCurrentSpeed();
 	DistRecord getLastRecord();
 	State getState();
 

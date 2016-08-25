@@ -58,8 +58,6 @@ public class TrackerActivity extends BaseActivity {
     private RunFragment runFragment;
     private boolean runInTestMode;
     private boolean openHomeOnExit;
-    private float currentDistanceCovered;
-    private int currentTotalSteps;
 
     private static final int HOME = 0;
     private static final int PROFILE = 1;
@@ -259,12 +257,14 @@ public class TrackerActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationServiceReceiver);
     }
 
+    public void continuedRun(){
+        invokeLocationService();
+    }
+
     public void beginRun() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
-            currentDistanceCovered = 0;
-            currentTotalSteps = 0;
             invokeLocationService();
         } else {
             //Need to get permissions
@@ -292,19 +292,34 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public int getElapsedTimeInSecs(){
+    public long getElapsedTimeInSecs(){
         if (isBoundToLocationService()) {
-            locationService.getTracker().getElapsedTimeInSecs();
+            long elapsedTime = locationService.getWorkoutElapsedTimeInSecs();
+            Logger.d(TAG, "getElapsedTimeInSecs = " + elapsedTime);
+            return elapsedTime;
         }
         return 0;
     }
 
     public float getTotalDistanceInMeters(){
-        return currentDistanceCovered;
+        if (isBoundToLocationService()){
+            return locationService.getTotalDistanceCoveredInMeters();
+        }
+        return 0;
     }
 
-    public float getTotalSteps(){
-        return currentTotalSteps;
+    public float getCurrentSpeed(){
+        if (isBoundToLocationService()){
+            return locationService.getCurrentSpeed();
+        }
+        return 0;
+    }
+
+    public int getTotalSteps(){
+        if (isBoundToLocationService()){
+            return locationService.getTotalStepsInWorkout();
+        }
+        return 0;
     }
 
     private void unbindLocationService() {
@@ -356,8 +371,12 @@ public class TrackerActivity extends BaseActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to WorkoutService, cast the IBinder and get WorkoutService instance
+            Logger.d(TAG, "onServiceConnected");
             WorkoutService.MyBinder binder = (WorkoutService.MyBinder) service;
             locationService = binder.getService();
+            if (runFragment != null){
+                runFragment.refreshWorkoutData();
+            }
         }
 
         @Override
@@ -412,20 +431,18 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
-                        currentDistanceCovered = result.getDistance();
-                        currentTotalSteps = result.getTotalSteps();
                         runFragment.onWorkoutResult(result);
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
                         float currentSpeed = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_SPEED);
-                        currentDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
+                        float currentDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
                         int elapsedTimeInSecs = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
                         runFragment.showUpdate(currentSpeed, currentDistanceCovered, elapsedTimeInSecs);
                         break;
 
                     case Constants.BROADCAST_STEPS_UPDATE_CODE:
-                        currentTotalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
+                        int currentTotalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
                         int elapsedTime = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
                         runFragment.showSteps(currentTotalSteps, elapsedTime);
                         break;
