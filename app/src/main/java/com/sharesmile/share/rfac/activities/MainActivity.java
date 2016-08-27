@@ -95,12 +95,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Menu menu = mNavigationView.getMenu();
         MenuItem loginMenu = menu.findItem(R.id.nav_item_login);
         MenuItem profileMenu = menu.findItem(R.id.nav_item_profile);
+        MenuItem leaderboardMenu = menu.findItem(R.id.nav_item_leaderboard);
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)) {
             loginMenu.setVisible(false);
             profileMenu.setVisible(true);
+            leaderboardMenu.setVisible(true);
         } else {
             loginMenu.setVisible(true);
             profileMenu.setVisible(false);
+            leaderboardMenu.setVisible(false);
         }
 
         Menu m = mNavigationView.getMenu();

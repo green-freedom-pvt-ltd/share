@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
@@ -37,11 +36,11 @@ android {
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled false
-        manifestPlaceholders = [manifestApplicationId: "${applicationId}",
-                                onesignal_app_id: "c6288ab1-1ded-48e4-a980-7e7195c54194",
+        manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
+                                onesignal_app_id               : "c6288ab1-1ded-48e4-a980-7e7195c54194",
                                 onesignal_google_project_number: "159550091621"]
     }
-    signingConfigs{
+    signingConfigs {
         release {
             storeFile file("impactRunKeyStore.jks")
             storePassword "greenfreedom"
@@ -53,11 +52,11 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'src/main/AndroidManifest.xml'
-            java.srcDirs = ['src/main/java', 'src/main/java-gen','src/main/Kotlin']
+            java.srcDirs = ['src/main/java', 'src/main/java-gen', 'src/main/Kotlin']
             res.srcDirs = ['src/main/res']
         }
 
-        beta{
+        beta {
             res.srcDirs = ['src/beta/res']
         }
         main.java.srcDirs += 'src/main/kotlin'
@@ -141,4 +140,5 @@ dependencies {
 
     compile 'com.google.android.gms:play-services-analytics:8.3.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
 }

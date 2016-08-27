@@ -18,7 +18,8 @@
         android:title="@string/login" />
     <item
         android:id="@+id/nav_item_leaderboard"
-        android:icon="@drawable/svg_ic_face_black_24_px"
+        android:icon="@drawable/ic_stars_black_24dp"
+        android:visible="false"
         android:title="@string/leaderboard" />
     <item
         android:id="@+id/nav_item_aboutUs"

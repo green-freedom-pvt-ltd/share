@@ -46,4 +46,5 @@
     <dimen name="view_pager_margin_left">40dp</dimen>
     <dimen name="view_pager_margin_right">40dp</dimen>
     <dimen name="view_pager_margin_top">40dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>
