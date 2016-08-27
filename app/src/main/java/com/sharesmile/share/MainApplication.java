@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.Tracker;
-//import com.onesignal.OneSignal;
+import com.onesignal.OneSignal;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.sync.SyncHelper;
@@ -140,7 +140,7 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //Initialization code
-//        OneSignal.startInit(this).init();
+        OneSignal.startInit(this).init();
         mMixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
         MixpanelAPI.People people = mMixpanel.getPeople();
 //        people.identify(String.valueOf(getUserID()));

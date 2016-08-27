@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
@@ -541,8 +542,13 @@ public class WorkoutService extends Service implements
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle("Running")
-                        .setContentText("Amount raised : " + getString(R.string.rs_symbol) + rupees)
-                        .setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue));
+                        .setContentText("Raised  : " + getString(R.string.rs_symbol) + rupees)
+                        .setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue))
+                        .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(),
+                                R.mipmap.ic_launcher))
+                        .setTicker(getBaseContext().getResources().getString(R.string.app_name))
+                        .setOngoing(true)
+                        .setVisibility(1);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -563,7 +569,7 @@ public class WorkoutService extends Service implements
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.drawable.notification_icon : R.mipmap.ic_launcher;
+        return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
     }
 
 }

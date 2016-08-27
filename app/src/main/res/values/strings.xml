@@ -96,6 +96,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="profile">Profile</string>
     <string name="profile_msg">Let\'s begin your ImpactRuns</string>
     <string name="login">Login</string>
+    <string name="leaderboard">Leader Board</string>
     <string name="share_msg">I use ImpactRun to track my daily runs and \'do good\' for society with every step. Check it out. It\'s amazing! https://goo.gl/9a0s34</string>
     <string name="logout">Logout</string>
     <string name="logout_msg">Are you sure you want to logout?</string>
