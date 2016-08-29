@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.sharesmile.share.Message
 import com.sharesmile.share.R
+import com.sharesmile.share.utils.DateUtil
+import com.sharesmile.share.utils.Utils
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_message_center.view.*
 import java.util.*
@@ -43,7 +45,7 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
 
         public fun bindData(data: Message) {
 
-            itemView.date.text = data.message_date;
+            itemView.date.text = DateUtil.getUserFormattedDate(DateUtil.getDefaultFormattedDate(data.message_date,DateUtil.DEFAULT_DATE_FORMAT_DATE_ONLY),DateUtil.USER_FORMAT_DATE_DATE_ONLY);
             itemView.description.text = data.messageBrief
             Picasso.with(itemView.context).load(data.message_image).placeholder(R.drawable.cause_image_placeholder).into(itemView.message_image)
             itemView.setOnClickListener(object : View.OnClickListener {

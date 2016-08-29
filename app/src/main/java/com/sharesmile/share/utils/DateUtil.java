@@ -11,7 +11,10 @@ import java.util.Date;
 public class DateUtil {
 
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    public static String DEFAULT_DATE_FORMAT_DATE_ONLY = "yyyy-MM-dd";
     public static String USER_FORMAT_DATE = "dd-MMM-yyyy hh:mm a";
+    public static String USER_FORMAT_DATE_DATE_ONLY = "dd-MMM-yyyy";
+
 
     public static String getCurrentDate() {
 
@@ -30,20 +33,29 @@ public class DateUtil {
     }
 
     public static String getUserFormattedDate(Date date) {
+        return getUserFormattedDate(date, USER_FORMAT_DATE);
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(USER_FORMAT_DATE);
+    }
+
+    public static String getUserFormattedDate(Date date, String format) {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         return simpleDateFormat.format(date);
 
     }
-    public static Date getDefaultFormattedDate(String dateString) {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+    public static Date getDefaultFormattedDate(String dateString) {
+        return getDefaultFormattedDate(dateString, DEFAULT_DATE_FORMAT);
+    }
+
+    public static Date getDefaultFormattedDate(String dateString, String format) {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         try {
-           return simpleDateFormat.parse(dateString);
+            return simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
-
     }
 }
