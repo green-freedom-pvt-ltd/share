@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="22dp"
+
+    android:orientation="vertical">
+
+    <com.sharesmile.share.views.MSBTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Any other question ? Ask us:"
+        android:textColor="@color/greyish_brown_two"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/user_response"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:hint="Enter your question here"
+        android:textColor="@color/greyish_brown_two"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_margin="18dp"
+        android:background="@drawable/rounded_corner"
+        android:text="@string/submit"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:textSize="16sp" />
+</LinearLayout>

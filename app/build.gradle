@@ -1,0 +1,144 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+    mavenCentral()
+}
+
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
+
+    defaultConfig {
+        applicationId "com.sharesmile.share"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 25
+        versionName "1.4.3"
+        generatedDensities = []
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled false
+        manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
+                                onesignal_app_id               : "c6288ab1-1ded-48e4-a980-7e7195c54194",
+                                onesignal_google_project_number: "159550091621"]
+    }
+    signingConfigs {
+        release {
+            storeFile file("impactRunKeyStore.jks")
+            storePassword "greenfreedom"
+            keyAlias "impactRun"
+            keyPassword "greenfreedom"
+        }
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java', 'src/main/java-gen', 'src/main/Kotlin']
+            res.srcDirs = ['src/main/res']
+        }
+
+        beta {
+            res.srcDirs = ['src/beta/res']
+        }
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    productFlavors {
+        prod {
+
+        }
+        beta {
+
+        }
+
+    }
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
+
+    dexOptions {
+        jumboMode = true
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.google.android.gms:play-services-location:8.3.0'
+    compile 'com.google.android.gms:play-services-maps:8.3.0'
+    compile 'com.google.android.gms:play-services-fitness:8.3.0'
+    compile 'com.google.android.gms:play-services-auth:8.3.0'
+    compile 'com.google.android.gms:play-services-plus:8.3.0'
+    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:design:23.2.0'
+    compile 'com.android.support:support-v4:23.2.0'
+    compile 'com.android.support:support-vector-drawable:23.2.0'
+    compile 'com.android.support:recyclerview-v7:23.2.0'
+    compile 'com.android.support:cardview-v7:23.2.0'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+        transitive = true;
+    }
+    compile('com.twitter.sdk.android:tweet-composer:1.0.3@aar') {
+        transitive = true;
+    }
+
+    compile 'com.onesignal:OneSignal:2.+@aar'
+    compile "com.mixpanel.android:mixpanel-android:4.+"
+
+
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
+    compile 'com.jakewharton:butterknife:8.0.1'
+    apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    compile 'de.greenrobot:greendao:2.1.0'
+
+    compile 'com.google.android.gms:play-services-appindexing:8.3.0'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+    //CirclePageIndicator
+    compile 'com.viewpagerindicator:library:2.4.1@aar'
+
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+}

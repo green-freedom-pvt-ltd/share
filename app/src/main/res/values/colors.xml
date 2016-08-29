@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/bright_sky_blue</color>
+    <color name="colorPrimaryDark">@color/dark_sky_blue</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
+
+    <color name="dark_sky_blue">#0099ff</color>
+    <color name="bright_sky_blue">#00b9ff</color>
+    <color name="white">#ffffff</color>
+    <color name="greyish_brown">#454545</color>
+    <color name="pale_magenta">#d667cd</color>
+    <color name="slate_blue">#6563a4</color>
+    <color name="black_separator">#1d1d26</color>
+
+    <color name="black">#000</color>
+    <color name="orange">#FA0</color>
+    <color name="light_grey">#c0c0c0</color>
+    <color name="grey">#F5F5F5</color>
+    <color name="MontserratLight">#353535</color>
+
+    <color name="sky_blue">#00b9ff</color>
+    <color name="MontserratRegular">#4a4a4a</color>
+
+    <color name="white_50">#7fffffff</color>
+    <color name="white_dark">#eeeeee</color>
+
+
+    <color name="black_one">#030303</color>
+    <color name="black_two">#262626</color>
+    <color name="black_three">#212121</color>
+    <color name="greyish_brown_two">#4a4a4a</color>
+    <color name="seafoam_blue">#50d2c2</color>
+    <color name="ice_blue">#e6f8ff</color>
+    <color name="black_50">#7f000000</color>
+    <color name="black_four">#141414</color>
+    <color name="dark_blue">#55acee</color>
+    <color name="denim_blue">#3c55a2</color>
+    <color name="fresh_green">#42d54a</color>
+    <color name="pale_red">#d84c30</color>
+    <color name="neon_red">#ff0439</color>
+    <color name="brownish_grey">#6a6a6a</color>
+    <color name="grey_disable">#C5C5BE</color>
+    <color name="white_three">#d8d8d8</color>
+    <color name="warm_grey">#979797</color>
+    <color name="warm_grey_two">#777777</color>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/nav_item_home"
+        android:icon="@drawable/svg_ic_home_black"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/nav_item_profile"
+        android:icon="@drawable/svg_ic_face_black_24_px"
+        android:title="Profile" />
+
+    <item
+        android:id="@+id/nav_item_login"
+        android:icon="@drawable/svg_ic_face_black_24_px"
+        android:title="@string/login" />
+    <item
+        android:id="@+id/nav_item_leaderboard"
+        android:icon="@drawable/ic_stars_black_24dp"
+        android:visible="false"
+        android:title="@string/leaderboard" />
+    <item
+        android:id="@+id/nav_item_aboutUs"
+        android:icon="@drawable/svg_ic_group_black"
+        android:visible="false"
+        android:title="About Us" />
+
+    <item
+        android:id="@+id/nav_item_faq"
+        android:icon="@drawable/svg_ic_help_black"
+        android:title="FAQ" />
+    <item
+        android:id="@+id/nav_item_feedback"
+        android:icon="@drawable/svg_ic_feedback_black"
+        android:title="Feedback" />
+
+
+    <item
+        android:id="@+id/nav_item_share"
+        android:icon="@drawable/ic_share_black_24dp"
+        android:title="Share" />
+
+    <item
+        android:id="@+id/nav_item_settings"
+        android:icon="@drawable/svg_ic_settings_applications_black"
+        android:title="Settings" />
+
+
+</menu>

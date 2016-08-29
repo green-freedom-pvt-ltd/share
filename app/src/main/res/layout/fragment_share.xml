@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white_50">
+
+    <RelativeLayout
+        android:id="@+id/detail_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp">
+
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_share_screen_impact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:text="@string/impact"
+            android:textAllCaps="true"
+            android:textColor="@color/greyish_brown_two"
+            android:textSize="20sp" />
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_share_screen_rupee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_share_screen_impact"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/greyish_brown_two"
+            android:textSize="18sp"
+            tools:text="120 Rs" />
+
+        <ImageView
+            android:id="@+id/img_screen_distance"
+            android:layout_width="18dp"
+            android:layout_height="23.5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tv_share_screen_rupee"
+            android:layout_marginLeft="72dp"
+            android:layout_marginTop="17dp"
+            app:srcCompat="@drawable/ic_directions_run_black_24px" />
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_share_screen_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/img_screen_distance"
+            android:layout_marginLeft="50.5dp"
+            android:layout_marginTop="14.5dp"
+            android:shadowColor="@color/greyish_brown_two"
+            android:textSize="16sp"
+            tools:text="12 Kms" />
+
+        <ImageView
+            android:id="@+id/img_screen_time"
+            android:layout_width="18dp"
+            android:layout_height="23.5dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tv_share_screen_rupee"
+            android:layout_marginRight="70.8dp"
+            android:layout_marginTop="17dp"
+            android:src="@drawable/timer" />
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_share_screen_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tv_share_screen_distance"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/img_screen_time"
+            android:layout_marginRight="35dp"
+            android:shadowColor="@color/greyish_brown_two"
+            android:textSize="16sp"
+            tools:text="1hr 2mins" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/share_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="visible">
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_share_screen_share_fb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="30dp"
+            android:text="@string/tell_about_us"
+            android:textSize="18sp" />
+
+        <RadioGroup
+            android:id="@+id/share_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_share_screen_share_fb"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/fb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@null"
+                android:checked="true"
+                android:drawablePadding="5dp"
+                android:drawableTop="@drawable/selector_fb_radio"
+                android:gravity="bottom|center"
+                android:text="@string/facebook"
+                android:textColor="@drawable/selector_fb_radio_button_text" />
+
+            <RadioButton
+                android:id="@+id/whatsapp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:drawableTop="@drawable/selector_whatsapp_radio"
+                android:gravity="bottom|center"
+                android:text="@string/whatsapp"
+                android:textColor="@drawable/selector_whatsapp_radio_button_text" />
+
+            <RadioButton
+                android:id="@+id/twitter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:drawableTop="@drawable/selector_twitter_radio"
+                android:gravity="bottom|center"
+                android:text="@string/twitter"
+                android:textColor="@drawable/selector_twitter_radio_button_text" />
+
+            <RadioButton
+                android:id="@+id/google"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:drawableTop="@drawable/selector_google_radio"
+                android:gravity="bottom|center"
+                android:text="@string/google_plus"
+                android:textColor="@drawable/selector_google_radio_button_text" />
+        </RadioGroup>
+
+        <com.sharesmile.share.views.MLButton
+            android:id="@+id/btn_share_screen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/share_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="32dp"
+            android:background="@drawable/rounded_corner"
+            android:text="@string/share"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/skip_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_share_screen"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="30dp">
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/share_skip"
+                android:clickable="false"
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="12.5sp" />
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:clickable="false"
+                android:text="SKIP"
+                android:textColor="@color/black_four"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/login_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.sharesmile.share.views.MRTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lines="2"
+            android:paddingBottom="48dp"
+            android:text="@string/share_login_msg"
+            android:textColor="@color/greyish_brown_two"
+            android:textSize="18sp" />
+
+        <include
+            android:id="@+id/btn_login_fb"
+            layout="@layout/login_button"
+            android:layout_width="250dp"
+            android:layout_height="53dp" />
+
+        <include
+            android:id="@+id/btn_login_google"
+            layout="@layout/login_button"
+            android:layout_width="250dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="15dp" />
+
+        <LinearLayout
+            android:id="@+id/tv_welcome_skip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login_skip"
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="12.5sp" />
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="SKIP"
+                android:textColor="@color/black_four"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/detail_container"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</RelativeLayout>
