@@ -47,7 +47,7 @@
 
     <string name="rfac_begin_run">BEGIN RUN</string>
 
-    <string name="rfac_usain_bolt_message">Oops! Looks like you are Usain Bolt, will pause workout</string>
+    <string name="rfac_usain_bolt_message">Oops! It seems like you are too fast, pausing workout</string>
     <string name="rfac_lazy_ass_message">Don\'t be too lazy, move your ass!</string>
     <string name="rfac_too_slow_message">You need to be a little more faster!</string>
     <string name="pause">PAUSE</string>
@@ -79,7 +79,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <!-- Facebook key-->
 
     <string name="facebook_app_id">167918020276053</string>
-    <string name="login_error">error in login.</string>
+    <string name="login_error">Login error, try again!</string>
     <string name="email_id_required">Email id require for login.</string>
 
     <string name="impact_run">impact run</string>
@@ -112,8 +112,8 @@ We teach kids every day for two hours. Our focus is value based education which 
 
     <string name="dialog_title_min_distance">That’s too short!</string>
     <string name="dialog_msg_min_distance">You need to run a minimum of %1$sm to convert the distance into impact.</string>
-    <string name="dialog_positive_button_min_distance">CONTINUE RUN</string>
-    <string name="dialog_negative_button_min_distance">END RUN</string>
+    <string name="dialog_positive_button_min_distance">CONTINUE</string>
+    <string name="dialog_negative_button_min_distance">END</string>
     <string name="title_about_us">About us</string>
     <string name="title_faq">FAQ</string>
     <string name="km">km</string>
@@ -127,11 +127,11 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="title_activity_on_boarding">OnBoardingActivity</string>
     <string name="onboarding_title_1">pick</string>
 
-    <string name="onboarding_title_2">OUTDOOR RUN OR WALK</string>
+    <string name="onboarding_title_2">RUN OR WALK</string>
     <string name="onboarding_title_3">RAISE</string>
     <string name="onboarding_title_4">DONE</string>
     <string name="onboarding_msg_1">Choose a cause you wish to support.</string>
-    <string name="onboarding_msg_2">Begin your run (or walk) &amp; watch as your steps...</string>
+    <string name="onboarding_msg_2">Begin your outdoor run (or walk) &amp; watch as your steps...</string>
     <string name="onboarding_msg_3">...raise funds for the cause, thanks to our sponsors.</string>
     <string name="onboarding_msg_4">Smile. Your efforts made someone happy :)</string>
 

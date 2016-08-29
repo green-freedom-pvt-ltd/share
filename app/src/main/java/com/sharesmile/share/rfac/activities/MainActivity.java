@@ -99,7 +99,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)) {
             loginMenu.setVisible(false);
             profileMenu.setVisible(true);
-            leaderboardMenu.setVisible(true);
+//            leaderboardMenu.setVisible(true);
         } else {
             loginMenu.setVisible(true);
             profileMenu.setVisible(false);
