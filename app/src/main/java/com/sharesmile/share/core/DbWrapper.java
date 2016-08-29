@@ -9,6 +9,10 @@ import com.sharesmile.share.DbMigration.UpgradeHelper;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.UserDao;
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.gps.models.WorkoutData;
 
 /**
  * Created by Shine on 07/05/16.
@@ -21,6 +25,7 @@ public class DbWrapper {
 
     private SQLiteDatabase db;
     //private DaoMaster.DevOpenHelper mDbHelper;
+
     private DaoSession mDaoSession;
     private WorkoutDao mWorkoutDao;
     private UserDao mUserdao;
@@ -71,6 +76,7 @@ public class DbWrapper {
     /*public DaoMaster.DevOpenHelper getDbHelper() {
         return mDbHelper;
     }*/
+
 
 
     public DaoSession getDaoSession() {

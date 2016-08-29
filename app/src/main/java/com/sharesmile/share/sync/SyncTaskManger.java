@@ -36,7 +36,6 @@ public class SyncTaskManger extends IntentService {
     private static final String ACTION_UPDATE_RUN = "com.sharesmile.share.sync.action.updaterundata";
     private static final String ACTION_FETCH_MESSAGES = "com.sharesmile.share.sync.action.fetchmessages";
 
-
     public SyncTaskManger() {
         super("SyncTaskManger");
     }

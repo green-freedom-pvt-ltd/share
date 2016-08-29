@@ -35,10 +35,14 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.sharesmile.share.views.MLTextView;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fragments.FaqFragment;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -90,7 +94,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mNavigationView.setNavigationItemSelectedListener(this);
         updateNavigationMenu();
     }
-
 
     public void updateNavigationMenu() {
         Menu menu = mNavigationView.getMenu();

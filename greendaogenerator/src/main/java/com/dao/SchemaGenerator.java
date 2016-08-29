@@ -29,7 +29,6 @@ public class SchemaGenerator {
         versions.add(new Version2(true));
 
 
-
         validateSchemas(versions);
         toFileForceExists("../Share/app/src/main/java-gen");
 
@@ -75,7 +74,7 @@ public class SchemaGenerator {
 
     protected static File toFileForceExists(String filename) throws IOException {
         File file = new File(filename);
-        Log.getLog("path : " , file.getCanonicalPath(),1);
+        Log.getLog("path : ", file.getCanonicalPath(), 1);
         if (!file.exists()) {
             throw new IOException(filename
                     + " does not exist. This check is to prevent accidental file generation into a wrong path.");

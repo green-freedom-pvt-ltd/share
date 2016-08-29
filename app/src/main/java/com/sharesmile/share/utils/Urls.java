@@ -16,6 +16,7 @@ public class Urls {
     private static final String MESSAGE_URL = "/api/messageCenter/";
 
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
+
     private static final String GOOGLE_BASE_URL = "https://www.googleapis.com";
     private static final String GOOGLE_CONVERT_TOKEN_URL = "/oauth2/v4/token";
 
@@ -67,4 +68,5 @@ public class Urls {
         String url = getBaseUrl() + MESSAGE_URL;
         return url;
     }
+
 }

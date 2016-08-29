@@ -3,6 +3,12 @@ package com.sharesmile.share;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import android.util.Log;
+import android.view.View;
+
+import com.google.gson.Gson;
+import com.sharesmile.share.utils.Logger;
+
 /**
  * Created by Shine on 30/04/16.
  */

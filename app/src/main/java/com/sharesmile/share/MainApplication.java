@@ -156,7 +156,6 @@ public class MainApplication extends Application {
     private void startSyncTasks() {
         SyncHelper.syncRunData();
         SyncHelper.syncMessageCenterData(this);
-
     }
 
     public DbWrapper getDbWrapper() {

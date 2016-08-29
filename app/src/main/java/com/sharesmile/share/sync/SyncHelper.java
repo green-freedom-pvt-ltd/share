@@ -3,6 +3,7 @@ package com.sharesmile.share.sync;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;

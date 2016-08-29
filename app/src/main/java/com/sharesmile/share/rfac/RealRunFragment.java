@@ -28,7 +28,6 @@ import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

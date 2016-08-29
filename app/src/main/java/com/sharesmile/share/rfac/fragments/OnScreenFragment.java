@@ -29,6 +29,8 @@ import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -37,19 +39,22 @@ import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLButton;
-
+import com.sharesmile.share.utils.Utils;
+import com.sharesmile.share.views.MLButton;
+import com.sharesmile.share.views.MRButton;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class OnScreenFragment extends BaseFragment implements View.OnClickListener {
 

@@ -120,5 +120,4 @@ public class Constants {
         add(new LatLng(19.117179,72.910924));
         add(new LatLng(19.116917,72.910417));
     }};
-
 }

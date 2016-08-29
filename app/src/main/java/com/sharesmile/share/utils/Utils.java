@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -169,6 +168,7 @@ public class Utils {
     }
 
     public static final long stringToSec(String time){
+
      String[] timeArray=   time.split(":");
         int j =1;
         long sec=0;
@@ -209,4 +209,5 @@ public class Utils {
         }
         return bmpUri;
     }
+
 }
