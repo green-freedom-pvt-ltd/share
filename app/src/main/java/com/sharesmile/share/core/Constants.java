@@ -90,7 +90,8 @@ public class Constants {
     public static final String PREF_IS_LOGIN  = "pref_user_login";
     public static final String PREF_USER_ID = "pref_user_id";
     public static final String PREF_FIRST_TIME_USER = "pref_first_time_user";
-
+    public static final String PREF_TOTAL_RUN = "pref_total_run_count";
+    public static final String PREF_TOTAL_IMPACT = "pref_total_impact";
 
     //User Data
     public static final String PREF_USER_NAME  = "pref_user_name";
@@ -100,6 +101,7 @@ public class Constants {
     public static final String PREF_AUTH_TOKEN  = "pref_auth_token";
     public static final String PREF_CAUSE_DATA = "perf_cause_data";
     public static final String PREF_HAS_RUN = "perf_has_run";
+    public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{
         add(new LatLng(19.118394,72.914196));

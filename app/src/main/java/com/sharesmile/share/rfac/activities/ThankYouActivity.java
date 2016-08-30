@@ -37,7 +37,7 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
 
     private void loadThankYouImage() {
 
-        Picasso.with(this).load(getIntent().getStringExtra(BUNDLE_THANKYOU_IMAGE_URL)).placeholder(R.drawable.background_splash_screen).into(new Target() {
+        Picasso.with(this).load(getIntent().getStringExtra(BUNDLE_THANKYOU_IMAGE_URL)).placeholder(R.drawable.placeholder_thankyou_image).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 mThankYouLayout.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));

@@ -1,6 +1,8 @@
 package com.sharesmile.share;
 
 import android.support.v4.view.ViewPager;
+import android.view.View;
+
 import android.util.Log;
 import android.view.View;
 
@@ -15,7 +17,6 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer {
 
     @Override
     public void transformPage(View page, float position) {
-        Log.i("anshul", "position : " + position);
         if (position < -1) {
             page.setScaleY(0.9f);
         } else if (position <= 1) {

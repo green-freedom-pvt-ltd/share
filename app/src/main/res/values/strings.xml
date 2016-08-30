@@ -118,6 +118,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="title_faq">FAQ</string>
     <string name="km">km</string>
     <string name="url_play_store">https://goo.gl/9a0s34</string>
+    <string name="url_play_store_with_utm">goo.gl/z8LeWG</string>
     <string name="web_address">http://impactrun.com</string>
 
     <string name="rs_string">%1$d Rs</string>
@@ -140,5 +141,9 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="server_secret_id">F1t8iwOMIfN5eXxGIByKVr5O</string>
     <string name="google_sender_api_id">159550091621</string>
     <string name="mixpanel_project_token">f890a940af311b7613fcdb530e37580b</string>
+
+    <string name="messages">Messages</string>
+    <string name="begin_impact">Begin your ImpactRuns</string>
+    <string name="impact_summary">Your Impact had begun. \u20B9 %1$d raised after %2$d runs. Awesome!</string>
 
 </resources>

@@ -30,6 +30,7 @@
             android:textSize="25dp" />
 
         <com.sharesmile.share.views.MLTextView
+            android:id="@+id/impact_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_profile_name"

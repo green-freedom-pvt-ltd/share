@@ -142,7 +142,7 @@ public class SharedPrefsManager {
     }
 
     public float getFloat(String key, float defValue) {
-        return getFloat(key, defValue);
+        return getPrefs().getFloat(key, defValue);
     }
 
     public void setFloat(String key, Float value) {

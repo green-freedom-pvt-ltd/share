@@ -41,6 +41,9 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.tv_profile_name)
     TextView mName;
 
+    @BindView(R.id.impact_summary)
+    TextView mImpactSummary;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,8 +75,13 @@ public class ProfileFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         boolean hasRun = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_HAS_RUN, false);
-        if(hasRun){
+        if (hasRun) {
             profile_viewPager.setCurrentItem(1);
+            int totalRun = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
+            int totalImpact = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT, 0);
+            mImpactSummary.setText(getString(R.string.impact_summary, totalImpact, totalRun));
+        } else {
+            mImpactSummary.setText(getString(R.string.begin_impact));
         }
 
     }

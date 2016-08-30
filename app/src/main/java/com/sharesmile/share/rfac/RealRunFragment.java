@@ -143,13 +143,16 @@ public class RealRunFragment extends RunFragment {
             workout.setIs_sync(false);
             workoutDao.insertOrReplace(workout);
 
+            //update userImpact
+            updateUserImpact(workout);
+
             mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
             try {
                 JSONObject props = new JSONObject();
                 props.put("End Run", "Clicked");
-                props.put("RunAmount",rupees);
-                props.put("CauseBrief",mCauseData.getTitle());
-                props.put("Distance Ran",distDecimal);
+                props.put("RunAmount", rupees);
+                props.put("CauseBrief", mCauseData.getTitle());
+                props.put("Distance Ran", distDecimal);
 
                 mixpanel.track("RealRunFragment - onWorkoutResult called", props);
             } catch (JSONException e) {
@@ -159,6 +162,17 @@ public class RealRunFragment extends RunFragment {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
             SyncHelper.pushRunData();
         }
+    }
+
+    private void updateUserImpact(Workout data) {
+        int totalRun = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
+        float totalImpact = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT, 0);
+
+        totalImpact = totalImpact + data.getRunAmount();
+        totalRun = totalRun + 1;
+
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRun);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int)totalImpact);
     }
 
     @Override

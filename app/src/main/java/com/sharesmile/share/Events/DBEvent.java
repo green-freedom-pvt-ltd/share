@@ -27,4 +27,8 @@ public class DBEvent {
     public static class RunDataUpdated {
         public RunDataUpdated(){}
     }
+
+    public static class MessageDataUpdated {
+        public MessageDataUpdated(){}
+    }
 }

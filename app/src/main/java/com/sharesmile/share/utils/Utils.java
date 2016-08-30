@@ -1,10 +1,13 @@
 package com.sharesmile.share.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -13,6 +16,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.core.Constants;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
@@ -161,7 +168,7 @@ public class Utils {
     }
 
     public static final long stringToSec(String time){
-        Log.i("anshul",""+time);
+
      String[] timeArray=   time.split(":");
         int j =1;
         long sec=0;
@@ -174,4 +181,33 @@ public class Utils {
         }
         return sec;
     }
+
+    public static void share(Context context,Uri uri, String shareTemplate) {
+      //  progress_bar.visibility = View.GONE
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.setType("image/*");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, "send"));
+    }
+
+
+    public static Uri getLocalBitmapUri(Bitmap bmp,Context context) {
+        Uri bmpUri=null;
+        try {
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.close();
+            bmpUri = Uri.fromFile(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmpUri;
+    }
+
 }

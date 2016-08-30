@@ -10,11 +10,16 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.Cause;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.Events.DBEvent;
@@ -22,6 +27,8 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkUtils;
@@ -30,16 +37,17 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.views.MLButton;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLButton;
 import com.sharesmile.share.views.MRButton;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
-
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +55,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 public class OnScreenFragment extends BaseFragment implements View.OnClickListener {
 
@@ -66,6 +73,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     private CausePageAdapter mAdapter;
     MixpanelAPI mixpanel;
+    private View badgeIndictor;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +87,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onStart() {
         super.onStart();
-
         Logger.d(TAG, "onstart");
 
     }
@@ -99,8 +106,22 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         viewPager.setOffscreenPageLimit(5);
         viewPager.setAdapter(mAdapter);
         showProgressDialog();
+        setHasOptionsMenu(true);
         return view;
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        MenuItem messageItem = menu.findItem(R.id.item_message);
+
+        RelativeLayout badge = (RelativeLayout) messageItem.getActionView();
+        badgeIndictor = badge.findViewById(R.id.badge_indicator);
+        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
+        badgeIndictor.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
+
+        badge.setOnClickListener(this);
     }
 
     @Override
@@ -156,6 +177,10 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                     Logger.e(TAG, "Unable to add properties to JSONObject", e);
                 }
                 getFragmentController().performOperation(IFragmentController.START_RUN, mAdapter.getItemAtPosition(viewPager.getCurrentItem()));
+                break;
+
+            case R.id.badge_layout:
+                getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
                 break;
             default:
 

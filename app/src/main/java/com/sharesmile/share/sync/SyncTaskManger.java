@@ -34,11 +34,7 @@ import java.util.List;
 public class SyncTaskManger extends IntentService {
     private static final String ACTION_CAUSE = "com.sharesmile.share.sync.action.cause";
     private static final String ACTION_UPDATE_RUN = "com.sharesmile.share.sync.action.updaterundata";
-
-
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.sharesmile.share.sync.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.sharesmile.share.sync.extra.PARAM2";
+    private static final String ACTION_FETCH_MESSAGES = "com.sharesmile.share.sync.action.fetchmessages";
 
     public SyncTaskManger() {
         super("SyncTaskManger");
@@ -56,14 +52,22 @@ public class SyncTaskManger extends IntentService {
         context.startService(intent);
     }
 
+    public static void fetchMessageData(Context context) {
+        Intent intent = new Intent(context, SyncTaskManger.class);
+        intent.setAction(ACTION_FETCH_MESSAGES);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_CAUSE.equals(action)) {
                 updateCauses();
-            }else if(ACTION_UPDATE_RUN.equals(action)){
+            } else if (ACTION_UPDATE_RUN.equals(action)) {
                 SyncHelper.updateWorkoutData();
+            } else if (ACTION_FETCH_MESSAGES.equals(action)) {
+                SyncHelper.fetchMessage();
             }
         }
     }

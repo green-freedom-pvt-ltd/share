@@ -17,6 +17,8 @@ public interface IFragmentController {
 
     int START_MAIN_ACTIVITY = 104;
 
+    int SHOW_MESSAGE_CENTER = 105;
+
     void addFragment(BaseFragment fragment, boolean addToBackStack);
 
     void replaceFragment(BaseFragment fragment, boolean addToBackStack);

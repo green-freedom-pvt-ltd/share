@@ -22,6 +22,8 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
+import fragments.MessageCenterFragment;
+
 /**
  * Created by ankitmaheshwari1 on 29/01/16.
  */
@@ -114,6 +116,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 break;
+            case SHOW_MESSAGE_CENTER:
+                showMessageCenter();
+                break;
         }
     }
 
@@ -186,5 +191,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         startActivity(intent);
     }
 
+    private void showMessageCenter() {
+        replaceFragment(new MessageCenterFragment(), true);
+    }
 
 }

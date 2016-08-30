@@ -2,12 +2,25 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
+import com.sharesmile.share.R;
+import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
@@ -69,10 +82,24 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragmant_cause_info, null);
+        View view = inflater.inflate(R.layout.fragment_cause_info, null);
         ButterKnife.bind(this, view);
         init();
+        setHasOptionsMenu(true);
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        MenuItem messageItem = menu.findItem(R.id.item_message);
+
+        RelativeLayout badge = (RelativeLayout) messageItem.getActionView();
+        View badgeIndicator = badge.findViewById(R.id.badge_indicator);
+        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
+        badgeIndicator.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
+
+        badge.setOnClickListener(this);
     }
 
     private void init() {
@@ -92,9 +119,9 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());
         if (cause.getExecutor() != null) {
-            if(cause.getExecutor().getType().equalsIgnoreCase("ngo")){
+            if (cause.getExecutor().getType().equalsIgnoreCase("ngo")) {
                 mSponsor.setText("by " + cause.getExecutor().getPartnerNgo());
-            }else {
+            } else {
                 mSponsor.setText("by " + cause.getExecutor().getPartnerCompany());
             }
         }
@@ -115,6 +142,9 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         switch (v.getId()) {
             case R.id.begin_run:
                 getFragmentController().performOperation(IFragmentController.START_RUN, cause);
+                break;
+            case R.id.badge_layout:
+                getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
                 break;
             default:
         }

@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
@@ -31,6 +32,9 @@ import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import com.sharesmile.share.views.MLTextView;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
