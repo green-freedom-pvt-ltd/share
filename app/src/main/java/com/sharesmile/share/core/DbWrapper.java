@@ -6,6 +6,7 @@ import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
 import com.sharesmile.share.DbMigration.UpgradeHelper;
+import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.WorkoutDao;
@@ -31,6 +32,8 @@ public class DbWrapper {
     private UserDao mUserdao;
     private CauseDao mCauseDao;
     private UpgradeHelper helper;
+
+    private LeaderBoardDao mLeaderBoardDao;
 
     public DbWrapper(MainApplication app) {
         application = app;
@@ -71,6 +74,7 @@ public class DbWrapper {
         mWorkoutDao = mDaoSession.getWorkoutDao();
         mUserdao = mDaoSession.getUserDao();
         mCauseDao = mDaoSession.getCauseDao();
+        mLeaderBoardDao = mDaoSession.getLeaderBoardDao();
     }
 
     /*public DaoMaster.DevOpenHelper getDbHelper() {
@@ -94,6 +98,8 @@ public class DbWrapper {
     public CauseDao getCauseDao() {
         return mCauseDao;
     }
+
+    public LeaderBoardDao getLeaderBoardDao(){ return mLeaderBoardDao;}
 
     public void clearAll() {
         getWorkoutDao().deleteAll();

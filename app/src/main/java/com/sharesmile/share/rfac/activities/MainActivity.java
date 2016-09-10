@@ -25,6 +25,7 @@ import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
+import com.sharesmile.share.rfac.fragments.LeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
@@ -103,7 +104,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)) {
             loginMenu.setVisible(false);
             profileMenu.setVisible(true);
-//            leaderboardMenu.setVisible(true);
+            leaderboardMenu.setVisible(true);
         } else {
             loginMenu.setVisible(true);
             profileMenu.setVisible(false);
@@ -234,7 +235,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             replaceFragment(new FaqFragment(), true);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
+        } else if (menuItem.getItemId() == R.id.nav_item_leaderboard){
+            replaceFragment(new LeaderBoardFragment(), true);
         }
+
 
         mDrawerLayout.closeDrawers();
 

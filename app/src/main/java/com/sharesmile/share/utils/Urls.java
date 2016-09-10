@@ -14,6 +14,7 @@ public class Urls {
     private static final String FEEDBACK_URL = "/api/userFeedback/";
     private static final String FAQ_URL = "/api/faq/";
     private static final String MESSAGE_URL = "/api/messageCenter/";
+    private static final String LEADERBOARD_URL = "/api/leaderBoard/";
 
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
@@ -69,4 +70,8 @@ public class Urls {
         return url;
     }
 
+    public static String getLeaderboardUrl() {
+        String url = getBaseUrl() + LEADERBOARD_URL;
+        return url;
+    }
 }
