@@ -53,7 +53,7 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
         recycler_view.layoutManager = LinearLayoutManager(context);
         recycler_view.adapter = mAdapter;
         recycler_view.setHasFixedSize(true);
-        fragmentController.updateToolBar(getString(R.string.messages), true);
+        fragmentController.updateToolBar(getString(R.string.title_messages), true);
         SyncHelper.syncMessageCenterData(context)
         progress_bar.visibility = View.VISIBLE;
     }

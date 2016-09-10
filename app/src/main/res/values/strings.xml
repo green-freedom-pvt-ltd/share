@@ -143,6 +143,7 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="mixpanel_project_token">f890a940af311b7613fcdb530e37580b</string>
 
     <string name="messages">Messages</string>
+    <string name="title_messages">Feed</string>
     <string name="begin_impact">Begin your ImpactRuns</string>
     <string name="impact_summary">Your Impact had begun. \u20B9 %1$d raised after %2$d runs. Awesome!</string>
 

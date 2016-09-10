@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal"
             android:paddingLeft="14dp"
             android:paddingRight="14dp">
@@ -60,7 +61,7 @@
                 android:drawablePadding="4dp"
                 android:gravity="center"
                 android:text="@string/share"
-                android:textColor="@color/warm_grey_two"
+                android:textColor="@color/greyish_brown_two"
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>

@@ -19,6 +19,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/share"
         android:background="@color/white">
 
         <LinearLayout
@@ -49,8 +50,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:singleLine="true"
-                    android:text="Sponser a Child, Foster a Future! "
+                    android:lines="2"
+                    tools:text="Sponser a Child, Foster a Future! "
                     android:textColor="@color/greyish_brown_two"
                     android:textSize="18sp" />
 
