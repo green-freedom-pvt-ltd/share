@@ -15,7 +15,7 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <com.sharesmile.share.views.MSBTextView
+        <com.sharesmile.share.views.MLTextView
             android:id="@+id/id_leaderboard"
             android:layout_width="30dp"
             android:layout_height="40dp"
@@ -46,7 +46,7 @@
             tools:text = "Name"
             android:textSize="14sp"/>
 
-        <com.sharesmile.share.views.MSBTextView
+        <com.sharesmile.share.views.MLTextView
             android:id="@+id/last_week_distance"
             android:layout_width="20dp"
             android:layout_height="50dp"
