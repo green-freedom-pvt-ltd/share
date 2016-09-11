@@ -22,6 +22,7 @@
             android:textColor="@color/black"
             android:textSize="14sp"
             android:layout_gravity="center"
+            android:layout_marginTop="8dp"
             android:text="1"/>
 
         <com.sharesmile.share.views.CircularImageView
