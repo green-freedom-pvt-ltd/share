@@ -1,19 +1,22 @@
 package fragments
 
+import activities.MessageVideoActivity
 import adapters.MessageCenterAdapter
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.sharesmile.share.*
+import com.google.gson.Gson
 import com.sharesmile.share.Events.DBEvent
+import com.sharesmile.share.MainApplication
+import com.sharesmile.share.Message
+import com.sharesmile.share.MessageDao
+import com.sharesmile.share.R
 import com.sharesmile.share.core.BaseFragment
 import com.sharesmile.share.core.Constants
 import com.sharesmile.share.rfac.fragments.MessageInfoFragment
@@ -26,9 +29,6 @@ import kotlinx.android.synthetic.main.fragment_message_center.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 /**
  * Created by Shine on 26/08/16.
@@ -55,6 +55,7 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
         recycler_view.setHasFixedSize(true);
         fragmentController.updateToolBar(getString(R.string.title_messages), true);
         SyncHelper.syncMessageCenterData(context)
+        fetchMessageDataFromDb()
         progress_bar.visibility = View.VISIBLE;
     }
 
@@ -99,32 +100,13 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
     }
 
     override fun onMessageCardClick(message: Message) {
-        fragmentController.replaceFragment(MessageInfoFragment.getInstance(message), true);
-    }
-
-    /* private fun share(uri: Uri?, shareTemplate: String?) {
-         progress_bar.visibility = View.GONE
-         val shareIntent = Intent()
-         shareIntent.setAction(Intent.ACTION_SEND)
-         shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate)
-         shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-         shareIntent.setType("image*//*")
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        context.startActivity(Intent.createChooser(shareIntent, "send"))
-    }
-
-
-    fun getLocalBitmapUri(bmp: Bitmap?, context: Context): Uri? {
-        var bmpUri: Uri? = null
-        try {
-            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png")
-            val out = FileOutputStream(file)
-            bmp?.compress(Bitmap.CompressFormat.PNG, 90, out)
-            out.close()
-            bmpUri = Uri.fromFile(file)
-        } catch (e: IOException) {
-            e.printStackTrace()
+        if (TextUtils.isEmpty(message.videoId)) {
+            fragmentController.replaceFragment(MessageInfoFragment.getInstance(message), true);
+        } else {
+            var intent = Intent(activity, MessageVideoActivity::class.java)
+            intent.putExtra(MessageVideoActivity.BUNDLE_MESSAGE_OBJECT, Gson().toJson(message))
+            startActivity(intent)
         }
-        return bmpUri
-    }*/
+    }
+
 }

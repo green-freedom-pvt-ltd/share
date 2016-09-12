@@ -50,6 +50,9 @@ class MessageList : UnObfuscable, Serializable, Iterable<Message> {
 
         @SerializedName("message_share_template")
         var shareTemplate: String? = "";
+
+        @SerializedName("message_video")
+        var videoId: String? = "";
     }
 
 
@@ -89,6 +92,7 @@ class MessageList : UnObfuscable, Serializable, Iterable<Message> {
         message.message_date = data.messageDate
         message.shareTemplate = data.shareTemplate
         message.messageBrief=data.brief
+        message.videoId=data.videoId
         // Save image Offline cache
         Picasso.with(MainApplication.getContext()).load(data.imageUrl).fetch()
 

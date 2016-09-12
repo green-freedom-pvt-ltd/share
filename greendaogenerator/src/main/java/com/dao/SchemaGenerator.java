@@ -26,7 +26,8 @@ public class SchemaGenerator {
         List<SchemaVersion> versions = new ArrayList<SchemaVersion>();
         //Schema Starts from version1
         versions.add(new Version1(false));
-        versions.add(new Version2(true));
+        versions.add(new Version2(false));
+        versions.add(new Version3(true));
 
 
         validateSchemas(versions);

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -246,6 +247,9 @@ public class LoginImpl {
         SyncHelper.fetchRunData();
 
         mListener.onLoginSuccess();
+
+        //show Toast confirmation
+        Toast.makeText(getContext(),"Logged in as " + name,Toast.LENGTH_SHORT).show();
     }
 
 

@@ -104,6 +104,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 SharedPrefsManager.getInstance().clearPrefs();
                 mListener.updateNavigationMenu();
                 updateSettingItems();
+                Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
+
             }
         });
         builder.show();

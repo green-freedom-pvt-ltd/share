@@ -80,6 +80,7 @@ public class SyncHelper {
             if (workoutCount >= runList.getTotalRunCount()) {
                 Logger.d(TAG, "update success" + workoutCount + " : " + runList.getTotalRunCount());
                 EventBus.getDefault().post(new DBEvent.RunDataUpdated());
+                updateUserImpact();
                 return GcmNetworkManager.RESULT_SUCCESS;
             } else {
                 WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();

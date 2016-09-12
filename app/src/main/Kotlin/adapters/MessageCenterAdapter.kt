@@ -1,6 +1,7 @@
 package adapters
 
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,9 +46,15 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
 
         public fun bindData(data: Message) {
 
-            itemView.date.text = DateUtil.getUserFormattedDate(DateUtil.getDefaultFormattedDate(data.message_date,DateUtil.DEFAULT_DATE_FORMAT_DATE_ONLY),DateUtil.USER_FORMAT_DATE_DATE_ONLY);
+            itemView.date.text = DateUtil.getUserFormattedDate(DateUtil.getDefaultFormattedDate(data.message_date, DateUtil.DEFAULT_DATE_FORMAT_DATE_ONLY), DateUtil.USER_FORMAT_DATE_DATE_ONLY);
             itemView.description.text = data.messageBrief
             Picasso.with(itemView.context).load(data.message_image).placeholder(R.drawable.cause_image_placeholder).into(itemView.message_image)
+
+            if (!TextUtils.isEmpty(data.videoId)) {
+                itemView.play_icon.visibility = View.VISIBLE
+            } else {
+                itemView.play_icon.visibility = View.GONE
+            }
             itemView.setOnClickListener(object : View.OnClickListener {
                 override fun onClick(v: View?) {
                     mListerner.onMessageCardClick(data);

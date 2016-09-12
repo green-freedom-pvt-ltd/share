@@ -20,7 +20,6 @@ import com.sharesmile.share.views.MLTextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import Models.MessageList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
