@@ -16,6 +16,8 @@ public class Version3 extends SchemaVersion {
         addCauseData(schema);
         addUserData(schema);
         addMessage(schema);
+        addLeaderBoard(schema);
+
     }
 
     @Override
@@ -120,6 +122,16 @@ public class Version3 extends SchemaVersion {
         message.addStringProperty("videoId").notNull();
         message.addBooleanProperty("is_read");
 
+    }
+
+    private static void addLeaderBoard(Schema schema){
+
+        Entity leaderBoard = schema.addEntity("LeaderBoard");
+        leaderBoard.addIdProperty();
+        leaderBoard.addStringProperty("first_name");
+        leaderBoard.addStringProperty("last_name");
+        leaderBoard.addStringProperty("social_thumb");
+        leaderBoard.addFloatProperty("last_week_distance");
     }
 
 }

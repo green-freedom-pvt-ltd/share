@@ -19,7 +19,7 @@ public class LeaderBoardDao extends AbstractDao<LeaderBoard, Long> {
     public static final String TABLENAME = "LEADER_BOARD";
 
     /**
-     * Properties of entity LeaderBoardData.<br/>
+     * Properties of entity LeaderBoard.<br/>
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {

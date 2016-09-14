@@ -7,6 +7,7 @@ package com.sharesmile.share.DbMigration;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
+import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.Message;
 import com.sharesmile.share.MessageDao;
 
@@ -26,8 +27,11 @@ public class MigrateV2ToV3 extends MigrationImpl {
                               int currentVersion) {
         prepareMigration(db, currentVersion);
 
-        //add single column discount_string to LineItem table
         db.execSQL(getSqlStringForMigration());
+
+        //created LeaderBoard table
+        LeaderBoardDao.createTable(db, true);
+
 
         return getMigratedVersion();
     }
