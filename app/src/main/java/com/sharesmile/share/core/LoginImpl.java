@@ -243,13 +243,15 @@ public class LoginImpl {
         UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
         userDao.insertOrReplace(user);
 
+        //show Toast confirmation
+        Toast.makeText(MainApplication.getContext(),"Logged in as " + name,Toast.LENGTH_SHORT).show();
+
         //Sync run data;
         SyncHelper.fetchRunData();
 
         mListener.onLoginSuccess();
 
-        //show Toast confirmation
-        Toast.makeText(getContext(),"Logged in as " + name,Toast.LENGTH_SHORT).show();
+
     }
 
 
