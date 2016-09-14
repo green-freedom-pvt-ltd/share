@@ -2,13 +2,12 @@ package com.sharesmile.share.sync;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
-import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.Workout;
@@ -18,6 +17,8 @@ import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.LeaderBoardData;
+import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -151,7 +152,48 @@ public class SyncHelper {
         }
 
         SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, workoutCount);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int)totalImpact);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
     }
+
+
+    public static void syncLeaderBoardData(Context context) {
+        SyncTaskManger.fetchLeaderBoardData(context);
+    }
+
+    // get leader board for the list
+    public static boolean fetchLeaderBoard(){
+//        LeaderBoardDao leaderBoardDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getLeaderBoardDao();
+        String url = Urls.getLeaderboardUrl();
+        return fetchLeaderBoardList(url);
+
+    }
+
+
+    private static boolean fetchLeaderBoardList(String url) {
+
+        try {
+            LeaderBoardDao mLeaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
+            LeaderBoardList leaderBoardlist = NetworkDataProvider.doGetCall(url, LeaderBoardList.class);
+            LeaderBoardList activeLeaderBoardList = new LeaderBoardList();
+            activeLeaderBoardList.setLeaderBoardList(new ArrayList<LeaderBoardData>());
+
+            for(LeaderBoardData data: leaderBoardlist.getLeaderBoardList()){
+
+                mLeaderBoardDao.insertOrReplaceInTx(data.getLeaderBoardDbObject());
+            }
+//
+//            com.sharesmile.share.LeaderBoardData lb = new com.sharesmile.share.LeaderBoardData();
+//            mLeaderBoardDao.insertOrReplace(leaderBoardlist);
+            Logger.d(TAG, "leaderboard fetch success" + leaderBoardlist + " : ");
+            EventBus.getDefault().post(new DBEvent.LeaderBoardDataUpdated());
+            return true;
+
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
+            return false;
+        }
+    }
+
 
 }

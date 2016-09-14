@@ -35,6 +35,7 @@ public class SyncTaskManger extends IntentService {
     private static final String ACTION_CAUSE = "com.sharesmile.share.sync.action.cause";
     private static final String ACTION_UPDATE_RUN = "com.sharesmile.share.sync.action.updaterundata";
     private static final String ACTION_FETCH_MESSAGES = "com.sharesmile.share.sync.action.fetchmessages";
+    private static final String ACTION_FETCH_LEADERBOARD = "com.sharesmile.share.sync.action.fetchleaderboard";
 
     public SyncTaskManger() {
         super("SyncTaskManger");
@@ -58,6 +59,12 @@ public class SyncTaskManger extends IntentService {
         context.startService(intent);
     }
 
+    public static void fetchLeaderBoardData(Context context){
+        Intent intent = new Intent(context, SyncTaskManger.class);
+        intent.setAction(ACTION_FETCH_LEADERBOARD);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -68,6 +75,9 @@ public class SyncTaskManger extends IntentService {
                 SyncHelper.updateWorkoutData();
             } else if (ACTION_FETCH_MESSAGES.equals(action)) {
                 SyncHelper.fetchMessage();
+            }
+            else if (ACTION_FETCH_LEADERBOARD.equals(action)){
+                SyncHelper.fetchLeaderBoard();
             }
         }
     }

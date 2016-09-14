@@ -31,4 +31,8 @@ public class DBEvent {
     public static class MessageDataUpdated {
         public MessageDataUpdated(){}
     }
+
+    public static class LeaderBoardDataUpdated{
+        public LeaderBoardDataUpdated(){}
+    }
 }
