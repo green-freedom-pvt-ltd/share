@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Created by piyush on 8/30/16.
  */
-public class LeaderBoardFragment extends BaseFragment{
+public class LeaderBoardFragment extends BaseFragment {
 
     RecyclerView mRecyclerView;
     private List<LeaderBoard> mleaderBoardList;
@@ -65,12 +65,10 @@ public class LeaderBoardFragment extends BaseFragment{
     }
 
 
-
     private void showProgressDialog() {
         mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
     }
-
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -92,4 +90,9 @@ public class LeaderBoardFragment extends BaseFragment{
     }
 
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
 }
