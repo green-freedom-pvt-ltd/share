@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ public class LeaderBoardFragment extends BaseFragment {
     private List<LeaderBoard> mleaderBoardList;
     LeaderBoardAdapter mLeaderBoardAdapter;
     ProgressBar mProgressBar;
+    SwipeRefreshLayout mswipeRefresh;
 
 
     @Override
@@ -48,12 +50,22 @@ public class LeaderBoardFragment extends BaseFragment {
         View l = inflater.inflate(R.layout.fragment_drawer_leaderboard, null);
         mRecyclerView = (RecyclerView) l.findViewById(R.id.recycler_view);
         mProgressBar = (ProgressBar) l.findViewById(R.id.progress_bar);
+        mswipeRefresh = (SwipeRefreshLayout) l.findViewById(R.id.swipeRefreshLayout);
         getFragmentController().updateToolBar(getResources().getString(R.string.leaderboard), true);
         init();
         EventBus.getDefault().register(this);
 //        SyncTaskManger.fetchLeaderBoardData(getContext());
         SyncHelper.syncLeaderBoardData(getContext());
         showProgressDialog();
+        mswipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshItems();
+
+            }
+        });
+
+        mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
         return l;
     }
 
@@ -64,6 +76,13 @@ public class LeaderBoardFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
+
+    public void refreshItems(){
+        mleaderBoardList.clear();
+        mLeaderBoardAdapter.notifyDataSetChanged();
+        SyncHelper.syncLeaderBoardData(getContext());
+
+    }
 
     private void showProgressDialog() {
         mProgressBar.setVisibility(View.VISIBLE);
@@ -87,6 +106,7 @@ public class LeaderBoardFragment extends BaseFragment {
     private void hideProgressDialog() {
         mProgressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
+        mswipeRefresh.setRefreshing(false);
     }
 
 
