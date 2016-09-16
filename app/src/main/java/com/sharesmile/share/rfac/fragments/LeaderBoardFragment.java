@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Created by piyush on 8/30/16.
  */
-public class LeaderBoardFragment extends BaseFragment{
+public class LeaderBoardFragment extends BaseFragment {
 
     RecyclerView mRecyclerView;
     private List<LeaderBoard> mleaderBoardList;
@@ -110,5 +110,10 @@ public class LeaderBoardFragment extends BaseFragment{
         mswipeRefresh.setRefreshing(false);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
 
 }
