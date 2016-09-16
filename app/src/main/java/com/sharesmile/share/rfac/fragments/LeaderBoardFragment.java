@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Created by piyush on 8/30/16.
  */
-public class LeaderBoardFragment extends BaseFragment {
+public class LeaderBoardFragment extends BaseFragment{
 
     RecyclerView mRecyclerView;
     private List<LeaderBoard> mleaderBoardList;
@@ -90,6 +90,7 @@ public class LeaderBoardFragment extends BaseFragment {
     }
 
 
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.LeaderBoardDataUpdated leaderBoardDataUpdated) {
         fetchLeaderBoardDataFromDb();
@@ -110,9 +111,4 @@ public class LeaderBoardFragment extends BaseFragment {
     }
 
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBus.getDefault().unregister(this);
-    }
 }
