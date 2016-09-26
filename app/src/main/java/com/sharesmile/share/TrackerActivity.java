@@ -338,7 +338,8 @@ public class TrackerActivity extends BaseActivity {
             } else {
                 // Permission was denied or request was cancelled
                 Logger.i(TAG, "Location Permission denied, could'nt update the UI");
-                Toast.makeText(this, "Please give permission to get Weather", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Please give permission to get Location", Toast.LENGTH_LONG).show();
+                exit();
             }
         }
 
@@ -349,7 +350,7 @@ public class TrackerActivity extends BaseActivity {
             } else {
                 // Permission was denied or request was cancelled
                 Logger.i(TAG, "Location Permission denied, could'nt update the UI");
-                Toast.makeText(this, "Please give permission to get Weather", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Please give permission to get Location", Toast.LENGTH_LONG).show();
             }
         }
     }

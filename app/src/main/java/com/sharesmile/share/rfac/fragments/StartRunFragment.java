@@ -1,8 +1,11 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.squareup.picasso.Picasso;
@@ -48,6 +52,14 @@ public class StartRunFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         Bundle arg=getArguments();
         mCauseData=(CauseData)arg.getSerializable(BUNDLE_CAUSE_DATA);
+
+        if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED)) {
+            //Need to get permissions
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.CODE_REQUEST_LOCATION_PERMISSION);
+        }
     }
 
     @Nullable
