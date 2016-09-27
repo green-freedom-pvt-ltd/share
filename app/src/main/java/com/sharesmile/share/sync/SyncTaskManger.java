@@ -11,12 +11,14 @@ import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.squareup.picasso.Picasso;
 
@@ -59,7 +61,7 @@ public class SyncTaskManger extends IntentService {
         context.startService(intent);
     }
 
-    public static void fetchLeaderBoardData(Context context){
+    public static void fetchLeaderBoardData(Context context) {
         Intent intent = new Intent(context, SyncTaskManger.class);
         intent.setAction(ACTION_FETCH_LEADERBOARD);
         context.startService(intent);
@@ -75,8 +77,7 @@ public class SyncTaskManger extends IntentService {
                 SyncHelper.updateWorkoutData();
             } else if (ACTION_FETCH_MESSAGES.equals(action)) {
                 SyncHelper.fetchMessage();
-            }
-            else if (ACTION_FETCH_LEADERBOARD.equals(action)){
+            } else if (ACTION_FETCH_LEADERBOARD.equals(action)) {
                 SyncHelper.fetchLeaderBoard();
             }
         }
@@ -96,6 +97,12 @@ public class SyncTaskManger extends IntentService {
                 Picasso.with(this).load(data.getImageUrl()).fetch();
                 if (data.isActive()) {
                     activeCauseList.getCauses().add(data);
+                }
+
+                if (data.getAppUpdate() != null) {
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, data.getAppUpdate().force_update);
+                    SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, data.getAppUpdate().app_version);
+
                 }
                 mCauseDao.insertOrReplace(data.getCauseDbObject());
             }

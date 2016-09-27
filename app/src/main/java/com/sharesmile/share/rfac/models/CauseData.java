@@ -54,6 +54,9 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("min_distance")
     private int minDistance;
 
+    @SerializedName("app_update")
+    private AppUpdate appUpdate;
+
     public long getId() {
         return id;
     }
@@ -216,5 +219,13 @@ public class CauseData implements UnObfuscable, Serializable {
         List<Partner> partners = new ArrayList<>();
         partners.add(partner);
         setExecutors(partners);
+    }
+
+    public AppUpdate getAppUpdate() {
+        return appUpdate;
+    }
+
+    public void setAppUpdate(AppUpdate appUpdate) {
+        this.appUpdate = appUpdate;
     }
 }

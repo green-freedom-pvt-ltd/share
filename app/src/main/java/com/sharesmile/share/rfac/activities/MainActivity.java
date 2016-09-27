@@ -1,6 +1,7 @@
 package com.sharesmile.share.rfac.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -20,6 +22,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
@@ -36,12 +39,15 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fragments.FaqFragment;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -94,6 +100,38 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mDrawerToggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this);
         updateNavigationMenu();
+        checkAppVersion();
+    }
+
+    private void checkAppVersion() {
+
+        int latestAppVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
+        boolean forceUpdate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FORCE_UPDATE, false);
+        if (latestAppVersion <= BuildConfig.VERSION_CODE) {
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(getString(R.string.title_app_update))
+                .setMessage(getString(R.string.app_update_message)).
+                        setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.redirectToPlayStore(MainActivity.this);
+                            }
+                        });
+
+        if (forceUpdate) {
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    finish();
+                }
+            });
+            builder.setCancelable(false);
+        } else {
+            builder.setNegativeButton(getString(R.string.later), null);
+        }
+        builder.show();
     }
 
     public void updateNavigationMenu() {
@@ -112,7 +150,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
         Menu m = mNavigationView.getMenu();
-        for (int i=0;i<m.size();i++) {
+        for (int i = 0; i < m.size(); i++) {
             MenuItem mi = m.getItem(i);
             //the method we have create in activity
             applyFontToMenuItem(mi);
@@ -122,7 +160,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void applyFontToMenuItem(MenuItem mi) {
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Montserrat-Light.otf");
         SpannableString mNewTitle = new SpannableString(mi.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("" , font), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mNewTitle.setSpan(new CustomTypefaceSpan("", font), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);
     }
 
@@ -235,7 +273,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             replaceFragment(new FaqFragment(), true);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
-        } else if (menuItem.getItemId() == R.id.nav_item_leaderboard){
+        } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
             replaceFragment(new LeaderBoardFragment(), true);
         }
 

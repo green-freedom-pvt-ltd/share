@@ -148,5 +148,9 @@ We teach kids every day for two hours. Our focus is value based education which 
     <string name="title_messages">Feed</string>
     <string name="begin_impact">Begin your ImpactRuns</string>
     <string name="impact_summary">Your Impact had begun. \u20B9 %1$d raised after %2$d runs. Awesome!</string>
+    <string name="title_app_update">New update available</string>
+    <string name="app_update_message">New app version available on playstore. Update app now.</string>
+    <string name="update">Update</string>
+    <string name="later">Later</string>
 
 </resources>

@@ -103,6 +103,11 @@ public class Constants {
     public static final String PREF_HAS_RUN = "perf_has_run";
     public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
 
+    //app Update
+    public static final String PREF_LATEST_APP_VERSION = "pref_latest_app_version";
+    public static final String PREF_FORCE_UPDATE = "pref_force_update";
+
+
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{
         add(new LatLng(19.118394,72.914196));
         add(new LatLng(19.118485,72.913496));
