@@ -16,4 +16,7 @@ public class AppUpdate implements Serializable, UnObfuscable {
 
     @SerializedName("force_update")
     public boolean force_update = false;
+
+    @SerializedName("update_text_message")
+    public String message;
 }

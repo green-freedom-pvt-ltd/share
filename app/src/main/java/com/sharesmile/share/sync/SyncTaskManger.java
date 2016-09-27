@@ -3,21 +3,16 @@ package com.sharesmile.share.sync;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 
+import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.R;
-import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
-import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.squareup.picasso.Picasso;
@@ -25,7 +20,6 @@ import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -100,9 +94,13 @@ public class SyncTaskManger extends IntentService {
                 }
 
                 if (data.getAppUpdate() != null) {
-                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, data.getAppUpdate().force_update);
-                    SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, data.getAppUpdate().app_version);
-
+                    int latestVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
+                    if (latestVersion < data.getAppUpdate().app_version && data.getAppUpdate().app_version > BuildConfig.VERSION_CODE) {
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, true);
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, data.getAppUpdate().force_update);
+                        SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, data.getAppUpdate().app_version);
+                        SharedPrefsManager.getInstance().setString(Constants.PREF_APP_UPDATE_MESSAGE, data.getAppUpdate().message);
+                    }
                 }
                 mCauseDao.insertOrReplace(data.getCauseDbObject());
             }

@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +19,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
@@ -41,15 +45,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sharesmile.share.utils.Utils;
-import com.sharesmile.share.views.MLTextView;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fragments.FaqFragment;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -66,6 +65,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ActionBarDrawerToggle mDrawerToggle;
 
     private InputMethodManager inputMethodManager;
+    private boolean isAppUpdateDialogShown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,18 +101,24 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mNavigationView.setNavigationItemSelectedListener(this);
         updateNavigationMenu();
         checkAppVersion();
+        showPromoModal();
     }
 
     private void checkAppVersion() {
 
         int latestAppVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
         boolean forceUpdate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FORCE_UPDATE, false);
-        if (latestAppVersion <= BuildConfig.VERSION_CODE) {
+
+        boolean showAppUpdateDialog = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, false);
+        String message = SharedPrefsManager.getInstance().getString(Constants.PREF_APP_UPDATE_MESSAGE);
+
+        if (!showAppUpdateDialog || latestAppVersion <= BuildConfig.VERSION_CODE) {
             return;
         }
 
+        isAppUpdateDialogShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(getString(R.string.title_app_update))
-                .setMessage(getString(R.string.app_update_message)).
+                .setMessage(message).
                         setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -129,6 +135,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             });
             builder.setCancelable(false);
         } else {
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, false);
             builder.setNegativeButton(getString(R.string.later), null);
         }
         builder.show();
@@ -323,4 +330,23 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mixpanel.flush();
         super.onDestroy();
     }
+
+    public void showPromoModal() {
+        if (isAppUpdateDialogShown) {
+            return;
+        }
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_promotion);
+        Button share = (Button) dialog.findViewById(R.id.share);
+        TextView title = (TextView) dialog.findViewById(R.id.title);
+        TextView sponsors = (TextView) dialog.findViewById(R.id.sponser);
+        TextView message = (TextView) dialog.findViewById(R.id.description);
+        ImageView image = (ImageView) dialog.findViewById(R.id.image_run);
+
+
+        dialog.show();
+
+    }
+
 }

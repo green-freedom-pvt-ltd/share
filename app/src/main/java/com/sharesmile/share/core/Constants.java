@@ -106,6 +106,10 @@ public class Constants {
     //app Update
     public static final String PREF_LATEST_APP_VERSION = "pref_latest_app_version";
     public static final String PREF_FORCE_UPDATE = "pref_force_update";
+    public static final String PREF_APP_UPDATE_MESSAGE = "pref_promo_model_message";
+    public static final String PREF_SHOW_APP_UPDATE_DIALOG = "pref_show_app_update_dialog";
+
+
 
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{
