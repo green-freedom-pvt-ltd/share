@@ -3,27 +3,23 @@ package com.sharesmile.share.sync;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 
+import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.R;
-import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.network.NetworkAsyncCallback;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -36,6 +32,8 @@ public class SyncTaskManger extends IntentService {
     private static final String ACTION_UPDATE_RUN = "com.sharesmile.share.sync.action.updaterundata";
     private static final String ACTION_FETCH_MESSAGES = "com.sharesmile.share.sync.action.fetchmessages";
     private static final String ACTION_FETCH_LEADERBOARD = "com.sharesmile.share.sync.action.fetchleaderboard";
+    private static final String ACTION_FETCH_COMPAIGN = "com.sharesmile.share.sync.action.fetchCompaign";
+
 
     public SyncTaskManger() {
         super("SyncTaskManger");
@@ -59,9 +57,15 @@ public class SyncTaskManger extends IntentService {
         context.startService(intent);
     }
 
-    public static void fetchLeaderBoardData(Context context){
+    public static void fetchLeaderBoardData(Context context) {
         Intent intent = new Intent(context, SyncTaskManger.class);
         intent.setAction(ACTION_FETCH_LEADERBOARD);
+        context.startService(intent);
+    }
+
+    public static void startCampaign(Context context) {
+        Intent intent = new Intent(context, SyncTaskManger.class);
+        intent.setAction(ACTION_FETCH_COMPAIGN);
         context.startService(intent);
     }
 
@@ -75,9 +79,10 @@ public class SyncTaskManger extends IntentService {
                 SyncHelper.updateWorkoutData();
             } else if (ACTION_FETCH_MESSAGES.equals(action)) {
                 SyncHelper.fetchMessage();
-            }
-            else if (ACTION_FETCH_LEADERBOARD.equals(action)){
+            } else if (ACTION_FETCH_LEADERBOARD.equals(action)) {
                 SyncHelper.fetchLeaderBoard();
+            }else if (ACTION_FETCH_COMPAIGN.equals(action)){
+                SyncHelper.fetchCampaign(this);
             }
         }
     }
@@ -96,6 +101,16 @@ public class SyncTaskManger extends IntentService {
                 Picasso.with(this).load(data.getImageUrl()).fetch();
                 if (data.isActive()) {
                     activeCauseList.getCauses().add(data);
+                }
+
+                if (data.getAppUpdate() != null) {
+                    int latestVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
+                    if (latestVersion < data.getAppUpdate().app_version && data.getAppUpdate().app_version > BuildConfig.VERSION_CODE) {
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, true);
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, data.getAppUpdate().force_update);
+                        SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, data.getAppUpdate().app_version);
+                        SharedPrefsManager.getInstance().setString(Constants.PREF_APP_UPDATE_MESSAGE, data.getAppUpdate().message);
+                    }
                 }
                 mCauseDao.insertOrReplace(data.getCauseDbObject());
             }

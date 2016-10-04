@@ -27,9 +27,9 @@ public class Constants {
 
     public static final int CODE_REQUEST_WRITE_PERMISSION = 103;
 
-    public static final String  LOCATION_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
+    public static final String LOCATION_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
 
-    public static final String  LOCATION_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
+    public static final String LOCATION_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
 
     public static final int BROADCAST_FIX_LOCATION_SETTINGS_CODE = 201;
 
@@ -75,7 +75,7 @@ public class Constants {
 
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";
 
-    public static final String PREF_PREV_DIST_RECORD  = "pref_prev_dist_record";
+    public static final String PREF_PREV_DIST_RECORD = "pref_prev_dist_record";
 
     public static final String PREF_WORKOUT_DATA_DIRTY = "pref_workout_data_dirty";
 
@@ -87,37 +87,47 @@ public class Constants {
 
     public static final String PREF_WORKOUT_LIFETIME_WORKING_OUT = "pref_workout_lifetime_working_out";
 
-    public static final String PREF_IS_LOGIN  = "pref_user_login";
+    public static final String PREF_IS_LOGIN = "pref_user_login";
     public static final String PREF_USER_ID = "pref_user_id";
     public static final String PREF_FIRST_TIME_USER = "pref_first_time_user";
     public static final String PREF_TOTAL_RUN = "pref_total_run_count";
     public static final String PREF_TOTAL_IMPACT = "pref_total_impact";
 
     //User Data
-    public static final String PREF_USER_NAME  = "pref_user_name";
-    public static final String PREF_USER_EMAIL  = "pref_user_email";
-    public static final String PREF_USER_IMAGE  = "pref_user_image";
-    public static final String PREF_LOGIN_SKIP  = "pref_login_skip";
-    public static final String PREF_AUTH_TOKEN  = "pref_auth_token";
+    public static final String PREF_USER_NAME = "pref_user_name";
+    public static final String PREF_USER_EMAIL = "pref_user_email";
+    public static final String PREF_USER_IMAGE = "pref_user_image";
+    public static final String PREF_LOGIN_SKIP = "pref_login_skip";
+    public static final String PREF_AUTH_TOKEN = "pref_auth_token";
     public static final String PREF_CAUSE_DATA = "perf_cause_data";
     public static final String PREF_HAS_RUN = "perf_has_run";
     public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
+    public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
 
-    public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>(){{
-        add(new LatLng(19.118394,72.914196));
-        add(new LatLng(19.118485,72.913496));
-        add(new LatLng(19.118592,72.912808));
-        add(new LatLng(19.118616,72.912654));
-        add(new LatLng(19.118616,72.912473));
-        add(new LatLng(19.118614,72.912325));
-        add(new LatLng(19.118609,72.912188));
-        add(new LatLng(19.118596,72.912044));
-        add(new LatLng(19.118472,72.911925));
-        add(new LatLng(19.118374,72.911835));
-        add(new LatLng(19.118280,72.911754));
-        add(new LatLng(19.118176,72.911660));
-        add(new LatLng(19.118086,72.911555));
-        add(new LatLng(19.117179,72.910924));
-        add(new LatLng(19.116917,72.910417));
+    //app Update
+    public static final String PREF_LATEST_APP_VERSION = "pref_latest_app_version";
+    public static final String PREF_FORCE_UPDATE = "pref_force_update";
+    public static final String PREF_APP_UPDATE_MESSAGE = "pref_promo_model_message";
+    public static final String PREF_SHOW_APP_UPDATE_DIALOG = "pref_show_app_update_dialog";
+    public static final String PREF_CAMPAIGN_DATA = "pref_campaign_data";
+    public static final String PREF_CAMPAIGN_SHOWN_ONCE = "pref_campaign_shown_once";
+
+
+    public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
+        add(new LatLng(19.118394, 72.914196));
+        add(new LatLng(19.118485, 72.913496));
+        add(new LatLng(19.118592, 72.912808));
+        add(new LatLng(19.118616, 72.912654));
+        add(new LatLng(19.118616, 72.912473));
+        add(new LatLng(19.118614, 72.912325));
+        add(new LatLng(19.118609, 72.912188));
+        add(new LatLng(19.118596, 72.912044));
+        add(new LatLng(19.118472, 72.911925));
+        add(new LatLng(19.118374, 72.911835));
+        add(new LatLng(19.118280, 72.911754));
+        add(new LatLng(19.118176, 72.911660));
+        add(new LatLng(19.118086, 72.911555));
+        add(new LatLng(19.117179, 72.910924));
+        add(new LatLng(19.116917, 72.910417));
     }};
 }

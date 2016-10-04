@@ -225,6 +225,11 @@ public class LoginImpl {
         if (response.has("gender_user")) {
             gender = JsonHelper.getValueOrNone(response, "gender_user");
         }
+        if (response.has("sign_up")) {
+            Boolean isSignUpUser = false;
+            isSignUpUser = response.get("sign_up").getAsBoolean();
+            SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
+        }
 
         User user = new User((long) user_id);
         user.setName(name);
@@ -244,7 +249,7 @@ public class LoginImpl {
         userDao.insertOrReplace(user);
 
         //show Toast confirmation
-        Toast.makeText(MainApplication.getContext(),"Logged in as " + name,Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainApplication.getContext(), "Logged in as " + name, Toast.LENGTH_SHORT).show();
 
         //Sync run data;
         SyncHelper.fetchRunData();

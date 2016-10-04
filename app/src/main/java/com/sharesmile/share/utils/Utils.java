@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Constants;
 
 import java.io.File;
@@ -208,6 +209,15 @@ public class Utils {
             e.printStackTrace();
         }
         return bmpUri;
+    }
+
+    public static void redirectToPlayStore(Context context){
+        final String appPackageName = BuildConfig.APPLICATION_ID;
+        try {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException e) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
     }
 
 }

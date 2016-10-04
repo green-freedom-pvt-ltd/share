@@ -23,12 +23,14 @@ import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import Models.CampaignList;
 import Models.MessageList;
 
 /**
@@ -90,7 +92,7 @@ public class SyncHelper {
                 Logger.d(TAG, "update success" + runList.toString());
                 if (!TextUtils.isEmpty(runList.getNextUrl())) {
                     updateWorkoutData(runList.getNextUrl(), workoutCount);
-                }else {
+                } else {
                     updateUserImpact();
                 }
             }
@@ -128,7 +130,7 @@ public class SyncHelper {
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, true);
                 Logger.d(TAG, "Message fetch success" + messageList.toString());
                 if (!TextUtils.isEmpty(messageList.getNextUrl())) {
-                   return fetchMessages(messageList.getNextUrl(), messageCount);
+                    return fetchMessages(messageList.getNextUrl(), messageCount);
                 }
             }
         } catch (NetworkException e) {
@@ -144,7 +146,7 @@ public class SyncHelper {
     // get user total Impact
     public static void updateUserImpact() {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        List<Workout> list =  mWorkoutDao.queryBuilder().list();
+        List<Workout> list = mWorkoutDao.queryBuilder().list();
         int workoutCount = list.size();
         float totalImpact = 0;
         for (Workout data : list) {
@@ -161,7 +163,7 @@ public class SyncHelper {
     }
 
     // get leader board for the list
-    public static boolean fetchLeaderBoard(){
+    public static boolean fetchLeaderBoard() {
 //        LeaderBoardDao leaderBoardDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getLeaderBoardDao();
         String url = Urls.getLeaderboardUrl();
         return fetchLeaderBoardList(url);
@@ -177,7 +179,7 @@ public class SyncHelper {
             LeaderBoardList activeLeaderBoardList = new LeaderBoardList();
             activeLeaderBoardList.setLeaderBoardList(new ArrayList<LeaderBoardData>());
 
-            for(LeaderBoardData data: leaderBoardlist.getLeaderBoardList()){
+            for (LeaderBoardData data : leaderBoardlist.getLeaderBoardList()) {
 
                 mLeaderBoardDao.insertOrReplaceInTx(data.getLeaderBoardDbObject());
             }
@@ -195,5 +197,37 @@ public class SyncHelper {
         }
     }
 
+
+    public static void syncCampaignData(Context context) {
+        SyncTaskManger.startCampaign(context);
+    }
+
+
+    public static void fetchCampaign(Context context) {
+
+        CampaignList.Campaign campaign = null;
+        CampaignList.Campaign oldCampaign = SharedPrefsManager.getInstance().getObject(Constants.PREF_CAMPAIGN_DATA, CampaignList.Campaign.class);
+        try {
+            CampaignList campaignList = NetworkDataProvider.doGetCall(Urls.getCampaignUrl(), CampaignList.class);
+            if (campaignList.getTotalCount() > 0) {
+                SharedPrefsManager.getInstance().setObject(Constants.PREF_CAMPAIGN_DATA, campaignList.getCampaignList().get(0));
+                campaign = campaignList.getCampaignList().get(0);
+                Picasso.with(context).load(campaign.getImageUrl()).fetch();
+                if (oldCampaign != null && oldCampaign.getId() != campaign.getId()) {
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CAMPAIGN_SHOWN_ONCE, false);
+                }
+            } else {
+                SharedPrefsManager.getInstance().removeKey(Constants.PREF_CAMPAIGN_DATA);
+            }
+
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
+            campaign = SharedPrefsManager.getInstance().getObject(Constants.PREF_CAMPAIGN_DATA, CampaignList.Campaign.class);
+        }
+        if (campaign != null) {
+            EventBus.getDefault().post(new DBEvent.CampaignDataUpdated(campaign));
+        }
+    }
 
 }

@@ -19,6 +19,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -83,7 +84,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                // share();
                 break;
             case R.id.rate:
-                rateApp();
+                Utils.redirectToPlayStore(getContext());
                 break;
             case R.id.tos:
                 Toast.makeText(getContext(), "open Tos", Toast.LENGTH_SHORT).show();
@@ -110,15 +111,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         });
         builder.show();
 
-    }
-
-    private void rateApp() {
-        final String appPackageName = getActivity().getPackageName();
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-        } catch (android.content.ActivityNotFoundException e) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-        }
     }
 
     public interface FragmentInterface {

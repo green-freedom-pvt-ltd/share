@@ -63,3 +63,4 @@ Thumbs.db
 
 *.iml
 *.hprof
+/projectFilesBackup/.idea/workspace.xml
