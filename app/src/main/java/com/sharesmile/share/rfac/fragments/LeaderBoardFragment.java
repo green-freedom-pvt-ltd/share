@@ -78,7 +78,9 @@ public class LeaderBoardFragment extends BaseFragment {
 
 
     public void refreshItems(){
-        mleaderBoardList.clear();
+        if(mleaderBoardList != null) {
+            mleaderBoardList.clear();
+        }
         mLeaderBoardAdapter.notifyDataSetChanged();
         SyncHelper.syncLeaderBoardData(getContext());
 

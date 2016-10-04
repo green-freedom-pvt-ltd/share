@@ -1,6 +1,7 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.location.DetectedActivity;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -64,6 +65,7 @@ public class VigilanceTimer implements Runnable {
 
 		Logger.d(TAG, "onTimerTick");
 
+
 		//check for slow speed
 		if (checkForTooSlow()){
 			Logger.d(TAG, "Workout too slow, not enough distance will pause Workout");
@@ -114,6 +116,16 @@ public class VigilanceTimer implements Runnable {
 		if (!Config.USAIN_BOLT_CHECK){
 			return false;
 		}
+
+		if(ActivityRecognizedService.getDetectedActivity().getType() == DetectedActivity.IN_VEHICLE
+				&& ActivityRecognizedService.getDetectedActivity().getConfidence() > 75){
+			Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
+			Logger.d( "ActivityRecogition", "On Vehicle Type: " + ActivityRecognizedService.getDetectedActivity() );
+			return true;
+
+
+		}
+
 		if (lastValidatedRecord == null){
 			// Will wait for next tick
 			lastValidatedRecord = workoutService.getTracker().getLastRecord();
@@ -143,8 +155,7 @@ public class VigilanceTimer implements Runnable {
 									+ " expectedNumOfSteps = " + expectedNumOfSteps);
 
 						if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
-							Logger.d(TAG, "Not enough steps, must be Usain Bolt");
-							return true;
+								return true;
 						}
 					}
 					lastValidatedRecord = latestRecord;

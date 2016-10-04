@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -464,6 +465,9 @@ public class TrackerActivity extends BaseActivity {
                                 switch (problem) {
                                     case Constants.PROBELM_TOO_FAST:
                                         errorMessage = getString(R.string.rfac_usain_bolt_message);
+                                        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                                        v.vibrate(3000);
+
                                         break;
                                     case Constants.PROBELM_TOO_SLOW:
                                         errorMessage = getString(R.string.rfac_too_slow_message);

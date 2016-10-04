@@ -2,6 +2,7 @@ package com.sharesmile.share.gps;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,6 +28,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionApi;
+import com.google.android.gms.location.ActivityRecognitionResult;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -43,6 +48,7 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -63,6 +69,7 @@ public class WorkoutService extends Service implements
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
     private VigilanceTimer vigilanceTimer;
+    private DetectedActivity detectedActivity;
 
     private StepCounter stepCounter;
 
@@ -121,8 +128,12 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopWorkout");
         if (currentlyTracking) {
             stopTracking();
+            Intent intent = new Intent(this, ActivityRecognizedService.class);
+            PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+
             if (googleApiClient != null && googleApiClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
                 googleApiClient.disconnect();
             }
             locationRequest = null;
@@ -278,6 +289,7 @@ public class WorkoutService extends Service implements
             if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
                 googleApiClient = new GoogleApiClient.Builder(this)
                         .addApi(LocationServices.API)
+                        .addApi(ActivityRecognition.API)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
                         .build();
@@ -286,6 +298,8 @@ public class WorkoutService extends Service implements
                 }
             } else {
                 Logger.e(TAG, "unable to connect to google play services.");
+                Toast.makeText(getApplicationContext(), "Unable to connect to google play services", Toast.LENGTH_SHORT);
+
             }
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
@@ -436,6 +450,10 @@ public class WorkoutService extends Service implements
         checkForLocationSettings();
 
         fetchInitialLocation();
+
+        Intent intent = new Intent(this, ActivityRecognizedService.class);
+        PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
     }
 
 
@@ -502,7 +520,6 @@ public class WorkoutService extends Service implements
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                         // Location settings are not satisfied. However, we have no way
                         // to fix the settings so we won't show the dialog.
-                        Toast.makeText(getApplicationContext(), "Sorry, can't Access GPS", Toast.LENGTH_SHORT);
                         break;
                 }
             }

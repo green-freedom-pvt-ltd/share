@@ -1,5 +1,7 @@
 package com.sharesmile.share.gps;
 
+import com.google.android.gms.location.DetectedActivity;
+
 /**
  * Created by ankitm on 22/03/16.
  */
@@ -17,5 +19,6 @@ public interface IWorkoutService {
 	int getTotalStepsInWorkout();
 	float getCurrentSpeed();
 	Tracker getTracker();
+//	DetectedActivity getDetectedActivity();
 
 }

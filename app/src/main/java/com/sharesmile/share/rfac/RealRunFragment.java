@@ -24,6 +24,8 @@ import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import butterknife.BindView;
@@ -46,6 +48,7 @@ public class RealRunFragment extends RunFragment {
     ProgressBar runProgressBar;
     Button pauseButton;
     Button stopButton;
+    SimpleDateFormat simpleDateFormat;
 
     @BindView(R.id.img_sponsor_logo)
     ImageView mSponsorLogo;
@@ -135,11 +138,19 @@ public class RealRunFragment extends RunFragment {
             String distDecimal = String.format("%1$,.1f", (data.getDistance() / 1000));
             int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distDecimal));
 
+            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             workout.setRunAmount((float) rupees);
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());
-            workout.setDate(Calendar.getInstance().getTime());
+            try {
+                workout.setDate(simpleDateFormat.parse(simpleDateFormat.format(Calendar.getInstance().getTime())));
+            }
+
+            catch (ParseException e){
+                Logger.e(TAG,"Date format error", e);
+            }
             workout.setIs_sync(false);
             workoutDao.insertOrReplace(workout);
 
@@ -153,6 +164,7 @@ public class RealRunFragment extends RunFragment {
                 props.put("RunAmount", rupees);
                 props.put("CauseBrief", mCauseData.getTitle());
                 props.put("Distance Ran", distDecimal);
+                props.put("Time", workout.getDate());
 
                 mixpanel.track("RealRunFragment - onWorkoutResult called", props);
             } catch (JSONException e) {

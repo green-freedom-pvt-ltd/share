@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.sharesmile.share">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,6 +15,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <permission
         android:name="com.sharesmile.share.permission.C2D_MESSAGE"
@@ -59,6 +62,10 @@
             android:name=".gps.WorkoutService"
             android:exported="false" />
 
+        <service
+            android:name=".gps.ActivityRecognizedService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -90,7 +97,8 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:replace="android:theme" />
 
         <provider
             android:name="com.facebook.FacebookContentProvider"
@@ -133,9 +141,11 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name="activities.MessageVideoActivity"
+        <activity
+            android:name="activities.MessageVideoActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>
