@@ -228,7 +228,7 @@ public class LoginImpl {
         if (response.has("sign_up")) {
             Boolean isSignUpUser = false;
             isSignUpUser = response.get("sign_up").getAsBoolean();
-            SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
         }
 
         User user = new User((long) user_id);
