@@ -4,11 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.BoolRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -31,6 +28,7 @@ import android.widget.TextView;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
@@ -45,16 +43,14 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.sharesmile.share.utils.Utils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import Models.CampaignList;
 import butterknife.BindView;
@@ -369,10 +365,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         needToShowCampaign = needToShowCampaign && !isAppUpdateDialogShown;
 
+
+        boolean isModelAlreadyShown = MainApplication.getInstance().isModelShown();
+        needToShowCampaign = needToShowCampaign && !isModelAlreadyShown;
         if (!needToShowCampaign) {
             return;
         }
-
+        MainApplication.getInstance().setModelShown();
 
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

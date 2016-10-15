@@ -33,6 +33,7 @@ public class MainApplication extends Application {
     private static MainApplication instance;
     private static Handler sMainThreadHandler;
     public static final long MINUTE_INTEVAL = 60000;
+    private boolean isModelShown = false;
     private int visibleActiviesCount = 0;
     private DbWrapper mDbWrapper;
     private String mToken;
@@ -182,22 +183,14 @@ public class MainApplication extends Application {
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
     }
 
-
-    private Tracker mTracker;
-
-    /**
-     * Gets the default {@link Tracker} for this {@link Application}.
-     * @return tracker
-     */
-   /* synchronized public Tracker getDefaultTracker() {
-        if (mTracker == null) {
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
-            mTracker = analytics.newTracker(R.xml.global_tracker);
-        }
-        return mTracker;
+    public void setModelShown() {
+        isModelShown = true;
     }
-*/
+
+    public boolean isModelShown() {
+        return isModelShown;
+    }
+
 
 }
 
