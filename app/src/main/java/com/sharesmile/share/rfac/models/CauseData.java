@@ -57,6 +57,9 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("app_update")
     private AppUpdate appUpdate;
 
+    @SerializedName("order_priority")
+    private int orderPriority;
+
     public long getId() {
         return id;
     }
@@ -180,7 +183,7 @@ public class CauseData implements UnObfuscable, Serializable {
         Cause cause = new Cause((long) getId(), getTitle(), getCauseDescription(), getConversionRate(), getMinDistance(), getCategory(), getDetailText(),
                 getImageUrl(), getCauseThankYouImage(), getCauseShareMessageTemplate(),
                 isActive(), getSponsor().getId(), getSponsor().getName(), getSponsor().getSponsorNgo(), getSponsor().getLogoUrl(), getExecutor().getId(), getExecutor().getPartnerCompany(),
-                getExecutor().getPartnerNgo(), getExecutor().getType());
+                getExecutor().getPartnerNgo(), getExecutor().getType(), getOrderPriority());
         return cause;
 
     }
@@ -219,6 +222,7 @@ public class CauseData implements UnObfuscable, Serializable {
         List<Partner> partners = new ArrayList<>();
         partners.add(partner);
         setExecutors(partners);
+        setOrderPriority(cause.getOrder_priority());
     }
 
     public AppUpdate getAppUpdate() {
@@ -227,5 +231,13 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setAppUpdate(AppUpdate appUpdate) {
         this.appUpdate = appUpdate;
+    }
+
+    public int getOrderPriority() {
+        return orderPriority;
+    }
+
+    public void setOrderPriority(int orderPriority) {
+        this.orderPriority = orderPriority;
     }
 }

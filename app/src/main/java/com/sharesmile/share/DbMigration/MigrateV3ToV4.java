@@ -7,9 +7,10 @@ package com.sharesmile.share.DbMigration;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.v3.LeaderBoardDao;
-import com.sharesmile.share.v3.Message;
-import com.sharesmile.share.v3.MessageDao;
+import com.sharesmile.share.Cause;
+import com.sharesmile.share.CauseDao;
+import com.sharesmile.share.LeaderBoardDao;
+import com.sharesmile.share.MessageDao;
 
 
 /**
@@ -17,7 +18,7 @@ import com.sharesmile.share.v3.MessageDao;
  *
  * @author Jeremy
  */
-public class MigrateV2ToV3 extends MigrationImpl {
+public class MigrateV3ToV4 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -29,10 +30,6 @@ public class MigrateV2ToV3 extends MigrationImpl {
 
         db.execSQL(getSqlStringForMigration());
 
-        //created LeaderBoard table
-        LeaderBoardDao.createTable(db, true);
-
-
         return getMigratedVersion();
     }
 
@@ -41,14 +38,6 @@ public class MigrateV2ToV3 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 2;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getMigratedVersion() {
         return 3;
     }
 
@@ -56,11 +45,19 @@ public class MigrateV2ToV3 extends MigrationImpl {
      * {@inheritDoc}
      */
     @Override
+    public int getMigratedVersion() {
+        return 4;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Migration getPreviousMigration() {
-        return new MigrateV1ToV2();
+        return new MigrateV2ToV3();
     }
 
     private String getSqlStringForMigration() {
-        return  "ALTER TABLE '" + MessageDao.TABLENAME + "' ADD COLUMN 'VIDEO_ID' TEXT DEFAULT NULL";
+        return "ALTER TABLE '" + CauseDao.TABLENAME + "' ADD COLUMN 'ORDER_PRIORITY' INTEGER DEFAULT 0";
     }
 }

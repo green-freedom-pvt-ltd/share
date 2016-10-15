@@ -1,8 +1,8 @@
 package com.sharesmile.share.sync;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.CauseDao;
@@ -81,7 +81,7 @@ public class SyncTaskManger extends IntentService {
                 SyncHelper.fetchMessage();
             } else if (ACTION_FETCH_LEADERBOARD.equals(action)) {
                 SyncHelper.fetchLeaderBoard();
-            }else if (ACTION_FETCH_COMPAIGN.equals(action)){
+            } else if (ACTION_FETCH_COMPAIGN.equals(action)) {
                 SyncHelper.fetchCampaign(this);
             }
         }

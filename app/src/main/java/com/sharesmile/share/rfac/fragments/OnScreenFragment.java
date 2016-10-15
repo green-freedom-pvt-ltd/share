@@ -29,8 +29,6 @@ import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -39,22 +37,20 @@ import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLButton;
-import com.sharesmile.share.utils.Utils;
-import com.sharesmile.share.views.MLButton;
-import com.sharesmile.share.views.MRButton;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class OnScreenFragment extends BaseFragment implements View.OnClickListener {
 
@@ -151,6 +147,12 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void AddCauseList(CauseList causesList) {
+        Collections.sort(causesList.getCauses(), new Comparator<CauseData>() {
+            @Override
+            public int compare(CauseData lhs, CauseData rhs) {
+                return lhs.getOrderPriority() - rhs.getOrderPriority();
+            }
+        });
         mAdapter.addData(causesList);
     }
 
@@ -196,6 +198,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 causes.add(causeData);
             }
         }
+        causesList.setCauses(causes);
+        ;
         setCausedata(causesList);
     }
 
@@ -203,7 +207,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onEvent(DBEvent.CauseFetchDataFromDb causeFetchDataFromDb) {
         Logger.d(TAG, "causeFetchDataFromDb");
         CauseDao causeDao = MainApplication.getInstance().getDbWrapper().getCauseDao();
-        List<Cause> causes = causeDao.queryBuilder().where(CauseDao.Properties.IsActive.eq(true)).list();
+        List<Cause> causes = causeDao.queryBuilder().where(CauseDao.Properties.IsActive.eq(true)).orderAsc(CauseDao.Properties.Order_priority).list();
         List<CauseData> causeDataList = new ArrayList<>();
         for (Cause cause : causes) {
             causeDataList.add(new CauseData(cause));
