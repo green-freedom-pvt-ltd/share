@@ -98,7 +98,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     private void logout() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(R.string.logout)).setMessage(getString(R.string.logout_msg));
-        builder.setPositiveButton(getString(R.string.logout), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.logout_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 MainApplication.getInstance().getDbWrapper().clearAll();

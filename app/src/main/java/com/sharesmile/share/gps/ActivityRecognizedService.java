@@ -44,7 +44,7 @@ public class ActivityRecognizedService extends IntentService {
                 case DetectedActivity.IN_VEHICLE: {
                     Logger.d( "ActivityRecogition", "In Vehicle: " + activity.getConfidence() );
                     detectedActivity = activity;
-                    if(activity.getConfidence() > 75) {
+                    if(activity.getConfidence() > 85) {
                         detectedActivityText = "Driving";
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                         builder.setContentText( "We have detected that you are driving." );
@@ -85,7 +85,7 @@ public class ActivityRecognizedService extends IntentService {
                     Logger.d( "ActivityRecogition", "Still: " + activity.getConfidence() );
                     detectedActivityText = "Still";
                     detectedActivity = activity;
-                    if(activity.getConfidence() > 75) {
+                    if(activity.getConfidence() > 85) {
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                         builder.setContentText("It seems like you are still!");
                         builder.setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue));

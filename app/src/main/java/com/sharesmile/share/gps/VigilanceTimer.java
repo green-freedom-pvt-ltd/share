@@ -117,13 +117,14 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
-		if(ActivityRecognizedService.getDetectedActivity().getType() == DetectedActivity.IN_VEHICLE
-				&& ActivityRecognizedService.getDetectedActivity().getConfidence() > 75){
-			Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
-			Logger.d( "ActivityRecogition", "On Vehicle Type: " + ActivityRecognizedService.getDetectedActivity() );
-			return true;
+		if(ActivityRecognizedService.getDetectedActivity() != null) {
 
-
+			if (ActivityRecognizedService.getDetectedActivity().getType() == DetectedActivity.IN_VEHICLE
+					&& ActivityRecognizedService.getDetectedActivity().getConfidence() > 85) {
+				Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
+				Logger.d("ActivityRecogition", "On Vehicle Type: " + ActivityRecognizedService.getDetectedActivity());
+				return true;
+			}
 		}
 
 		if (lastValidatedRecord == null){

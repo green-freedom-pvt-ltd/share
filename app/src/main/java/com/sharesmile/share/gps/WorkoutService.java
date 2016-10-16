@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
@@ -145,6 +146,8 @@ public class WorkoutService extends Service implements
             }
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
+            NotificationManagerCompat.from(this).cancel(0);
+
         }
     }
 

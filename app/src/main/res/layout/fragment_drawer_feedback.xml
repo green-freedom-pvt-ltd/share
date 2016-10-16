@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
-        android:hint="Enter your feedback here"
+        android:hint="Help us improve with your valuable feedback"
         android:maxLines="4"
         android:textColor="@color/greyish_brown_two"
         android:textSize="14sp" />

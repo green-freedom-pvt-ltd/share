@@ -19,6 +19,7 @@ import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.sync.SyncTaskManger;
+import com.sharesmile.share.utils.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -80,6 +81,8 @@ public class LeaderBoardFragment extends BaseFragment {
     public void refreshItems(){
         if(mleaderBoardList != null) {
             mleaderBoardList.clear();
+            Logger.i("LeaderBoard", mleaderBoardList.toString());
+
         }
         mLeaderBoardAdapter.notifyDataSetChanged();
         SyncHelper.syncLeaderBoardData(getContext());
