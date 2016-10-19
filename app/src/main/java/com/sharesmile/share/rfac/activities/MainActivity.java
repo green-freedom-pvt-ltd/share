@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         isAppUpdateDialogShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(getString(R.string.title_app_update))
                 .setMessage(message).
-                        setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
+                        setPositiveButton(getString(R.string.let_go), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Utils.redirectToPlayStore(MainActivity.this);
@@ -381,6 +381,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         TextView sponsors = (TextView) dialog.findViewById(R.id.sponser);
         TextView message = (TextView) dialog.findViewById(R.id.description);
         ImageView image = (ImageView) dialog.findViewById(R.id.image_run);
+        TextView skip = (TextView) dialog.findViewById(R.id.skip);
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
 
         Picasso.with(this).load(campaign.getImageUrl()).into(image);
         share.setText(campaign.getButtonText());

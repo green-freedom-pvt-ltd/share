@@ -3,12 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:orientation="vertical"
     android:minWidth="300dp"
-    android:paddingBottom="24dp"
+    android:orientation="vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="24dp">
+    android:paddingTop="20dp">
 
     <ImageView
         android:id="@+id/image_run"
@@ -67,5 +66,15 @@
         android:textAllCaps="true"
         android:textColor="@color/white"
         android:textSize="14dp" />
+
+    <com.sharesmile.share.views.MLTextView
+        android:id="@+id/skip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="Skip"
+        android:textColor="@color/greyish_brown_two"
+        android:textSize="10sp" />
 </LinearLayout>
 
