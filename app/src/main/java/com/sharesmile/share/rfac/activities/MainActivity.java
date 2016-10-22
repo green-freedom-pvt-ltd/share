@@ -378,7 +378,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         dialog.setContentView(R.layout.dialog_promotion);
         Button share = (Button) dialog.findViewById(R.id.share);
         TextView title = (TextView) dialog.findViewById(R.id.title);
-        TextView sponsors = (TextView) dialog.findViewById(R.id.sponser);
         TextView message = (TextView) dialog.findViewById(R.id.description);
         ImageView image = (ImageView) dialog.findViewById(R.id.image_run);
         TextView skip = (TextView) dialog.findViewById(R.id.skip);
@@ -393,7 +392,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         share.setText(campaign.getButtonText());
         title.setText(campaign.getTitle());
         message.setText(campaign.getDescritption());
-        sponsors.setText("By " + campaign.getSponsor());
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

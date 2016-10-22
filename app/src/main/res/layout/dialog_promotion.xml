@@ -34,23 +34,12 @@
             android:textColor="@color/greyish_brown_two"
             android:textSize="18sp" />
 
-        <com.sharesmile.share.views.MRTextView
-            android:id="@+id/sponser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/title"
-            android:layout_below="@+id/title"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"
-            android:text="by Shwas Foundation"
-            android:textColor="@color/black_two"
-            android:textSize="12sp" />
-
         <com.sharesmile.share.views.MLTextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sponser"
+            android:layout_below="@+id/title"
+            android:layout_marginTop="18dp"
             android:text="Shwas is an effort started by a group of volunteers to educate the underprivileged kids of Gulbai Tekra, Ahmedabad since year 2009."
             android:textColor="@color/greyish_brown_two"
             android:textSize="14sp" />
@@ -71,10 +60,10 @@
         android:id="@+id/skip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:padding="16dp"
         android:gravity="center"
-        android:text="Skip"
+        android:text="@string/skip"
         android:textColor="@color/greyish_brown_two"
-        android:textSize="10sp" />
+        android:textSize="14sp" />
 </LinearLayout>
 
