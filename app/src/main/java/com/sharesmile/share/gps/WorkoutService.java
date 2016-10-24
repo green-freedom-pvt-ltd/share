@@ -345,8 +345,21 @@ public class WorkoutService extends Service implements
             vigilanceTimer.pauseTimer();
         }
         if (tracker != null && tracker.isRunning()) {
-            //TODO: Put stopping locationServices code over here
             tracker.pauseRun();
+            //Test: Put stopping locationServices code over here
+            Logger.d(TAG, "PauseWorkout");
+            if (currentlyTracking) {
+                Intent intent = new Intent(this, ActivityRecognizedService.class);
+                PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+
+                if (googleApiClient != null && googleApiClient.isConnected()) {
+                    LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+                }
+                NotificationManagerCompat.from(this).cancel(0);
+
+            }
+
         }
     }
 
@@ -356,6 +369,18 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.getState() != Tracker.State.RUNNING) {
             //TODO: Put resuming locationServices code over here
             tracker.resumeRun();
+            Logger.d(TAG, "ResumeWorkout");
+            if (currentlyTracking) {
+                Intent intent = new Intent(this, ActivityRecognizedService.class);
+                PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+
+                if (googleApiClient != null && googleApiClient.isConnected()) {
+                    LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
+                }
+                NotificationManagerCompat.from(this).cancel(0);
+
+            }
         }
     }
 
