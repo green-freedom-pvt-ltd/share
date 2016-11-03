@@ -124,7 +124,7 @@ dependencies {
     }
 
     compile 'com.onesignal:OneSignal:2.+@aar'
-    compile "com.mixpanel.android:mixpanel-android:4.+"
+    compile "com.mixpanel.android:mixpanel-android:4.9.0"
 
 
     compile 'com.facebook.android:facebook-android-sdk:4.+'

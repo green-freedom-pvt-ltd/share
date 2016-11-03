@@ -94,6 +94,7 @@ public class ProfileHistoryFragment extends Fragment {
     @Override
     public void onDestroyView() {
         SyncTaskManger.startRunDataUpdate(getContext());
+        EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 
