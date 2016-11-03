@@ -103,7 +103,7 @@ public class LeaderBoardFragment extends BaseFragment {
 
     public void fetchLeaderBoardDataFromDb() {
         LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
-        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(20).list();
+        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(30).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();
     }
@@ -117,8 +117,8 @@ public class LeaderBoardFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
 }

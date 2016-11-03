@@ -19,7 +19,7 @@ import java.util.List;
 
 public class ActivityRecognizedService extends IntentService {
 
-    public static DetectedActivity detectedActivity;
+    public static DetectedActivity detectedActivity = null;
     public static String detectedActivityText = "Running";
 
     public ActivityRecognizedService() {
