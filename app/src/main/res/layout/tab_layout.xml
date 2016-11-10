@@ -23,7 +23,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginRight="46dp"
         android:background="@drawable/rounded_corner"
-        android:text="Let's Run"
+        android:text="@string/let_go"
         android:textAllCaps="true"
         android:textColor="@color/white"
         android:textSize="16sp" />

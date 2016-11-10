@@ -38,6 +38,9 @@ public class LeaderBoardFragment extends BaseFragment {
     ProgressBar mProgressBar;
     SwipeRefreshLayout mswipeRefresh;
 
+    LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,7 @@ public class LeaderBoardFragment extends BaseFragment {
             Logger.i("LeaderBoard", mleaderBoardList.toString());
 
         }
+        mleaderBoardDao.deleteAll();
         mLeaderBoardAdapter.notifyDataSetChanged();
         SyncHelper.syncLeaderBoardData(getContext());
 
@@ -102,7 +106,6 @@ public class LeaderBoardFragment extends BaseFragment {
     }
 
     public void fetchLeaderBoardDataFromDb() {
-        LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
         mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(30).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();

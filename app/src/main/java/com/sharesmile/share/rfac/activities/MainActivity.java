@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         isAppUpdateDialogShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(getString(R.string.title_app_update))
                 .setMessage(message).
-                        setPositiveButton(getString(R.string.let_go), new DialogInterface.OnClickListener() {
+                        setPositiveButton(getString(R.string.update), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Utils.redirectToPlayStore(MainActivity.this);
