@@ -183,13 +183,21 @@ public class Utils {
         return sec;
     }
 
+    public static void share(Context context, String shareTemplate) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
+        shareIntent.setType("text/plain");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, "send"));
+    }
+
     public static void share(Context context,Uri uri, String shareTemplate) {
-      //  progress_bar.visibility = View.GONE
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.setType("image/*");
+        shareIntent.setType("image");
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, "send"));
     }

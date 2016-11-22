@@ -395,7 +395,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utils.share(v.getContext(), null, campaign.getShareTemplate());
+                Utils.share(v.getContext(), campaign.getShareTemplate());
             }
         });
 
