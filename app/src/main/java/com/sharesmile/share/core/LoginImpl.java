@@ -25,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
@@ -43,8 +44,6 @@ import com.sharesmile.share.utils.Urls;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;

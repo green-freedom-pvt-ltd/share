@@ -61,7 +61,6 @@
         <service
             android:name=".gps.WorkoutService"
             android:exported="false" />
-
         <service
             android:name=".gps.ActivityRecognizedService"
             android:exported="false" />
@@ -96,8 +95,7 @@
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name"
-             />
+            android:label="@string/app_name" />
 
         <provider
             android:name="com.facebook.FacebookContentProvider"
@@ -144,7 +142,7 @@
             android:name="activities.MessageVideoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
+        <activity android:name="activities.ImpactLeagueActivity"></activity>
     </application>
 
 </manifest>

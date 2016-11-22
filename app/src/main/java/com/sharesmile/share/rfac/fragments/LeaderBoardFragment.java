@@ -1,31 +1,40 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.sync.SyncTaskManger;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+
+import activities.ImpactLeagueActivity;
 
 /**
  * Created by piyush on 8/30/16.
@@ -39,7 +48,7 @@ public class LeaderBoardFragment extends BaseFragment {
     SwipeRefreshLayout mswipeRefresh;
 
     LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
-
+    private View badgeIndictor;
 
 
     @Override
@@ -70,8 +79,12 @@ public class LeaderBoardFragment extends BaseFragment {
         });
 
         mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
+
+        setupToolbar();
         return l;
     }
+
+
 
     private void init() {
         mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), mleaderBoardList);
@@ -80,6 +93,27 @@ public class LeaderBoardFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
+    private void setupToolbar() {
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        MenuItem messageItem = menu.findItem(R.id.item_message);
+
+        RelativeLayout badge = (RelativeLayout) messageItem.getActionView();
+        badgeIndictor = badge.findViewById(R.id.badge_indicator);
+        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
+        badgeIndictor.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
+
+        badge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
+            }
+        });
+    }
 
     public void refreshItems(){
         if(mleaderBoardList != null) {

@@ -22,6 +22,7 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
+import activities.ImpactLeagueActivity;
 import fragments.MessageCenterFragment;
 
 /**
@@ -119,6 +120,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 break;
             case SHOW_MESSAGE_CENTER:
                 showMessageCenter();
+                break;
+            case SHOW_LEAGUE_ACTIVITY:
+                startActivity(new Intent(this, ImpactLeagueActivity.class));
                 break;
         }
     }

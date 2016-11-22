@@ -20,6 +20,8 @@ apply plugin: 'kotlin-android-extensions'
 repositories {
     maven { url 'https://maven.fabric.io/public' }
     mavenCentral()
+    maven { url "https://clojars.org/repo/" }
+
 }
 
 
@@ -29,7 +31,7 @@ android {
 
     defaultConfig {
         applicationId "com.sharesmile.share"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 30
         versionName "1.5.4"
@@ -142,4 +144,9 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:8.3.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
+   // compile "com.google.firebase:firebase-core:8.3.0"
+
+    compile ('com.github.anshulagarwal06:Lumiere:v1'){
+        exclude group: 'com.google.firebase'
+    }
 }
