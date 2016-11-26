@@ -22,6 +22,8 @@ public class Urls {
     private static final String GOOGLE_CONVERT_TOKEN_URL = "/oauth2/v4/token";
     private static final String CAMPAIGN_URL = "/api/campaign/";
 
+    private static final String LEAGUE_URL = "/api/employeetoteam/";
+
     public static String getBaseUrl() {
         return BASE_URL;
     }
@@ -78,6 +80,11 @@ public class Urls {
 
     public static String getCampaignUrl() {
         String url = getBaseUrl() + CAMPAIGN_URL;
+        return url;
+    }
+
+    public static String getLeagueUrl() {
+        String url = getBaseUrl() + LEAGUE_URL;
         return url;
     }
 }

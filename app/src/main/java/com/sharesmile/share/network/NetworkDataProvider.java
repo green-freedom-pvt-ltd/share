@@ -305,6 +305,33 @@ public class NetworkDataProvider {
         call.enqueue(cb);
     }
 
+    public static <R extends UnObfuscable> void doPostCallAsyncWithFormData(String url, List<NameValuePair> data,
+                                                                            NetworkAsyncCallback<R> cb) {
+        RequestBody body = convertFormDataToBody(data);
+        Request.Builder requestBuilder = new Request.Builder().url(url)
+                .post(body);
+
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
+        Request request = requestBuilder.build();
+        Call call = getSingleOkHttpClient().newCall(request);
+        call.enqueue(cb);
+    }
+
+    public static <R extends UnObfuscable> void doPutCallAsyncWithForData(String url, List<NameValuePair> data,
+                                                                          NetworkAsyncCallback<R> cb) {
+        RequestBody body = convertFormDataToBody(data);
+        Request.Builder requestBuilder = new Request.Builder().url(url)
+                .put(body);
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
+        Request request = requestBuilder.build();
+        Call call = getSingleOkHttpClient().newCall(request);
+        call.enqueue(cb);
+    }
+
     private static String convertToData(List<NameValuePair> data) {
 
         String body = "";

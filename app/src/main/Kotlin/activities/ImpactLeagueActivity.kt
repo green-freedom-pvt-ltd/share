@@ -1,6 +1,7 @@
 package activities
 
 import android.os.Bundle
+import android.support.v7.app.ActionBar
 import android.view.MenuItem
 import base.BaseActivity2
 import com.sharesmile.share.R
@@ -28,7 +29,7 @@ class ImpactLeagueActivity : BaseActivity2() {
     }
 
     override fun configureToolbar() {
-
+        supportActionBar?.displayOptions = ActionBar.DISPLAY_HOME_AS_UP.or(ActionBar.DISPLAY_SHOW_TITLE);
     }
 
     override fun setUpNavigationView() {
