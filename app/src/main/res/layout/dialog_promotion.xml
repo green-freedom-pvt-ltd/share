@@ -1,69 +1,90 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:minWidth="300dp"
-    android:orientation="vertical"
+
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="20dp">
 
-    <ImageView
-        android:id="@+id/image_run"
-        android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:background="@color/light_grey"
-        android:clickable="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/cause_image_placeholder" />
-
-    <RelativeLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:paddingBottom="20dp">
+        android:orientation="vertical">
 
-        <com.sharesmile.share.views.MRTextView
-            android:id="@+id/title"
+        <ImageView
+            android:id="@+id/image_run"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:background="@color/light_grey"
+            android:clickable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cause_image_placeholder" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:maxLines="2"
-            android:text="Sponser a Child, Foster a Future! "
-            android:textColor="@color/greyish_brown_two"
-            android:textSize="18sp" />
+            android:background="@color/white"
+            android:paddingBottom="20dp">
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:maxLines="2"
+                android:text="Sponser a Child, Foster a Future! "
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="18sp" />
+
+            <com.sharesmile.share.views.MLTextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/title"
+                android:layout_marginTop="18dp"
+                android:text="Shwas is an effort started by a group of volunteers to educate the underprivileged kids of Gulbai Tekra, Ahmedabad since year 2009."
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+        <com.sharesmile.share.views.MRButton
+            android:id="@+id/share"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/light_gold"
+            android:text="Share"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="14dp" />
 
         <com.sharesmile.share.views.MLTextView
-            android:id="@+id/description"
+            android:id="@+id/skip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
-            android:layout_marginTop="18dp"
-            android:text="Shwas is an effort started by a group of volunteers to educate the underprivileged kids of Gulbai Tekra, Ahmedabad since year 2009."
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="@string/skip"
             android:textColor="@color/greyish_brown_two"
             android:textSize="14sp" />
+    </LinearLayout>
 
-    </RelativeLayout>
-
-    <com.sharesmile.share.views.MRButton
-        android:id="@+id/share"
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/progress_view"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/light_gold"
-        android:text="Share"
-        android:textAllCaps="true"
-        android:textColor="@color/white"
-        android:textSize="14dp" />
-
-    <com.sharesmile.share.views.MLTextView
-        android:id="@+id/skip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:layout_height="240dp"
+        android:clickable="true"
         android:gravity="center"
-        android:text="@string/skip"
-        android:textColor="@color/greyish_brown_two"
-        android:textSize="14sp" />
-</LinearLayout>
+        android:orientation="vertical">
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</RelativeLayout>

@@ -4,7 +4,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +25,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
@@ -45,6 +48,7 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -379,6 +383,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Button share = (Button) dialog.findViewById(R.id.share);
         TextView title = (TextView) dialog.findViewById(R.id.title);
         TextView message = (TextView) dialog.findViewById(R.id.description);
+        final LinearLayout progressView = (LinearLayout) dialog.findViewById(R.id.progress_view);
+
         ImageView image = (ImageView) dialog.findViewById(R.id.image_run);
         TextView skip = (TextView) dialog.findViewById(R.id.skip);
         skip.setOnClickListener(new View.OnClickListener() {
@@ -394,8 +400,27 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         message.setText(campaign.getDescritption());
         share.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Utils.share(v.getContext(), campaign.getShareTemplate());
+            public void onClick(final View v) {
+                progressView.setVisibility(View.VISIBLE);
+                Picasso.with(MainActivity.this).load(campaign.getImageUrl()).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        Utils.share(v.getContext(), Utils.getLocalBitmapUri(bitmap, MainActivity.this), campaign.getShareTemplate());
+                        progressView.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        progressView.setVisibility(View.GONE);
+                        Utils.share(v.getContext(), campaign.getShareTemplate());
+
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
             }
         });
 
