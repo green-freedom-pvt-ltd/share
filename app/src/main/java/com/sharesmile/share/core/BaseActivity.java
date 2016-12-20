@@ -32,6 +32,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     private static final String TAG = "BaseActivity";
     private static final int REQUEST_CHECK_SETTINGS = 102;
+    public static final int REQUEST_LEAGUE_REGISTRATION = 103;
+
     private static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
 
@@ -122,7 +124,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 showMessageCenter();
                 break;
             case SHOW_LEAGUE_ACTIVITY:
-                startActivity(new Intent(this, ImpactLeagueActivity.class));
+                startActivityForResult(new Intent(this, ImpactLeagueActivity.class), REQUEST_LEAGUE_REGISTRATION);
                 break;
         }
     }

@@ -23,6 +23,7 @@ public class Urls {
     private static final String CAMPAIGN_URL = "/api/campaign/";
 
     private static final String LEAGUE_URL = "/api/employeetoteam/";
+    private static final String TEAMBOARD_URL = "/api/teamboard/";
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -86,5 +87,9 @@ public class Urls {
     public static String getLeagueUrl() {
         String url = getBaseUrl() + LEAGUE_URL;
         return url;
+    }
+
+    public static String getTeamBoardUrl() {
+        return getBaseUrl() + TEAMBOARD_URL;
     }
 }

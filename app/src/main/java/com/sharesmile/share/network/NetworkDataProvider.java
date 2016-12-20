@@ -353,7 +353,12 @@ public class NetworkDataProvider {
     }
 
     public static <R extends UnObfuscable> void doGetCallAsync(String url, NetworkAsyncCallback<R> cb) {
-        Request request = new Request.Builder().url(url).build();
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
+        Request request = requestBuilder.build();
+
         Call call = getSingleOkHttpClient().newCall(request);
         call.enqueue(cb);
     }

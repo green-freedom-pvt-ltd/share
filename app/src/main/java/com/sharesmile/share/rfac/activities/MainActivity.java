@@ -62,6 +62,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CODE_LOGIN = 1001;
+
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
@@ -289,7 +290,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
-            replaceFragment(new LeaderBoardFragment(), true);
+            replaceFragment(LeaderBoardFragment.getInstance(false), true);
         }
 
 
@@ -315,6 +316,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOGIN) {
             updateNavigationMenu();
+        } else if (requestCode == REQUEST_LEAGUE_REGISTRATION) {
+            if (resultCode == RESULT_OK) {
+                replaceFragment(LeaderBoardFragment.getInstance(true), true);
+            }
         }
     }
 

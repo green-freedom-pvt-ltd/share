@@ -96,7 +96,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
             }
         }
 
-        fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code), true, null);
+        fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code,banner = leagueData?.banner), true, null);
     }
 
     private fun invalidCode() {
