@@ -1,12 +1,13 @@
 package com.sharesmile.share.core;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -16,11 +17,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
+import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import activities.ImpactLeagueActivity;
 import fragments.MessageCenterFragment;
@@ -200,6 +204,27 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     private void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
+    }
+
+    public void showFeedBackDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.post_fun_feedback_title)).setMessage(getString(R.string.post_fun_feedback_msg));
+        builder.setPositiveButton("Great", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Utils.redirectToPlayStore(BaseActivity.this);
+            }
+        });
+        builder.setNegativeButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                replaceFragment(new FeedbackFragment(), true);
+            }
+        });
+
+        builder.show();
+
     }
 
 }

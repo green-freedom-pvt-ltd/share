@@ -183,6 +183,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void loadInitialFragment() {
         addFragment(new OnScreenFragment(), false);
+        boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_PROFILE, false);
+        if (showProfile && MainApplication.isLogin()) {
+            replaceFragment(new ProfileFragment(), true);
+        }
+        boolean showFeedBackDialog = getIntent().getBooleanExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, false);
+        if (showFeedBackDialog) {
+            showFeedBackDialog();
+        }
     }
 
     @Override
