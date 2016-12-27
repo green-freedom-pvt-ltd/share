@@ -103,8 +103,8 @@ public class Constants {
     public static final String PREF_HAS_RUN = "perf_has_run";
     public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
     public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
-    public static final String PREF_LEAGUE_TEAM_CODE ="pref_league_team_code" ;
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
+    public static final String PREF_LEAGUE_TEAM_ID="pref_league_team_id";
 
 
     //app Update
@@ -136,4 +136,5 @@ public class Constants {
         add(new LatLng(19.117179, 72.910924));
         add(new LatLng(19.116917, 72.910417));
     }};
+
 }

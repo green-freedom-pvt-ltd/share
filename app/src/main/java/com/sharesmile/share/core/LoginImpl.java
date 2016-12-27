@@ -230,6 +230,11 @@ public class LoginImpl {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
         }
 
+        if (response.has("team_code")) {
+            int teamCode = response.get("team_code").getAsInt();
+            SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamCode);
+        }
+
         User user = new User((long) user_id);
         user.setName(name);
         user.setEmailId(userEmail);

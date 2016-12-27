@@ -24,6 +24,7 @@ public class Urls {
 
     private static final String LEAGUE_URL = "/api/employeetoteam/";
     private static final String TEAMBOARD_URL = "/api/teamboard/";
+    private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboard/";
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -91,5 +92,9 @@ public class Urls {
 
     public static String getTeamBoardUrl() {
         return getBaseUrl() + TEAMBOARD_URL;
+    }
+
+    public static String getTeamLeaderBoardUrl() {
+        return getBaseUrl() + TEAMLEADERBOARD_URL;
     }
 }

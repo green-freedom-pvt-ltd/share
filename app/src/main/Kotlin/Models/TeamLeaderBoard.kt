@@ -1,5 +1,6 @@
 package Models
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.LeaderBoard
 import com.sharesmile.share.core.UnObfuscable
@@ -10,10 +11,10 @@ import java.util.*
 /**
  * Created by Shine on 19/12/16.
  */
-class TeamBoard : UnObfuscable, Serializable {
+class TeamLeaderBoard : UnObfuscable, Serializable {
 
     @SerializedName("count")
-    var totalMessageCount: Long = 0
+    var count: Long = 0
 
     @SerializedName("next")
     var nextUrl: String = ""
@@ -22,24 +23,38 @@ class TeamBoard : UnObfuscable, Serializable {
     var previousUrl: String = ""
 
     @SerializedName("results")
-    var teamList: ArrayList<Team>? = null;
+    var teamList: ArrayList<UserDetails>? = null;
 
-    public class Team : Serializable {
+    public class UserDetails : Serializable {
+        @SerializedName("user")
+        var user: User? = null;
 
-        @SerializedName("id")
+    }
+
+    public class User : Serializable {
+
+        @SerializedName("user_id")
         var id: Long? = 0;
 
-        @SerializedName("team_name")
-        var teamName: String? = "";
+        @SerializedName("first_name")
+        private var firstName: String? = null
+
+        @SerializedName("last_name")
+        private val lastName: String? = null
+
+        @SerializedName("social_thumb")
+        private val imageUrl: String? = null
 
         @SerializedName("total_distance")
-        private var total_distance: TotalDistance? = null;
+        private val totalDistance: TotalDistance? = null
 
         public fun convertToLeaderBoard(): LeaderBoard {
+
             var board = LeaderBoard();
             board.id = id;
-            board.first_name = teamName;
-            board.last_week_distance = total_distance?.totalDistance;
+            board.first_name = firstName;
+            board.last_name = lastName
+            board.last_week_distance = totalDistance?.totalDistance;
             return board;
         }
 

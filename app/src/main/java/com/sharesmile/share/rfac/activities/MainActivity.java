@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
@@ -298,7 +299,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
-            replaceFragment(LeaderBoardFragment.getInstance(false), true);
+            replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEADERBOARD), true);
         }
 
 
@@ -326,7 +327,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             updateNavigationMenu();
         } else if (requestCode == REQUEST_LEAGUE_REGISTRATION) {
             if (resultCode == RESULT_OK) {
-                replaceFragment(LeaderBoardFragment.getInstance(true), true);
+                replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMBAORD), true);
             }
         }
     }

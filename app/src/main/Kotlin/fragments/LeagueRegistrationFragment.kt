@@ -118,7 +118,7 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
                 fragmentListener.showActivityContent();
-                SharedPrefsManager.getInstance().setString(Constants.PREF_LEAGUE_TEAM_CODE, leagueTeam?.team);
+                SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueTeam?.id!!);
                 activity.setResult(Activity.RESULT_OK);
                 activity.finish();
             }

@@ -1,6 +1,7 @@
 package fragments
 
 import Models.LeagueTeam
+import android.app.Activity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -9,13 +10,11 @@ import android.view.ViewGroup
 import base.BaseFragment2
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
+import com.sharesmile.share.core.Constants
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
-import com.sharesmile.share.utils.BasicNameValuePair
-import com.sharesmile.share.utils.NameValuePair
-import com.sharesmile.share.utils.Urls
-import com.sharesmile.share.utils.Utils
+import com.sharesmile.share.utils.*
 import kotlinx.android.synthetic.main.fragment_secret_code.view.*
 import java.util.*
 
@@ -77,12 +76,12 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
                 fragmentListener.showActivityContent();
-                getTeamDetails(leagueTeam, code);
+                getTeamDetails(leagueTeam!!, code);
             }
         })
     }
 
-    private fun getTeamDetails(leagueData: LeagueTeam?, code: String) {
+    private fun getTeamDetails(leagueData: LeagueTeam, code: String) {
         var location: ArrayList<String> = ArrayList<String>();
         var department: ArrayList<String> = ArrayList<String>();
 
@@ -96,7 +95,9 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
             }
         }
 
-        fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code,banner = leagueData?.banner), true, null);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueData.id!!);
+        activity.setResult(Activity.RESULT_OK);
+        fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null);
     }
 
     private fun invalidCode() {

@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,17 +41,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Models.TeamBoard;
+import Models.TeamLeaderBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Created by piyush on 8/30/16.
  */
-public class LeaderBoardFragment extends BaseFragment {
+public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdapter.ItemClickListener {
 
     private static final String BUNDLE_LEAGUE_BOARD = "bundle_league_board";
     RecyclerView mRecyclerView;
-    private List<LeaderBoard> mleaderBoardList;
+    private List<LeaderBoard> mleaderBoardList = new ArrayList<>();
     LeaderBoardAdapter mLeaderBoardAdapter;
     ProgressBar mProgressBar;
     SwipeRefreshLayout mswipeRefresh;
@@ -63,13 +63,47 @@ public class LeaderBoardFragment extends BaseFragment {
     LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
     private View badgeIndictor;
     private boolean mShowLeagueBoard = false;
+    private BOARD_TYPE mBoard;
 
+    public enum BOARD_TYPE {
+        LEADERBOARD,
+        TEAMBAORD,
+        TEAMLEADERBAORD;
 
-    public static LeaderBoardFragment getInstance(Boolean showLeagueLeaderBoard) {
+        public static BOARD_TYPE getBoardType(int board) {
+
+            switch (board) {
+                case 1:
+                    return LEADERBOARD;
+                case 2:
+                    return TEAMBAORD;
+                case 3:
+                    return TEAMLEADERBAORD;
+                default:
+                    return LEADERBOARD;
+            }
+        }
+
+        public static int getBoardID(BOARD_TYPE board) {
+
+            switch (board) {
+                case LEADERBOARD:
+                    return 1;
+                case TEAMBAORD:
+                    return 2;
+                case TEAMLEADERBAORD:
+                    return 3;
+                default:
+                    return 1;
+            }
+        }
+    }
+
+    public static LeaderBoardFragment getInstance(BOARD_TYPE board) {
 
         LeaderBoardFragment fragment = new LeaderBoardFragment();
         Bundle bundle = new Bundle();
-        bundle.putBoolean(BUNDLE_LEAGUE_BOARD, showLeagueLeaderBoard);
+        bundle.putInt(BUNDLE_LEAGUE_BOARD, BOARD_TYPE.getBoardID(board));
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -79,11 +113,9 @@ public class LeaderBoardFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
         if (arg != null) {
-            mShowLeagueBoard = arg.getBoolean(BUNDLE_LEAGUE_BOARD, false);
+            mBoard = BOARD_TYPE.getBoardType(arg.getInt(BUNDLE_LEAGUE_BOARD));
+            mShowLeagueBoard = mBoard == BOARD_TYPE.TEAMBAORD ? true : false;
         }
-
-        Log.i("Anshul", " mShowLeagueBoard : " + mShowLeagueBoard);
-
     }
 
     @Nullable
@@ -95,16 +127,20 @@ public class LeaderBoardFragment extends BaseFragment {
         mRecyclerView = (RecyclerView) l.findViewById(R.id.recycler_view);
         mProgressBar = (ProgressBar) l.findViewById(R.id.progress_bar);
         mswipeRefresh = (SwipeRefreshLayout) l.findViewById(R.id.swipeRefreshLayout);
-        getFragmentController().updateToolBar(getResources().getString(R.string.leaderboard), true);
         init();
-        if (!mShowLeagueBoard) {
-            EventBus.getDefault().register(this);
-            SyncHelper.syncLeaderBoardData(getContext());
-        } else {
-            mInfoView.setVisibility(View.GONE);
-            fetchTeamLeaderBoardData();
+        return l;
+    }
+
+    private void init() {
+        if (mLeaderBoardAdapter == null) {
+            mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), mleaderBoardList, mShowLeagueBoard, this);
+            mLeaderBoardAdapter.setData(mleaderBoardList);
+            fetchData();
         }
-        showProgressDialog();
+        mRecyclerView.setAdapter(mLeaderBoardAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        setupToolbar();
+
         mswipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -113,25 +149,41 @@ public class LeaderBoardFragment extends BaseFragment {
             }
         });
         mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
-        setupToolbar();
-        return l;
+
     }
 
-    private void init() {
-        mleaderBoardList = new ArrayList<>();
-        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), mleaderBoardList, mShowLeagueBoard);
-        mLeaderBoardAdapter.setData(mleaderBoardList);
-        mRecyclerView.setAdapter(mLeaderBoardAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    private void fetchData() {
+        if (mBoard == BOARD_TYPE.LEADERBOARD) {
+            EventBus.getDefault().register(this);
+            SyncHelper.syncLeaderBoardData(getContext());
+        } else {
+            mInfoView.setVisibility(View.GONE);
+            if (mBoard == BOARD_TYPE.TEAMBAORD) {
+                fetchTeamBoardData();
+            } else {
+                fetchTeamLeaderBoardData();
+            }
+        }
+        showProgressDialog();
     }
 
     private void setupToolbar() {
         setHasOptionsMenu(true);
+        if (mBoard == BOARD_TYPE.LEADERBOARD) {
+            getFragmentController().updateToolBar(getResources().getString(R.string.leaderboard), true);
+        } else {
+            mInfoView.setVisibility(View.GONE);
+            if (mBoard == BOARD_TYPE.TEAMBAORD) {
+                getFragmentController().updateToolBar(getResources().getString(R.string.impact_league), true);
+            } else {
+                getFragmentController().updateToolBar(getResources().getString(R.string.team_leader_board), true);
+            }
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (!mShowLeagueBoard) {
+        if (mBoard == BOARD_TYPE.LEADERBOARD) {
             inflater.inflate(R.menu.menu_leaderboard, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -141,9 +193,9 @@ public class LeaderBoardFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_league:
-                String teamCode = SharedPrefsManager.getInstance().getString(Constants.PREF_LEAGUE_TEAM_CODE, "");
-                if (!TextUtils.isEmpty(teamCode)) {
-                    getFragmentController().replaceFragment(getInstance(true), true);
+                int teamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID, 0);
+                if (teamId > 0) {
+                    getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAMBAORD), true);
                 } else {
                     getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
                 }
@@ -158,10 +210,13 @@ public class LeaderBoardFragment extends BaseFragment {
         if (mleaderBoardList != null) {
             mleaderBoardList.clear();
             Logger.i("LeaderBoard", mleaderBoardList.toString());
-
         }
         if (mShowLeagueBoard) {
-            fetchTeamLeaderBoardData();
+            if (mBoard == BOARD_TYPE.TEAMBAORD) {
+                fetchTeamBoardData();
+            } else {
+                fetchTeamLeaderBoardData();
+            }
         } else {
             mleaderBoardDao.deleteAll();
             mLeaderBoardAdapter.notifyDataSetChanged();
@@ -188,6 +243,28 @@ public class LeaderBoardFragment extends BaseFragment {
     }
 
     private void fetchTeamLeaderBoardData() {
+        NetworkDataProvider.doGetCallAsync(Urls.getTeamLeaderBoardUrl(), new NetworkAsyncCallback<TeamLeaderBoard>() {
+            @Override
+            public void onNetworkFailure(NetworkException ne) {
+                hideProgressDialog();
+                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+                ne.printStackTrace();
+            }
+
+            @Override
+            public void onNetworkSuccess(TeamLeaderBoard board) {
+                mleaderBoardList.clear();
+                for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
+                    mleaderBoardList.add(team.getUser().convertToLeaderBoard());
+                }
+
+                hideProgressDialog();
+                mLeaderBoardAdapter.setData(mleaderBoardList);
+            }
+        });
+    }
+
+    private void fetchTeamBoardData() {
         NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
@@ -210,6 +287,10 @@ public class LeaderBoardFragment extends BaseFragment {
         });
     }
 
+    @Override
+    public void onItemClick(int id) {
+        getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAMLEADERBAORD), true);
+    }
 
     private void hideProgressDialog() {
         mProgressBar.setVisibility(View.GONE);

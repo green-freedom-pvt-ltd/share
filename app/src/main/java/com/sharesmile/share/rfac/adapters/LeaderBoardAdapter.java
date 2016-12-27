@@ -9,9 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.LeaderBoard;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -25,6 +27,7 @@ import butterknife.ButterKnife;
  */
 public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.LeaderBoardViewHolder> {
 
+    private ItemClickListener mListener;
     private boolean isLeagueBoard = false;
     private List<LeaderBoard> mData;
     private Context mContext;
@@ -34,9 +37,10 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         this.mContext = context;
     }
 
-    public LeaderBoardAdapter(Context context, List<LeaderBoard> leaderBoard, boolean isLeagueBoard) {
+    public LeaderBoardAdapter(Context context, List<LeaderBoard> leaderBoard, boolean isLeagueBoard, ItemClickListener lis) {
         this(context, leaderBoard);
         this.isLeagueBoard = isLeagueBoard;
+        mListener = lis;
     }
 
     @Override
@@ -104,20 +108,32 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             String last_Week_Distance = String.format("%.2f", leaderboard.getLast_week_distance());
             mlastWeekDistance.setText(last_Week_Distance + " Km");
 
+            final int id;
             if (isLeagueBoard) {
-
+                id = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
             } else {
-                int id = MainApplication.getInstance().getUserID();
-                if (id == leaderboard.getId()) {
-                    container.setBackgroundColor(mContext.getResources().getColor(R.color.light_gold));
-                } else {
-                    container.setBackgroundColor(mContext.getResources().getColor(R.color.white));
-
-                }
+                id = MainApplication.getInstance().getUserID();
             }
 
+            if (id == leaderboard.getId()) {
+                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.light_gold));
+                if (isLeagueBoard) {
+                    container.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mListener.onItemClick(id);
+                        }
+                    });
+                }
+            } else {
+                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
+                container.setOnClickListener(null);
+
+            }
         }
+    }
 
-
+    public interface ItemClickListener {
+        public void onItemClick(int id);
     }
 }

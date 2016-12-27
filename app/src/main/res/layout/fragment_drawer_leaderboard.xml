@@ -12,9 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
+        android:layout_marginBottom="10dp"
         android:layout_marginLeft="101dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:text="@string/leader_board_week"
         android:textSize="14sp" />
 
@@ -42,7 +42,8 @@
                 android:id="@+id/progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
 
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>

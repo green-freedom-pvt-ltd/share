@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@color/pale_magenta"
     android:id="@+id/containerView"
     android:orientation="vertical"
+    app:cardBackgroundColor="@color/white"
     app:cardElevation="0.5dp"
     app:cardUseCompatPadding="true">
 
@@ -14,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
+        android:background="@null"
         android:padding="8dp">
 
         <com.sharesmile.share.views.MLTextView
