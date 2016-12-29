@@ -5,13 +5,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -60,8 +62,10 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     @BindView(R.id.tv_leaderboard_data)
     TextView mInfoView;
 
+    @BindView(R.id.banner)
+    ImageView mBanner;
+
     LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
-    private View badgeIndictor;
     private boolean mShowLeagueBoard = false;
     private BOARD_TYPE mBoard;
 
@@ -276,8 +280,14 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onNetworkSuccess(TeamBoard board) {
                 mleaderBoardList.clear();
+                String banner = null;
                 for (TeamBoard.Team team : board.getTeamList()) {
                     mleaderBoardList.add(team.convertToLeaderBoard());
+                    banner = team.getBanner();
+                }
+                if (!TextUtils.isEmpty(banner)) {
+                    Picasso.with(getContext()).load(banner).placeholder(R.drawable.cause_image_placeholder).into(mBanner);
+                    mBanner.setVisibility(View.VISIBLE);
                 }
 
                 hideProgressDialog();
