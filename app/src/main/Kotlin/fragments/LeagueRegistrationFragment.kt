@@ -130,6 +130,6 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
     }
 
     override fun screenTitle(): String {
-        return getString(R.string.team);
+        return getString(R.string.impact_league);
     }
 }

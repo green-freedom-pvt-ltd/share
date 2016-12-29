@@ -45,8 +45,8 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
         @SerializedName("social_thumb")
         private val imageUrl: String? = null
 
-        @SerializedName("total_distance")
-        private val totalDistance: TotalDistance? = null
+        @SerializedName("league_total_distance")
+        private val leagueTotalDistance: TotalDistance? = null
 
         public fun convertToLeaderBoard(): LeaderBoard {
 
@@ -54,7 +54,8 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
             board.id = id;
             board.first_name = firstName;
             board.last_name = lastName
-            board.last_week_distance = totalDistance?.totalDistance;
+            board.last_week_distance = leagueTotalDistance?.totalDistance;
+            board.social_thumb = imageUrl;
             return board;
         }
 

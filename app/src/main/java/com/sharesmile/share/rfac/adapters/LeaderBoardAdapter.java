@@ -93,10 +93,14 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         private void bindData(LeaderBoard leaderboard, int position) {
             mleaderBoard.setText(String.valueOf(position + 1));
 
-            Picasso.with(mContext).
-                    load(leaderboard.getSocial_thumb()).
-                    placeholder(R.drawable.placeholder_profile).
-                    into(mProfileImage);
+            if (!TextUtils.isEmpty(leaderboard.getSocial_thumb())) {
+                Picasso.with(mContext).
+                        load(leaderboard.getSocial_thumb()).
+                        placeholder(R.drawable.placeholder_profile).
+                        into(mProfileImage);
+            } else {
+                mProfileImage.setImageResource(R.drawable.placeholder_profile);
+            }
 
             String firstName = leaderboard.getFirst_name().substring(0, 1).toUpperCase() + leaderboard.getFirst_name().substring(1);
             String name = firstName;
