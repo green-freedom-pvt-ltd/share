@@ -3,6 +3,7 @@ package Models
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.LeaderBoard
 import com.sharesmile.share.core.UnObfuscable
+import com.sharesmile.share.utils.SharedPrefsManager
 import org.json.JSONObject
 import java.io.Serializable
 import java.util.*
@@ -34,6 +35,9 @@ class TeamBoard : UnObfuscable, Serializable {
 
         @SerializedName("total_distance")
         private var total_distance: TotalDistance? = null;
+
+        @SerializedName("impactleague_banner")
+        public var banner: String? = null;
 
         public fun convertToLeaderBoard(): LeaderBoard {
             var board = LeaderBoard();
