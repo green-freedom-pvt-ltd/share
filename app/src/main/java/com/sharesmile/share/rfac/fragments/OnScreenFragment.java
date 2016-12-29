@@ -218,10 +218,12 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(List<CauseData> causeDataList) {
-        Logger.d(TAG, "causes");
-        CauseList causeList = new CauseList();
-        causeList.setCauses(causeDataList);
-        setCausedata(causeList);
+        if (isVisible()) {
+            Logger.d(TAG, "causes");
+            CauseList causeList = new CauseList();
+            causeList.setCauses(causeDataList);
+            setCausedata(causeList);
+        }
     }
 
     @Override

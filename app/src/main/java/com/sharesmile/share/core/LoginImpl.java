@@ -25,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
@@ -43,8 +44,6 @@ import com.sharesmile.share.utils.Urls;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -229,6 +228,11 @@ public class LoginImpl {
             Boolean isSignUpUser = false;
             isSignUpUser = response.get("sign_up").getAsBoolean();
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
+        }
+
+        if (response.has("team_code")) {
+            int teamCode = response.get("team_code").getAsInt();
+            SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamCode);
         }
 
         User user = new User((long) user_id);

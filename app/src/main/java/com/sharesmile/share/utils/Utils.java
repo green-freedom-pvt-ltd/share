@@ -8,7 +8,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -61,7 +63,7 @@ public class Utils {
     }
 
     /**
-     gets screen height in pixels, Application Context should be used
+     * gets screen height in pixels, Application Context should be used
      */
     public static int getScreenHeightUsingDisplayMetrics(Context context) {
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -71,7 +73,7 @@ public class Utils {
     }
 
     /**
-     gets screen width in pixels, Application Context should be used
+     * gets screen width in pixels, Application Context should be used
      */
     public static int getScreenWidthUsingDisplayMetrics(Context context) {
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -100,7 +102,7 @@ public class Utils {
 
     public static void setStaticGoogleMap(int width, int height, ImageView staticMapView,
                                           List<LatLng> points) {
-        if (isCollectionFilled(points) && points.size() >= 2){
+        if (isCollectionFilled(points) && points.size() >= 2) {
 
             String staticMapUrl = Constants.STATIC_GOOGLE_MAP_BASE_URL + "size=" + width + "x" + height
                     + Constants.STATIC_GOOGLE_MAP_COMMON_PARAMS
@@ -108,15 +110,15 @@ public class Utils {
                     + getMarkerParams(points.get(0), points.get(points.size() - 1))
                     + getPathParams(points)
                     + "&key=" + Constants.STATIC_GOOGLE_MAP_API_KEY;
-            Logger.i(TAG,"Hitting Static Map API with URL: " + staticMapUrl);
+            Logger.i(TAG, "Hitting Static Map API with URL: " + staticMapUrl);
             ShareImageLoader.getInstance().loadImage(staticMapUrl, staticMapView);
         }
     }
 
-    public static boolean isScreenTooLarge(Context context){
+    public static boolean isScreenTooLarge(Context context) {
         int screenLayoutWithMask = context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_LAYOUTDIR_MASK;
-        switch (screenLayoutWithMask){
+        switch (screenLayoutWithMask) {
             case Configuration.SCREENLAYOUT_SIZE_LARGE:
                 return true;
             case Configuration.SCREENLAYOUT_SIZE_XLARGE:
@@ -129,55 +131,55 @@ public class Utils {
         return false;
     }
 
-    public static String getMarkerParams(LatLng startPoint, LatLng endPoint){
+    public static String getMarkerParams(LatLng startPoint, LatLng endPoint) {
         String firstMarker = "color:blue|label:S|" + startPoint.latitude + "," + startPoint.longitude;
         String secondMarker = "color:red|label:E|" + endPoint.latitude + "," + endPoint.longitude;
         try {
             return "&markers=" + URLEncoder.encode(firstMarker, "UTF-8") + "&markers="
                     + URLEncoder.encode(secondMarker, "UTF-8");
-        }catch (UnsupportedEncodingException usee){
+        } catch (UnsupportedEncodingException usee) {
             Logger.e(TAG, usee.getMessage(), usee);
         }
         return "";
     }
 
-    public static String getPathParams(List<LatLng> points){
+    public static String getPathParams(List<LatLng> points) {
         String prefix = "&path=";
         StringBuilder sb = new StringBuilder();
         sb.append("color:0x00ff0080|weight:6");
-        for (LatLng point : points){
+        for (LatLng point : points) {
             sb.append("|").append(point.latitude).append(",").append(point.longitude);
         }
         try {
             return prefix + URLEncoder.encode(sb.toString(), "UTF-8");
-        }catch (UnsupportedEncodingException usee){
+        } catch (UnsupportedEncodingException usee) {
             Logger.e(TAG, usee.getMessage(), usee);
         }
         return "";
     }
 
-    public static final String secondsToString(int secs){
-        if (secs >= 3600){
-            int sec = secs%60;
-            int totalMins = secs/60;
-            int hour = totalMins/60;
-            int min = totalMins%60;
+    public static final String secondsToString(int secs) {
+        if (secs >= 3600) {
+            int sec = secs % 60;
+            int totalMins = secs / 60;
+            int hour = totalMins / 60;
+            int min = totalMins % 60;
             return String.format("%02d:%02d:%02d", hour, min, sec);
-        }else{
-            return String.format("%02d:%02d", secs/60, secs%60);
+        } else {
+            return String.format("%02d:%02d", secs / 60, secs % 60);
         }
     }
 
-    public static final long stringToSec(String time){
+    public static final long stringToSec(String time) {
 
-     String[] timeArray=   time.split(":");
-        int j =1;
-        long sec=0;
-        for(int i= timeArray.length-1;i>=0;i--){
+        String[] timeArray = time.split(":");
+        int j = 1;
+        long sec = 0;
+        for (int i = timeArray.length - 1; i >= 0; i--) {
 
             int duration = Integer.parseInt(timeArray[i]);
-            sec=duration*j+sec;
-            j=j*60;
+            sec = duration * j + sec;
+            j = j * 60;
 
         }
         return sec;
@@ -192,7 +194,7 @@ public class Utils {
         context.startActivity(Intent.createChooser(shareIntent, "send"));
     }
 
-    public static void share(Context context,Uri uri, String shareTemplate) {
+    public static void share(Context context, Uri uri, String shareTemplate) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
@@ -203,8 +205,8 @@ public class Utils {
     }
 
 
-    public static Uri getLocalBitmapUri(Bitmap bmp,Context context) {
-        Uri bmpUri=null;
+    public static Uri getLocalBitmapUri(Bitmap bmp, Context context) {
+        Uri bmpUri = null;
         try {
             File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
             FileOutputStream out = new FileOutputStream(file);
@@ -219,7 +221,7 @@ public class Utils {
         return bmpUri;
     }
 
-    public static void redirectToPlayStore(Context context){
+    public static void redirectToPlayStore(Context context) {
         final String appPackageName = BuildConfig.APPLICATION_ID;
         try {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
@@ -228,4 +230,16 @@ public class Utils {
         }
     }
 
-}
+    public static void hideKeyboard(View view, Context context) {
+        if (view == null || context == null) {
+            return;
+        }
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    }

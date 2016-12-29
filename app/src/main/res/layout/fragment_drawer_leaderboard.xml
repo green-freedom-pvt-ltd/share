@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/profile_tab_layout"
     android:layout_width="match_parent"
@@ -7,23 +7,39 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <com.sharesmile.share.views.MLTextView
-        android:id="@+id/tv_leaderboard_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="101dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/leader_board_week"
-        android:textSize="14sp" />
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cause_image_placeholder"
+            android:visibility="gone"
+            app:layout_scrollFlags="scroll|snap" />
+
+        <com.sharesmile.share.views.MLTextView
+            android:id="@+id/tv_leaderboard_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="@string/leader_board_week"
+            android:textSize="14sp" />
+
+    </android.support.design.widget.AppBarLayout>
+
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -31,20 +47,22 @@
             android:paddingLeft="1dp"
             android:paddingRight="1dp">
 
-
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
             <ProgressBar
                 android:id="@+id/progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        </RelativeLayout>
+        </android.support.design.widget.CoordinatorLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

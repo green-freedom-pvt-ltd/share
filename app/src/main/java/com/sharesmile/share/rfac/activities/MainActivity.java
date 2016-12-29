@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
@@ -66,6 +67,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CODE_LOGIN = 1001;
+
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
@@ -186,6 +188,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void loadInitialFragment() {
         addFragment(new OnScreenFragment(), false);
+        boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_PROFILE, false);
+        if (showProfile && MainApplication.isLogin()) {
+            replaceFragment(new ProfileFragment(), true);
+        }
+        boolean showFeedBackDialog = getIntent().getBooleanExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, false);
+        if (showFeedBackDialog) {
+            showFeedBackDialog();
+        }
     }
 
     @Override
@@ -293,7 +303,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
-            replaceFragment(new LeaderBoardFragment(), true);
+            replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEADERBOARD), true);
         }
 
 
@@ -319,6 +329,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOGIN) {
             updateNavigationMenu();
+        } else if (requestCode == REQUEST_LEAGUE_REGISTRATION) {
+            if (resultCode == RESULT_OK) {
+                replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMBAORD), true);
+            }
         }
     }
 

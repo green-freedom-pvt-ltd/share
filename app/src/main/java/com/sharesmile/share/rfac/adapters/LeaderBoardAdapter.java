@@ -1,14 +1,19 @@
 package com.sharesmile.share.rfac.adapters;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.sharesmile.share.R;
 import com.sharesmile.share.LeaderBoard;
+import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -20,14 +25,22 @@ import butterknife.ButterKnife;
 /**
  * Created by piyush on 9/1/16.
  */
-public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.LeaderBoardViewHolder>{
+public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.LeaderBoardViewHolder> {
 
+    private ItemClickListener mListener;
+    private boolean isLeagueBoard = false;
     private List<LeaderBoard> mData;
     private Context mContext;
 
     public LeaderBoardAdapter(Context context, List<LeaderBoard> leaderBoard) {
         this.mData = leaderBoard;
         this.mContext = context;
+    }
+
+    public LeaderBoardAdapter(Context context, List<LeaderBoard> leaderBoard, boolean isLeagueBoard, ItemClickListener lis) {
+        this(context, leaderBoard);
+        this.isLeagueBoard = isLeagueBoard;
+        mListener = lis;
     }
 
     @Override
@@ -42,7 +55,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         return mData != null ? mData.size() : 0;
     }
 
-    public void setData(List<LeaderBoard> data){
+    public void setData(List<LeaderBoard> data) {
         this.mData = data;
         notifyDataSetChanged();
     }
@@ -52,7 +65,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         holder.bindData(mData.get(position), position);
     }
 
-    class LeaderBoardViewHolder extends RecyclerView.ViewHolder{
+    class LeaderBoardViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_leaderboard)
         TextView mleaderBoard;
@@ -65,33 +78,66 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         @BindView(R.id.last_week_distance)
         TextView mlastWeekDistance;
 
+        @BindView(R.id.containerView)
+        CardView container;
 
 
-        public LeaderBoardViewHolder(View itemView){
+        public LeaderBoardViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            if (isLeagueBoard) {
+                mProfileImage.setVisibility(View.GONE);
+            }
         }
 
-        private void bindData(LeaderBoard leaderboard, int position){
+        private void bindData(LeaderBoard leaderboard, int position) {
             mleaderBoard.setText(String.valueOf(position + 1));
 
-            Picasso.with(mContext).
-                    load(leaderboard.getSocial_thumb()).
-                    placeholder(R.drawable.placeholder_profile).
-                    into(mProfileImage);
+            if (!TextUtils.isEmpty(leaderboard.getSocial_thumb())) {
+                Picasso.with(mContext).
+                        load(leaderboard.getSocial_thumb()).
+                        placeholder(R.drawable.placeholder_profile).
+                        into(mProfileImage);
+            } else {
+                mProfileImage.setImageResource(R.drawable.placeholder_profile);
+            }
 
-            String firstName = leaderboard.getFirst_name().substring(0,1).toUpperCase() + leaderboard.getFirst_name().substring(1);
-            String lastName = leaderboard.getLast_name().substring(0,1).toUpperCase() + leaderboard.getLast_name().substring(1);
-
-            String name = firstName + ' ' + lastName;
+            String firstName = leaderboard.getFirst_name().substring(0, 1).toUpperCase() + leaderboard.getFirst_name().substring(1);
+            String name = firstName;
+            if (!TextUtils.isEmpty(leaderboard.getLast_name())) {
+                String lastName = leaderboard.getLast_name().substring(0, 1).toUpperCase() + leaderboard.getLast_name().substring(1);
+                name = firstName + ' ' + lastName;
+            }
             mProfileName.setText(name);
-
-            String last_Week_Distance =  String.format("%.2f", leaderboard.getLast_week_distance());
+            String last_Week_Distance = String.format("%.2f", leaderboard.getLast_week_distance());
             mlastWeekDistance.setText(last_Week_Distance + " Km");
 
+            final int id;
+            if (isLeagueBoard) {
+                id = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
+            } else {
+                id = MainApplication.getInstance().getUserID();
+            }
 
+            if (id == leaderboard.getId()) {
+                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.light_gold));
+                if (isLeagueBoard) {
+                    container.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mListener.onItemClick(id);
+                        }
+                    });
+                }
+            } else {
+                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
+                container.setOnClickListener(null);
+
+            }
         }
+    }
 
-
+    public interface ItemClickListener {
+        public void onItemClick(int id);
     }
 }
