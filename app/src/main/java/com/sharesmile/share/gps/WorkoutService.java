@@ -58,17 +58,13 @@ import java.util.concurrent.ScheduledExecutorService;
  * Created by ankitmaheshwari1 on 20/02/16.
  */
 public class WorkoutService extends Service implements
-        IWorkoutService, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, RunTracker.UpdateListner, StepCounter.Listener {
+        IWorkoutService, RunTracker.UpdateListner, StepCounter.Listener {
 
     private static final String TAG = "WorkoutService";
 
     private static boolean currentlyTracking = false;
     private static boolean currentlyProcessingSteps = false;
-    private LocationRequest locationRequest;
-    private GoogleApiClient googleApiClient;
-    private Location currentLocation;
+
     private VigilanceTimer vigilanceTimer;
     private DetectedActivity detectedActivity;
 
@@ -131,15 +127,6 @@ public class WorkoutService extends Service implements
             stopTracking();
             Intent intent = new Intent(this, ActivityRecognizedService.class);
             PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-            if (googleApiClient != null && googleApiClient.isConnected()) {
-                LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
-                googleApiClient.disconnect();
-            }
-            locationRequest = null;
-            googleApiClient = null;
-            currentLocation = null;
             currentlyTracking = false;
             if (stepCounter != null) {
                 stepCounter.stopCounting();
@@ -147,7 +134,6 @@ public class WorkoutService extends Service implements
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
             NotificationManagerCompat.from(this).cancel(0);
-
         }
     }
 
@@ -161,14 +147,6 @@ public class WorkoutService extends Service implements
     }
 
     private void initiateLocationFetching() {
-        Logger.d(TAG, "initiateLocationFetching");
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //This check is redundant as permissions are already granted in TrackerActivity
-            return;
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         startTracking();
     }
 
@@ -241,13 +219,6 @@ public class WorkoutService extends Service implements
         return mBinder;
     }
 
-    @Override
-    public synchronized void onLocationChanged(Location location) {
-        if (tracker != null && location != null) {
-            currentLocation = location;
-            tracker.feedLocation(location);
-        }
-    }
 
     @Override
     public void updateWorkoutRecord(float totalDistance, float currentSpeed) {
@@ -289,21 +260,7 @@ public class WorkoutService extends Service implements
         if (!currentlyTracking) {
             currentlyTracking = true;
             Logger.d(TAG, "startWorkout");
-            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
-                googleApiClient = new GoogleApiClient.Builder(this)
-                        .addApi(LocationServices.API)
-                        .addApi(ActivityRecognition.API)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .build();
-                if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
-                    googleApiClient.connect();
-                }
-            } else {
-                Logger.e(TAG, "unable to connect to google play services.");
-                Toast.makeText(getApplicationContext(), "Unable to connect to google play services", Toast.LENGTH_SHORT);
 
-            }
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
                     Logger.d(TAG, "Step Detector present! Will register");
@@ -351,11 +308,9 @@ public class WorkoutService extends Service implements
             if (currentlyTracking) {
                 Intent intent = new Intent(this, ActivityRecognizedService.class);
                 PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-                if (googleApiClient != null && googleApiClient.isConnected()) {
-                    LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
-                }
+                //TODO: Create GoogleApiClient for ActivityRecognition
+                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+                // Not pausing location updates
                 NotificationManagerCompat.from(this).cancel(0);
 
             }
@@ -367,17 +322,14 @@ public class WorkoutService extends Service implements
     public void resume() {
         Logger.i(TAG, "resume");
         if (tracker != null && tracker.getState() != Tracker.State.RUNNING) {
-            //TODO: Put resuming locationServices code over here
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
             if (currentlyTracking) {
                 Intent intent = new Intent(this, ActivityRecognizedService.class);
                 PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
-                if (googleApiClient != null && googleApiClient.isConnected()) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-                }
+                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
+
                 NotificationManagerCompat.from(this).cancel(0);
 
             }
@@ -460,45 +412,9 @@ public class WorkoutService extends Service implements
         return tracker;
     }
 
-    /**
-     * Called by Location Services when the request to connect the
-     * client finishes successfully. At this point, you can
-     * request the current location or startWorkout periodic updates
-     */
-    @Override
-    public void onConnected(Bundle bundle) {
-        Logger.d(TAG, "onConnected");
-
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(Config.LOCATION_UPDATE_INTERVAL); // milliseconds
-        locationRequest.setSmallestDisplacement(Config.SMALLEST_DISPLACEMENT);
-        locationRequest.setFastestInterval(Config.LOCATION_UPDATE_INTERVAL); // the fastest rate in milliseconds at which your app can handle location updates
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        checkForLocationSettings();
-
-        fetchInitialLocation();
-
-        Intent intent = new Intent(this, ActivityRecognizedService.class);
-        PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-    }
-
-
-    private void fetchInitialLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            currentLocation =
-                    LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (currentLocation == null) {
-                Logger.i(TAG, "Last Known Location could'nt be fetched");
-            }
-        } else {
-            //No need to worry about permission unavailability, as it was already granted before service started
-        }
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         switch (requestCode) {
             case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
                 if (resultCode == Activity.RESULT_OK) {
@@ -515,57 +431,6 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void checkForLocationSettings() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(googleApiClient,
-                        builder.build());
-
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult locationSettingsResult) {
-                final Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        // All location settings are satisfied. The client can
-                        // initialize location requests here.
-                        initiateLocationFetching();
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied, but this can be fixed
-                        // by showing the user a dialog.
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
-                                Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE);
-                        Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
-                        bundle.putParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE,
-                                status);
-                        intent.putExtras(bundle);
-                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
-    }
-
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Logger.e(TAG, "onConnectionFailed");
-        stopWorkout();
-        stopSelf();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Logger.e(TAG, "GoogleApiClient connection has been suspend");
-    }
 
     private void makeForeground() {
         Notification notification = getNotificationBuilder().build();

@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.analytics.Tracker;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
@@ -18,7 +18,6 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -26,7 +25,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
  */
-public class MainApplication extends Application {
+public class MainApplication extends Application implements AppLifecycleHelper.LifeCycleCallbackListener{
 
     private static final String TAG = "MainApplication";
 
@@ -39,6 +38,8 @@ public class MainApplication extends Application {
     private String mToken;
     private int mUserId = 0;
     MixpanelAPI mMixpanel;
+
+    private AppLifecycleHelper lifecycleHelper;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -148,6 +149,10 @@ public class MainApplication extends Application {
         people.initPushHandling("159550091621");
 
         SharedPrefsManager.initialize(getApplicationContext());
+
+        lifecycleHelper = new AppLifecycleHelper(this);
+        registerActivityLifecycleCallbacks(lifecycleHelper);
+
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
@@ -191,6 +196,33 @@ public class MainApplication extends Application {
         return isModelShown;
     }
 
+    public static boolean isApplicationInForeground(){
+        return getInstance().lifecycleHelper.isApplicationInForeground();
+    }
 
+    public static boolean isApplicationVisible(){
+        return getInstance().lifecycleHelper.isApplicationVisible();
+    }
+
+
+    @Override
+    public void onStart() {
+        Logger.i(TAG, "onStart");
+    }
+
+    @Override
+    public void onResume() {
+        Logger.i(TAG, "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        Logger.i(TAG, "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        Logger.i(TAG, "onStop");
+    }
 }
 
