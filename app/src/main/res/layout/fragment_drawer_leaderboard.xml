@@ -24,9 +24,10 @@
             android:id="@+id/tv_leaderboard_data"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:gravity="center"
+            android:background="@color/white"
             android:text="@string/leader_board_week"
             android:textSize="14sp" />
 

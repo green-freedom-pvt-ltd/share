@@ -68,6 +68,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
     private boolean mShowLeagueBoard = false;
     private BOARD_TYPE mBoard;
+    private String mBannerUrl;
 
     public enum BOARD_TYPE {
         LEADERBOARD,
@@ -140,6 +141,10 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), mleaderBoardList, mShowLeagueBoard, this);
             mLeaderBoardAdapter.setData(mleaderBoardList);
             fetchData();
+        } else {
+            if (mBoard == BOARD_TYPE.TEAMBAORD) {
+                setBannerImage();
+            }
         }
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -215,12 +220,11 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             mleaderBoardList.clear();
             Logger.i("LeaderBoard", mleaderBoardList.toString());
         }
-        if (mShowLeagueBoard) {
-            if (mBoard == BOARD_TYPE.TEAMBAORD) {
-                fetchTeamBoardData();
-            } else {
-                fetchTeamLeaderBoardData();
-            }
+
+        if (mBoard == BOARD_TYPE.TEAMBAORD) {
+            fetchTeamBoardData();
+        } else if (mBoard == BOARD_TYPE.TEAMLEADERBAORD) {
+            fetchTeamLeaderBoardData();
         } else {
             mleaderBoardDao.deleteAll();
             mLeaderBoardAdapter.notifyDataSetChanged();
@@ -280,21 +284,25 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onNetworkSuccess(TeamBoard board) {
                 mleaderBoardList.clear();
-                String banner = null;
+                mBannerUrl = null;
                 for (TeamBoard.Team team : board.getTeamList()) {
                     mleaderBoardList.add(team.convertToLeaderBoard());
-                    banner = team.getBanner();
+                    mBannerUrl = team.getBanner();
                 }
-                if (!TextUtils.isEmpty(banner)) {
-                    Picasso.with(getContext()).load(banner).placeholder(R.drawable.cause_image_placeholder).into(mBanner);
-                    mBanner.setVisibility(View.VISIBLE);
-                }
+                setBannerImage();
 
                 hideProgressDialog();
                 mLeaderBoardAdapter.setData(mleaderBoardList);
 
             }
         });
+    }
+
+    private void setBannerImage() {
+        if (!TextUtils.isEmpty(mBannerUrl)) {
+            Picasso.with(getContext()).load(mBannerUrl).placeholder(R.drawable.cause_image_placeholder).into(mBanner);
+            mBanner.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

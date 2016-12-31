@@ -3,6 +3,7 @@ package fragments
 import Models.LeagueTeam
 import android.app.Activity
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +14,11 @@ import android.widget.Toast
 import base.BaseFragment2
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
-import com.sharesmile.share.core.Constants
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
 import com.sharesmile.share.utils.BasicNameValuePair
 import com.sharesmile.share.utils.NameValuePair
-import com.sharesmile.share.utils.SharedPrefsManager
 import com.sharesmile.share.utils.Urls
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_league_registration.view.*
@@ -62,6 +61,9 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         mLocationArray = arguments.getStringArrayList(BUNDLE_LOCATION_ARRAY);
         mDepartmentArray = arguments.getStringArrayList(BUNDLE_DEPARTMENT_ARRAY);
+        mDepartmentArray.add(0, "Choose your department");
+        mLocationArray.add(0, "Choose your location");
+
         mCode = arguments.getString(BUNDLE_LEAGUE_CODE);
         mBanner = arguments.getString(BUNDLE_LEAGUE_BANNER);
     }
@@ -84,6 +86,10 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position <= 0) {
+                    mSelectedDepartment = "";
+                    return
+                }
                 mSelectedDepartment = mDepartmentArray[position];
             }
         }
@@ -94,6 +100,10 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position <= 0) {
+                    mSelectedLocation = "";
+                    return
+                }
                 mSelectedLocation = mLocationArray[position];
             }
         }
@@ -103,6 +113,15 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
     }
 
     private fun onSubmit() {
+        if (TextUtils.isEmpty(mSelectedDepartment)) {
+            Toast.makeText(context, "Select Department", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (TextUtils.isEmpty(mSelectedLocation)) {
+            Toast.makeText(context, "Select Location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         fragmentListener.showProgressBar()
         val data = ArrayList<NameValuePair>()
         data.add(BasicNameValuePair("user", MainApplication.getInstance().userID.toString()))
@@ -118,7 +137,6 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
                 fragmentListener.showActivityContent();
-                SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueTeam?.id!!);
                 activity.setResult(Activity.RESULT_OK);
                 activity.finish();
             }

@@ -29,8 +29,10 @@ class LeagueTeam : UnObfuscable, Serializable {
     var department: String? = null;
 
     @SerializedName("impactleague_banner")
-    var banner:String?=null;
+    var banner: String? = null;
 
+    @SerializedName("team_code")
+    var teamCode: Int? = null;
 
     @SerializedName("company_attribute")
     var companyDetails: ArrayList<Company>? = null;

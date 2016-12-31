@@ -95,7 +95,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
             }
         }
 
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueData.id!!);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueData.teamCode!!);
         activity.setResult(Activity.RESULT_OK);
         fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null);
     }
