@@ -2,7 +2,9 @@ package fragments
 
 import Models.LeagueTeam
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.support.annotation.LayoutRes
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +25,8 @@ import com.sharesmile.share.utils.Urls
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_league_registration.view.*
 import java.util.*
+import android.widget.TextView
+
 
 /**
  * Created by Shine on 17/11/16.
@@ -51,8 +55,8 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
     private lateinit var mDepartmentArray: ArrayList<String>;
     private lateinit var mLocationArray: ArrayList<String>;
     private var mCode: String? = "";
-    private var mDepartmentAdapter: ArrayAdapter<String>? = null;
-    private var mLocationAdapter: ArrayAdapter<String>? = null;
+    private var mDepartmentAdapter: ArrayItemAdapter? = null;
+    private var mLocationAdapter: ArrayItemAdapter? = null;
     private var mSelectedDepartment: String = "";
     private var mSelectedLocation: String = "";
     private var mBanner: String = "";
@@ -75,8 +79,8 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mDepartmentAdapter = ArrayAdapter(context, R.layout.spinner_item, R.id.text1, mDepartmentArray)
-        mLocationAdapter = ArrayAdapter(context, R.layout.spinner_item, R.id.text1, mLocationArray)
+        mDepartmentAdapter = ArrayItemAdapter(context, R.layout.spinner_item, R.id.text1, mDepartmentArray)
+        mLocationAdapter = ArrayItemAdapter(context, R.layout.spinner_item, R.id.text1, mLocationArray)
         view!!.department.adapter = mDepartmentAdapter;
         view!!.location.adapter = mLocationAdapter;
 
@@ -149,5 +153,21 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
     override fun screenTitle(): String {
         return getString(R.string.impact_league);
+    }
+
+    inner class ArrayItemAdapter(context: Context, layout: Int, res: Int, itemarray: ArrayList<String>) : ArrayAdapter<String>(context,layout, res,itemarray) {
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val v = super.getView(position, convertView, parent)
+            if (position === 0) {
+                (v.findViewById(R.id.text1) as TextView).setTextColor(resources.getColor(R.color.bluey_grey))
+            } else {
+                (v.findViewById(R.id.text1) as TextView).setTextColor(resources.getColor(R.color.greyish_brown_two))
+
+            }
+            return v;
+
+        }
+
     }
 }

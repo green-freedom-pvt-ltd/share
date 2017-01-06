@@ -8,7 +8,7 @@
     android:id="@+id/containerView"
     android:orientation="vertical"
     app:cardBackgroundColor="@color/white"
-    app:cardElevation="0.5dp"
+    app:cardElevation=".5dp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -22,7 +22,6 @@
             android:id="@+id/id_leaderboard"
             android:layout_width="30dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
             android:gravity="center"
             android:text="1"
             android:textColor="@color/black"

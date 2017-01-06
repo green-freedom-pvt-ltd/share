@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/rounded_corner"
                 android:text="@string/submit"
                 android:textColor="@color/white"
