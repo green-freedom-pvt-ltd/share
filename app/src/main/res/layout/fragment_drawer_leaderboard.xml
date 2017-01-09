@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:paddingLeft="16dp"
+            android:paddingLeft="96dp"
             android:gravity="left"
             android:background="@color/white"
             android:text="@string/leader_board_week"

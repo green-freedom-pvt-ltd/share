@@ -40,13 +40,16 @@
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/department"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/background_drop"
                 android:layout_marginTop="32dp" />
 
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:background="@drawable/background_drop"
+
                 android:layout_marginTop="32dp" />
 
             <com.sharesmile.share.views.MLButton
