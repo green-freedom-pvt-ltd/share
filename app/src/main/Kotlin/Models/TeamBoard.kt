@@ -49,7 +49,7 @@ class TeamBoard : UnObfuscable, Serializable {
 
         private class TotalDistance : Serializable {
             @SerializedName("total_distance")
-            public val totalDistance: Float? = null
+            public val totalDistance: Float? = 0f;
         }
     }
 

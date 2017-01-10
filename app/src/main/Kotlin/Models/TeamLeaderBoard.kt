@@ -29,7 +29,11 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
         @SerializedName("user")
         var user: User? = null;
 
+        @SerializedName("league_total_distance")
+        public val leagueTotalDistance: User.TotalDistance? = null
+
     }
+
 
     public class User : Serializable {
 
@@ -45,23 +49,21 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
         @SerializedName("social_thumb")
         private val imageUrl: String? = null
 
-        @SerializedName("league_total_distance")
-        private val leagueTotalDistance: TotalDistance? = null
 
-        public fun convertToLeaderBoard(): LeaderBoard {
+        public fun convertToLeaderBoard(distance: Float): LeaderBoard {
 
             var board = LeaderBoard();
             board.id = id;
             board.first_name = firstName;
             board.last_name = lastName
-            board.last_week_distance = leagueTotalDistance?.totalDistance;
+            board.last_week_distance = distance;
             board.social_thumb = imageUrl;
             return board;
         }
 
-        private class TotalDistance : Serializable {
+        class TotalDistance : Serializable {
             @SerializedName("total_distance")
-            public val totalDistance: Float? = null
+            public val totalDistance: Float? = 0f;
         }
     }
 

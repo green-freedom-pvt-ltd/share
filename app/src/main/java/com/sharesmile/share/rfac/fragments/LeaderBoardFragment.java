@@ -263,7 +263,11 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             public void onNetworkSuccess(TeamLeaderBoard board) {
                 mleaderBoardList.clear();
                 for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
-                    mleaderBoardList.add(team.getUser().convertToLeaderBoard());
+                    Float distance = 0f;
+                    if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
+                        distance = team.getLeagueTotalDistance().getTotalDistance();
+                    }
+                    mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
                 }
 
                 hideProgressDialog();
