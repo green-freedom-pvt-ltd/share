@@ -120,9 +120,9 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         mCategory.setText(cause.getCategory());
         if (cause.getExecutor() != null) {
             if (cause.getExecutor().getType().equalsIgnoreCase("ngo")) {
-                mSponsor.setText("by " + cause.getExecutor().getPartnerNgo());
+                mSponsor.setText("with " + cause.getExecutor().getPartnerNgo());
             } else {
-                mSponsor.setText("by " + cause.getExecutor().getPartnerCompany());
+                mSponsor.setText("with " + cause.getExecutor().getPartnerCompany());
             }
         }
 

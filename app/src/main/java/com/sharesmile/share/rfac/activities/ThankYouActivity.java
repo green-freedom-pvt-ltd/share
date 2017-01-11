@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -59,6 +61,9 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         Intent intent = new Intent(ThankYouActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        boolean showFirstRunFeedBack = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_RUN_FEEDBACK, false);
+        intent.putExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, showFirstRunFeedBack);
+        intent.putExtra(Constants.BUNDLE_SHOW_PROFILE, true);
         startActivity(intent);
     }
 }

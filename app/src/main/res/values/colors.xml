@@ -19,6 +19,8 @@
     <color name="orange">#FA0</color>
     <color name="light_grey">#c0c0c0</color>
     <color name="grey">#F5F5F5</color>
+    <color name="bluey_grey">#90a1b5</color>
+
     <color name="MontserratLight">#353535</color>
 
     <color name="sky_blue">#00b9ff</color>
@@ -47,4 +49,6 @@
     <color name="warm_grey">#979797</color>
     <color name="warm_grey_two">#777777</color>
     <color name="light_gold">#ffcd4d</color>
+    <color name="purplish_brown">#453640</color>
+    <color name="pale_grey">#f6f7f9</color>
 </resources>

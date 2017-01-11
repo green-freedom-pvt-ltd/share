@@ -3,6 +3,7 @@ package com.sharesmile.share.core;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -14,15 +15,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-
 import com.google.android.gms.common.api.Status;
+import android.support.v7.app.AlertDialog;
+import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.MainActivity;
+import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
+import activities.ImpactLeagueActivity;
+import fragments.MessageCenterFragment;
 
 /**
  * Created by ankitmaheshwari1 on 29/01/16.
@@ -30,6 +36,9 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 public abstract class BaseActivity extends AppCompatActivity implements IFragmentController {
 
     private static final String TAG = "BaseActivity";
+    private static final int REQUEST_CHECK_SETTINGS = 102;
+    public static final int REQUEST_LEAGUE_REGISTRATION = 103;
+
     private static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
 
@@ -120,6 +129,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case SHOW_MESSAGE_CENTER:
                 showMessageCenter();
                 break;
+            case SHOW_LEAGUE_ACTIVITY:
+                startActivityForResult(new Intent(this, ImpactLeagueActivity.class), REQUEST_LEAGUE_REGISTRATION);
+                break;
         }
     }
 
@@ -188,6 +200,27 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     private void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
+    }
+
+    public void showFeedBackDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.post_fun_feedback_title)).setMessage(getString(R.string.post_fun_feedback_msg));
+        builder.setPositiveButton("Great", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Utils.redirectToPlayStore(BaseActivity.this);
+            }
+        });
+        builder.setNegativeButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                replaceFragment(new FeedbackFragment(), true);
+            }
+        });
+
+        builder.show();
+
     }
 
 }
