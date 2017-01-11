@@ -224,6 +224,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         if (mBoard == BOARD_TYPE.TEAMBAORD) {
             fetchTeamBoardData();
         } else if (mBoard == BOARD_TYPE.TEAMLEADERBAORD) {
+            mleaderBoardDao.deleteAll();
+            mLeaderBoardAdapter.notifyDataSetChanged();
             fetchTeamLeaderBoardData();
         } else {
             mleaderBoardDao.deleteAll();
