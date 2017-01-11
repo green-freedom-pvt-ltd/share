@@ -1,28 +1,28 @@
 package com.sharesmile.share.core;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
-import fragments.MessageCenterFragment;
 
 /**
  * Created by ankitmaheshwari1 on 29/01/16.
@@ -30,7 +30,6 @@ import fragments.MessageCenterFragment;
 public abstract class BaseActivity extends AppCompatActivity implements IFragmentController {
 
     private static final String TAG = "BaseActivity";
-    private static final int REQUEST_CHECK_SETTINGS = 102;
     private static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
 
@@ -38,7 +37,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(locationTrackerReceiver,
+                new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION));
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case START_RUN:
                 if (input instanceof CauseData) {
                     mCauseData = (CauseData) input;
-                    checkLocationEnabled();
+                    showTrackingActivity();
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -123,65 +123,26 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-    private void checkLocationEnabled() {
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
-
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(Config.LOCATION_UPDATE_INTERVAL); // milliseconds
-        locationRequest.setSmallestDisplacement(Config.SMALLEST_DISPLACEMENT);
-        locationRequest.setFastestInterval(Config.LOCATION_UPDATE_INTERVAL); // the fastest rate in milliseconds at which your app can handle location updates
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
-
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult locationSettingsResult) {
-                final Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        // All location settings are satisfied. The client can
-                        // initialize location requests here.
-                        showTrackingActivity();
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied, but this can be fixed
-                        // by showing the user a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(
-                                    BaseActivity.this,
-                                    REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
-                        break;
-                }
+        if (requestCode == Constants.CODE_REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                GoogleLocationTracker.getInstance().onPermissionsGranted();
+            } else {
+                GoogleLocationTracker.getInstance().onPermissionsRejected();
             }
-        });
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                if (resultCode == RESULT_OK) {
-                    showTrackingActivity();
-                }
+            case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
+                GoogleLocationTracker.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
         }
     }
@@ -191,6 +152,39 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);
     }
+
+    private BroadcastReceiver locationTrackerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                int broadcastCategory = bundle
+                        .getInt(Constants.LOCATION_TRACKER_BROADCAST_CATEGORY);
+                switch (broadcastCategory) {
+                    case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
+                        Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(BaseActivity.this,
+                                    Constants.CODE_LOCATION_SETTINGS_RESOLUTION);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+
+                    case Constants.BROADCAST_REQUEST_PERMISSION_CODE:
+                        ActivityCompat.requestPermissions(BaseActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                Constants.CODE_REQUEST_LOCATION_PERMISSION);
+                        break;
+
+                }
+            }
+        }
+    };
+
 
     private void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);

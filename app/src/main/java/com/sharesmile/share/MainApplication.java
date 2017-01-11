@@ -12,6 +12,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -156,6 +157,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
+        GoogleLocationTracker.initialize(this);
         startSyncTasks();
     }
 
@@ -204,7 +206,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         return getInstance().lifecycleHelper.isApplicationVisible();
     }
 
-
     @Override
     public void onStart() {
         Logger.i(TAG, "onStart");
@@ -213,11 +214,13 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     @Override
     public void onResume() {
         Logger.i(TAG, "onResume");
+        GoogleLocationTracker.getInstance().startLocationTracking();
     }
 
     @Override
     public void onPause() {
         Logger.i(TAG, "onPause");
+        GoogleLocationTracker.getInstance().stopLocationTracking();
     }
 
     @Override

@@ -10,6 +10,7 @@ public interface StepCounter {
     int PERMISSION_NOT_GRANTED_BY_USER = 101;
     int SENSOR_API_NOT_ADDED = 102;
     int STEP_DETECTOR_NOT_SUPPORTED = 103;
+    int GOOGLE_FIT_STEP_COUNTER_DEPRECATED = 104;
 
     void startCounting();
     void stopCounting();

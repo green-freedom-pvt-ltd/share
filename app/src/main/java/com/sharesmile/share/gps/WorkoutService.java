@@ -1,8 +1,5 @@
 package com.sharesmile.share.gps;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,7 +13,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -26,22 +22,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
-import com.google.android.gms.location.ActivityRecognitionApi;
-import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.gson.Gson;
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
@@ -49,7 +33,6 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -58,13 +41,15 @@ import java.util.concurrent.ScheduledExecutorService;
  * Created by ankitmaheshwari1 on 20/02/16.
  */
 public class WorkoutService extends Service implements
-        IWorkoutService, RunTracker.UpdateListner, StepCounter.Listener {
+        IWorkoutService, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        RunTracker.UpdateListner, StepCounter.Listener, GoogleLocationTracker.Listener {
 
     private static final String TAG = "WorkoutService";
 
     private static boolean currentlyTracking = false;
     private static boolean currentlyProcessingSteps = false;
-
+    private GoogleApiClient googleApiClient;
     private VigilanceTimer vigilanceTimer;
     private DetectedActivity detectedActivity;
 
@@ -111,12 +96,44 @@ public class WorkoutService extends Service implements
             WorkoutData result = tracker.endRun();
             tracker = null;
             Bundle bundle = new Bundle();
-            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+            bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_WORKOUT_RESULT_CODE);
             bundle.putParcelable(Constants.KEY_WORKOUT_RESULT, result);
-            Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
+            Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
+    }
+
+    @Override
+    public void startWorkout() {
+        //If tracking is already in progress then no need to setup again
+        if (!currentlyTracking) {
+            currentlyTracking = true;
+            Logger.d(TAG, "startWorkout");
+            GoogleLocationTracker.getInstance().register(this);
+            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+                googleApiClient = new GoogleApiClient.Builder(this)
+                        .addApi(ActivityRecognition.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+                if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
+                    googleApiClient.connect();
+                }
+            } else {
+                Logger.e(TAG, "unable to connect to google play services.");
+                Toast.makeText(getApplicationContext(), "Unable to connect to google play services", Toast.LENGTH_SHORT);
+            }
+            if (!currentlyProcessingSteps) {
+                if (isKitkatWithStepSensor(getApplicationContext())) {
+                    Logger.d(TAG, "Step Detector present! Will register");
+                    stepCounter = new AndroidStepCounter(this, this);
+                } else {
+                    Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
+                    stepCounter = new GoogleFitStepCounter(this, this);
+                }
+            }
         }
     }
 
@@ -125,8 +142,14 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopWorkout");
         if (currentlyTracking) {
             stopTracking();
+            GoogleLocationTracker.getInstance().unregister(this);
             Intent intent = new Intent(this, ActivityRecognizedService.class);
             PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+            if (googleApiClient != null && googleApiClient.isConnected()) {
+                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+                googleApiClient.disconnect();
+            }
+            googleApiClient = null;
             currentlyTracking = false;
             if (stepCounter != null) {
                 stepCounter.stopCounting();
@@ -140,14 +163,10 @@ public class WorkoutService extends Service implements
     private void unBindFromActivityAndStop() {
         Logger.d(TAG, "unBindFromActivityAndStop");
         Bundle bundle = new Bundle();
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_UNBIND_SERVICE_CODE);
         sendBroadcast(bundle);
         stopSelf();
-    }
-
-    private void initiateLocationFetching() {
-        startTracking();
     }
 
     @Override
@@ -177,7 +196,6 @@ public class WorkoutService extends Service implements
     public void notAvailable(int reasonCode) {
         Logger.d(TAG, "notAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
-        //TODO: Do something with the reasonCode
     }
 
     @Override
@@ -219,6 +237,31 @@ public class WorkoutService extends Service implements
         return mBinder;
     }
 
+    @Override
+    public void onLocationTrackerReady() {
+        Logger.i(TAG, "onLocationTrackerReady");
+        startTracking();
+    }
+
+    @Override
+    public synchronized void onLocationChanged(Location location) {
+        if (tracker != null && location != null) {
+            tracker.feedLocation(location);
+        }
+    }
+
+    @Override
+    public void onPermissionDenied() {
+        stopWorkout();
+        stopSelf();
+    }
+
+    @Override
+    public void onConnectionFailure() {
+        Logger.e(TAG, "GoogleLocationTracker onConnectionFailure, will stop workoutService");
+        stopWorkout();
+        stopSelf();
+    }
 
     @Override
     public void updateWorkoutRecord(float totalDistance, float currentSpeed) {
@@ -226,7 +269,7 @@ public class WorkoutService extends Service implements
                 + " currentSpeed = " + currentSpeed);
         // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_WORKOUT_UPDATE_CODE);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
@@ -237,7 +280,7 @@ public class WorkoutService extends Service implements
     }
 
     private void sendBroadcast(Bundle bundle) {
-        Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
+        Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
@@ -247,30 +290,11 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "Time to show steps count, totalSteps = " + tracker.getTotalSteps());
         // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_STEPS_UPDATE_CODE);
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_STEPS, tracker.getTotalSteps());
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
-    }
-
-    @Override
-    public void startWorkout() {
-        //If tracking is already in progress then no need to setup again
-        if (!currentlyTracking) {
-            currentlyTracking = true;
-            Logger.d(TAG, "startWorkout");
-
-            if (!currentlyProcessingSteps) {
-                if (isKitkatWithStepSensor(getApplicationContext())) {
-                    Logger.d(TAG, "Step Detector present! Will register");
-                    stepCounter = new AndroidStepCounter(this, this);
-                } else {
-                    Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
-                    stepCounter = new GoogleFitStepCounter(this, this);
-                }
-            }
-        }
     }
 
     /**
@@ -308,11 +332,11 @@ public class WorkoutService extends Service implements
             if (currentlyTracking) {
                 Intent intent = new Intent(this, ActivityRecognizedService.class);
                 PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-                //TODO: Create GoogleApiClient for ActivityRecognition
-                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
-                // Not pausing location updates
-                NotificationManagerCompat.from(this).cancel(0);
 
+                if (googleApiClient != null && googleApiClient.isConnected()) {
+                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+                }
+                NotificationManagerCompat.from(this).cancel(0);
             }
 
         }
@@ -328,8 +352,9 @@ public class WorkoutService extends Service implements
                 Intent intent = new Intent(this, ActivityRecognizedService.class);
                 PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
-                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-
+                if (googleApiClient != null && googleApiClient.isConnected()) {
+                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
+                }
                 NotificationManagerCompat.from(this).cancel(0);
 
             }
@@ -339,7 +364,7 @@ public class WorkoutService extends Service implements
     public void sendStopWorkoutBroadcast(int problem) {
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_STOP_WORKOUT_PROBLEM, problem);
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_STOP_WORKOUT_CODE);
         sendBroadcast(bundle);
         stopWorkout();
@@ -350,7 +375,7 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "workoutVigilanceSessiondefaulted");
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
-        bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_PAUSE_WORKOUT_CODE);
         sendBroadcast(bundle);
         if (tracker != null && tracker.isActive()) {
@@ -412,25 +437,36 @@ public class WorkoutService extends Service implements
         return tracker;
     }
 
+    /**
+     * Called by Location Services when the request to connect the
+     * client finishes successfully. At this point, you can
+     * request the current location or startWorkout periodic updates
+     */
+    @Override
+    public void onConnected(Bundle bundle) {
+        Logger.d(TAG, "onConnected");
+        Intent intent = new Intent(this, ActivityRecognizedService.class);
+        PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
+    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         switch (requestCode) {
-            case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
-                if (resultCode == Activity.RESULT_OK) {
-                    // Can startWorkout with location requests
-                    initiateLocationFetching();
-                } else {
-                    // Can't do nothing, retry for enabling Location Settings
-                    checkForLocationSettings();
-                }
-                break;
             case GoogleFitStepCounter.REQUEST_OAUTH:
                 stepCounter.onActivityResult(requestCode, resultCode, data);
                 break;
         }
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Logger.e(TAG, "GoogleApiClient connection has been suspend");
+    }
 
     private void makeForeground() {
         Notification notification = getNotificationBuilder().build();

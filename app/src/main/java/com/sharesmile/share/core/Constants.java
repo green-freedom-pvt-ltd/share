@@ -27,9 +27,13 @@ public class Constants {
 
     public static final int CODE_REQUEST_WRITE_PERMISSION = 103;
 
-    public static final String LOCATION_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
+    public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
 
-    public static final String LOCATION_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
+    public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.gps.location.tracker";
+
+    public static final String WORKOUT_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
+
+    public static final String LOCATION_TRACKER_BROADCAST_CATEGORY = "location_tracker_braodcast_category";
 
     public static final int BROADCAST_FIX_LOCATION_SETTINGS_CODE = 201;
 
@@ -46,6 +50,8 @@ public class Constants {
     public static final int BROADCAST_PAUSE_WORKOUT_CODE = 207;
 
     public static final int BROADCAST_GOOGLE_FIT_READ_PERMISSION = 208;
+
+    public static final int BROADCAST_REQUEST_PERMISSION_CODE = 209;
 
     public static final int PROBELM_NOT_MOVING = 0;
 

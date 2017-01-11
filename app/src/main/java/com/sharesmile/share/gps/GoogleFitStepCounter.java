@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,7 +23,6 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
 
@@ -56,6 +54,9 @@ public class GoogleFitStepCounter implements StepCounter,
     @Override
     public void startCounting() {
         Logger.d(TAG, "startCounting");
+        Logger.i(TAG, "Will trigger notAvailable as GoogleFitStepCounter is deprecated");
+        listener.notAvailable(GOOGLE_FIT_STEP_COUNTER_DEPRECATED);
+        /*
         mApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Fitness.SENSORS_API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
@@ -63,11 +64,15 @@ public class GoogleFitStepCounter implements StepCounter,
                 .addOnConnectionFailedListener(this)
                 .build();
         mApiClient.connect();
+        */
     }
 
     @Override
     public void stopCounting() {
         Logger.d(TAG, "stopCounting");
+        Logger.i(TAG, "Will do nothing as GoogleFitStepCounter is deprecated");
+        return;
+        /*
         Fitness.SensorsApi.remove( mApiClient, this )
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
@@ -77,6 +82,7 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 });
+        */
     }
 
     @Override
@@ -162,9 +168,9 @@ public class GoogleFitStepCounter implements StepCounter,
         Logger.e(TAG, "onConnectionFailed, hasResolution = " + connectionResult.hasResolution());
         if (connectionResult.hasResolution()){
             Bundle bundle = new Bundle();
-            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+            bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_GOOGLE_FIT_READ_PERMISSION);
-            Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
+            Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             bundle.putParcelable(Constants.KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE,
                     connectionResult);
             intent.putExtras(bundle);
