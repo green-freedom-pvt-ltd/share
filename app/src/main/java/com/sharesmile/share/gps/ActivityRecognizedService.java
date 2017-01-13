@@ -8,6 +8,7 @@ import android.support.v4.app.NotificationManagerCompat;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.utils.Logger;
 
@@ -34,7 +35,7 @@ public class ActivityRecognizedService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            handleDetectedActivities( result.getProbableActivities() );
+            handleDetectedActivities(result.getProbableActivities());
         }
     }
 
@@ -46,15 +47,7 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivity = activity;
                     if(activity.getConfidence() > 85) {
                         detectedActivityText = "Driving";
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                        builder.setContentText( "We have detected that you are driving." );
-                        builder.setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue));
-                        builder.setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(),
-                                R.mipmap.ic_launcher));
-                        builder.setContentTitle( getString( R.string.app_name ) );
-                        builder.setVibrate(new long[] {500,500,500,500});
-
-                        NotificationManagerCompat.from(this).notify(0, builder.build());
+                        MainApplication.showRunNotification("We have detected that you are driving.");
                     }
                     break;
                 }
@@ -63,8 +56,6 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivity = activity;
                     detectedActivityText = "Cycling";
                     NotificationManagerCompat.from(this).cancel(0);
-
-
                     break;
                 }
                 case DetectedActivity.ON_FOOT: {
@@ -76,7 +67,6 @@ public class ActivityRecognizedService extends IntentService {
                     Logger.d( "ActivityRecogition", "Running: " + activity.getConfidence() );
                     detectedActivity = activity;
                     NotificationManagerCompat.from(this).cancel(0);
-
                     detectedActivityText = "Running";
 
                     break;
@@ -86,15 +76,7 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivityText = "Still";
                     detectedActivity = activity;
                     if(activity.getConfidence() > 85) {
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                        builder.setContentText("It seems like you are still!");
-                        builder.setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue));
-                        builder.setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(),
-                                R.mipmap.ic_launcher));
-                        builder.setContentTitle(getString(R.string.app_name));
-                        builder.setVibrate(new long[] {500,500,500,500});
-                        builder.setAutoCancel(true);
-                        NotificationManagerCompat.from(this).notify(0, builder.build());
+                        MainApplication.showRunNotification("It seems like you are still!");
                     }
                     break;
                 }
@@ -107,8 +89,6 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivity = activity;
                     detectedActivityText = "Walking";
                     NotificationManagerCompat.from(this).cancel(0);
-
-
                     break;
                 }
                 case DetectedActivity.UNKNOWN: {
@@ -124,10 +104,7 @@ public class ActivityRecognizedService extends IntentService {
     }
 
 
-    private int getNotificationIcon() {
-        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
-    }
+
 
 
 }

@@ -120,7 +120,7 @@ public class VigilanceTimer implements Runnable {
 		if(ActivityRecognizedService.getDetectedActivity() != null) {
 
 			if (ActivityRecognizedService.getDetectedActivity().getType() == DetectedActivity.IN_VEHICLE
-					&& ActivityRecognizedService.getDetectedActivity().getConfidence() > 85) {
+					&& ActivityRecognizedService.getDetectedActivity().getConfidence() > Config.ACTIVITY_RECOGNITION_CONFIDENCE_THRESHOLD) {
 				Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
 				Logger.d("ActivityRecogition", "On Vehicle Type: " + ActivityRecognizedService.getDetectedActivity());
 				return true;

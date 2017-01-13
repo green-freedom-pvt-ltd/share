@@ -45,5 +45,7 @@ public class Config {
 
     public static boolean USAIN_BOLT_CHECK = true;
 
+    public static final int ACTIVITY_RECOGNITION_CONFIDENCE_THRESHOLD = 85;
+
 
 }

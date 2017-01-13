@@ -2,8 +2,12 @@ package com.sharesmile.share;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -84,6 +88,22 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
      */
     public static void showToast(int stringId) {
         showToast(getContext().getResources().getString(stringId));
+    }
+
+    public static void showRunNotification(String notifText){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
+        builder.setContentText( notifText )
+                .setSmallIcon(getNotificationIcon())
+                .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
+                .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
+                .setContentTitle(getContext().getResources().getString(R.string.app_name))
+                .setVibrate(new long[] {500,500,500,500});
+        NotificationManagerCompat.from(getContext()).notify(0, builder.build());
+    }
+
+    private static int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
     }
 
 

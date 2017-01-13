@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
@@ -39,7 +42,7 @@ import java.util.Set;
  * Created by ankitm on 22/12/16.
  */
 public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, GpsStatus.Listener {
 
     private static final String TAG = "GoogleLocationTracker";
 
@@ -48,13 +51,14 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     private Context appContext;
     private GoogleApiClient googleApiClient;
     private boolean isActive = false;
-    private boolean workoutInProgess;
     private LocationRequest locationRequest;
     private Location currentLocation;
     private State state;
     private Handler handler;
     Set<WeakReference<Listener>> listeners;
     private boolean permissionAskedOnce;
+    private LocationManager locationManager;
+    private int numSatellitesConnected;
 
     private GoogleLocationTracker(Context appContext) {
         this.appContext = appContext;
@@ -64,6 +68,8 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
             state = State.PERMISSIONS_GRANTED;
+            locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
+            locationManager.addGpsStatusListener(this);
             connectToLocationServices();
         } else {
             //Need to get permissions
@@ -115,7 +121,6 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             if (toAdd){
                 WeakReference<Listener> reference = new WeakReference<>(listener);
                 listeners.add(reference);
-                workoutInProgess = true;
                 if (state != State.FETCHING_LOCATION){
                     startLocationTracking();
                 }else {
@@ -139,14 +144,10 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 }
             }
         }
-        if (listeners.size() == 0){
-            // No more active listeners
-            workoutInProgess = false;
-        }
     }
 
     public void stopLocationTracking(){
-        if (workoutInProgess == false){
+        if (workoutInProgess() == false){
             // Will stop location updates only if Workout is not in progress
             if (state == State.FETCHING_LOCATION){
                 LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
@@ -160,7 +161,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         Logger.d(TAG, "startLocationTracking");
         isActive = true;
         if (state == State.NEEDS_PERMISSION){
-            if (workoutInProgess){
+            if (workoutInProgess()){
                 // First of all need to fetch permissions from user
                 sendPermissionBroadcast();
             }else if (permissionAskedOnce == false){
@@ -197,6 +198,12 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     public void onPermissionsGranted(){
         state = State.PERMISSIONS_GRANTED;
         permissionAskedOnce = true;
+        try {
+            locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
+            locationManager.addGpsStatusListener(this);
+        }catch (SecurityException se){
+            // Won't happen ever, because permission just granted by the user
+        }
         connectToLocationServices();
     }
 
@@ -291,7 +298,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         // Location settings are not satisfied, but this can be fixed
                         // by showing the user a dialog.
-                        if (workoutInProgess){
+                        if (workoutInProgess()){
                             // Show location enable dialog only when a workout is in progress
                             sendLocationEnableBroadcast(status);
                         }
@@ -327,7 +334,6 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         Logger.d(TAG, "onConnected");
         state = State.API_CLIENT_CONNECTED;
         retryAttempt = 0;
-
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(Config.LOCATION_UPDATE_INTERVAL); // milliseconds
         locationRequest.setSmallestDisplacement(Config.SMALLEST_DISPLACEMENT);
@@ -378,18 +384,62 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 reference.get().onLocationChanged(location);
             }
         }
-
-        // TODO: Handle the case when GPS location is turned off during run
     }
 
     public boolean isGpsEnabled(){
         try {
-            LocationManager locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (locationManager != null){
+                return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            }
+            return false;
         }catch (SecurityException se){
             Logger.e(TAG, "Location permission not granted: " + se.getMessage());
             se.printStackTrace();
             return false;
+        }
+    }
+
+    public boolean workoutInProgess(){
+        // Workout is in progress if alteast one listeners is attached to this LocationTracker
+        return (listeners.size() > 0);
+    }
+
+    public int getNumSatellites(){
+        return numSatellitesConnected;
+    }
+
+    @Override
+    public void onGpsStatusChanged(int event) {
+        switch (event){
+            case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+                GpsStatus gpsStatus = locationManager.getGpsStatus(null);
+                if(gpsStatus != null) {
+                    Iterable<GpsSatellite>satellites = gpsStatus.getSatellites();
+                    Iterator<GpsSatellite>sat = satellites.iterator();
+                    int count=0;
+                    while (sat.hasNext()) {
+                        GpsSatellite satellite = sat.next();
+                        Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Satellite: " + satellite.getPrn()
+                                + ", SNR: " + satellite.getSnr() );
+                        count++;
+                    }
+                    numSatellitesConnected = count;
+                    Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
+                            + numSatellitesConnected);
+                    MainApplication.showToast("%d Satellites connected!", numSatellitesConnected);
+                }
+                break;
+            case GpsStatus.GPS_EVENT_STARTED:
+                Logger.i(TAG, "GPS STARTED");
+                MainApplication.showToast("GPS STARTED");
+                break;
+            case GpsStatus.GPS_EVENT_STOPPED:
+                // TODO: Handle the case when GPS location is turned off during run
+                // TODO: Maybe stop/pause the run and show notification to the user
+                Logger.i(TAG, "GPS STOPPED");
+                MainApplication.showToast("GPS STOPPED");
+                break;
+
         }
     }
 
