@@ -144,7 +144,12 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         } else {
             if (mBoard == BOARD_TYPE.TEAMBAORD) {
                 setBannerImage();
+            } else if (mBoard == BOARD_TYPE.LEADERBOARD) {
+                fetchLeaderBoardDataFromDb();
             }
+        }
+        if (mBoard == BOARD_TYPE.LEADERBOARD) {
+            EventBus.getDefault().register(this);
         }
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -163,7 +168,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     private void fetchData() {
         if (mBoard == BOARD_TYPE.LEADERBOARD) {
-            EventBus.getDefault().register(this);
             SyncHelper.syncLeaderBoardData(getContext());
         } else {
             mInfoView.setVisibility(View.GONE);
