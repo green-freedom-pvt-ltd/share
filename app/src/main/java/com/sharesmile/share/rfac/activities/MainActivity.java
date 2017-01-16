@@ -1,13 +1,16 @@
 package com.sharesmile.share.rfac.activities;
 
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,11 +30,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
-import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
@@ -46,6 +49,7 @@ import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareUtils;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -419,14 +423,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 Picasso.with(MainActivity.this).load(campaign.getImageUrl()).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        Utils.share(v.getContext(), Utils.getLocalBitmapUri(bitmap, MainActivity.this), campaign.getShareTemplate());
                         progressView.setVisibility(View.GONE);
+
+                        showBottomDialog(campaign.getShareTemplate(), Utils.getLocalBitmapUri(bitmap, MainActivity.this), Uri.parse(campaign.getImageUrl()));
                     }
 
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
                         progressView.setVisibility(View.GONE);
-                        Utils.share(v.getContext(), campaign.getShareTemplate());
+                        showBottomDialog(campaign.getShareTemplate(), Uri.parse(campaign.getImageUrl()), Uri.parse(campaign.getImageUrl()));
 
                     }
 
@@ -442,5 +447,54 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         dialog.show();
 
     }
+
+    private void showBottomDialog(final String message, final Uri pathUrl, final Uri imageNetworkUrl) {
+
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().from(this).inflate(R.layout.share_message_layout, null);
+        View fbView = view.findViewById(R.id.fb);
+        View whatsAppView = view.findViewById(R.id.whatsapp);
+        View twitterView = view.findViewById(R.id.twitter);
+        bindShareData(fbView, R.drawable.facebook, getString(R.string.facebook));
+        bindShareData(whatsAppView, R.drawable.whatsapp, getString(R.string.whatsapp));
+        bindShareData(twitterView, R.drawable.twitter, getString(R.string.twitter));
+        dialog.setContentView(view);
+
+        fbView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareUtils.shareOnFb(MainActivity.this, message, imageNetworkUrl);
+            }
+        });
+
+        whatsAppView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = ShareUtils.shareOnWhatsAppIntent(MainActivity.this, message, pathUrl);
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(MainActivity.this, "Whats app not installed ", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        twitterView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareUtils.shareOnTwitterIntent(MainActivity.this, message, pathUrl);
+
+            }
+        });
+        dialog.show();
+    }
+
+    private void bindShareData(View view, int imgRes, String appName) {
+        ImageView image = (ImageView) view.findViewById(R.id.logo);
+        image.setImageResource(imgRes);
+        TextView textView = (TextView) view.findViewById(R.id.app_name);
+        textView.setText(appName);
+    }
+
 
 }
