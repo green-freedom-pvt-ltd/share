@@ -251,7 +251,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     public void fetchLeaderBoardDataFromDb() {
-        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(30).list();
+        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();
     }
