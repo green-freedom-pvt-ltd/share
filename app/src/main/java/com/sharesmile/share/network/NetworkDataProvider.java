@@ -365,16 +365,24 @@ public class NetworkDataProvider {
 
     public static <R extends UnObfuscable> void doGetCallAsync(String url, Map<String, String> header, Callback cb) {
         Request.Builder requestBuilder = new Request.Builder().url(url);
-
         if (header != null) {
             for (Map.Entry<String, String> entry : header.entrySet()) {
                 System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
                 requestBuilder.addHeader(entry.getKey(), entry.getValue());
             }
         }
+        if (MainApplication.isLogin()) {
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+        }
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
         call.enqueue(cb);
+    }
+
+    public static <R extends UnObfuscable> void doGetCallAsync(String url, Map<String, String> queryParamsMap, Map<String, String> header,
+                                                               Callback cb) {
+        String modifiedUrl = getUrlWithParams(url, queryParamsMap);
+        doGetCallAsync(modifiedUrl, header, cb);
     }
 
     private static String getUrlWithParams(String baseUrl, Map<String, String> queryParamsMap) {
