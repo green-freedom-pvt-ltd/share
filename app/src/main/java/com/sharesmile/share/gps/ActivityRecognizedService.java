@@ -21,6 +21,7 @@ public class ActivityRecognizedService extends IntentService {
 
     public static DetectedActivity detectedActivity = null;
     public static String detectedActivityText = "Running";
+    private static int stillOccurredCounter = 0;
 
     public ActivityRecognizedService() {
         super("ActivityRecognizedService");
@@ -70,6 +71,9 @@ public class ActivityRecognizedService extends IntentService {
                 case DetectedActivity.ON_FOOT: {
                     Logger.d( "ActivityRecogition", "On Foot: " + activity.getConfidence() );
                     NotificationManagerCompat.from(this).cancel(0);
+                    if(activity.getConfidence() > 85) {
+                        stillOccurredCounter = 0;
+                    }
                     break;
                 }
                 case DetectedActivity.RUNNING: {
@@ -78,14 +82,16 @@ public class ActivityRecognizedService extends IntentService {
                     NotificationManagerCompat.from(this).cancel(0);
 
                     detectedActivityText = "Running";
-
+                    if(activity.getConfidence() > 85) {
+                        stillOccurredCounter = 0;
+                    }
                     break;
                 }
                 case DetectedActivity.STILL: {
                     Logger.d( "ActivityRecogition", "Still: " + activity.getConfidence() );
                     detectedActivityText = "Still";
                     detectedActivity = activity;
-                    if(activity.getConfidence() > 85) {
+                    if(activity.getConfidence() > 85 && stillOccurredCounter == 0) {
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                         builder.setContentText("It seems like you are still!");
                         builder.setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue));
@@ -95,6 +101,7 @@ public class ActivityRecognizedService extends IntentService {
                         builder.setVibrate(new long[] {500,500,500,500});
                         builder.setAutoCancel(true);
                         NotificationManagerCompat.from(this).notify(0, builder.build());
+                        stillOccurredCounter = 1;
                     }
                     break;
                 }
@@ -107,8 +114,9 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivity = activity;
                     detectedActivityText = "Walking";
                     NotificationManagerCompat.from(this).cancel(0);
-
-
+                    if(activity.getConfidence() > 85) {
+                        stillOccurredCounter = 0;
+                    }
                     break;
                 }
                 case DetectedActivity.UNKNOWN: {
