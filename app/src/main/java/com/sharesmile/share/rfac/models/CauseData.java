@@ -1,7 +1,6 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
-import com.sharesmile.share.*;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.io.Serializable;
@@ -55,7 +54,7 @@ public class CauseData implements UnObfuscable, Serializable {
     private int minDistance;
 
     @SerializedName("app_update")
-    private AppUpdate appUpdate;
+    private ApplicationUpdate applicationUpdate;
 
     @SerializedName("order_priority")
     private int orderPriority;
@@ -225,12 +224,12 @@ public class CauseData implements UnObfuscable, Serializable {
         setOrderPriority(cause.getOrder_priority());
     }
 
-    public AppUpdate getAppUpdate() {
-        return appUpdate;
+    public ApplicationUpdate getApplicationUpdate() {
+        return applicationUpdate;
     }
 
-    public void setAppUpdate(AppUpdate appUpdate) {
-        this.appUpdate = appUpdate;
+    public void setApplicationUpdate(ApplicationUpdate applicationUpdate) {
+        this.applicationUpdate = applicationUpdate;
     }
 
     public int getOrderPriority() {

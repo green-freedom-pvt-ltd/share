@@ -97,7 +97,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(getContext().getResources().getString(R.string.app_name))
-                .setVibrate(new long[] {500,500,500,500});
+                .setVibrate(new long[]{500, 500, 500, 500});
         NotificationManagerCompat.from(getContext()).notify(0, builder.build());
     }
 
@@ -127,7 +127,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
      * A thread safe way to show a Toast. Can be called from any thread.
      */
     public static void showToast(final String message) {
-        showToast(message, Toast.LENGTH_LONG);
+        showToast(message, Toast.LENGTH_SHORT);
     }
 
 
@@ -229,23 +229,21 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     @Override
     public void onStart() {
         Logger.i(TAG, "onStart");
+        GoogleLocationTracker.getInstance().startLocationTracking(false);
     }
 
     @Override
     public void onResume() {
-        Logger.i(TAG, "onResume");
-        GoogleLocationTracker.getInstance().startLocationTracking();
     }
 
     @Override
     public void onPause() {
-        Logger.i(TAG, "onPause");
-        GoogleLocationTracker.getInstance().stopLocationTracking();
     }
 
     @Override
     public void onStop() {
         Logger.i(TAG, "onStop");
+        GoogleLocationTracker.getInstance().stopLocationTracking();
     }
 }
 

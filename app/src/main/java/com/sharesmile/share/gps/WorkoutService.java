@@ -25,6 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.gson.Gson;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -111,7 +112,8 @@ public class WorkoutService extends Service implements
         if (!currentlyTracking) {
             currentlyTracking = true;
             Logger.d(TAG, "startWorkout");
-            GoogleLocationTracker.getInstance().register(this);
+
+            GoogleLocationTracker.getInstance().registerForWorkout(this);
             if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
                 googleApiClient = new GoogleApiClient.Builder(this)
                         .addApi(ActivityRecognition.API)
@@ -142,9 +144,9 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopWorkout");
         if (currentlyTracking) {
             stopTracking();
-            GoogleLocationTracker.getInstance().unregister(this);
+            GoogleLocationTracker.getInstance().unregisterWorkout(this);
             Intent intent = new Intent(this, ActivityRecognizedService.class);
-            PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             if (googleApiClient != null && googleApiClient.isConnected()) {
                 ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
                 googleApiClient.disconnect();
@@ -252,6 +254,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public void onPermissionDenied() {
+        Logger.i(TAG, "onPermissionDenied");
         stopWorkout();
         stopSelf();
     }
@@ -261,6 +264,30 @@ public class WorkoutService extends Service implements
         Logger.e(TAG, "GoogleLocationTracker onConnectionFailure, will stop workoutService");
         stopWorkout();
         stopSelf();
+    }
+
+    @Override
+    public void onGpsEnabled() {
+        if (tracker != null && tracker.isPaused()){
+            Logger.i(TAG, "onGpsEnabled: Gps enabled while workout was ongoing, user can resume the workout now");
+            // User can resume the workout now, if it was paused because of disabled GPS.
+        }
+    }
+
+    @Override
+    public void onGpsDisabled() {
+        if (tracker != null && tracker.isRunning()){
+            Logger.i(TAG, "onGpsDisabled: Gps disabled while workout was ongoing, will pause the workout");
+            // Pause workout
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, Constants.PROBLEM_GPS_DISABLED);
+            bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
+                    Constants.BROADCAST_PAUSE_WORKOUT_CODE);
+            sendBroadcast(bundle);
+            pause();
+            // Popup to enable location again
+            GoogleLocationTracker.getInstance().startLocationTracking(true);
+        }
     }
 
     @Override
@@ -338,7 +365,6 @@ public class WorkoutService extends Service implements
                 }
                 NotificationManagerCompat.from(this).cancel(0);
             }
-
         }
     }
 

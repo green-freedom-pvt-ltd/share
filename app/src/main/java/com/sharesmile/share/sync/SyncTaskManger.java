@@ -103,13 +103,13 @@ public class SyncTaskManger extends IntentService {
                     activeCauseList.getCauses().add(data);
                 }
 
-                if (data.getAppUpdate() != null) {
+                if (data.getApplicationUpdate() != null) {
                     int latestVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
-                    if (latestVersion < data.getAppUpdate().app_version && data.getAppUpdate().app_version > BuildConfig.VERSION_CODE) {
+                    if (latestVersion < data.getApplicationUpdate().app_version && data.getApplicationUpdate().app_version > BuildConfig.VERSION_CODE) {
                         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, true);
-                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, data.getAppUpdate().force_update);
-                        SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, data.getAppUpdate().app_version);
-                        SharedPrefsManager.getInstance().setString(Constants.PREF_APP_UPDATE_MESSAGE, data.getAppUpdate().message);
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, data.getApplicationUpdate().force_update);
+                        SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, data.getApplicationUpdate().app_version);
+                        SharedPrefsManager.getInstance().setString(Constants.PREF_APP_UPDATE_MESSAGE, data.getApplicationUpdate().message);
                     }
                 }
                 mCauseDao.insertOrReplace(data.getCauseDbObject());

@@ -59,6 +59,8 @@ public class Constants {
 
     public static final int PROBELM_TOO_FAST = 2;
 
+    public static final int PROBLEM_GPS_DISABLED = 3;
+
     public static final String KEY_LOCATION_SETTINGS_PARCELABLE = "location_settings_parcelable";
 
     public static final String KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE = "google_fit_resolution_parcelable";

@@ -198,7 +198,7 @@ public class RealRunFragment extends RunFragment {
         String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
         distance.setText(distDecimal);
 
-        int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distance.getText().toString()));
+        int rupees = (int) Math.ceil(getConversionFactor() * Math.round(distanceCovered / 1000));
         impact.setText(String.valueOf(rupees));
     }
 

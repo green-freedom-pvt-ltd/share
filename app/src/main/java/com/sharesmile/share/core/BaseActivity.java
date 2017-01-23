@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,8 +47,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
-        LocalBroadcastManager.getInstance(this).registerReceiver(locationTrackerReceiver,
-                new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION));
+        IntentFilter filter = new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(locationTrackerReceiver, filter);
     }
 
     @Override
@@ -100,13 +101,54 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    private GoogleLocationTracker.Listener googleLocationTrackerListener
+            = new GoogleLocationTracker.Listener() {
+        @Override
+        public void onLocationTrackerReady() {
+            Logger.i(TAG, "onLocationTrackerReady, will start tracking activity");
+            GoogleLocationTracker.getInstance().unregister(this);
+            showTrackingActivity();
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            Logger.i(TAG, "onPermissionDenied: Can't do nothing");
+            GoogleLocationTracker.getInstance().unregister(this);
+        }
+
+        @Override
+        public void onConnectionFailure() {
+            Logger.i(TAG, "onConnectionFailure");
+            GoogleLocationTracker.getInstance().unregister(this);
+        }
+
+        @Override
+        public void onGpsEnabled() {
+
+        }
+
+        @Override
+        public void onGpsDisabled() {
+
+        }
+    };
+
     @Override
     public void performOperation(int operationId, Object input) {
         switch (operationId) {
             case START_RUN:
                 if (input instanceof CauseData) {
                     mCauseData = (CauseData) input;
-                    showTrackingActivity();
+                    if ( !GoogleLocationTracker.getInstance().isFetchingLocation() ){
+                        GoogleLocationTracker.getInstance().register(googleLocationTrackerListener);
+                    }else {
+                        showTrackingActivity();
+                    }
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -143,7 +185,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             if (grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 GoogleLocationTracker.getInstance().onPermissionsGranted();
-            } else {
+            } else if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_DENIED){
                 GoogleLocationTracker.getInstance().onPermissionsRejected();
             }
         }
@@ -160,6 +203,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
     private void showTrackingActivity() {
+        Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity");
         Intent intent = new Intent(this, TrackerActivity.class);
         intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);
@@ -173,6 +217,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             if (bundle != null) {
                 int broadcastCategory = bundle
                         .getInt(Constants.LOCATION_TRACKER_BROADCAST_CATEGORY);
+                // TODO: Use priority broadcasts to avoid duplicate receivers
+                Logger.d(TAG, "locationTrackerReceiver onReceive with broadcastCategory = " + broadcastCategory);
                 switch (broadcastCategory) {
                     case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
                         Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
@@ -184,12 +230,15 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }
+                        // Aborting broadcast so that other receivers registered in different activities do not receive this broadcast
+                        abortBroadcast();
                         break;
 
                     case Constants.BROADCAST_REQUEST_PERMISSION_CODE:
                         ActivityCompat.requestPermissions(BaseActivity.this,
                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                 Constants.CODE_REQUEST_LOCATION_PERMISSION);
+                        abortBroadcast();
                         break;
 
                 }
@@ -223,4 +272,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     }
 
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locationTrackerReceiver);
+        super.onDestroy();
+    }
 }

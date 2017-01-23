@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Created by Shine on 21/09/16.
  */
 
-public class AppUpdate implements Serializable, UnObfuscable {
+public class ApplicationUpdate implements Serializable, UnObfuscable {
 
     @SerializedName("app_version")
     public int app_version;

@@ -23,6 +23,8 @@ public class ActivityRecognizedService extends IntentService {
     public static DetectedActivity detectedActivity = null;
     public static String detectedActivityText = "Running";
 
+    private static final String TAG = "ActivityRecognizedService";
+
     public ActivityRecognizedService() {
         super("ActivityRecognizedService");
     }
@@ -43,7 +45,7 @@ public class ActivityRecognizedService extends IntentService {
         for( DetectedActivity activity : probableActivities ) {
             switch( activity.getType() ) {
                 case DetectedActivity.IN_VEHICLE: {
-                    Logger.d( "ActivityRecogition", "In Vehicle: " + activity.getConfidence() );
+                    Logger.d( TAG, "In Vehicle: " + activity.getConfidence() );
                     detectedActivity = activity;
                     if(activity.getConfidence() > 85) {
                         detectedActivityText = "Driving";
@@ -52,19 +54,19 @@ public class ActivityRecognizedService extends IntentService {
                     break;
                 }
                 case DetectedActivity.ON_BICYCLE: {
-                    Logger.d( "ActivityRecogition", "On Bicycle: " + activity.getConfidence() );
+                    Logger.d( TAG, "On Bicycle: " + activity.getConfidence() );
                     detectedActivity = activity;
                     detectedActivityText = "Cycling";
                     NotificationManagerCompat.from(this).cancel(0);
                     break;
                 }
                 case DetectedActivity.ON_FOOT: {
-                    Logger.d( "ActivityRecogition", "On Foot: " + activity.getConfidence() );
+                    Logger.d( TAG, "On Foot: " + activity.getConfidence() );
                     NotificationManagerCompat.from(this).cancel(0);
                     break;
                 }
                 case DetectedActivity.RUNNING: {
-                    Logger.d( "ActivityRecogition", "Running: " + activity.getConfidence() );
+                    Logger.d( TAG, "Running: " + activity.getConfidence() );
                     detectedActivity = activity;
                     NotificationManagerCompat.from(this).cancel(0);
                     detectedActivityText = "Running";
@@ -72,7 +74,7 @@ public class ActivityRecognizedService extends IntentService {
                     break;
                 }
                 case DetectedActivity.STILL: {
-                    Logger.d( "ActivityRecogition", "Still: " + activity.getConfidence() );
+                    Logger.d( TAG, "Still: " + activity.getConfidence() );
                     detectedActivityText = "Still";
                     detectedActivity = activity;
                     if(activity.getConfidence() > 85) {
@@ -81,18 +83,18 @@ public class ActivityRecognizedService extends IntentService {
                     break;
                 }
                 case DetectedActivity.TILTING: {
-                    Logger.d( "ActivityRecogition", "Tilting: " + activity.getConfidence() );
+                    Logger.d( TAG, "Tilting: " + activity.getConfidence() );
                     break;
                 }
                 case DetectedActivity.WALKING: {
-                    Logger.d( "ActivityRecogition", "Walking: " + activity.getConfidence() );
+                    Logger.d( TAG, "Walking: " + activity.getConfidence() );
                     detectedActivity = activity;
                     detectedActivityText = "Walking";
                     NotificationManagerCompat.from(this).cancel(0);
                     break;
                 }
                 case DetectedActivity.UNKNOWN: {
-                    Logger.d( "ActivityRecogition", "Unknown: " + activity.getConfidence() );
+                    Logger.d( TAG, "Unknown: " + activity.getConfidence() );
                     break;
                 }
             }

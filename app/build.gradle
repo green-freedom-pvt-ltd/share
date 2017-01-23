@@ -75,6 +75,7 @@ android {
         }
         debug {
             debuggable true
+            signingConfig signingConfigs.release
         }
     }
 

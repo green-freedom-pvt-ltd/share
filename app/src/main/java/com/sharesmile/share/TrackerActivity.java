@@ -262,20 +262,24 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public void beginRun() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            // All required permissions available
-            invokeWorkoutService();
-        } else {
-            //Need to get permissions
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.CODE_REQUEST_LOCATION_PERMISSION);
-        }
+        Logger.d(TAG, "beginRun");
+        invokeWorkoutService();
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            // All required permissions available
+//
+//        } else {
+//            //Need to get permissions
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                    Constants.CODE_REQUEST_LOCATION_PERMISSION);
+//        }
     }
 
     public void endRun() {
+        Logger.d(TAG, "endRun");
         if (isBoundToLocationService()) {
+            Logger.d(TAG, "Bound to WorkoutService, will stopWorkout first");
             locationService.stopWorkout();
         }
     }
@@ -446,10 +450,15 @@ public class TrackerActivity extends BaseActivity {
                                     case Constants.PROBELM_NOT_MOVING:
                                         errorMessage = getString(R.string.rfac_lazy_ass_message);
                                         break;
+                                    case Constants.PROBLEM_GPS_DISABLED:
+                                        errorMessage = getString(R.string.rfac_gps_disabled_message);
+                                        break;
                                 }
                                 if (!TextUtils.isEmpty(errorMessage)) {
                                     Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
-                                    runFragment.showErrorMessage(errorMessage);
+                                    if (problem != Constants.PROBLEM_GPS_DISABLED){
+                                        runFragment.showErrorMessage(errorMessage);
+                                    }
                                 }
                                 runFragment.pauseRun(false);
                             }
