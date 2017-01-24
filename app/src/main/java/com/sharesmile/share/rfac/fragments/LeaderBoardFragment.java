@@ -6,6 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +41,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
@@ -53,6 +56,8 @@ import butterknife.ButterKnife;
 public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdapter.ItemClickListener {
 
     private static final String BUNDLE_LEAGUE_BOARD = "bundle_league_board";
+    private static final String BUNDLE_TEAM_ID = "bundle_team_id";
+
     RecyclerView mRecyclerView;
     private List<LeaderBoard> mleaderBoardList = new ArrayList<>();
     LeaderBoardAdapter mLeaderBoardAdapter;
@@ -69,6 +74,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     private boolean mShowLeagueBoard = false;
     private BOARD_TYPE mBoard;
     private String mBannerUrl;
+    private int mTeamId;
 
     public enum BOARD_TYPE {
         LEADERBOARD,
@@ -113,6 +119,16 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         return fragment;
     }
 
+    public static LeaderBoardFragment getInstance(BOARD_TYPE board,int teamId) {
+        LeaderBoardFragment fragment = getInstance(board);
+        Bundle bundle = fragment.getArguments();
+        if (board == BOARD_TYPE.TEAMLEADERBAORD) {
+            bundle.putInt(BUNDLE_TEAM_ID, teamId);
+        }
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +136,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         if (arg != null) {
             mBoard = BOARD_TYPE.getBoardType(arg.getInt(BUNDLE_LEAGUE_BOARD));
             mShowLeagueBoard = mBoard == BOARD_TYPE.TEAMBAORD ? true : false;
+            mTeamId = arg.getInt(BUNDLE_TEAM_ID);
         }
     }
 
@@ -251,13 +268,15 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     public void fetchLeaderBoardDataFromDb() {
-        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(30).list();
+        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(50).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();
     }
 
     private void fetchTeamLeaderBoardData() {
-        NetworkDataProvider.doGetCallAsync(Urls.getTeamLeaderBoardUrl(), new NetworkAsyncCallback<TeamLeaderBoard>() {
+        Map<String, String> header = new HashMap<>();
+        header.put("team_id", String.valueOf(mTeamId));
+        NetworkDataProvider.doGetCallAsync(Urls.getTeamLeaderBoardUrl(), header, null, new NetworkAsyncCallback<TeamLeaderBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 hideProgressDialog();
@@ -316,8 +335,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     @Override
-    public void onItemClick(int id) {
-        getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAMLEADERBAORD), true);
+    public void onItemClick(long id) {
+        getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAMLEADERBAORD,(int)id), true);
     }
 
     private void hideProgressDialog() {

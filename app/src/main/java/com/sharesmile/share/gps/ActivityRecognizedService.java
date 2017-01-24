@@ -22,6 +22,7 @@ public class ActivityRecognizedService extends IntentService {
 
     public static DetectedActivity detectedActivity = null;
     public static String detectedActivityText = "Running";
+    private static int stillOccurredCounter = 0;
 
     private static final String TAG = "ActivityRecognizedService";
 
@@ -63,6 +64,9 @@ public class ActivityRecognizedService extends IntentService {
                 case DetectedActivity.ON_FOOT: {
                     Logger.d( TAG, "On Foot: " + activity.getConfidence() );
                     NotificationManagerCompat.from(this).cancel(0);
+                    if(activity.getConfidence() > 85) {
+                        stillOccurredCounter = 0;
+                    }
                     break;
                 }
                 case DetectedActivity.RUNNING: {
@@ -70,15 +74,18 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivity = activity;
                     NotificationManagerCompat.from(this).cancel(0);
                     detectedActivityText = "Running";
-
+                    if(activity.getConfidence() > 85) {
+                        stillOccurredCounter = 0;
+                    }
                     break;
                 }
                 case DetectedActivity.STILL: {
                     Logger.d( TAG, "Still: " + activity.getConfidence() );
                     detectedActivityText = "Still";
                     detectedActivity = activity;
-                    if(activity.getConfidence() > 85) {
+                    if(activity.getConfidence() > 85 && stillOccurredCounter == 0) {
                         MainApplication.showRunNotification("It seems like you are still!");
+                        stillOccurredCounter = 1;
                     }
                     break;
                 }
@@ -91,6 +98,9 @@ public class ActivityRecognizedService extends IntentService {
                     detectedActivity = activity;
                     detectedActivityText = "Walking";
                     NotificationManagerCompat.from(this).cancel(0);
+                    if(activity.getConfidence() > 85) {
+                        stillOccurredCounter = 0;
+                    }
                     break;
                 }
                 case DetectedActivity.UNKNOWN: {

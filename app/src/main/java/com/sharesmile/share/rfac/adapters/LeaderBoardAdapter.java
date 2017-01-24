@@ -90,7 +90,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             }
         }
 
-        private void bindData(LeaderBoard leaderboard, int position) {
+        private void bindData(final LeaderBoard leaderboard, int position) {
             mleaderBoard.setText(String.valueOf(position + 1));
 
             if (!TextUtils.isEmpty(leaderboard.getSocial_thumb())) {
@@ -125,27 +125,28 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.white));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.white));
                 mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.white));
-
-                if (isLeagueBoard) {
-                    container.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mListener.onItemClick(id);
-                        }
-                    });
-                }
             } else {
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.black));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.black));
                 mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.black));
-                container.setCardElevation(.5f);
+                if(isLeagueBoard) container.setCardElevation(3f);
+                else container.setCardElevation(.5f);
                 container.setOnClickListener(null);
+            }
+
+            if (isLeagueBoard) {
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.onItemClick(leaderboard.getId());
+                    }
+                });
             }
         }
     }
 
     public interface ItemClickListener {
-        public void onItemClick(int id);
+        public void onItemClick(long id);
     }
 }
