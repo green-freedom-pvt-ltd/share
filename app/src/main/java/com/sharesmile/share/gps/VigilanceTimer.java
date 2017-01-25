@@ -117,16 +117,17 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
-		if(ActivityRecognizedService.getDetectedActivity() != null) {
-
-			if (ActivityRecognizedService.getDetectedActivity().getType() == DetectedActivity.IN_VEHICLE
-					&& ActivityRecognizedService.getDetectedActivity().getConfidence() > Config.ACTIVITY_RECOGNITION_CONFIDENCE_THRESHOLD) {
-				Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
-				Logger.d(TAG, "On Vehicle Type: " + ActivityRecognizedService.getDetectedActivity());
-				return true;
-			}
+		if (ActivityRecognizedService.isIsInVehicle()){
+			Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
+			return true;
 		}
 
+//		return tooFastSecondaryCheck();
+		return false;
+
+	}
+
+	private boolean tooFastSecondaryCheck(){
 		if (lastValidatedRecord == null){
 			// Will wait for next tick
 			lastValidatedRecord = workoutService.getTracker().getLastRecord();
@@ -153,10 +154,10 @@ public class VigilanceTimer implements Runnable {
 								? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
 						int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
 						Logger.d(TAG, "averageStrideLength = " + averageStrideLength + "meters hence "
-									+ " expectedNumOfSteps = " + expectedNumOfSteps);
+								+ " expectedNumOfSteps = " + expectedNumOfSteps);
 
 						if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
-								return true;
+							return true;
 						}
 					}
 					lastValidatedRecord = latestRecord;

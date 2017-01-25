@@ -24,6 +24,7 @@ import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -194,12 +195,15 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
-
-        String distDecimal = String.format("%1$,.1f", (distanceCovered / 1000));
-        distance.setText(distDecimal);
-
-        int rupees = (int) Math.ceil(getConversionFactor() * Math.round(distanceCovered / 1000));
+        String distanceString = formatToKms(distanceCovered);
+        distance.setText(distanceString);
+        int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));
+    }
+
+    public String formatToKms(float distanceInMeters){
+        DecimalFormat df = new DecimalFormat("0.0");
+        return df.format(distanceInMeters / 1000);
     }
 
     @Override

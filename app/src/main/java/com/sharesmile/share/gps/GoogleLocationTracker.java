@@ -449,7 +449,6 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
 
             if (locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
                 Logger.i(TAG, "GPS ENABLED");
-                MainApplication.showToast("GPS ENABLED");
                 if (state != State.FETCHING_LOCATION && state != State.LOCATION_ENABLED){
                     startLocationTracking(false);
                     Iterator<WeakReference<Listener>> iterator = listeners.iterator();
@@ -462,7 +461,6 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 }
             } else {
                 Logger.i(TAG, "GPS DISABLED");
-                MainApplication.showToast("GPS DISABLED");
                 if (state == State.FETCHING_LOCATION || state == State.LOCATION_ENABLED){
                     state = State.API_CLIENT_CONNECTED;
                     Iterator<WeakReference<Listener>> iterator = listeners.iterator();
@@ -496,8 +494,6 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     numSatellitesConnected = count;
                     Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
                             + numSatellitesConnected);
-                    String format = String.format("%d Satellites connected!", numSatellitesConnected);
-                    MainApplication.showToast(format, Toast.LENGTH_SHORT);
                 }
                 break;
             case GpsStatus.GPS_EVENT_STARTED:
