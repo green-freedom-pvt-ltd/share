@@ -217,7 +217,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             if (bundle != null) {
                 int broadcastCategory = bundle
                         .getInt(Constants.LOCATION_TRACKER_BROADCAST_CATEGORY);
-                // TODO: Use priority broadcasts to avoid duplicate receivers
                 Logger.d(TAG, "locationTrackerReceiver onReceive with broadcastCategory = " + broadcastCategory);
                 switch (broadcastCategory) {
                     case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
@@ -231,14 +230,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                             // Ignore the error.
                         }
                         // Aborting broadcast so that other receivers registered in different activities do not receive this broadcast
-                        abortBroadcast();
                         break;
 
                     case Constants.BROADCAST_REQUEST_PERMISSION_CODE:
                         ActivityCompat.requestPermissions(BaseActivity.this,
                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                 Constants.CODE_REQUEST_LOCATION_PERMISSION);
-                        abortBroadcast();
                         break;
 
                 }
