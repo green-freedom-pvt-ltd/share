@@ -8,10 +8,11 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.analytics.Tracker;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.pushNotification.NotificationConsts;
+import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -141,7 +142,7 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //Initialization code
-        OneSignal.startInit(this).init();
+
         mMixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
         MixpanelAPI.People people = mMixpanel.getPeople();
 //        people.identify(String.valueOf(getUserID()));
@@ -150,8 +151,20 @@ public class MainApplication extends Application {
         SharedPrefsManager.initialize(getApplicationContext());
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
+        initOneSignal();
         mDbWrapper = new DbWrapper(this);
         startSyncTasks();
+    }
+
+    private void initOneSignal() {
+        OneSignal.startInit(this).setNotificationOpenedHandler(new NotificationHandler()).init();
+        String email = SharedPrefsManager.getInstance().getString(Constants.PREF_USER_EMAIL);
+        if (!TextUtils.isEmpty(email)) {
+            OneSignal.syncHashedEmail(email);
+        }
+
+        int total_runs = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
+        OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT, String.valueOf(total_runs));
     }
 
     private void startSyncTasks() {

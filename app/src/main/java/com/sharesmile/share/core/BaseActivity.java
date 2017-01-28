@@ -202,7 +202,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         startActivity(intent);
     }
 
-    private void showMessageCenter() {
+    protected void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
     }
 

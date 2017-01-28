@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
+import com.onesignal.OneSignal;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
@@ -17,6 +18,7 @@ import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.RunList;
@@ -155,6 +157,8 @@ public class SyncHelper {
 
         SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, workoutCount);
         SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
+
+        OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT, String.valueOf(workoutCount));
     }
 
 

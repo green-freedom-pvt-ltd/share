@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +41,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
+import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.LeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
@@ -120,6 +122,31 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         updateNavigationMenu();
         checkAppVersion();
         SyncHelper.syncCampaignData(getApplicationContext());
+        handleNotificationIntent();
+    }
+
+    private void handleNotificationIntent() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String screen = bundle.getString(NotificationConsts.KEY_SCREEN);
+            if (!TextUtils.isEmpty(screen)) {
+                if (screen.equals(NotificationConsts.Screen.MESSAGE_CENTER)) {
+                    showMessageCenter();
+                } else if (screen.equals(NotificationConsts.Screen.PROFILE)) {
+                    if (!MainApplication.isLogin()) {
+                        showLoginActivity();
+                    } else {
+                        showProfileScreen();
+                    }
+                } else if (screen.equals(NotificationConsts.Screen.LEADERBOARD)) {
+                    if (!MainApplication.isLogin()) {
+                        showLoginActivity();
+                    } else {
+                        showLeaderBoard();
+                    }
+                }
+            }
+        }
     }
 
     private void checkAppVersion() {
@@ -281,7 +308,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Logger.d(TAG, "onNavigationItemSelected");
 
         if (menuItem.getItemId() == R.id.nav_item_profile) {
-            replaceFragment(new ProfileFragment(), true);
+            showProfileScreen();
         }
 
         if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
@@ -299,21 +326,33 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_home) {
             showHome();
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra(LoginActivity.BUNDLE_FROM_MAINACTIVITY, true);
-            startActivityForResult(intent, REQUEST_CODE_LOGIN);
+            showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
             replaceFragment(new FaqFragment(), true);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
-            replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEADERBOARD), true);
+            showLeaderBoard();
         }
 
 
         mDrawerLayout.closeDrawers();
 
         return false;
+    }
+
+    private void showLeaderBoard() {
+        replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEADERBOARD), true);
+    }
+
+    private void showProfileScreen() {
+        replaceFragment(new ProfileFragment(), true);
+    }
+
+    private void showLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra(LoginActivity.BUNDLE_FROM_MAINACTIVITY, true);
+        startActivityForResult(intent, REQUEST_CODE_LOGIN);
     }
 
     private void share() {
