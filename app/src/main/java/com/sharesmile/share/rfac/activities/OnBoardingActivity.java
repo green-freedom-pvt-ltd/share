@@ -92,6 +92,10 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Bundle extraBundle = getIntent().getExtras();
+        if (extraBundle != null) {
+            intent.putExtras(extraBundle);
+        }
         startActivity(intent);
     }
 

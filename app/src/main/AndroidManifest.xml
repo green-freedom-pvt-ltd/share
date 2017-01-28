@@ -146,6 +146,8 @@
             android:screenOrientation="portrait"/>
         <activity android:name="activities.LeagueLeaderBoard"
             android:screenOrientation="portrait"></activity>
+
+        <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
     </application>
 
 </manifest>
