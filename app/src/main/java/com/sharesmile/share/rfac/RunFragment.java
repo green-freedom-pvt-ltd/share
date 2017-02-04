@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -135,11 +136,15 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public void resumeRun() {
         Logger.d(TAG, "resumeRun");
-        // Resume will always be done by the user
-        myActivity.resumeWorkout();
-        startTimer(SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE));
-        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
-        onResumeRun();
+        if (GoogleLocationTracker.getInstance().isFetchingLocation()){
+            // Resume will always be done by the user
+            myActivity.resumeWorkout();
+            startTimer(SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE));
+            SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
+            onResumeRun();
+        }else {
+            GoogleLocationTracker.getInstance().startLocationTracking(true);
+        }
     }
 
     private void setIsRunActive(boolean b) {

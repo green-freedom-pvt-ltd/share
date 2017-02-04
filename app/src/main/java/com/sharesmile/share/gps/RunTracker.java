@@ -252,7 +252,6 @@ public class RunTracker implements Tracker {
     }
 
 
-    //TODO: revise this method to handle pause resume
     private synchronized void processLocation(Location point){
         if (isRunning()){
             //Check if the start point has been detected since the workout started/resumed

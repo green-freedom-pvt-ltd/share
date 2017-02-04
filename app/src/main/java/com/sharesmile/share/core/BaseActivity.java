@@ -18,6 +18,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import com.google.android.gms.common.api.Status;
 import android.support.v7.app.AlertDialog;
+
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.GoogleLocationTracker;
@@ -209,10 +211,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         startActivity(intent);
     }
 
+    private static boolean blockRequestPermission = false;
+    private static boolean blockLocationEnablePopup = false;
+
     private BroadcastReceiver locationTrackerReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 int broadcastCategory = bundle
@@ -220,28 +224,59 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 Logger.d(TAG, "locationTrackerReceiver onReceive with broadcastCategory = " + broadcastCategory);
                 switch (broadcastCategory) {
                     case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
-                        Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(BaseActivity.this,
-                                    Constants.CODE_LOCATION_SETTINGS_RESOLUTION);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-                        // Aborting broadcast so that other receivers registered in different activities do not receive this broadcast
+                        handleFixLocationSettingsBroadcast(bundle);
                         break;
 
                     case Constants.BROADCAST_REQUEST_PERMISSION_CODE:
-                        ActivityCompat.requestPermissions(BaseActivity.this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                Constants.CODE_REQUEST_LOCATION_PERMISSION);
+                        handleRequestPermissionBroadcast();
                         break;
 
                 }
             }
         }
     };
+
+    private void handleFixLocationSettingsBroadcast(Bundle bundle){
+        synchronized (BaseActivity.class){
+            if (!blockLocationEnablePopup){
+                Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
+                    status.startResolutionForResult(BaseActivity.this,
+                            Constants.CODE_LOCATION_SETTINGS_RESOLUTION);
+                    // Hack to block subsequent location enable broadcast for 1 sec
+                    blockLocationEnablePopup = true;
+                    MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            blockLocationEnablePopup = false;
+                        }
+                    }, 1000);
+                } catch (IntentSender.SendIntentException e) {
+                    // Ignore the error.
+                }
+            }
+        }
+    }
+
+    private void handleRequestPermissionBroadcast(){
+        synchronized (BaseActivity.class){
+            if (!blockRequestPermission){
+                ActivityCompat.requestPermissions(BaseActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        Constants.CODE_REQUEST_LOCATION_PERMISSION);
+                // Hack to block subsequent request permission broadcast for 1 sec
+                blockRequestPermission = true;
+                MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        blockRequestPermission = false;
+                    }
+                }, 1000);
+            }
+        }
+    }
 
 
     private void showMessageCenter() {

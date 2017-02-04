@@ -118,7 +118,7 @@ public class VigilanceTimer implements Runnable {
 		}
 
 		if (ActivityRecognizedService.isIsInVehicle()){
-			Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
+			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
 			return true;
 		}
 
