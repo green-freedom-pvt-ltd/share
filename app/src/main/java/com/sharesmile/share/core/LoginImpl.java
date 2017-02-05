@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -184,6 +185,17 @@ public class LoginImpl {
                 String responseString = response.body().string();
                 Logger.d("LoginImpl", "onResponse: " + responseString);
                 JsonArray array = JsonHelper.StringToJsonArray(responseString);
+                if (array == null) {
+                    Crashlytics.logException(new Throwable("Login Response error. Server response : " + responseString));
+                    MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.showHideProgress(false, null);
+                        }
+                    });
+                    return;
+                }
+
                 final JsonObject element = array.get(0).getAsJsonObject();
                 Log.i("LoginImpl", "element: " + element.toString());
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
