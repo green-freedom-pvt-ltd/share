@@ -127,6 +127,10 @@ public class Constants {
     public static final String BUNDLE_FIRST_RUN_FEEDBACK = "bundle_first_run_feedback";
     public static final String BUNDLE_SHOW_PROFILE = "bundle_show_profile";
 
+    public static final String GOOGLE_PROJECT_ID = "159550091621";
+
+    public static final String PREF_FIRST_LAUNCH_EVENT_SENT = "first_launch_event_sent";
+
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));
         add(new LatLng(19.118485, 72.913496));

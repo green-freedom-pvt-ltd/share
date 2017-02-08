@@ -75,6 +75,14 @@
             android:name="io.fabric.ApiKey"
             android:value="471ab2c2abae38db00f4a7d4feae7a603a81b669" />
 
+        <meta-data
+            android:name="CLEVERTAP_ACCOUNT_ID"
+            android:value="654-KWR-584Z"/>
+        <meta-data
+            android:name="CLEVERTAP_TOKEN"
+            android:value="203-456"/>
+
+
         <!-- Facebook login integration -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -137,6 +145,15 @@
                 <category android:name="com.sharesmile.share" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name="com.clevertap.android.sdk.InstallReferrerBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
+
 
         <activity
             android:name="activities.MessageVideoActivity"

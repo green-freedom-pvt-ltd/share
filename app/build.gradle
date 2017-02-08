@@ -147,7 +147,15 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:8.3.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-   // compile "com.google.firebase:firebase-core:8.3.0"
+    dependencies {
+        compile 'com.clevertap.android:clevertap-android-sdk:3.1.2'
+        compile 'com.android.support:support-v4:23.1.1'
+    }
+
+    apply plugin: 'com.google.gms.google-services'
+
+
+    // compile "com.google.firebase:firebase-core:8.3.0"
 
     compile ('com.github.anshulagarwal06:Lumiere:v1'){
         exclude group: 'com.google.firebase'

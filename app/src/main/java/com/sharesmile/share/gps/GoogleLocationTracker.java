@@ -29,7 +29,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
@@ -477,7 +476,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
 
     @Override
     public void onGpsStatusChanged(int event) {
-        Logger.i(TAG, "onGpsStatusChanged");
+//        Logger.i(TAG, "onGpsStatusChanged");
         switch (event){
             case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
                 GpsStatus gpsStatus = locationManager.getGpsStatus(null);
@@ -487,13 +486,13 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     int count=0;
                     while (sat.hasNext()) {
                         GpsSatellite satellite = sat.next();
-                        Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Satellite: " + satellite.getPrn()
-                                + ", SNR: " + satellite.getSnr() );
+//                        Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Satellite: " + satellite.getPrn()
+//                                + ", SNR: " + satellite.getSnr() );
                         count++;
                     }
                     numSatellitesConnected = count;
-                    Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
-                            + numSatellitesConnected);
+//                    Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
+//                            + numSatellitesConnected);
                 }
                 break;
             case GpsStatus.GPS_EVENT_STARTED:

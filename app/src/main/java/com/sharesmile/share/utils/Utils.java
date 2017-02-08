@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Constants;
@@ -168,6 +169,10 @@ public class Utils {
         } else {
             return String.format("%02d:%02d", secs / 60, secs % 60);
         }
+    }
+
+    public static String createPrettyJSONStringFromObject(Object object) {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(object);
     }
 
     public static final long stringToSec(String time) {

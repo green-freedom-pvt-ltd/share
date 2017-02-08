@@ -6,7 +6,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -305,9 +304,11 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
-                hideProgressDialog();
-                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
-                ne.printStackTrace();
+                if (isAttachedToActivity()){
+                    hideProgressDialog();
+                    MainApplication.showToast("Network Error");
+                    ne.printStackTrace();
+                }
             }
 
             @Override

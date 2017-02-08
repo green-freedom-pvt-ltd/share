@@ -1,7 +1,6 @@
 package com.sharesmile.share.rfac.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,20 +8,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 
 
@@ -95,6 +96,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         ImageView mGImage = (ImageView) mGoogleLoginButton.findViewById(R.id.login_image);
         mGImage.setImageResource(R.drawable.login_google);
+
+        AnalyticsEvent.create(Event.ON_LOAD_LOGIN_SCREEN)
+                .buildAndDispatch();
     }
 
 
@@ -112,8 +116,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     mixpanel.track("LoginActivity - initUi called", props);
                 } catch (JSONException e) {
                 }
-
                 mLoginHandler.performFbLogin();
+                AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
+                        .put("medium", "fb")
+                        .buildAndDispatch();
                 break;
             case R.id.tv_welcome_skip:
                 SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
@@ -127,6 +133,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
 
                 startMainActivity();
+                AnalyticsEvent.create(Event.ON_CLICK_LOGIN_SKIP)
+                        .buildAndDispatch();
                 break;
             case R.id.btn_login_google:
 
@@ -138,6 +146,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
 
                 mLoginHandler.performGoogleLogin();
+                AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
+                        .put("medium", "gplus")
+                        .buildAndDispatch();
                 break;
 
         }

@@ -11,9 +11,13 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.crashlytics.android.Crashlytics;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.onesignal.OneSignal;
+import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.gps.GoogleLocationTracker;
@@ -161,24 +165,28 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
 
     @Override
     public void onCreate() {
+        ActivityLifecycleCallback.register(this);
         super.onCreate();
         //Initialization code
         OneSignal.startInit(this).init();
         mMixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
         MixpanelAPI.People people = mMixpanel.getPeople();
-//        people.identify(String.valueOf(getUserID()));
-        people.initPushHandling("159550091621");
+        people.initPushHandling(Constants.GOOGLE_PROJECT_ID);
 
         SharedPrefsManager.initialize(getApplicationContext());
 
         lifecycleHelper = new AppLifecycleHelper(this);
         registerActivityLifecycleCallbacks(lifecycleHelper);
 
+        Analytics.initialize(this);
+
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         mDbWrapper = new DbWrapper(this);
         GoogleLocationTracker.initialize(this);
         startSyncTasks();
+        checkForFirstLaunchAfterInstall();
+
     }
 
     private void startSyncTasks() {
@@ -224,6 +232,15 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
 
     public static boolean isApplicationVisible(){
         return getInstance().lifecycleHelper.isApplicationVisible();
+    }
+
+    private void checkForFirstLaunchAfterInstall(){
+        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_LAUNCH_EVENT_SENT)){
+            AnalyticsEvent.create(Event.FIRST_LAUNCH_AFTER_INSTALL)
+                    .build()
+                    .dispatch();
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_LAUNCH_EVENT_SENT, true);
+        }
     }
 
     @Override
