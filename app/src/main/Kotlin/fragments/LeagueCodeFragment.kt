@@ -55,7 +55,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         Utils.hideKeyboard(view!!.secret_code, context);
         var code = view!!.secret_code.text.toString();
         if (TextUtils.isEmpty(code)) {
-            view!!.code_layout.error = "Enter Secret code"
+            view!!.code_layout.error = "Enter Secret team code"
             return;
         }
         verifySecretCode(code);

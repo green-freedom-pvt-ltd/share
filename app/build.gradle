@@ -128,7 +128,7 @@ dependencies {
         transitive = true;
     }
 
-    compile 'com.onesignal:OneSignal:2.+@aar'
+    compile 'com.onesignal:OneSignal:3.+@aar'
     compile "com.mixpanel.android:mixpanel-android:4.9.0"
 
 

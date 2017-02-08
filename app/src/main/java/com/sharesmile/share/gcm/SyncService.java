@@ -11,6 +11,8 @@ import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.AnalyticsEvent;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
@@ -43,7 +45,7 @@ public class SyncService extends GcmTaskService {
         if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_WORKOUT_DATA)) {
             return uploadWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPDATE_WORKOUT_DATA)) {
-          //  WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            //  WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             //long count = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
             return SyncHelper.updateWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
@@ -90,39 +92,23 @@ public class SyncService extends GcmTaskService {
 
     }
 
-   /* private int updateWorkoutData(String runUrl, long workoutCount) {
-        try {
-            RunList runList = NetworkDataProvider.doGetCall(runUrl, RunList.class);
-            if (workoutCount >= runList.getTotalRunCount()) {
-                Logger.d(TAG, "update success" + workoutCount + " : " + runList.getTotalRunCount());
-                return GcmNetworkManager.RESULT_SUCCESS;
-            } else {
-                WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-                mWorkoutDao.insertOrReplaceInTx(runList);
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN,true);
-                Logger.d(TAG, "update success" + runList.toString());
-                if (!TextUtils.isEmpty(runList.getNextUrl())) {
-                    updateWorkoutData(runList.getNextUrl(), workoutCount);
-                }
-            }
-        } catch (NetworkException e) {
-            e.printStackTrace();
-            Logger.d(TAG, "update NetworkException" + e.getMessageFromServer() + e.getMessage());
-        }
-        return 0;
-    }*/
-
     private int uploadWorkoutData() {
 
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(false)).list();
+
         if (mWorkoutList != null && mWorkoutList.size() > 0) {
+            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, Analytics.createProp(null, AnalyticsEvent.RunSync.LOCAL_RUN_COUNT, String.valueOf(mWorkoutList.size())));
+
             boolean isSuccess = true;
             for (Workout workout : mWorkoutList) {
                 isSuccess = isSuccess && uploadWorkoutData(workout);
             }
+            JSONObject jsonObject = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_GCM, isSuccess ? "Success" : "Reschedule");
+            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, jsonObject);
             return isSuccess ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
         } else {
+            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_GCM, "Success"));
             return GcmNetworkManager.RESULT_SUCCESS;
         }
 
@@ -155,15 +141,25 @@ public class SyncService extends GcmTaskService {
             workout.setId(response.getId());
             workout.setIs_sync(true);
             mWorkoutDao.insertOrReplace(workout);
+            //Analytics :
+
+            JSONObject props = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_SUCCESS, "Successful");
+            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, props);
+
             return true;
 
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e.getMessageFromServer());
+
+            JSONObject props = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_SUCCESS, "Network Exception : " + e.getMessageFromServer());
+            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, props);
             return false;
         } catch (JSONException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException");
+            Logger.d(TAG, "JSONException");
+            JSONObject props = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_SUCCESS, "JSONException");
+            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, props);
             return false;
         }
 

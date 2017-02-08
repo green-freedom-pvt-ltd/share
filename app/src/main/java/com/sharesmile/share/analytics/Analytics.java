@@ -1,7 +1,6 @@
 package com.sharesmile.share.analytics;
 
 import android.content.Context;
-
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.utils.Logger;
