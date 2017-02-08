@@ -15,10 +15,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-import com.google.android.gms.common.api.Status;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 
+import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
@@ -279,7 +279,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
 
-    private void showMessageCenter() {
+    public void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
     }
 
