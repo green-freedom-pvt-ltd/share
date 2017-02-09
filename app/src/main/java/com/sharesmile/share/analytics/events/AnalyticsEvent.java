@@ -21,6 +21,9 @@ public class AnalyticsEvent implements UnObfuscable {
     public static final String CATEGORY_CAUSE = "CAUSE";
     public static final String CATEGORY_PROFILE = "PROFILE";
     public static final String CATEGORY_LEADERBOARD = "LEADERBOARD";
+    public static final String CATEGORY_VIGILANCE = "VIGILANCE";
+    public static final String CATEGORY_WORKOUT = "WORKOUT";
+    public static final String CATEGORY_SHARE = "SHARE";
 
     private Properties eventProperties;
 
@@ -66,7 +69,9 @@ public class AnalyticsEvent implements UnObfuscable {
         }
 
         public Builder addBundle(Properties props){
-            allProps.add(props);
+            if (props != null){
+                allProps.add(props);
+            }
             return this;
         }
 

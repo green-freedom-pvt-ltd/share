@@ -1,11 +1,12 @@
 package com.sharesmile.share.gps.models;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,6 +212,16 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public synchronized WorkoutData copy() {
 		return new WorkoutDataImpl(this);
+	}
+
+	@Override
+	public Properties getWorkoutBundle() {
+		Properties p = new Properties();
+		p.put("distance", Utils.formatToKms(getDistance()));
+		p.put("time_elapsed", getElapsedTime());
+		p.put("avg_speed", getAvgSpeed()*(3.6f));
+		p.put("num_steps", getTotalSteps());
+		return p;
 	}
 
 	@Override

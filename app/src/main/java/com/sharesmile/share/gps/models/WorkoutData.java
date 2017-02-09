@@ -1,9 +1,9 @@
 package com.sharesmile.share.gps.models;
 
-import android.location.Location;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.util.List;
@@ -120,5 +120,11 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 * Creates a Deep copy of this WorkoutData instance
 	 */
 	WorkoutData copy();
+
+	/**
+	 * Construct a Properties bundle object for analytics events
+	 * @return
+	 */
+	Properties getWorkoutBundle();
 
 }

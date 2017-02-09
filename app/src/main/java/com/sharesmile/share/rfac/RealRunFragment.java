@@ -14,6 +14,8 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
@@ -27,7 +29,6 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -103,6 +104,9 @@ public class RealRunFragment extends RunFragment {
         } else {
             continuedRun();
         }
+        AnalyticsEvent.create(Event.ON_LOAD_TRACKER_SCREEN)
+                .addBundle(mCauseData.getCauseBundle())
+                .buildAndDispatch();
     }
 
     @Override
@@ -190,22 +194,19 @@ public class RealRunFragment extends RunFragment {
         totalRun = totalRun + 1;
 
         SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRun);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int)totalImpact);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
     }
 
     @Override
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
-        String distanceString = formatToKms(distanceCovered);
+        String distanceString = Utils.formatToKms(distanceCovered);
         distance.setText(distanceString);
         int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));
     }
 
-    public String formatToKms(float distanceInMeters){
-        DecimalFormat df = new DecimalFormat("0.0");
-        return df.format(distanceInMeters / 1000);
-    }
+
 
     @Override
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs) {
@@ -273,15 +274,26 @@ public class RealRunFragment extends RunFragment {
                 if (isRunActive()) {
                     if (isRunning()) {
                         pauseRun(true);
+                        AnalyticsEvent.create(Event.ON_CLICK_PAUSE_RUN)
+                                .addBundle(mCauseData.getCauseBundle())
+                                .addBundle(getWorkoutBundle())
+                                .buildAndDispatch();
                     } else {
                         resumeRun();
+                        AnalyticsEvent.create(Event.ON_CLICK_RESUME_RUN)
+                                .addBundle(mCauseData.getCauseBundle())
+                                .addBundle(getWorkoutBundle())
+                                .buildAndDispatch();
                     }
                 }
                 break;
 
             case R.id.btn_stop:
-
                 showStopDialog();
+                AnalyticsEvent.create(Event.ON_CLICK_STOP_RUN)
+                        .addBundle(mCauseData.getCauseBundle())
+                        .addBundle(getWorkoutBundle())
+                        .buildAndDispatch();
                 break;
         }
     }
@@ -313,6 +325,10 @@ public class RealRunFragment extends RunFragment {
             }
         });
         alertDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_FINISH_RUN_POPUP)
+                .addBundle(mCauseData.getCauseBundle())
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     private void showMinDistanceDialog() {
@@ -331,6 +347,10 @@ public class RealRunFragment extends RunFragment {
             }
         });
         alertDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_TOO_SHORT_POPUP)
+                .addBundle(mCauseData.getCauseBundle())
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     /*  Rs per km*/

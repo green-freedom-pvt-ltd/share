@@ -1,7 +1,8 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.location.DetectedActivity;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -119,11 +120,14 @@ public class VigilanceTimer implements Runnable {
 
 		if (ActivityRecognizedService.isIsInVehicle()){
 			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
+			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+					.addBundle(workoutService.getWorkoutBundle())
+					.put("detected_by", "activity_recognition")
+					.buildAndDispatch();
 			return true;
 		}
 
-//		return tooFastSecondaryCheck();
-		return false;
+		return tooFastSecondaryCheck();
 
 	}
 
@@ -157,6 +161,10 @@ public class VigilanceTimer implements Runnable {
 								+ " expectedNumOfSteps = " + expectedNumOfSteps);
 
 						if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
+							AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+									.addBundle(workoutService.getWorkoutBundle())
+									.put("detected_by", "speed_logic")
+									.buildAndDispatch();
 							return true;
 						}
 					}

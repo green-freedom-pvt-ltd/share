@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import base.BaseFragment2
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
+import com.sharesmile.share.analytics.Analytics
 import com.sharesmile.share.core.Constants
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
@@ -96,6 +97,8 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         }
 
         SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueData.teamCode!!);
+        // Setting team code for Analytics
+        Analytics.getInstance().setUserImpactLeagueTeamCode(leagueData.teamCode!!);
         activity.setResult(Activity.RESULT_OK);
         fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null);
     }

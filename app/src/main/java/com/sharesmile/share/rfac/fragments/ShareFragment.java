@@ -33,6 +33,8 @@ import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
@@ -214,6 +216,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         mTime.setText(getTimeInHHMMFormat((int) (elapsedTimeInSecs * 1000)));
 
         initShareLayout();
+        AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
+                .addBundle(mWorkoutData.getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     private void initShareLayout() {

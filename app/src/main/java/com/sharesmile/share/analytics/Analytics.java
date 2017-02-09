@@ -84,11 +84,15 @@ public class Analytics {
         clevertapManager.setUserProperty("Email", email);
     }
 
+    public void setUserId(int userId){
+        clevertapManager.setUserProperty("Identity", userId);
+    }
+
     /**
      * Sets 10 digit phone number without country code
      * @param phone
      */
-    public void setUserPhone(long phone){
+    public void setUserPhone(String phone){
         clevertapManager.setUserProperty("Phone", phone);
     }
 
@@ -98,6 +102,10 @@ public class Analytics {
      */
     public void setUserGender(String gender){
         clevertapManager.setUserProperty("Gender", gender);
+    }
+
+    public void setUserImpactLeagueTeamCode(int teamCode){
+        clevertapManager.setUserProperty("team_code", teamCode);
     }
 
     public void setUserAge(int age){

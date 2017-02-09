@@ -6,6 +6,8 @@ import android.content.Intent;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.utils.Logger;
 
 /**
@@ -43,23 +45,33 @@ public class ActivityRecognizedService extends IntentService {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
             Logger.d( TAG, "IN_VEHICLE, confidence " +  result.getActivityConfidence(DetectedActivity.IN_VEHICLE));
 
-            if (result.getActivityConfidence(DetectedActivity.IN_VEHICLE) > CONFIDENCE_THRESHOLD_EVENT){
-                //TODO: To send IN_VEHICLE confidence result as analytics event
+            int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
+            int stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
+            if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
+                AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_IN_VEHICLE)
+                        .put("confidence_value", inVehicleConfidence)
+                        .buildAndDispatch();
             }
-            if (result.getActivityConfidence(DetectedActivity.STILL) > CONFIDENCE_THRESHOLD_EVENT){
-                //TODO: To send STILL confidence result as analytics event
+            if (stillConfidence > CONFIDENCE_THRESHOLD_EVENT){
+                AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_STILL)
+                        .put("confidence_value", stillConfidence)
+                        .buildAndDispatch();
             }
-            if (result.getActivityConfidence(DetectedActivity.IN_VEHICLE) > CONFIDENCE_THRESHOLD){
+            if (inVehicleConfidence > CONFIDENCE_THRESHOLD){
                 isInVehicle = true;
                 MainApplication.showRunNotification("We have detected that you are driving.");
+                AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
+                        .buildAndDispatch();
             }else {
                 isInVehicle = false;
             }
             Logger.d( TAG, "STILL, confidence " +  result.getActivityConfidence(DetectedActivity.STILL));
-            if (result.getActivityConfidence(DetectedActivity.STILL) > CONFIDENCE_THRESHOLD){
+            if (stillConfidence > CONFIDENCE_THRESHOLD){
                 if (stillOccurredCounter == 0){
                     // Show notification and increment still occurred counter
                     MainApplication.showRunNotification("It seems like you are still!");
+                    AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
+                            .buildAndDispatch();
                     stillOccurredCounter = 1;
                 }
             }

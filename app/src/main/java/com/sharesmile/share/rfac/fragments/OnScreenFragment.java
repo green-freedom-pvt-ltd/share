@@ -185,8 +185,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                     Logger.e(TAG, "Unable to add properties to JSONObject", e);
                 }
                 AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
-                        .put("cause_title", causeData.getTitle())
-                        .put("cause_id", causeData.getId())
+                        .addBundle(causeData.getCauseBundle())
                         .put("cause_index", viewPager.getCurrentItem())
                         .buildAndDispatch();
                 break;

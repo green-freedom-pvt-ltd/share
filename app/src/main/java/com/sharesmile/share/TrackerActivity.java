@@ -28,6 +28,8 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
@@ -286,7 +288,7 @@ public class TrackerActivity extends BaseActivity {
 
     public void pauseWorkout() {
         if (isBoundToLocationService()) {
-            locationService.pause();
+            locationService.pause("user_clicked");
         }
     }
 
@@ -409,6 +411,10 @@ public class TrackerActivity extends BaseActivity {
                         Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         runFragment.onWorkoutResult(result);
+                        AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
+                                .addBundle(mCauseData.getCauseBundle())
+                                .addBundle(result.getWorkoutBundle())
+                                .buildAndDispatch();
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:

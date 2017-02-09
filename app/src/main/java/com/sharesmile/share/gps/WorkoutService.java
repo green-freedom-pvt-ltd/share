@@ -25,14 +25,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.gson.Gson;
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -136,7 +139,11 @@ public class WorkoutService extends Service implements
                     stepCounter = new GoogleFitStepCounter(this, this);
                 }
             }
+            AnalyticsEvent.create(Event.ON_WORKOUT_START)
+                    .addBundle(mCauseData.getCauseBundle())
+                    .buildAndDispatch();
         }
+
     }
 
     @Override
@@ -159,7 +166,24 @@ public class WorkoutService extends Service implements
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
             NotificationManagerCompat.from(this).cancel(0);
+
+            AnalyticsEvent.create(Event.ON_WORKOUT_END)
+                    .addBundle(mCauseData.getCauseBundle())
+                    .addBundle(getWorkoutBundle())
+                    .buildAndDispatch();
         }
+    }
+
+    public Properties getWorkoutBundle(){
+        if (tracker != null){
+            Properties p = new Properties();
+            p.put("distance", Utils.formatToKms(getTotalDistanceCoveredInMeters()));
+            p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
+            p.put("avg_speed", getCurrentSpeed() * (3.6f));
+            p.put("num_steps", getTotalStepsInWorkout());
+            return p;
+        }
+        return  null;
     }
 
     private void unBindFromActivityAndStop() {
@@ -284,7 +308,7 @@ public class WorkoutService extends Service implements
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_PAUSE_WORKOUT_CODE);
             sendBroadcast(bundle);
-            pause();
+            pause("gps_disabled");
             // Popup to enable location again
             GoogleLocationTracker.getInstance().startLocationTracking(true);
         }
@@ -304,6 +328,10 @@ public class WorkoutService extends Service implements
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
         updateNotification();
+        AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
+                .addBundle(mCauseData.getCauseBundle())
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     private void sendBroadcast(Bundle bundle) {
@@ -347,7 +375,7 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void pause() {
+    public void pause(String reason) {
         Logger.i(TAG, "pause");
         if (vigilanceTimer != null) {
             vigilanceTimer.pauseTimer();
@@ -365,6 +393,11 @@ public class WorkoutService extends Service implements
                 }
                 NotificationManagerCompat.from(this).cancel(0);
             }
+            AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
+                    .addBundle(mCauseData.getCauseBundle())
+                    .addBundle(getWorkoutBundle())
+                    .put("reason", reason)
+                    .buildAndDispatch();
         }
     }
 
@@ -382,8 +415,11 @@ public class WorkoutService extends Service implements
                     ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
                 }
                 NotificationManagerCompat.from(this).cancel(0);
-
             }
+            AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
+                    .addBundle(mCauseData.getCauseBundle())
+                    .addBundle(getWorkoutBundle())
+                    .buildAndDispatch();
         }
     }
 
@@ -407,7 +443,7 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isActive()) {
             tracker.discardApprovalQueue();
         }
-        pause();
+        pause("usain_bolt");
     }
 
     @Override

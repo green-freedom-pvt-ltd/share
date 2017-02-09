@@ -261,6 +261,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     public void onStart() {
         Logger.i(TAG, "onStart");
         GoogleLocationTracker.getInstance().startLocationTracking(false);
+        AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
     }
 
     @Override

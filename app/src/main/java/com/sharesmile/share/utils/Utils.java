@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +62,11 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    public static String formatToKms(float distanceInMeters){
+        DecimalFormat df = new DecimalFormat("0.0");
+        return df.format(distanceInMeters / 1000);
     }
 
     /**

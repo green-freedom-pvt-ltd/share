@@ -22,15 +22,15 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -141,6 +141,7 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
         }
         if (!TextUtils.isEmpty(mName.getText())) {
             mUser.setName(mName.getText().toString());
+            Analytics.getInstance().setUserName(mName.getText().toString());
         }
 
         if (!TextUtils.isEmpty(mBirthday.getText())) {
@@ -148,16 +149,24 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
         }
 
         if (!TextUtils.isEmpty(mNumber.getText())) {
-            mUser.setMobileNO(mNumber.getText().toString());
+            if (Utils.isValidPhoneNumber(mNumber.getText().toString())){
+                mUser.setMobileNO(mNumber.getText().toString());
+                Analytics.getInstance().setUserPhone(mNumber.getText().toString());
+            }
         }
 
         if (mFemaleRadioBtn.isChecked() || mMaleRadioBtn.isChecked()) {
-            mUser.setGender(mFemaleRadioBtn.isChecked() ? "f" : "m");
+            if (mFemaleRadioBtn.isChecked()){
+                mUser.setGender("f");
+                Analytics.getInstance().setUserGender("F");
+            }else {
+                mUser.setGender("m");
+                Analytics.getInstance().setUserGender("M");
+            }
         }
 
         mUserDao.insertOrReplace(mUser);
         syncUserData();
-
 
     }
 

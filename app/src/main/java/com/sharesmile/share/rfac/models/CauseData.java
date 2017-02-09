@@ -1,13 +1,13 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharesmile.share.Cause;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.sharesmile.share.Cause;
 
 /**
  * Created by Shine on 01/05/16..
@@ -238,5 +238,17 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setOrderPriority(int orderPriority) {
         this.orderPriority = orderPriority;
+    }
+
+    public Properties getCauseBundle(){
+        int sponsorId = 0;
+        if (getSponsor() != null){
+            sponsorId = getSponsor().getId();
+        }
+        Properties p = new Properties();
+        p.put("cause_id", getId());
+        p.put("cause_title", getTitle());
+        p.put("sponsor_id", sponsorId);
+        return p;
     }
 }
