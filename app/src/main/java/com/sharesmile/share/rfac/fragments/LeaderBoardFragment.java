@@ -280,7 +280,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 hideProgressDialog();
-                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+                MainApplication.showToast("Network Error, Please Refresh");
                 ne.printStackTrace();
             }
 
@@ -306,7 +307,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 hideProgressDialog();
-                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+                MainApplication.showToast("Network Error, Please Refresh");
                 ne.printStackTrace();
             }
 

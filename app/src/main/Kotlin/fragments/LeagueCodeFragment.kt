@@ -102,7 +102,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
 
     private fun invalidCode(error: NetworkException?) {
 
-        if (error?.httpStatusCode == 403) {
+        if (error?.httpStatusCode == 406) {
             view!!.code_layout.error = "Sorry, the team is already full."
 
         } else {
