@@ -123,6 +123,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Logger.d(TAG, "onViewCreated");
         if (mAdapter.getCount() <= 0) {
             fetchPageData();
         } else {
@@ -142,6 +143,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void fetchPageData() {
+        Logger.d(TAG, "fetchPageData");
         showProgressDialog();
         EventBus.getDefault().post(new DBEvent.CauseFetchDataFromDb());
     }
@@ -199,11 +201,10 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
             }
         }
         causesList.setCauses(causes);
-        ;
         setCausedata(causesList);
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(threadMode = ThreadMode.ASYNC)
     public void onEvent(DBEvent.CauseFetchDataFromDb causeFetchDataFromDb) {
         Logger.d(TAG, "causeFetchDataFromDb");
         CauseDao causeDao = MainApplication.getInstance().getDbWrapper().getCauseDao();
@@ -219,7 +220,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(List<CauseData> causeDataList) {
         if (isVisible()) {
-            Logger.d(TAG, "causes");
             CauseList causeList = new CauseList();
             causeList.setCauses(causeDataList);
             setCausedata(causeList);
