@@ -486,13 +486,11 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     int count=0;
                     while (sat.hasNext()) {
                         GpsSatellite satellite = sat.next();
-//                        Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Satellite: " + satellite.getPrn()
-//                                + ", SNR: " + satellite.getSnr() );
                         count++;
                     }
                     numSatellitesConnected = count;
-//                    Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
-//                            + numSatellitesConnected);
+                    Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
+                            + numSatellitesConnected);
                 }
                 break;
             case GpsStatus.GPS_EVENT_STARTED:

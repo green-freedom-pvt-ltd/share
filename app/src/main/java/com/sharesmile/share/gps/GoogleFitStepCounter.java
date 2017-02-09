@@ -54,9 +54,6 @@ public class GoogleFitStepCounter implements StepCounter,
     @Override
     public void startCounting() {
         Logger.d(TAG, "startCounting");
-        Logger.i(TAG, "Will trigger notAvailable as GoogleFitStepCounter is deprecated");
-        listener.notAvailable(GOOGLE_FIT_STEP_COUNTER_DEPRECATED);
-        /*
         mApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Fitness.SENSORS_API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
@@ -64,15 +61,11 @@ public class GoogleFitStepCounter implements StepCounter,
                 .addOnConnectionFailedListener(this)
                 .build();
         mApiClient.connect();
-        */
     }
 
     @Override
     public void stopCounting() {
         Logger.d(TAG, "stopCounting");
-        Logger.i(TAG, "Will do nothing as GoogleFitStepCounter is deprecated");
-        return;
-        /*
         Fitness.SensorsApi.remove( mApiClient, this )
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
@@ -82,7 +75,7 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 });
-        */
+
     }
 
     @Override

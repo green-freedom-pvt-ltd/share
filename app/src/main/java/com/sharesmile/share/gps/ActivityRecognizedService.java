@@ -18,6 +18,7 @@ public class ActivityRecognizedService extends IntentService {
     private static int stillOccurredCounter = 0;
 
     public static final int CONFIDENCE_THRESHOLD = 85;
+    public static final int CONFIDENCE_THRESHOLD_EVENT = 30;
 
     private static final String TAG = "ActivityRecognizedService";
 
@@ -41,6 +42,13 @@ public class ActivityRecognizedService extends IntentService {
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
             Logger.d( TAG, "IN_VEHICLE, confidence " +  result.getActivityConfidence(DetectedActivity.IN_VEHICLE));
+
+            if (result.getActivityConfidence(DetectedActivity.IN_VEHICLE) > CONFIDENCE_THRESHOLD_EVENT){
+                //TODO: To send IN_VEHICLE confidence result as analytics event
+            }
+            if (result.getActivityConfidence(DetectedActivity.STILL) > CONFIDENCE_THRESHOLD_EVENT){
+                //TODO: To send STILL confidence result as analytics event
+            }
             if (result.getActivityConfidence(DetectedActivity.IN_VEHICLE) > CONFIDENCE_THRESHOLD){
                 isInVehicle = true;
                 MainApplication.showRunNotification("We have detected that you are driving.");
