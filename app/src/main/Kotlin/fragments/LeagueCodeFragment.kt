@@ -72,7 +72,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         NetworkDataProvider.doPostCallAsyncWithFormData(Urls.getLeagueUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
                 fragmentListener.showActivityContent();
-                invalidCode();
+                invalidCode(ne);
             }
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
@@ -103,8 +103,14 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null);
     }
 
-    private fun invalidCode() {
-        view!!.code_layout.error = "Sorry, that’s not the code."
+    private fun invalidCode(error: NetworkException?) {
+
+        if (error?.httpStatusCode == 406) {
+            view!!.code_layout.error = "Sorry, the team is already full."
+
+        } else {
+            view!!.code_layout.error = "Sorry, that’s not the code."
+        }
     }
 
     override fun screenTitle(): String {

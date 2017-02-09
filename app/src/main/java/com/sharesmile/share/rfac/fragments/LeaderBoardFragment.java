@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoard;
@@ -48,6 +47,7 @@ import Models.TeamBoard;
 import Models.TeamLeaderBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit.http.HEAD;
 
 /**
  * Created by piyush on 8/30/16.
@@ -279,7 +279,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 hideProgressDialog();
-                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
+                MainApplication.showToast("Network Error, Please Refresh");
                 ne.printStackTrace();
             }
 
