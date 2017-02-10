@@ -31,6 +31,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
     private static final String WORKOUT_DATA = "workout_data";
     private static final String ERROR_MESSAGE = "error_message";
+    WorkoutData workoutData;
 
     LinearLayout runDataContainer;
     LinearLayout liveDataContainer;
