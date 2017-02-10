@@ -169,7 +169,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
             Properties p = new Properties();
             p.put("distance", Utils.formatToKms(myActivity.getTotalDistanceInMeters()));
             p.put("time_elapsed", myActivity.getElapsedTimeInSecs());
-            p.put("avg_speed", myActivity.getCurrentSpeed()*(3.6f));
+            p.put("avg_speed", myActivity.getAvgSpeed()*(3.6f));
             p.put("num_steps", myActivity.getTotalSteps());
             return p;
         }

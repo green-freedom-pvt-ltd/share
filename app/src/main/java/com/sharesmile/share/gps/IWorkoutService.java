@@ -18,6 +18,7 @@ public interface IWorkoutService {
 	long getWorkoutElapsedTimeInSecs();
 	int getTotalStepsInWorkout();
 	float getCurrentSpeed();
+	float getAvgSpeed();
 	Tracker getTracker();
 	Properties getWorkoutBundle();
 //	DetectedActivity getDetectedActivity();

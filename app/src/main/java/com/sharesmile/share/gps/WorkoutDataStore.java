@@ -10,6 +10,8 @@ public interface WorkoutDataStore {
 
 	void addRecord(DistRecord record);
 
+	float getAvgSpeed();
+
 	float getTotalDistance();
 
 	long getBeginTimeStamp();

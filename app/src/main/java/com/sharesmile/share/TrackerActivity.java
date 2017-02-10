@@ -321,6 +321,13 @@ public class TrackerActivity extends BaseActivity {
         return 0;
     }
 
+    public float getAvgSpeed(){
+        if (isBoundToLocationService()){
+            return locationService.getAvgSpeed();
+        }
+        return 0;
+    }
+
     public int getTotalSteps(){
         if (isBoundToLocationService()){
             return locationService.getTotalStepsInWorkout();

@@ -1,6 +1,5 @@
 package com.sharesmile.share.gps;
 
-import android.location.Location;
 import android.text.TextUtils;
 
 import com.sharesmile.share.core.Config;
@@ -8,14 +7,12 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
-import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.SynchronousQueue;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
@@ -81,6 +78,11 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         waitingForApprovalQueue.add(record);
         // Persist dirtyWorkoutData object
         persistDirtyWorkoutData();
+    }
+
+    @Override
+    public float getAvgSpeed() {
+        return dirtyWorkoutData.getAvgSpeed();
     }
 
     @Override

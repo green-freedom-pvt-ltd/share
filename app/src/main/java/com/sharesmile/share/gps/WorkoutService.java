@@ -179,7 +179,7 @@ public class WorkoutService extends Service implements
             Properties p = new Properties();
             p.put("distance", Utils.formatToKms(getTotalDistanceCoveredInMeters()));
             p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
-            p.put("avg_speed", getCurrentSpeed() * (3.6f));
+            p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
             return p;
         }
@@ -315,14 +315,15 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void updateWorkoutRecord(float totalDistance, float currentSpeed) {
+    public void updateWorkoutRecord(float totalDistance, float avgSpeed, float deltaDistance,
+                                    int deltaTime, float deltaSpeed) {
         Logger.d(TAG, "updateWorkoutRecord: totalDistance = " + totalDistance
-                + " currentSpeed = " + currentSpeed);
+                + " avgSpeed = " + avgSpeed + ", deltaSpeed = " + deltaSpeed + ", deltaTime = " + deltaTime);
         // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_WORKOUT_UPDATE_CODE);
-        bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, currentSpeed);
+        bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, deltaSpeed);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
         mDistance = totalDistance;
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
@@ -331,6 +332,9 @@ public class WorkoutService extends Service implements
         AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                 .addBundle(mCauseData.getCauseBundle())
                 .addBundle(getWorkoutBundle())
+                .put("delta_distance", deltaDistance)
+                .put("delta_time", deltaTime)
+                .put("delta_speed", deltaSpeed)
                 .buildAndDispatch();
     }
 
@@ -490,6 +494,14 @@ public class WorkoutService extends Service implements
     public float getCurrentSpeed() {
         if (tracker != null && tracker.isActive()){
             return tracker.getCurrentSpeed();
+        }
+        return 0;
+    }
+
+    @Override
+    public float getAvgSpeed() {
+        if (tracker != null && tracker.isActive()){
+            return tracker.getAvgSpeed();
         }
         return 0;
     }

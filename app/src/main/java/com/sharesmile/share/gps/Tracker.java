@@ -26,6 +26,7 @@ public interface Tracker {
 	int getTotalSteps();
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();
+	float getAvgSpeed();
 	float getCurrentSpeed();
 	DistRecord getLastRecord();
 	State getState();
