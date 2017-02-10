@@ -23,12 +23,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
-import com.google.android.gms.location.DetectedActivity;
 import com.google.gson.Gson;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
@@ -55,7 +55,7 @@ public class WorkoutService extends Service implements
     private static boolean currentlyProcessingSteps = false;
     private GoogleApiClient googleApiClient;
     private VigilanceTimer vigilanceTimer;
-    private DetectedActivity detectedActivity;
+    private Location prevLocationFix;
 
     private StepCounter stepCounter;
 
@@ -87,6 +87,9 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "startTracking");
         if (tracker == null) {
             tracker = new RunTracker(backgroundExecutorService, this);
+        }
+        synchronized (this){
+            prevLocationFix = null;
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         mDistance = tracker.getTotalDistanceCovered();
@@ -271,9 +274,57 @@ public class WorkoutService extends Service implements
 
     @Override
     public synchronized void onLocationChanged(Location location) {
-        if (tracker != null && location != null) {
-            tracker.feedLocation(location);
+        if (location == null){
+            return;
         }
+        if (prevLocationFix == null){
+            prevLocationFix = location;
+            // Will not send to tracker as it is the very first location fix received
+            // Will start sending subsequent location fixes, only after they are approved by spike filter
+            return;
+        }
+        // Spike filter check
+        if (!checkForSpike(prevLocationFix, location)){
+            if (tracker != null) {
+                tracker.feedLocation(location);
+            }
+        }
+        prevLocationFix = location;
+    }
+
+    /**
+     * Simple spike filter which detects whether given couple of subsequent location fixes is having spike
+     * @param loc1
+     * @param loc2
+     * @return
+     */
+    public boolean checkForSpike(Location loc1, Location loc2){
+
+        long deltaTime = Math.abs(loc2.getTime() - loc1.getTime()) / 1000;
+
+        if (deltaTime > Config.SPIKE_FILTER_ELIGIBLE_TIME_INTERVAL){
+            // If time interval between two location fixes is sufficiently large then those fixes are not considered as spikes
+            return false;
+        }
+
+        float deltaDistance = loc1.distanceTo(loc2);
+        float deltaSpeed = deltaDistance / deltaTime;
+
+        // If speed is greater than threshold, then it is considered as GPS spike
+        if (deltaSpeed > Config.SPIKE_FILTER_SPEED_THRESHOLD){
+            Logger.e(TAG, "Detected GPS spike, between locations loc1:\n" + loc1.toString()
+                        + "\n, loc2:\n" + loc2.toString()
+                        + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
+            AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
+                    .addBundle(getWorkoutBundle())
+                    .put("spikey_distance", deltaDistance)
+                    .put("time_interval", deltaTime)
+                    .buildAndDispatch();
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
     @Override
@@ -393,7 +444,7 @@ public class WorkoutService extends Service implements
                 PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
                 if (googleApiClient != null && googleApiClient.isConnected()) {
-                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(googleApiClient, pendingIntent);
                 }
                 NotificationManagerCompat.from(this).cancel(0);
             }
@@ -409,6 +460,9 @@ public class WorkoutService extends Service implements
     public void resume() {
         Logger.i(TAG, "resume");
         if (tracker != null && tracker.getState() != Tracker.State.RUNNING) {
+            synchronized (this){
+                prevLocationFix = null;
+            }
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
             if (currentlyTracking) {

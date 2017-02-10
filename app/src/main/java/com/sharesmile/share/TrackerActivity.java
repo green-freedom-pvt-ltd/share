@@ -266,16 +266,6 @@ public class TrackerActivity extends BaseActivity {
     public void beginRun() {
         Logger.d(TAG, "beginRun");
         invokeWorkoutService();
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED) {
-//            // All required permissions available
-//
-//        } else {
-//            //Need to get permissions
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                    Constants.CODE_REQUEST_LOCATION_PERMISSION);
-//        }
     }
 
     public void endRun() {
