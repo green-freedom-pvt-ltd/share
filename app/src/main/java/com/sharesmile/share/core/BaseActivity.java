@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -225,6 +227,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
         builder.show();
 
+    }
+
+    static
+    {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
 }
