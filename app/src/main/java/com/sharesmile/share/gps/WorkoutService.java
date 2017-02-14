@@ -180,7 +180,7 @@ public class WorkoutService extends Service implements
     public Properties getWorkoutBundle(){
         if (tracker != null){
             Properties p = new Properties();
-            p.put("distance", Utils.formatToKms(getTotalDistanceCoveredInMeters()));
+            p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistanceCoveredInMeters()));
             p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
             p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
@@ -610,16 +610,9 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getNotificationBuilder() {
-        String distDecimal = String.format("%1$.1f", (mDistance / 1000));
-        int rupees = 0;
-
-        try{
-            float fDistance = Float.parseFloat(distDecimal);
-            rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
-        }
-        catch ( NumberFormatException e){
-
-        }
+        String distDecimal = Utils.formatToKmsWithOneDecimal(mDistance);
+        float fDistance = Float.parseFloat(distDecimal);
+        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)

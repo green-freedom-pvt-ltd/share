@@ -64,9 +64,14 @@ public class Utils {
         return true;
     }
 
-    public static String formatToKms(float distanceInMeters){
+    public static String formatToKmsWithOneDecimal(float distanceInMeters){
         DecimalFormat df = new DecimalFormat("0.0");
         return df.format(distanceInMeters / 1000);
+    }
+
+    public static String formatWithOneDecimal(float distance){
+        DecimalFormat df = new DecimalFormat("0.0");
+        return df.format(distance);
     }
 
     /**

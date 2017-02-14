@@ -39,6 +39,7 @@ import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
@@ -201,7 +202,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         float distanceInMeters = mWorkoutData.getDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
-        String distanceCovered = String.format("%1$,.1f", (distanceInMeters / 1000));
+        String distanceCovered = Utils.formatToKmsWithOneDecimal(distanceInMeters);
         mDistance.setText(distanceCovered + " km");
 
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
@@ -404,11 +405,12 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         String msg = mCauseData.getCauseShareMessageTemplate();
 
         if (msg.contains(SHARE_PLACEHOLDER_DISTANCE)) {
-            msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE, String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000)));
+            msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE,
+                    Utils.formatToKmsWithOneDecimal(mWorkoutData.getDistance()));
         }
 
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
-            String rDistance = String.format("%1$,.1f", (mWorkoutData.getDistance() / 1000));
+            String rDistance = Utils.formatToKmsWithOneDecimal(mWorkoutData.getDistance());
             Float fDistance = Float.parseFloat(rDistance);
             int rs = (int) Math.ceil(fDistance * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
