@@ -17,7 +17,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-
+import android.support.v7.app.AppCompatDelegate;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -44,6 +44,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     private static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
+
+    static
+    {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -309,4 +314,5 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationTrackerReceiver);
         super.onDestroy();
     }
+
 }
