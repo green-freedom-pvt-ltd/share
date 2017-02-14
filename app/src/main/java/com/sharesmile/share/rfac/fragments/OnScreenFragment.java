@@ -31,6 +31,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -177,7 +178,14 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.btn_lets_run:
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
+
+//                getFragmentController()
+//                        .replaceFragment(ShareFragment.newInstance(
+//                                WorkoutDataImpl.getTestWorkoutData(), causeData, false), true
+//                        );
+
                 getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
+
                 mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
                 try {
                     JSONObject props = new JSONObject();

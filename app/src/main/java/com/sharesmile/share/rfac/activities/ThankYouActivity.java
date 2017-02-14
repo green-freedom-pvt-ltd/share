@@ -26,6 +26,11 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
 
     public static final String BUNDLE_THANKYOU_IMAGE_URL = "bundle_thanks_image_url";
 
+    static
+    {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
     @BindView(R.id.thank_you_layout)
     RelativeLayout mThankYouLayout;
 
@@ -66,10 +71,5 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, showFirstRunFeedBack);
         intent.putExtra(Constants.BUNDLE_SHOW_PROFILE, true);
         startActivity(intent);
-    }
-
-    static
-    {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 }

@@ -224,6 +224,16 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		return p;
 	}
 
+	public static WorkoutDataImpl getTestWorkoutData(){
+		WorkoutDataImpl data = new WorkoutDataImpl(System.currentTimeMillis());
+		data.distance = 3240; // meters
+		data.elapsedTime = 1400; // secs
+		data.recordedTime = 1400;
+		data.totalSteps = 4321;
+		return data;
+	}
+
+
 	@Override
 	public String toString() {
 		return "WorkoutDataImpl{" +
