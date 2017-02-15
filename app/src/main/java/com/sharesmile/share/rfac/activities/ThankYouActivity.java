@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -65,5 +66,10 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, showFirstRunFeedBack);
         intent.putExtra(Constants.BUNDLE_SHOW_PROFILE, true);
         startActivity(intent);
+    }
+
+    static
+    {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 }
