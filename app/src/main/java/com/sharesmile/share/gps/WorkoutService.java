@@ -610,9 +610,17 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getNotificationBuilder() {
-        String distDecimal = String.format("%1$,.1f", (mDistance / 1000));
-        float fDistance = Float.parseFloat(distDecimal);
-        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
+        String distDecimal = String.format("%1$.1f", (mDistance / 1000));
+        int rupees = 0;
+
+        try{
+            float fDistance = Float.parseFloat(distDecimal);
+            rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
+        }
+        catch ( NumberFormatException e){
+
+        }
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle("Running")
