@@ -26,6 +26,8 @@ import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
@@ -130,6 +132,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
             hideProgressDialog();
         }
         updateActionbar();
+        AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SELECTION)
+                .buildAndDispatch();
     }
 
     private void updateActionbar() {
@@ -172,6 +176,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_lets_run:
+                CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
+                getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
                 mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
                 try {
                     JSONObject props = new JSONObject();
@@ -180,7 +186,10 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 } catch (JSONException e) {
                     Logger.e(TAG, "Unable to add properties to JSONObject", e);
                 }
-                getFragmentController().performOperation(IFragmentController.START_RUN, mAdapter.getItemAtPosition(viewPager.getCurrentItem()));
+                AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
+                        .addBundle(causeData.getCauseBundle())
+                        .put("cause_index", viewPager.getCurrentItem())
+                        .buildAndDispatch();
                 break;
 
             case R.id.badge_layout:

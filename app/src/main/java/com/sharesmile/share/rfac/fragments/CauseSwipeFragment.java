@@ -3,16 +3,15 @@ package com.sharesmile.share.rfac.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.views.MLTextView;
@@ -99,6 +98,10 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         switch (v.getId()) {
             case R.id.card_view:
                 showCauseInfoFragment();
+                AnalyticsEvent.create(Event.ON_CLICK_CAUSE_CARD)
+                        .put("cause_title", cause.getTitle())
+                        .put("cause_id", cause.getId())
+                        .buildAndDispatch();
                 break;
             default:
         }

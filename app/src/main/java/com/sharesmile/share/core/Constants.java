@@ -27,9 +27,13 @@ public class Constants {
 
     public static final int CODE_REQUEST_WRITE_PERMISSION = 103;
 
-    public static final String LOCATION_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
+    public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
 
-    public static final String LOCATION_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
+    public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.gps.location.tracker";
+
+    public static final String WORKOUT_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
+
+    public static final String LOCATION_TRACKER_BROADCAST_CATEGORY = "location_tracker_braodcast_category";
 
     public static final int BROADCAST_FIX_LOCATION_SETTINGS_CODE = 201;
 
@@ -47,11 +51,15 @@ public class Constants {
 
     public static final int BROADCAST_GOOGLE_FIT_READ_PERMISSION = 208;
 
+    public static final int BROADCAST_REQUEST_PERMISSION_CODE = 209;
+
     public static final int PROBELM_NOT_MOVING = 0;
 
     public static final int PROBELM_TOO_SLOW = 1;
 
     public static final int PROBELM_TOO_FAST = 2;
+
+    public static final int PROBLEM_GPS_DISABLED = 3;
 
     public static final String KEY_LOCATION_SETTINGS_PARCELABLE = "location_settings_parcelable";
 
@@ -118,6 +126,10 @@ public class Constants {
     //Bundle
     public static final String BUNDLE_FIRST_RUN_FEEDBACK = "bundle_first_run_feedback";
     public static final String BUNDLE_SHOW_PROFILE = "bundle_show_profile";
+
+    public static final String GOOGLE_PROJECT_ID = "159550091621";
+
+    public static final String PREF_FIRST_LAUNCH_EVENT_SENT = "first_launch_event_sent";
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));

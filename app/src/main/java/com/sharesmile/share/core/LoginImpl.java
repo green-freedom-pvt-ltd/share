@@ -31,6 +31,9 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
+import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
@@ -153,12 +156,13 @@ public class LoginImpl {
                     Logger.d("facebook", "Error");
                     error.printStackTrace();
                     MainApplication.getInstance().showToast(R.string.login_error);
+                    sendLoginFailureEvent(error.getMessage(), true);
                 }
             });
         }
     }
 
-    private void verifyUserDetails(String userEmail, String token, boolean isFbLogin) {
+    private void verifyUserDetails(String userEmail, String token, final boolean isFbLogin) {
 
         mListener.showHideProgress(true, getContext().getString(R.string.login));
         Map<String, String> header = new HashMap<>();
@@ -178,6 +182,7 @@ public class LoginImpl {
                         mListener.showHideProgress(false, null);
                     }
                 });
+                sendLoginFailureEvent("", isFbLogin);
             }
 
             @Override
@@ -193,6 +198,7 @@ public class LoginImpl {
                             mListener.showHideProgress(false, null);
                         }
                     });
+                    sendLoginFailureEvent(responseString, isFbLogin);
                     return;
                 }
 
@@ -201,7 +207,7 @@ public class LoginImpl {
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        userLoginSuccess(element);
+                        userLoginSuccess(element, isFbLogin);
                     }
                 });
 
@@ -210,19 +216,30 @@ public class LoginImpl {
 
     }
 
-    private void userLoginSuccess(JsonObject response) {
+    private void sendLoginFailureEvent(String optionalErrorMessage, final boolean isFbLogin){
+        String medium = isFbLogin ? "fb" : "google";
+        AnalyticsEvent.create(Event.ON_LOGIN_FAILED)
+                .put("error", optionalErrorMessage)
+                .put("medium", medium)
+                .buildAndDispatch();
+    }
+
+    private void userLoginSuccess(JsonObject response, final boolean isFbLogin) {
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
         String name = "";
         if (response.has("first_name")) {
             name = response.get("first_name").getAsString();
             prefsManager.setString(Constants.PREF_USER_NAME, name);
+            Analytics.getInstance().setUserName(name);
         }
         String userEmail = response.get("email").getAsString();
         prefsManager.setString(Constants.PREF_USER_EMAIL, userEmail);
+        Analytics.getInstance().setUserEmail(userEmail);
 
         prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
         int user_id = response.get("user_id").getAsInt();
         prefsManager.setInt(Constants.PREF_USER_ID, user_id);
+        Analytics.getInstance().setUserId(user_id);
 
         String token = response.get("auth_token").getAsString();
         prefsManager.setString(Constants.PREF_AUTH_TOKEN, token);
@@ -231,13 +248,16 @@ public class LoginImpl {
         String mobile_number = "";
         if (response.has("phone_number")) {
             mobile_number = JsonHelper.getValueOrNone(response, "phone_number");
+            if (!TextUtils.isEmpty(mobile_number)){
+                Analytics.getInstance().setUserPhone(mobile_number);
+            }
         }
         String gender = "";
         if (response.has("gender_user")) {
             gender = JsonHelper.getValueOrNone(response, "gender_user");
         }
+        Boolean isSignUpUser = false;
         if (response.has("sign_up")) {
-            Boolean isSignUpUser = false;
             isSignUpUser = response.get("sign_up").getAsBoolean();
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
         }
@@ -245,20 +265,32 @@ public class LoginImpl {
         if (response.has("team_code")) {
             int teamCode = response.get("team_code").getAsInt();
             SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamCode);
+
+            if (teamCode > 0){
+                Analytics.getInstance().setUserImpactLeagueTeamCode(teamCode);
+            }
         }
 
         User user = new User((long) user_id);
         user.setName(name);
         user.setEmailId(userEmail);
         user.setMobileNO(mobile_number);
-        if (!TextUtils.isEmpty(gender)) {
-            user.setGender(gender.equalsIgnoreCase("male") ? "m" : "f");
+
+        if (!TextUtils.isEmpty(gender)){
+            if (gender.startsWith("M") || gender.startsWith("m")){
+                user.setGender("M");
+                Analytics.getInstance().setUserGender("M");
+            }else if (gender.startsWith("F") || gender.startsWith("f")){
+                user.setGender("F");
+                Analytics.getInstance().setUserGender("F");
+            }
         }
 
         String profilePictureUri = JsonHelper.getValueOrNone(response, "social_thumb");
-        if (profilePictureUri != null) {
-            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri.toString());
+        if (!TextUtils.isEmpty(profilePictureUri)) {
+            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri);
             user.setProfileImageUrl(profilePictureUri.toString());
+            Analytics.getInstance().setUserPhoto(profilePictureUri);
         }
 
         UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
@@ -266,6 +298,15 @@ public class LoginImpl {
 
         //show Toast confirmation
         Toast.makeText(MainApplication.getContext(), "Logged in as " + name, Toast.LENGTH_SHORT).show();
+
+        String medium = isFbLogin ? "fb" : "google";
+        AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)
+                .put("user_id", user_id)
+                .put("user_name", name)
+                .put("user_email", userEmail)
+                .put("is_sign_up_user", isSignUpUser)
+                .put("medium", medium)
+                .buildAndDispatch();
 
         //Sync run data;
         SyncHelper.fetchRunData();
@@ -327,11 +368,12 @@ public class LoginImpl {
     private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            Logger.d("google", "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  " + acct.getServerAuthCode());
+            Logger.d(TAG, "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  " + acct.getServerAuthCode());
             get_google_access_token(acct.getEmail(), acct.getServerAuthCode());
         } else {
-            Logger.d("google", "failed");
+            Logger.d(TAG, "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
+            sendLoginFailureEvent("", false);
         }
     }
 
@@ -364,6 +406,7 @@ public class LoginImpl {
                                 MainApplication.getInstance().showToast(R.string.login_error);
                             }
                         });
+                        sendLoginFailureEvent(ne.getMessage(), false);
                     }
 
 

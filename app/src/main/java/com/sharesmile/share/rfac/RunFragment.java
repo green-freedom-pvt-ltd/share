@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -31,8 +33,6 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     TrackerActivity myActivity;
     private View baseView;
-
-    WorkoutData workoutData;
 
     boolean isRunActive;
     Handler handler = new Handler();
@@ -135,11 +135,15 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public void resumeRun() {
         Logger.d(TAG, "resumeRun");
-        // Resume will always be done by the user
-        myActivity.resumeWorkout();
-        startTimer(SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE));
-        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
-        onResumeRun();
+        if (GoogleLocationTracker.getInstance().isFetchingLocation()){
+            // Resume will always be done by the user
+            myActivity.resumeWorkout();
+            startTimer(SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE));
+            SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
+            onResumeRun();
+        }else {
+            GoogleLocationTracker.getInstance().startLocationTracking(true);
+        }
     }
 
     private void setIsRunActive(boolean b) {
@@ -160,11 +164,22 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
                 (int) myActivity.getElapsedTimeInSecs());
     }
 
+    public Properties getWorkoutBundle(){
+        if (myActivity != null){
+            Properties p = new Properties();
+            p.put("distance", Utils.formatToKms(myActivity.getTotalDistanceInMeters()));
+            p.put("time_elapsed", myActivity.getElapsedTimeInSecs());
+            p.put("avg_speed", myActivity.getAvgSpeed()*(3.6f));
+            p.put("num_steps", myActivity.getTotalSteps());
+            return p;
+        }
+        return null;
+    }
+
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
         myActivity.continuedRun();
         setIsRunActive(true);
-        workoutData = null;
         if (!isRunning()){
             updateTimeView(Utils.secondsToString(SharedPrefsManager
                     .getInstance().getInt(SECS_ELAPSED_ON_PAUSE)));
@@ -178,7 +193,6 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         setIsRunActive(true);
         startTimer(0);
         SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
-        workoutData = null;
         onBeginRun();
     }
 

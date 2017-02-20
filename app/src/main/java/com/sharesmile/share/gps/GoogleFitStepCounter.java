@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,7 +23,6 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
 
@@ -77,6 +75,7 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 });
+
     }
 
     @Override
@@ -162,9 +161,9 @@ public class GoogleFitStepCounter implements StepCounter,
         Logger.e(TAG, "onConnectionFailed, hasResolution = " + connectionResult.hasResolution());
         if (connectionResult.hasResolution()){
             Bundle bundle = new Bundle();
-            bundle.putInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY,
+            bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_GOOGLE_FIT_READ_PERMISSION);
-            Intent intent = new Intent(Constants.LOCATION_SERVICE_BROADCAST_ACTION);
+            Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             bundle.putParcelable(Constants.KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE,
                     connectionResult);
             intent.putExtras(bundle);

@@ -141,6 +141,14 @@ public class RunTracker implements Tracker {
     }
 
     @Override
+    public float getAvgSpeed() {
+        if (dataStore != null){
+            return dataStore.getAvgSpeed();
+        }
+        return 0;
+    }
+
+    @Override
     public float getCurrentSpeed() {
         if (lastRecord != null && !lastRecord.isStartRecord()){
             return lastRecord.getSpeed();
@@ -252,7 +260,6 @@ public class RunTracker implements Tracker {
     }
 
 
-    //TODO: revise this method to handle pause resume
     private synchronized void processLocation(Location point){
         if (isRunning()){
             //Check if the start point has been detected since the workout started/resumed
@@ -294,11 +301,15 @@ public class RunTracker implements Tracker {
                     // Step 3: Record if needed, else wait for next location
                     if (toRecord){
                         DistRecord record = new DistRecord(point, prevLocation, dist);
-                        Logger.d(TAG,"Distance Recording: " + record.toString());
+                        Logger.d(TAG, "Distance Recording: " + record.toString());
                         dataStore.addRecord(record);
                         lastRecord = record;
                         SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, lastRecord);
-                        listener.updateWorkoutRecord(dataStore.getTotalDistance(), record.getSpeed());
+                        float deltaDistance = dist; // in meters
+                        int deltaTime = Math.round(record.getInterval()); // in secs
+                        float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs
+                        listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
+                                deltaDistance, deltaTime, deltaSpeed);
                     }
                 }
             }
@@ -332,7 +343,9 @@ public class RunTracker implements Tracker {
 
     interface UpdateListner {
 
-        void updateWorkoutRecord(float totalDistance, float currentSpeed);
+        void updateWorkoutRecord(float totalDistance, float avgSpeed,
+                                 float deltaDistance, int deltaTime,
+                                 float deltaSpeed);
 
         void updateStepsRecord(long timeStampMillis);
 

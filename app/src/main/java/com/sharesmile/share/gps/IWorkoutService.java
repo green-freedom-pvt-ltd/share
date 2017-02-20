@@ -1,6 +1,6 @@
 package com.sharesmile.share.gps;
 
-import com.google.android.gms.location.DetectedActivity;
+import com.sharesmile.share.analytics.events.Properties;
 
 /**
  * Created by ankitm on 22/03/16.
@@ -9,7 +9,7 @@ public interface IWorkoutService {
 
 	void startWorkout();
 	void stopWorkout();
-	void pause();
+	void pause(String reason);
 	void resume();
 	void workoutVigilanceSessiondefaulted(int problem);
 	void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime);
@@ -18,7 +18,9 @@ public interface IWorkoutService {
 	long getWorkoutElapsedTimeInSecs();
 	int getTotalStepsInWorkout();
 	float getCurrentSpeed();
+	float getAvgSpeed();
 	Tracker getTracker();
+	Properties getWorkoutBundle();
 //	DetectedActivity getDetectedActivity();
 
 }

@@ -1,11 +1,20 @@
 package com.sharesmile.share.core;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -14,13 +23,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -47,7 +53,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
-
+        IntentFilter filter = new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(locationTrackerReceiver, filter);
     }
 
     @Override
@@ -100,13 +107,54 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    private GoogleLocationTracker.Listener googleLocationTrackerListener
+            = new GoogleLocationTracker.Listener() {
+        @Override
+        public void onLocationTrackerReady() {
+            Logger.i(TAG, "onLocationTrackerReady, will start tracking activity");
+            GoogleLocationTracker.getInstance().unregister(this);
+            showTrackingActivity();
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            Logger.i(TAG, "onPermissionDenied: Can't do nothing");
+            GoogleLocationTracker.getInstance().unregister(this);
+        }
+
+        @Override
+        public void onConnectionFailure() {
+            Logger.i(TAG, "onConnectionFailure");
+            GoogleLocationTracker.getInstance().unregister(this);
+        }
+
+        @Override
+        public void onGpsEnabled() {
+
+        }
+
+        @Override
+        public void onGpsDisabled() {
+
+        }
+    };
+
     @Override
     public void performOperation(int operationId, Object input) {
         switch (operationId) {
             case START_RUN:
                 if (input instanceof CauseData) {
                     mCauseData = (CauseData) input;
-                    checkLocationEnabled();
+                    if ( !GoogleLocationTracker.getInstance().isFetchingLocation() ){
+                        GoogleLocationTracker.getInstance().register(googleLocationTrackerListener);
+                    }else {
+                        showTrackingActivity();
+                    }
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -135,76 +183,107 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-    private void checkLocationEnabled() {
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
-
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(Config.LOCATION_UPDATE_INTERVAL); // milliseconds
-        locationRequest.setSmallestDisplacement(Config.SMALLEST_DISPLACEMENT);
-        locationRequest.setFastestInterval(Config.LOCATION_UPDATE_INTERVAL); // the fastest rate in milliseconds at which your app can handle location updates
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
-
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult locationSettingsResult) {
-                final Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        // All location settings are satisfied. The client can
-                        // initialize location requests here.
-                        showTrackingActivity();
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied, but this can be fixed
-                        // by showing the user a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(
-                                    BaseActivity.this,
-                                    REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
-                        break;
-                }
+        if (requestCode == Constants.CODE_REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                GoogleLocationTracker.getInstance().onPermissionsGranted();
+            } else if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                GoogleLocationTracker.getInstance().onPermissionsRejected();
             }
-        });
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                if (resultCode == RESULT_OK) {
-                    showTrackingActivity();
-                }
+            case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
+                GoogleLocationTracker.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
         }
     }
 
     private void showTrackingActivity() {
+        Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity");
         Intent intent = new Intent(this, TrackerActivity.class);
         intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);
     }
 
-    protected void showMessageCenter() {
+    private static boolean blockRequestPermission = false;
+    private static boolean blockLocationEnablePopup = false;
+
+    private BroadcastReceiver locationTrackerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                int broadcastCategory = bundle
+                        .getInt(Constants.LOCATION_TRACKER_BROADCAST_CATEGORY);
+                Logger.d(TAG, "locationTrackerReceiver onReceive with broadcastCategory = " + broadcastCategory);
+                switch (broadcastCategory) {
+                    case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
+                        handleFixLocationSettingsBroadcast(bundle);
+                        break;
+
+                    case Constants.BROADCAST_REQUEST_PERMISSION_CODE:
+                        handleRequestPermissionBroadcast();
+                        break;
+
+                }
+            }
+        }
+    };
+
+    private void handleFixLocationSettingsBroadcast(Bundle bundle){
+        synchronized (BaseActivity.class){
+            if (!blockLocationEnablePopup){
+                Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
+                    status.startResolutionForResult(BaseActivity.this,
+                            Constants.CODE_LOCATION_SETTINGS_RESOLUTION);
+                    // Hack to block subsequent location enable broadcast for 1 sec
+                    blockLocationEnablePopup = true;
+                    MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            blockLocationEnablePopup = false;
+                        }
+                    }, 1000);
+                } catch (IntentSender.SendIntentException e) {
+                    // Ignore the error.
+                }
+            }
+        }
+    }
+
+    private void handleRequestPermissionBroadcast(){
+        synchronized (BaseActivity.class){
+            if (!blockRequestPermission){
+                ActivityCompat.requestPermissions(BaseActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        Constants.CODE_REQUEST_LOCATION_PERMISSION);
+                // Hack to block subsequent request permission broadcast for 1 sec
+                blockRequestPermission = true;
+                MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        blockRequestPermission = false;
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+
+    public void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
     }
 
@@ -228,10 +307,13 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         builder.show();
 
     }
-
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locationTrackerReceiver);
+        super.onDestroy();
+    }
     static
     {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
-
 }

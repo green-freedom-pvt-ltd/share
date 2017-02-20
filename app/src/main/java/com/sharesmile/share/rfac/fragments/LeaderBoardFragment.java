@@ -6,7 +6,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoard;
@@ -49,6 +47,7 @@ import Models.TeamBoard;
 import Models.TeamLeaderBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit.http.HEAD;
 
 /**
  * Created by piyush on 8/30/16.
@@ -306,10 +305,11 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
-                hideProgressDialog();
-//                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
-                MainApplication.showToast("Network Error, Please Refresh");
-                ne.printStackTrace();
+                if (isAttachedToActivity()){
+                    hideProgressDialog();
+                    MainApplication.showToast("Network Error");
+                    ne.printStackTrace();
+                }
             }
 
             @Override

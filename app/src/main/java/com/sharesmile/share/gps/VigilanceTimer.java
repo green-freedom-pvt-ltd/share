@@ -1,7 +1,8 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.location.DetectedActivity;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -117,16 +118,20 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
-		if(ActivityRecognizedService.getDetectedActivity() != null) {
-
-			if (ActivityRecognizedService.getDetectedActivity().getType() == DetectedActivity.IN_VEHICLE
-					&& ActivityRecognizedService.getDetectedActivity().getConfidence() > 85) {
-				Logger.d(TAG, "Activity detected in_vehicle, must be Usain Bolt");
-				Logger.d("ActivityRecogition", "On Vehicle Type: " + ActivityRecognizedService.getDetectedActivity());
-				return true;
-			}
+		if (ActivityRecognizedService.isIsInVehicle()){
+			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
+			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+					.addBundle(workoutService.getWorkoutBundle())
+					.put("detected_by", "activity_recognition")
+					.buildAndDispatch();
+			return true;
 		}
 
+		return tooFastSecondaryCheck();
+
+	}
+
+	private boolean tooFastSecondaryCheck(){
 		if (lastValidatedRecord == null){
 			// Will wait for next tick
 			lastValidatedRecord = workoutService.getTracker().getLastRecord();
@@ -153,10 +158,14 @@ public class VigilanceTimer implements Runnable {
 								? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
 						int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
 						Logger.d(TAG, "averageStrideLength = " + averageStrideLength + "meters hence "
-									+ " expectedNumOfSteps = " + expectedNumOfSteps);
+								+ " expectedNumOfSteps = " + expectedNumOfSteps);
 
 						if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
-								return true;
+							AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+									.addBundle(workoutService.getWorkoutBundle())
+									.put("detected_by", "speed_logic")
+									.buildAndDispatch();
+							return true;
 						}
 					}
 					lastValidatedRecord = latestRecord;

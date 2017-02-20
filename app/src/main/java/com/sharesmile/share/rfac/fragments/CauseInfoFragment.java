@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,18 +13,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
-
-import com.sharesmile.share.R;
-import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.views.MLTextView;
 import com.sharesmile.share.views.MRTextView;
 import com.squareup.picasso.Picasso;
@@ -142,6 +136,9 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         switch (v.getId()) {
             case R.id.begin_run:
                 getFragmentController().performOperation(IFragmentController.START_RUN, cause);
+                AnalyticsEvent.create(Event.ON_CLICK_BEGIN_RUN)
+                        .addBundle(cause.getCauseBundle())
+                        .buildAndDispatch();
                 break;
             case R.id.badge_layout:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);

@@ -27,8 +27,9 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
 import com.google.gson.Gson;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
@@ -94,12 +95,12 @@ public class TrackerActivity extends BaseActivity {
 
         loadInitialFragment();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(locationServiceReceiver,
-                new IntentFilter(Constants.LOCATION_SERVICE_BROADCAST_ACTION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(workoutServiceReceiver,
+                new IntentFilter(Constants.WORKOUT_SERVICE_BROADCAST_ACTION));
 
         if (isWorkoutActive()) {
             // If workout sesion going on then bind to service
-            invokeLocationService();
+            invokeWorkoutService();
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -255,35 +256,29 @@ public class TrackerActivity extends BaseActivity {
         if (isBoundToLocationService()) {
             unbindLocationService();
         }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(locationServiceReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(workoutServiceReceiver);
     }
 
     public void continuedRun(){
-        invokeLocationService();
+        invokeWorkoutService();
     }
 
     public void beginRun() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            // All required permissions available
-            invokeLocationService();
-        } else {
-            //Need to get permissions
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.CODE_REQUEST_LOCATION_PERMISSION);
-        }
+        Logger.d(TAG, "beginRun");
+        invokeWorkoutService();
     }
 
     public void endRun() {
+        Logger.d(TAG, "endRun");
         if (isBoundToLocationService()) {
+            Logger.d(TAG, "Bound to WorkoutService, will stopWorkout first");
             locationService.stopWorkout();
         }
     }
 
     public void pauseWorkout() {
         if (isBoundToLocationService()) {
-            locationService.pause();
+            locationService.pause("user_clicked");
         }
     }
 
@@ -316,6 +311,13 @@ public class TrackerActivity extends BaseActivity {
         return 0;
     }
 
+    public float getAvgSpeed(){
+        if (isBoundToLocationService()){
+            return locationService.getAvgSpeed();
+        }
+        return 0;
+    }
+
     public int getTotalSteps(){
         if (isBoundToLocationService()){
             return locationService.getTotalStepsInWorkout();
@@ -331,33 +333,20 @@ public class TrackerActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == Constants.CODE_REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.length == 1
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                invokeLocationService();
-            } else {
-                // Permission was denied or request was cancelled
-                Logger.i(TAG, "Location Permission denied, could'nt update the UI");
-                Toast.makeText(this, "Please give permission to get Location", Toast.LENGTH_LONG).show();
-                exit();
-            }
-        }
-
         if (requestCode == Constants.CODE_REQUEST_WRITE_PERMISSION) {
             if (grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Can re-capture logs
             } else {
                 // Permission was denied or request was cancelled
-                Logger.i(TAG, "Location Permission denied, could'nt update the UI");
-                Toast.makeText(this, "Please give permission to get Location", Toast.LENGTH_LONG).show();
+                Logger.i(TAG, "WRITE Permission denied, couldn't update the UI");
+                Toast.makeText(this, "Please give permission to WRITE", Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    public void invokeLocationService() {
-        Log.d(TAG, "invokeLocationService");
+    public void invokeWorkoutService() {
+        Log.d(TAG, "invokeWorkoutService");
         Bundle bundle = new Bundle();
         Intent intent = new Intent(this, WorkoutService.class);
         intent.putExtras(bundle);
@@ -392,31 +381,16 @@ public class TrackerActivity extends BaseActivity {
     }
 
 
-    private BroadcastReceiver locationServiceReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver workoutServiceReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 int broadcastCategory = bundle
-                        .getInt(Constants.LOCATION_SERVICE_BROADCAST_CATEGORY);
+                        .getInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY);
                 switch (broadcastCategory) {
-                    case Constants.BROADCAST_FIX_LOCATION_SETTINGS_CODE:
-
-                        Status status = (Status) bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(TrackerActivity.this,
-                                    Constants.CODE_LOCATION_SETTINGS_RESOLUTION);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-
-                        break;
-
                     case Constants.BROADCAST_GOOGLE_FIT_READ_PERMISSION:
-
                         ConnectionResult connectionResult =
                                 bundle.getParcelable(Constants.KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE);
                         try {
@@ -431,9 +405,13 @@ public class TrackerActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
-                        Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
+                        Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         runFragment.onWorkoutResult(result);
+                        AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
+                                .addBundle(mCauseData.getCauseBundle())
+                                .addBundle(result.getWorkoutBundle())
+                                .buildAndDispatch();
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
@@ -450,14 +428,14 @@ public class TrackerActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:
-                        Logger.i(TAG, "onReceive of locationServiceReceiver, BROADCAST_UNBIND_SERVICE_CODE");
+                        Logger.i(TAG, "onReceive of workoutServiceReceiver, BROADCAST_UNBIND_SERVICE_CODE");
                         if (isBoundToLocationService()) {
                             unbindLocationService();
                             locationService = null;
                         }
                         break;
                     case Constants.BROADCAST_PAUSE_WORKOUT_CODE:
-                        Logger.i(TAG, "onReceive of locationServiceReceiver,  BROADCAST_PAUSE_WORKOUT_CODE");
+                        Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_PAUSE_WORKOUT_CODE");
                         synchronized (this) {
                             if (runFragment != null && runFragment.isRunActive()) {
                                 int problem = bundle.getInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM);
@@ -475,10 +453,15 @@ public class TrackerActivity extends BaseActivity {
                                     case Constants.PROBELM_NOT_MOVING:
                                         errorMessage = getString(R.string.rfac_lazy_ass_message);
                                         break;
+                                    case Constants.PROBLEM_GPS_DISABLED:
+                                        errorMessage = getString(R.string.rfac_gps_disabled_message);
+                                        break;
                                 }
                                 if (!TextUtils.isEmpty(errorMessage)) {
                                     Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
-                                    runFragment.showErrorMessage(errorMessage);
+                                    if (problem != Constants.PROBLEM_GPS_DISABLED){
+                                        runFragment.showErrorMessage(errorMessage);
+                                    }
                                 }
                                 runFragment.pauseRun(false);
                             }

@@ -1,14 +1,13 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
-import com.sharesmile.share.*;
+import com.sharesmile.share.Cause;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.sharesmile.share.Cause;
 
 /**
  * Created by Shine on 01/05/16..
@@ -55,7 +54,7 @@ public class CauseData implements UnObfuscable, Serializable {
     private int minDistance;
 
     @SerializedName("app_update")
-    private AppUpdate appUpdate;
+    private ApplicationUpdate applicationUpdate;
 
     @SerializedName("order_priority")
     private int orderPriority;
@@ -225,12 +224,12 @@ public class CauseData implements UnObfuscable, Serializable {
         setOrderPriority(cause.getOrder_priority());
     }
 
-    public AppUpdate getAppUpdate() {
-        return appUpdate;
+    public ApplicationUpdate getApplicationUpdate() {
+        return applicationUpdate;
     }
 
-    public void setAppUpdate(AppUpdate appUpdate) {
-        this.appUpdate = appUpdate;
+    public void setApplicationUpdate(ApplicationUpdate applicationUpdate) {
+        this.applicationUpdate = applicationUpdate;
     }
 
     public int getOrderPriority() {
@@ -239,5 +238,17 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setOrderPriority(int orderPriority) {
         this.orderPriority = orderPriority;
+    }
+
+    public Properties getCauseBundle(){
+        int sponsorId = 0;
+        if (getSponsor() != null){
+            sponsorId = getSponsor().getId();
+        }
+        Properties p = new Properties();
+        p.put("cause_id", getId());
+        p.put("cause_title", getTitle());
+        p.put("sponsor_id", sponsorId);
+        return p;
     }
 }

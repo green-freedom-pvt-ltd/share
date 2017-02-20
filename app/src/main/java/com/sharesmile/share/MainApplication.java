@@ -2,15 +2,25 @@ package com.sharesmile.share;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.crashlytics.android.Crashlytics;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.onesignal.OneSignal;
+import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.sync.SyncHelper;
@@ -19,7 +29,6 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -27,7 +36,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
  */
-public class MainApplication extends Application {
+public class MainApplication extends Application implements AppLifecycleHelper.LifeCycleCallbackListener{
 
     private static final String TAG = "MainApplication";
 
@@ -40,6 +49,8 @@ public class MainApplication extends Application {
     private String mToken;
     private int mUserId = 0;
     MixpanelAPI mMixpanel;
+
+    private AppLifecycleHelper lifecycleHelper;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -85,6 +96,22 @@ public class MainApplication extends Application {
         showToast(getContext().getResources().getString(stringId));
     }
 
+    public static void showRunNotification(String notifText){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
+        builder.setContentText( notifText )
+                .setSmallIcon(getNotificationIcon())
+                .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
+                .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
+                .setContentTitle(getContext().getResources().getString(R.string.app_name))
+                .setVibrate(new long[]{500, 500, 500, 500});
+        NotificationManagerCompat.from(getContext()).notify(0, builder.build());
+    }
+
+    private static int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
+    }
+
 
     public static Context getContext() {
         return instance.getApplicationContext();
@@ -106,7 +133,7 @@ public class MainApplication extends Application {
      * A thread safe way to show a Toast. Can be called from any thread.
      */
     public static void showToast(final String message) {
-        showToast(message, Toast.LENGTH_LONG);
+        showToast(message, Toast.LENGTH_SHORT);
     }
 
 
@@ -140,20 +167,29 @@ public class MainApplication extends Application {
 
     @Override
     public void onCreate() {
+        ActivityLifecycleCallback.register(this);
         super.onCreate();
         //Initialization code
 
         mMixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
         MixpanelAPI.People people = mMixpanel.getPeople();
-//        people.identify(String.valueOf(getUserID()));
-        people.initPushHandling("159550091621");
+        people.initPushHandling(Constants.GOOGLE_PROJECT_ID);
 
         SharedPrefsManager.initialize(getApplicationContext());
+
+        lifecycleHelper = new AppLifecycleHelper(this);
+        registerActivityLifecycleCallbacks(lifecycleHelper);
+
+        Analytics.initialize(this);
+
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
         initOneSignal();
         mDbWrapper = new DbWrapper(this);
+        GoogleLocationTracker.initialize(this);
         startSyncTasks();
+        checkForFirstLaunchAfterInstall();
+
     }
 
     private void initOneSignal() {
@@ -204,6 +240,42 @@ public class MainApplication extends Application {
         return isModelShown;
     }
 
+    public static boolean isApplicationInForeground(){
+        return getInstance().lifecycleHelper.isApplicationInForeground();
+    }
 
+    public static boolean isApplicationVisible(){
+        return getInstance().lifecycleHelper.isApplicationVisible();
+    }
+
+    private void checkForFirstLaunchAfterInstall(){
+        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_LAUNCH_EVENT_SENT)){
+            AnalyticsEvent.create(Event.FIRST_LAUNCH_AFTER_INSTALL)
+                    .build()
+                    .dispatch();
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_LAUNCH_EVENT_SENT, true);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        Logger.i(TAG, "onStart");
+        GoogleLocationTracker.getInstance().startLocationTracking(false);
+        AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
+    }
+
+    @Override
+    public void onResume() {
+    }
+
+    @Override
+    public void onPause() {
+    }
+
+    @Override
+    public void onStop() {
+        Logger.i(TAG, "onStop");
+        GoogleLocationTracker.getInstance().stopLocationTracking();
+    }
 }
 
