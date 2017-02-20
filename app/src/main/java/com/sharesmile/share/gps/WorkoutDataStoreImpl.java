@@ -155,10 +155,15 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             Logger.d(TAG, "Approving record: " + record.toString());
             approvedWorkoutData.addRecord(record);
         }
+        approvePendingSteps();
+        persistBothWorkoutData();
+    }
+
+    private synchronized void approvePendingSteps(){
         if (numStepsToBeApproved > 0){
             approvedWorkoutData.addSteps(numStepsToBeApproved);
+            numStepsToBeApproved = 0;
         }
-        persistBothWorkoutData();
     }
 
     @Override
@@ -180,9 +185,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             Logger.d(TAG, "Approving record: " + record.toString());
             approvedWorkoutData.addRecord(record);
         }
-        if (numStepsToBeApproved > 0){
-            approvedWorkoutData.addSteps(numStepsToBeApproved);
-        }
+        approvePendingSteps();
         clearPersistentStorage();
         return approvedWorkoutData.close();
     }

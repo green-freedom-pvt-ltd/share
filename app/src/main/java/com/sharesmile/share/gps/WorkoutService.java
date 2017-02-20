@@ -155,10 +155,9 @@ public class WorkoutService extends Service implements
         if (currentlyTracking) {
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
-            Intent intent = new Intent(this, ActivityRecognizedService.class);
-            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (googleApiClient != null && googleApiClient.isConnected()) {
-                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+
+            unregisterForActivityUpdates();
+            if (googleApiClient != null && googleApiClient.isConnected()){
                 googleApiClient.disconnect();
             }
             googleApiClient = null;
@@ -283,12 +282,13 @@ public class WorkoutService extends Service implements
             // Will start sending subsequent location fixes, only after they are approved by spike filter
             return;
         }
-        // Spike filter check
-        if (!checkForSpike(prevLocationFix, location)){
-            if (tracker != null) {
+        if (tracker != null && tracker.isRunning()){
+            // Spike filter check
+            if (!checkForSpike(prevLocationFix, location)){
                 tracker.feedLocation(location);
             }
         }
+
         prevLocationFix = location;
     }
 
@@ -310,8 +310,24 @@ public class WorkoutService extends Service implements
         float deltaDistance = loc1.distanceTo(loc2);
         float deltaSpeed = deltaDistance / deltaTime;
 
+        // Determine speed threshold based on User's current context
+
+        float spikeFilterSpeedThreshold;
+
+        if (ActivityRecognizedService.isIsInVehicle()){
+            spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+        }else {
+            if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
+                // Can make a safe assumption that the person is on foot
+                spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
+            }else {
+                spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
+            }
+        }
+
         // If speed is greater than threshold, then it is considered as GPS spike
-        if (deltaSpeed > Config.SPIKE_FILTER_SPEED_THRESHOLD){
+
+        if (deltaSpeed > Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE){
             Logger.e(TAG, "Detected GPS spike, between locations loc1:\n" + loc1.toString()
                         + "\n, loc2:\n" + loc2.toString()
                         + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
@@ -319,6 +335,7 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .put("spikey_distance", deltaDistance)
                     .put("time_interval", deltaTime)
+                    .put("accuracy", loc2.getAccuracy())
                     .buildAndDispatch();
             return true;
         }else {
@@ -383,9 +400,9 @@ public class WorkoutService extends Service implements
         AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                 .addBundle(mCauseData.getCauseBundle())
                 .addBundle(getWorkoutBundle())
-                .put("delta_distance", deltaDistance)
-                .put("delta_time", deltaTime)
-                .put("delta_speed", deltaSpeed)
+                .put("delta_distance", deltaDistance) // in meters
+                .put("delta_time", deltaTime) // in secs
+                .put("delta_speed", deltaSpeed) // in km/hrs
                 .buildAndDispatch();
     }
 
@@ -440,12 +457,7 @@ public class WorkoutService extends Service implements
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
             if (currentlyTracking) {
-                Intent intent = new Intent(this, ActivityRecognizedService.class);
-                PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-                if (googleApiClient != null && googleApiClient.isConnected()) {
-                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(googleApiClient, pendingIntent);
-                }
+                unregisterForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
@@ -466,12 +478,7 @@ public class WorkoutService extends Service implements
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
             if (currentlyTracking) {
-                Intent intent = new Intent(this, ActivityRecognizedService.class);
-                PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-                if (googleApiClient != null && googleApiClient.isConnected()) {
-                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-                }
+                registerForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
@@ -573,9 +580,23 @@ public class WorkoutService extends Service implements
     @Override
     public void onConnected(Bundle bundle) {
         Logger.d(TAG, "onConnected");
+        registerForActivityUpdates();
+    }
+
+    private void registerForActivityUpdates(){
+        ActivityRecognizedService.reset();
         Intent intent = new Intent(this, ActivityRecognizedService.class);
         PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
+    }
+
+    private void unregisterForActivityUpdates(){
+        ActivityRecognizedService.reset();
+        Intent intent = new Intent(this, ActivityRecognizedService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

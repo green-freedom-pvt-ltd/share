@@ -26,7 +26,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.User;
@@ -73,7 +72,6 @@ public class LoginImpl {
     private WeakReference<Fragment> fragmentWeakReference = null;
     private CallbackManager callbackManager;
     private GoogleApiClient mGoogleApiClient;
-    MixpanelAPI mMixpanel;
 
     public LoginImpl(AppCompatActivity activity, LoginListener listener) {
         activityWeakReference = new WeakReference<AppCompatActivity>(activity);

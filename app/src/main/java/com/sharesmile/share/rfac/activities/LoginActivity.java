@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -19,9 +18,6 @@ import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,7 +47,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     LinearLayout mProgressContainer;
     private boolean isFromMainActivity;
     private LoginImpl mLoginHandler;
-    MixpanelAPI mixpanel;
 
     static
     {
@@ -110,18 +105,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        mixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
 
         switch (v.getId()) {
             case R.id.btn_login_fb:
                 // performFbLogin();
-
-                try {
-                    JSONObject props = new JSONObject();
-                    props.put("Perform Login ", "FB");
-                    mixpanel.track("LoginActivity - initUi called", props);
-                } catch (JSONException e) {
-                }
                 mLoginHandler.performFbLogin();
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
                         .put("medium", "fb")
@@ -130,27 +117,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tv_welcome_skip:
                 SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
                 prefsManager.setBoolean(Constants.PREF_LOGIN_SKIP, true);
-
-                try {
-                    JSONObject props = new JSONObject();
-                    props.put("Perform Login ", "Skipped");
-                    mixpanel.track("LoginActivity - initUi called", props);
-                } catch (JSONException e) {
-                }
-
                 startMainActivity();
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_SKIP)
                         .buildAndDispatch();
                 break;
             case R.id.btn_login_google:
-
-                try {
-                    JSONObject props = new JSONObject();
-                    props.put("Perform Login ", "Google");
-                    mixpanel.track("LoginActivity - initUi called", props);
-                } catch (JSONException e) {
-                }
-
                 mLoginHandler.performGoogleLogin();
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
                         .put("medium", "gplus")

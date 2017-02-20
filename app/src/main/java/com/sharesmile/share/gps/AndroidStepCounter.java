@@ -12,6 +12,10 @@ import android.hardware.SensorManager;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.utils.Logger;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Created by ankitm on 12/05/16.
  */
@@ -23,6 +27,13 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     private Listener listener;
     private SensorManager sensorManager;
     private volatile int stepsSinceReboot = 0;
+    private LinkedHashMap historyQueue = new LinkedHashMap<Long, Long>()
+    {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, Long> eldest) {
+            return this.size() > NUM_ELEMS_IN_HISTORY_QUEUE;
+        }
+    };
 
     public AndroidStepCounter(Context context, Listener listener){
         this.context = context;
@@ -33,6 +44,7 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     @Override
     public void startCounting() {
         stepsSinceReboot = 0;
+        historyQueue.clear();
         registerStepDetector();
     }
 
@@ -42,11 +54,13 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             sensorManager.unregisterListener(this);
         }
         stepsSinceReboot = 0;
+        historyQueue.clear();
     }
 
     @Override
     public void pauseCounting() {
         stepsSinceReboot = 0;
+        historyQueue.clear();
     }
 
     @Override
@@ -56,6 +70,33 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    }
+
+    @Override
+    public float getMovingAverageOfStepsPerSec() {
+        if (historyQueue.isEmpty() || historyQueue.size() == 1){
+            return -1;
+        }else {
+            Iterator iterator = historyQueue.entrySet().iterator();
+            Map.Entry<Long, Long> first = null;
+            Map.Entry<Long, Long> last = null;
+            while (iterator.hasNext()){
+                Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
+                if (first == null){
+                    first = thisEntry;
+                    last = thisEntry;
+                }else {
+                    if (thisEntry.getKey() < first.getKey()){
+                        first = thisEntry;
+                    }
+                    if (thisEntry.getKey() > last.getKey()){
+                        last = thisEntry;
+                    }
+                }
+            }
+            return ((last.getValue() - first.getValue()) / (last.getKey() - first.getKey()));
+        }
 
     }
 
@@ -86,13 +127,17 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
             stepsSinceReboot = (int) event.values[0];
+            historyQueue.put(System.currentTimeMillis() / 1000, stepsSinceReboot);
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
+            return;
         }
         int deltaSteps = (int) event.values[0] - stepsSinceReboot;
         stepsSinceReboot = (int) event.values[0];
+        historyQueue.put(System.currentTimeMillis() / 1000, stepsSinceReboot);
         listener.onStepCount(deltaSteps);
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

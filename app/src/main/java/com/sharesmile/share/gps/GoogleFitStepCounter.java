@@ -26,6 +26,9 @@ import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,6 +48,15 @@ public class GoogleFitStepCounter implements StepCounter,
     private GoogleApiClient mApiClient;
     boolean isPaused;
 
+    private LinkedHashMap historyQueue = new LinkedHashMap<Long, Long>()
+    {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, Long> eldest) {
+            return this.size() > NUM_ELEMS_IN_HISTORY_QUEUE + 1;
+        }
+    };
+
+
     public GoogleFitStepCounter(Context context, Listener listener) {
         this.context = context;
         this.listener = listener;
@@ -54,6 +66,9 @@ public class GoogleFitStepCounter implements StepCounter,
     @Override
     public void startCounting() {
         Logger.d(TAG, "startCounting");
+        synchronized (historyQueue){
+            historyQueue.clear();
+        }
         mApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Fitness.SENSORS_API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
@@ -75,17 +90,25 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 });
-
+        synchronized (historyQueue){
+            historyQueue.clear();
+        }
     }
 
     @Override
     public void pauseCounting() {
         isPaused = true;
+        synchronized (historyQueue){
+            historyQueue.clear();
+        }
     }
 
     @Override
     public void resumeCounting() {
         isPaused = false;
+        synchronized (historyQueue){
+            historyQueue.clear();
+        }
     }
 
     @Override
@@ -99,6 +122,38 @@ public class GoogleFitStepCounter implements StepCounter,
             Logger.e(TAG, "RESULT_CANCELED");
         }
         listener.notAvailable(PERMISSION_NOT_GRANTED_BY_USER);
+    }
+
+    @Override
+    public float getMovingAverageOfStepsPerSec() {
+        if (historyQueue.isEmpty() || historyQueue.size() == 1){
+            return -1;
+        }else {
+            synchronized (historyQueue){
+                Iterator iterator = historyQueue.entrySet().iterator();
+                Map.Entry<Long, Long> first = null;
+                Map.Entry<Long, Long> last = null;
+                long numSteps = 0;
+                while (iterator.hasNext()){
+                    Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
+                    numSteps += thisEntry.getValue();
+                    if (first == null){
+                        first = thisEntry;
+                        last = thisEntry;
+                    }else {
+                        if (thisEntry.getKey() < first.getKey()){
+                            first = thisEntry;
+                        }
+                        if (thisEntry.getKey() > last.getKey()){
+                            last = thisEntry;
+                        }
+                    }
+                }
+                long numStepsInFirst = first.getValue();
+                numSteps = numSteps - numStepsInFirst;
+                return numSteps / (last.getKey() - first.getKey());
+            }
+        }
     }
 
     @Override
@@ -179,7 +234,9 @@ public class GoogleFitStepCounter implements StepCounter,
                 Value value = dataPoint.getValue( field );
                 String message = "Field: " + field.getName() + " Value: " + value;
                 Logger.d(TAG, message);
-                listener.onStepCount(Integer.parseInt(value.toString()));
+                int deltaSteps = Integer.parseInt(value.toString());
+                historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
+                listener.onStepCount(deltaSteps);
             }
         }
     }

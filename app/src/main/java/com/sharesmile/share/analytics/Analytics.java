@@ -3,14 +3,8 @@ package com.sharesmile.share.analytics;
 import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
-import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.utils.Logger;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by ankitm on 11/04/16.
@@ -23,14 +17,9 @@ public class Analytics {
     private ClevertapManager clevertapManager;
     private Context context;
 
-    private static MixpanelAPI mixpanel;
-
     private Analytics(Context ctx){
         clevertapManager = new ClevertapManager(ctx);
         context = ctx;
-        if (mixpanel == null) {
-            mixpanel = MixpanelAPI.getInstance(MainApplication.getContext(), MainApplication.getContext().getString(R.string.mixpanel_project_token));
-        }
     }
 
     public static synchronized void initialize(Context appContext) {
@@ -114,26 +103,6 @@ public class Analytics {
 
     public void setUserPhoto(String pictureUrl){
         clevertapManager.setUserProperty("Photo", pictureUrl);
-    }
-
-
-    public static void track(String event, JSONObject jsonObject) {
-        mixpanel.track(event, jsonObject);
-    }
-
-    public static JSONObject createProp(JSONObject props, String key, String value) {
-
-        if (props == null) {
-            props = new JSONObject();
-        }
-
-        try {
-            props.put(key, value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return props;
-
     }
 
 }

@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.crashlytics.android.Crashlytics;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -48,7 +47,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     private DbWrapper mDbWrapper;
     private String mToken;
     private int mUserId = 0;
-    MixpanelAPI mMixpanel;
 
     private AppLifecycleHelper lifecycleHelper;
 
@@ -170,11 +168,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         ActivityLifecycleCallback.register(this);
         super.onCreate();
         //Initialization code
-
-        mMixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
-        MixpanelAPI.People people = mMixpanel.getPeople();
-        people.initPushHandling(Constants.GOOGLE_PROJECT_ID);
-
         SharedPrefsManager.initialize(getApplicationContext());
 
         lifecycleHelper = new AppLifecycleHelper(this);

@@ -29,7 +29,6 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -38,14 +37,10 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -63,7 +58,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     private static final String BUNDLE_SHOW_LOGIN = "bundle_show_login";
     private static final int REQUEST_SHARE = 101;
     private CauseData mCauseData;
-    MixpanelAPI mixpanel;
 
 
     @BindView(R.id.skip_layout)
@@ -244,7 +238,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     @Override
     public void onClick(View v) {
-        mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
 
         switch (v.getId()) {
 
@@ -253,44 +246,12 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
                 break;
             case R.id.btn_share_screen:
                 if (mSelectedShareMedium == SHARE_MEDIUM.WHATS_APP) {
-                    try {
-                        JSONObject props = new JSONObject();
-                        props.put("Share Medium", "WhatsApp");
-                        mixpanel.track("ShareFragment - onClick called", props);
-                    } catch (JSONException e) {
-                        Logger.e(TAG, "Unable to add properties to JSONObject", e);
-                    }
-
                     shareOnWhatsApp();
                 } else if (mSelectedShareMedium == SHARE_MEDIUM.GOOGLE) {
-                    try {
-                        JSONObject props = new JSONObject();
-                        props.put("Share Medium", "Google+");
-                        mixpanel.track("ShareFragment - onClick called", props);
-                    } catch (JSONException e) {
-                        Logger.e(TAG, "Unable to add properties to JSONObject", e);
-                    }
-
                     shareOnGooglePlus();
                 } else if (mSelectedShareMedium == SHARE_MEDIUM.TWITTER) {
-                    try {
-                        JSONObject props = new JSONObject();
-                        props.put("Share Medium", "Twitter");
-                        mixpanel.track("ShareFragment - onClick called", props);
-                    } catch (JSONException e) {
-                        Logger.e(TAG, "Unable to add properties to JSONObject", e);
-                    }
-
                     shareOnTwitter();
                 } else {
-                    try {
-                        JSONObject props = new JSONObject();
-                        props.put("Share Medium", "FB");
-                        mixpanel.track("ShareFragment - onClick called", props);
-                    } catch (JSONException e) {
-                        Logger.e(TAG, "Unable to add properties to JSONObject", e);
-                    }
-
                     shareOnFb();
                 }
                 break;
