@@ -18,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -308,11 +309,15 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         builder.show();
 
     }
-
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationTrackerReceiver);
         super.onDestroy();
+    }
+
+    static
+    {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
 }
