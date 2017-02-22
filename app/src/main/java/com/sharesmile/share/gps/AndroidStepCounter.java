@@ -95,7 +95,8 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
                     }
                 }
             }
-            return ((last.getValue() - first.getValue()) / (last.getKey() - first.getKey()));
+            Long numSteps = last.getValue() - first.getValue();
+            return (numSteps.floatValue() / (last.getKey() - first.getKey()));
         }
 
     }
@@ -127,14 +128,14 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
             stepsSinceReboot = (int) event.values[0];
-            historyQueue.put(System.currentTimeMillis() / 1000, stepsSinceReboot);
+            historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
             return;
         }
         int deltaSteps = (int) event.values[0] - stepsSinceReboot;
         stepsSinceReboot = (int) event.values[0];
-        historyQueue.put(System.currentTimeMillis() / 1000, stepsSinceReboot);
+        historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
         listener.onStepCount(deltaSteps);
     }
 

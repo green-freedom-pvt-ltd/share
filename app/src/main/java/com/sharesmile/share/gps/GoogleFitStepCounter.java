@@ -133,7 +133,7 @@ public class GoogleFitStepCounter implements StepCounter,
                 Iterator iterator = historyQueue.entrySet().iterator();
                 Map.Entry<Long, Long> first = null;
                 Map.Entry<Long, Long> last = null;
-                long numSteps = 0;
+                Long numSteps = 0L;
                 while (iterator.hasNext()){
                     Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
                     numSteps += thisEntry.getValue();
@@ -149,9 +149,9 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 }
-                long numStepsInFirst = first.getValue();
+                Long numStepsInFirst = first.getValue();
                 numSteps = numSteps - numStepsInFirst;
-                return numSteps / (last.getKey() - first.getKey());
+                return  numSteps.floatValue()  / (last.getKey() - first.getKey());
             }
         }
     }
@@ -234,9 +234,9 @@ public class GoogleFitStepCounter implements StepCounter,
                 Value value = dataPoint.getValue( field );
                 String message = "Field: " + field.getName() + " Value: " + value;
                 Logger.d(TAG, message);
-                int deltaSteps = Integer.parseInt(value.toString());
+                Long deltaSteps = Long.parseLong(value.toString());
                 historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
-                listener.onStepCount(deltaSteps);
+                listener.onStepCount(deltaSteps.intValue());
             }
         }
     }

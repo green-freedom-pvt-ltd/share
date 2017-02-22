@@ -313,21 +313,25 @@ public class WorkoutService extends Service implements
         // Determine speed threshold based on User's current context
 
         float spikeFilterSpeedThreshold;
+        String thresholdApplied;
 
         if (ActivityRecognizedService.isIsInVehicle()){
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+            thresholdApplied = "in_vehicle";
         }else {
             if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
+                thresholdApplied = "on_foot";
             }else {
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
+                thresholdApplied = "default";
             }
         }
 
         // If speed is greater than threshold, then it is considered as GPS spike
 
-        if (deltaSpeed > Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE){
+        if (deltaSpeed > spikeFilterSpeedThreshold){
             Logger.e(TAG, "Detected GPS spike, between locations loc1:\n" + loc1.toString()
                         + "\n, loc2:\n" + loc2.toString()
                         + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
@@ -336,6 +340,8 @@ public class WorkoutService extends Service implements
                     .put("spikey_distance", deltaDistance)
                     .put("time_interval", deltaTime)
                     .put("accuracy", loc2.getAccuracy())
+                    .put("threshold_applied", thresholdApplied)
+                    .put("steps_per_sec_moving_average", stepCounter.getMovingAverageOfStepsPerSec())
                     .buildAndDispatch();
             return true;
         }else {
