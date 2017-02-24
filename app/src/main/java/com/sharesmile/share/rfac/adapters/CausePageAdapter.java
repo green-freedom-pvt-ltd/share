@@ -47,6 +47,7 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
         mData.clear();
         mData.addAll(causesList.getCauses());
         notifyDataSetChanged();
+
     }
 
     public CauseData getItemAtPosition(int position) {

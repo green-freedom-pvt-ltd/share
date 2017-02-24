@@ -96,10 +96,10 @@ public class SyncTaskManger extends IntentService {
             CauseList activeCauseList = new CauseList();
             activeCauseList.setCauses(new ArrayList<CauseData>());
             for (CauseData data : causeList.getCauses()) {
-                Picasso.with(this).load(data.getCauseThankYouImage()).fetch();
-                Picasso.with(this).load(data.getSponsor().getLogoUrl()).fetch();
-                Picasso.with(this).load(data.getImageUrl()).fetch();
                 if (data.isActive()) {
+                    Picasso.with(this).load(data.getCauseThankYouImage()).fetch();
+                    Picasso.with(this).load(data.getSponsor().getLogoUrl()).fetch();
+                    Picasso.with(this).load(data.getImageUrl()).fetch();
                     activeCauseList.getCauses().add(data);
                 }
 
