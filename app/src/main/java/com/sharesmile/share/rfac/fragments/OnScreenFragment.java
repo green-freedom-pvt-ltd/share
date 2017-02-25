@@ -173,12 +173,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.btn_lets_run:
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
-
-//                getFragmentController()
-//                        .replaceFragment(ShareFragment.newInstance(
-//                                WorkoutDataImpl.getTestWorkoutData(), causeData, false), true
-//                        );
-
                 getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
 
                 AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
@@ -223,7 +217,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(List<CauseData> causeDataList) {
-        if (isVisible()) {
+        if (isAdded()) {
             CauseList causeList = new CauseList();
             causeList.setCauses(causeDataList);
             setCausedata(causeList);
