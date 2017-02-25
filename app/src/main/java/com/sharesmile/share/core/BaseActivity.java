@@ -315,9 +315,4 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         super.onDestroy();
     }
 
-    static
-    {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
-
 }
