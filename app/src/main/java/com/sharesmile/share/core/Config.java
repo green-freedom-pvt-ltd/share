@@ -43,7 +43,7 @@ public class Config {
 
     public static float THRESHOLD_ACCURACY = 12; // in m
 
-    public static float THRESHOLD_FACTOR = 5.7f;
+    public static float THRESHOLD_FACTOR = 5.2f;
 
     public static float SMALLEST_DISPLACEMENT = 0.1f;// in m
 

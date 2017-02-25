@@ -25,6 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.gson.Gson;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -224,12 +225,18 @@ public class WorkoutService extends Service implements
     public void notAvailable(int reasonCode) {
         Logger.d(TAG, "notAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
+        Analytics.getInstance().setUserProperty("StepCounter", "not_available");
     }
 
     @Override
     public void isReady() {
         Logger.d(TAG, "isReady");
         currentlyProcessingSteps = true;
+        if (isKitkatWithStepSensor(getApplicationContext())){
+            Analytics.getInstance().setUserProperty("StepCounter", "sensor_service");
+        }else {
+            Analytics.getInstance().setUserProperty("StepCounter", "google_fit");
+        }
     }
 
     @Override
@@ -300,7 +307,8 @@ public class WorkoutService extends Service implements
      */
     public boolean checkForSpike(Location loc1, Location loc2){
 
-        long deltaTime = Math.abs(loc2.getTime() - loc1.getTime()) / 1000;
+        long deltaTimeInMillis = Math.abs(loc2.getTime() - loc1.getTime());
+        long deltaTime = deltaTimeInMillis / 1000;
 
         if (deltaTime > Config.SPIKE_FILTER_ELIGIBLE_TIME_INTERVAL){
             // If time interval between two location fixes is sufficiently large then those fixes are not considered as spikes
@@ -308,7 +316,7 @@ public class WorkoutService extends Service implements
         }
 
         float deltaDistance = loc1.distanceTo(loc2);
-        float deltaSpeed = deltaDistance / deltaTime;
+        float deltaSpeed = (deltaDistance * 1000) / deltaTimeInMillis;
 
         // Determine speed threshold based on User's current context
 

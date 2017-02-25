@@ -151,7 +151,10 @@ public class GoogleFitStepCounter implements StepCounter,
                 }
                 Long numStepsInFirst = first.getValue();
                 numSteps = numSteps - numStepsInFirst;
-                return  numSteps.floatValue()  / (last.getKey() - first.getKey());
+                //In a rare scenario when queue has just two entries with same keys (i.e. epoch in secs) we are considering delta as 1
+                Long deltaTime = (last.getKey() - first.getKey()) > 0
+                        ? last.getKey() - first.getKey() : 1;
+                return  numSteps.floatValue()  / deltaTime;
             }
         }
     }
