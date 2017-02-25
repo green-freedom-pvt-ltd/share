@@ -19,9 +19,9 @@ public class Config {
 
     public static final float SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE = 52f; // in m/s, i.e. 187 km/hr
 
-    public static final float SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 30.5f; // in m/s, i.e. 110 km/hr
+    public static final float SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 34f; // in m/s, i.e. 122.4 km/hr
 
-    public static final float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 15f; // in m/s, i.e. 54 km/hr
+    public static final float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 18f; // in m/s, i.e. 64.8 km/hr
 
     public static final float UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
