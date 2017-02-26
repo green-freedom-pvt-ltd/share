@@ -37,6 +37,7 @@ import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
@@ -59,8 +60,6 @@ import com.squareup.picasso.Target;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import Models.CampaignList;
 import butterknife.BindView;
@@ -111,6 +110,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         checkAppVersion();
         SyncHelper.syncCampaignData(getApplicationContext());
         handleNotificationIntent();
+        Analytics.getInstance().setUserProperties();
     }
 
     private void handleNotificationIntent() {
