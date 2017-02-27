@@ -1,5 +1,6 @@
 package com.sharesmile.share.gcm;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
@@ -9,6 +10,8 @@ import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
@@ -132,16 +135,29 @@ public class SyncService extends GcmTaskService {
             workout.setId(response.getId());
             workout.setIs_sync(true);
             mWorkoutDao.insertOrReplace(workout);
+            AnalyticsEvent.create(Event.ON_RUN_SYNC)
+                    .put("upload_result", "success")
+                    .buildAndDispatch();
 
             return true;
 
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e.getMessageFromServer());
+            Crashlytics.log("Run sync networkException");
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_RUN_SYNC)
+                    .put("upload_result", "Network exception " + e.getMessageFromServer())
+                    .buildAndDispatch();
             return false;
         } catch (JSONException e) {
             e.printStackTrace();
             Logger.d(TAG, "JSONException");
+            Crashlytics.log("Run sync JSONException");
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_RUN_SYNC)
+                    .put("upload_result", "JSONException ")
+                    .buildAndDispatch();
             return false;
         }
 

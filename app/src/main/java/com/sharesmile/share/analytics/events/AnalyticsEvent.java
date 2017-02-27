@@ -24,6 +24,7 @@ public class AnalyticsEvent implements UnObfuscable {
     public static final String CATEGORY_VIGILANCE = "VIGILANCE";
     public static final String CATEGORY_WORKOUT = "WORKOUT";
     public static final String CATEGORY_SHARE = "SHARE";
+    public static final String CATEGORY_SYNC = "SYNC";
 
     private Properties eventProperties;
 
