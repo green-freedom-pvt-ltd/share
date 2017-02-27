@@ -64,9 +64,14 @@ public class Utils {
         return true;
     }
 
-    public static String formatToKms(float distanceInMeters){
+    public static String formatToKmsWithOneDecimal(float distanceInMeters){
         DecimalFormat df = new DecimalFormat("0.0");
         return df.format(distanceInMeters / 1000);
+    }
+
+    public static String formatWithOneDecimal(float distance){
+        DecimalFormat df = new DecimalFormat("0.0");
+        return df.format(distance);
     }
 
     /**
@@ -166,6 +171,7 @@ public class Utils {
     }
 
     public static final String secondsToString(int secs) {
+
         if (secs >= 3600) {
             int sec = secs % 60;
             int totalMins = secs / 60;
@@ -183,11 +189,10 @@ public class Utils {
 
     public static final long stringToSec(String time) {
 
-        String[] timeArray = time.split(":");
+        String[] timeArray = time.split("[:\\s]");
         int j = 1;
         long sec = 0;
         for (int i = timeArray.length - 1; i >= 0; i--) {
-
             int duration = Integer.parseInt(timeArray[i]);
             sec = duration * j + sec;
             j = j * 60;

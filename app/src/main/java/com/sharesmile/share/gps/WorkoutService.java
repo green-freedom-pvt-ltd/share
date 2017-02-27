@@ -25,6 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.gson.Gson;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -64,6 +65,8 @@ public class WorkoutService extends Service implements
     private Tracker tracker;
     private float mDistance;
     private CauseData mCauseData;
+
+    private float distanceInKmsOnLastUpdateEvent = 0f;
 
     @Override
     public void onCreate() {
@@ -155,10 +158,9 @@ public class WorkoutService extends Service implements
         if (currentlyTracking) {
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
-            Intent intent = new Intent(this, ActivityRecognizedService.class);
-            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (googleApiClient != null && googleApiClient.isConnected()) {
-                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+
+            unregisterForActivityUpdates();
+            if (googleApiClient != null && googleApiClient.isConnected()){
                 googleApiClient.disconnect();
             }
             googleApiClient = null;
@@ -174,13 +176,14 @@ public class WorkoutService extends Service implements
                     .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
+            distanceInKmsOnLastUpdateEvent = 0f;
         }
     }
 
     public Properties getWorkoutBundle(){
         if (tracker != null){
             Properties p = new Properties();
-            p.put("distance", Utils.formatToKms(getTotalDistanceCoveredInMeters()));
+            p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistanceCoveredInMeters()));
             p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
             p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
@@ -225,12 +228,18 @@ public class WorkoutService extends Service implements
     public void notAvailable(int reasonCode) {
         Logger.d(TAG, "notAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
+        Analytics.getInstance().setUserProperty("StepCounter", "not_available");
     }
 
     @Override
     public void isReady() {
         Logger.d(TAG, "isReady");
         currentlyProcessingSteps = true;
+        if (isKitkatWithStepSensor(getApplicationContext())){
+            Analytics.getInstance().setUserProperty("StepCounter", "sensor_service");
+        }else {
+            Analytics.getInstance().setUserProperty("StepCounter", "google_fit");
+        }
     }
 
     @Override
@@ -283,12 +292,13 @@ public class WorkoutService extends Service implements
             // Will start sending subsequent location fixes, only after they are approved by spike filter
             return;
         }
-        // Spike filter check
-        if (!checkForSpike(prevLocationFix, location)){
-            if (tracker != null) {
+        if (tracker != null && tracker.isRunning()){
+            // Spike filter check
+            if (!checkForSpike(prevLocationFix, location)){
                 tracker.feedLocation(location);
             }
         }
+
         prevLocationFix = location;
     }
 
@@ -300,7 +310,8 @@ public class WorkoutService extends Service implements
      */
     public boolean checkForSpike(Location loc1, Location loc2){
 
-        long deltaTime = Math.abs(loc2.getTime() - loc1.getTime()) / 1000;
+        long deltaTimeInMillis = Math.abs(loc2.getTime() - loc1.getTime());
+        long deltaTime = deltaTimeInMillis / 1000;
 
         if (deltaTime > Config.SPIKE_FILTER_ELIGIBLE_TIME_INTERVAL){
             // If time interval between two location fixes is sufficiently large then those fixes are not considered as spikes
@@ -308,10 +319,30 @@ public class WorkoutService extends Service implements
         }
 
         float deltaDistance = loc1.distanceTo(loc2);
-        float deltaSpeed = deltaDistance / deltaTime;
+        float deltaSpeed = (deltaDistance * 1000) / deltaTimeInMillis;
+
+        // Determine speed threshold based on User's current context
+
+        float spikeFilterSpeedThreshold;
+        String thresholdApplied;
+
+        if (ActivityRecognizedService.isIsInVehicle()){
+            spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+            thresholdApplied = "in_vehicle";
+        }else {
+            if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
+                // Can make a safe assumption that the person is on foot
+                spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
+                thresholdApplied = "on_foot";
+            }else {
+                spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
+                thresholdApplied = "default";
+            }
+        }
 
         // If speed is greater than threshold, then it is considered as GPS spike
-        if (deltaSpeed > Config.SPIKE_FILTER_SPEED_THRESHOLD){
+
+        if (deltaSpeed > spikeFilterSpeedThreshold){
             Logger.e(TAG, "Detected GPS spike, between locations loc1:\n" + loc1.toString()
                         + "\n, loc2:\n" + loc2.toString()
                         + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
@@ -319,6 +350,9 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .put("spikey_distance", deltaDistance)
                     .put("time_interval", deltaTime)
+                    .put("accuracy", loc2.getAccuracy())
+                    .put("threshold_applied", thresholdApplied)
+                    .put("steps_per_sec_moving_average", stepCounter.getMovingAverageOfStepsPerSec())
                     .buildAndDispatch();
             return true;
         }else {
@@ -380,13 +414,18 @@ public class WorkoutService extends Service implements
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
         updateNotification();
-        AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
-                .addBundle(mCauseData.getCauseBundle())
-                .addBundle(getWorkoutBundle())
-                .put("delta_distance", deltaDistance)
-                .put("delta_time", deltaTime)
-                .put("delta_speed", deltaSpeed)
-                .buildAndDispatch();
+        float totalDistanceKmsOneDecimal = Float.parseFloat(Utils.formatToKmsWithOneDecimal(totalDistance));
+        if (totalDistanceKmsOneDecimal > distanceInKmsOnLastUpdateEvent){
+            // Send event only when the distance counter increment by one unit
+            AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
+                    .addBundle(mCauseData.getCauseBundle())
+                    .addBundle(getWorkoutBundle())
+                    .put("delta_distance", deltaDistance) // in meters
+                    .put("delta_time", deltaTime) // in secs
+                    .put("delta_speed", deltaSpeed) // in km/hrs
+                    .buildAndDispatch();
+            distanceInKmsOnLastUpdateEvent = totalDistanceKmsOneDecimal;
+        }
     }
 
     private void sendBroadcast(Bundle bundle) {
@@ -440,12 +479,7 @@ public class WorkoutService extends Service implements
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
             if (currentlyTracking) {
-                Intent intent = new Intent(this, ActivityRecognizedService.class);
-                PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-                if (googleApiClient != null && googleApiClient.isConnected()) {
-                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(googleApiClient, pendingIntent);
-                }
+                unregisterForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
@@ -466,12 +500,7 @@ public class WorkoutService extends Service implements
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
             if (currentlyTracking) {
-                Intent intent = new Intent(this, ActivityRecognizedService.class);
-                PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-                if (googleApiClient != null && googleApiClient.isConnected()) {
-                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-                }
+                registerForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
@@ -573,9 +602,23 @@ public class WorkoutService extends Service implements
     @Override
     public void onConnected(Bundle bundle) {
         Logger.d(TAG, "onConnected");
+        registerForActivityUpdates();
+    }
+
+    private void registerForActivityUpdates(){
+        ActivityRecognizedService.reset();
         Intent intent = new Intent(this, ActivityRecognizedService.class);
         PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
+    }
+
+    private void unregisterForActivityUpdates(){
+        ActivityRecognizedService.reset();
+        Intent intent = new Intent(this, ActivityRecognizedService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -610,16 +653,9 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getNotificationBuilder() {
-        String distDecimal = String.format("%1$.1f", (mDistance / 1000));
-        int rupees = 0;
-
-        try{
-            float fDistance = Float.parseFloat(distDecimal);
-            rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
-        }
-        catch ( NumberFormatException e){
-
-        }
+        String distDecimal = Utils.formatToKmsWithOneDecimal(mDistance);
+        float fDistance = Float.parseFloat(distDecimal);
+        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)

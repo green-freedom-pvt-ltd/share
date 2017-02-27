@@ -19,7 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.Cause;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.Events.DBEvent;
@@ -43,8 +42,6 @@ import com.sharesmile.share.views.MLButton;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +67,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     ProgressBar mProgressBar;
 
     private CausePageAdapter mAdapter;
-    MixpanelAPI mixpanel;
     private View badgeIndictor;
 
     @Override
@@ -177,16 +173,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.btn_lets_run:
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
-
                 getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
-                mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
-                try {
-                    JSONObject props = new JSONObject();
-                    props.put("Let's Run", "Clicked");
-                    mixpanel.track("OnScreenFragment - onClick called", props);
-                } catch (JSONException e) {
-                    Logger.e(TAG, "Unable to add properties to JSONObject", e);
-                }
+
                 AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                         .addBundle(causeData.getCauseBundle())
                         .put("cause_index", viewPager.getCurrentItem())

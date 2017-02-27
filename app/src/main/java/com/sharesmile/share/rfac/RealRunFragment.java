@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -59,7 +58,6 @@ public class RealRunFragment extends RunFragment {
     @BindView(R.id.timer_indicator)
     TextView mTimerIndicator;
     private CauseData mCauseData;
-    MixpanelAPI mixpanel;
 
     public static final String RUPEES_IMPACT_ON_PAUSE = "rupees_impact_on_pause";
     public static final String DISTANCE_COVERED_ON_PAUSE = "distance_covered_on_pause";
@@ -141,11 +139,11 @@ public class RealRunFragment extends RunFragment {
             Workout workout = new Workout();
 
             workout.setAvgSpeed(data.getAvgSpeed());
-            workout.setDistance(data.getDistance() / 1000);
+            workout.setDistance(data.getDistance() / 1000); // in Kms
             workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
 
             //data.getDistance()
-            String distDecimal = String.format("%1$,.1f", (data.getDistance() / 1000));
+            String distDecimal = Utils.formatToKmsWithOneDecimal(data.getDistance());
             int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distDecimal));
 
             simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -167,7 +165,6 @@ public class RealRunFragment extends RunFragment {
             //update userImpact
             updateUserImpact(workout);
 
-            mixpanel = MixpanelAPI.getInstance(getActivity().getBaseContext(), getString(R.string.mixpanel_project_token));
             try {
                 JSONObject props = new JSONObject();
                 props.put("End Run", "Clicked");
@@ -175,8 +172,6 @@ public class RealRunFragment extends RunFragment {
                 props.put("CauseBrief", mCauseData.getTitle());
                 props.put("Distance Ran", distDecimal);
                 props.put("Time", workout.getDate());
-
-                mixpanel.track("RealRunFragment - onWorkoutResult called", props);
             } catch (JSONException e) {
                 Logger.e(TAG, "Unable to add properties to JSONObject", e);
             }
@@ -200,7 +195,7 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
-        String distanceString = Utils.formatToKms(distanceCovered);
+        String distanceString = Utils.formatToKmsWithOneDecimal(distanceCovered);
         distance.setText(distanceString);
         int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));

@@ -1,7 +1,6 @@
 package com.sharesmile.share.rfac.adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,10 +74,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mDate.setText(DateUtil.getUserFormattedDate(workout.getDate()));
             }
             mCause.setText(workout.getCauseBrief());
-            String distanceCovered = String.format("%1$,.1f", workout.getDistance());
+            String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
-
-         //   mImpact.setText(mImpact.getContext().getString(R.string.rs_string, (int) Math.ceil(workout.getRunAmount())));
             mImpact.setText (mImpact.getContext().getString(R.string.rs_symbol) +" "+ (int) Math.ceil(workout.getRunAmount()));
 
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());

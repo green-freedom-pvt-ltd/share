@@ -33,11 +33,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
@@ -60,8 +60,6 @@ import com.squareup.picasso.Target;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import Models.CampaignList;
 import butterknife.BindView;
@@ -77,7 +75,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar toolbar;
-    MixpanelAPI mixpanel;
 
     @BindView(R.id.toolbar_title)
     TextView mToolbarTitle;
@@ -91,16 +88,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         setContentView(R.layout.activity_main);
-
-        mixpanel = MixpanelAPI.getInstance(this, getString(R.string.mixpanel_project_token));
-
-        try {
-            JSONObject props = new JSONObject();
-            props.put("Logged in", false);
-            mixpanel.track("MainActivity - onCreate called", props);
-        } catch (JSONException e) {
-            Logger.e(TAG, "Unable to add properties to JSONObject", e);
-        }
 
         ButterKnife.bind(this);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -123,6 +110,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         checkAppVersion();
         SyncHelper.syncCampaignData(getApplicationContext());
         handleNotificationIntent();
+        Analytics.getInstance().setUserProperties();
     }
 
     private void handleNotificationIntent() {
@@ -396,7 +384,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onDestroy() {
-        mixpanel.flush();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }

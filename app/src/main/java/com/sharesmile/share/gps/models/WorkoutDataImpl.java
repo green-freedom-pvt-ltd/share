@@ -217,12 +217,22 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public Properties getWorkoutBundle() {
 		Properties p = new Properties();
-		p.put("distance", Utils.formatToKms(getDistance()));
+		p.put("distance", Utils.formatToKmsWithOneDecimal(getDistance()));
 		p.put("time_elapsed", getElapsedTime());
 		p.put("avg_speed", getAvgSpeed()*(3.6f));
 		p.put("num_steps", getTotalSteps());
 		return p;
 	}
+
+	public static WorkoutDataImpl getTestWorkoutData(){
+		WorkoutDataImpl data = new WorkoutDataImpl(System.currentTimeMillis());
+		data.distance = 3240; // meters
+		data.elapsedTime = 1400; // secs
+		data.recordedTime = 1400;
+		data.totalSteps = 4321;
+		return data;
+	}
+
 
 	@Override
 	public String toString() {

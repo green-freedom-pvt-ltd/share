@@ -52,11 +52,6 @@ public class ActivityRecognizedService extends IntentService {
                         .put("confidence_value", inVehicleConfidence)
                         .buildAndDispatch();
             }
-            if (stillConfidence > CONFIDENCE_THRESHOLD_EVENT){
-                AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_STILL)
-                        .put("confidence_value", stillConfidence)
-                        .buildAndDispatch();
-            }
             if (inVehicleConfidence > CONFIDENCE_THRESHOLD){
                 isInVehicle = true;
                 MainApplication.showRunNotification("We have detected that you are driving.");
@@ -84,6 +79,11 @@ public class ActivityRecognizedService extends IntentService {
 
     public static boolean isIsInVehicle(){
         return isInVehicle;
+    }
+
+    public static void reset(){
+        isInVehicle = false;
+        stillOccurredCounter = 0;
     }
 
 

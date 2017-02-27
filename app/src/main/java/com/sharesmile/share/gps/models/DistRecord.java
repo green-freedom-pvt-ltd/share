@@ -33,7 +33,7 @@ public class DistRecord implements UnObfuscable, Serializable{
         // distanceTo() method, though not blocking but is very computationally intensive
         this.dist = dist;
         interval = ((float) (getElapsedTimeMs())) / 1000;
-        speed = dist / interval;
+        speed = (dist * 1000) / getElapsedTimeMs();
     }
 
     private long getElapsedTimeMs(){

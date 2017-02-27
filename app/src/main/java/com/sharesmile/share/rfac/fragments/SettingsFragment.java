@@ -2,11 +2,9 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
@@ -40,6 +39,10 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     @BindView(R.id.logout)
     TextView mLogout;
+
+    @BindView(R.id.tv_app_version)
+    TextView appVersionText;
+
     private FragmentInterface mListener;
 
     @Nullable
@@ -53,6 +56,15 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mRate.setOnClickListener(this);
         mLogout.setOnClickListener(this);
         getFragmentController().updateToolBar(getString(R.string.action_settings), true);
+        String version = "";
+        try {
+            PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+            version = pInfo.versionName;
+        }catch (Exception e){
+            Logger.e("SettingsFragment", e.getMessage());
+        }
+
+        appVersionText.setText("App Version " + version);
         return view;
 
     }

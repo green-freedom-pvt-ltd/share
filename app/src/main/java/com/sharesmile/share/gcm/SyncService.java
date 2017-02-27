@@ -1,7 +1,5 @@
 package com.sharesmile.share.gcm;
 
-import android.text.TextUtils;
-
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
@@ -11,13 +9,10 @@ import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.analytics.Analytics;
-import com.sharesmile.share.analytics.AnalyticsEvent;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.Run;
-import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -98,17 +93,13 @@ public class SyncService extends GcmTaskService {
         List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(false)).list();
 
         if (mWorkoutList != null && mWorkoutList.size() > 0) {
-            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, Analytics.createProp(null, AnalyticsEvent.RunSync.LOCAL_RUN_COUNT, String.valueOf(mWorkoutList.size())));
 
             boolean isSuccess = true;
             for (Workout workout : mWorkoutList) {
                 isSuccess = isSuccess && uploadWorkoutData(workout);
             }
-            JSONObject jsonObject = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_GCM, isSuccess ? "Success" : "Reschedule");
-            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, jsonObject);
             return isSuccess ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
         } else {
-            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_GCM, "Success"));
             return GcmNetworkManager.RESULT_SUCCESS;
         }
 
@@ -141,25 +132,16 @@ public class SyncService extends GcmTaskService {
             workout.setId(response.getId());
             workout.setIs_sync(true);
             mWorkoutDao.insertOrReplace(workout);
-            //Analytics :
-
-            JSONObject props = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_SUCCESS, "Successful");
-            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, props);
 
             return true;
 
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e.getMessageFromServer());
-
-            JSONObject props = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_SUCCESS, "Network Exception : " + e.getMessageFromServer());
-            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, props);
             return false;
         } catch (JSONException e) {
             e.printStackTrace();
             Logger.d(TAG, "JSONException");
-            JSONObject props = Analytics.createProp(null, AnalyticsEvent.RunSync.RUN_UPLOAD_SUCCESS, "JSONException");
-            Analytics.track(AnalyticsEvent.EVENT_RUN_SYNC, props);
             return false;
         }
 

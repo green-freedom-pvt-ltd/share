@@ -15,9 +15,13 @@ public class Config {
 
     public static final float MIN_DISTANCE_FOR_VIGILANCE = 50; // in meters
 
-    public static final int SPIKE_FILTER_ELIGIBLE_TIME_INTERVAL = 20; // in secs
+    public static final int SPIKE_FILTER_ELIGIBLE_TIME_INTERVAL = 40; // in secs
 
-    public static final float SPIKE_FILTER_SPEED_THRESHOLD = 45f; // in m/s, i.e. 166 km/hr
+    public static final float SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE = 52f; // in m/s, i.e. 187 km/hr
+
+    public static final float SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 34f; // in m/s, i.e. 122.4 km/hr
+
+    public static final float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 18f; // in m/s, i.e. 64.8 km/hr
 
     public static final float UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
@@ -39,7 +43,7 @@ public class Config {
 
     public static float THRESHOLD_ACCURACY = 12; // in m
 
-    public static float THRESHOLD_FACTOR = 5.7f;
+    public static float THRESHOLD_FACTOR = 5.2f;
 
     public static float SMALLEST_DISPLACEMENT = 0.1f;// in m
 
