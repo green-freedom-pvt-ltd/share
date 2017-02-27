@@ -66,6 +66,8 @@ public class WorkoutService extends Service implements
     private float mDistance;
     private CauseData mCauseData;
 
+    private float distanceInKmsOnLastUpdateEvent = 0f;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -174,6 +176,7 @@ public class WorkoutService extends Service implements
                     .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
+            distanceInKmsOnLastUpdateEvent = 0f;
         }
     }
 
@@ -411,13 +414,18 @@ public class WorkoutService extends Service implements
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
         updateNotification();
-        AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
-                .addBundle(mCauseData.getCauseBundle())
-                .addBundle(getWorkoutBundle())
-                .put("delta_distance", deltaDistance) // in meters
-                .put("delta_time", deltaTime) // in secs
-                .put("delta_speed", deltaSpeed) // in km/hrs
-                .buildAndDispatch();
+        float totalDistanceKmsOneDecimal = Float.parseFloat(Utils.formatToKmsWithOneDecimal(totalDistance));
+        if (totalDistanceKmsOneDecimal > distanceInKmsOnLastUpdateEvent){
+            // Send event only when the distance counter increment by one unit
+            AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
+                    .addBundle(mCauseData.getCauseBundle())
+                    .addBundle(getWorkoutBundle())
+                    .put("delta_distance", deltaDistance) // in meters
+                    .put("delta_time", deltaTime) // in secs
+                    .put("delta_speed", deltaSpeed) // in km/hrs
+                    .buildAndDispatch();
+            distanceInKmsOnLastUpdateEvent = totalDistanceKmsOneDecimal;
+        }
     }
 
     private void sendBroadcast(Bundle bundle) {
