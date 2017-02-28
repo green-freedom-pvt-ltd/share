@@ -41,6 +41,8 @@ public enum Event {
     ON_WORKOUT_RESUME(AnalyticsEvent.CATEGORY_WORKOUT),
     ON_LOAD_FINISH_RUN_POPUP(AnalyticsEvent.CATEGORY_WORKOUT),
     ON_LOAD_TOO_SHORT_POPUP(AnalyticsEvent.CATEGORY_WORKOUT),
+    ON_RUN_SYNC(AnalyticsEvent.CATEGORY_SYNC),
+
 
     ON_CLICK_PAUSE_RUN(AnalyticsEvent.CATEGORY_WORKOUT),
 
