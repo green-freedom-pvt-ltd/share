@@ -286,19 +286,29 @@ public class RunTracker implements Tracker {
                 if (interval > Config.THRESHOLD_INTEVAL){
 
                     boolean toRecord = false;
-                    float accuracy = point.getAccuracy();
                     /*
-                     Step 2: Record if point is accurate, i.e. accuracy better/lower than our threshold
-                             Else
-                             Apply formula to check whether to record the point or not
-                      */
-                    if (accuracy < Config.THRESHOLD_ACCURACY){
-                        Logger.d(TAG, "Accuracy Wins");
-                        toRecord = true;
-                    }else{
-                        toRecord = checkUsingFormula(dist, point.getAccuracy());
+                    Step 2: Secondary check for spike
+                     */
+                    float deltaSpeedMs = dist / interval;
+                    if (deltaSpeedMs > Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE){
+                        // Insanely high velocity, must be a GPS spike
+                        toRecord = false;
+                    }else {
+                        /*
+                         Step 3: Record if point is accurate, i.e. accuracy better/lower than our threshold
+                                 Else
+                                 Apply formula to check whether to record the point or not
+                          */
+                        float accuracy = point.getAccuracy();
+                        if (accuracy < Config.THRESHOLD_ACCURACY){
+                            Logger.d(TAG, "Accuracy Wins");
+                            toRecord = true;
+                        }else{
+                            toRecord = checkUsingFormula(dist, point.getAccuracy());
+                        }
                     }
-                    // Step 3: Record if needed, else wait for next location
+
+                    // Step 4: Record if needed, else wait for next location
                     if (toRecord){
                         DistRecord record = new DistRecord(point, prevLocation, dist);
                         Logger.d(TAG, "Distance Recording: " + record.toString());

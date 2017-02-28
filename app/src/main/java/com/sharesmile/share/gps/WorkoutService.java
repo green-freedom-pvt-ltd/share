@@ -34,6 +34,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -56,7 +57,8 @@ public class WorkoutService extends Service implements
     private static boolean currentlyProcessingSteps = false;
     private GoogleApiClient googleApiClient;
     private VigilanceTimer vigilanceTimer;
-    private Location prevLocationFix;
+    private Location acceptedLocationFix;
+    private CircularQueue<Location> beginningLocationsRotatingQueue;
 
     private StepCounter stepCounter;
 
@@ -92,7 +94,8 @@ public class WorkoutService extends Service implements
             tracker = new RunTracker(backgroundExecutorService, this);
         }
         synchronized (this){
-            prevLocationFix = null;
+            acceptedLocationFix = null;
+            beginningLocationsRotatingQueue = null;
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         mDistance = tracker.getTotalDistanceCovered();
@@ -286,20 +289,45 @@ public class WorkoutService extends Service implements
         if (location == null){
             return;
         }
-        if (prevLocationFix == null){
-            prevLocationFix = location;
-            // Will not send to tracker as it is the very first location fix received
-            // Will start sending subsequent location fixes, only after they are approved by spike filter
-            return;
-        }
         if (tracker != null && tracker.isRunning()){
-            // Spike filter check
-            if (!checkForSpike(prevLocationFix, location)){
-                tracker.feedLocation(location);
+            if (acceptedLocationFix == null){
+                if (beginningLocationsRotatingQueue == null){
+                    beginningLocationsRotatingQueue = new CircularQueue<>(3);
+                    beginningLocationsRotatingQueue.enqueue(location);
+                    // Will not send to tracker as it is the very first location fix received
+                    // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
+                    // Will start sending subsequent location fixes, only after they are approved by spike filter
+                }else {
+                    // First fill
+                    beginningLocationsRotatingQueue.add(location);
+                    if (beginningLocationsRotatingQueue.isFull()){
+                        // Check if oldest location is a fit
+                        if (isOldestLocationAccepted()){
+                            acceptedLocationFix = beginningLocationsRotatingQueue.peekOldest();
+                            tracker.feedLocation(acceptedLocationFix);
+                        }
+                    }
+                }
+            } else {
+                // Spike filter check
+                if (!checkForSpike(acceptedLocationFix, location)){
+                    tracker.feedLocation(location);
+                    acceptedLocationFix = location;
+                }
             }
         }
 
-        prevLocationFix = location;
+    }
+
+    private boolean isOldestLocationAccepted(){
+        Location oldest = beginningLocationsRotatingQueue.peekOldest();
+        for (int i=1; i<beginningLocationsRotatingQueue.getMaxSize(); i++){
+            if (checkForSpike(oldest, beginningLocationsRotatingQueue.getElemAtPosition(i))){
+                // There is a spike, must discard Oldest
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -495,7 +523,8 @@ public class WorkoutService extends Service implements
         Logger.i(TAG, "resume");
         if (tracker != null && tracker.getState() != Tracker.State.RUNNING) {
             synchronized (this){
-                prevLocationFix = null;
+                acceptedLocationFix = null;
+                beginningLocationsRotatingQueue = null;
             }
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
