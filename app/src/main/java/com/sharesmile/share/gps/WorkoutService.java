@@ -286,12 +286,14 @@ public class WorkoutService extends Service implements
 
     @Override
     public synchronized void onLocationChanged(Location location) {
+        Logger.i(TAG, "onLocationChanged with \n" + location.toString());
         if (location == null){
             return;
         }
         if (tracker != null && tracker.isRunning()){
             if (acceptedLocationFix == null){
                 if (beginningLocationsRotatingQueue == null){
+                    Logger.d(TAG, "Hunt for first accepted location begins");
                     beginningLocationsRotatingQueue = new CircularQueue<>(3);
                     beginningLocationsRotatingQueue.enqueue(location);
                     // Will not send to tracker as it is the very first location fix received
@@ -301,8 +303,12 @@ public class WorkoutService extends Service implements
                     // First fill
                     beginningLocationsRotatingQueue.add(location);
                     if (beginningLocationsRotatingQueue.isFull()){
+                        Logger.d(TAG, "Rotating queue is full, will check if we can " +
+                                "accept the oldest location: "
+                                + beginningLocationsRotatingQueue.peekOldest().toString());
                         // Check if oldest location is a fit
                         if (isOldestLocationAccepted()){
+                            Logger.d(TAG, "Oldest location accepted, will feed to tracker");
                             acceptedLocationFix = beginningLocationsRotatingQueue.peekOldest();
                             tracker.feedLocation(acceptedLocationFix);
                         }
@@ -474,6 +480,15 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
     }
 
+    @Override
+    public float getMovingAverageOfStepsPerSec() {
+        if (stepCounter != null){
+            return stepCounter.getMovingAverageOfStepsPerSec();
+        }
+        return -1;
+
+    }
+
     /**
      * Returns true if this device is supported. It needs to be running Android KitKat (4.4) or
      * higher and has a step counter and step detector sensor.
@@ -578,7 +593,6 @@ public class WorkoutService extends Service implements
     @Override
     public float getTotalDistanceCoveredInMeters() {
         if (tracker != null && tracker.isActive()){
-            Logger.d(TAG, "getTotalDistanceCoveredInMeters from Tracker");
             return tracker.getTotalDistanceCovered();
         }
         return 0;
@@ -588,7 +602,6 @@ public class WorkoutService extends Service implements
     public long getWorkoutElapsedTimeInSecs() {
         if (tracker != null && tracker.isActive()){
             long elapsedTime = tracker.getElapsedTimeInSecs();
-            Logger.d(TAG, "getElapsedTimeInSecs from Tracker = " + elapsedTime);
             return elapsedTime;
         }
         return 0;

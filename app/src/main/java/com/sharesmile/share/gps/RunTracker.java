@@ -3,6 +3,9 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -293,6 +296,15 @@ public class RunTracker implements Tracker {
                     if (deltaSpeedMs > Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE){
                         // Insanely high velocity, must be a GPS spike
                         toRecord = false;
+                        Logger.i(TAG, "GPS spike detected in RunTracker, through secondary check");
+                        AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
+                                .addBundle(getWorkoutBundle())
+                                .put("spikey_distance", dist)
+                                .put("time_interval", interval)
+                                .put("accuracy", point.getAccuracy())
+                                .put("threshold_applied", "secondary_check")
+                                .put("steps_per_sec_moving_average", listener.getMovingAverageOfStepsPerSec())
+                                .buildAndDispatch();
                     }else {
                         /*
                          Step 3: Record if point is accurate, i.e. accuracy better/lower than our threshold
@@ -324,6 +336,15 @@ public class RunTracker implements Tracker {
                 }
             }
         }
+    }
+
+    public Properties getWorkoutBundle(){
+        Properties p = new Properties();
+        p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistanceCovered()));
+        p.put("time_elapsed", getElapsedTimeInSecs());
+        p.put("avg_speed", getAvgSpeed() * (3.6f));
+        p.put("num_steps", getTotalSteps());
+        return p;
     }
 
     private boolean checkUsingFormula(float dist, float accuracy){
@@ -358,6 +379,8 @@ public class RunTracker implements Tracker {
                                  float deltaSpeed);
 
         void updateStepsRecord(long timeStampMillis);
+
+        float getMovingAverageOfStepsPerSec();
 
     }
 
