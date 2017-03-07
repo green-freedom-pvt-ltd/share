@@ -25,6 +25,7 @@ public interface IFragmentController {
 
     int SHOW_MESSAGE_CENTER = 105;
     int SHOW_LEAGUE_ACTIVITY = 106;
+    int SHOW_FAQ_FRAGMENT = 107;
 
     /*
         Common methods which can be implemented either by abstract BaseActivity or by solid child activities

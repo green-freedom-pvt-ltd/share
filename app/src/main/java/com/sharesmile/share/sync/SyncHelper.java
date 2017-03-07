@@ -74,7 +74,7 @@ public class SyncHelper {
     public static int updateWorkoutData() {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         long workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
-        String runUrl = Urls.getRunUrl();
+        String runUrl = Urls.getFlaggedRunUrl();
         return updateWorkoutData(runUrl, workoutCount);
     }
 
@@ -148,7 +148,7 @@ public class SyncHelper {
     // get user total Impact
     public static void updateUserImpact() {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        List<Workout> list = mWorkoutDao.queryBuilder().list();
+        List<Workout> list = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.IsValidRun.eq(true)).list();
         int workoutCount = list.size();
         float totalImpact = 0;
         for (Workout data : list) {

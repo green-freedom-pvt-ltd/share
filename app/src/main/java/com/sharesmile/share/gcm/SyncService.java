@@ -134,6 +134,7 @@ public class SyncService extends GcmTaskService {
             mWorkoutDao.delete(workout);
             workout.setId(response.getId());
             workout.setIs_sync(true);
+            workout.setIsValidRun(!response.isFlag());
             mWorkoutDao.insertOrReplace(workout);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "success")

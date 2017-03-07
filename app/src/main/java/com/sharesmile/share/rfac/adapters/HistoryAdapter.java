@@ -1,9 +1,11 @@
 package com.sharesmile.share.rfac.adapters;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
@@ -21,7 +23,12 @@ import butterknife.ButterKnife;
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
+    private final AdapterInterface mInterface;
     private List<Workout> mData;
+
+    public HistoryAdapter(AdapterInterface adapterInterface) {
+        mInterface = adapterInterface;
+    }
 
     @Override
     public HistoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -64,6 +71,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         @BindView(R.id.duration)
         TextView mDuration;
 
+        @BindView(R.id.error_indicator)
+        ImageView mIndicator;
+
+        @BindView(R.id.content_view)
+        CardView mCard;
+
         public HistoryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -76,7 +89,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             mCause.setText(workout.getCauseBrief());
             String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
-            mImpact.setText (mImpact.getContext().getString(R.string.rs_symbol) +" "+ (int) Math.ceil(workout.getRunAmount()));
+            mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + (int) Math.ceil(workout.getRunAmount()));
 
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());
             if (timeInSec >= 60) {
@@ -86,7 +99,27 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mDuration.setText(mImpact.getResources().getQuantityString(R.plurals.time_in_sec, (int) timeInSec, (int) timeInSec));
             }
 
+            if (workout.getIsValidRun()) {
+                mIndicator.setVisibility(View.GONE);
+                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white));
+                mCard.setOnClickListener(null);
+            } else {
+                mIndicator.setVisibility(View.VISIBLE);
+                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white_50));
+
+                mCard.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mInterface.showInvalidRunDialog();
+                    }
+                });
+            }
+
 
         }
+    }
+
+    public interface AdapterInterface {
+        public void showInvalidRunDialog();
     }
 }

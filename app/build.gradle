@@ -28,14 +28,14 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 45
-        versionName "1.7.7"
+        versionCode 46
+        versionName "1.7.8"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true

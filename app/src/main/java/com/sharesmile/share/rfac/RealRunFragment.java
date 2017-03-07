@@ -138,6 +138,7 @@ public class RealRunFragment extends RunFragment {
             WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             Workout workout = new Workout();
 
+            workout.setIsValidRun(true);
             workout.setAvgSpeed(data.getAvgSpeed());
             workout.setDistance(data.getDistance() / 1000); // in Kms
             workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
