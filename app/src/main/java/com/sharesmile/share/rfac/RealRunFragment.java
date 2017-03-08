@@ -165,17 +165,6 @@ public class RealRunFragment extends RunFragment {
             //update userImpact
             updateUserImpact(workout);
 
-            try {
-                JSONObject props = new JSONObject();
-                props.put("End Run", "Clicked");
-                props.put("RunAmount", rupees);
-                props.put("CauseBrief", mCauseData.getTitle());
-                props.put("Distance Ran", distDecimal);
-                props.put("Time", workout.getDate());
-            } catch (JSONException e) {
-                Logger.e(TAG, "Unable to add properties to JSONObject", e);
-            }
-
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
             SyncHelper.pushRunData();
         }

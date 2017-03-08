@@ -295,7 +295,7 @@ public class WorkoutService extends Service implements
                 if (beginningLocationsRotatingQueue == null){
                     Logger.d(TAG, "Hunt for first accepted location begins");
                     beginningLocationsRotatingQueue = new CircularQueue<>(3);
-                    beginningLocationsRotatingQueue.enqueue(location);
+                    beginningLocationsRotatingQueue.add(location);
                     // Will not send to tracker as it is the very first location fix received
                     // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
                     // Will start sending subsequent location fixes, only after they are approved by spike filter
