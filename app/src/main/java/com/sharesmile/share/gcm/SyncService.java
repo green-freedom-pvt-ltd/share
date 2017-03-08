@@ -143,10 +143,13 @@ public class SyncService extends GcmTaskService {
 
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException" + e.getMessageFromServer());
-            Crashlytics.log("Run sync networkException");
+            Logger.d(TAG, "NetworkException: " + e.getMessageFromServer());
+            Crashlytics.log("Run sync networkException, messageFromServer: " + e.getMessageFromServer());
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
+                    .put("upload_result", "failure")
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
                     .put("upload_result", "Network exception " + e.getMessageFromServer())
                     .buildAndDispatch();
             return false;

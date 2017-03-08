@@ -1,7 +1,9 @@
 package com.sharesmile.share.gps;
 
+import android.location.Location;
 import android.text.TextUtils;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -12,6 +14,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -38,8 +41,9 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     WorkoutDataStoreImpl(long beginTimeStamp){
-        dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp);
-        approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp);
+        String workoutId = UUID.randomUUID().toString();
+        dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
+        approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
         //Persist dirtyWorkoutData object over here
         persistBothWorkoutData();
     }
@@ -67,8 +71,12 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
                                             ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
             float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
+            //TODO: Add a startPoint identified analytics event.
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
+            Location startLocation = record.getLocation();
+            dirtyWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
+            approvedWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
             Logger.d(TAG, "addRecord: Source record after begin/resume, extraPolatedDistanceToBeApproved = "
                     + extraPolatedDistance);
         }
@@ -171,6 +179,16 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         extraPolatedDistanceToBeApproved = 0;
         waitingForApprovalQueue.clear();
         numStepsToBeApproved = 0;
+    }
+
+    @Override
+    public LatLng getStartPoint() {
+        return dirtyWorkoutData.getStartPoint();
+    }
+
+    @Override
+    public String getWorkoutId() {
+        return dirtyWorkoutData.getWorkoutId();
     }
 
     @Override

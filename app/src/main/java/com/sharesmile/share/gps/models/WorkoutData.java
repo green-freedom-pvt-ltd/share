@@ -127,4 +127,22 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 */
 	Properties getWorkoutBundle();
 
+	/**
+	 * Fetches the start point (LatLng) of the workout
+	 * @return
+     */
+	LatLng getStartPoint();
+
+	/**
+	 * Sets the start point (LatLng) of the workout
+	 * @return
+	 */
+	void setStartPoint(LatLng latLng);
+
+	/**
+	 * Gets the universally unique identifier of workout
+	 * @return
+     */
+	String getWorkoutId();
+
 }

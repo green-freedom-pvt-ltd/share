@@ -152,13 +152,7 @@ public class RealRunFragment extends RunFragment {
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());
-            try {
-                workout.setDate(simpleDateFormat.parse(simpleDateFormat.format(Calendar.getInstance().getTime())));
-            }
-
-            catch (ParseException e){
-                Logger.e(TAG,"Date format error", e);
-            }
+            workout.setDate(Calendar.getInstance().getTime());
             workout.setIs_sync(false);
             workoutDao.insertOrReplace(workout);
 

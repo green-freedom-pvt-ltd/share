@@ -25,18 +25,22 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private long beginTimeStamp;
 	private boolean isActive;
 	private boolean paused;
+	private LatLng startPoint;
+	private String workoutId;
+
 	private List<WorkoutBatchImpl> batches;
 
 	/**
 	 * Constructor to be used for creating a new WorkoutData object
 	 * @param beginTimeStamp
 	 */
-	public WorkoutDataImpl(long beginTimeStamp) {
+	public WorkoutDataImpl(long beginTimeStamp, String workoutId) {
 		isActive = true;
 		paused = false;
 		batches = new ArrayList<>();
 		this.beginTimeStamp = beginTimeStamp;
 		invokeNewBatch(beginTimeStamp);
+		this.workoutId = workoutId;
 	}
 
 	private WorkoutDataImpl(WorkoutDataImpl source){
@@ -47,6 +51,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		beginTimeStamp = source.beginTimeStamp;
 		isActive = source.isActive;
 		paused = source.paused;
+		this.startPoint = new LatLng(source.startPoint.latitude, source.startPoint.longitude);
+		this.workoutId = source.workoutId;
 		batches = new ArrayList<>();
 		for (WorkoutBatch batch : source.batches){
 			batches.add((WorkoutBatchImpl)batch.copy());
@@ -56,6 +62,21 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private void invokeNewBatch(long startTimeStamp){
 		WorkoutBatchImpl newbatch = new WorkoutBatchImpl(startTimeStamp);
 		batches.add(newbatch);
+	}
+
+	@Override
+	public LatLng getStartPoint() {
+		return startPoint;
+	}
+
+	@Override
+	public void setStartPoint(LatLng source) {
+		this.startPoint = source;
+	}
+
+	@Override
+	public String getWorkoutId() {
+		return workoutId;
 	}
 
 	@Override
@@ -225,7 +246,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	public static WorkoutDataImpl getTestWorkoutData(){
-		WorkoutDataImpl data = new WorkoutDataImpl(System.currentTimeMillis());
+		WorkoutDataImpl data = new WorkoutDataImpl(System.currentTimeMillis(), "test");
 		data.distance = 3240; // meters
 		data.elapsedTime = 1400; // secs
 		data.recordedTime = 1400;
@@ -244,6 +265,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", isActive=" + isActive +
 				", paused=" + paused +
 				", beginTimeStamp=" + beginTimeStamp +
+				", startPoint=" + startPoint +
+				", workoutId=" + workoutId +
 				'}';
 	}
 
@@ -255,8 +278,10 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		beginTimeStamp = in.readLong();
 		isActive = in.readByte() != 0x00;
 		paused = in.readByte() != 0x00;
+		startPoint = (LatLng) in.readValue(LatLng.class.getClassLoader());
+		workoutId = in.readString();
 		if (in.readByte() == 0x01) {
-			batches = new ArrayList<>();
+			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
 		} else {
 			batches = null;
@@ -277,6 +302,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeLong(beginTimeStamp);
 		dest.writeByte((byte) (isActive ? 0x01 : 0x00));
 		dest.writeByte((byte) (paused ? 0x01 : 0x00));
+		dest.writeValue(startPoint);
+		dest.writeString(workoutId);
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {
