@@ -202,6 +202,14 @@ public class RunTracker implements Tracker {
     }
 
     @Override
+    public String getCurrentWorkoutId() {
+        if (isActive() && dataStore != null){
+            return dataStore.getWorkoutId();
+        }
+        return null;
+    }
+
+    @Override
     public float getTotalDistanceCovered(){
         if (isActive() && dataStore != null){
             return dataStore.getTotalDistance();
@@ -344,6 +352,7 @@ public class RunTracker implements Tracker {
         p.put("time_elapsed", getElapsedTimeInSecs());
         p.put("avg_speed", getAvgSpeed() * (3.6f));
         p.put("num_steps", getTotalSteps());
+        p.put("client_run_id", getCurrentWorkoutId());
         return p;
     }
 

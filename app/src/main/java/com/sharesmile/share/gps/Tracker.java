@@ -29,6 +29,7 @@ public interface Tracker {
 	float getAvgSpeed();
 	float getCurrentSpeed();
 	DistRecord getLastRecord();
+	String getCurrentWorkoutId();
 	State getState();
 
 	enum State{

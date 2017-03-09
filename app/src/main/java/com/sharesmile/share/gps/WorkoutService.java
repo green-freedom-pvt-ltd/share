@@ -244,6 +244,7 @@ public class WorkoutService extends Service implements
             p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
             p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
+            p.put("client_run_id", tracker.getCurrentWorkoutId());
             return p;
         }
         return  null;

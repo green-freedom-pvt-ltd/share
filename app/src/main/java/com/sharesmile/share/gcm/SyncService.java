@@ -139,9 +139,9 @@ public class SyncService extends GcmTaskService {
             workout.setId(response.getId());
             workout.setIs_sync(true);
             mWorkoutDao.insertOrReplace(workout);
-            //TODO: Add more info in ON_RUN_SYNC event
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "success")
+                    .put("client_run_id", workout.getWorkoutId())
                     .buildAndDispatch();
 
             return true;
@@ -153,9 +153,10 @@ public class SyncService extends GcmTaskService {
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "failure")
+                    .put("client_run_id", workout.getWorkoutId())
                     .put("exception_message", e.getMessage())
                     .put("message_from_server", e.getMessageFromServer())
-                    .put("upload_result", "Network exception " + e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
                     .buildAndDispatch();
             return false;
         } catch (JSONException e) {

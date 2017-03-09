@@ -166,12 +166,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public Properties getWorkoutBundle(){
         if (myActivity != null){
-            Properties p = new Properties();
-            p.put("distance", Utils.formatToKmsWithOneDecimal(myActivity.getTotalDistanceInMeters()));
-            p.put("time_elapsed", myActivity.getElapsedTimeInSecs());
-            p.put("avg_speed", myActivity.getAvgSpeed()*(3.6f));
-            p.put("num_steps", myActivity.getTotalSteps());
-            return p;
+            return myActivity.getWorkoutBundle();
         }
         return null;
     }

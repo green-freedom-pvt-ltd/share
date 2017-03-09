@@ -250,6 +250,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		p.put("time_elapsed", getElapsedTime());
 		p.put("avg_speed", getAvgSpeed()*(3.6f));
 		p.put("num_steps", getTotalSteps());
+		p.put("client_run_id", getWorkoutId());
 		return p;
 	}
 
