@@ -123,8 +123,9 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("no_of_steps", workout.getSteps());
 
             jsonObject.put("avg_speed", workout.getAvgSpeed());
-            //// TODO: 15/05/16 remove Peak speed
-            jsonObject.put("peak_speed", 1);
+            jsonObject.put("client_run_id", workout.getWorkoutId());
+            jsonObject.put("start_location_lat", workout.getStartPointLatitude());
+            jsonObject.put("start_location_long", workout.getStartPointLongitude());
             Logger.d(TAG, jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);

@@ -65,7 +65,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             return;
         }
 
-        if (record.isStartRecord()){
+        if (record.isFirstRecordAfterResume()){
             //Source point fetched for the batch
             int stepsRanWhileSearchingForSource = getTotalSteps() - numStepsWhenBatchBegan;
             float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
@@ -84,8 +84,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
         dirtyWorkoutData.addRecord(record);
         waitingForApprovalQueue.add(record);
-        // Persist dirtyWorkoutData object
-        persistDirtyWorkoutData();
     }
 
     @Override
@@ -98,7 +96,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         if (isWorkoutRunning()){
             dirtyWorkoutData.addSteps(numSteps);
             numStepsToBeApproved += numSteps;
-            persistDirtyWorkoutData();
         }
     }
 

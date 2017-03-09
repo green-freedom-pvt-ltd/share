@@ -154,6 +154,9 @@ public class RealRunFragment extends RunFragment {
             workout.setCauseBrief(mCauseData.getTitle());
             workout.setDate(Calendar.getInstance().getTime());
             workout.setIs_sync(false);
+            workout.setWorkoutId(data.getWorkoutId());
+            workout.setStartPointLatitude(data.getStartPoint().latitude);
+            workout.setStartPointLongitude(data.getStartPoint().longitude);
             workoutDao.insertOrReplace(workout);
 
             //update userImpact

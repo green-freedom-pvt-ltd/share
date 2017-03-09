@@ -134,6 +134,12 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	LatLng getStartPoint();
 
 	/**
+	 * Fetches the end point (LatLng) of the workout
+	 * @return
+	 */
+	LatLng getLatestPoint();
+
+	/**
 	 * Sets the start point (LatLng) of the workout
 	 * @return
 	 */

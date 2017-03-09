@@ -27,6 +27,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private boolean paused;
 	private LatLng startPoint;
 	private String workoutId;
+	private LatLng latestPoint;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -53,6 +54,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		paused = source.paused;
 		this.startPoint = new LatLng(source.startPoint.latitude, source.startPoint.longitude);
 		this.workoutId = source.workoutId;
+		this.latestPoint = new LatLng(source.latestPoint.latitude, source.latestPoint.longitude);
 		batches = new ArrayList<>();
 		for (WorkoutBatch batch : source.batches){
 			batches.add((WorkoutBatchImpl)batch.copy());
@@ -67,6 +69,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public LatLng getStartPoint() {
 		return startPoint;
+	}
+
+	@Override
+	public LatLng getLatestPoint() {
+		return latestPoint;
 	}
 
 	@Override
@@ -187,7 +194,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			Logger.i(TAG, "Won't add add record as user is not running");
 			return;
 		}
-		if (record.isStartRecord()){
+		if (record.isFirstRecordAfterResume()){
 			//Just set the start point if it is "first cold started" record after start/resume of workout
 			getCurrentBatch().setStartPoint(record.getLocation());
 		}else{
@@ -197,6 +204,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			recordedTime =
 					((float) (record.getLocation().getTime() - getCurrentBatch().getStartTimeStamp())) / 1000;
 		}
+		latestPoint = new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude());
 	}
 
 	@Override
@@ -267,6 +275,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", beginTimeStamp=" + beginTimeStamp +
 				", startPoint=" + startPoint +
 				", workoutId=" + workoutId +
+				", latestPoint=" + latestPoint +
 				'}';
 	}
 
@@ -280,6 +289,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		paused = in.readByte() != 0x00;
 		startPoint = (LatLng) in.readValue(LatLng.class.getClassLoader());
 		workoutId = in.readString();
+		latestPoint = (LatLng) in.readValue(LatLng.class.getClassLoader());
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
@@ -304,6 +314,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeByte((byte) (paused ? 0x01 : 0x00));
 		dest.writeValue(startPoint);
 		dest.writeString(workoutId);
+		dest.writeValue(latestPoint);
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

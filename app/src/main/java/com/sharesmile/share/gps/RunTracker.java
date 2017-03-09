@@ -153,7 +153,7 @@ public class RunTracker implements Tracker {
 
     @Override
     public float getCurrentSpeed() {
-        if (lastRecord != null && !lastRecord.isStartRecord()){
+        if (lastRecord != null && !lastRecord.isFirstRecordAfterResume()){
             return lastRecord.getSpeed();
         }
         return 0;
