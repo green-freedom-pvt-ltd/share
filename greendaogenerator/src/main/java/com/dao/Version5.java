@@ -40,6 +40,10 @@ public class Version5 extends SchemaVersion {
         workout.addStringProperty("workoutId").notNull();
         workout.addDoubleProperty("startPointLatitude");
         workout.addDoubleProperty("startPointLongitude");
+        workout.addDoubleProperty("endPointLatitude");
+        workout.addDoubleProperty("endPointLongitude");
+        workout.addLongProperty("beginTimeStamp");
+        workout.addLongProperty("endTimeStamp");
     }
 
     private static void addUserData(Schema schema) {

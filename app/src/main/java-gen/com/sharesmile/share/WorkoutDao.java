@@ -34,6 +34,10 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         public final static Property WorkoutId = new Property(10, String.class, "workoutId", false, "WORKOUT_ID");
         public final static Property StartPointLatitude = new Property(11, Double.class, "startPointLatitude", false, "START_POINT_LATITUDE");
         public final static Property StartPointLongitude = new Property(12, Double.class, "startPointLongitude", false, "START_POINT_LONGITUDE");
+        public final static Property EndPointLatitude = new Property(13, Double.class, "endPointLatitude", false, "END_POINT_LATITUDE");
+        public final static Property EndPointLongitude = new Property(14, Double.class, "endPointLongitude", false, "END_POINT_LONGITUDE");
+        public final static Property BeginTimeStamp = new Property(15, Long.class, "beginTimeStamp", false, "BEGIN_TIME_STAMP");
+        public final static Property EndTimeStamp = new Property(16, Long.class, "endTimeStamp", false, "END_TIME_STAMP");
     };
 
 
@@ -61,7 +65,11 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"IS_SYNC\" INTEGER," + // 9: is_sync
                 "\"WORKOUT_ID\" TEXT NOT NULL ," + // 10: workoutId
                 "\"START_POINT_LATITUDE\" REAL," + // 11: startPointLatitude
-                "\"START_POINT_LONGITUDE\" REAL);"); // 12: startPointLongitude
+                "\"START_POINT_LONGITUDE\" REAL," + // 12: startPointLongitude
+                "\"END_POINT_LATITUDE\" REAL," + // 13: endPointLatitude
+                "\"END_POINT_LONGITUDE\" REAL," + // 14: endPointLongitude
+                "\"BEGIN_TIME_STAMP\" INTEGER," + // 15: beginTimeStamp
+                "\"END_TIME_STAMP\" INTEGER);"); // 16: endTimeStamp
     }
 
     /** Drops the underlying database table. */
@@ -119,6 +127,26 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (startPointLongitude != null) {
             stmt.bindDouble(13, startPointLongitude);
         }
+ 
+        Double endPointLatitude = entity.getEndPointLatitude();
+        if (endPointLatitude != null) {
+            stmt.bindDouble(14, endPointLatitude);
+        }
+ 
+        Double endPointLongitude = entity.getEndPointLongitude();
+        if (endPointLongitude != null) {
+            stmt.bindDouble(15, endPointLongitude);
+        }
+ 
+        Long beginTimeStamp = entity.getBeginTimeStamp();
+        if (beginTimeStamp != null) {
+            stmt.bindLong(16, beginTimeStamp);
+        }
+ 
+        Long endTimeStamp = entity.getEndTimeStamp();
+        if (endTimeStamp != null) {
+            stmt.bindLong(17, endTimeStamp);
+        }
     }
 
     /** @inheritdoc */
@@ -143,7 +171,11 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // is_sync
             cursor.getString(offset + 10), // workoutId
             cursor.isNull(offset + 11) ? null : cursor.getDouble(offset + 11), // startPointLatitude
-            cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12) // startPointLongitude
+            cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12), // startPointLongitude
+            cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13), // endPointLatitude
+            cursor.isNull(offset + 14) ? null : cursor.getDouble(offset + 14), // endPointLongitude
+            cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15), // beginTimeStamp
+            cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16) // endTimeStamp
         );
         return entity;
     }
@@ -164,6 +196,10 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         entity.setWorkoutId(cursor.getString(offset + 10));
         entity.setStartPointLatitude(cursor.isNull(offset + 11) ? null : cursor.getDouble(offset + 11));
         entity.setStartPointLongitude(cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12));
+        entity.setEndPointLatitude(cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13));
+        entity.setEndPointLongitude(cursor.isNull(offset + 14) ? null : cursor.getDouble(offset + 14));
+        entity.setBeginTimeStamp(cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15));
+        entity.setEndTimeStamp(cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16));
      }
     
     /** @inheritdoc */

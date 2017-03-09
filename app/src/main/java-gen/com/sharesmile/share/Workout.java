@@ -24,6 +24,10 @@ public class Workout {
     private String workoutId;
     private Double startPointLatitude;
     private Double startPointLongitude;
+    private Double endPointLatitude;
+    private Double endPointLongitude;
+    private Long beginTimeStamp;
+    private Long endTimeStamp;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -35,7 +39,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -49,6 +53,10 @@ public class Workout {
         this.workoutId = workoutId;
         this.startPointLatitude = startPointLatitude;
         this.startPointLongitude = startPointLongitude;
+        this.endPointLatitude = endPointLatitude;
+        this.endPointLongitude = endPointLongitude;
+        this.beginTimeStamp = beginTimeStamp;
+        this.endTimeStamp = endTimeStamp;
     }
 
     public Long getId() {
@@ -157,6 +165,38 @@ public class Workout {
 
     public void setStartPointLongitude(Double startPointLongitude) {
         this.startPointLongitude = startPointLongitude;
+    }
+
+    public Double getEndPointLatitude() {
+        return endPointLatitude;
+    }
+
+    public void setEndPointLatitude(Double endPointLatitude) {
+        this.endPointLatitude = endPointLatitude;
+    }
+
+    public Double getEndPointLongitude() {
+        return endPointLongitude;
+    }
+
+    public void setEndPointLongitude(Double endPointLongitude) {
+        this.endPointLongitude = endPointLongitude;
+    }
+
+    public Long getBeginTimeStamp() {
+        return beginTimeStamp;
+    }
+
+    public void setBeginTimeStamp(Long beginTimeStamp) {
+        this.beginTimeStamp = beginTimeStamp;
+    }
+
+    public Long getEndTimeStamp() {
+        return endTimeStamp;
+    }
+
+    public void setEndTimeStamp(Long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
 
     // KEEP METHODS - put your custom methods here

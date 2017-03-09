@@ -52,7 +52,11 @@ public class MigrateV4ToV5 extends MigrationImpl {
         return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD " +
                 " 'WORKOUT_ID' TEXT NOT NULL ," +
                 " 'START_POINT_LATITUDE' REAL ," +
-                " 'START_POINT_LONGITUDE' REAL;";
+                " 'START_POINT_LONGITUDE' REAL," +
+                " 'END_POINT_LATITUDE' REAL ," +
+                " 'END_POINT_LONGITUDE' REAL ," +
+                " 'BEGIN_TIME_STAMP' INTEGER," +
+                " 'END_TIME_STAMP' INTEGER";
     }
 
 }
