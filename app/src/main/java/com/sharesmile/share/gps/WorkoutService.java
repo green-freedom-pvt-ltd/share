@@ -24,7 +24,10 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.gson.Gson;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -34,11 +37,13 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -107,6 +112,9 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
+
+            persistWorkoutInDb(result);
+
             tracker = null;
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
@@ -115,7 +123,53 @@ public class WorkoutService extends Service implements
             Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
         }
+    }
+
+    private void persistWorkoutInDb(WorkoutData data){
+
+        WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        Workout workout = new Workout();
+
+        workout.setAvgSpeed(data.getAvgSpeed());
+        workout.setDistance(data.getDistance() / 1000); // in Kms
+        workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
+
+        //data.getDistance()
+        String distDecimal = Utils.formatToKmsWithOneDecimal(data.getDistance());
+        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distDecimal));
+
+        workout.setRunAmount((float) rupees);
+        workout.setRecordedTime(data.getRecordedTime());
+        workout.setSteps(data.getTotalSteps());
+        workout.setCauseBrief(mCauseData.getTitle());
+        workout.setDate(new Date(data.getBeginTimeStamp()));
+        workout.setIs_sync(false);
+        workout.setWorkoutId(data.getWorkoutId());
+        workout.setStartPointLatitude(data.getStartPoint().latitude);
+        workout.setStartPointLongitude(data.getStartPoint().longitude);
+        workout.setEndPointLatitude(data.getLatestPoint().latitude);
+        workout.setEndPointLongitude(data.getLatestPoint().longitude);
+        workout.setBeginTimeStamp(data.getBeginTimeStamp());
+        workout.setEndTimeStamp(System.currentTimeMillis());
+        workoutDao.insertOrReplace(workout);
+
+        //update userImpact
+        updateUserImpact(workout);
+
+        SyncHelper.pushRunData();
+    }
+
+    private void updateUserImpact(Workout data) {
+        int totalRun = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
+        float totalImpact = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT, 0);
+
+        totalImpact = totalImpact + data.getRunAmount();
+        totalRun = totalRun + 1;
+
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRun);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
     }
 
     @Override

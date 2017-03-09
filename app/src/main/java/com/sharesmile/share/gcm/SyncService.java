@@ -25,6 +25,7 @@ import com.sharesmile.share.utils.Urls;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -117,15 +118,17 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
-            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
+            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+            jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
             jsonObject.put("run_amount", workout.getRunAmount());
             jsonObject.put("run_duration", workout.getElapsedTime());
             jsonObject.put("no_of_steps", workout.getSteps());
-
             jsonObject.put("avg_speed", workout.getAvgSpeed());
             jsonObject.put("client_run_id", workout.getWorkoutId());
             jsonObject.put("start_location_lat", workout.getStartPointLatitude());
             jsonObject.put("start_location_long", workout.getStartPointLongitude());
+            jsonObject.put("end_location_lat", workout.getEndPointLatitude());
+            jsonObject.put("end_location_long", workout.getEndPointLongitude());
             Logger.d(TAG, jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
@@ -136,6 +139,7 @@ public class SyncService extends GcmTaskService {
             workout.setId(response.getId());
             workout.setIs_sync(true);
             mWorkoutDao.insertOrReplace(workout);
+            //TODO: Add more info in ON_RUN_SYNC event
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "success")
                     .buildAndDispatch();

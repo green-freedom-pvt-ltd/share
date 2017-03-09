@@ -136,47 +136,9 @@ public class RealRunFragment extends RunFragment {
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
             getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
 
-            WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            Workout workout = new Workout();
-
-            workout.setAvgSpeed(data.getAvgSpeed());
-            workout.setDistance(data.getDistance() / 1000); // in Kms
-            workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
-
-            //data.getDistance()
-            String distDecimal = Utils.formatToKmsWithOneDecimal(data.getDistance());
-            int rupees = (int) Math.ceil(getConversionFactor() * Float.valueOf(distDecimal));
-
-            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            workout.setRunAmount((float) rupees);
-            workout.setRecordedTime(data.getRecordedTime());
-            workout.setSteps(data.getTotalSteps());
-            workout.setCauseBrief(mCauseData.getTitle());
-            workout.setDate(new Date(data.getBeginTimeStamp()));
-            workout.setIs_sync(false);
-            workout.setWorkoutId(data.getWorkoutId());
-            workout.setStartPointLatitude(data.getStartPoint().latitude);
-            workout.setStartPointLongitude(data.getStartPoint().longitude);
-            workoutDao.insertOrReplace(workout);
-
-            //update userImpact
-            updateUserImpact(workout);
-
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
-            SyncHelper.pushRunData();
+
         }
-    }
-
-    private void updateUserImpact(Workout data) {
-        int totalRun = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
-        float totalImpact = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT, 0);
-
-        totalImpact = totalImpact + data.getRunAmount();
-        totalRun = totalRun + 1;
-
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRun);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
     }
 
     @Override
