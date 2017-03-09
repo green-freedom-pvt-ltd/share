@@ -32,6 +32,8 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("avg_speed")
     float avgSpeed;
 
+    //TODO: Need to add newly added fields, like end_time, start_location_lat, etc.
+
     public long getId() {
         return id;
     }
