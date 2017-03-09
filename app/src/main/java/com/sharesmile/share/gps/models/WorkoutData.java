@@ -70,7 +70,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	void addRecord(DistRecord recordToAdd);
 
 	/**
-	 * @return epoch at which workout began
+	 * @return epoch (millis) at which workout began
 	 */
 	long getBeginTimeStamp();
 

@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -152,7 +153,7 @@ public class RealRunFragment extends RunFragment {
             workout.setRecordedTime(data.getRecordedTime());
             workout.setSteps(data.getTotalSteps());
             workout.setCauseBrief(mCauseData.getTitle());
-            workout.setDate(Calendar.getInstance().getTime());
+            workout.setDate(new Date(data.getBeginTimeStamp()));
             workout.setIs_sync(false);
             workout.setWorkoutId(data.getWorkoutId());
             workout.setStartPointLatitude(data.getStartPoint().latitude);
