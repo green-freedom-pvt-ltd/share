@@ -43,7 +43,7 @@ public class Config {
 
     public static float THRESHOLD_ACCURACY = 12; // in m
 
-    public static float THRESHOLD_FACTOR = 5.2f;
+    public static float THRESHOLD_FACTOR = 4.75f;
 
     public static float SMALLEST_DISPLACEMENT = 0.1f;// in m
 
@@ -52,8 +52,6 @@ public class Config {
     public static boolean LAZY_ASS_CHECK = false;
 
     public static boolean USAIN_BOLT_CHECK = true;
-
-    public static final int ACTIVITY_RECOGNITION_CONFIDENCE_THRESHOLD = 85;
 
 
 }
