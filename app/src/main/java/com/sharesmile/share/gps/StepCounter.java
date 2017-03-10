@@ -12,7 +12,7 @@ public interface StepCounter {
     int STEP_DETECTOR_NOT_SUPPORTED = 103;
     int GOOGLE_FIT_STEP_COUNTER_DEPRECATED = 104;
 
-    int NUM_ELEMS_IN_HISTORY_QUEUE = 6;
+    int NUM_ELEMS_IN_HISTORY_QUEUE = 8;
 
     void startCounting();
     void stopCounting();
