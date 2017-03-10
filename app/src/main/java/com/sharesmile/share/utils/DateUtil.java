@@ -14,6 +14,7 @@ public class DateUtil {
     public static String DEFAULT_DATE_FORMAT_DATE_ONLY = "yyyy-MM-dd";
     public static String USER_FORMAT_DATE = "dd-MMM-yyyy hh:mm a";
     public static String USER_FORMAT_DATE_DATE_ONLY = "dd-MMM-yyyy";
+    public static String MILLISEC_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
 
     public static String getCurrentDate() {
@@ -28,6 +29,13 @@ public class DateUtil {
     public static String getDefaultFormattedDate(Date date) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        return simpleDateFormat.format(date);
+
+    }
+
+    public static String getMillisecFormattedDate(Date date) {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MILLISEC_DATE_FORMAT);
         return simpleDateFormat.format(date);
 
     }

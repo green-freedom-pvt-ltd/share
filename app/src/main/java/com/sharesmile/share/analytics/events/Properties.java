@@ -17,6 +17,7 @@ public class Properties {
     public static final String EVENT_ID = "eid";
     public static final String EVENT_NAME = "enanme";
     public static final String EVENT_CATEGORY = "ecat";
+    public static final String EVENT_TIME_STAMP = "ets";
 
     private HashMap<String, Object> backingMap;
 

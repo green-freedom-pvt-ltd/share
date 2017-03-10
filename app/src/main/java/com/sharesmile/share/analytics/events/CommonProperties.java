@@ -2,7 +2,10 @@ package com.sharesmile.share.analytics.events;
 
 import android.content.Context;
 
+import com.sharesmile.share.utils.DateUtil;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -55,6 +58,7 @@ public class CommonProperties extends Properties {
             }
             //All Mandatory properties present, add other common properties using context
             commonProperties.put(EVENT_ID, UUID.randomUUID().toString());
+            commonProperties.put(EVENT_TIME_STAMP, DateUtil.getMillisecFormattedDate(new Date()));
             return commonProperties;
         }
     }
