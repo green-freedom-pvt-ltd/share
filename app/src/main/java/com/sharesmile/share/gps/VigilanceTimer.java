@@ -5,6 +5,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.activityrecognition.ActivityRecognizedService;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.utils.Logger;
 

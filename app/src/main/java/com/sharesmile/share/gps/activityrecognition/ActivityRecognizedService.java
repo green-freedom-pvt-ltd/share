@@ -1,4 +1,4 @@
-package com.sharesmile.share.gps;
+package com.sharesmile.share.gps.activityrecognition;
 
 import android.app.IntentService;
 import android.content.Intent;

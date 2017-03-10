@@ -62,7 +62,7 @@
             android:name=".gps.WorkoutService"
             android:exported="false" />
         <service
-            android:name=".gps.ActivityRecognizedService"
+            android:name=".gps.activityrecognition.ActivityRecognizedService"
             android:exported="false" />
 
         <meta-data
