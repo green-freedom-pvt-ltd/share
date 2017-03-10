@@ -27,6 +27,7 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     private Listener listener;
     private SensorManager sensorManager;
     private volatile int stepsSinceReboot = 0;
+    private volatile long lastStepsRecordTs = 0;
     private LinkedHashMap historyQueue = new LinkedHashMap<Long, Long>()
     {
         @Override
@@ -130,14 +131,26 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         //Need to calculate delta steps
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
-            stepsSinceReboot = (int) event.values[0];
+            lastStepsRecordTs = System.currentTimeMillis();
+            stepsSinceReboot = Math.round(event.values[0]);
             historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
             return;
         }
-        int deltaSteps = (int) event.values[0] - stepsSinceReboot;
-        stepsSinceReboot = (int) event.values[0];
+        int deltaSteps = Math.round(event.values[0]) - stepsSinceReboot;
+        long deltaTimeMillis = System.currentTimeMillis() - lastStepsRecordTs;
+
+        // Filtering on deltaSteps value
+        float deltaCadence = deltaSteps / (deltaTimeMillis / 1000f);
+        if (deltaCadence > 10f){
+            // 10 step per sec is our upper threshold, above which we will not accept step_detector reading
+            Logger.i(TAG, "Detected absurdly high number of steps (" + deltaSteps + ") in "
+                    + (deltaTimeMillis/1000) + " secs, wont feed to the listener");
+            return;
+        }
+        stepsSinceReboot = Math.round(event.values[0]);
+        lastStepsRecordTs = System.currentTimeMillis();
         historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
         listener.onStepCount(deltaSteps);
     }

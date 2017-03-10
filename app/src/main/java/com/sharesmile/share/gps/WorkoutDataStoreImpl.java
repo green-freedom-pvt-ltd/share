@@ -72,6 +72,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
                                             ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
             float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
             //TODO: Add a startPoint identified analytics event.
+            //TODO: Fix averageStrideLength logic to calculate extraPolatedDistanceToBeApproved.
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
             Location startLocation = record.getLocation();
