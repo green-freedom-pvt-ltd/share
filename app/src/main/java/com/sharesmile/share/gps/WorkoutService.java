@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -67,6 +68,7 @@ public class WorkoutService extends Service implements
     private Tracker tracker;
     private float mDistance;
     private CauseData mCauseData;
+    private Handler handler;
 
     private float distanceInKmsOnLastUpdateEvent = 0f;
 
@@ -76,6 +78,7 @@ public class WorkoutService extends Service implements
         Logger.i(TAG, "onCreate");
         mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
                 CauseData.class);
+        handler = new Handler();
     }
 
     @Override
@@ -176,6 +179,8 @@ public class WorkoutService extends Service implements
             Logger.d(TAG, "startWorkout");
 
             GoogleLocationTracker.getInstance().registerForWorkout(this);
+            handler.removeCallbacks(handleGpsInactivityRunnable);
+            handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
 
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
@@ -323,6 +328,8 @@ public class WorkoutService extends Service implements
         if (location == null){
             return;
         }
+        handler.removeCallbacks(handleGpsInactivityRunnable);
+        handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
         if (tracker != null && tracker.isRunning()){
             if (acceptedLocationFix == null){
                 if (beginningLocationsRotatingQueue == null){
@@ -728,5 +735,13 @@ public class WorkoutService extends Service implements
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
         return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
     }
+
+    final Runnable handleGpsInactivityRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // GoogleLocationTracker has not sent GPS fix since a long time, need to notify the user about it
+            MainApplication.showRunNotification("Not receiving GPS updates, do you want to pause the workout?");
+        }
+    };
 
 }

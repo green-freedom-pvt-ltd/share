@@ -53,5 +53,7 @@ public class Config {
 
     public static boolean USAIN_BOLT_CHECK = true;
 
+    public static long GPS_INACTIVITY_NOTIFICATION_DELAY = 50000; // in Millisecs
+
 
 }

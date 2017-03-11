@@ -4,7 +4,6 @@ package com.sharesmile.share;
 
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
-
 /**
  * Entity mapped to table "WORKOUT".
  */
@@ -29,7 +28,6 @@ public class Workout {
     private Double endPointLongitude;
     private Long beginTimeStamp;
     private Long endTimeStamp;
-    /** Not-null value. */
     private boolean isValidRun;
 
     // KEEP FIELDS - put your custom fields here
