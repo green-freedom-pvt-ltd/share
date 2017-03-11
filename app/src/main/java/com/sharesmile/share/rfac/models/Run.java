@@ -14,11 +14,15 @@ public class Run implements UnObfuscable, Serializable {
 
     @SerializedName("run_id")
     long id;
+
     @SerializedName("cause_run_title")
     String causeName;
 
     @SerializedName("start_time")
     String startTime;
+
+    @SerializedName("end_time")
+    String endTime;
 
     @SerializedName("distance")
     float distance;
@@ -29,12 +33,29 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("run_duration")
     String runDuration;
 
+    @SerializedName("no_of_steps")
+    float numSteps;
+
     @SerializedName("avg_speed")
     float avgSpeed;
 
-    //TODO: Need to add newly added fields, like end_time, start_location_lat, etc.
     @SerializedName("is_flag")
     boolean is_flag = false;
+
+    @SerializedName("client_run_id")
+    String clientRunId;
+
+    @SerializedName("start_location_lat")
+    double startLocationLat;
+
+    @SerializedName("start_location_long")
+    double startLocationLong;
+
+    @SerializedName("end_location_lat")
+    double endLocationLat;
+
+    @SerializedName("end_location_long")
+    double endLocationLong;
 
     public long getId() {
         return id;
@@ -76,7 +97,7 @@ public class Run implements UnObfuscable, Serializable {
         this.avgSpeed = avgSpeed;
     }
 
-    public Date getData() {
+    public Date getDate() {
         return DateUtil.getDefaultFormattedDate(getStartTime());
     }
 
@@ -102,5 +123,61 @@ public class Run implements UnObfuscable, Serializable {
 
     public void setIsFlag(boolean is_flag) {
         this.is_flag = is_flag;
+    }
+
+    public String getClientRunId() {
+        return clientRunId;
+    }
+
+    public void setClientRunId(String clientRunId) {
+        this.clientRunId = clientRunId;
+    }
+
+    public double getStartLocationLat() {
+        return startLocationLat;
+    }
+
+    public void setStartLocationLat(double startLocationLat) {
+        this.startLocationLat = startLocationLat;
+    }
+
+    public double getStartLocationLong() {
+        return startLocationLong;
+    }
+
+    public void setStartLocationLong(double startLocationLong) {
+        this.startLocationLong = startLocationLong;
+    }
+
+    public double getEndLocationLat() {
+        return endLocationLat;
+    }
+
+    public void setEndLocationLat(double endLocationLat) {
+        this.endLocationLat = endLocationLat;
+    }
+
+    public double getEndLocationLong() {
+        return endLocationLong;
+    }
+
+    public void setEndLocationLong(double endLocationLong) {
+        this.endLocationLong = endLocationLong;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public float getNumSteps() {
+        return numSteps;
+    }
+
+    public void setNumSteps(float numSteps) {
+        this.numSteps = numSteps;
     }
 }
