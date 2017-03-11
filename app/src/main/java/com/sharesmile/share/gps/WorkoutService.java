@@ -126,6 +126,8 @@ public class WorkoutService extends Service implements
         WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         Workout workout = new Workout();
 
+        //TODO: Set isValidRun on the basis of final sanity filter
+        workout.setIsValidRun(true);
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
         workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));

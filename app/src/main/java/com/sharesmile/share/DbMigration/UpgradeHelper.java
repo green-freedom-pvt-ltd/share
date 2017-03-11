@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.sharesmile.share.DaoMaster;
 
+import retrofit.http.HEAD;
+
 
 /**
  * Created by Shine on 27/08/16.

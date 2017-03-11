@@ -38,6 +38,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         public final static Property EndPointLongitude = new Property(14, Double.class, "endPointLongitude", false, "END_POINT_LONGITUDE");
         public final static Property BeginTimeStamp = new Property(15, Long.class, "beginTimeStamp", false, "BEGIN_TIME_STAMP");
         public final static Property EndTimeStamp = new Property(16, Long.class, "endTimeStamp", false, "END_TIME_STAMP");
+        public final static Property IsValidRun = new Property(17, boolean.class, "isValidRun", false, "IS_VALID_RUN");
     };
 
 
@@ -69,7 +70,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"END_POINT_LATITUDE\" REAL," + // 13: endPointLatitude
                 "\"END_POINT_LONGITUDE\" REAL," + // 14: endPointLongitude
                 "\"BEGIN_TIME_STAMP\" INTEGER," + // 15: beginTimeStamp
-                "\"END_TIME_STAMP\" INTEGER);"); // 16: endTimeStamp
+                "\"END_TIME_STAMP\" INTEGER)," + // 16: endTimeStamp
+                "\"IS_VALID_RUN\" INTEGER NOT NULL );"); // 17: isValidRun
     }
 
     /** Drops the underlying database table. */
@@ -116,6 +118,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (is_sync != null) {
             stmt.bindLong(10, is_sync ? 1L: 0L);
         }
+
         stmt.bindString(11, entity.getWorkoutId());
  
         Double startPointLatitude = entity.getStartPointLatitude();
@@ -147,6 +150,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (endTimeStamp != null) {
             stmt.bindLong(17, endTimeStamp);
         }
+
+        stmt.bindLong(18, entity.getIsValidRun() ? 1L: 0L);
     }
 
     /** @inheritdoc */
@@ -175,7 +180,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13), // endPointLatitude
             cursor.isNull(offset + 14) ? null : cursor.getDouble(offset + 14), // endPointLongitude
             cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15), // beginTimeStamp
-            cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16) // endTimeStamp
+            cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16), // endTimeStamp
+            cursor.getShort(offset + 17) != 0 // isValidRun
         );
         return entity;
     }
@@ -200,6 +206,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         entity.setEndPointLongitude(cursor.isNull(offset + 14) ? null : cursor.getDouble(offset + 14));
         entity.setBeginTimeStamp(cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15));
         entity.setEndTimeStamp(cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16));
+        entity.setIsValidRun(cursor.getShort(offset + 17) != 0);
      }
     
     /** @inheritdoc */

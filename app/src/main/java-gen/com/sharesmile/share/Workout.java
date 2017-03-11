@@ -4,6 +4,7 @@ package com.sharesmile.share;
 
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
+
 /**
  * Entity mapped to table "WORKOUT".
  */
@@ -28,6 +29,8 @@ public class Workout {
     private Double endPointLongitude;
     private Long beginTimeStamp;
     private Long endTimeStamp;
+    /** Not-null value. */
+    private boolean isValidRun;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -39,7 +42,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, boolean isValidRun) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -57,6 +60,7 @@ public class Workout {
         this.endPointLongitude = endPointLongitude;
         this.beginTimeStamp = beginTimeStamp;
         this.endTimeStamp = endTimeStamp;
+        this.isValidRun = isValidRun;
     }
 
     public Long getId() {
@@ -197,6 +201,14 @@ public class Workout {
 
     public void setEndTimeStamp(Long endTimeStamp) {
         this.endTimeStamp = endTimeStamp;
+    }
+
+    public boolean getIsValidRun() {
+        return isValidRun;
+    }
+
+    public void setIsValidRun(boolean isValidRun) {
+        this.isValidRun = isValidRun;
     }
 
     // KEEP METHODS - put your custom methods here

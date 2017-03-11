@@ -1,14 +1,13 @@
 package com.sharesmile.share.DbMigration;
 
+/**
+ * Created by shine on 11/09/16.
+ */
+
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.sharesmile.share.WorkoutDao;
-
-/**
- * Created by ankitmaheshwari on 3/9/17.
- */
-
 public class MigrateV4ToV5 extends MigrationImpl {
 
     /**
@@ -56,7 +55,7 @@ public class MigrateV4ToV5 extends MigrationImpl {
                 " 'END_POINT_LATITUDE' REAL ," +
                 " 'END_POINT_LONGITUDE' REAL ," +
                 " 'BEGIN_TIME_STAMP' INTEGER," +
-                " 'END_TIME_STAMP' INTEGER";
+                " 'END_TIME_STAMP' INTEGER," +
+                " 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL";
     }
-
 }

@@ -7,10 +7,7 @@ package com.sharesmile.share.DbMigration;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.Cause;
-import com.sharesmile.share.CauseDao;
-import com.sharesmile.share.LeaderBoardDao;
-import com.sharesmile.share.MessageDao;
+import com.sharesmile.share.v4.CauseDao;
 
 
 /**

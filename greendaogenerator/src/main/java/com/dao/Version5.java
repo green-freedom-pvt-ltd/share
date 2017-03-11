@@ -6,7 +6,6 @@ import de.greenrobot.daogenerator.Schema;
 /**
  * Created by ankitmaheshwari on 3/9/17.
  */
-
 public class Version5 extends SchemaVersion {
 
     public Version5(boolean current) {
@@ -44,6 +43,7 @@ public class Version5 extends SchemaVersion {
         workout.addDoubleProperty("endPointLongitude");
         workout.addLongProperty("beginTimeStamp");
         workout.addLongProperty("endTimeStamp");
+        workout.addBooleanProperty("isValidRun").notNull();
     }
 
     private static void addUserData(Schema schema) {

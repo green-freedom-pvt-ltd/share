@@ -135,7 +135,6 @@ public class RealRunFragment extends RunFragment {
 
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
             getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
-
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
 
         }

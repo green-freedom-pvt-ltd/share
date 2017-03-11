@@ -3,10 +3,8 @@ package com.sharesmile.share.rfac.models;
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.core.UnObfuscable;
-import com.sharesmile.share.utils.Logger;
 
 import java.io.Serializable;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -107,7 +105,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
             Run run = getRunList().get((int) remaining);
 
 
-            return getWorkOutdata(run);
+            return getWorkoutData(run);
         }
 
         @Override
@@ -115,7 +113,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         }
     }
 
-    private Workout getWorkOutdata(Run run) {
+    private Workout getWorkoutData(Run run) {
 
         Workout workout = new Workout(run.getId());
         workout.setIs_sync(true);
@@ -125,6 +123,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setDistance(run.getDistance());
         workout.setRunAmount(run.getRunAmount());
         workout.setElapsedTime(run.getRunDuration());
+        workout.setIsValidRun(!run.isFlag());
         return workout;
     }
 }

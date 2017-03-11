@@ -40,6 +40,11 @@ public class Urls {
         return url;
     }
 
+    public static String getFlaggedRunUrl() {
+        String url = getBaseUrl() + RUN_URL+"?is_flag=all";
+        return url;
+    }
+
     public static String getLoginUrl(String email) {
         String url = getBaseUrl() + LOGIN_URL;
         url = url + "?" + email;
