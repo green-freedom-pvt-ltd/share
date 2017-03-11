@@ -7,7 +7,9 @@ package com.sharesmile.share.DbMigration;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.v4.CauseDao;
+import com.sharesmile.share.CauseDao;
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.v3.MessageDao;
 
 
 /**
@@ -15,7 +17,7 @@ import com.sharesmile.share.v4.CauseDao;
  *
  * @author Jeremy
  */
-public class MigrateV3ToV4 extends MigrationImpl {
+public class MigrateV4ToV5 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -35,14 +37,6 @@ public class MigrateV3ToV4 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 3;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getMigratedVersion() {
         return 4;
     }
 
@@ -50,11 +44,20 @@ public class MigrateV3ToV4 extends MigrationImpl {
      * {@inheritDoc}
      */
     @Override
+    public int getMigratedVersion() {
+        return 5;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Migration getPreviousMigration() {
-        return new MigrateV2ToV3();
+        return new MigrateV3ToV4();
     }
 
     private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + CauseDao.TABLENAME + "' ADD COLUMN 'ORDER_PRIORITY' INTEGER DEFAULT 0";
+        return  "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL";
+
     }
 }

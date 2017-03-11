@@ -32,6 +32,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import activities.ImpactLeagueActivity;
+import fragments.FaqFragment;
 import fragments.MessageCenterFragment;
 
 /**
@@ -46,8 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     private static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
 
-    static
-    {
+    static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
@@ -152,9 +152,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case START_RUN:
                 if (input instanceof CauseData) {
                     mCauseData = (CauseData) input;
-                    if ( !GoogleLocationTracker.getInstance().isFetchingLocation() ){
+                    if (!GoogleLocationTracker.getInstance().isFetchingLocation()) {
                         GoogleLocationTracker.getInstance().register(googleLocationTrackerListener);
-                    }else {
+                    } else {
                         showTrackingActivity();
                     }
                 } else {
@@ -182,7 +182,14 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case SHOW_LEAGUE_ACTIVITY:
                 startActivityForResult(new Intent(this, ImpactLeagueActivity.class), REQUEST_LEAGUE_REGISTRATION);
                 break;
+            case SHOW_FAQ_FRAGMENT:
+                showFaq();
+                break;
         }
+    }
+
+    private void showFaq() {
+        replaceFragment(new FaqFragment(), true);
     }
 
     @Override
@@ -194,7 +201,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 GoogleLocationTracker.getInstance().onPermissionsGranted();
             } else if (grantResults.length == 1
-                    && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 GoogleLocationTracker.getInstance().onPermissionsRejected();
             }
         }
@@ -242,9 +249,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     };
 
-    private void handleFixLocationSettingsBroadcast(Bundle bundle){
-        synchronized (BaseActivity.class){
-            if (!blockLocationEnablePopup){
+    private void handleFixLocationSettingsBroadcast(Bundle bundle) {
+        synchronized (BaseActivity.class) {
+            if (!blockLocationEnablePopup) {
                 Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
                 try {
                     // Show the dialog by calling startResolutionForResult(),
@@ -266,9 +273,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
-    private void handleRequestPermissionBroadcast(){
-        synchronized (BaseActivity.class){
-            if (!blockRequestPermission){
+    private void handleRequestPermissionBroadcast() {
+        synchronized (BaseActivity.class) {
+            if (!blockRequestPermission) {
                 ActivityCompat.requestPermissions(BaseActivity.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         Constants.CODE_REQUEST_LOCATION_PERMISSION);
@@ -309,6 +316,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         builder.show();
 
     }
+
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationTrackerReceiver);

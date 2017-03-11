@@ -33,6 +33,9 @@ public class UpgradeHelper extends DaoMaster.OpenHelper {
             case 4:
                 new MigrateV3ToV4().applyMigration(db, oldVersion);
                 break;
+            case 5:
+                new MigrateV4ToV5().applyMigration(db,oldVersion);
+                break;
             default:
                 return;
         }

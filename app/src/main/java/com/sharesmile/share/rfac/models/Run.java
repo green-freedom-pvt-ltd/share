@@ -32,6 +32,9 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("avg_speed")
     float avgSpeed;
 
+    @SerializedName("is_flag")
+    boolean is_flag = false;
+
     public long getId() {
         return id;
     }
@@ -90,5 +93,13 @@ public class Run implements UnObfuscable, Serializable {
 
     public void setRunDuration(String runDuration) {
         this.runDuration = runDuration;
+    }
+
+    public boolean isFlag() {
+        return is_flag;
+    }
+
+    public void setIsFlag(boolean is_flag) {
+        this.is_flag = is_flag;
     }
 }
