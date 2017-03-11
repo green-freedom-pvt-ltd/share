@@ -5,7 +5,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.activityrecognition.ActivityRecognizedService;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.utils.Logger;
 
@@ -119,7 +119,7 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
-		if (ActivityRecognizedService.isIsInVehicle()){
+		if (ActivityDetector.getInstance().isIsInVehicle()){
 			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
 			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 					.addBundle(workoutService.getWorkoutBundle())

@@ -17,12 +17,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.ActivityRecognition;
 import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -34,7 +29,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.activityrecognition.ActivityRecognizedService;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -53,15 +48,14 @@ import java.util.concurrent.ScheduledExecutorService;
  * Created by ankitmaheshwari1 on 20/02/16.
  */
 public class WorkoutService extends Service implements
-        IWorkoutService, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        RunTracker.UpdateListner, StepCounter.Listener, GoogleLocationTracker.Listener {
+        IWorkoutService, RunTracker.UpdateListner, StepCounter.Listener,
+        GoogleLocationTracker.Listener {
 
     private static final String TAG = "WorkoutService";
 
     private static boolean currentlyTracking = false;
     private static boolean currentlyProcessingSteps = false;
-    private GoogleApiClient googleApiClient;
+
     private VigilanceTimer vigilanceTimer;
     private Location acceptedLocationFix;
     private CircularQueue<Location> beginningLocationsRotatingQueue;
@@ -106,6 +100,7 @@ public class WorkoutService extends Service implements
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         mDistance = tracker.getTotalDistanceCovered();
         makeForeground();
+        ActivityDetector.getInstance().workoutActive();
     }
 
 
@@ -113,9 +108,7 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
-
             persistWorkoutInDb(result);
-
             tracker = null;
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
@@ -124,8 +117,8 @@ public class WorkoutService extends Service implements
             Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
         }
+        ActivityDetector.getInstance().workoutIdle();
     }
 
     private void persistWorkoutInDb(WorkoutData data){
@@ -181,19 +174,7 @@ public class WorkoutService extends Service implements
             Logger.d(TAG, "startWorkout");
 
             GoogleLocationTracker.getInstance().registerForWorkout(this);
-            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
-                googleApiClient = new GoogleApiClient.Builder(this)
-                        .addApi(ActivityRecognition.API)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .build();
-                if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
-                    googleApiClient.connect();
-                }
-            } else {
-                Logger.e(TAG, "unable to connect to google play services.");
-                Toast.makeText(getApplicationContext(), "Unable to connect to google play services", Toast.LENGTH_SHORT);
-            }
+
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
                     Logger.d(TAG, "Step Detector present! Will register");
@@ -216,12 +197,6 @@ public class WorkoutService extends Service implements
         if (currentlyTracking) {
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
-
-            unregisterForActivityUpdates();
-            if (googleApiClient != null && googleApiClient.isConnected()){
-                googleApiClient.disconnect();
-            }
-            googleApiClient = null;
             currentlyTracking = false;
             if (stepCounter != null) {
                 stepCounter.stopCounting();
@@ -416,7 +391,7 @@ public class WorkoutService extends Service implements
         float spikeFilterSpeedThreshold;
         String thresholdApplied;
 
-        if (ActivityRecognizedService.isIsInVehicle()){
+        if (ActivityDetector.getInstance().isIsInVehicle()){
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
@@ -578,7 +553,6 @@ public class WorkoutService extends Service implements
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
             if (currentlyTracking) {
-                unregisterForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
@@ -587,6 +561,7 @@ public class WorkoutService extends Service implements
                     .put("reason", reason)
                     .buildAndDispatch();
         }
+        ActivityDetector.getInstance().workoutIdle();
     }
 
     @Override
@@ -600,7 +575,6 @@ public class WorkoutService extends Service implements
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
             if (currentlyTracking) {
-                registerForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
@@ -608,6 +582,7 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
         }
+        ActivityDetector.getInstance().workoutActive();
     }
 
     public void sendStopWorkoutBroadcast(int problem) {
@@ -692,33 +667,6 @@ public class WorkoutService extends Service implements
         return tracker;
     }
 
-    /**
-     * Called by Location Services when the request to connect the
-     * client finishes successfully. At this point, you can
-     * request the current location or startWorkout periodic updates
-     */
-    @Override
-    public void onConnected(Bundle bundle) {
-        Logger.d(TAG, "onConnected");
-        registerForActivityUpdates();
-    }
-
-    private void registerForActivityUpdates(){
-        ActivityRecognizedService.reset();
-        Intent intent = new Intent(this, ActivityRecognizedService.class);
-        PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-    }
-
-    private void unregisterForActivityUpdates(){
-        ActivityRecognizedService.reset();
-        Intent intent = new Intent(this, ActivityRecognizedService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
-        }
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case GoogleFitStepCounter.REQUEST_OAUTH:
@@ -727,15 +675,6 @@ public class WorkoutService extends Service implements
         }
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Logger.e(TAG, "GoogleApiClient connection has been suspend");
-    }
 
     private void makeForeground() {
         Notification notification = getNotificationBuilder().build();
