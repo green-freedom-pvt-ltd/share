@@ -20,7 +20,6 @@ public class Workout {
     private java.util.Date date;
     private Float runAmount;
     private Boolean is_sync;
-    /** Not-null value. */
     private String workoutId;
     private Double startPointLatitude;
     private Double startPointLongitude;
@@ -143,12 +142,10 @@ public class Workout {
         this.is_sync = is_sync;
     }
 
-    /** Not-null value. */
     public String getWorkoutId() {
         return workoutId;
     }
 
-    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setWorkoutId(String workoutId) {
         this.workoutId = workoutId;
     }

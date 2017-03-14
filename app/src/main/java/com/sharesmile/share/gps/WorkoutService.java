@@ -146,10 +146,14 @@ public class WorkoutService extends Service implements
         workout.setDate(new Date(data.getBeginTimeStamp()));
         workout.setIs_sync(false);
         workout.setWorkoutId(data.getWorkoutId());
-        workout.setStartPointLatitude(data.getStartPoint().latitude);
-        workout.setStartPointLongitude(data.getStartPoint().longitude);
-        workout.setEndPointLatitude(data.getLatestPoint().latitude);
-        workout.setEndPointLongitude(data.getLatestPoint().longitude);
+        if (data.getStartPoint() != null){
+            workout.setStartPointLatitude(data.getStartPoint().latitude);
+            workout.setStartPointLongitude(data.getStartPoint().longitude);
+        }
+        if (data.getLatestPoint() != null){
+            workout.setEndPointLatitude(data.getLatestPoint().latitude);
+            workout.setEndPointLongitude(data.getLatestPoint().longitude);
+        }
         workout.setBeginTimeStamp(data.getBeginTimeStamp());
         workout.setEndTimeStamp(System.currentTimeMillis());
         workoutDao.insertOrReplace(workout);
@@ -202,6 +206,7 @@ public class WorkoutService extends Service implements
     public synchronized void stopWorkout() {
         Logger.d(TAG, "stopWorkout");
         if (currentlyTracking) {
+            handler.removeCallbacks(handleGpsInactivityRunnable);
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
@@ -740,7 +745,11 @@ public class WorkoutService extends Service implements
         @Override
         public void run() {
             // GoogleLocationTracker has not sent GPS fix since a long time, need to notify the user about it
-            MainApplication.showRunNotification("Not receiving GPS updates, do you want to pause the workout?");
+            // But will do it only when user is on the move
+            Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
+            if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
+                MainApplication.showRunNotification("Not receiving GPS updates, do you want to pause the workout?");
+            }
         }
     };
 

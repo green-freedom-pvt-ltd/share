@@ -52,9 +52,9 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		beginTimeStamp = source.beginTimeStamp;
 		isActive = source.isActive;
 		paused = source.paused;
-		this.startPoint = new LatLng(source.startPoint.latitude, source.startPoint.longitude);
+		this.startPoint = (startPoint != null) ? new LatLng(source.startPoint.latitude, source.startPoint.longitude) : null;
 		this.workoutId = source.workoutId;
-		this.latestPoint = new LatLng(source.latestPoint.latitude, source.latestPoint.longitude);
+		this.latestPoint = (latestPoint != null) ? new LatLng(source.latestPoint.latitude, source.latestPoint.longitude) : null;
 		batches = new ArrayList<>();
 		for (WorkoutBatch batch : source.batches){
 			batches.add((WorkoutBatchImpl)batch.copy());

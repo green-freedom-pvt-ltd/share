@@ -21,7 +21,7 @@ public interface StepCounter {
     void onActivityResult(int requestCode, int resultCode, Intent data);
 
     /**
-     * Returns current step speed of the user, which is based on the last six step readings from sensor
+     * Returns current step speed of the user, which is based on the last few step readings from sensor
      * @return steps per sec as float value, returns -1 if step counting has not started yet.
      */
     float getMovingAverageOfStepsPerSec();

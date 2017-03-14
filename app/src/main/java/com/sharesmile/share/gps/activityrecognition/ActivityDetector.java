@@ -121,6 +121,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }else {
             connectToLocationServices();
         }
+        handler.removeCallbacks(handleStillRunnable);
     }
 
     public void workoutIdle(){
@@ -130,6 +131,11 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }else {
             connectToLocationServices();
         }
+        handler.removeCallbacks(handleStillRunnable);
+    }
+
+    public boolean isWorkoutActive(){
+        return isWorkoutActive;
     }
 
     public void stopActivityDetection(){
@@ -150,24 +156,48 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
+    final Runnable handleStillRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // Show notification and increment still occurred counter
+            MainApplication.showRunNotification("It seems like you are still!");
+            AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
+                    .buildAndDispatch();
+            stillOccurredCounter = 1;
+        }
+    };
+
     public void handleActivityRecognitionResult(ActivityRecognitionResult result){
         Logger.d( TAG, "IN_VEHICLE, confidence " +  result.getActivityConfidence(DetectedActivity.IN_VEHICLE));
 
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
+        float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
         if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
             AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_IN_VEHICLE)
                     .put("confidence_value", inVehicleConfidence)
                     .buildAndDispatch();
         }
 
+        Logger.d( TAG, "STILL, confidence " +  stillConfidence);
+        if (isWorkoutActive()){
+            if (stillConfidence > CONFIDENCE_THRESHOLD){
+                if (stillOccurredCounter == 0){
+                    handler.removeCallbacks(handleStillRunnable);
+                    handler.postDelayed(handleStillRunnable, 5000);
+                }
+            }else {
+                handler.removeCallbacks(handleStillRunnable);
+            }
+        }
+
         // Add the fresh result in HistoryQueue
         long currentTime = result.getTime();
         historyQueue.add(result);
         if (historyQueue.isFull()){
+            Logger.d(TAG, "HistoryQueue is full, will calculate Rolling confidence values");
             int i = historyQueue.getMaxSize() - 1;
             int count = 0;
             float cumulativeVehicleConfidence = 0;
-            float cumulativeStillConfidence = 0;
             float cumulativeOnFootConfidence = 0;
             while (i >= 0){
                 ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
@@ -176,36 +206,26 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     break;
                 }
                 cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
-                cumulativeStillConfidence += elem.getActivityConfidence(DetectedActivity.STILL);
                 cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
                 count++;
+                i--;
             }
             float avgVehilceConfidence = cumulativeVehicleConfidence / count;
-            float avgStillConfidence = cumulativeStillConfidence / count;
             float avgOnFootConfidence = cumulativeOnFootConfidence / count;
 
-            Logger.d( TAG, "IN_VEHICLE, AverageConfidence " +  avgVehilceConfidence);
+            Logger.d(TAG, "IN_VEHICLE, AverageConfidence " +  avgVehilceConfidence);
             if (avgVehilceConfidence > CONFIDENCE_THRESHOLD){
                 isInVehicle = true;
-                MainApplication.showRunNotification("We have detected that you are driving.");
-                AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
-                        .buildAndDispatch();
+                if (isWorkoutActive()){
+                    MainApplication.showRunNotification("We have detected that you are driving.");
+                    AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
+                            .buildAndDispatch();
+                }
             }else {
                 isInVehicle = false;
             }
 
-            Logger.d( TAG, "STILL, AverageConfidence " +  avgStillConfidence);
-            if (avgStillConfidence > CONFIDENCE_THRESHOLD){
-                if (stillOccurredCounter == 0){
-                    // Show notification and increment still occurred counter
-                    MainApplication.showRunNotification("It seems like you are still!");
-                    AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
-                            .buildAndDispatch();
-                    stillOccurredCounter = 1;
-                }
-            }
-
-            Logger.d( TAG, "ON_FOOT, AverageConfidence " +  avgOnFootConfidence);
+            Logger.d(TAG, "ON_FOOT, AverageConfidence " +  avgOnFootConfidence);
             if (avgOnFootConfidence > CONFIDENCE_THRESHOLD){
                 isOnFoot = true;
                 stillOccurredCounter = 0;

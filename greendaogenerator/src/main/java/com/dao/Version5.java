@@ -36,7 +36,7 @@ public class Version5 extends SchemaVersion {
         workout.addDateProperty("date");
         workout.addFloatProperty("runAmount");
         workout.addBooleanProperty("is_sync");
-        workout.addStringProperty("workoutId").notNull();
+        workout.addStringProperty("workoutId");
         workout.addDoubleProperty("startPointLatitude");
         workout.addDoubleProperty("startPointLongitude");
         workout.addDoubleProperty("endPointLatitude");

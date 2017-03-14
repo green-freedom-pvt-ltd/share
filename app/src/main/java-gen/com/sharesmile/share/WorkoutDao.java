@@ -66,7 +66,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"DATE\" INTEGER," + // 7: date
                 "\"RUN_AMOUNT\" REAL," + // 8: runAmount
                 "\"IS_SYNC\" INTEGER," + // 9: is_sync
-                "\"WORKOUT_ID\" TEXT NOT NULL ," + // 10: workoutId
+                "\"WORKOUT_ID\" TEXT," + // 10: workoutId
                 "\"START_POINT_LATITUDE\" REAL," + // 11: startPointLatitude
                 "\"START_POINT_LONGITUDE\" REAL," + // 12: startPointLongitude
                 "\"END_POINT_LATITUDE\" REAL," + // 13: endPointLatitude
@@ -120,7 +120,11 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (is_sync != null) {
             stmt.bindLong(10, is_sync ? 1L: 0L);
         }
-        stmt.bindString(11, entity.getWorkoutId());
+ 
+        String workoutId = entity.getWorkoutId();
+        if (workoutId != null) {
+            stmt.bindString(11, workoutId);
+        }
  
         Double startPointLatitude = entity.getStartPointLatitude();
         if (startPointLatitude != null) {
@@ -174,7 +178,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // date
             cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8), // runAmount
             cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // is_sync
-            cursor.getString(offset + 10), // workoutId
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // workoutId
             cursor.isNull(offset + 11) ? null : cursor.getDouble(offset + 11), // startPointLatitude
             cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12), // startPointLongitude
             cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13), // endPointLatitude
@@ -199,7 +203,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         entity.setDate(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
         entity.setRunAmount(cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8));
         entity.setIs_sync(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
-        entity.setWorkoutId(cursor.getString(offset + 10));
+        entity.setWorkoutId(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setStartPointLatitude(cursor.isNull(offset + 11) ? null : cursor.getDouble(offset + 11));
         entity.setStartPointLongitude(cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12));
         entity.setEndPointLatitude(cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13));
