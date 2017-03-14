@@ -9,6 +9,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.utils.Logger;
 
@@ -131,15 +132,15 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         //Need to calculate delta steps
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
-            lastStepsRecordTs = System.currentTimeMillis();
+            lastStepsRecordTs = TrueTime.now().getTime();
             stepsSinceReboot = Math.round(event.values[0]);
-            historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
+            historyQueue.put(Long.valueOf(TrueTime.now().getTime() / 1000), Long.valueOf(stepsSinceReboot));
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
             return;
         }
         int deltaSteps = Math.round(event.values[0]) - stepsSinceReboot;
-        long deltaTimeMillis = System.currentTimeMillis() - lastStepsRecordTs;
+        long deltaTimeMillis = TrueTime.now().getTime() - lastStepsRecordTs;
 
         // Filtering on deltaSteps value
         float deltaCadence = deltaSteps / (deltaTimeMillis / 1000f);
@@ -150,8 +151,8 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             return;
         }
         stepsSinceReboot = Math.round(event.values[0]);
-        lastStepsRecordTs = System.currentTimeMillis();
-        historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
+        lastStepsRecordTs = TrueTime.now().getTime();
+        historyQueue.put(Long.valueOf(TrueTime.now().getTime() / 1000), Long.valueOf(stepsSinceReboot));
         listener.onStepCount(deltaSteps);
     }
 

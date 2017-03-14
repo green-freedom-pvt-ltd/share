@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.RunPathFragment;
@@ -20,7 +21,6 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.io.File;
-import java.util.Date;
 
 /**
  * Created by ankitm on 22/04/16.
@@ -220,7 +220,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
                     // The intent does not have a URI, so declare the "text/plain" MIME type
                     emailIntent.setType("text/plain");
                     emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"maheshwari.ankit.iitd@gmail.com"}); // recipients
-                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RFAC Logs " + new Date().toString());
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RFAC Logs " + TrueTime.now().toString());
                     emailIntent.putExtra(Intent.EXTRA_TEXT, textForMail());
                     emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logsFile));
                     startActivity(Intent.createChooser(emailIntent, "Send email..."));

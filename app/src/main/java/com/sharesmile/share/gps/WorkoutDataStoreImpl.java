@@ -121,6 +121,11 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     @Override
+    public float getRecordedTime() {
+        return dirtyWorkoutData.getRecordedTime();
+    }
+
+    @Override
     public boolean coldStartAfterResume() {
         return dirtyWorkoutData.coldStartAfterResume();
     }

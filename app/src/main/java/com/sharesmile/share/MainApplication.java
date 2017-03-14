@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.crashlytics.android.Crashlytics;
+import com.instacart.library.truetime.TrueTime;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -29,6 +30,8 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
+
+import java.io.IOException;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -257,6 +260,16 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         Logger.i(TAG, "onStart");
         GoogleLocationTracker.getInstance().startLocationTracking(false);
         AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    TrueTime.build().initialize();
+                }catch (IOException ioe){
+                    ioe.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override

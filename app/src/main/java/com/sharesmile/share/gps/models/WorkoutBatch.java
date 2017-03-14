@@ -47,6 +47,11 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	float getElapsedTime();
 
 	/**
+	 * @return time interval in secs for which distance has been recorded
+	 */
+	float getRecordedTime();
+
+	/**
 	 * @return list of all points of this batch
 	 */
 	List<LatLng> getPoints();

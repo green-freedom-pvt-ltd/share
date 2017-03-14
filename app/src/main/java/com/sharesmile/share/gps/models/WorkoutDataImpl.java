@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -93,6 +94,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public float getRecordedTime() {
+		setRecordedTime();
 		return recordedTime;
 	}
 
@@ -102,12 +104,23 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		return elapsedTime;
 	}
 
+	private void setRecordedTime(){
+		if (isActive){
+			float acc = 0;
+			for (WorkoutBatch batch : getBatches()){
+				acc += batch.getRecordedTime();
+			}
+			recordedTime = acc;
+		}
+	}
+
 	private void setElapsedTime(){
 		if (isActive){
-			elapsedTime = 0;
+			float acc = 0;
 			for (WorkoutBatch batch : getBatches()){
-				elapsedTime += batch.getElapsedTime();
+				acc += batch.getElapsedTime();
 			}
+			elapsedTime = acc;
 		}
 	}
 
@@ -166,7 +179,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public synchronized void workoutResume() {
 		if (isPaused()){
-			invokeNewBatch(System.currentTimeMillis());
+			invokeNewBatch(TrueTime.now().getTime());
 			paused = false;
 		}
 	}
@@ -201,8 +214,6 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			// Add record over here
 			getCurrentBatch().addRecord(record);
 			this.distance += record.getDist();
-			recordedTime =
-					((float) (record.getLocation().getTime() - getCurrentBatch().getStartTimeStamp())) / 1000;
 		}
 		latestPoint = new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude());
 	}
@@ -234,6 +245,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			workoutPause();
 		}
 		setElapsedTime();
+		setRecordedTime();
 		isActive = false;
 		return this;
 	}
@@ -255,7 +267,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	public static WorkoutDataImpl getTestWorkoutData(){
-		WorkoutDataImpl data = new WorkoutDataImpl(System.currentTimeMillis(), "test");
+		WorkoutDataImpl data = new WorkoutDataImpl(TrueTime.now().getTime(), "test");
 		data.distance = 3240; // meters
 		data.elapsedTime = 1400; // secs
 		data.recordedTime = 1400;

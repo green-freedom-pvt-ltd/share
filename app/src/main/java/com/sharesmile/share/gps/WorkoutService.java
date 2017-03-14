@@ -20,6 +20,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
+import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -155,7 +156,7 @@ public class WorkoutService extends Service implements
             workout.setEndPointLongitude(data.getLatestPoint().longitude);
         }
         workout.setBeginTimeStamp(data.getBeginTimeStamp());
-        workout.setEndTimeStamp(System.currentTimeMillis());
+        workout.setEndTimeStamp(TrueTime.now().getTime());
         workoutDao.insertOrReplace(workout);
 
         //update userImpact

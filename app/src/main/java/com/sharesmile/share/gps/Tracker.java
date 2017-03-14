@@ -23,6 +23,7 @@ public interface Tracker {
 	long getBeginTimeStamp();
 	long getLastResumeTimeStamp();
 	int getElapsedTimeInSecs();
+	float getRecordedTimeInSecs();
 	int getTotalSteps();
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();
