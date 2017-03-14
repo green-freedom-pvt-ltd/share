@@ -3,7 +3,6 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
-import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -11,6 +10,7 @@ import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -44,7 +44,7 @@ public class RunTracker implements Tracker {
             }else{
                 // User started workout
                 setState(State.RUNNING);
-                dataStore = new WorkoutDataStoreImpl(TrueTime.now().getTime());
+                dataStore = new WorkoutDataStoreImpl(DateUtil.getServerTimeInMillis());
                 resumeRun();
             }
         }
@@ -280,7 +280,7 @@ public class RunTracker implements Tracker {
         if (isRunning()){
             // Below logic was required when we were getting cumulative steps, with google fit, it is not required
 
-            long reportimeStamp = TrueTime.now().getTime();
+            long reportimeStamp = DateUtil.getServerTimeInMillis();
             dataStore.addSteps(deltaSteps);
             listener.updateStepsRecord(reportimeStamp);
         }

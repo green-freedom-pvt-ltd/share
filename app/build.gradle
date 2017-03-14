@@ -143,8 +143,6 @@ dependencies {
 
     compile 'com.clevertap.android:clevertap-android-sdk:3.1.2'
 
-    compile 'com.github.instacart.truetime-android:library:2.2'
-
     compile ('com.github.anshulagarwal06:Lumiere:v1'){
         exclude group: 'com.google.firebase'
     }

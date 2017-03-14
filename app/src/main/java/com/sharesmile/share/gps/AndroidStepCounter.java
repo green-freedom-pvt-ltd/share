@@ -9,8 +9,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.core.Config;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 
 import java.util.Iterator;
@@ -132,15 +132,15 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         //Need to calculate delta steps
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
-            lastStepsRecordTs = TrueTime.now().getTime();
+            lastStepsRecordTs = DateUtil.getServerTimeInMillis();
             stepsSinceReboot = Math.round(event.values[0]);
-            historyQueue.put(Long.valueOf(TrueTime.now().getTime() / 1000), Long.valueOf(stepsSinceReboot));
+            historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
             return;
         }
         int deltaSteps = Math.round(event.values[0]) - stepsSinceReboot;
-        long deltaTimeMillis = TrueTime.now().getTime() - lastStepsRecordTs;
+        long deltaTimeMillis = DateUtil.getServerTimeInMillis() - lastStepsRecordTs;
 
         // Filtering on deltaSteps value
         float deltaCadence = deltaSteps / (deltaTimeMillis / 1000f);
@@ -151,8 +151,8 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             return;
         }
         stepsSinceReboot = Math.round(event.values[0]);
-        lastStepsRecordTs = TrueTime.now().getTime();
-        historyQueue.put(Long.valueOf(TrueTime.now().getTime() / 1000), Long.valueOf(stepsSinceReboot));
+        lastStepsRecordTs = DateUtil.getServerTimeInMillis();
+        historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
         listener.onStepCount(deltaSteps);
     }
 

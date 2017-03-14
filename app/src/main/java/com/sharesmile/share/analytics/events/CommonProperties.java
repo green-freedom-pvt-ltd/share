@@ -2,7 +2,6 @@ package com.sharesmile.share.analytics.events;
 
 import android.content.Context;
 
-import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.utils.DateUtil;
 
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ public class CommonProperties extends Properties {
             }
             //All Mandatory properties present, add other common properties using context
             commonProperties.put(EVENT_ID, UUID.randomUUID().toString());
-            commonProperties.put(EVENT_TIME_STAMP, DateUtil.getMillisecFormattedDate(TrueTime.now()));
+            commonProperties.put(EVENT_TIME_STAMP, DateUtil.getMillisecFormattedDate(DateUtil.getDate()));
             return commonProperties;
         }
     }

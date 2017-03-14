@@ -4,8 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
@@ -179,7 +179,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public synchronized void workoutResume() {
 		if (isPaused()){
-			invokeNewBatch(TrueTime.now().getTime());
+			invokeNewBatch(DateUtil.getServerTimeInMillis());
 			paused = false;
 		}
 	}
@@ -267,7 +267,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	public static WorkoutDataImpl getTestWorkoutData(){
-		WorkoutDataImpl data = new WorkoutDataImpl(TrueTime.now().getTime(), "test");
+		WorkoutDataImpl data = new WorkoutDataImpl(DateUtil.getServerTimeInMillis(), "test");
 		data.distance = 3240; // meters
 		data.elapsedTime = 1400; // secs
 		data.recordedTime = 1400;

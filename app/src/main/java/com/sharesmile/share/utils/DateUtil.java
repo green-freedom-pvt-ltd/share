@@ -56,6 +56,14 @@ public class DateUtil {
         return getDefaultFormattedDate(dateString, DEFAULT_DATE_FORMAT);
     }
 
+    public static Date getDate(){
+        return new Date();
+    }
+
+    public static long getServerTimeInMillis(){
+        return System.currentTimeMillis();
+    }
+
     public static Date getDefaultFormattedDate(String dateString, String format) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);

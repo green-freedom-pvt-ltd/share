@@ -1,12 +1,12 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
-import com.instacart.library.truetime.TrueTime;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -92,7 +92,7 @@ public class VigilanceTimer implements Runnable {
 		}
 
 		//Reaching here means everything is alright, vigilance approved
-		long currentTime = TrueTime.now().getTime();
+		long currentTime = DateUtil.getServerTimeInMillis();
 		workoutService.workoutVigilanceSessionApproved(currentTime - Config.VIGILANCE_TIMER_INTERVAL,
 									currentTime);
 
@@ -102,7 +102,7 @@ public class VigilanceTimer implements Runnable {
 		if (!Config.TOO_SLOW_CHECK){
 			return false;
 		}
-		long timeElapsedSinceLastResume = TrueTime.now().getTime() - workoutService.getTracker().getLastResumeTimeStamp();
+		long timeElapsedSinceLastResume = DateUtil.getServerTimeInMillis() - workoutService.getTracker().getLastResumeTimeStamp();
 		float inSecs = (float)(timeElapsedSinceLastResume / 1000);
 		Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + workoutService.getTracker().getTotalSteps()
 				+ ", timeElapsed in secs = " + inSecs

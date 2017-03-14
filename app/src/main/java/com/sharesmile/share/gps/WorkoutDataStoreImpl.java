@@ -9,6 +9,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -36,11 +37,15 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         dirtyWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_DIRTY);
         approvedWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_APPROVED);
         if (dirtyWorkoutData == null){
-            throw new IllegalStateException("Workout is active but Couldn't find workout data in persistent storage");
+            init(DateUtil.getServerTimeInMillis());
         }
     }
 
     WorkoutDataStoreImpl(long beginTimeStamp){
+        init(beginTimeStamp);
+    }
+
+    public void init(long beginTimeStamp){
         String workoutId = UUID.randomUUID().toString();
         dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
         approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);

@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.instacart.library.truetime.TrueTime;
+import com.sharesmile.share.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	@Override
 	public void addDistance(float distanceToAdd) {
 		distance += distanceToAdd;
-		lastRecordAddedTs = TrueTime.now().getTime();
+		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	private void setElapsedTime(){
 		if (isRunning){
-			elapsedTime = (TrueTime.now().getTime() - startTimeStamp) / 1000;
+			elapsedTime = (DateUtil.getServerTimeInMillis() - startTimeStamp) / 1000;
 		}
 	}
 
