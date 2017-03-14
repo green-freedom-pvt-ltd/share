@@ -495,7 +495,7 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
         updateNotification();
         float totalDistanceKmsOneDecimal = Float.parseFloat(Utils.formatToKmsWithOneDecimal(totalDistance));
-        if (totalDistanceKmsOneDecimal > distanceInKmsOnLastUpdateEvent){
+        if (totalDistanceKmsOneDecimal != distanceInKmsOnLastUpdateEvent){
             // Send event only when the distance counter increment by one unit
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(mCauseData.getCauseBundle())

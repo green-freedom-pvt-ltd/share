@@ -263,7 +263,17 @@ public class RunTracker implements Tracker {
 
     @Override
     public void discardApprovalQueue() {
+
+        float distBeforeDiscard = dataStore.getTotalDistance();
+        float recordedTimeBeforeDiscard = dataStore.getRecordedTime();
+
         dataStore.discardApprovalQueue();
+
+        float deltaDistance = dataStore.getTotalDistance() - distBeforeDiscard; // in meters, should be negative
+        float deltaTime = dataStore.getRecordedTime() - recordedTimeBeforeDiscard; // in secs
+        float deltaSpeed = (deltaDistance / deltaTime) * 3.6f; // in km/hrs
+        listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
+                deltaDistance, Math.round(deltaTime), deltaSpeed);
     }
 
     private synchronized void processSteps(int deltaSteps){

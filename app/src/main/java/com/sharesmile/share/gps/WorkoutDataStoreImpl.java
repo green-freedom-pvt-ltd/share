@@ -182,6 +182,9 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         extraPolatedDistanceToBeApproved = 0;
         waitingForApprovalQueue.clear();
         numStepsToBeApproved = 0;
+        // Cleansing DirtyWorkoutData as user defaulted
+        dirtyWorkoutData = approvedWorkoutData.copy();
+        persistDirtyWorkoutData();
     }
 
     @Override
