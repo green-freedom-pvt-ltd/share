@@ -20,6 +20,12 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 
+import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL;
+import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD;
+import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_EVENT;
+import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
+import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
+
 /**
  * Created by ankitmaheshwari on 3/10/17.
  */
@@ -36,12 +42,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private boolean isWorkoutActive;
 
     private CircularQueue<ActivityRecognitionResult> historyQueue;
-
-    public static final int CONFIDENCE_THRESHOLD = 80;
-    public static final int CONFIDENCE_THRESHOLD_EVENT = 30;
-    public static final int ACTIVITY_VALID_INTERVAL = 21000; // in millisecs
-    public static final long DETECTED_INTERVAL_IDLE = 6000; // in millisecs
-    public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 
 
     private static ActivityDetector uniqueInstance;
@@ -172,10 +172,14 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
         float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
-        if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
-            AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_IN_VEHICLE)
-                    .put("confidence_value", inVehicleConfidence)
-                    .buildAndDispatch();
+        float onFootConfidence = result.getActivityConfidence(DetectedActivity.ON_FOOT);
+
+        if (isWorkoutActive()){
+            if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
+                AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_IN_VEHICLE)
+                        .put("confidence_value", inVehicleConfidence)
+                        .buildAndDispatch();
+            }
         }
 
         Logger.d( TAG, "STILL, confidence " +  stillConfidence);
@@ -189,6 +193,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 handler.removeCallbacks(handleStillRunnable);
             }
         }
+        Logger.d( TAG, "ON_FOOT, confidence " +  onFootConfidence);
 
         // Add the fresh result in HistoryQueue
         long currentTime = result.getTime();

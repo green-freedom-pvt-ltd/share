@@ -3,6 +3,7 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -74,6 +75,14 @@ public class RunTracker implements Tracker {
                 + (long) workoutData.getTotalSteps());
         SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT, lifetimeWorkingOut
                 + (long) workoutData.getRecordedTime());
+
+        Analytics.getInstance().setUserProperty("LifeTimeDistance",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE));
+        Analytics.getInstance().setUserProperty("LifeTimeSteps",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS));
+        Analytics.getInstance().setUserProperty("AvgStrideLength", getAverageStrideLength());
+        Analytics.getInstance().setUserProperty("AvgSpeed", getLifetimeAverageSpeed());
+        Analytics.getInstance().setUserProperty("AvgCadence", getLifetimeAverageStepsPerSec());
     }
 
     public static float getAverageStrideLength(){
@@ -363,13 +372,10 @@ public class RunTracker implements Tracker {
     }
 
     public Properties getWorkoutBundle(){
-        Properties p = new Properties();
-        p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistanceCovered()));
-        p.put("time_elapsed", getElapsedTimeInSecs());
-        p.put("avg_speed", getAvgSpeed() * (3.6f));
-        p.put("num_steps", getTotalSteps());
-        p.put("client_run_id", getCurrentWorkoutId());
-        return p;
+        if (dataStore != null){
+            return dataStore.getWorkoutBundle();
+        }
+        return null;
     }
 
     private boolean checkUsingFormula(float dist, float accuracy){

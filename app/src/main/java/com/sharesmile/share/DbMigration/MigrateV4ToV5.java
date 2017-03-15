@@ -18,8 +18,14 @@ public class MigrateV4ToV5 extends MigrationImpl {
                               int currentVersion) {
         prepareMigration(db, currentVersion);
 
-        db.execSQL(getSqlStringForMigration());
-
+        db.execSQL(getSqlQueryForAddingColumn(" 'WORKOUT_ID' TEXT NOT NULL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'START_POINT_LATITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'START_POINT_LONGITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'END_POINT_LATITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'END_POINT_LONGITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'BEGIN_TIME_STAMP' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'END_TIME_STAMP' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL"));
         return getMigratedVersion();
     }
 
@@ -47,15 +53,8 @@ public class MigrateV4ToV5 extends MigrationImpl {
         return new MigrateV3ToV4();
     }
 
-    private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD " +
-                " 'WORKOUT_ID' TEXT NOT NULL ," +
-                " 'START_POINT_LATITUDE' REAL ," +
-                " 'START_POINT_LONGITUDE' REAL," +
-                " 'END_POINT_LATITUDE' REAL ," +
-                " 'END_POINT_LONGITUDE' REAL ," +
-                " 'BEGIN_TIME_STAMP' INTEGER," +
-                " 'END_TIME_STAMP' INTEGER," +
-                " 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL";
+
+    private String getSqlQueryForAddingColumn(String columnDef) {
+        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN " + columnDef;
     }
 }

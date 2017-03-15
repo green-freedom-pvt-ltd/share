@@ -33,11 +33,13 @@ public class Config {
 
     public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.2f;
 
-    public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 1.2f; // in meters
+    public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
 
     public static long VIGILANCE_TIMER_INTERVAL = 10000; // in millisecs
 
     public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
+
+    public static float MAX_STEPS_PER_SECOND_FACTOR = 3.5f;
 
     public static float SOURCE_ACCEPTABLE_ACCURACY = 40; // in m
 
@@ -54,6 +56,14 @@ public class Config {
     public static boolean USAIN_BOLT_CHECK = true;
 
     public static long GPS_INACTIVITY_NOTIFICATION_DELAY = 50000; // in Millisecs
+
+    // Activity Detector Config
+
+    public static final int CONFIDENCE_THRESHOLD = 80;
+    public static final int CONFIDENCE_THRESHOLD_EVENT = 60;
+    public static final int ACTIVITY_VALID_INTERVAL = 24000; // in millisecs
+    public static final long DETECTED_INTERVAL_IDLE = 7000; // in millisecs
+    public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 
 
 }
