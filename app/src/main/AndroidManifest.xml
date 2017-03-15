@@ -87,11 +87,15 @@
         <meta-data
             android:name="CLEVERTAP_NOTIFICATION_ICON"
             android:value="ic_stat_onesignal_default"/> <!-- name of your file in the drawable directory without the file extension. -->
-        
+
         <activity
             android:name="com.clevertap.android.sdk.InAppNotificationActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges="orientation|keyboardHidden"/>
+
+        <meta-data
+            android:name="CLEVERTAP_INAPP_EXCLUDE"
+            android:value="OnBoardingActivity"/>
 
         <!-- Facebook login integration -->
         <meta-data
@@ -161,12 +165,12 @@
         </activity>
 
         <receiver
-            android:name="com.sharesmile.share.gcm.CustomGcmBroadcastReceiver"
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
-
                 <category android:name="com.sharesmile.share"/>
             </intent-filter>
         </receiver>
