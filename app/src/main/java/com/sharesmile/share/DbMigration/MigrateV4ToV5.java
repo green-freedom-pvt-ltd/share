@@ -18,7 +18,7 @@ public class MigrateV4ToV5 extends MigrationImpl {
                               int currentVersion) {
         prepareMigration(db, currentVersion);
 
-        db.execSQL(getSqlQueryForAddingColumn(" 'WORKOUT_ID' TEXT NOT NULL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'WORKOUT_ID' TEXT"));
         db.execSQL(getSqlQueryForAddingColumn(" 'START_POINT_LATITUDE' REAL"));
         db.execSQL(getSqlQueryForAddingColumn(" 'START_POINT_LONGITUDE' REAL"));
         db.execSQL(getSqlQueryForAddingColumn(" 'END_POINT_LATITUDE' REAL"));

@@ -112,7 +112,9 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
-            persistWorkoutInDb(result);
+            if (result.getDistance() >= mCauseData.getMinDistance()) {
+                persistWorkoutInDb(result);
+            }
             tracker = null;
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,

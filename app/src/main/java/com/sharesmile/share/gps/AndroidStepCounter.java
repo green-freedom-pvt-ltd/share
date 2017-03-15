@@ -85,6 +85,13 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             Map.Entry<Long, Long> last = null;
             while (iterator.hasNext()){
                 Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
+
+                if ( ((DateUtil.getServerTimeInMillis() / 1000) - thisEntry.getKey())
+                        > STEP_COUNT_READING_VALID_INTERVAL){
+                    // This entry is too old to be considered in calculation
+                    continue;
+                }
+
                 if (first == null){
                     first = thisEntry;
                     last = thisEntry;
@@ -97,6 +104,12 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
                     }
                 }
             }
+
+            if (first == null){
+                // No entry picked for calculation
+                return 0;
+            }
+
             Long numSteps = last.getValue() - first.getValue();
             //In a rare scenario when queue has just two entries with same keys (i.e. epoch in secs) we are considering delta as 1
             Long deltaTime = (last.getKey() - first.getKey()) > 0

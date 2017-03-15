@@ -55,13 +55,13 @@ public class Config {
 
     public static boolean USAIN_BOLT_CHECK = true;
 
-    public static long GPS_INACTIVITY_NOTIFICATION_DELAY = 50000; // in Millisecs
+    public static long GPS_INACTIVITY_NOTIFICATION_DELAY = 55000; // in Millisecs
 
     // Activity Detector Config
 
     public static final int CONFIDENCE_THRESHOLD = 80;
     public static final int CONFIDENCE_THRESHOLD_EVENT = 60;
-    public static final int ACTIVITY_VALID_INTERVAL = 24000; // in millisecs
+    public static final long ACTIVITY_VALID_INTERVAL = 24000; // in millisecs
     public static final long DETECTED_INTERVAL_IDLE = 7000; // in millisecs
     public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 

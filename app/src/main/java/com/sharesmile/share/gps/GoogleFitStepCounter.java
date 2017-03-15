@@ -24,6 +24,7 @@ import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 
 import java.util.Iterator;
@@ -136,6 +137,13 @@ public class GoogleFitStepCounter implements StepCounter,
                 Long numSteps = 0L;
                 while (iterator.hasNext()){
                     Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
+
+                    if ( ((DateUtil.getServerTimeInMillis() / 1000) - thisEntry.getKey())
+                            > STEP_COUNT_READING_VALID_INTERVAL){
+                        // This entry is too old to be considered in calculation
+                        continue;
+                    }
+
                     numSteps += thisEntry.getValue();
                     if (first == null){
                         first = thisEntry;
@@ -149,6 +157,12 @@ public class GoogleFitStepCounter implements StepCounter,
                         }
                     }
                 }
+
+                if (first == null){
+                    // No entry picked for calculation
+                    return 0;
+                }
+
                 Long numStepsInFirst = first.getValue();
                 numSteps = numSteps - numStepsInFirst;
                 //In a rare scenario when queue has just two entries with same keys (i.e. epoch in secs) we are considering delta as 1
