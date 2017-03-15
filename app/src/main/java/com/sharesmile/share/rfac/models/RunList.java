@@ -116,14 +116,19 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
     private Workout getWorkoutData(Run run) {
 
         Workout workout = new Workout(run.getId());
+        workout.setWorkoutId(run.getClientRunId());
         workout.setIs_sync(true);
-        workout.setDate(run.getData());
+        workout.setDate(run.getDate());
         workout.setCauseBrief(run.getCauseName());
         workout.setAvgSpeed(run.getAvgSpeed());
         workout.setDistance(run.getDistance());
         workout.setRunAmount(run.getRunAmount());
         workout.setElapsedTime(run.getRunDuration());
         workout.setIsValidRun(!run.isFlag());
+        workout.setStartPointLatitude(run.getStartLocationLat());
+        workout.setStartPointLongitude(run.getStartLocationLong());
+        workout.setEndPointLatitude(run.getEndLocationLat());
+        workout.setEndPointLongitude(run.getEndLocationLong());
         return workout;
     }
 }

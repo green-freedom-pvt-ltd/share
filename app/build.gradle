@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 47
-        versionName "1.7.8"
+        versionCode 51
+        versionName "1.8.2"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -146,6 +146,7 @@ dependencies {
     compile ('com.github.anshulagarwal06:Lumiere:v1'){
         exclude group: 'com.google.firebase'
     }
+
 }
 
 apply plugin: 'com.google.gms.google-services'

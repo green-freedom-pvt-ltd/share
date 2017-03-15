@@ -20,6 +20,13 @@ public class Workout {
     private java.util.Date date;
     private Float runAmount;
     private Boolean is_sync;
+    private String workoutId;
+    private Double startPointLatitude;
+    private Double startPointLongitude;
+    private Double endPointLatitude;
+    private Double endPointLongitude;
+    private Long beginTimeStamp;
+    private Long endTimeStamp;
     private boolean isValidRun;
 
     // KEEP FIELDS - put your custom fields here
@@ -32,7 +39,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, boolean isValidRun) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, boolean isValidRun) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -43,6 +50,13 @@ public class Workout {
         this.date = date;
         this.runAmount = runAmount;
         this.is_sync = is_sync;
+        this.workoutId = workoutId;
+        this.startPointLatitude = startPointLatitude;
+        this.startPointLongitude = startPointLongitude;
+        this.endPointLatitude = endPointLatitude;
+        this.endPointLongitude = endPointLongitude;
+        this.beginTimeStamp = beginTimeStamp;
+        this.endTimeStamp = endTimeStamp;
         this.isValidRun = isValidRun;
     }
 
@@ -126,6 +140,62 @@ public class Workout {
 
     public void setIs_sync(Boolean is_sync) {
         this.is_sync = is_sync;
+    }
+
+    public String getWorkoutId() {
+        return workoutId;
+    }
+
+    public void setWorkoutId(String workoutId) {
+        this.workoutId = workoutId;
+    }
+
+    public Double getStartPointLatitude() {
+        return startPointLatitude;
+    }
+
+    public void setStartPointLatitude(Double startPointLatitude) {
+        this.startPointLatitude = startPointLatitude;
+    }
+
+    public Double getStartPointLongitude() {
+        return startPointLongitude;
+    }
+
+    public void setStartPointLongitude(Double startPointLongitude) {
+        this.startPointLongitude = startPointLongitude;
+    }
+
+    public Double getEndPointLatitude() {
+        return endPointLatitude;
+    }
+
+    public void setEndPointLatitude(Double endPointLatitude) {
+        this.endPointLatitude = endPointLatitude;
+    }
+
+    public Double getEndPointLongitude() {
+        return endPointLongitude;
+    }
+
+    public void setEndPointLongitude(Double endPointLongitude) {
+        this.endPointLongitude = endPointLongitude;
+    }
+
+    public Long getBeginTimeStamp() {
+        return beginTimeStamp;
+    }
+
+    public void setBeginTimeStamp(Long beginTimeStamp) {
+        this.beginTimeStamp = beginTimeStamp;
+    }
+
+    public Long getEndTimeStamp() {
+        return endTimeStamp;
+    }
+
+    public void setEndTimeStamp(Long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
 
     public boolean getIsValidRun() {

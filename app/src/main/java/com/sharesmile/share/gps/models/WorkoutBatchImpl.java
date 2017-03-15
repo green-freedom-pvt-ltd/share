@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +22,13 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	private List<LatLng> points;
 	private boolean isRunning;
 	private float elapsedTime; // in secs
+	private long lastRecordAddedTs; // in millis
 
 	public WorkoutBatchImpl(long startTimeStamp){
 		isRunning = true;
 		this.startTimeStamp = startTimeStamp;
 		points = new ArrayList<>();
+		lastRecordAddedTs = startTimeStamp;
 	}
 
 	private WorkoutBatchImpl(WorkoutBatchImpl source){
@@ -37,12 +40,14 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		for (LatLng latLong : points){
 			points.add(new LatLng(latLong.latitude, latLong.longitude));
 		}
+		lastRecordAddedTs = source.lastRecordAddedTs;
 	}
 
 	@Override
 	public void addRecord(DistRecord record) {
 		addDistance(record.getDist());
 		points.add(new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude()));
+		lastRecordAddedTs = record.getLocation().getTime();
 	}
 
 	@Override
@@ -53,6 +58,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	@Override
 	public void addDistance(float distanceToAdd) {
 		distance += distanceToAdd;
+		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 
 	@Override
@@ -71,9 +77,14 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		return elapsedTime;
 	}
 
+	@Override
+	public float getRecordedTime() {
+		return (lastRecordAddedTs - startTimeStamp) / 1000;
+	}
+
 	private void setElapsedTime(){
 		if (isRunning){
-			elapsedTime = (System.currentTimeMillis() - startTimeStamp) / 1000;
+			elapsedTime = (DateUtil.getServerTimeInMillis() - startTimeStamp) / 1000;
 		}
 	}
 
@@ -102,6 +113,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 				", points=" + points +
 				", isRunning=" + isRunning +
 				", elapsedTime=" + elapsedTime +
+				", lastRecordAddedTs=" + lastRecordAddedTs +
 				'}';
 	}
 
@@ -116,6 +128,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		}
 		isRunning = in.readByte() != 0x00;
 		elapsedTime = in.readFloat();
+		lastRecordAddedTs = in.readLong();
 	}
 
 	@Override
@@ -135,6 +148,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		}
 		dest.writeByte((byte) (isRunning ? 0x01 : 0x00));
 		dest.writeFloat(elapsedTime);
+		dest.writeLong(lastRecordAddedTs);
 	}
 
 	@SuppressWarnings("unused")

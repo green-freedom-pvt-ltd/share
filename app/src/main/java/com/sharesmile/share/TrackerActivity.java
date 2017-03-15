@@ -26,6 +26,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.gson.Gson;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
@@ -283,6 +284,13 @@ public class TrackerActivity extends BaseActivity {
             return elapsedTime;
         }
         return 0;
+    }
+
+    public Properties getWorkoutBundle(){
+        if (isBoundToLocationService()) {
+            return locationService.getWorkoutBundle();
+        }
+        return null;
     }
 
     public float getTotalDistanceInMeters(){

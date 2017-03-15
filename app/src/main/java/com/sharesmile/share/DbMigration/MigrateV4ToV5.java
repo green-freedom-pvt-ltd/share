@@ -7,16 +7,7 @@ package com.sharesmile.share.DbMigration;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.v3.MessageDao;
-
-
-/**
- * Migration from Version1 to Version2
- *
- * @author Jeremy
- */
 public class MigrateV4ToV5 extends MigrationImpl {
 
     /**
@@ -27,8 +18,14 @@ public class MigrateV4ToV5 extends MigrationImpl {
                               int currentVersion) {
         prepareMigration(db, currentVersion);
 
-        db.execSQL(getSqlStringForMigration());
-
+        db.execSQL(getSqlQueryForAddingColumn(" 'WORKOUT_ID' TEXT"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'START_POINT_LATITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'START_POINT_LONGITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'END_POINT_LATITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'END_POINT_LONGITUDE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'BEGIN_TIME_STAMP' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'END_TIME_STAMP' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL"));
         return getMigratedVersion();
     }
 
@@ -56,8 +53,8 @@ public class MigrateV4ToV5 extends MigrationImpl {
         return new MigrateV3ToV4();
     }
 
-    private String getSqlStringForMigration() {
-        return  "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL";
 
+    private String getSqlQueryForAddingColumn(String columnDef) {
+        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN " + columnDef;
     }
 }

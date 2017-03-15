@@ -56,7 +56,7 @@ public class DistRecord implements UnObfuscable, Serializable{
                 '}';
     }
 
-    public boolean isStartRecord(){
+    public boolean isFirstRecordAfterResume(){
         if (location != null && prevLocation == null){
             return true;
         }

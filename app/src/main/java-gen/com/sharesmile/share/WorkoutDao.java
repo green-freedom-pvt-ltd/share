@@ -33,7 +33,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         public final static Property Date = new Property(7, java.util.Date.class, "date", false, "DATE");
         public final static Property RunAmount = new Property(8, Float.class, "runAmount", false, "RUN_AMOUNT");
         public final static Property Is_sync = new Property(9, Boolean.class, "is_sync", false, "IS_SYNC");
-        public final static Property IsValidRun = new Property(10, boolean.class, "isValidRun", false, "IS_VALID_RUN");
+        public final static Property WorkoutId = new Property(10, String.class, "workoutId", false, "WORKOUT_ID");
+        public final static Property StartPointLatitude = new Property(11, Double.class, "startPointLatitude", false, "START_POINT_LATITUDE");
+        public final static Property StartPointLongitude = new Property(12, Double.class, "startPointLongitude", false, "START_POINT_LONGITUDE");
+        public final static Property EndPointLatitude = new Property(13, Double.class, "endPointLatitude", false, "END_POINT_LATITUDE");
+        public final static Property EndPointLongitude = new Property(14, Double.class, "endPointLongitude", false, "END_POINT_LONGITUDE");
+        public final static Property BeginTimeStamp = new Property(15, Long.class, "beginTimeStamp", false, "BEGIN_TIME_STAMP");
+        public final static Property EndTimeStamp = new Property(16, Long.class, "endTimeStamp", false, "END_TIME_STAMP");
+        public final static Property IsValidRun = new Property(17, boolean.class, "isValidRun", false, "IS_VALID_RUN");
     };
 
 
@@ -59,7 +66,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"DATE\" INTEGER," + // 7: date
                 "\"RUN_AMOUNT\" REAL," + // 8: runAmount
                 "\"IS_SYNC\" INTEGER," + // 9: is_sync
-                "\"IS_VALID_RUN\" INTEGER NOT NULL );"); // 10: isValidRun
+                "\"WORKOUT_ID\" TEXT," + // 10: workoutId
+                "\"START_POINT_LATITUDE\" REAL," + // 11: startPointLatitude
+                "\"START_POINT_LONGITUDE\" REAL," + // 12: startPointLongitude
+                "\"END_POINT_LATITUDE\" REAL," + // 13: endPointLatitude
+                "\"END_POINT_LONGITUDE\" REAL," + // 14: endPointLongitude
+                "\"BEGIN_TIME_STAMP\" INTEGER," + // 15: beginTimeStamp
+                "\"END_TIME_STAMP\" INTEGER," + // 16: endTimeStamp
+                "\"IS_VALID_RUN\" INTEGER NOT NULL );"); // 17: isValidRun
     }
 
     /** Drops the underlying database table. */
@@ -106,7 +120,42 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (is_sync != null) {
             stmt.bindLong(10, is_sync ? 1L: 0L);
         }
-        stmt.bindLong(11, entity.getIsValidRun() ? 1L: 0L);
+ 
+        String workoutId = entity.getWorkoutId();
+        if (workoutId != null) {
+            stmt.bindString(11, workoutId);
+        }
+ 
+        Double startPointLatitude = entity.getStartPointLatitude();
+        if (startPointLatitude != null) {
+            stmt.bindDouble(12, startPointLatitude);
+        }
+ 
+        Double startPointLongitude = entity.getStartPointLongitude();
+        if (startPointLongitude != null) {
+            stmt.bindDouble(13, startPointLongitude);
+        }
+ 
+        Double endPointLatitude = entity.getEndPointLatitude();
+        if (endPointLatitude != null) {
+            stmt.bindDouble(14, endPointLatitude);
+        }
+ 
+        Double endPointLongitude = entity.getEndPointLongitude();
+        if (endPointLongitude != null) {
+            stmt.bindDouble(15, endPointLongitude);
+        }
+ 
+        Long beginTimeStamp = entity.getBeginTimeStamp();
+        if (beginTimeStamp != null) {
+            stmt.bindLong(16, beginTimeStamp);
+        }
+ 
+        Long endTimeStamp = entity.getEndTimeStamp();
+        if (endTimeStamp != null) {
+            stmt.bindLong(17, endTimeStamp);
+        }
+        stmt.bindLong(18, entity.getIsValidRun() ? 1L: 0L);
     }
 
     /** @inheritdoc */
@@ -129,7 +178,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // date
             cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8), // runAmount
             cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // is_sync
-            cursor.getShort(offset + 10) != 0 // isValidRun
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // workoutId
+            cursor.isNull(offset + 11) ? null : cursor.getDouble(offset + 11), // startPointLatitude
+            cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12), // startPointLongitude
+            cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13), // endPointLatitude
+            cursor.isNull(offset + 14) ? null : cursor.getDouble(offset + 14), // endPointLongitude
+            cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15), // beginTimeStamp
+            cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16), // endTimeStamp
+            cursor.getShort(offset + 17) != 0 // isValidRun
         );
         return entity;
     }
@@ -147,7 +203,14 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         entity.setDate(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
         entity.setRunAmount(cursor.isNull(offset + 8) ? null : cursor.getFloat(offset + 8));
         entity.setIs_sync(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
-        entity.setIsValidRun(cursor.getShort(offset + 10) != 0);
+        entity.setWorkoutId(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setStartPointLatitude(cursor.isNull(offset + 11) ? null : cursor.getDouble(offset + 11));
+        entity.setStartPointLongitude(cursor.isNull(offset + 12) ? null : cursor.getDouble(offset + 12));
+        entity.setEndPointLatitude(cursor.isNull(offset + 13) ? null : cursor.getDouble(offset + 13));
+        entity.setEndPointLongitude(cursor.isNull(offset + 14) ? null : cursor.getDouble(offset + 14));
+        entity.setBeginTimeStamp(cursor.isNull(offset + 15) ? null : cursor.getLong(offset + 15));
+        entity.setEndTimeStamp(cursor.isNull(offset + 16) ? null : cursor.getLong(offset + 16));
+        entity.setIsValidRun(cursor.getShort(offset + 17) != 0);
      }
     
     /** @inheritdoc */

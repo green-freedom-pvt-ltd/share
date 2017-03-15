@@ -70,7 +70,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	void addRecord(DistRecord recordToAdd);
 
 	/**
-	 * @return epoch at which workout began
+	 * @return epoch (millis) at which workout began
 	 */
 	long getBeginTimeStamp();
 
@@ -126,5 +126,29 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 * @return
 	 */
 	Properties getWorkoutBundle();
+
+	/**
+	 * Fetches the start point (LatLng) of the workout
+	 * @return
+     */
+	LatLng getStartPoint();
+
+	/**
+	 * Fetches the end point (LatLng) of the workout
+	 * @return
+	 */
+	LatLng getLatestPoint();
+
+	/**
+	 * Sets the start point (LatLng) of the workout
+	 * @return
+	 */
+	void setStartPoint(LatLng latLng);
+
+	/**
+	 * Gets the universally unique identifier of workout
+	 * @return
+     */
+	String getWorkoutId();
 
 }

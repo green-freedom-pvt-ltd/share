@@ -12,7 +12,8 @@ public interface StepCounter {
     int STEP_DETECTOR_NOT_SUPPORTED = 103;
     int GOOGLE_FIT_STEP_COUNTER_DEPRECATED = 104;
 
-    int NUM_ELEMS_IN_HISTORY_QUEUE = 8;
+    int NUM_ELEMS_IN_HISTORY_QUEUE = 6;
+    long STEP_COUNT_READING_VALID_INTERVAL = 25; // in secs
 
     void startCounting();
     void stopCounting();
@@ -21,7 +22,7 @@ public interface StepCounter {
     void onActivityResult(int requestCode, int resultCode, Intent data);
 
     /**
-     * Returns current step speed of the user, which is based on the last six step readings from sensor
+     * Returns current step speed of the user, which is based on the last few step readings from sensor
      * @return steps per sec as float value, returns -1 if step counting has not started yet.
      */
     float getMovingAverageOfStepsPerSec();

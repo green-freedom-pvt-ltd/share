@@ -25,6 +25,7 @@ import com.sharesmile.share.utils.Urls;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -117,14 +118,17 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
-            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
+            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+            jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
             jsonObject.put("run_amount", workout.getRunAmount());
             jsonObject.put("run_duration", workout.getElapsedTime());
             jsonObject.put("no_of_steps", workout.getSteps());
-
             jsonObject.put("avg_speed", workout.getAvgSpeed());
-            //// TODO: 15/05/16 remove Peak speed
-            jsonObject.put("peak_speed", 1);
+            jsonObject.put("client_run_id", workout.getWorkoutId());
+            jsonObject.put("start_location_lat", workout.getStartPointLatitude());
+            jsonObject.put("start_location_long", workout.getStartPointLongitude());
+            jsonObject.put("end_location_lat", workout.getEndPointLatitude());
+            jsonObject.put("end_location_long", workout.getEndPointLongitude());
             Logger.d(TAG, jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
@@ -138,17 +142,22 @@ public class SyncService extends GcmTaskService {
             mWorkoutDao.insertOrReplace(workout);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "success")
+                    .put("client_run_id", workout.getWorkoutId())
                     .buildAndDispatch();
 
             return true;
 
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException" + e.getMessageFromServer());
-            Crashlytics.log("Run sync networkException");
+            Logger.d(TAG, "NetworkException: " + e.getMessageFromServer());
+            Crashlytics.log("Run sync networkException, messageFromServer: " + e.getMessageFromServer());
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
-                    .put("upload_result", "Network exception " + e.getMessageFromServer())
+                    .put("upload_result", "failure")
+                    .put("client_run_id", workout.getWorkoutId())
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
                     .buildAndDispatch();
             return false;
         } catch (JSONException e) {

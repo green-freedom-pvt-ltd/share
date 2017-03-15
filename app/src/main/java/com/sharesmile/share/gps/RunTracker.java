@@ -3,6 +3,7 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -10,6 +11,7 @@ import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -43,7 +45,7 @@ public class RunTracker implements Tracker {
             }else{
                 // User started workout
                 setState(State.RUNNING);
-                dataStore = new WorkoutDataStoreImpl(System.currentTimeMillis());
+                dataStore = new WorkoutDataStoreImpl(DateUtil.getServerTimeInMillis());
                 resumeRun();
             }
         }
@@ -73,6 +75,14 @@ public class RunTracker implements Tracker {
                 + (long) workoutData.getTotalSteps());
         SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT, lifetimeWorkingOut
                 + (long) workoutData.getRecordedTime());
+
+        Analytics.getInstance().setUserProperty("LifeTimeDistance",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE));
+        Analytics.getInstance().setUserProperty("LifeTimeSteps",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS));
+        Analytics.getInstance().setUserProperty("AvgStrideLength", getAverageStrideLength());
+        Analytics.getInstance().setUserProperty("AvgSpeed", getLifetimeAverageSpeed());
+        Analytics.getInstance().setUserProperty("AvgCadence", getLifetimeAverageStepsPerSec());
     }
 
     public static float getAverageStrideLength(){
@@ -139,6 +149,11 @@ public class RunTracker implements Tracker {
     }
 
     @Override
+    public float getRecordedTimeInSecs() {
+        return dataStore.getRecordedTime();
+    }
+
+    @Override
     public float getDistanceCoveredSinceLastResume() {
         return dataStore.getDistanceCoveredSinceLastResume();
     }
@@ -153,7 +168,7 @@ public class RunTracker implements Tracker {
 
     @Override
     public float getCurrentSpeed() {
-        if (lastRecord != null && !lastRecord.isStartRecord()){
+        if (lastRecord != null && !lastRecord.isFirstRecordAfterResume()){
             return lastRecord.getSpeed();
         }
         return 0;
@@ -197,6 +212,14 @@ public class RunTracker implements Tracker {
     public DistRecord getLastRecord(){
         if (isActive()){
             return lastRecord;
+        }
+        return null;
+    }
+
+    @Override
+    public String getCurrentWorkoutId() {
+        if (isActive() && dataStore != null){
+            return dataStore.getWorkoutId();
         }
         return null;
     }
@@ -249,14 +272,24 @@ public class RunTracker implements Tracker {
 
     @Override
     public void discardApprovalQueue() {
+
+        float distBeforeDiscard = dataStore.getTotalDistance();
+        float recordedTimeBeforeDiscard = dataStore.getRecordedTime();
+
         dataStore.discardApprovalQueue();
+
+        float deltaDistance = dataStore.getTotalDistance() - distBeforeDiscard; // in meters, should be negative
+        float deltaTime = dataStore.getRecordedTime() - recordedTimeBeforeDiscard; // in secs
+        float deltaSpeed = (deltaDistance / deltaTime) * 3.6f; // in km/hrs
+        listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
+                deltaDistance, Math.round(deltaTime), deltaSpeed);
     }
 
     private synchronized void processSteps(int deltaSteps){
         if (isRunning()){
             // Below logic was required when we were getting cumulative steps, with google fit, it is not required
 
-            long reportimeStamp = System.currentTimeMillis();
+            long reportimeStamp = DateUtil.getServerTimeInMillis();
             dataStore.addSteps(deltaSteps);
             listener.updateStepsRecord(reportimeStamp);
         }
@@ -339,12 +372,10 @@ public class RunTracker implements Tracker {
     }
 
     public Properties getWorkoutBundle(){
-        Properties p = new Properties();
-        p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistanceCovered()));
-        p.put("time_elapsed", getElapsedTimeInSecs());
-        p.put("avg_speed", getAvgSpeed() * (3.6f));
-        p.put("num_steps", getTotalSteps());
-        return p;
+        if (dataStore != null){
+            return dataStore.getWorkoutBundle();
+        }
+        return null;
     }
 
     private boolean checkUsingFormula(float dist, float accuracy){

@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.sharesmile.share.DaoMaster;
 
+import retrofit.http.HEAD;
+
 
 /**
  * Created by Shine on 27/08/16.
@@ -34,7 +36,7 @@ public class UpgradeHelper extends DaoMaster.OpenHelper {
                 new MigrateV3ToV4().applyMigration(db, oldVersion);
                 break;
             case 5:
-                new MigrateV4ToV5().applyMigration(db,oldVersion);
+                new MigrateV4ToV5().applyMigration(db, oldVersion);
                 break;
             default:
                 return;

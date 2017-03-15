@@ -20,6 +20,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.sync.SyncHelper;
@@ -180,6 +181,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         initOneSignal();
         mDbWrapper = new DbWrapper(this);
         GoogleLocationTracker.initialize(this);
+        ActivityDetector.initialize(this);
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
 

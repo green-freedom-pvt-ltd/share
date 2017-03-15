@@ -5,7 +5,8 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.models.DistRecord;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,7 +22,7 @@ public class VigilanceTimer implements Runnable {
 	private IWorkoutService workoutService;
 
 	private int stepsTillNow = -1;
-	private DistRecord lastValidatedRecord;
+	private float lastValidatedRecordedTimeInSecs; // in secs
 	private float lastValidatedDistance;
 	private int lastValidatedNumSteps;
 
@@ -30,6 +31,7 @@ public class VigilanceTimer implements Runnable {
 		this.scheduledExecutor = executorService;
 		this.workoutService = workoutService;
 		scheduledExecutor.scheduleAtFixedRate(this, 0, Config.VIGILANCE_TIMER_INTERVAL, TimeUnit.MILLISECONDS);
+		resetCounters();
 	}
 
 	@Override
@@ -57,9 +59,9 @@ public class VigilanceTimer implements Runnable {
 
 	private void resetCounters(){
 		Logger.d(TAG, "resetCounters");
-		lastValidatedRecord = null;
-		lastValidatedDistance = 0;
-		lastValidatedNumSteps = 0;
+		this.lastValidatedRecordedTimeInSecs = workoutService.getTracker().getRecordedTimeInSecs(); // in secs
+		this.lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
+		this.lastValidatedNumSteps = workoutService.getTracker().getTotalSteps();
 	}
 
 	private synchronized void onTimerTick(){
@@ -90,7 +92,7 @@ public class VigilanceTimer implements Runnable {
 		}
 
 		//Reaching here means everything is alright, vigilance approved
-		long currentTime = System.currentTimeMillis();
+		long currentTime = DateUtil.getServerTimeInMillis();
 		workoutService.workoutVigilanceSessionApproved(currentTime - Config.VIGILANCE_TIMER_INTERVAL,
 									currentTime);
 
@@ -100,7 +102,7 @@ public class VigilanceTimer implements Runnable {
 		if (!Config.TOO_SLOW_CHECK){
 			return false;
 		}
-		long timeElapsedSinceLastResume = System.currentTimeMillis() - workoutService.getTracker().getLastResumeTimeStamp();
+		long timeElapsedSinceLastResume = DateUtil.getServerTimeInMillis() - workoutService.getTracker().getLastResumeTimeStamp();
 		float inSecs = (float)(timeElapsedSinceLastResume / 1000);
 		Logger.d(TAG, "onTick, Lower speed limit check, till now steps = " + workoutService.getTracker().getTotalSteps()
 				+ ", timeElapsed in secs = " + inSecs
@@ -118,7 +120,7 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
-		if (ActivityRecognizedService.isIsInVehicle()){
+		if (ActivityDetector.getInstance().isIsInVehicle()){
 			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
 			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 					.addBundle(workoutService.getWorkoutBundle())
@@ -132,46 +134,41 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	private boolean tooFastSecondaryCheck(){
-		if (lastValidatedRecord == null){
-			// Will wait for next tick
-			lastValidatedRecord = workoutService.getTracker().getLastRecord();
-			lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
-			lastValidatedNumSteps = workoutService.getTracker().getTotalSteps();
-		}else{
-			DistRecord latestRecord = workoutService.getTracker().getLastRecord();
-			if (!lastValidatedRecord.equals(latestRecord)){
-				// We have a new record!
-				float distanceInSession = workoutService.getTracker().getTotalDistanceCovered() - lastValidatedDistance;
-				int stepsInSession = workoutService.getTracker().getTotalSteps() - lastValidatedNumSteps;
-				float timeElapsedInSecs = (float)
-						((latestRecord.getLocation().getTime() - lastValidatedRecord.getLocation().getTime()) / 1000);
-				Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
-						+ ", timeElapsedInSecs = " + timeElapsedInSecs
-						+ ", distanceCovered = " +  workoutService.getTracker().getTotalDistanceCovered());
-				if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
-					// Distance is above the threshold minimum to apply Usain Bolt Filter
-					float speedInSession = distanceInSession / timeElapsedInSecs;
-					if (speedInSession > Config.UPPER_SPEED_LIMIT){
-						// Running faster than Usain Bolt
-						Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
-						float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
-								? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
-						int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
-						Logger.d(TAG, "averageStrideLength = " + averageStrideLength + "meters hence "
-								+ " expectedNumOfSteps = " + expectedNumOfSteps);
 
-						if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
-							AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
-									.addBundle(workoutService.getWorkoutBundle())
-									.put("detected_by", "speed_logic")
-									.buildAndDispatch();
-							return true;
-						}
+		float currentRecordedTime = workoutService.getTracker().getRecordedTimeInSecs();
+		float currentDistanceCovered = workoutService.getTotalDistanceCoveredInMeters();
+		int currentNumSteps = workoutService.getTotalStepsInWorkout();
+
+		if (currentRecordedTime > lastValidatedRecordedTimeInSecs){
+			float distanceInSession = currentDistanceCovered - lastValidatedDistance;
+			int stepsInSession = currentNumSteps - lastValidatedNumSteps;
+			float timeElapsedInSecs = currentRecordedTime - lastValidatedRecordedTimeInSecs;
+			Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
+					+ ", timeElapsedInSecs = " + timeElapsedInSecs
+					+ ", total distanceCovered = " +  workoutService.getTracker().getTotalDistanceCovered());
+			if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
+				// Distance is above the threshold minimum to apply Usain Bolt Filter
+				float speedInSession = distanceInSession / timeElapsedInSecs;
+				if (speedInSession > Config.UPPER_SPEED_LIMIT){
+					// Running faster than Usain Bolt
+					Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
+					float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
+							? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+					int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
+					Logger.d(TAG, "averageStrideLength = " + averageStrideLength + "meters hence "
+							+ " expectedNumOfSteps = " + expectedNumOfSteps);
+
+					if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
+						AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+								.addBundle(workoutService.getWorkoutBundle())
+								.put("detected_by", "speed_logic")
+								.buildAndDispatch();
+						return true;
 					}
-					lastValidatedRecord = latestRecord;
-					lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
-					lastValidatedNumSteps = workoutService.getTracker().getTotalSteps();
 				}
+				lastValidatedRecordedTimeInSecs = currentRecordedTime;
+				lastValidatedDistance = currentDistanceCovered;
+				lastValidatedNumSteps = currentNumSteps;
 			}
 		}
 		return false;

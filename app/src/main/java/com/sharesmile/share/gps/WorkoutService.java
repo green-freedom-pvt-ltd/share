@@ -12,33 +12,36 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.ActivityRecognition;
 import com.google.gson.Gson;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CircularQueue;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -47,15 +50,14 @@ import java.util.concurrent.ScheduledExecutorService;
  * Created by ankitmaheshwari1 on 20/02/16.
  */
 public class WorkoutService extends Service implements
-        IWorkoutService, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        RunTracker.UpdateListner, StepCounter.Listener, GoogleLocationTracker.Listener {
+        IWorkoutService, RunTracker.UpdateListner, StepCounter.Listener,
+        GoogleLocationTracker.Listener {
 
     private static final String TAG = "WorkoutService";
 
     private static boolean currentlyTracking = false;
     private static boolean currentlyProcessingSteps = false;
-    private GoogleApiClient googleApiClient;
+
     private VigilanceTimer vigilanceTimer;
     private Location acceptedLocationFix;
     private CircularQueue<Location> beginningLocationsRotatingQueue;
@@ -67,6 +69,7 @@ public class WorkoutService extends Service implements
     private Tracker tracker;
     private float mDistance;
     private CauseData mCauseData;
+    private Handler handler;
 
     private float distanceInKmsOnLastUpdateEvent = 0f;
 
@@ -76,6 +79,7 @@ public class WorkoutService extends Service implements
         Logger.i(TAG, "onCreate");
         mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
                 CauseData.class);
+        handler = new Handler();
     }
 
     @Override
@@ -100,6 +104,7 @@ public class WorkoutService extends Service implements
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         mDistance = tracker.getTotalDistanceCovered();
         makeForeground();
+        ActivityDetector.getInstance().workoutActive();
     }
 
 
@@ -107,6 +112,9 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
+            if (result.getDistance() >= mCauseData.getMinDistance()) {
+                persistWorkoutInDb(result);
+            }
             tracker = null;
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
@@ -116,6 +124,58 @@ public class WorkoutService extends Service implements
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
+        ActivityDetector.getInstance().workoutIdle();
+    }
+
+    private void persistWorkoutInDb(WorkoutData data){
+
+        WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        Workout workout = new Workout();
+
+        //TODO: Set isValidRun on the basis of final sanity filter
+        workout.setIsValidRun(true);
+        workout.setAvgSpeed(data.getAvgSpeed());
+        workout.setDistance(data.getDistance() / 1000); // in Kms
+        workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
+
+        //data.getDistance()
+        String distDecimal = Utils.formatToKmsWithOneDecimal(data.getDistance());
+        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distDecimal));
+
+        workout.setRunAmount((float) rupees);
+        workout.setRecordedTime(data.getRecordedTime());
+        workout.setSteps(data.getTotalSteps());
+        workout.setCauseBrief(mCauseData.getTitle());
+        workout.setDate(new Date(data.getBeginTimeStamp()));
+        workout.setIs_sync(false);
+        workout.setWorkoutId(data.getWorkoutId());
+        if (data.getStartPoint() != null){
+            workout.setStartPointLatitude(data.getStartPoint().latitude);
+            workout.setStartPointLongitude(data.getStartPoint().longitude);
+        }
+        if (data.getLatestPoint() != null){
+            workout.setEndPointLatitude(data.getLatestPoint().latitude);
+            workout.setEndPointLongitude(data.getLatestPoint().longitude);
+        }
+        workout.setBeginTimeStamp(data.getBeginTimeStamp());
+        workout.setEndTimeStamp(DateUtil.getServerTimeInMillis());
+        workoutDao.insertOrReplace(workout);
+
+        //update userImpact
+        updateUserImpact(workout);
+
+        SyncHelper.pushRunData();
+    }
+
+    private void updateUserImpact(Workout data) {
+        int totalRun = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
+        float totalImpact = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT, 0);
+
+        totalImpact = totalImpact + data.getRunAmount();
+        totalRun = totalRun + 1;
+
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRun);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
     }
 
     @Override
@@ -126,19 +186,9 @@ public class WorkoutService extends Service implements
             Logger.d(TAG, "startWorkout");
 
             GoogleLocationTracker.getInstance().registerForWorkout(this);
-            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
-                googleApiClient = new GoogleApiClient.Builder(this)
-                        .addApi(ActivityRecognition.API)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .build();
-                if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
-                    googleApiClient.connect();
-                }
-            } else {
-                Logger.e(TAG, "unable to connect to google play services.");
-                Toast.makeText(getApplicationContext(), "Unable to connect to google play services", Toast.LENGTH_SHORT);
-            }
+            handler.removeCallbacks(handleGpsInactivityRunnable);
+            handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
+
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
                     Logger.d(TAG, "Step Detector present! Will register");
@@ -159,14 +209,9 @@ public class WorkoutService extends Service implements
     public synchronized void stopWorkout() {
         Logger.d(TAG, "stopWorkout");
         if (currentlyTracking) {
+            handler.removeCallbacks(handleGpsInactivityRunnable);
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
-
-            unregisterForActivityUpdates();
-            if (googleApiClient != null && googleApiClient.isConnected()){
-                googleApiClient.disconnect();
-            }
-            googleApiClient = null;
             currentlyTracking = false;
             if (stepCounter != null) {
                 stepCounter.stopCounting();
@@ -190,6 +235,7 @@ public class WorkoutService extends Service implements
             p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
             p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
+            p.put("client_run_id", tracker.getCurrentWorkoutId());
             return p;
         }
         return  null;
@@ -290,12 +336,14 @@ public class WorkoutService extends Service implements
         if (location == null){
             return;
         }
+        handler.removeCallbacks(handleGpsInactivityRunnable);
+        handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
         if (tracker != null && tracker.isRunning()){
             if (acceptedLocationFix == null){
                 if (beginningLocationsRotatingQueue == null){
                     Logger.d(TAG, "Hunt for first accepted location begins");
                     beginningLocationsRotatingQueue = new CircularQueue<>(3);
-                    beginningLocationsRotatingQueue.enqueue(location);
+                    beginningLocationsRotatingQueue.add(location);
                     // Will not send to tracker as it is the very first location fix received
                     // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
                     // Will start sending subsequent location fixes, only after they are approved by spike filter
@@ -360,11 +408,11 @@ public class WorkoutService extends Service implements
         float spikeFilterSpeedThreshold;
         String thresholdApplied;
 
-        if (ActivityRecognizedService.isIsInVehicle()){
+        if (ActivityDetector.getInstance().isIsInVehicle()){
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
+            if (isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() > 1){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
@@ -449,7 +497,7 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
         updateNotification();
         float totalDistanceKmsOneDecimal = Float.parseFloat(Utils.formatToKmsWithOneDecimal(totalDistance));
-        if (totalDistanceKmsOneDecimal > distanceInKmsOnLastUpdateEvent){
+        if (totalDistanceKmsOneDecimal != distanceInKmsOnLastUpdateEvent){
             // Send event only when the distance counter increment by one unit
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(mCauseData.getCauseBundle())
@@ -522,7 +570,6 @@ public class WorkoutService extends Service implements
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
             if (currentlyTracking) {
-                unregisterForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
@@ -531,6 +578,7 @@ public class WorkoutService extends Service implements
                     .put("reason", reason)
                     .buildAndDispatch();
         }
+        ActivityDetector.getInstance().workoutIdle();
     }
 
     @Override
@@ -544,7 +592,6 @@ public class WorkoutService extends Service implements
             tracker.resumeRun();
             Logger.d(TAG, "ResumeWorkout");
             if (currentlyTracking) {
-                registerForActivityUpdates();
                 NotificationManagerCompat.from(this).cancel(0);
             }
             AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
@@ -552,6 +599,7 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
         }
+        ActivityDetector.getInstance().workoutActive();
     }
 
     public void sendStopWorkoutBroadcast(int problem) {
@@ -636,33 +684,6 @@ public class WorkoutService extends Service implements
         return tracker;
     }
 
-    /**
-     * Called by Location Services when the request to connect the
-     * client finishes successfully. At this point, you can
-     * request the current location or startWorkout periodic updates
-     */
-    @Override
-    public void onConnected(Bundle bundle) {
-        Logger.d(TAG, "onConnected");
-        registerForActivityUpdates();
-    }
-
-    private void registerForActivityUpdates(){
-        ActivityRecognizedService.reset();
-        Intent intent = new Intent(this, ActivityRecognizedService.class);
-        PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 3000, pendingIntent );
-    }
-
-    private void unregisterForActivityUpdates(){
-        ActivityRecognizedService.reset();
-        Intent intent = new Intent(this, ActivityRecognizedService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
-        }
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case GoogleFitStepCounter.REQUEST_OAUTH:
@@ -671,15 +692,6 @@ public class WorkoutService extends Service implements
         }
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Logger.e(TAG, "GoogleApiClient connection has been suspend");
-    }
 
     private void makeForeground() {
         Notification notification = getNotificationBuilder().build();
@@ -731,5 +743,17 @@ public class WorkoutService extends Service implements
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
         return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
     }
+
+    final Runnable handleGpsInactivityRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // GoogleLocationTracker has not sent GPS fix since a long time, need to notify the user about it
+            // But will do it only when user is on the move
+            Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
+            if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
+                MainApplication.showRunNotification("Not receiving GPS updates, do you want to pause the workout?");
+            }
+        }
+    };
 
 }

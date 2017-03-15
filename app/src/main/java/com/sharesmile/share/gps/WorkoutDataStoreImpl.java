@@ -1,17 +1,24 @@
 package com.sharesmile.share.gps;
 
+import android.location.Location;
 import android.text.TextUtils;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -33,13 +40,18 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         dirtyWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_DIRTY);
         approvedWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_APPROVED);
         if (dirtyWorkoutData == null){
-            throw new IllegalStateException("Workout is active but Couldn't find workout data in persistent storage");
+            init(DateUtil.getServerTimeInMillis());
         }
     }
 
     WorkoutDataStoreImpl(long beginTimeStamp){
-        dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp);
-        approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp);
+        init(beginTimeStamp);
+    }
+
+    public void init(long beginTimeStamp){
+        String workoutId = UUID.randomUUID().toString();
+        dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
+        approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
         //Persist dirtyWorkoutData object over here
         persistBothWorkoutData();
     }
@@ -61,23 +73,60 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             return;
         }
 
-        if (record.isStartRecord()){
+        if (record.isFirstRecordAfterResume()){
             //Source point fetched for the batch
             int stepsRanWhileSearchingForSource = getTotalSteps() - numStepsWhenBatchBegan;
+
+            float timeElapsedWhileSearchingForSource =
+                    (DateUtil.getServerTimeInMillis() - dirtyWorkoutData.getCurrentBatch().getStartTimeStamp()) / 1000; // in secs
+
+            if (stepsRanWhileSearchingForSource > (Config.MAX_STEPS_PER_SECOND_FACTOR * timeElapsedWhileSearchingForSource)){
+                // Num steps recorded is too large, will ignore
+                stepsRanWhileSearchingForSource = 0;
+            }
+
             float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
-                                            ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+                        ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+
+            // Normalising averageStrideLength obtained
+            if (averageStrideLength < 0.25f){
+                averageStrideLength = 0.25f;
+            }
+            if (averageStrideLength > 1f){
+                averageStrideLength = 1f;
+            }
+
             float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
+
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
+            Location startLocation = record.getLocation();
+            dirtyWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
+            approvedWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
             Logger.d(TAG, "addRecord: Source record after begin/resume, extraPolatedDistanceToBeApproved = "
                     + extraPolatedDistance);
+            AnalyticsEvent.create(Event.ON_START_LOCATION_AFTER_RESUME)
+                    .addBundle(getWorkoutBundle())
+                    .put("start_location_latitude", startLocation.getLatitude())
+                    .put("start_location_longitude", startLocation.getLongitude())
+                    .put("extrapolated_distance", extraPolatedDistance)
+                    .buildAndDispatch();
         }
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
         dirtyWorkoutData.addRecord(record);
         waitingForApprovalQueue.add(record);
-        // Persist dirtyWorkoutData object
-        persistDirtyWorkoutData();
+    }
+
+    @Override
+    public Properties getWorkoutBundle(){
+        Properties p = new Properties();
+        p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistance()));
+        p.put("time_elapsed", getElapsedTime());
+        p.put("avg_speed", getAvgSpeed() * (3.6f));
+        p.put("num_steps", getTotalSteps());
+        p.put("client_run_id", getWorkoutId());
+        return p;
     }
 
     @Override
@@ -90,7 +139,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         if (isWorkoutRunning()){
             dirtyWorkoutData.addSteps(numSteps);
             numStepsToBeApproved += numSteps;
-            persistDirtyWorkoutData();
         }
     }
 
@@ -112,6 +160,11 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public float getElapsedTime() {
         return dirtyWorkoutData.getElapsedTime();
+    }
+
+    @Override
+    public float getRecordedTime() {
+        return dirtyWorkoutData.getRecordedTime();
     }
 
     @Override
@@ -171,6 +224,19 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         extraPolatedDistanceToBeApproved = 0;
         waitingForApprovalQueue.clear();
         numStepsToBeApproved = 0;
+        // Cleansing DirtyWorkoutData as user defaulted
+        dirtyWorkoutData = approvedWorkoutData.copy();
+        persistDirtyWorkoutData();
+    }
+
+    @Override
+    public LatLng getStartPoint() {
+        return dirtyWorkoutData.getStartPoint();
+    }
+
+    @Override
+    public String getWorkoutId() {
+        return dirtyWorkoutData.getWorkoutId();
     }
 
     @Override

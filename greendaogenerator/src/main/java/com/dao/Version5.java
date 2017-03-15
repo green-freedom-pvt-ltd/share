@@ -4,10 +4,9 @@ import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Schema;
 
 /**
- * Created by Shine on 15/08/16.
+ * Created by ankitmaheshwari on 3/9/17.
  */
 public class Version5 extends SchemaVersion {
-
 
     public Version5(boolean current) {
         super(current);
@@ -37,6 +36,13 @@ public class Version5 extends SchemaVersion {
         workout.addDateProperty("date");
         workout.addFloatProperty("runAmount");
         workout.addBooleanProperty("is_sync");
+        workout.addStringProperty("workoutId");
+        workout.addDoubleProperty("startPointLatitude");
+        workout.addDoubleProperty("startPointLongitude");
+        workout.addDoubleProperty("endPointLatitude");
+        workout.addDoubleProperty("endPointLongitude");
+        workout.addLongProperty("beginTimeStamp");
+        workout.addLongProperty("endTimeStamp");
         workout.addBooleanProperty("isValidRun").notNull();
     }
 

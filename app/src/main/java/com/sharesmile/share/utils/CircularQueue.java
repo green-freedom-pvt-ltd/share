@@ -54,11 +54,21 @@ public class CircularQueue<E> {
         return maxSize;
     }
 
+    public int getCurrentSize(){
+        return number;
+    }
+
     public void add(E item){
         if (isFull()){
             dequeue();
         }
         enqueue(item);
+    }
+
+    public void clear(){
+        while (!isEmpty()){
+            dequeue();
+        }
     }
 
 

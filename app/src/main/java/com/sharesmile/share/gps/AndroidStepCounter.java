@@ -10,6 +10,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.sharesmile.share.core.Config;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 
 import java.util.Iterator;
@@ -27,6 +28,7 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     private Listener listener;
     private SensorManager sensorManager;
     private volatile int stepsSinceReboot = 0;
+    private volatile long lastStepsRecordTs = 0;
     private LinkedHashMap historyQueue = new LinkedHashMap<Long, Long>()
     {
         @Override
@@ -83,6 +85,13 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             Map.Entry<Long, Long> last = null;
             while (iterator.hasNext()){
                 Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
+
+                if ( ((DateUtil.getServerTimeInMillis() / 1000) - thisEntry.getKey())
+                        > STEP_COUNT_READING_VALID_INTERVAL){
+                    // This entry is too old to be considered in calculation
+                    continue;
+                }
+
                 if (first == null){
                     first = thisEntry;
                     last = thisEntry;
@@ -95,6 +104,12 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
                     }
                 }
             }
+
+            if (first == null){
+                // No entry picked for calculation
+                return 0;
+            }
+
             Long numSteps = last.getValue() - first.getValue();
             //In a rare scenario when queue has just two entries with same keys (i.e. epoch in secs) we are considering delta as 1
             Long deltaTime = (last.getKey() - first.getKey()) > 0
@@ -130,15 +145,27 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         //Need to calculate delta steps
         if (stepsSinceReboot < 1){
             //i.e. fresh reading after creation of runtracker
-            stepsSinceReboot = (int) event.values[0];
-            historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
+            lastStepsRecordTs = DateUtil.getServerTimeInMillis();
+            stepsSinceReboot = Math.round(event.values[0]);
+            historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
             return;
         }
-        int deltaSteps = (int) event.values[0] - stepsSinceReboot;
-        stepsSinceReboot = (int) event.values[0];
-        historyQueue.put(Long.valueOf(System.currentTimeMillis() / 1000), Long.valueOf(stepsSinceReboot));
+        int deltaSteps = Math.round(event.values[0]) - stepsSinceReboot;
+        long deltaTimeMillis = DateUtil.getServerTimeInMillis() - lastStepsRecordTs;
+
+        // Filtering on deltaSteps value
+        float deltaCadence = deltaSteps / (deltaTimeMillis / 1000f);
+        if (deltaCadence > 10f){
+            // 10 step per sec is our upper threshold, above which we will not accept step_detector reading
+            Logger.i(TAG, "Detected absurdly high number of steps (" + deltaSteps + ") in "
+                    + (deltaTimeMillis/1000) + " secs, wont feed to the listener");
+            return;
+        }
+        stepsSinceReboot = Math.round(event.values[0]);
+        lastStepsRecordTs = DateUtil.getServerTimeInMillis();
+        historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
         listener.onStepCount(deltaSteps);
     }
 

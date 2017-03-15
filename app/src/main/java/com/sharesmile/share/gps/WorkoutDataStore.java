@@ -1,5 +1,7 @@
 package com.sharesmile.share.gps;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 
@@ -26,6 +28,8 @@ public interface WorkoutDataStore {
 
 	float getElapsedTime();
 
+	float getRecordedTime();
+
 	boolean coldStartAfterResume();
 
 	void workoutPause();
@@ -37,6 +41,12 @@ public interface WorkoutDataStore {
 	void approveWorkoutData();
 
 	void discardApprovalQueue();
+
+	LatLng getStartPoint();
+
+	String getWorkoutId();
+
+	Properties getWorkoutBundle();
 
 	WorkoutData clear();
 }

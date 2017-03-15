@@ -23,12 +23,14 @@ public interface Tracker {
 	long getBeginTimeStamp();
 	long getLastResumeTimeStamp();
 	int getElapsedTimeInSecs();
+	float getRecordedTimeInSecs();
 	int getTotalSteps();
 	float getTotalDistanceCovered();
 	float getDistanceCoveredSinceLastResume();
 	float getAvgSpeed();
 	float getCurrentSpeed();
 	DistRecord getLastRecord();
+	String getCurrentWorkoutId();
 	State getState();
 
 	enum State{
