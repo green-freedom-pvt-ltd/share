@@ -82,6 +82,16 @@
             android:name="CLEVERTAP_TOKEN"
             android:value="203-456"/>
 
+        <meta-data android:name="GCM_SENDER_ID" android:value="id:159550091621"/>
+
+        <meta-data
+            android:name="CLEVERTAP_NOTIFICATION_ICON"
+            android:value="ic_stat_onesignal_default"/> <!-- name of your file in the drawable directory without the file extension. -->
+        
+        <activity
+            android:name="com.clevertap.android.sdk.InAppNotificationActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="orientation|keyboardHidden"/>
 
         <!-- Facebook login integration -->
         <meta-data
@@ -112,6 +122,21 @@
         <!-- Facebook login END -->
 
         <service
+            android:name="com.clevertap.android.sdk.GcmMessageListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service android:name="com.clevertap.android.sdk.GcmTokenListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+
+        <service
             android:name=".gcm.SyncService"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
@@ -134,6 +159,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="com.sharesmile.share.gcm.CustomGcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+
+                <category android:name="com.sharesmile.share"/>
+            </intent-filter>
+        </receiver>
 
         <!--<receiver-->
             <!--android:name="com.mixpanel.android.mpmetrics.GCMReceiver"-->
