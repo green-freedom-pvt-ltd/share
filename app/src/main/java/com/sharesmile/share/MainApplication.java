@@ -96,6 +96,12 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     }
 
     public static void showRunNotification(String notifText){
+
+//        Intent actionPause = new Intent();
+//        actionPause.setAction(WORKOUT_PAUSE);
+//        PendingIntent pendingIntentPause = PendingIntent.getBroadcast(getContext(), 12345, actionPause,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
         builder.setContentText( notifText )
                 .setSmallIcon(getNotificationIcon())
