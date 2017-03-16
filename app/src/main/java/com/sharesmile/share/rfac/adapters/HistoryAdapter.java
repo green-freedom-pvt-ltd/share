@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.adapters;
 
+import android.graphics.Paint;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -103,9 +104,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mIndicator.setVisibility(View.GONE);
                 mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white));
                 mCard.setOnClickListener(null);
+                mImpact.setPaintFlags(mImpact.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 mIndicator.setVisibility(View.VISIBLE);
                 mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white_50));
+                mImpact.setPaintFlags(mImpact.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
 
                 mCard.setOnClickListener(new View.OnClickListener() {
                     @Override

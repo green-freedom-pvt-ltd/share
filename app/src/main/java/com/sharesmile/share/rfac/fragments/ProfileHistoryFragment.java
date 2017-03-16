@@ -99,10 +99,10 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(R.string.invalid_run_title))
                 .setMessage(getString(R.string.invalid_run_message))
-                .setPositiveButton(getString(R.string.know_more), new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.feedback), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        getFragmentController().performOperation(IFragmentController.SHOW_FAQ_FRAGMENT, null);
+                        getFragmentController().performOperation(IFragmentController.SHOW_FEEDBACK_FRAGMENT, null);
                     }
                 }).setNegativeButton(getString(R.string.ok), null).show();
     }
