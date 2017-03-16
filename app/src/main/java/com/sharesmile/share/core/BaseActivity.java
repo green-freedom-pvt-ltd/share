@@ -185,7 +185,14 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case SHOW_FAQ_FRAGMENT:
                 showFaq();
                 break;
+            case SHOW_FEEDBACK_FRAGMENT:
+                showFeedbackFragment();
+                break;
         }
+    }
+
+    private void showFeedbackFragment() {
+        replaceFragment(new FeedbackFragment(), true);
     }
 
     private void showFaq() {
