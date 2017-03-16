@@ -107,7 +107,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mImpact.setPaintFlags(mImpact.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 mIndicator.setVisibility(View.VISIBLE);
-                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.grey_disable));
+                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.very_light_grey));
                 mImpact.setPaintFlags(mImpact.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
 
