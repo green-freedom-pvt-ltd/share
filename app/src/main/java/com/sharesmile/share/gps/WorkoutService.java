@@ -20,6 +20,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
+import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -40,6 +41,10 @@ import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -80,6 +85,7 @@ public class WorkoutService extends Service implements
         mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
                 CauseData.class);
         handler = new Handler();
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -268,6 +274,7 @@ public class WorkoutService extends Service implements
         backgroundExecutorService.shutdownNow();
         backgroundExecutorService = null;
         stopForeground(true);
+        EventBus.getDefault().unregister(this);
     }
 
     final IBinder mBinder = new MyBinder();
@@ -295,6 +302,11 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isActive()) {
             tracker.feedSteps(deltaSteps);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(PauseWorkoutEvent pauseWorkoutEvent) {
+        //
     }
 
     public static boolean isCurrentlyTracking() {
