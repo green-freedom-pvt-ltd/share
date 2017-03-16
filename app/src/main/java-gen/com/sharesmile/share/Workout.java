@@ -27,7 +27,7 @@ public class Workout {
     private Double endPointLongitude;
     private Long beginTimeStamp;
     private Long endTimeStamp;
-    private boolean isValidRun;
+    private Boolean isValidRun;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -39,7 +39,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, boolean isValidRun) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -198,11 +198,11 @@ public class Workout {
         this.endTimeStamp = endTimeStamp;
     }
 
-    public boolean getIsValidRun() {
+    public Boolean getIsValidRun() {
         return isValidRun;
     }
 
-    public void setIsValidRun(boolean isValidRun) {
+    public void setIsValidRun(Boolean isValidRun) {
         this.isValidRun = isValidRun;
     }
 

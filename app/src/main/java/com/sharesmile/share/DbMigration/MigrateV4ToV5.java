@@ -25,7 +25,7 @@ public class MigrateV4ToV5 extends MigrationImpl {
         db.execSQL(getSqlQueryForAddingColumn(" 'END_POINT_LONGITUDE' REAL"));
         db.execSQL(getSqlQueryForAddingColumn(" 'BEGIN_TIME_STAMP' INTEGER"));
         db.execSQL(getSqlQueryForAddingColumn(" 'END_TIME_STAMP' INTEGER"));
-        db.execSQL(getSqlQueryForAddingColumn(" 'IS_VALID_RUN' BOOLEAN DEFAULT TRUE NOT NULL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'IS_VALID_RUN' INTEGER DEFAULT 1"));
         return getMigratedVersion();
     }
 
