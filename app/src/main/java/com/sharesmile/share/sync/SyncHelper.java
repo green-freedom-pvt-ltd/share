@@ -72,12 +72,6 @@ public class SyncHelper {
     }
 
     public static int pullRunData() {
-
-       /* WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        long workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
-        String runUrl = Urls.getFlaggedRunUrl();
-        return updateWorkoutData(runUrl, workoutCount);*/
-
         int result = updateWorkoutData(false);
         int flaggedResult = updateWorkoutData(true);
 
