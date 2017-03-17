@@ -71,10 +71,32 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
-    public static int updateWorkoutData() {
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+    public static int pullRunData() {
+
+       /* WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         long workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
         String runUrl = Urls.getFlaggedRunUrl();
+        return updateWorkoutData(runUrl, workoutCount);*/
+
+        int result = updateWorkoutData(false);
+        int flaggedResult = updateWorkoutData(true);
+
+        return (result == GcmNetworkManager.RESULT_RESCHEDULE || flaggedResult == GcmNetworkManager.RESULT_RESCHEDULE) ? GcmNetworkManager.RESULT_RESCHEDULE : GcmNetworkManager.RESULT_SUCCESS;
+
+    }
+
+    public static int updateWorkoutData(boolean fetch_flagged_run) {
+
+        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        long workoutCount;
+        String runUrl;
+        if (fetch_flagged_run) {
+            workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true), WorkoutDao.Properties.IsValidRun.eq(false)).count();
+            runUrl = Urls.getFlaggedRunUrl(fetch_flagged_run);
+        } else {
+            workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
+            runUrl = Urls.getFlaggedRunUrl(fetch_flagged_run);
+        }
         return updateWorkoutData(runUrl, workoutCount);
     }
 
