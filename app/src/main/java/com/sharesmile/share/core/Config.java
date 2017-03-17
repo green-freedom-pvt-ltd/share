@@ -31,7 +31,7 @@ public class Config {
 
     public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
 
-    public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.2f;
+    public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.4f;
 
     public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
 
