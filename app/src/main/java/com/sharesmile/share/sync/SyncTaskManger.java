@@ -76,7 +76,7 @@ public class SyncTaskManger extends IntentService {
             if (ACTION_CAUSE.equals(action)) {
                 updateCauses();
             } else if (ACTION_UPDATE_RUN.equals(action)) {
-                SyncHelper.updateWorkoutData();
+                SyncHelper.pullRunData();
             } else if (ACTION_FETCH_MESSAGES.equals(action)) {
                 SyncHelper.fetchMessage();
             } else if (ACTION_FETCH_LEADERBOARD.equals(action)) {

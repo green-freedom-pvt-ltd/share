@@ -46,7 +46,7 @@ public class SyncService extends GcmTaskService {
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPDATE_WORKOUT_DATA)) {
             //  WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             //long count = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
-            return SyncHelper.updateWorkoutData();
+            return SyncHelper.pullRunData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
         }
