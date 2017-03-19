@@ -118,8 +118,12 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
-            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
-            jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+            if (workout.getBeginTimeStamp() != null){
+                jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+            }
+            if (workout.getEndTimeStamp() != null){
+                jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+            }
             jsonObject.put("run_amount", workout.getRunAmount());
             jsonObject.put("run_duration", workout.getElapsedTime());
             jsonObject.put("no_of_steps", workout.getSteps());
