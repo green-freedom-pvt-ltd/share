@@ -446,27 +446,29 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                Logger.i(TAG, "GPS ENABLED");
-                if (state != State.FETCHING_LOCATION && state != State.LOCATION_ENABLED){
-                    startLocationTracking(false);
-                    Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-                    while (iterator.hasNext()){
-                        WeakReference<Listener> reference = iterator.next();
-                        if (reference.get() != null){
-                            reference.get().onGpsEnabled();
+            if (locationManager != null){
+                if (locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                    Logger.i(TAG, "GPS ENABLED");
+                    if (state != State.FETCHING_LOCATION && state != State.LOCATION_ENABLED){
+                        startLocationTracking(false);
+                        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+                        while (iterator.hasNext()){
+                            WeakReference<Listener> reference = iterator.next();
+                            if (reference.get() != null){
+                                reference.get().onGpsEnabled();
+                            }
                         }
                     }
-                }
-            } else {
-                Logger.i(TAG, "GPS DISABLED");
-                if (state == State.FETCHING_LOCATION || state == State.LOCATION_ENABLED){
-                    state = State.API_CLIENT_CONNECTED;
-                    Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-                    while (iterator.hasNext()){
-                        WeakReference<Listener> reference = iterator.next();
-                        if (reference.get() != null){
-                            reference.get().onGpsDisabled();
+                } else {
+                    Logger.i(TAG, "GPS DISABLED");
+                    if (state == State.FETCHING_LOCATION || state == State.LOCATION_ENABLED){
+                        state = State.API_CLIENT_CONNECTED;
+                        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+                        while (iterator.hasNext()){
+                            WeakReference<Listener> reference = iterator.next();
+                            if (reference.get() != null){
+                                reference.get().onGpsDisabled();
+                            }
                         }
                     }
                 }
