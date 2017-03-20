@@ -264,11 +264,13 @@ public class Utils {
     }
 
     public static Run convertWorkoutToRun(Workout workout){
+        Logger.d(TAG, "convertWorkoutToRun");
         Run run = new Run();
         run.setId(workout.getId());
         run.setCauseName(workout.getCauseBrief());
         run.setDistance(workout.getDistance());
         if (workout.getBeginTimeStamp() != null){
+            Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
             run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
         }
         if (workout.getEndTimeStamp() != null){

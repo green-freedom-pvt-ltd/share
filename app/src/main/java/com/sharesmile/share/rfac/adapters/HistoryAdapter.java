@@ -13,6 +13,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
@@ -115,6 +116,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Logger.d("HistoryAdapter", "Flagged run card clicked: " + Utils.createJSONStringFromObject(workout));
                         mInterface.showInvalidRunDialog(Utils.convertWorkoutToRun(workout));
                     }
                 });

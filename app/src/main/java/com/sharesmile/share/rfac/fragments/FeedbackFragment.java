@@ -85,19 +85,19 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         hideKeyboard(mFeedbackText);
         MainApplication.showToast(R.string.feedback_thanks);
         String feedbackText = mFeedbackText.getText().toString();
-        String textToUpload = "Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n";
+        StringBuilder stringBuilder = new StringBuilder("Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n");
         if (concernedRun != null){
             String concernedRunDetails = concernedRun.toString();
-            textToUpload.concat("Concerned Run:\n" + concernedRunDetails
+            stringBuilder.append("Concerned Run:\n" + concernedRunDetails
                     + "\n Feedback Message: " + feedbackText) ;
         }else {
-            textToUpload.concat("Feedback Message: " + feedbackText) ;
+            stringBuilder.append("Feedback Message: " + feedbackText) ;
         }
 
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("user_id", MainApplication.getInstance().getUserID());
-            jsonObject.put("feedback", textToUpload);
+            jsonObject.put("feedback", stringBuilder.toString());
             NetworkDataProvider.doPostCallAsync(Urls.getFeedBackUrl(), jsonObject, new NetworkAsyncCallback<CustomJSONObject>() {
                 @Override
                 public void onNetworkFailure(NetworkException ne) {
