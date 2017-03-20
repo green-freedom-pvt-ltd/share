@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
+import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Utils;
 
@@ -83,7 +84,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindData(Workout workout) {
+        public void bindData(final Workout workout) {
             if (workout.getDate() != null) {
                 mDate.setText(DateUtil.getUserFormattedDate(workout.getDate()));
             }
@@ -114,7 +115,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mInterface.showInvalidRunDialog();
+                        mInterface.showInvalidRunDialog(Utils.convertWorkoutToRun(workout));
                     }
                 });
             }
@@ -124,6 +125,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     }
 
     public interface AdapterInterface {
-        public void showInvalidRunDialog();
+        public void showInvalidRunDialog(Run invalidRun);
     }
 }

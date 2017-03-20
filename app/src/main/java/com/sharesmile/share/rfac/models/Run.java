@@ -180,4 +180,17 @@ public class Run implements UnObfuscable, Serializable {
     public void setNumSteps(float numSteps) {
         this.numSteps = numSteps;
     }
+
+    @Override
+    public String toString() {
+        return "Run{" +
+                " id=" + id +
+                ", startTime='" + startTime + '\'' +
+                ", distance=" + distance +
+                ", runDuration='" + runDuration + '\'' +
+                ", numSteps=" + numSteps +
+                ", is_flag=" + is_flag +
+                ", clientRunId='" + clientRunId + '\'' +
+                '}';
+    }
 }
