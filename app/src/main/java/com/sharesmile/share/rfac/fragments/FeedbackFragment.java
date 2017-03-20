@@ -18,7 +18,6 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Urls;
@@ -62,7 +61,9 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
-        concernedRun = (Run) arg.getSerializable(BUNDLE_CONCERNED_RUN);
+        if (arg != null){
+            concernedRun = (Run) arg.getSerializable(BUNDLE_CONCERNED_RUN);
+        }
     }
 
     @Nullable
@@ -84,10 +85,15 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         hideKeyboard(mFeedbackText);
         MainApplication.showToast(R.string.feedback_thanks);
         String feedbackText = mFeedbackText.getText().toString();
-        String concernedRunDetails = concernedRun.toString();
-        String textToUpload = "Feedback for:\n" + concernedRunDetails
-                + "\n Time: " + DateUtil.getCurrentDate()
-                + "\n Feedback: " + feedbackText;
+        String textToUpload = "Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n";
+        if (concernedRun != null){
+            String concernedRunDetails = concernedRun.toString();
+            textToUpload.concat("Concerned Run:\n" + concernedRunDetails
+                    + "\n Feedback Message: " + feedbackText) ;
+        }else {
+            textToUpload.concat("Feedback Message: " + feedbackText) ;
+        }
+
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("user_id", MainApplication.getInstance().getUserID());

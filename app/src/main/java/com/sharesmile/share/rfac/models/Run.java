@@ -184,13 +184,14 @@ public class Run implements UnObfuscable, Serializable {
     @Override
     public String toString() {
         return "Run{" +
-                " id=" + id +
-                ", startTime='" + startTime + '\'' +
-                ", distance=" + distance +
-                ", runDuration='" + runDuration + '\'' +
-                ", numSteps=" + numSteps +
-                ", is_flag=" + is_flag +
-                ", clientRunId='" + clientRunId + '\'' +
-                '}';
+                "\tid=" + id +
+                ",\n\t startTime='" + startTime + '\'' +
+                ",\n\t entTime='" + endTime + '\'' +
+                ",\n\t distance=" + distance +
+                ",\n\t runDuration='" + runDuration + '\'' +
+                ",\n\t numSteps=" + numSteps +
+                ",\n\t is_flag=" + is_flag +
+                ",\n\t clientRunId='" + clientRunId + '\'' +
+                "\n}";
     }
 }
