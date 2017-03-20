@@ -46,8 +46,12 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
 
     Run concernedRun;
 
-    public static RealRunFragment newInstance(Run concernedRun) {
-        RealRunFragment fragment = new RealRunFragment();
+    public FeedbackFragment(){
+
+    }
+
+    public static FeedbackFragment newInstance(Run concernedRun) {
+        FeedbackFragment fragment = new FeedbackFragment();
         Bundle args = new Bundle();
         args.putSerializable(BUNDLE_CONCERNED_RUN, concernedRun);
         fragment.setArguments(args);
