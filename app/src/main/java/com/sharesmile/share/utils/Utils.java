@@ -69,11 +69,13 @@ public class Utils {
 
     public static String formatToKmsWithOneDecimal(float distanceInMeters){
         DecimalFormat df = new DecimalFormat("0.0");
+        df.setGroupingUsed(false);
         return df.format(distanceInMeters / 1000);
     }
 
     public static String formatWithOneDecimal(float distance){
         DecimalFormat df = new DecimalFormat("0.0");
+        df.setGroupingUsed(false);
         return df.format(distance);
     }
 
