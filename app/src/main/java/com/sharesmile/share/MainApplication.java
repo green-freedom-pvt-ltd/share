@@ -1,8 +1,11 @@
 package com.sharesmile.share;
 
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
@@ -19,7 +22,9 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
@@ -31,6 +36,10 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ACTION_BUTTON;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_PAUSE;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_STOP;
 
 
 /**
@@ -97,10 +106,21 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
 
     public static void showRunNotification(String notifText){
 
-//        Intent actionPause = new Intent();
-//        actionPause.setAction(WORKOUT_PAUSE);
-//        PendingIntent pendingIntentPause = PendingIntent.getBroadcast(getContext(), 12345, actionPause,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent actionPause = new Intent();
+        actionPause.setAction(NotificationActionReceiver.NOTIFICATION_ACTION);
+        Bundle bundle = new Bundle();
+        bundle.putInt(NOTIFICATION_ACTION_BUTTON, WORKOUT_PAUSE);
+        actionPause.putExtras(bundle);
+        PendingIntent pendingIntentPause = PendingIntent.getBroadcast(getContext(), 100, actionPause,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent actionStop = new Intent();
+        actionStop.setAction(NotificationActionReceiver.NOTIFICATION_ACTION);
+        Bundle bundle2 = new Bundle();
+        bundle2.putInt(NOTIFICATION_ACTION_BUTTON, WORKOUT_STOP);
+        actionStop.putExtras(bundle2);
+        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getContext(), 100, actionStop,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
         builder.setContentText( notifText )
@@ -108,7 +128,9 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(getContext().getResources().getString(R.string.app_name))
-                .setVibrate(new long[]{500, 500, 500, 500});
+                .setVibrate(new long[]{500, 500, 500, 500})
+                .addAction(R.drawable.call_icon, RunTracker.isWorkoutActive() ? "Pause" : "Resume", pendingIntentPause)
+                .addAction(R.drawable.logout_icon, "Stop", pendingIntentStop);
         NotificationManagerCompat.from(getContext()).notify(0, builder.build());
     }
 
@@ -190,7 +212,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         ActivityDetector.initialize(this);
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
-
     }
 
     private void initOneSignal() {
