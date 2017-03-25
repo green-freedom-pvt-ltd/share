@@ -1,5 +1,6 @@
 package com.sharesmile.share.core;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +8,12 @@ import android.content.Intent;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
 import com.sharesmile.share.Events.StopWorkoutEvent;
+import com.sharesmile.share.R;
 import com.sharesmile.share.utils.Logger;
 
 import org.greenrobot.eventbus.EventBus;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by ankitmaheshwari on 3/15/17.
@@ -20,23 +24,24 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
     private static final String TAG = "NotificationActionReceiver";
 
-    public static final String WORKOUT_PAUSE = "workout_pause";
-    public static final String WORKOUT_RESUME = "workout_resume";
-    public static final String WORKOUT_STOP = "workout_stop";
+    public static final int WORKOUT_NOTIFICATION_ID = 101;
+    public static final int WORKOUT_TRACK_NOTIFICATION_ID = 102;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String action = intent.getAction();
-
-        if(WORKOUT_PAUSE.equals(action)) {
+        if(context.getString(R.string.notification_action_pause).equals(action)) {
             Logger.i(TAG, "Action Pause");
             EventBus.getDefault().post(new PauseWorkoutEvent());
-        } else if(WORKOUT_RESUME.equals(action)) {
+        } else if(context.getString(R.string.notification_action_resume).equals(action)) {
             Logger.i(TAG, "Action Resume");
             EventBus.getDefault().post(new ResumeWorkoutEvent());
-        } else if(WORKOUT_STOP.equals(action)) {
+        } else if(context.getString(R.string.notification_action_stop).equals(action)) {
             Logger.i(TAG,"Action Stop");
             EventBus.getDefault().post(new StopWorkoutEvent());
+            manager.cancel(WORKOUT_TRACK_NOTIFICATION_ID);
         }
+        manager.cancel(WORKOUT_NOTIFICATION_ID);
     }
 }

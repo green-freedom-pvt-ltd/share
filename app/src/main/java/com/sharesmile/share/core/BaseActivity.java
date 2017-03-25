@@ -27,6 +27,7 @@ import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -185,7 +186,19 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case SHOW_FAQ_FRAGMENT:
                 showFaq();
                 break;
+            case SHOW_FEEDBACK_FRAGMENT:
+                if (input instanceof Run){
+                    showFeedbackFragment((Run)input);
+                }else {
+                    throw new IllegalArgumentException("Input should be a Run object for SHOW_FEEDBACK_FRAGMENT");
+                }
+
+                break;
         }
+    }
+
+    private void showFeedbackFragment(Run concernedRun) {
+        replaceFragment(FeedbackFragment.newInstance(concernedRun), true);
     }
 
     private void showFaq() {

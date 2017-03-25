@@ -40,8 +40,8 @@ public class Urls {
         return url;
     }
 
-    public static String getFlaggedRunUrl() {
-        String url = getBaseUrl() + RUN_URL+"?is_flag=all";
+    public static String getFlaggedRunUrl(boolean fetch_flagged_run) {
+        String url = getBaseUrl() + RUN_URL + "?is_flag=" + (fetch_flagged_run ? "true" : "all");
         return url;
     }
 

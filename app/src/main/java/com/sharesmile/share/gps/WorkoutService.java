@@ -21,6 +21,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
+import com.sharesmile.share.Events.ResumeWorkoutEvent;
+import com.sharesmile.share.Events.StopWorkoutEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -49,6 +51,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
 
 
 /**
@@ -306,7 +311,17 @@ public class WorkoutService extends Service implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(PauseWorkoutEvent pauseWorkoutEvent) {
-        //
+        pause("user_clicked_notification");
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(ResumeWorkoutEvent resumeWorkoutEvent) {
+        resume();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(StopWorkoutEvent stopWorkoutEvent) {
+        stopWorkout();
     }
 
     public static boolean isCurrentlyTracking() {
@@ -634,6 +649,7 @@ public class WorkoutService extends Service implements
             tracker.discardApprovalQueue();
         }
         pause("usain_bolt");
+        MainApplication.showRunNotification(getString(R.string.notification_usain_bolt, R.string.notification_action_stop));
     }
 
     @Override
@@ -706,7 +722,7 @@ public class WorkoutService extends Service implements
 
     private void makeForeground() {
         Notification notification = getNotificationBuilder().build();
-        startForeground(1000, notification);
+        startForeground(WORKOUT_TRACK_NOTIFICATION_ID, notification);
     }
 
     private void updateNotification() {
@@ -714,13 +730,32 @@ public class WorkoutService extends Service implements
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.notify(1000, getNotificationBuilder().build());
+        mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getNotificationBuilder().build());
     }
 
     private NotificationCompat.Builder getNotificationBuilder() {
         String distDecimal = Utils.formatToKmsWithOneDecimal(mDistance);
         float fDistance = Float.parseFloat(distDecimal);
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
+
+        String pauseResumeAction, pauseResumeLabel;
+        if (RunTracker.isWorkoutActive()){
+            pauseResumeAction = getString(R.string.notification_action_pause);
+            pauseResumeLabel = "Pause";
+        }else {
+            pauseResumeAction = getString(R.string.notification_action_resume);
+            pauseResumeLabel = "Resume";
+        }
+
+        Intent pauseResumeIntent = new Intent();
+        pauseResumeIntent.setAction(pauseResumeAction);
+        PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent stopIntent = new Intent();
+        stopIntent.setAction(getString(R.string.notification_action_stop));
+        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getContext(), 100, stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -731,7 +766,9 @@ public class WorkoutService extends Service implements
                                 R.mipmap.ic_launcher))
                         .setTicker(getBaseContext().getResources().getString(R.string.app_name))
                         .setOngoing(true)
-                        .setVisibility(1);
+                        .setVisibility(1)
+                        .addAction(R.drawable.call_icon, pauseResumeLabel , pendingIntentPauseResume)
+                        .addAction(R.drawable.call_icon, "Stop" , pendingIntentStop);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -762,7 +799,11 @@ public class WorkoutService extends Service implements
             // But will do it only when user is on the move
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
             if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
-                MainApplication.showRunNotification("Not receiving GPS updates, do you want to pause the workout?");
+                MainApplication.showRunNotification(
+                        getString(R.string.notification_gps_inactivity),
+                        getString(R.string.notification_action_pause),
+                        getString(R.string.notification_action_stop)
+                );
             }
         }
     };

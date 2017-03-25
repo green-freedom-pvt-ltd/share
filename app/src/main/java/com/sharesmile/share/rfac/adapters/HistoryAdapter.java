@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.adapters;
 
+import android.graphics.Paint;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +11,9 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
+import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
@@ -82,7 +85,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindData(Workout workout) {
+        public void bindData(final Workout workout) {
             if (workout.getDate() != null) {
                 mDate.setText(DateUtil.getUserFormattedDate(workout.getDate()));
             }
@@ -103,14 +106,18 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 mIndicator.setVisibility(View.GONE);
                 mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white));
                 mCard.setOnClickListener(null);
+                mImpact.setPaintFlags(mImpact.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 mIndicator.setVisibility(View.VISIBLE);
-                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white_50));
+                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.very_light_grey));
+                mImpact.setPaintFlags(mImpact.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
 
                 mCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mInterface.showInvalidRunDialog();
+                        Logger.d("HistoryAdapter", "Flagged run card clicked: " + Utils.createJSONStringFromObject(workout));
+                        mInterface.showInvalidRunDialog(Utils.convertWorkoutToRun(workout));
                     }
                 });
             }
@@ -120,6 +127,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     }
 
     public interface AdapterInterface {
-        public void showInvalidRunDialog();
+        public void showInvalidRunDialog(Run invalidRun);
     }
 }

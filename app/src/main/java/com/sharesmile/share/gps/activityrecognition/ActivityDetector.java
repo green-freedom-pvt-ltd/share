@@ -15,6 +15,7 @@ import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.utils.CircularQueue;
@@ -160,7 +161,11 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             // Show notification and increment still occurred counter
-            MainApplication.showRunNotification("It seems like you are still!");
+            MainApplication.showRunNotification(
+                    appContext.getString(R.string.notification_standing_still),
+                    appContext.getString(R.string.notification_action_pause),
+                    appContext.getString(R.string.notification_action_stop)
+            );
             AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
                     .buildAndDispatch();
             stillOccurredCounter = 1;
@@ -222,7 +227,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             if (avgVehilceConfidence > CONFIDENCE_THRESHOLD){
                 isInVehicle = true;
                 if (isWorkoutActive()){
-                    MainApplication.showRunNotification("We have detected that you are driving.");
+//                    MainApplication.showRunNotification("We have detected that you are in a vehicle.");
                     AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
                             .buildAndDispatch();
                 }

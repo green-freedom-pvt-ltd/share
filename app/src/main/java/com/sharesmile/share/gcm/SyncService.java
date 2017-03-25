@@ -46,7 +46,7 @@ public class SyncService extends GcmTaskService {
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPDATE_WORKOUT_DATA)) {
             //  WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             //long count = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
-            return SyncHelper.updateWorkoutData();
+            return SyncHelper.pullRunData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
         }
@@ -118,8 +118,16 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
-            jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
-            jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+
+            if (workout.getBeginTimeStamp() != null){
+                jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+            }else if (workout.getDate() != null){
+                jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
+            }
+
+            if (workout.getEndTimeStamp() != null){
+                jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+            }
             jsonObject.put("run_amount", workout.getRunAmount());
             jsonObject.put("run_duration", workout.getElapsedTime());
             jsonObject.put("no_of_steps", workout.getSteps());

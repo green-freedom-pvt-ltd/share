@@ -194,6 +194,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="com.sharesmile.share.core.NotificationActionReceiver">
+            <intent-filter>
+                <action android:name="@string/notification_action_pause"/>
+                <action android:name="@string/notification_action_resume"/>
+                <action android:name="@string/notification_action_stop"/>
+            </intent-filter>
+        </receiver>
+
 
         <activity
             android:name="activities.MessageVideoActivity"

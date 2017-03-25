@@ -18,7 +18,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.Workout;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.rfac.models.Run;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -67,11 +69,13 @@ public class Utils {
 
     public static String formatToKmsWithOneDecimal(float distanceInMeters){
         DecimalFormat df = new DecimalFormat("0.0");
+        df.setGroupingUsed(false);
         return df.format(distanceInMeters / 1000);
     }
 
     public static String formatWithOneDecimal(float distance){
         DecimalFormat df = new DecimalFormat("0.0");
+        df.setGroupingUsed(false);
         return df.format(distance);
     }
 
@@ -257,6 +261,41 @@ public class Utils {
         if (view != null) {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    public static Run convertWorkoutToRun(Workout workout){
+        Logger.d(TAG, "convertWorkoutToRun");
+        Run run = new Run();
+        run.setId(workout.getId());
+        run.setCauseName(workout.getCauseBrief());
+        run.setDistance(workout.getDistance());
+        if (workout.getBeginTimeStamp() != null){
+            Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
+            run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+        }
+        if (workout.getEndTimeStamp() != null){
+            run.setEndTime(DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+        }
+        run.setRunAmount(workout.getRunAmount() == null ? 0 : workout.getRunAmount());
+        run.setRunDuration(workout.getElapsedTime());
+        run.setNumSteps(workout.getSteps() == null ? 0 : workout.getSteps());
+        run.setAvgSpeed(workout.getAvgSpeed());
+        run.setClientRunId(workout.getWorkoutId());
+        if (workout.getStartPointLatitude() != null){
+            run.setStartLocationLat(workout.getStartPointLatitude());
+        }
+        if (workout.getStartPointLongitude() != null){
+            run.setStartLocationLong(workout.getStartPointLongitude());
+        }
+        if (workout.getEndPointLatitude() != null){
+            run.setEndLocationLat(workout.getEndPointLatitude());
+        }
+        if (workout.getEndPointLongitude() != null){
+            run.setEndLocationLong(workout.getEndPointLongitude());
+        }
+        run.setIsFlag(!workout.getIsValidRun());
+
+        return run;
     }
 
     }

@@ -152,11 +152,22 @@ public class VigilanceTimer implements Runnable {
 				if (speedInSession > Config.UPPER_SPEED_LIMIT){
 					// Running faster than Usain Bolt
 					Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
+
 					float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
 							? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+
+					// Normalising averageStrideLength obtained
+					if (averageStrideLength < 0.25f){
+						averageStrideLength = 0.25f;
+					}
+					if (averageStrideLength > 1f){
+						averageStrideLength = 1f;
+					}
+
 					int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
-					Logger.d(TAG, "averageStrideLength = " + averageStrideLength + "meters hence "
-							+ " expectedNumOfSteps = " + expectedNumOfSteps);
+					Logger.d(TAG, "averageStrideLength = " + averageStrideLength + " meters hence "
+							+ " expectedNumOfSteps = " + expectedNumOfSteps + ", but actual number of steps are "
+							+ stepsInSession);
 
 					if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
 						AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)

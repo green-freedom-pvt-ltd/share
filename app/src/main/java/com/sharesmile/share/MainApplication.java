@@ -1,7 +1,9 @@
 package com.sharesmile.share;
 
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,6 +33,8 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
 
 
 /**
@@ -95,12 +99,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         showToast(getContext().getResources().getString(stringId));
     }
 
-    public static void showRunNotification(String notifText){
-
-//        Intent actionPause = new Intent();
-//        actionPause.setAction(WORKOUT_PAUSE);
-//        PendingIntent pendingIntentPause = PendingIntent.getBroadcast(getContext(), 12345, actionPause,
-//                PendingIntent.FLAG_UPDATE_CURRENT);
+    public static void showRunNotification(String notifText, String... args){
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
         builder.setContentText( notifText )
@@ -109,7 +108,22 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(getContext().getResources().getString(R.string.app_name))
                 .setVibrate(new long[]{500, 500, 500, 500});
-        NotificationManagerCompat.from(getContext()).notify(0, builder.build());
+
+        for (String action : args){
+            Intent intent = new Intent();
+            intent.setAction(action);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            if (getContext().getString(R.string.notification_action_pause).equals(action)){
+                builder.addAction(R.drawable.call_icon, "Pause", pendingIntent);
+            }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
+                builder.addAction(R.drawable.call_icon, "Resume", pendingIntent);
+            }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
+                builder.addAction(R.drawable.call_icon, "Stop", pendingIntent);
+            }
+        }
+
+        NotificationManagerCompat.from(getContext()).notify(WORKOUT_NOTIFICATION_ID, builder.build());
     }
 
     private static int getNotificationIcon() {
@@ -190,7 +204,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         ActivityDetector.initialize(this);
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
-
     }
 
     private void initOneSignal() {

@@ -18,6 +18,8 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Urls;
 
 import org.json.JSONException;
@@ -32,6 +34,8 @@ import butterknife.ButterKnife;
  */
 public class FeedbackFragment extends BaseFragment implements View.OnClickListener {
 
+    public static final String BUNDLE_CONCERNED_RUN = "bundle_concerned_run";
+
     @BindView(R.id.btn_feedback)
     Button mSubmitButton;
 
@@ -39,9 +43,27 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
     EditText mFeedbackText;
     private InputMethodManager inputMethodManager;
 
+    Run concernedRun;
+
+    public FeedbackFragment(){
+
+    }
+
+    public static FeedbackFragment newInstance(Run concernedRun) {
+        FeedbackFragment fragment = new FeedbackFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(BUNDLE_CONCERNED_RUN, concernedRun);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle arg = getArguments();
+        if (arg != null){
+            concernedRun = (Run) arg.getSerializable(BUNDLE_CONCERNED_RUN);
+        }
     }
 
     @Nullable
@@ -62,10 +84,20 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         }
         hideKeyboard(mFeedbackText);
         MainApplication.showToast(R.string.feedback_thanks);
+        String feedbackText = mFeedbackText.getText().toString();
+        StringBuilder stringBuilder = new StringBuilder("Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n");
+        if (concernedRun != null){
+            String concernedRunDetails = concernedRun.toString();
+            stringBuilder.append("Concerned Run:\n" + concernedRunDetails
+                    + "\n Feedback Message: " + feedbackText) ;
+        }else {
+            stringBuilder.append("Feedback Message: " + feedbackText) ;
+        }
+
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("user_id", MainApplication.getInstance().getUserID());
-            jsonObject.put("feedback", mFeedbackText.getText().toString());
+            jsonObject.put("feedback", stringBuilder.toString());
             NetworkDataProvider.doPostCallAsync(Urls.getFeedBackUrl(), jsonObject, new NetworkAsyncCallback<CustomJSONObject>() {
                 @Override
                 public void onNetworkFailure(NetworkException ne) {

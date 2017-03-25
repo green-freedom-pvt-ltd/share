@@ -43,7 +43,7 @@ public class Version5 extends SchemaVersion {
         workout.addDoubleProperty("endPointLongitude");
         workout.addLongProperty("beginTimeStamp");
         workout.addLongProperty("endTimeStamp");
-        workout.addBooleanProperty("isValidRun").notNull();
+        workout.addBooleanProperty("isValidRun");
     }
 
     private static void addUserData(Schema schema) {

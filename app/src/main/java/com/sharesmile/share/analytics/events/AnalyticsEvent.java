@@ -98,10 +98,6 @@ public class AnalyticsEvent implements UnObfuscable {
         return new Builder(MainApplication.getContext()).event(event);
     }
 
-
-    /**
-     @return the JSON string of the DSL event indianCommaSeparatedDoubleDecimalFormat
-     */
     public String toJsonString() {
         return eventProperties.toJsonString();
     }

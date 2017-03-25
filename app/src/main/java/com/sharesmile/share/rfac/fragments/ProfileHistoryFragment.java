@@ -19,6 +19,7 @@ import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
+import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.sync.SyncTaskManger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -95,14 +96,14 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
 
     @Override
-    public void showInvalidRunDialog() {
+    public void showInvalidRunDialog(final Run invalidRun) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(R.string.invalid_run_title))
                 .setMessage(getString(R.string.invalid_run_message))
-                .setPositiveButton(getString(R.string.know_more), new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.feedback), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        getFragmentController().performOperation(IFragmentController.SHOW_FAQ_FRAGMENT, null);
+                        getFragmentController().performOperation(IFragmentController.SHOW_FEEDBACK_FRAGMENT, invalidRun);
                     }
                 }).setNegativeButton(getString(R.string.ok), null).show();
     }
