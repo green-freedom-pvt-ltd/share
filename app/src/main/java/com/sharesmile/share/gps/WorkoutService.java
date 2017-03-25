@@ -739,12 +739,15 @@ public class WorkoutService extends Service implements
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
 
         String pauseResumeAction, pauseResumeLabel;
+        int pauseResumeDrawable;
         if (RunTracker.isWorkoutActive()){
             pauseResumeAction = getString(R.string.notification_action_pause);
             pauseResumeLabel = "Pause";
+            pauseResumeDrawable = R.drawable.ic_pause_black_24px;
         }else {
             pauseResumeAction = getString(R.string.notification_action_resume);
             pauseResumeLabel = "Resume";
+            pauseResumeDrawable = R.drawable.ic_play_arrow_black_24px;
         }
 
         Intent pauseResumeIntent = new Intent();
@@ -767,8 +770,8 @@ public class WorkoutService extends Service implements
                         .setTicker(getBaseContext().getResources().getString(R.string.app_name))
                         .setOngoing(true)
                         .setVisibility(1)
-                        .addAction(R.drawable.call_icon, pauseResumeLabel , pendingIntentPauseResume)
-                        .addAction(R.drawable.call_icon, "Stop" , pendingIntentStop);
+                        .addAction(pauseResumeDrawable, pauseResumeLabel , pendingIntentPauseResume)
+                        .addAction(pauseResumeDrawable, "Stop" , pendingIntentStop);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);

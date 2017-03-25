@@ -115,11 +115,11 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             if (getContext().getString(R.string.notification_action_pause).equals(action)){
-                builder.addAction(R.drawable.call_icon, "Pause", pendingIntent);
+                builder.addAction(R.drawable.ic_pause_black_24px, "Pause", pendingIntent);
             }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
-                builder.addAction(R.drawable.call_icon, "Resume", pendingIntent);
+                builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume", pendingIntent);
             }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
-                builder.addAction(R.drawable.call_icon, "Stop", pendingIntent);
+                builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntent);
             }
         }
 
