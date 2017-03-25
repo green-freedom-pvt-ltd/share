@@ -19,7 +19,7 @@ public interface Tracker {
 	void feedLocation(Location point);
 	void feedSteps(int cumulativeSteps);
 	void approveWorkoutData();
-	void discardApprovalQueue();
+	float discardApprovalQueue();
 	long getBeginTimeStamp();
 	long getLastResumeTimeStamp();
 	int getElapsedTimeInSecs();

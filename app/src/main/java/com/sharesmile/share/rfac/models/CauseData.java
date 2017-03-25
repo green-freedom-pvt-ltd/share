@@ -169,6 +169,10 @@ public class CauseData implements UnObfuscable, Serializable {
         this.causeThankYouImage = causeThankYouImage;
     }
 
+    /**
+     * Gets min distance in meters
+     * @return
+     */
     public int getMinDistance() {
         return minDistance;
     }

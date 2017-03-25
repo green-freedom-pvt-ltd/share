@@ -67,6 +67,10 @@ public class DistRecord implements UnObfuscable, Serializable{
         return location;
     }
 
+    public long getTimeStamp(){
+        return location.getTime();
+    }
+
     public float getDist() {
         return dist;
     }

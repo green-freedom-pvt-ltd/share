@@ -438,7 +438,12 @@ public class TrackerActivity extends BaseActivity {
                                 String errorMessage = "";
                                 switch (problem) {
                                     case Constants.PROBELM_TOO_FAST:
-                                        errorMessage = getString(R.string.rfac_usain_bolt_message);
+                                        String reducedDistance = bundle.getString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED);
+                                        if (TextUtils.isEmpty(reducedDistance)){
+                                            errorMessage = getString(R.string.rfac_usain_bolt_message_without_distance);
+                                        }else {
+                                            errorMessage = getString(R.string.rfac_usain_bolt_message_with_distance, reducedDistance);
+                                        }
                                         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
                                         v.vibrate(3000);
 

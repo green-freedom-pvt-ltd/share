@@ -79,6 +79,8 @@ public class Constants {
 
     public static final String KEY_PAUSE_WORKOUT_PROBLEM = "key_workout_pause_reason";
 
+    public static final String KEY_USAIN_BOLT_DISTANCE_REDUCED = "key_usain_bolt_distance_reduced";
+
     public static final String KEY_STOP_WORKOUT_PROBLEM = "key_workout_stop_reason";
 
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";

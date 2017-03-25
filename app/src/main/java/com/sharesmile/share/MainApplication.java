@@ -110,6 +110,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setVibrate(new long[]{500, 500, 500, 500});
 
         for (String action : args){
+            Logger.i(TAG, "Setting pendingIntent for " + action);
             Intent intent = new Intent();
             intent.setAction(action);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,

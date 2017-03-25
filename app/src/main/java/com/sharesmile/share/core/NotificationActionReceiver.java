@@ -29,6 +29,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Logger.d(TAG, "onReceive with action " + intent.getAction());
         NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String action = intent.getAction();
         if(context.getString(R.string.notification_action_pause).equals(action)) {

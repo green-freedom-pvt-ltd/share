@@ -18,6 +18,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
@@ -640,15 +641,21 @@ public class WorkoutService extends Service implements
     @Override
     public void workoutVigilanceSessiondefaulted(int problem) {
         Logger.d(TAG, "workoutVigilanceSessiondefaulted");
+        float distanceReduction = 0f;
+        String distReductionString = null;
+        if (tracker != null && tracker.isActive()) {
+            distanceReduction = tracker.discardApprovalQueue();
+            distReductionString = Utils.formatToKmsWithOneDecimal(Math.abs(distanceReduction));
+        }
+        pause("usain_bolt");
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_PAUSE_WORKOUT_CODE);
-        sendBroadcast(bundle);
-        if (tracker != null && tracker.isActive()) {
-            tracker.discardApprovalQueue();
+        if (!TextUtils.isEmpty(distReductionString)){
+            bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
         }
-        pause("usain_bolt");
+        sendBroadcast(bundle);
         MainApplication.showRunNotification(getString(R.string.notification_usain_bolt, R.string.notification_action_stop));
     }
 
@@ -771,7 +778,7 @@ public class WorkoutService extends Service implements
                         .setOngoing(true)
                         .setVisibility(1)
                         .addAction(pauseResumeDrawable, pauseResumeLabel , pendingIntentPauseResume)
-                        .addAction(pauseResumeDrawable, "Stop" , pendingIntentStop);
+                        .addAction(R.drawable.ic_stop_black_24px, "Stop" , pendingIntentStop);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);

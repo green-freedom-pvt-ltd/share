@@ -126,7 +126,8 @@ public class RealRunFragment extends RunFragment {
         //Workout completed and results obtained, time to show the next Fragment
         if (isAttachedToActivity()) {
             String distanceString = Utils.formatToKmsWithOneDecimal(data.getDistance());
-            if (mCauseData.getMinDistance() > Float.parseFloat(distanceString)) {
+            Float fDistance = Float.parseFloat(distanceString);
+            if (mCauseData.getMinDistance() > (fDistance * 1000) ) {
                 myActivity.exit();
                 return;
             }

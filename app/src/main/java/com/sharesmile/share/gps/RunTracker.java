@@ -28,16 +28,19 @@ public class RunTracker implements Tracker {
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
     private ScheduledExecutorService executorService;
+//    private CircularQueue<DistRecord> recordHistoryQueue;
     private DistRecord lastRecord;
 
     public RunTracker(ScheduledExecutorService executorService, UpdateListner listener){
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
+//            recordHistoryQueue = new CircularQueue<>(5);
             if (isActive()){
                 dataStore = new WorkoutDataStoreImpl();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
                 if (!TextUtils.isEmpty(prevRecordAsString)){
+//                    recordHistoryQueue.add(Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class));
                     lastRecord = Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class);
                 }
                 setState(State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE,
@@ -270,8 +273,12 @@ public class RunTracker implements Tracker {
         dataStore.approveWorkoutData();
     }
 
+    /**
+     * Discards distance and steps pending approval and return the distance amount which was reduced (negative value)
+     * @return
+     */
     @Override
-    public void discardApprovalQueue() {
+    public float discardApprovalQueue() {
 
         float distBeforeDiscard = dataStore.getTotalDistance();
         float recordedTimeBeforeDiscard = dataStore.getRecordedTime();
@@ -283,6 +290,7 @@ public class RunTracker implements Tracker {
         float deltaSpeed = (deltaDistance / deltaTime) * 3.6f; // in km/hrs
         listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
                 deltaDistance, Math.round(deltaTime), deltaSpeed);
+        return deltaDistance;
     }
 
     private synchronized void processSteps(int deltaSteps){

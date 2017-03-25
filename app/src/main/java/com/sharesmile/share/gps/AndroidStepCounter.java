@@ -45,8 +45,7 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
 
     @Override
     public void startCounting() {
-        stepsSinceReboot = 0;
-        historyQueue.clear();
+        resetCounters();
         registerStepDetector();
     }
 
@@ -55,14 +54,12 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
         }
-        stepsSinceReboot = 0;
-        historyQueue.clear();
+        resetCounters();
     }
 
     @Override
     public void pauseCounting() {
-        stepsSinceReboot = 0;
-        historyQueue.clear();
+        resetCounters();
     }
 
     @Override
@@ -156,17 +153,23 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         long deltaTimeMillis = DateUtil.getServerTimeInMillis() - lastStepsRecordTs;
 
         // Filtering on deltaSteps value
-        float deltaCadence = deltaSteps / (deltaTimeMillis / 1000f);
-        if (deltaCadence > 10f){
+        float deltaCadence = deltaSteps / (deltaTimeMillis / 1000f); // num of steps per sec
+        if ( deltaSteps < 0 || Math.abs(deltaCadence) > 10f){
             // 10 step per sec is our upper threshold, above which we will not accept step_detector reading
             Logger.i(TAG, "Detected absurdly high number of steps (" + deltaSteps + ") in "
                     + (deltaTimeMillis/1000) + " secs, wont feed to the listener");
+            resetCounters();
             return;
         }
         stepsSinceReboot = Math.round(event.values[0]);
         lastStepsRecordTs = DateUtil.getServerTimeInMillis();
         historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
         listener.onStepCount(deltaSteps);
+    }
+
+    private void resetCounters(){
+        stepsSinceReboot = 0;
+        historyQueue.clear();
     }
 
 
