@@ -11,6 +11,7 @@ import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -28,20 +29,18 @@ public class RunTracker implements Tracker {
     private WorkoutDataStore dataStore;
     private UpdateListner listener;
     private ScheduledExecutorService executorService;
-//    private CircularQueue<DistRecord> recordHistoryQueue;
-    private DistRecord lastRecord;
+    private CircularQueue<DistRecord> recordHistoryQueue;
 
     public RunTracker(ScheduledExecutorService executorService, UpdateListner listener){
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
-//            recordHistoryQueue = new CircularQueue<>(5);
+            recordHistoryQueue = new CircularQueue<>(5);
             if (isActive()){
                 dataStore = new WorkoutDataStoreImpl();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
                 if (!TextUtils.isEmpty(prevRecordAsString)){
-//                    recordHistoryQueue.add(Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class));
-                    lastRecord = Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class);
+                    recordHistoryQueue.add(Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class));
                 }
                 setState(State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE,
                                 State.PAUSED.name())));
@@ -171,10 +170,36 @@ public class RunTracker implements Tracker {
 
     @Override
     public float getCurrentSpeed() {
-        if (lastRecord != null && !lastRecord.isFirstRecordAfterResume()){
-            return lastRecord.getSpeed();
+        float distCovered = 0f; // in meters
+        float timeTaken = 0; // in millis
+        if (!recordHistoryQueue.isEmpty()){
+            if (recordHistoryQueue.getCurrentSize() == 1){
+                // Only one record is present
+                if (!getLastRecord().isFirstRecordAfterResume() && !getLastRecord().isTooOld()){
+                    return getLastRecord().getSpeed();
+                }
+            }else {
+                // More than one record present in the list
+                for (int i=recordHistoryQueue.getCurrentSize(); i >= 0; i--){
+                    // latest record first
+                    DistRecord qRecord = recordHistoryQueue.getElemAtPosition(i);
+                    if (qRecord.isTooOld()){
+                        break;
+                    }else {
+                        distCovered += qRecord.getDist();
+                        timeTaken += qRecord.getInterval();
+                    }
+                }
+            }
         }
-        return 0;
+
+        if (distCovered == 0){
+            return 0;
+        }else if (timeTaken > 0){
+            return (distCovered*1000f) / timeTaken;
+        }else {
+            return 0;
+        }
     }
 
     /**
@@ -213,8 +238,8 @@ public class RunTracker implements Tracker {
 
     @Override
     public DistRecord getLastRecord(){
-        if (isActive()){
-            return lastRecord;
+        if (isActive() && !recordHistoryQueue.isEmpty()){
+            return recordHistoryQueue.peekLatest();
         }
         return null;
     }
@@ -315,13 +340,13 @@ public class RunTracker implements Tracker {
                     Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
                     DistRecord startRecord = new DistRecord(point);
                     dataStore.addRecord(startRecord);
-                    lastRecord = startRecord;
-                    SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, lastRecord);
+                    recordHistoryQueue.add(startRecord);
+                    SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, startRecord);
                 }
             }else{
                 Logger.d(TAG,"Processing Location:\n " + point.toString());
                 long ts = point.getTime();
-                Location prevLocation = lastRecord.getLocation();
+                Location prevLocation = getLastRecord().getLocation();
                 long prevTs = prevLocation.getTime();
                 float interval = ((float) (ts - prevTs)) / 1000;
                 float dist = prevLocation.distanceTo(point);
@@ -366,8 +391,8 @@ public class RunTracker implements Tracker {
                         DistRecord record = new DistRecord(point, prevLocation, dist);
                         Logger.d(TAG, "Distance Recording: " + record.toString());
                         dataStore.addRecord(record);
-                        lastRecord = record;
-                        SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, lastRecord);
+                        recordHistoryQueue.add(record);
+                        SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);
                         float deltaDistance = dist; // in meters
                         int deltaTime = Math.round(record.getInterval()); // in secs
                         float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs

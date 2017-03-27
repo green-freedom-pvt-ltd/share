@@ -3,7 +3,9 @@ package com.sharesmile.share.gps.models;
 import android.location.Location;
 import android.os.Build;
 
+import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.utils.DateUtil;
 
 import java.io.Serializable;
 
@@ -69,6 +71,10 @@ public class DistRecord implements UnObfuscable, Serializable{
 
     public long getTimeStamp(){
         return location.getTime();
+    }
+
+    public boolean isTooOld(){
+        return (DateUtil.getServerTimeInMillis() - getTimeStamp() > Config.CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL);
     }
 
     public float getDist() {

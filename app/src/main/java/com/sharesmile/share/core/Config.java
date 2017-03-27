@@ -25,6 +25,8 @@ public class Config {
 
     public static final float UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
+    public static final float UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION = 5.5f; // in m/s, i.e. 20 km/hr
+
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s,
 
     public static final float THRESHOLD_INTEVAL = 1; // in secs
@@ -64,6 +66,10 @@ public class Config {
     public static final long ACTIVITY_VALID_INTERVAL = 24000; // in millisecs
     public static final long DETECTED_INTERVAL_IDLE = 7000; // in millisecs
     public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
+
+    public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 12000; // in millisecs
+
+
 
 
 }

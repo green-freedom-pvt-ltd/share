@@ -120,8 +120,8 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
-		//TODO: Put additional check of workoutService.getCurrentSpeed() to avoid false positives
-		if (ActivityDetector.getInstance().isIsInVehicle()){
+		if (ActivityDetector.getInstance().isIsInVehicle()
+				&& workoutService.getCurrentSpeed() > Config.UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION){
 			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
 			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 					.addBundle(workoutService.getWorkoutBundle())

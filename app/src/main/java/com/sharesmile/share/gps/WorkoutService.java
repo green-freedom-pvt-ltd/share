@@ -645,6 +645,7 @@ public class WorkoutService extends Service implements
         String distReductionString = null;
         if (tracker != null && tracker.isActive()) {
             distanceReduction = tracker.discardApprovalQueue();
+            // TODO: Make sure that this string is null if dist is 0.0km
             distReductionString = Utils.formatToKmsWithOneDecimal(Math.abs(distanceReduction));
         }
         pause("usain_bolt");
