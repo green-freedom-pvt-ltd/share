@@ -430,6 +430,12 @@ public class TrackerActivity extends BaseActivity {
                             locationService = null;
                         }
                         break;
+                    case Constants.BROADCAST_RESUME_WORKOUT_CODE:
+                        Logger.i(TAG, "onReceive of workoutServiceReceiver, BROADCAST_RESUME_WORKOUT_CODE");
+                        if (runFragment != null && runFragment.isRunActive() && !runFragment.isRunning()){
+                            runFragment.resumeRun();
+                        }
+                        break;
                     case Constants.BROADCAST_PAUSE_WORKOUT_CODE:
                         Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_PAUSE_WORKOUT_CODE");
                         synchronized (this) {
@@ -459,7 +465,6 @@ public class TrackerActivity extends BaseActivity {
                                         break;
                                 }
                                 if (!TextUtils.isEmpty(errorMessage)) {
-                                    Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
                                     if (problem != Constants.PROBLEM_GPS_DISABLED){
                                         runFragment.showErrorMessage(errorMessage);
                                     }

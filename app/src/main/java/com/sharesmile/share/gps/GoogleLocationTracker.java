@@ -11,8 +11,10 @@ import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
@@ -70,6 +72,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             state = State.PERMISSIONS_GRANTED;
             locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
             locationManager.addGpsStatusListener(this);
+//            locationManager.removeTestProvider(LocationManager.GPS_PROVIDER);
             connectToLocationServices();
         } else {
             //Need to get permissions
@@ -399,6 +402,20 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     @Override
     public void onLocationChanged(Location location) {
         Logger.i(TAG, "onLocationChanged: " + location.toString());
+        if (isMockLocationEnabled()){
+            Logger.i(TAG, "Mock location is enabled");
+        }
+
+        if (Build.VERSION.SDK_INT >= 18) {
+            if (location.isFromMockProvider()){
+                Logger.i(TAG, "Mock Location detected: " + location.toString());
+            }
+        }else {
+            if (isMockLocationEnabled()){
+                Logger.i(TAG, "Mock location is enabled");
+            }
+        }
+
         currentLocation = location;
         Iterator<WeakReference<Listener>> iterator = listeners.iterator();
         while (iterator.hasNext()){
@@ -408,6 +425,12 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             }
         }
     }
+
+    public boolean isMockLocationEnabled(){
+        return !Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ALLOW_MOCK_LOCATION).equals("0");
+    }
+
+
 
     public boolean isFetchingLocation(){
         return state == State.FETCHING_LOCATION;
@@ -448,8 +471,8 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
 
             if (locationManager != null){
                 if (locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                    Logger.i(TAG, "GPS ENABLED");
                     if (state != State.FETCHING_LOCATION && state != State.LOCATION_ENABLED){
+                        Logger.i(TAG, "GPS ENABLED");
                         startLocationTracking(false);
                         Iterator<WeakReference<Listener>> iterator = listeners.iterator();
                         while (iterator.hasNext()){

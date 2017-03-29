@@ -489,6 +489,11 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isPaused()){
             Logger.i(TAG, "onGpsEnabled: Gps enabled while workout was ongoing, user can resume the workout now");
             // User can resume the workout now, if it was paused because of disabled GPS.
+            resume();
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
+                    Constants.BROADCAST_RESUME_WORKOUT_CODE);
+            sendBroadcast(bundle);
         }
     }
 
@@ -545,7 +550,6 @@ public class WorkoutService extends Service implements
 
     @Override
     public void updateStepsRecord(long timeStampMillis) {
-        Logger.d(TAG, "Time to show steps count, totalSteps = " + tracker.getTotalSteps());
         // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
@@ -645,8 +649,8 @@ public class WorkoutService extends Service implements
         String distReductionString = null;
         if (tracker != null && tracker.isActive()) {
             distanceReduction = tracker.discardApprovalQueue();
-            // TODO: Make sure that this string is null if dist is 0.0km
-            distReductionString = Utils.formatToKmsWithOneDecimal(Math.abs(distanceReduction));
+            distReductionString =
+                    (distanceReduction == 0) ? null : Utils.formatToKmsWithOneDecimal(Math.abs(distanceReduction));
         }
         pause("usain_bolt");
         Bundle bundle = new Bundle();

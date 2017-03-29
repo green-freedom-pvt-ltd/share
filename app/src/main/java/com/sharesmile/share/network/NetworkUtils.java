@@ -102,8 +102,6 @@ public class NetworkUtils {
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
 
-        Logger.d(TAG, "Response obtained from network is: \n" + responseString);
-
         try{
             return gson.fromJson(responseString, tClass);
         }catch(JsonSyntaxException jse){
@@ -119,8 +117,6 @@ public class NetworkUtils {
 
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
-
-        Logger.d(TAG, "Response obtained from network is: \n" + responseString);
 
         try{
             return gson.fromJson(responseString, typeOfT);

@@ -173,7 +173,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     };
 
     public void handleActivityRecognitionResult(ActivityRecognitionResult result){
-        Logger.d( TAG, "IN_VEHICLE, confidence " +  result.getActivityConfidence(DetectedActivity.IN_VEHICLE));
 
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
         float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
@@ -187,7 +186,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             }
         }
 
-        Logger.d( TAG, "STILL, confidence " +  stillConfidence);
         if (isWorkoutActive()){
             if (stillConfidence > CONFIDENCE_THRESHOLD){
                 if (stillOccurredCounter == 0){
@@ -198,13 +196,11 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 handler.removeCallbacks(handleStillRunnable);
             }
         }
-        Logger.d( TAG, "ON_FOOT, confidence " +  onFootConfidence);
 
         // Add the fresh result in HistoryQueue
         long currentTime = result.getTime();
         historyQueue.add(result);
         if (historyQueue.isFull()){
-            Logger.d(TAG, "HistoryQueue is full, will calculate Rolling confidence values");
             int i = historyQueue.getMaxSize() - 1;
             int count = 0;
             float cumulativeVehicleConfidence = 0;
@@ -223,7 +219,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             float avgVehilceConfidence = cumulativeVehicleConfidence / count;
             float avgOnFootConfidence = cumulativeOnFootConfidence / count;
 
-            Logger.d(TAG, "IN_VEHICLE, AverageConfidence " +  avgVehilceConfidence);
             if (avgVehilceConfidence > CONFIDENCE_THRESHOLD){
                 isInVehicle = true;
                 if (isWorkoutActive()){
@@ -235,7 +230,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 isInVehicle = false;
             }
 
-            Logger.d(TAG, "ON_FOOT, AverageConfidence " +  avgOnFootConfidence);
             if (avgOnFootConfidence > CONFIDENCE_THRESHOLD){
                 isOnFoot = true;
                 stillOccurredCounter = 0;

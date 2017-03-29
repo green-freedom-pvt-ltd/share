@@ -53,6 +53,8 @@ public class Constants {
 
     public static final int BROADCAST_REQUEST_PERMISSION_CODE = 209;
 
+    public static final int BROADCAST_RESUME_WORKOUT_CODE = 210;
+
     public static final int PROBELM_NOT_MOVING = 0;
 
     public static final int PROBELM_TOO_SLOW = 1;

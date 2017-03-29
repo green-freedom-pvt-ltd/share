@@ -13,7 +13,9 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.bugfender.sdk.Bugfender;
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
+import com.clevertap.android.sdk.CleverTapAPI;
 import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.analytics.Analytics;
@@ -107,7 +109,8 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(getContext().getResources().getString(R.string.app_name))
-                .setVibrate(new long[]{500, 500, 500, 500});
+                .setVibrate(new long[]{500, 500, 500, 500})
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText));
 
         for (String action : args){
             Logger.i(TAG, "Setting pendingIntent for " + action);
@@ -187,6 +190,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
 
     @Override
     public void onCreate() {
+        CleverTapAPI.setDebugLevel(1277182231);
         ActivityLifecycleCallback.register(this);
         super.onCreate();
         //Initialization code
@@ -205,6 +209,10 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         ActivityDetector.initialize(this);
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
+
+        Bugfender.init(this, "tCMmpKrIgAqf4ZgfOA6Z1x00P7pugWna", BuildConfig.DEBUG);
+        Bugfender.enableLogcatLogging();
+        Bugfender.enableUIEventLogging(this);
     }
 
     private void initOneSignal() {

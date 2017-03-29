@@ -25,14 +25,10 @@ public class AppLifecycleHelper implements Application.ActivityLifecycleCallback
 
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         created++;
-        Logger.d(TAG, "onActivityCreated: " + activity.getClass().getSimpleName()
-                + ", createdCount = " + created);
     }
 
     public void onActivityDestroyed(Activity activity) {
         destroyed++;
-        Logger.d(TAG, "onActivityDestroyed: " + activity.getClass().getSimpleName()
-                + ", destroyedCount = " + destroyed);
         if (areAllActivitiesDestroyed()){
 //            SessionManager.getInstance().onApplicationDestroyed();
 //            Analytics.getInstance().onApplicationDestroyed();
@@ -44,9 +40,6 @@ public class AppLifecycleHelper implements Application.ActivityLifecycleCallback
             listener.onResume();
         }
         ++resumed;
-        Logger.d(TAG, "ForegroundCheck: onActivityResumed: " + activity.getClass().getSimpleName());
-        Logger.i(TAG, "ForegroundCheck: Is Application Backgrounded? " + (resumed == stopped)
-                + ", stoppedCount = " + stopped + ", resumedCount = " + resumed);
     }
 
 

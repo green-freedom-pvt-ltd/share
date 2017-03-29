@@ -116,7 +116,8 @@ public class SyncHelper {
             }
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "update NetworkException" + e.getMessageFromServer() + e.getMessage());
+            Logger.d(TAG, "update NetworkException, messageFromServer " + e.getMessageFromServer()
+                    + " exceptionMessage: " + e.getMessage());
         }
         EventBus.getDefault().post(new DBEvent.RunDataUpdated());
 

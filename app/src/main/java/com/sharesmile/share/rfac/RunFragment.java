@@ -83,12 +83,16 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
                 + ", secsSinceRunBegan = " + secsSinceRunBegan);
         if (secsSinceRunBegan == -1){
             startTimer(elapsedTimeInSecs);
+        }else if (Math.abs(elapsedTimeInSecs - secsSinceRunBegan) > 1){
+            secsSinceRunBegan = elapsedTimeInSecs;
         }
     }
 
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs ){
         if (secsSinceRunBegan == -1){
             startTimer(elapsedTimeInSecs);
+        }else if (Math.abs(elapsedTimeInSecs - secsSinceRunBegan) > 1){
+            secsSinceRunBegan = elapsedTimeInSecs;
         }
     }
 
@@ -133,15 +137,23 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         onPauseRun();
     }
 
+//    public void resumeTimer(){
+//        Logger.d(TAG, "resumeTimer");
+//        startTimer((int) myActivity.getElapsedTimeInSecs());
+//        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
+//    }
+
     public void resumeRun() {
         Logger.d(TAG, "resumeRun");
         if (GoogleLocationTracker.getInstance().isFetchingLocation()){
+            Logger.d(TAG, "resumeRun: LocationFetching on");
             // Resume will always be done by the user
             myActivity.resumeWorkout();
-            startTimer(SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE));
+            startTimer((int) myActivity.getElapsedTimeInSecs());
             SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
             onResumeRun();
         }else {
+            Logger.d(TAG, "resumeRun: need to initiate location fetching");
             GoogleLocationTracker.getInstance().startLocationTracking(true);
         }
     }
