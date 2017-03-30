@@ -200,20 +200,18 @@ public class SyncHelper {
             LeaderBoardList activeLeaderBoardList = new LeaderBoardList();
             activeLeaderBoardList.setLeaderBoardList(new ArrayList<LeaderBoardData>());
             for (LeaderBoardData data : leaderBoardlist.getLeaderBoardList()) {
-
                 mLeaderBoardDao.insertOrReplaceInTx(data.getLeaderBoardDbObject());
             }
-            Logger.d(TAG, "leaderboard fetch success" + leaderBoardlist + " : ");
+            Logger.d(TAG, "Leaderboard fetch success for URL: " + url);
             EventBus.getDefault().post(new DBEvent.LeaderBoardDataUpdated());
             return true;
-
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
+            Logger.d(TAG, "Problem while fetching Leaderboard, url: " + url +
+                    "\nNetworkException: " + e.getMessageFromServer() + e.getMessage());
             return false;
         }
     }
-
 
     public static void syncCampaignData(Context context) {
         SyncTaskManger.startCampaign(context);

@@ -32,8 +32,6 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
         this.firstName = firstName;
     }
 
-
-
     public String getFirstName() { return firstName; }
 
     public String getLastName() { return lastName; }
@@ -56,7 +54,7 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
 
     public com.sharesmile.share.LeaderBoard getLeaderBoardDbObject()
     {
-        com.sharesmile.share.LeaderBoard lb = new com.sharesmile.share.LeaderBoard((long) getUserid(), getFirstName(), getLastName(), getImageUrl(), getLastWeekDistance());
+        com.sharesmile.share.LeaderBoard lb = new com.sharesmile.share.LeaderBoard((long) getUserid(), getFirstName(), getLastName(), getImageUrl(), getLastWeekDistance(), getRank());
         return lb;
     }
 

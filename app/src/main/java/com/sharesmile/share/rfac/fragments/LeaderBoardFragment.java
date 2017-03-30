@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -72,11 +73,18 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     @BindView(R.id.my_list_item)
     CardView myListItem;
 
+    TextView myRank;
+
+    TextView myProfileName;
+
+    TextView mylastWeekDistance;
+
     LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
     private boolean mShowLeagueBoard = false;
     private BOARD_TYPE mBoard;
     private String mBannerUrl;
     private int mTeamId;
+    private LeaderBoard myLeaderBoard;
 
     public enum BOARD_TYPE {
         LEADERBOARD,
@@ -270,6 +278,23 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     public void fetchLeaderBoardDataFromDb() {
+        int userId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
+        myLeaderBoard = mleaderBoardDao.queryBuilder().where(LeaderBoardDao.Properties.Id.eq(userId)).build().unique();
+        if (myLeaderBoard.getRank() != null && myLeaderBoard.getRank() > 50){
+            // Need to show rank at the bottom
+            myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
+            myListItem.setCardElevation(3f);
+            myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
+            mylastWeekDistance = (TextView) myListItem.findViewById(R.id.last_week_distance);
+            myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
+
+            myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            myListItem.setVisibility(View.VISIBLE);
+        }else {
+            myListItem.setVisibility(View.GONE);
+        }
         mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(50).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();
