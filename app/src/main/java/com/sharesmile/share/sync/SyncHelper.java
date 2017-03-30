@@ -199,14 +199,10 @@ public class SyncHelper {
             LeaderBoardList leaderBoardlist = NetworkDataProvider.doGetCall(url, LeaderBoardList.class);
             LeaderBoardList activeLeaderBoardList = new LeaderBoardList();
             activeLeaderBoardList.setLeaderBoardList(new ArrayList<LeaderBoardData>());
-
             for (LeaderBoardData data : leaderBoardlist.getLeaderBoardList()) {
 
                 mLeaderBoardDao.insertOrReplaceInTx(data.getLeaderBoardDbObject());
             }
-//
-//            com.sharesmile.share.LeaderBoardData lb = new com.sharesmile.share.LeaderBoardData();
-//            mLeaderBoardDao.insertOrReplace(leaderBoardlist);
             Logger.d(TAG, "leaderboard fetch success" + leaderBoardlist + " : ");
             EventBus.getDefault().post(new DBEvent.LeaderBoardDataUpdated());
             return true;

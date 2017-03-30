@@ -3,6 +3,7 @@ package com.sharesmile.share.rfac.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -47,7 +48,6 @@ import Models.TeamBoard;
 import Models.TeamLeaderBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.http.HEAD;
 
 /**
  * Created by piyush on 8/30/16.
@@ -68,6 +68,9 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     @BindView(R.id.banner)
     ImageView mBanner;
+
+    @BindView(R.id.my_list_item)
+    CardView myListItem;
 
     LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
     private boolean mShowLeagueBoard = false;
