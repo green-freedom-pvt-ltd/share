@@ -185,11 +185,11 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
+        secsSinceRunBegan = SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE);
         myActivity.continuedRun();
         setIsRunActive(true);
         if (!isRunning()){
-            updateTimeView(Utils.secondsToString(SharedPrefsManager
-                    .getInstance().getInt(SECS_ELAPSED_ON_PAUSE)));
+            updateTimeView(Utils.secondsToString(secsSinceRunBegan));
         }
         onContinuedRun(!isRunning());
     }

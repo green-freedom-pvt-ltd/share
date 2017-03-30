@@ -68,6 +68,7 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracker);
 
@@ -241,6 +242,7 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        Logger.d(TAG, "onDestroy");
         super.onDestroy();
         if (isBoundToLocationService()) {
             unbindLocationService();

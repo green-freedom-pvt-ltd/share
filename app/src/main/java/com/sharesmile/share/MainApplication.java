@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
@@ -112,18 +113,20 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setVibrate(new long[]{500, 500, 500, 500})
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText));
 
-        for (String action : args){
-            Logger.i(TAG, "Setting pendingIntent for " + action);
-            Intent intent = new Intent();
-            intent.setAction(action);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            if (getContext().getString(R.string.notification_action_pause).equals(action)){
-                builder.addAction(R.drawable.ic_pause_black_24px, "Pause", pendingIntent);
-            }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
-                builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume", pendingIntent);
-            }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
-                builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntent);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
+            for (String action : args){
+                Logger.i(TAG, "Setting pendingIntent for " + action);
+                Intent intent = new Intent();
+                intent.setAction(action);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+                if (getContext().getString(R.string.notification_action_pause).equals(action)){
+                    builder.addAction(R.drawable.ic_pause_black_24px, "Pause", pendingIntent);
+                }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
+                    builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume", pendingIntent);
+                }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
+                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntent);
+                }
             }
         }
 

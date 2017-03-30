@@ -39,11 +39,9 @@ android {
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
-        multiDexEnabled false
         manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
                                 onesignal_app_id               : "c6288ab1-1ded-48e4-a980-7e7195c54194",
                                 onesignal_google_project_number: "159550091621"]
-        multiDexEnabled true
     }
     signingConfigs {
         release {
@@ -144,8 +142,6 @@ dependencies {
     compile 'com.clevertap.android:clevertap-android-sdk:3.1.2'
 
     compile 'com.bugfender.sdk:android:0.+'
-
-    compile 'com.android.support:multidex:1.0.1'
 
     compile ('com.github.anshulagarwal06:Lumiere:v1'){
         exclude group: 'com.google.firebase'

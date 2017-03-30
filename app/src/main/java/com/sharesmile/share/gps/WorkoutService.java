@@ -374,7 +374,7 @@ public class WorkoutService extends Service implements
                     // Will not send to tracker as it is the very first location fix received
                     // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
                     // Will start sending subsequent location fixes, only after they are approved by spike filter
-                }else {
+                } else {
                     // First fill
                     beginningLocationsRotatingQueue.add(location);
                     if (beginningLocationsRotatingQueue.isFull()){
@@ -421,11 +421,6 @@ public class WorkoutService extends Service implements
 
         long deltaTimeInMillis = Math.abs(loc2.getTime() - loc1.getTime());
         long deltaTime = deltaTimeInMillis / 1000;
-
-        if (deltaTime > Config.SPIKE_FILTER_ELIGIBLE_TIME_INTERVAL){
-            // If time interval between two location fixes is sufficiently large then those fixes are not considered as spikes
-            return false;
-        }
 
         float deltaDistance = loc1.distanceTo(loc2);
         float deltaSpeed = (deltaDistance * 1000) / deltaTimeInMillis;
@@ -781,9 +776,12 @@ public class WorkoutService extends Service implements
                                 R.mipmap.ic_launcher))
                         .setTicker(getBaseContext().getResources().getString(R.string.app_name))
                         .setOngoing(true)
-                        .setVisibility(1)
-                        .addAction(pauseResumeDrawable, pauseResumeLabel , pendingIntentPauseResume)
-                        .addAction(R.drawable.ic_stop_black_24px, "Stop" , pendingIntentStop);
+                        .setVisibility(1);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
+            mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel , pendingIntentPauseResume)
+                    .addAction(R.drawable.ic_stop_black_24px, "Stop" , pendingIntentStop);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);

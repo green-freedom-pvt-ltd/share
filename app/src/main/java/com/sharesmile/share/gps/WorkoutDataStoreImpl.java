@@ -42,6 +42,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         if (dirtyWorkoutData == null){
             init(DateUtil.getServerTimeInMillis());
         }
+        numStepsWhenBatchBegan = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
     }
 
     WorkoutDataStoreImpl(long beginTimeStamp){
@@ -261,6 +262,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         if (approvedWorkoutData != null){
             SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA_APPROVED, approvedWorkoutData.copy());
         }
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN, numStepsWhenBatchBegan);
     }
 
     private void persistDirtyWorkoutData(){
@@ -281,5 +283,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     private void clearPersistentStorage() {
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_DIRTY);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_APPROVED);
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
     }
 }
