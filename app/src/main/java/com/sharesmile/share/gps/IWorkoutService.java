@@ -10,7 +10,7 @@ public interface IWorkoutService {
 	void startWorkout();
 	void stopWorkout();
 	void pause(String reason);
-	void resume();
+	boolean resume();
 	void workoutVigilanceSessiondefaulted(int problem);
 	void workoutVigilanceSessionApproved(long sessionStartTime, long sessionEndTime);
 	boolean isCountingSteps();

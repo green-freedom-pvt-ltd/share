@@ -31,12 +31,6 @@ public interface Tracker {
 	float getCurrentSpeed();
 	DistRecord getLastRecord();
 	String getCurrentWorkoutId();
-	State getState();
-
-	enum State{
-		IDLE,
-		RUNNING,
-		PAUSED;
-	}
+	WorkoutSingleton.State getState();
 
 }

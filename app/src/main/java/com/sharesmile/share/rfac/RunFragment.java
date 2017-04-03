@@ -8,15 +8,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
+import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 ;
 
@@ -28,13 +34,10 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     private static final String TAG = "RunFragment";
     public static final long TIMER_TICK = 1000; // in millis
 
-    public static final String SECS_ELAPSED_ON_PAUSE = "secs_elapsed_on_pause";
-
 
     TrackerActivity myActivity;
     private View baseView;
 
-    boolean isRunActive;
     Handler handler = new Handler();
 
     private int secsSinceRunBegan = -1;
@@ -66,6 +69,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         // Inflate the layout for this fragment
         baseView = inflater.inflate(getLayoutResId(), container, false);
         populateViews(baseView);
+        EventBus.getDefault().register(this);
         return baseView;
     }
 
@@ -98,7 +102,9 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     private void startTimer(int initialSecs){
         secsSinceRunBegan = initialSecs;
+        handler.removeCallbacks(timer);
         handler.postDelayed(timer, TIMER_TICK);
+        updateTimeView(Utils.secondsToString(secsSinceRunBegan));
     }
 
     protected abstract void onEndRun();
@@ -119,8 +125,6 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         if (userEnded) {
             myActivity.endRun();
         }
-        setIsRunActive(false);
-        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
         SharedPrefsManager.getInstance().removeKey(Constants.KEY_WORKOUT_TEST_MODE_ON);
         handler.removeCallbacks(timer);
         onEndRun();
@@ -130,44 +134,37 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     public void pauseRun(boolean userPaused) {
         Logger.d(TAG, "pauseRun");
         handler.removeCallbacks(timer);
-        SharedPrefsManager.getInstance().setInt(SECS_ELAPSED_ON_PAUSE, secsSinceRunBegan);
         if (userPaused) {
             myActivity.pauseWorkout();
         }
         onPauseRun();
     }
 
-//    public void resumeTimer(){
-//        Logger.d(TAG, "resumeTimer");
-//        startTimer((int) myActivity.getElapsedTimeInSecs());
-//        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
-//    }
-
     public void resumeRun() {
         Logger.d(TAG, "resumeRun");
-        if (GoogleLocationTracker.getInstance().isFetchingLocation()){
-            Logger.d(TAG, "resumeRun: LocationFetching on");
-            // Resume will always be done by the user
-            myActivity.resumeWorkout();
+        if (myActivity.resumeWorkout()){
             startTimer((int) myActivity.getElapsedTimeInSecs());
-            SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
             onResumeRun();
-        }else {
-            Logger.d(TAG, "resumeRun: need to initiate location fetching");
-            GoogleLocationTracker.getInstance().startLocationTracking(true);
         }
     }
 
-    private void setIsRunActive(boolean b) {
-        Logger.d(TAG, "setIsRunActive, b = " + b);
-        synchronized (RunFragment.class) {
-            isRunActive = b;
-        }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateUiOnWorkoutPauseEvent updateUiOnWorkoutPauseEvent) {
+        Logger.d(TAG, "onEvent: UpdateUiOnWorkoutPauseEvent");
+        handler.removeCallbacks(timer);
+        onPauseRun();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateUiOnWorkoutResumeEvent updateUiOnWorkoutResumeEvent) {
+        Logger.d(TAG, "onEvent: UpdateUiOnWorkoutResumeEvent");
+        startTimer((int) myActivity.getElapsedTimeInSecs());
+        onResumeRun();
     }
 
     public boolean isRunActive() {
         synchronized (RunFragment.class) {
-            return isRunActive;
+            return WorkoutSingleton.getInstance().isWorkoutActive();
         }
     }
 
@@ -185,26 +182,32 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
-        secsSinceRunBegan = SharedPrefsManager.getInstance().getInt(SECS_ELAPSED_ON_PAUSE);
+        secsSinceRunBegan = (int) WorkoutSingleton.getInstance().getDataStore().getElapsedTime();
         myActivity.continuedRun();
-        setIsRunActive(true);
         if (!isRunning()){
             updateTimeView(Utils.secondsToString(secsSinceRunBegan));
+        }else {
+            startTimer(secsSinceRunBegan);
         }
         onContinuedRun(!isRunning());
     }
 
+
     protected void beginRun() {
         Logger.d(TAG, "beginRun");
         myActivity.beginRun();
-        setIsRunActive(true);
         startTimer(0);
-        SharedPrefsManager.getInstance().removeKey(SECS_ELAPSED_ON_PAUSE);
         onBeginRun();
     }
 
     public boolean isRunning() {
-        return isRunActive() && !SharedPrefsManager.getInstance().containsKey(SECS_ELAPSED_ON_PAUSE);
+        return WorkoutSingleton.getInstance().isRunning();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     private Runnable timer = new Runnable() {

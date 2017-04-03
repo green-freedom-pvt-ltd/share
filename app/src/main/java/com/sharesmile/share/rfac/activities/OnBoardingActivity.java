@@ -3,7 +3,6 @@ package com.sharesmile.share.rfac.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,7 +11,7 @@ import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.gps.RunTracker;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.rfac.adapters.OnBoardingAdapter;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -40,7 +39,7 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
             Boolean isLoginSkip = !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
             if (!userLogin && !isLoginSkip) {
                 startLoginActivity();
-            } else if (RunTracker.isWorkoutActive()) {
+            } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
                 Intent intent = new Intent(this, TrackerActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

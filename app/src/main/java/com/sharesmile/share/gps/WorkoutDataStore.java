@@ -12,22 +12,40 @@ public interface WorkoutDataStore {
 
 	void addRecord(DistRecord record);
 
+	/**
+	 * @return Avg speed of the workout in meter/sec
+	 */
 	float getAvgSpeed();
 
+	/**
+	 * gets total distance ran in workout in meters
+	 * @return
+	 */
 	float getTotalDistance();
 
 	long getBeginTimeStamp();
 
 	void addSteps(int numSteps);
 
+	/**
+	 * @return total number of steps in the entire workout session
+	 */
 	int getTotalSteps();
 
 	float getDistanceCoveredSinceLastResume();
 
 	long getLastResumeTimeStamp();
 
+	/**
+	 * @return elapsed time interval in secs for which the workout was in running state( i.e. not paused)
+	 * since the beginning
+	 *
+	 */
 	float getElapsedTime();
 
+	/**
+	 * @return time interval in secs for which distance has been recorded
+	 */
 	float getRecordedTime();
 
 	boolean coldStartAfterResume();

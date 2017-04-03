@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -24,10 +25,13 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
+import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -116,7 +120,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
             for (String action : args){
                 Logger.i(TAG, "Setting pendingIntent for " + action);
-                Intent intent = new Intent();
+                Intent intent = new Intent(getInstance(), NotificationActionReceiver.class);
                 intent.setAction(action);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
@@ -129,6 +133,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 }
             }
         }
+        builder.setContentIntent(getInstance().createAppIntent());
 
         NotificationManagerCompat.from(getContext()).notify(WORKOUT_NOTIFICATION_ID, builder.build());
     }
@@ -213,9 +218,20 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
 
+        WorkoutSingleton.initialize(getApplicationContext());
+
         Bugfender.init(this, "tCMmpKrIgAqf4ZgfOA6Z1x00P7pugWna", BuildConfig.DEBUG);
         Bugfender.enableLogcatLogging();
         Bugfender.enableUIEventLogging(this);
+    }
+
+    public PendingIntent createAppIntent(){
+        Intent resultIntent = new Intent(getInstance().getApplicationContext(), LoginActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        return resultPendingIntent;
     }
 
     private void initOneSignal() {

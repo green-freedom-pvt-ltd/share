@@ -15,7 +15,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.LoginImpl;
-import com.sharesmile.share.gps.RunTracker;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
 
@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mLoginHandler = new LoginImpl(this, this);
             ButterKnife.bind(this);
             initUi();
-        } else if(RunTracker.isWorkoutActive()) {
+        } else if(WorkoutSingleton.getInstance().isWorkoutActive()) {
             Intent intent = new Intent(this, TrackerActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

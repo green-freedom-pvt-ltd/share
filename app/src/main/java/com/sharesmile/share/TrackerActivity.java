@@ -31,8 +31,8 @@ import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.gps.GoogleFitStepCounter;
-import com.sharesmile.share.gps.RunTracker;
 import com.sharesmile.share.gps.WorkoutService;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
@@ -98,7 +98,7 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public boolean isWorkoutActive() {
-        return RunTracker.isWorkoutActive();
+        return WorkoutSingleton.getInstance().isWorkoutActive();
     }
 
     @Override
@@ -273,10 +273,11 @@ public class TrackerActivity extends BaseActivity {
         }
     }
 
-    public void resumeWorkout() {
+    public boolean resumeWorkout() {
         if (isBoundToLocationService()) {
-            locationService.resume();
+            return locationService.resume();
         }
+        return false;
     }
 
     public long getElapsedTimeInSecs(){
@@ -482,7 +483,7 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (RunTracker.isWorkoutActive()) {
+        if (WorkoutSingleton.getInstance().isWorkoutActive()) {
             runFragment.showStopDialog();
             return;
         }

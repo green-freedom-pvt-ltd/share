@@ -168,15 +168,19 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             );
             AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
                     .buildAndDispatch();
+            handler.removeCallbacks(handleStillRunnable);
             stillOccurredCounter = 1;
         }
     };
 
     public void handleActivityRecognitionResult(ActivityRecognitionResult result){
-
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
         float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
         float onFootConfidence = result.getActivityConfidence(DetectedActivity.ON_FOOT);
+
+        Logger.d(TAG, "handleActivityRecognitionResult: inVehicleConfidence = " + inVehicleConfidence
+                    + ", stillConfidence = " + stillConfidence + ", onFootConfidence = " + onFootConfidence
+                    + ", stillOccurredCounter " + stillOccurredCounter);
 
         if (isWorkoutActive()){
             if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
@@ -189,11 +193,12 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         if (isWorkoutActive()){
             if (stillConfidence > CONFIDENCE_THRESHOLD){
                 if (stillOccurredCounter == 0){
-                    handler.removeCallbacks(handleStillRunnable);
-                    handler.postDelayed(handleStillRunnable, 5000);
+                    handler.postDelayed(handleStillRunnable, 10000);
+                    Logger.d(TAG, "Scheduling Still notification.");
                 }
             }else {
                 handler.removeCallbacks(handleStillRunnable);
+                Logger.d(TAG, "Removing Still notification.");
             }
         }
 

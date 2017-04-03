@@ -15,8 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -24,6 +22,8 @@ import com.google.gson.Gson;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
 import com.sharesmile.share.Events.StopWorkoutEvent;
+import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
+import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -34,9 +34,9 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CircularQueue;
@@ -54,6 +54,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
 
 
@@ -115,7 +116,7 @@ public class WorkoutService extends Service implements
         }
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         mDistance = tracker.getTotalDistanceCovered();
-        makeForeground();
+        makeForegroundAndSticky();
         ActivityDetector.getInstance().workoutActive();
     }
 
@@ -229,13 +230,13 @@ public class WorkoutService extends Service implements
             }
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
-            NotificationManagerCompat.from(this).cancel(0);
 
             AnalyticsEvent.create(Event.ON_WORKOUT_END)
                     .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = 0f;
+            cancelWorkoutNotification();
         }
     }
 
@@ -265,7 +266,7 @@ public class WorkoutService extends Service implements
     public boolean onUnbind(Intent intent) {
         Logger.d(TAG, "onUnbind");
         super.onUnbind(intent);
-        if (!RunTracker.isWorkoutActive()) {
+        if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
             // Stop service only when workout session is not going on
             Logger.d(TAG, "onUnbind: Will stopWorkout service");
             stopSelf();
@@ -313,11 +314,14 @@ public class WorkoutService extends Service implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(PauseWorkoutEvent pauseWorkoutEvent) {
         pause("user_clicked_notification");
+        EventBus.getDefault().post(new UpdateUiOnWorkoutPauseEvent());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ResumeWorkoutEvent resumeWorkoutEvent) {
-        resume();
+        if (resume()){
+            EventBus.getDefault().post(new UpdateUiOnWorkoutResumeEvent());
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -522,7 +526,7 @@ public class WorkoutService extends Service implements
         mDistance = totalDistance;
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
-        updateNotification();
+        updateStickyNotification();
         float totalDistanceKmsOneDecimal = Float.parseFloat(Utils.formatToKmsWithOneDecimal(totalDistance));
         if (totalDistanceKmsOneDecimal != distanceInKmsOnLastUpdateEvent){
             // Send event only when the distance counter increment by one unit
@@ -595,9 +599,6 @@ public class WorkoutService extends Service implements
             tracker.pauseRun();
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
-            if (currentlyTracking) {
-                NotificationManagerCompat.from(this).cancel(0);
-            }
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
                     .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
@@ -605,27 +606,42 @@ public class WorkoutService extends Service implements
                     .buildAndDispatch();
         }
         ActivityDetector.getInstance().workoutIdle();
+        updateStickyNotification();
+        cancelWorkoutNotification();
     }
 
     @Override
-    public void resume() {
+    public boolean resume() {
         Logger.i(TAG, "resume");
-        if (tracker != null && tracker.getState() != Tracker.State.RUNNING) {
-            synchronized (this){
-                acceptedLocationFix = null;
-                beginningLocationsRotatingQueue = null;
+        if (GoogleLocationTracker.getInstance().isFetchingLocation()){
+            Logger.d(TAG, "resume: LocationFetching going on");
+            if (tracker != null && !tracker.isRunning()) {
+                synchronized (this){
+                    acceptedLocationFix = null;
+                    beginningLocationsRotatingQueue = null;
+                }
+                tracker.resumeRun();
+                Logger.d(TAG, "ResumeWorkout");
+                AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
+                        .addBundle(mCauseData.getCauseBundle())
+                        .addBundle(getWorkoutBundle())
+                        .buildAndDispatch();
             }
-            tracker.resumeRun();
-            Logger.d(TAG, "ResumeWorkout");
-            if (currentlyTracking) {
-                NotificationManagerCompat.from(this).cancel(0);
-            }
-            AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
-                    .addBundle(mCauseData.getCauseBundle())
-                    .addBundle(getWorkoutBundle())
-                    .buildAndDispatch();
+            ActivityDetector.getInstance().workoutActive();
+            updateStickyNotification();
+            cancelWorkoutNotification();
+            return true;
+        }else {
+            Logger.d(TAG, "resume: need to initiate location fetching");
+            GoogleLocationTracker.getInstance().startLocationTracking(true);
+            return false;
         }
-        ActivityDetector.getInstance().workoutActive();
+    }
+
+    private void cancelWorkoutNotification(){
+        Logger.d(TAG, "cancelWorkoutNotification");
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(WORKOUT_NOTIFICATION_ID);
     }
 
     public void sendStopWorkoutBroadcast(int problem) {
@@ -656,7 +672,9 @@ public class WorkoutService extends Service implements
             bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
         }
         sendBroadcast(bundle);
-        MainApplication.showRunNotification(getString(R.string.notification_usain_bolt, R.string.notification_action_stop));
+        MainApplication.showRunNotification(
+                getString(R.string.notification_usain_bolt), getString(R.string.notification_action_stop)
+        );
     }
 
     @Override
@@ -727,17 +745,18 @@ public class WorkoutService extends Service implements
     }
 
 
-    private void makeForeground() {
+    private void makeForegroundAndSticky() {
         Notification notification = getNotificationBuilder().build();
         startForeground(WORKOUT_TRACK_NOTIFICATION_ID, notification);
     }
 
-    private void updateNotification() {
-
+    private void updateStickyNotification() {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-        mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getNotificationBuilder().build());
+        if (tracker != null && tracker.isActive()){
+            mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getNotificationBuilder().build());
+        }
+
     }
 
     private NotificationCompat.Builder getNotificationBuilder() {
@@ -745,31 +764,32 @@ public class WorkoutService extends Service implements
         float fDistance = Float.parseFloat(distDecimal);
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
 
-        String pauseResumeAction, pauseResumeLabel;
+        String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeDrawable;
-        if (RunTracker.isWorkoutActive()){
+        if (tracker.isRunning()){
             pauseResumeAction = getString(R.string.notification_action_pause);
             pauseResumeLabel = "Pause";
+            contentTitle = "Running";
             pauseResumeDrawable = R.drawable.ic_pause_black_24px;
         }else {
             pauseResumeAction = getString(R.string.notification_action_resume);
             pauseResumeLabel = "Resume";
+            contentTitle = "Paused";
             pauseResumeDrawable = R.drawable.ic_play_arrow_black_24px;
         }
-
-        Intent pauseResumeIntent = new Intent();
+        Intent pauseResumeIntent = new Intent(this, NotificationActionReceiver.class);
         pauseResumeIntent.setAction(pauseResumeAction);
         PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent stopIntent = new Intent();
+        Intent stopIntent = new Intent(this, NotificationActionReceiver.class);
         stopIntent.setAction(getString(R.string.notification_action_stop));
         PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getContext(), 100, stopIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setContentTitle("Running")
+                        .setContentTitle(contentTitle)
                         .setContentText("Raised  : " + getString(R.string.rs_symbol) + rupees)
                         .setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue))
                         .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(),
@@ -787,18 +807,11 @@ public class WorkoutService extends Service implements
             mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
 
-        Intent resultIntent = new Intent(this, LoginActivity.class);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
+        mBuilder.setContentIntent(MainApplication.getInstance().createAppIntent());
         return mBuilder;
     }
+
+
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);

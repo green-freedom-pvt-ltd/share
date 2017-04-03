@@ -9,6 +9,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.WorkoutSingleton.State;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.CircularQueue;
@@ -37,17 +38,14 @@ public class RunTracker implements Tracker {
             this.listener = listener;
             recordHistoryQueue = new CircularQueue<>(5);
             if (isActive()){
-                dataStore = new WorkoutDataStoreImpl();
+                dataStore = WorkoutSingleton.getInstance().getDataStore();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
                 if (!TextUtils.isEmpty(prevRecordAsString)){
                     recordHistoryQueue.add(Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class));
                 }
-                setState(State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE,
-                                State.PAUSED.name())));
             }else{
                 // User started workout
-                setState(State.RUNNING);
-                dataStore = new WorkoutDataStoreImpl(DateUtil.getServerTimeInMillis());
+                dataStore = WorkoutSingleton.getInstance().beginWorkout();
                 resumeRun();
             }
         }
@@ -61,8 +59,7 @@ public class RunTracker implements Tracker {
         updateTrackRecord(workoutData);
 
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
-        dataStore = null;
-        setState(State.IDLE);
+        WorkoutSingleton.getInstance().endWorkout();
         listener = null;
         return workoutData;
     }
@@ -118,26 +115,20 @@ public class RunTracker implements Tracker {
     }
 
     @Override
-    public Tracker.State getState() {
-        return State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()));
-    }
-
-    private void setState(Tracker.State state){
-        SharedPrefsManager.getInstance().setString(Constants.PREF_WORKOUT_STATE, state.name());
+    public State getState() {
+        return WorkoutSingleton.getInstance().getState();
     }
 
     @Override
     public synchronized void pauseRun() {
         Logger.d(TAG, "pauseRun");
-        setState(State.PAUSED);
-        dataStore.workoutPause();
+        WorkoutSingleton.getInstance().pauseWorkout();
     }
 
     @Override
     public synchronized void resumeRun() {
         Logger.d(TAG, "resumeRun");
-        setState(State.RUNNING);
-        dataStore.workoutResume();
+        WorkoutSingleton.getInstance().resumeWorkout();
     }
 
     @Override
@@ -435,11 +426,6 @@ public class RunTracker implements Tracker {
     @Override
     public boolean isActive(){
         return (getState() != State.IDLE);
-    }
-
-    public static boolean isWorkoutActive(){
-        return (State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()))
-                != State.IDLE);
     }
 
     interface UpdateListner {

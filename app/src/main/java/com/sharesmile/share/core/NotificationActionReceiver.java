@@ -41,8 +41,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         } else if(context.getString(R.string.notification_action_stop).equals(action)) {
             Logger.i(TAG,"Action Stop");
             EventBus.getDefault().post(new StopWorkoutEvent());
-            manager.cancel(WORKOUT_TRACK_NOTIFICATION_ID);
+//            manager.cancel(WORKOUT_TRACK_NOTIFICATION_ID);
         }
-        manager.cancel(WORKOUT_NOTIFICATION_ID);
     }
 }
