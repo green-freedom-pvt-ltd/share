@@ -1,16 +1,21 @@
 package com.sharesmile.share.rfac;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
@@ -160,6 +165,30 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         Logger.d(TAG, "onEvent: UpdateUiOnWorkoutResumeEvent");
         startTimer((int) myActivity.getElapsedTimeInSecs());
         onResumeRun();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateUiOnMockLocation updateUiOnMockLocation) {
+        Logger.d(TAG, "onEvent: UpdateUiOnMockLocation");
+        showDisableMockDialog();
+    }
+
+    private void showDisableMockDialog() {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle("Mock location detected!");
+        alertDialog.setMessage("Please disable mock location to proceed");
+        alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (isAttachedToActivity()) {
+                    myActivity.exit();
+                }
+            }
+        });
+        alertDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_DISBALE_MOCK_LOCATION)
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     public boolean isRunActive() {

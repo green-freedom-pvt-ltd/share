@@ -1,6 +1,5 @@
 package com.sharesmile.share.core;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,8 +11,6 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.utils.Logger;
 
 import org.greenrobot.eventbus.EventBus;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by ankitmaheshwari on 3/15/17.
@@ -30,7 +27,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Logger.d(TAG, "onReceive with action " + intent.getAction());
-        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         String action = intent.getAction();
         if(context.getString(R.string.notification_action_pause).equals(action)) {
             Logger.i(TAG, "Action Pause");

@@ -93,6 +93,8 @@ public class Constants {
 
     public static final String PREF_WORKOUT_DATA_APPROVED = "pref_workout_data_approved";
 
+    public static final String PREF_WORKOUT_MOCK_LOCATION_ENABLED = "pref_workout_mock_location_enabled";
+
     public static final String PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN = "pref_workout_data_num_steps_when_batch_begin";
 
     public static final String PREF_WORKOUT_LIFETIME_DISTANCE = "pref_workout_lifetime_distance_new";

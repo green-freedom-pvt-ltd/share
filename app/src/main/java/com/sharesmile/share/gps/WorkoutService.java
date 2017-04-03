@@ -23,6 +23,7 @@ import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
 import com.sharesmile.share.Events.StopWorkoutEvent;
+import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.MainApplication;
@@ -312,21 +313,15 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private boolean mockLocationEnabled;
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MockLocationDetected mockLocationDetected) {
         Logger.d(TAG, "onEvent: MockLocationDetected");
-        mockLocationEnabled = true;
-        stopWorkout();
-    }
-
-    public boolean isMockLocationEnabled() {
-        return mockLocationEnabled;
-    }
-
-    public void setMockLocationEnabled(boolean value){
-        mockLocationEnabled = value;
+        if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
+            stopWorkout();
+            MainApplication.showRunNotification(getString(R.string.notification_disable_mock_location));
+            EventBus.getDefault().post(new UpdateUiOnMockLocation());
+            WorkoutSingleton.getInstance().mockLocationDetected();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

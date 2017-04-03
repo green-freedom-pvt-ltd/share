@@ -1,11 +1,16 @@
 package com.sharesmile.share.gps;
 
+import android.app.NotificationManager;
 import android.content.Context;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.SharedPrefsManager;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
 
 /**
  * Created by ankitmaheshwari on 4/3/17.
@@ -18,6 +23,7 @@ public class WorkoutSingleton {
     private static WorkoutSingleton uniqueInstance;
 
     private WorkoutDataStore dataStore;
+
 
     private WorkoutSingleton(Context appContext){
         if (isWorkoutActive()){
@@ -60,6 +66,9 @@ public class WorkoutSingleton {
 
     public WorkoutDataStore beginWorkout(){
         setState(State.RUNNING);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_WORKOUT_MOCK_LOCATION_ENABLED, false);
+        NotificationManager manager = (NotificationManager) MainApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(WORKOUT_NOTIFICATION_ID);
         dataStore = new WorkoutDataStoreImpl(DateUtil.getServerTimeInMillis());
         return dataStore;
     }
@@ -81,6 +90,14 @@ public class WorkoutSingleton {
 
     public State getState() {
         return State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()));
+    }
+
+    public void mockLocationDetected(){
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_WORKOUT_MOCK_LOCATION_ENABLED, true);
+    }
+
+    public boolean isMockLocationEnabled(){
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_WORKOUT_MOCK_LOCATION_ENABLED);
     }
 
     private void setState(State state){
