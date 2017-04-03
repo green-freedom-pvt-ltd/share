@@ -25,7 +25,7 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
     @SerializedName("last_week_distance")
     private LastWeekDistance lastWeekDistance;
 
-    @SerializedName("rank")
+    @SerializedName("ranking")
     private int rank;
 
     public void setFirstName(String firstName) {

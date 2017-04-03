@@ -34,6 +34,7 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
@@ -70,7 +71,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     @BindView(R.id.banner)
     ImageView mBanner;
 
-    @BindView(R.id.my_list_item)
+    @BindView(R.id.containerView)
     CardView myListItem;
 
     TextView myRank;
@@ -269,6 +270,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     private void showProgressDialog() {
         mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
+        myListItem.setVisibility(View.GONE);
     }
 
 
@@ -291,11 +293,15 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
             myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
             mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
             myListItem.setVisibility(View.VISIBLE);
-        }else {
+            mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard);
+        } else {
             myListItem.setVisibility(View.GONE);
+            mRecyclerView.setPadding(0,0,0,0);
         }
-        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance).limit(50).list();
+        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance)
+                .limit(50).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();
     }
@@ -307,7 +313,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 hideProgressDialog();
-//                Toast.makeText(getContext(), "Network Error", Toast.LENGTH_SHORT).show();
                 MainApplication.showToast("Network Error, Please Refresh");
                 ne.printStackTrace();
             }

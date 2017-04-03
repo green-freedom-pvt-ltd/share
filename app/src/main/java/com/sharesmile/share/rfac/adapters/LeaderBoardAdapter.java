@@ -62,10 +62,14 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
     @Override
     public void onBindViewHolder(LeaderBoardViewHolder holder, int position) {
-        holder.bindData(mData.get(position), position);
+        holder.bindData(mData.get(position));
     }
 
-    class LeaderBoardViewHolder extends RecyclerView.ViewHolder {
+    public LeaderBoardViewHolder createMyViewHolder(View myListItem){
+        return new LeaderBoardViewHolder(myListItem);
+    }
+
+    public class LeaderBoardViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_leaderboard)
         TextView mleaderBoard;
@@ -90,8 +94,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             }
         }
 
-        private void bindData(final LeaderBoard leaderboard, int position) {
-            mleaderBoard.setText(String.valueOf(position + 1));
+        public void bindData(final LeaderBoard leaderboard) {
+            mleaderBoard.setText(String.valueOf(leaderboard.getRank()));
 
             if (!TextUtils.isEmpty(leaderboard.getSocial_thumb())) {
                 Picasso.with(mContext).

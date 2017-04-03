@@ -180,7 +180,7 @@ public class RunTracker implements Tracker {
                 }
             }else {
                 // More than one record present in the list
-                for (int i=recordHistoryQueue.getCurrentSize(); i >= 0; i--){
+                for (int i=recordHistoryQueue.getCurrentSize()-1; i >= 0; i--){
                     // latest record first
                     DistRecord qRecord = recordHistoryQueue.getElemAtPosition(i);
                     if (qRecord.isTooOld()){
@@ -272,7 +272,12 @@ public class RunTracker implements Tracker {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    processLocation(point);
+                    try {
+                        processLocation(point);
+                    }catch (Exception e){
+                        Logger.d(TAG, "Exception in processLocation: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             });
         }
@@ -344,12 +349,13 @@ public class RunTracker implements Tracker {
                     SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, startRecord);
                 }
             }else{
-                Logger.d(TAG,"Processing Location:\n " + point.toString());
+                Logger.d(TAG,"Processing Location: " + point.toString());
                 long ts = point.getTime();
                 Location prevLocation = getLastRecord().getLocation();
                 long prevTs = prevLocation.getTime();
                 float interval = ((float) (ts - prevTs)) / 1000;
                 float dist = prevLocation.distanceTo(point);
+                Logger.d(TAG, "Processing Location5: prevTs = " + prevTs  + ", interval = " + interval + " dist = " + dist);
 
                 // Step 1: Check whether threshold interval for recording has elapsed
                 if (interval > Config.THRESHOLD_INTEVAL){

@@ -7,6 +7,8 @@ package com.sharesmile.share.utils;
  */
 public class CircularQueue<E> {
 
+    private static final String TAG = "CircularQueue";
+
     private E[] circularQueueAr;
     private int maxSize;   //Maximum Size of Circular Queue
     private int rear;//elements will be added/queued at rear.
@@ -37,7 +39,8 @@ public class CircularQueue<E> {
 
     public E peekLatest(){
         if (!isEmpty()){
-            return circularQueueAr[rear];
+            int latestPos = ((rear - 1) + circularQueueAr.length) % circularQueueAr.length;
+            return circularQueueAr[latestPos];
         }
         return null;
     }
