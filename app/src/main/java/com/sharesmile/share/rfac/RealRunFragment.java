@@ -3,12 +3,15 @@ package com.sharesmile.share.rfac;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -16,9 +19,14 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 
@@ -116,7 +124,8 @@ public class RealRunFragment extends RunFragment {
         if (isAttachedToActivity()) {
             String distanceString = Utils.formatToKmsWithOneDecimal(data.getDistance());
             Float fDistance = Float.parseFloat(distanceString);
-            if (mCauseData.getMinDistance() > (fDistance * 1000) ) {
+            if (mCauseData.getMinDistance() > (fDistance * 1000)
+                    && !myActivity.isMockLocationEnabled()) {
                 myActivity.exit();
                 return;
             }
@@ -126,7 +135,10 @@ public class RealRunFragment extends RunFragment {
 
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
 
-            getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
+            if (!myActivity.isMockLocationEnabled()){
+                getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
+            }
+
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
 
         }
@@ -266,6 +278,44 @@ public class RealRunFragment extends RunFragment {
                 .addBundle(mCauseData.getCauseBundle())
                 .addBundle(getWorkoutBundle())
                 .buildAndDispatch();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        EventBus.getDefault().register(this);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    private void showDisableMockDialog() {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle("Mock location detected!");
+        alertDialog.setMessage("Please disable mock location to proceed");
+        alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (isAttachedToActivity()){
+                    myActivity.mockLocationChecked();
+                    myActivity.exit();
+                }
+            }
+        });
+        alertDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_DISBALE_MOCK_LOCATION)
+                .addBundle(mCauseData.getCauseBundle())
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MockLocationDetected mockLocationDetected) {
+        Logger.d(TAG, "onEvent: MockLocationDetected");
+        showDisableMockDialog();
     }
 
     private void showMinDistanceDialog() {

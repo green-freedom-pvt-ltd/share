@@ -19,6 +19,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
 import com.sharesmile.share.Events.StopWorkoutEvent;
@@ -309,6 +310,23 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isActive()) {
             tracker.feedSteps(deltaSteps);
         }
+    }
+
+    private boolean mockLocationEnabled;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MockLocationDetected mockLocationDetected) {
+        Logger.d(TAG, "onEvent: MockLocationDetected");
+        mockLocationEnabled = true;
+        stopWorkout();
+    }
+
+    public boolean isMockLocationEnabled() {
+        return mockLocationEnabled;
+    }
+
+    public void setMockLocationEnabled(boolean value){
+        mockLocationEnabled = value;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

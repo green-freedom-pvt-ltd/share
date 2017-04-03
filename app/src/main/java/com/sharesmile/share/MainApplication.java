@@ -109,7 +109,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     public static void showRunNotification(String notifText, String... args){
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
-        builder.setContentText( notifText )
+        builder.setContentText( notifText)
                 .setSmallIcon(getNotificationIcon())
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
@@ -134,7 +134,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
             }
         }
         builder.setContentIntent(getInstance().createAppIntent());
-
         NotificationManagerCompat.from(getContext()).notify(WORKOUT_NOTIFICATION_ID, builder.build());
     }
 

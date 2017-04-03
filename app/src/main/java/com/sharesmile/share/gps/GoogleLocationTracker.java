@@ -31,9 +31,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.sharesmile.share.Events.MockLocationDetected;
+import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.R;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
@@ -409,10 +414,14 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         if (Build.VERSION.SDK_INT >= 18) {
             if (location.isFromMockProvider()){
                 Logger.i(TAG, "Mock Location detected: " + location.toString());
+                EventBus.getDefault().post(new MockLocationDetected());
+                MainApplication.showRunNotification(appContext.getString(R.string.notification_disable_mock_location));
             }
         }else {
             if (isMockLocationEnabled()){
                 Logger.i(TAG, "Mock location is enabled");
+                EventBus.getDefault().post(new MockLocationDetected());
+                MainApplication.showRunNotification(appContext.getString(R.string.notification_disable_mock_location));
             }
         }
 

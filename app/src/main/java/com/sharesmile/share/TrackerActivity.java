@@ -481,6 +481,20 @@ public class TrackerActivity extends BaseActivity {
         }
     };
 
+    public boolean isMockLocationEnabled(){
+        if (isBoundToLocationService()){
+            return locationService.isMockLocationEnabled();
+        }
+        return false;
+    }
+
+    public void mockLocationChecked(){
+        if (isBoundToLocationService()){
+            locationService.setMockLocationEnabled(false);
+        }
+    }
+
+
     @Override
     public void onBackPressed() {
         if (WorkoutSingleton.getInstance().isWorkoutActive()) {
