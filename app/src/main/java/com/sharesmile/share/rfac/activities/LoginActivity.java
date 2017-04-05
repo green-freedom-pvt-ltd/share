@@ -29,8 +29,10 @@ import butterknife.ButterKnife;
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, LoginImpl.LoginListener {
 
+    private static final String TAG = "LoginActivity";
     private static final int REQUEST_GOOGLE_SIGN_IN = 1001;
     public static final String BUNDLE_FROM_MAINACTIVITY = "is_from_mainactivity";
+    public static final String INTENT_STOP_RUN = "intent_stop_run";
     @BindView(R.id.btn_login_fb)
     LinearLayout mFbLoginButton;
 
@@ -59,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
 
         isFromMainActivity = getIntent().getBooleanExtra(BUNDLE_FROM_MAINACTIVITY, false);
+        boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
 
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)
                 && (isFromMainActivity || !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false))) {
@@ -69,6 +72,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else if(WorkoutSingleton.getInstance().isWorkoutActive()) {
             Intent intent = new Intent(this, TrackerActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            if (intentStopRun){
+                WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
+            }
             startActivity(intent);
         } else {
             startMainActivity();

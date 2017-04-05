@@ -295,7 +295,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
             mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
             myListItem.setVisibility(View.VISIBLE);
-            mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard);
+            mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
         } else {
             myListItem.setVisibility(View.GONE);
             mRecyclerView.setPadding(0,0,0,0);

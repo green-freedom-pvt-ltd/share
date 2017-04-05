@@ -129,7 +129,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume", pendingIntent);
                 }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
-                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntent);
+                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createStopRunIntent());
                 }
             }
         }
@@ -230,6 +230,16 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        return resultPendingIntent;
+    }
+
+    public PendingIntent createStopRunIntent(){
+        Intent resultIntent = new Intent(getInstance().getApplicationContext(), LoginActivity.class);
+        resultIntent.putExtra(LoginActivity.INTENT_STOP_RUN, true);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(1, PendingIntent.FLAG_UPDATE_CURRENT);
         return resultPendingIntent;
     }
 

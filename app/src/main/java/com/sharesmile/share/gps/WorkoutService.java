@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
-import com.sharesmile.share.Events.StopWorkoutEvent;
 import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
@@ -335,11 +334,6 @@ public class WorkoutService extends Service implements
         if (resume()){
             EventBus.getDefault().post(new UpdateUiOnWorkoutResumeEvent());
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(StopWorkoutEvent stopWorkoutEvent) {
-        stopWorkout();
     }
 
     public static boolean isCurrentlyTracking() {
@@ -795,11 +789,6 @@ public class WorkoutService extends Service implements
         PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent stopIntent = new Intent(this, NotificationActionReceiver.class);
-        stopIntent.setAction(getString(R.string.notification_action_stop));
-        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getContext(), 100, stopIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle(contentTitle)
@@ -813,7 +802,7 @@ public class WorkoutService extends Service implements
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
             mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel , pendingIntentPauseResume)
-                    .addAction(R.drawable.ic_stop_black_24px, "Stop" , pendingIntentStop);
+                    .addAction(R.drawable.ic_stop_black_24px, "Stop" , MainApplication.getInstance().createStopRunIntent());
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

@@ -24,6 +24,8 @@ public class WorkoutSingleton {
 
     private WorkoutDataStore dataStore;
 
+    private boolean toShowEndRunDialog;
+
 
     private WorkoutSingleton(Context appContext){
         if (isWorkoutActive()){
@@ -90,6 +92,14 @@ public class WorkoutSingleton {
 
     public State getState() {
         return State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()));
+    }
+
+    public void setToShowEndRunDialog(boolean value){
+        this.toShowEndRunDialog = value;
+    }
+
+    public boolean toShowEndRunDialog(){
+        return toShowEndRunDialog;
     }
 
     public void mockLocationDetected(){

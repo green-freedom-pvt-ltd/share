@@ -6,7 +6,6 @@ import android.content.Intent;
 
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
-import com.sharesmile.share.Events.StopWorkoutEvent;
 import com.sharesmile.share.R;
 import com.sharesmile.share.utils.Logger;
 
@@ -36,8 +35,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             EventBus.getDefault().post(new ResumeWorkoutEvent());
         } else if(context.getString(R.string.notification_action_stop).equals(action)) {
             Logger.i(TAG,"Action Stop");
-            EventBus.getDefault().post(new StopWorkoutEvent());
-//            manager.cancel(WORKOUT_TRACK_NOTIFICATION_ID);
         }
     }
 }

@@ -50,8 +50,6 @@ public class RealRunFragment extends RunFragment {
     TextView mTimerIndicator;
     private CauseData mCauseData;
 
-    public static final String RUPEES_IMPACT_ON_PAUSE = "rupees_impact_on_pause";
-    public static final String DISTANCE_COVERED_ON_PAUSE = "distance_covered_on_pause";
 
     public static RealRunFragment newInstance(CauseData causeData) {
         RealRunFragment fragment = new RealRunFragment();
@@ -147,6 +145,11 @@ public class RealRunFragment extends RunFragment {
     }
 
 
+    private String getImpactInRupees(float distanceCovered){
+        String distanceString = Utils.formatToKmsWithOneDecimal(distanceCovered);
+        int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
+        return String.valueOf(rupees);
+    }
 
     @Override
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs) {
@@ -155,7 +158,6 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     protected void onEndRun() {
-        clearState();
         // Will wait for workout result broadcast
     }
 
@@ -163,17 +165,6 @@ public class RealRunFragment extends RunFragment {
     protected void onPauseRun() {
         pauseButton.setText(R.string.resume);
         runProgressBar.setVisibility(View.INVISIBLE);
-        persistStateOnPause();
-    }
-
-    private void persistStateOnPause() {
-        SharedPrefsManager.getInstance().setString(DISTANCE_COVERED_ON_PAUSE, distance.getText().toString());
-        SharedPrefsManager.getInstance().setString(RUPEES_IMPACT_ON_PAUSE, impact.getText().toString());
-    }
-
-    private void clearState() {
-        SharedPrefsManager.getInstance().removeKey(DISTANCE_COVERED_ON_PAUSE);
-        SharedPrefsManager.getInstance().removeKey(RUPEES_IMPACT_ON_PAUSE);
     }
 
     //TODO: Remove persistence of distance and impact on Pause.
@@ -182,14 +173,12 @@ public class RealRunFragment extends RunFragment {
     protected void onResumeRun() {
         pauseButton.setText(R.string.pause);
         runProgressBar.setVisibility(View.VISIBLE);
-        clearState();
     }
 
     @Override
     protected void onBeginRun() {
         impact.setText("0");
         distance.setText("0.0");
-        clearState();
     }
 
     @Override
@@ -197,10 +186,18 @@ public class RealRunFragment extends RunFragment {
         if (!isRunning()) {
             pauseButton.setText(R.string.resume);
             runProgressBar.setVisibility(View.INVISIBLE);
-            impact.setText(SharedPrefsManager.getInstance().getString(RUPEES_IMPACT_ON_PAUSE));
-            distance.setText(SharedPrefsManager.getInstance().getString(DISTANCE_COVERED_ON_PAUSE));
         } else {
-//            refreshWorkoutData();
+            pauseButton.setText(R.string.pause);
+            runProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
+        impact.setText(getImpactInRupees(distanceCovered));
+        distance.setText(Utils.formatToKmsWithOneDecimal(distanceCovered));
+
+        if (WorkoutSingleton.getInstance().toShowEndRunDialog()){
+            showRunEndDialog();
+            WorkoutSingleton.getInstance().setToShowEndRunDialog(false);
         }
     }
 
