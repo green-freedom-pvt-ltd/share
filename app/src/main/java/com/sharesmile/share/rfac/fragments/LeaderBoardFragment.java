@@ -281,25 +281,35 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     public void fetchLeaderBoardDataFromDb() {
         int userId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
-        myLeaderBoard = mleaderBoardDao.queryBuilder().where(LeaderBoardDao.Properties.Id.eq(userId)).build().unique();
-        if (myLeaderBoard.getRank() != null && myLeaderBoard.getRank() > 50){
-            // Need to show rank at the bottom
-            myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
-            myListItem.setCardElevation(3f);
-            myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
-            mylastWeekDistance = (TextView) myListItem.findViewById(R.id.last_week_distance);
-            myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
+        List<LeaderBoard> myLeaderBoardList = mleaderBoardDao.queryBuilder().where(LeaderBoardDao.Properties.Id.eq(userId)).list();
 
-            myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-            myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-            mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-            mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
-            myListItem.setVisibility(View.VISIBLE);
-            mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
-        } else {
+        boolean isShowingMyRank = false;
+
+        if (myLeaderBoardList != null && !myLeaderBoardList.isEmpty()){
+            myLeaderBoard = myLeaderBoardList.get(0);
+
+            if (myLeaderBoard.getRank() != null && myLeaderBoard.getRank() > 50){
+                // Need to show rank at the bottom
+                myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
+                myListItem.setCardElevation(3f);
+                myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
+                mylastWeekDistance = (TextView) myListItem.findViewById(R.id.last_week_distance);
+                myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
+
+                myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+                mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
+                myListItem.setVisibility(View.VISIBLE);
+                mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
+                isShowingMyRank = true;
+            }
+        }
+        if (!isShowingMyRank) {
             myListItem.setVisibility(View.GONE);
             mRecyclerView.setPadding(0,0,0,0);
         }
+
         mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance)
                 .limit(50).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);

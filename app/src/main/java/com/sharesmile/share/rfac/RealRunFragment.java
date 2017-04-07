@@ -254,7 +254,9 @@ public class RealRunFragment extends RunFragment {
         alertDialog.setMessage("Are you sure you want to end the run?");
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                endRun(true);
+                if (isAttachedToActivity()){
+                    endRun(true);
+                }
             }
         });
 
@@ -277,12 +279,15 @@ public class RealRunFragment extends RunFragment {
         alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+
             }
         });
 
         alertDialog.setNegativeButton(getString(R.string.dialog_negative_button_min_distance), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                endRun(true);
+                if (isAttachedToActivity()) {
+                    endRun(true);
+                }
             }
         });
         alertDialog.show();
@@ -313,13 +318,17 @@ public class RealRunFragment extends RunFragment {
         alertDialog.setMessage(msg);
         alertDialog.setPositiveButton(getString(R.string.resume), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                resumeRun();
+                if (isAttachedToActivity()){
+                    resumeRun();
+                }
 
             }
         });
         alertDialog.setNegativeButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                endRun(true);
+                if (isAttachedToActivity()){
+                    endRun(true);
+                }
             }
         });
 
