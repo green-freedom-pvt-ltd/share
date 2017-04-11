@@ -37,10 +37,6 @@ public class DBEvent {
         }
     }
 
-    public static class LeaderBoardDataUpdated {
-        public LeaderBoardDataUpdated() {
-        }
-    }
 
     public static class CampaignDataUpdated {
         private CampaignList.Campaign campaign;

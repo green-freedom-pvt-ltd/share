@@ -445,7 +445,7 @@ public class WorkoutService extends Service implements
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if (isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() > 1){
+            if (isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() >= 1){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
@@ -468,6 +468,7 @@ public class WorkoutService extends Service implements
                     .put("accuracy", loc2.getAccuracy())
                     .put("threshold_applied", thresholdApplied)
                     .put("steps_per_sec_moving_average", stepCounter.getMovingAverageOfStepsPerSec())
+                    .put("is_secondary_check", false)
                     .buildAndDispatch();
             return true;
         }else {

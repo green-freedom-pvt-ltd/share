@@ -32,13 +32,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
     private List<LeaderBoard> mData;
     private Context mContext;
 
-    public LeaderBoardAdapter(Context context, List<LeaderBoard> leaderBoard) {
-        this.mData = leaderBoard;
+    public LeaderBoardAdapter(Context context, boolean isLeagueBoard, ItemClickListener lis) {
         this.mContext = context;
-    }
-
-    public LeaderBoardAdapter(Context context, List<LeaderBoard> leaderBoard, boolean isLeagueBoard, ItemClickListener lis) {
-        this(context, leaderBoard);
         this.isLeagueBoard = isLeagueBoard;
         mListener = lis;
     }

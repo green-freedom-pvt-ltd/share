@@ -8,7 +8,6 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.Events.DBEvent;
-import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.Workout;
@@ -19,8 +18,6 @@ import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.pushNotification.NotificationConsts;
-import com.sharesmile.share.rfac.models.LeaderBoardData;
-import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -29,7 +26,6 @@ import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import Models.CampaignList;
@@ -193,24 +189,8 @@ public class SyncHelper {
 
 
     private static boolean fetchLeaderBoardList(String url) {
-
-        try {
-            LeaderBoardDao mLeaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
-            LeaderBoardList leaderBoardlist = NetworkDataProvider.doGetCall(url, LeaderBoardList.class);
-            LeaderBoardList activeLeaderBoardList = new LeaderBoardList();
-            activeLeaderBoardList.setLeaderBoardList(new ArrayList<LeaderBoardData>());
-            for (LeaderBoardData data : leaderBoardlist.getLeaderBoardList()) {
-                mLeaderBoardDao.insertOrReplaceInTx(data.getLeaderBoardDbObject());
-            }
-            Logger.d(TAG, "Leaderboard fetch success for URL: " + url);
-            EventBus.getDefault().post(new DBEvent.LeaderBoardDataUpdated());
-            return true;
-        } catch (NetworkException e) {
-            e.printStackTrace();
-            Logger.d(TAG, "Problem while fetching Leaderboard, url: " + url +
-                    "\nNetworkException: " + e.getMessageFromServer() + e.getMessage());
-            return false;
-        }
+        //TODO: Fetch Leaderboard and sync in SharedPreferences, not in DB
+        return true;
     }
 
     public static void syncCampaignData(Context context) {

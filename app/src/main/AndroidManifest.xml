@@ -175,17 +175,6 @@
             </intent-filter>
         </receiver>
 
-        <!--<receiver-->
-            <!--android:name="com.mixpanel.android.mpmetrics.GCMReceiver"-->
-            <!--android:permission="com.google.android.c2dm.permission.SEND">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.google.android.c2dm.intent.RECEIVE" />-->
-                <!--<action android:name="com.google.android.c2dm.intent.REGISTRATION" />-->
-
-                <!--<category android:name="com.sharesmile.share" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
-
         <receiver
             android:name="com.clevertap.android.sdk.InstallReferrerBroadcastReceiver"
             android:exported="true">
@@ -210,8 +199,6 @@
             android:theme="@style/AppTheme" />
         <activity android:name="activities.ImpactLeagueActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name="activities.LeagueLeaderBoard"
-            android:screenOrientation="portrait"></activity>
 
         <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
     </application>

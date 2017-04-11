@@ -18,9 +18,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoard;
-import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
@@ -30,16 +28,13 @@ import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
-import com.sharesmile.share.sync.SyncHelper;
+import com.sharesmile.share.rfac.models.LeaderBoardData;
+import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +53,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     private static final String BUNDLE_LEAGUE_BOARD = "bundle_league_board";
     private static final String BUNDLE_TEAM_ID = "bundle_team_id";
+    private static final String TAG = "LeaderBoardFragment";
 
     RecyclerView mRecyclerView;
     private List<LeaderBoard> mleaderBoardList = new ArrayList<>();
@@ -80,7 +76,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     TextView mylastWeekDistance;
 
-    LeaderBoardDao mleaderBoardDao = MainApplication.getInstance().getDbWrapper().getLeaderBoardDao();
+    private String toolbarTitle;
+
     private boolean mShowLeagueBoard = false;
     private BOARD_TYPE mBoard;
     private String mBannerUrl;
@@ -165,24 +162,11 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     private void init() {
-        if (mLeaderBoardAdapter == null) {
-            mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), mleaderBoardList, mShowLeagueBoard, this);
-            mLeaderBoardAdapter.setData(mleaderBoardList);
-            fetchData();
-        } else {
-            if (mBoard == BOARD_TYPE.TEAMBAORD) {
-                setBannerImage();
-            } else if (mBoard == BOARD_TYPE.LEADERBOARD) {
-                fetchLeaderBoardDataFromDb();
-            }
-        }
-        if (mBoard == BOARD_TYPE.LEADERBOARD) {
-            EventBus.getDefault().register(this);
-        }
+        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), mShowLeagueBoard, this);
+        fetchData();
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         setupToolbar();
-
         mswipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -196,7 +180,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     private void fetchData() {
         if (mBoard == BOARD_TYPE.LEADERBOARD) {
-            SyncHelper.syncLeaderBoardData(getContext());
+            fetchGlobalLeaderBoardData();
         } else {
             mInfoView.setVisibility(View.GONE);
             if (mBoard == BOARD_TYPE.TEAMBAORD) {
@@ -211,15 +195,16 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     private void setupToolbar() {
         setHasOptionsMenu(true);
         if (mBoard == BOARD_TYPE.LEADERBOARD) {
-            getFragmentController().updateToolBar(getResources().getString(R.string.leaderboard), true);
+            toolbarTitle = getResources().getString(R.string.leaderboard);
         } else {
             mInfoView.setVisibility(View.GONE);
             if (mBoard == BOARD_TYPE.TEAMBAORD) {
-                getFragmentController().updateToolBar(getResources().getString(R.string.impact_league), true);
+                toolbarTitle = getResources().getString(R.string.impact_league);
             } else {
-                getFragmentController().updateToolBar(getResources().getString(R.string.team_leader_board), true);
+                toolbarTitle = getResources().getString(R.string.team_leader_board);
             }
         }
+        getFragmentController().updateToolBar(toolbarTitle, true);
     }
 
     @Override
@@ -250,21 +235,16 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     public void refreshItems() {
         if (mleaderBoardList != null) {
             mleaderBoardList.clear();
-            Logger.i("LeaderBoard", mleaderBoardList.toString());
+            Logger.i(TAG, "LeaderBoard list cleared");
         }
-
+        mLeaderBoardAdapter.notifyDataSetChanged();
         if (mBoard == BOARD_TYPE.TEAMBAORD) {
             fetchTeamBoardData();
         } else if (mBoard == BOARD_TYPE.TEAMLEADERBAORD) {
-            mleaderBoardDao.deleteAll();
-            mLeaderBoardAdapter.notifyDataSetChanged();
             fetchTeamLeaderBoardData();
         } else {
-            mleaderBoardDao.deleteAll();
-            mLeaderBoardAdapter.notifyDataSetChanged();
-            SyncHelper.syncLeaderBoardData(getContext());
+            fetchGlobalLeaderBoardData();
         }
-
     }
 
     private void showProgressDialog() {
@@ -273,47 +253,44 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         myListItem.setVisibility(View.GONE);
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DBEvent.LeaderBoardDataUpdated leaderBoardDataUpdated) {
-        fetchLeaderBoardDataFromDb();
-    }
-
-    public void fetchLeaderBoardDataFromDb() {
+    public void showGLobalLeaderBoardData(LeaderBoardList list) {
+        mleaderBoardList.clear();
         int userId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
-        List<LeaderBoard> myLeaderBoardList = mleaderBoardDao.queryBuilder().where(LeaderBoardDao.Properties.Id.eq(userId)).list();
-
         boolean isShowingMyRank = false;
-
-        if (myLeaderBoardList != null && !myLeaderBoardList.isEmpty()){
-            myLeaderBoard = myLeaderBoardList.get(0);
-
-            if (myLeaderBoard.getRank() != null && myLeaderBoard.getRank() > 50){
-                // Need to show rank at the bottom
-                myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
-                myListItem.setCardElevation(3f);
-                myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
-                mylastWeekDistance = (TextView) myListItem.findViewById(R.id.last_week_distance);
-                myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
-
-                myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-                myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-                mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-                mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
-                myListItem.setVisibility(View.VISIBLE);
-                mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
+        for (LeaderBoardData data : list.getLeaderBoardList()){
+            if (data.getRank() > 50 && userId == data.getUserid()){
+                myLeaderBoard = data.getLeaderBoardDbObject();
                 isShowingMyRank = true;
+            }else if (data.getRank() > 0 && data.getRank() <= 50){
+                mleaderBoardList.add(data.getRank() - 1, data.getLeaderBoardDbObject());
             }
         }
-        if (!isShowingMyRank) {
+
+        if (isShowingMyRank){
+            showMyRank(myLeaderBoard);
+        }else {
             myListItem.setVisibility(View.GONE);
             mRecyclerView.setPadding(0,0,0,0);
         }
 
-        mleaderBoardList = mleaderBoardDao.queryBuilder().orderDesc(LeaderBoardDao.Properties.Last_week_distance)
-                .limit(50).list();
         mLeaderBoardAdapter.setData(mleaderBoardList);
         hideProgressDialog();
+    }
+
+    private void showMyRank(LeaderBoard myLeaderBoard){
+        // Need to show rank at the bottom
+        myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
+        myListItem.setCardElevation(3f);
+        myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
+        mylastWeekDistance = (TextView) myListItem.findViewById(R.id.last_week_distance);
+        myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
+
+        myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
+        myListItem.setVisibility(View.VISIBLE);
+        mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
     }
 
     private void fetchTeamLeaderBoardData() {
@@ -322,27 +299,51 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         NetworkDataProvider.doGetCallAsync(Urls.getTeamLeaderBoardUrl(), header, null, new NetworkAsyncCallback<TeamLeaderBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
-                hideProgressDialog();
-                MainApplication.showToast("Network Error, Please Refresh");
-                ne.printStackTrace();
+                if (isAttachedToActivity()){
+                    hideProgressDialog();
+                    MainApplication.showToast("Network Error, Please Refresh");
+                    ne.printStackTrace();
+                }
             }
 
             @Override
             public void onNetworkSuccess(TeamLeaderBoard board) {
-                mleaderBoardList.clear();
-                for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
-                    Float distance = 0f;
-                    if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
-                        distance = team.getLeagueTotalDistance().getTotalDistance();
+                if (isAttachedToActivity()){
+                    mleaderBoardList.clear();
+                    for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
+                        Float distance = 0f;
+                        if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
+                            distance = team.getLeagueTotalDistance().getTotalDistance();
+                        }
+                        mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
                     }
-                    mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
+                    hideProgressDialog();
+                    mLeaderBoardAdapter.setData(mleaderBoardList);
                 }
-
-                hideProgressDialog();
-                mLeaderBoardAdapter.setData(mleaderBoardList);
             }
         });
     }
+
+    private void fetchGlobalLeaderBoardData(){
+        NetworkDataProvider.doGetCallAsync(Urls.getLeaderboardUrl(), new NetworkAsyncCallback<LeaderBoardList>() {
+            @Override
+            public void onNetworkFailure(NetworkException ne) {
+                if (isAttachedToActivity()){
+                    hideProgressDialog();
+                    MainApplication.showToast("Network Error, Please Refresh");
+                    ne.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onNetworkSuccess(LeaderBoardList list) {
+                if (isAttachedToActivity()){
+                    showGLobalLeaderBoardData(list);
+                }
+            }
+        });
+    }
+
 
     private void fetchTeamBoardData() {
         NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
@@ -350,24 +351,24 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             public void onNetworkFailure(NetworkException ne) {
                 if (isAttachedToActivity()){
                     hideProgressDialog();
-                    MainApplication.showToast("Network Error");
+                    MainApplication.showToast("Network Error, Please Refresh");
                     ne.printStackTrace();
                 }
             }
 
             @Override
             public void onNetworkSuccess(TeamBoard board) {
-                mleaderBoardList.clear();
-                mBannerUrl = null;
-                for (TeamBoard.Team team : board.getTeamList()) {
-                    mleaderBoardList.add(team.convertToLeaderBoard());
-                    mBannerUrl = team.getBanner();
+                if (isAttachedToActivity()){
+                    mleaderBoardList.clear();
+                    mBannerUrl = null;
+                    for (TeamBoard.Team team : board.getTeamList()) {
+                        mleaderBoardList.add(team.convertToLeaderBoard());
+                        mBannerUrl = team.getBanner();
+                    }
+                    setBannerImage();
+                    hideProgressDialog();
+                    mLeaderBoardAdapter.setData(mleaderBoardList);
                 }
-                setBannerImage();
-
-                hideProgressDialog();
-                mLeaderBoardAdapter.setData(mleaderBoardList);
-
             }
         });
     }
@@ -388,12 +389,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         mProgressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
         mswipeRefresh.setRefreshing(false);
-    }
-
-    @Override
-    public void onDestroyView() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroyView();
     }
 
 }

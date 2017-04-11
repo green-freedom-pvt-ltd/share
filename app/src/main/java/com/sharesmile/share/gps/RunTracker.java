@@ -10,6 +10,7 @@ import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton.State;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.CircularQueue;
@@ -19,6 +20,8 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
+
+import static com.sharesmile.share.gps.WorkoutService.isCurrentlyProcessingSteps;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
@@ -356,7 +359,25 @@ public class RunTracker implements Tracker {
                     Step 2: Secondary check for spike
                      */
                     float deltaSpeedMs = dist / interval;
-                    if (deltaSpeedMs > Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE){
+
+                    float spikeFilterSpeedThreshold;
+                    String thresholdApplied;
+
+                    if (ActivityDetector.getInstance().isIsInVehicle()){
+                        spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+                        thresholdApplied = "in_vehicle";
+                    }else {
+                        if (isCurrentlyProcessingSteps() && listener.getMovingAverageOfStepsPerSec() >= 1){
+                            // Can make a safe assumption that the person is on foot
+                            spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
+                            thresholdApplied = "on_foot";
+                        }else {
+                            spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
+                            thresholdApplied = "default";
+                        }
+                    }
+
+                    if (deltaSpeedMs > spikeFilterSpeedThreshold){
                         // Insanely high velocity, must be a GPS spike
                         toRecord = false;
                         Logger.i(TAG, "GPS spike detected in RunTracker, through secondary check");
@@ -365,8 +386,9 @@ public class RunTracker implements Tracker {
                                 .put("spikey_distance", dist)
                                 .put("time_interval", interval)
                                 .put("accuracy", point.getAccuracy())
-                                .put("threshold_applied", "secondary_check")
+                                .put("threshold_applied", thresholdApplied)
                                 .put("steps_per_sec_moving_average", listener.getMovingAverageOfStepsPerSec())
+                                .put("is_secondary_check", true)
                                 .buildAndDispatch();
                     }else {
                         /*
