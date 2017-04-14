@@ -55,7 +55,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
 
 
@@ -237,7 +240,7 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = 0f;
-            cancelWorkoutNotification();
+            cancelAllWorkoutNotifications();
         }
     }
 
@@ -317,7 +320,8 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "onEvent: MockLocationDetected");
         if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
             stopWorkout();
-            MainApplication.showRunNotification(getString(R.string.notification_disable_mock_location));
+            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
+                    getString(R.string.notification_disable_mock_location));
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
             WorkoutSingleton.getInstance().mockLocationDetected();
         }
@@ -374,6 +378,7 @@ public class WorkoutService extends Service implements
         if (location == null){
             return;
         }
+        cancelWorkoutNotification(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
         handler.removeCallbacks(handleGpsInactivityRunnable);
         handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
         if (tracker != null && tracker.isRunning()){
@@ -546,6 +551,7 @@ public class WorkoutService extends Service implements
                     .put("delta_speed", deltaSpeed) // in km/hrs
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsOneDecimal;
+            cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
         }
     }
 
@@ -615,7 +621,7 @@ public class WorkoutService extends Service implements
         }
         ActivityDetector.getInstance().workoutIdle();
         updateStickyNotification();
-        cancelWorkoutNotification();
+        cancelAllWorkoutNotifications();
     }
 
     @Override
@@ -637,7 +643,7 @@ public class WorkoutService extends Service implements
             }
             ActivityDetector.getInstance().workoutActive();
             updateStickyNotification();
-            cancelWorkoutNotification();
+            cancelAllWorkoutNotifications();
             return true;
         }else {
             Logger.d(TAG, "resume: need to initiate location fetching");
@@ -646,10 +652,20 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void cancelWorkoutNotification(){
-        Logger.d(TAG, "cancelWorkoutNotification");
+    private void cancelAllWorkoutNotifications(){
+        Logger.d(TAG, "cancelAllWorkoutNotifications");
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.cancel(WORKOUT_NOTIFICATION_ID);
+        manager.cancel(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
+        manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
+        manager.cancel(WORKOUT_NOTIFICATION_STILL_ID);
+        manager.cancel(WORKOUT_NOTIFICATION_DISABLE_MOCK_ID);
+    }
+
+    public static void cancelWorkoutNotification(int notificationId){
+        Logger.d(TAG, "cancelWorkoutNotification with id = " + notificationId);
+        NotificationManager manager = (NotificationManager) MainApplication.getContext()
+                .getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(notificationId);
     }
 
     public void sendStopWorkoutBroadcast(int problem) {
@@ -680,7 +696,7 @@ public class WorkoutService extends Service implements
             bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
         }
         sendBroadcast(bundle);
-        MainApplication.showRunNotification(
+        MainApplication.showRunNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID,
                 getString(R.string.notification_usain_bolt), getString(R.string.notification_action_stop)
         );
     }
@@ -829,6 +845,7 @@ public class WorkoutService extends Service implements
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
             if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
                 MainApplication.showRunNotification(
+                        WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
                         getString(R.string.notification_gps_inactivity),
                         getString(R.string.notification_action_pause),
                         getString(R.string.notification_action_stop)

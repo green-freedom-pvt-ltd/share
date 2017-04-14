@@ -23,7 +23,7 @@ public class Config {
 
     public static final float UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
-    public static final float UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION = 5.5f; // in m/s, i.e. 20 km/hr
+    public static final float UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION = 4.1f; // in m/s, i.e. 14.8 km/hr
 
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s,
 

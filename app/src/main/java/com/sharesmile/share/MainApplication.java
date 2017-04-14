@@ -41,8 +41,6 @@ import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import io.fabric.sdk.android.Fabric;
 
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
-
 
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
@@ -106,7 +104,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         showToast(getContext().getResources().getString(stringId));
     }
 
-    public static void showRunNotification(String notifText, String... args){
+    public static void showRunNotification(int notificationId, String notifText, String... args){
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
         builder.setContentText( notifText)
@@ -114,8 +112,9 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(getContext().getResources().getString(R.string.app_name))
-                .setVibrate(new long[]{500, 500, 500, 500})
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText));
+                .setVibrate(new long[]{0, 200, 100, 400}) // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText))
+                .setAutoCancel(true);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
             for (String action : args){
@@ -134,7 +133,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
             }
         }
         builder.setContentIntent(getInstance().createAppIntent());
-        NotificationManagerCompat.from(getContext()).notify(WORKOUT_NOTIFICATION_ID, builder.build());
+        NotificationManagerCompat.from(getContext()).notify(notificationId, builder.build());
     }
 
     private static int getNotificationIcon() {

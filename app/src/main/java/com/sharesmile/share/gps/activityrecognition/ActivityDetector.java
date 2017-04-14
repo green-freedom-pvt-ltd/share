@@ -26,6 +26,7 @@ import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_EVENT;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 
 /**
  * Created by ankitmaheshwari on 3/10/17.
@@ -161,7 +162,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             // Show notification and increment still occurred counter
-            MainApplication.showRunNotification(
+            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_STILL_ID,
                     appContext.getString(R.string.notification_standing_still),
                     appContext.getString(R.string.notification_action_pause),
                     appContext.getString(R.string.notification_action_stop)

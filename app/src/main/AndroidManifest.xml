@@ -184,11 +184,11 @@
         </receiver>
 
         <receiver
-            android:name="com.sharesmile.share.core.NotificationActionReceiver">
+            android:name=".core.NotificationActionReceiver">
             <intent-filter>
-                <action android:name="@string/notification_action_pause"/>
-                <action android:name="@string/notification_action_resume"/>
-                <action android:name="@string/notification_action_stop"/>
+                <action android:name="com.sharesmile.share.notification.action.PAUSE"/>
+                <action android:name="com.sharesmile.share.notification.action.RESUME"/>
+                <action android:name="com.sharesmile.share.notification.action.STOP"/>
             </intent-filter>
         </receiver>
 
