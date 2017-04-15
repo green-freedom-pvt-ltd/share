@@ -22,11 +22,6 @@ public class DBEvent {
         }
     }
 
-    public static class CauseFetchDataFromDb {
-        public CauseFetchDataFromDb() {
-        }
-    }
-
     public static class RunDataUpdated {
         public RunDataUpdated() {
         }

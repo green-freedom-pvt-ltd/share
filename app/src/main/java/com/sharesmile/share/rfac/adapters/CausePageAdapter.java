@@ -7,9 +7,9 @@ import android.util.SparseArray;
 
 import com.sharesmile.share.rfac.fragments.CauseSwipeFragment;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.rfac.models.CauseList;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Shine on 01/05/16.
@@ -43,11 +43,10 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
     }
 
 
-    public void addData(CauseList causesList) {
+    public void addData(List<CauseData> causes) {
         mData.clear();
-        mData.addAll(causesList.getCauses());
+        mData.addAll(causes);
         notifyDataSetChanged();
-
     }
 
     public CauseData getItemAtPosition(int position) {

@@ -5,6 +5,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.sharesmile.share.CustomJSONObject;
+import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
@@ -15,6 +16,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
@@ -22,6 +24,7 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,8 +52,23 @@ public class SyncService extends GcmTaskService {
             return SyncHelper.pullRunData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
+        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_CAUSE_DATA)) {
+            return updateCauseData();
         }
         return GcmNetworkManager.RESULT_SUCCESS;
+    }
+
+    private int updateCauseData() {
+        try {
+            CauseList causeList = NetworkDataProvider.doGetCall(Urls.getCauseListUrl(), CauseList.class);
+            MainApplication.getInstance().updateCauseList(causeList);
+            EventBus.getDefault().post(new DBEvent.CauseDataUpdated(causeList));
+            return GcmNetworkManager.RESULT_SUCCESS;
+        } catch (NetworkException e) {
+            Logger.e(TAG, "Exception occurred while fetching updated cause list from network");
+            e.printStackTrace();
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
     }
 
     private int uploadUserData() {

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.Events.DBEvent;
@@ -31,6 +33,8 @@ import java.util.List;
 import Models.CampaignList;
 import Models.MessageList;
 
+import static com.sharesmile.share.gcm.TaskConstants.SYNC_CAUSE_DATA;
+
 /**
  * Created by Shine on 20/07/16.
  */
@@ -51,7 +55,8 @@ public class SyncHelper {
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
                 .build();
 
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager
+                .getInstance(MainApplication.getContext().getApplicationContext());
         mGcmNetworkManager.schedule(task);
     }
 
@@ -177,6 +182,19 @@ public class SyncHelper {
 
     public static void syncLeaderBoardData(Context context) {
         SyncTaskManger.fetchLeaderBoardData(context);
+    }
+
+    public static void syncCauseData(Context context) {
+        PeriodicTask task = new PeriodicTask.Builder()
+                .setService(GcmTaskService.class)
+                .setTag(SYNC_CAUSE_DATA)
+                .setPeriod(7200L)
+                .setPersisted(true)
+                .setFlex(2400)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        mGcmNetworkManager.schedule(task);
     }
 
     // get leader board for the list

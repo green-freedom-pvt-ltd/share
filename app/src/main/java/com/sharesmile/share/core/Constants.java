@@ -85,6 +85,8 @@ public class Constants {
 
     public static final String KEY_STOP_WORKOUT_PROBLEM = "key_workout_stop_reason";
 
+    public static final String KEY_CAUSE_LIST = "key_cause_list";
+
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";
 
     public static final String PREF_PREV_DIST_RECORD = "pref_prev_dist_record";

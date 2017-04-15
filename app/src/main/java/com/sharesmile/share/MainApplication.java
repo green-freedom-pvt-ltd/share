@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.bugfender.sdk.Bugfender;
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.crashlytics.android.Crashlytics;
@@ -32,12 +31,17 @@ import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.LoginActivity;
+import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -59,6 +63,8 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     private int mUserId = 0;
 
     private AppLifecycleHelper lifecycleHelper;
+
+    private CauseList causeList;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -218,9 +224,32 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
 
         WorkoutSingleton.initialize(getApplicationContext());
 
-        Bugfender.init(this, "tCMmpKrIgAqf4ZgfOA6Z1x00P7pugWna", BuildConfig.DEBUG);
-        Bugfender.enableLogcatLogging();
-        Bugfender.enableUIEventLogging(this);
+        causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
+
+//        Bugfender.init(this, "tCMmpKrIgAqf4ZgfOA6Z1x00P7pugWna", BuildConfig.DEBUG);
+//        Bugfender.enableLogcatLogging();
+//        Bugfender.enableUIEventLogging(this);
+    }
+
+    public void updateCauseList(CauseList updated){
+        this.causeList = updated;
+        SharedPrefsManager.getInstance().setObject(Constants.KEY_CAUSE_LIST, updated);
+    }
+
+    public CauseList getCauseList(){
+        return causeList;
+    }
+
+    public List<CauseData> getActiveCauses(){
+        List<CauseData> activeCauses = new ArrayList<CauseData>();
+        if (causeList != null){
+            for (CauseData causeData : causeList.getCauses()) {
+                if (causeData.isActive()) {
+                    activeCauses.add(causeData);
+                }
+            }
+        }
+        return activeCauses;
     }
 
     public PendingIntent createAppIntent(){
@@ -257,6 +286,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         SyncHelper.syncRunData();
         SyncHelper.syncMessageCenterData(this);
         SyncHelper.syncLeaderBoardData(this);
+        SyncHelper.syncCauseData(this);
     }
 
     public DbWrapper getDbWrapper() {

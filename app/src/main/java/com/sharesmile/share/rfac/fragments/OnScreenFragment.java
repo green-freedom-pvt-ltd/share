@@ -144,18 +144,22 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     private void fetchPageData() {
         Logger.d(TAG, "fetchPageData");
+        if (MainApplication.getInstance().getActiveCauses().isEmpty()){
+            showProgressDialog();
+            MainApplication.getInstance().updateCauseList();
+        }
         showProgressDialog();
         EventBus.getDefault().post(new DBEvent.CauseFetchDataFromDb());
     }
 
-    private void AddCauseList(CauseList causesList) {
-        Collections.sort(causesList.getCauses(), new Comparator<CauseData>() {
+    private void addCauses(List<CauseData> causes) {
+        Collections.sort(causes, new Comparator<CauseData>() {
             @Override
             public int compare(CauseData lhs, CauseData rhs) {
                 return lhs.getOrderPriority() - rhs.getOrderPriority();
             }
         });
-        mAdapter.addData(causesList);
+        mAdapter.addData(causes);
     }
 
     private void showProgressDialog() {
@@ -191,36 +195,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
-        List<CauseData> causes = new ArrayList<CauseData>();
-        CauseList causesList = causeDataUpdated.getCauseList();
-        for (CauseData causeData : causesList.getCauses()) {
-            if (causeData.isActive()) {
-                causes.add(causeData);
-            }
-        }
-        causesList.setCauses(causes);
-        setCausedata(causesList);
-    }
-
-    @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onEvent(DBEvent.CauseFetchDataFromDb causeFetchDataFromDb) {
-        Logger.d(TAG, "causeFetchDataFromDb");
-        CauseDao causeDao = MainApplication.getInstance().getDbWrapper().getCauseDao();
-        List<Cause> causes = causeDao.queryBuilder().where(CauseDao.Properties.IsActive.eq(true)).orderAsc(CauseDao.Properties.Order_priority).list();
-        List<CauseData> causeDataList = new ArrayList<>();
-        for (Cause cause : causes) {
-            causeDataList.add(new CauseData(cause));
-        }
-        EventBus.getDefault().post(causeDataList);
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(List<CauseData> causeDataList) {
-        if (isAdded()) {
-            CauseList causeList = new CauseList();
-            causeList.setCauses(causeDataList);
-            setCausedata(causeList);
+        if (isAdded()){
+            setCausedata(MainApplication.getInstance().getActiveCauses());
         }
     }
 
@@ -231,14 +207,13 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     }
 
-    public void setCausedata(CauseList causeList) {
-        AddCauseList(causeList);
+    public void setCausedata(List<CauseData> causes) {
+        addCauses(causes);
         hideProgressDialog();
         mRunButton.setVisibility(View.VISIBLE);
         if (mAdapter.getCount() <= 0) {
             mRunButton.setVisibility(View.GONE);
             if (!NetworkUtils.isNetworkConnected(getContext())) {
-
                 Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -247,7 +222,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                     }
                 }).show();
             } else {
-                showProgressDialog();
+                fetchPageData();
             }
         }
     }

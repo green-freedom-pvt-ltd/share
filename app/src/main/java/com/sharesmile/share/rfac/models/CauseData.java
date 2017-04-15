@@ -59,6 +59,12 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("order_priority")
     private int orderPriority;
 
+    private int targetAmount;
+
+    private int amountRaised;
+
+    private int totalRuns;
+
     public long getId() {
         return id;
     }
@@ -179,6 +185,30 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setMinDistance(int minDistance) {
         this.minDistance = minDistance;
+    }
+
+    public int getTargetAmount() {
+        return targetAmount;
+    }
+
+    public void setTargetAmount(int targetAmount) {
+        this.targetAmount = targetAmount;
+    }
+
+    public int getAmountRaised() {
+        return amountRaised;
+    }
+
+    public void setAmountRaised(int amountRaised) {
+        this.amountRaised = amountRaised;
+    }
+
+    public int getTotalRuns() {
+        return totalRuns;
+    }
+
+    public void setTotalRuns(int totalRuns) {
+        this.totalRuns = totalRuns;
     }
 
     public Cause getCauseDbObject() {
