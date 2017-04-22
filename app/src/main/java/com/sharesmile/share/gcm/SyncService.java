@@ -43,12 +43,9 @@ public class SyncService extends GcmTaskService {
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false)) {
             return GcmNetworkManager.RESULT_FAILURE;
         }
-
         if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_WORKOUT_DATA)) {
             return uploadWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPDATE_WORKOUT_DATA)) {
-            //  WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            //long count = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
             return SyncHelper.pullRunData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
@@ -56,6 +53,12 @@ public class SyncService extends GcmTaskService {
             return updateCauseData();
         }
         return GcmNetworkManager.RESULT_SUCCESS;
+    }
+
+    @Override
+    public void onInitializeTasks() {
+        super.onInitializeTasks();
+        // Re-initialize cancelled tasks on update of application OR google play services
     }
 
     private int updateCauseData() {

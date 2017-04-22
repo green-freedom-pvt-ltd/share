@@ -234,6 +234,19 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     public void updateCauseList(CauseList updated){
         this.causeList = updated;
         SharedPrefsManager.getInstance().setObject(Constants.KEY_CAUSE_LIST, updated);
+        if (causeList != null){
+            for (CauseData causeData : causeList.getCauses()) {
+                if (causeData.getApplicationUpdate() != null) {
+                    int latestVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
+                    if (latestVersion < causeData.getApplicationUpdate().app_version && causeData.getApplicationUpdate().app_version > BuildConfig.VERSION_CODE) {
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, true);
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, causeData.getApplicationUpdate().force_update);
+                        SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, causeData.getApplicationUpdate().app_version);
+                        SharedPrefsManager.getInstance().setString(Constants.PREF_APP_UPDATE_MESSAGE, causeData.getApplicationUpdate().message);
+                    }
+                }
+            }
+        }
     }
 
     public CauseList getCauseList(){

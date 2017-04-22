@@ -19,8 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.sharesmile.share.Cause;
-import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -33,8 +31,7 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.rfac.models.CauseList;
-import com.sharesmile.share.sync.SyncTaskManger;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLButton;
@@ -43,7 +40,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -74,8 +70,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         mAdapter = new CausePageAdapter(getChildFragmentManager());
-        SyncTaskManger.startCauseSync(getActivity());
-
     }
 
     @Override
@@ -136,20 +130,14 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         getFragmentController().updateToolBar(getString(R.string.title_cause), false);
     }
 
-    @Override
-    public void onStop() {
-        //  EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
-
     private void fetchPageData() {
         Logger.d(TAG, "fetchPageData");
         if (MainApplication.getInstance().getActiveCauses().isEmpty()){
             showProgressDialog();
-            MainApplication.getInstance().updateCauseList();
+            SyncHelper.syncCauseData(getContext().getApplicationContext());
+        }else {
+            setCausedata(MainApplication.getInstance().getActiveCauses());
         }
-        showProgressDialog();
-        EventBus.getDefault().post(new DBEvent.CauseFetchDataFromDb());
     }
 
     private void addCauses(List<CauseData> causes) {
@@ -217,8 +205,9 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        SyncTaskManger.startCauseSync(getActivity());
-                        showProgressDialog();
+                        if ( NetworkUtils.isNetworkConnected(getContext()) ){
+                            fetchPageData();
+                        }
                     }
                 }).show();
             } else {

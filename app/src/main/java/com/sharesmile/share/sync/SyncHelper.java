@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
@@ -186,9 +185,9 @@ public class SyncHelper {
 
     public static void syncCauseData(Context context) {
         PeriodicTask task = new PeriodicTask.Builder()
-                .setService(GcmTaskService.class)
+                .setService(SyncService.class)
                 .setTag(SYNC_CAUSE_DATA)
-                .setPeriod(7200L)
+                .setPeriod(7200L) // in secs
                 .setPersisted(true)
                 .setFlex(2400)
                 .build();
