@@ -203,7 +203,9 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showErrorMessage(String msg) {
-        showErrorDialog(msg);
+        if (isAttachedToActivity()){
+            showErrorDialog(msg);
+        }
     }
 
     @Override
