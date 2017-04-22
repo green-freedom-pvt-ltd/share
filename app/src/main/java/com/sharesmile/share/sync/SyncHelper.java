@@ -183,7 +183,7 @@ public class SyncHelper {
         SyncTaskManger.fetchLeaderBoardData(context);
     }
 
-    public static void syncCauseData(Context context) {
+    public static void scheduleCauseDataSync(Context context) {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(SYNC_CAUSE_DATA)

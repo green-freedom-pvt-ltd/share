@@ -59,10 +59,13 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("order_priority")
     private int orderPriority;
 
-    private int targetAmount;
+    @SerializedName("amount")
+    private float targetAmount;
 
-    private int amountRaised;
+    @SerializedName("amount_raised")
+    private float amountRaised;
 
+    @SerializedName("total_runs")
     private int totalRuns;
 
     public long getId() {
@@ -187,7 +190,7 @@ public class CauseData implements UnObfuscable, Serializable {
         this.minDistance = minDistance;
     }
 
-    public int getTargetAmount() {
+    public float getTargetAmount() {
         return targetAmount;
     }
 
@@ -195,7 +198,7 @@ public class CauseData implements UnObfuscable, Serializable {
         this.targetAmount = targetAmount;
     }
 
-    public int getAmountRaised() {
+    public float getAmountRaised() {
         return amountRaised;
     }
 

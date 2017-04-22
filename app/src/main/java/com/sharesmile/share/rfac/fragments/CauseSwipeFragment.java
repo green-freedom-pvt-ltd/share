@@ -8,14 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.views.MLTextView;
-import com.sharesmile.share.views.MRTextView;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -30,22 +31,35 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     private CauseData cause;
 
     @BindView(R.id.run_screen_sponsor)
-    MLTextView mSponsor;
+    TextView mSponsor;
 
     @BindView(R.id.run_screen_title)
-    MRTextView mTitle;
+    TextView mTitle;
     @BindView(R.id.category)
-    MRTextView mCategory;
+    TextView mCategory;
 
 
     @BindView(R.id.run_screen_description)
-    MLTextView mDescription;
+    TextView mDescription;
 
     @BindView(R.id.img_run)
     ImageView mCauseImage;
 
     @BindView(R.id.card_view)
     CardView mCardView;
+
+    @BindView(R.id.amount_raised_rupees)
+    TextView amountRaisedRupees;
+
+    @BindView(R.id.amount_raised_percent)
+    TextView amountRaisedPercent;
+
+    @BindView(R.id.amount_raised_progress_bar)
+    View amountRaisedProgress;
+
+    @BindView(R.id.num_impact_runs)
+    TextView numImpactRuns;
+
 
     public static Fragment getInstance(CauseData causeData) {
 
@@ -88,10 +102,24 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
 
         mCardView.setOnClickListener(this);
 
+        float targetAmount = cause.getTargetAmount();
+        float amountRaised = cause.getAmountRaised();
+        amountRaisedRupees.setText(getString(R.string.amount_raised_rupees,
+                Utils.formatIndianCommaSeparated(amountRaised)));
+
+        float percent = (targetAmount > 0f) ? (amountRaised / targetAmount) : 0;
+        amountRaisedPercent.setText((int) (percent*100) + "%");
+
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) amountRaisedProgress.getLayoutParams();
+        params.weight = percent;
+        amountRaisedProgress.setLayoutParams(params);
+
+        int numRuns = cause.getTotalRuns();
+        numImpactRuns.setText(getString(R.string.num_impact_runs, numRuns));
+
         //load image
         Picasso.with(getContext()).load(cause.getImageUrl()).placeholder(R.drawable.cause_image_placeholder).into(mCauseImage);
     }
-
 
     @Override
     public void onClick(View v) {

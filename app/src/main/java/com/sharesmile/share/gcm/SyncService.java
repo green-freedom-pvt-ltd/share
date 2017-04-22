@@ -61,7 +61,8 @@ public class SyncService extends GcmTaskService {
         // Re-initialize cancelled tasks on update of application OR google play services
     }
 
-    private int updateCauseData() {
+    public static int updateCauseData() {
+        Logger.d(TAG, "updateCauseData");
         try {
             CauseList causeList = NetworkDataProvider.doGetCall(Urls.getCauseListUrl(), CauseList.class);
             MainApplication.getInstance().updateCauseList(causeList);

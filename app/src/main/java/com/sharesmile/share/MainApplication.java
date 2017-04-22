@@ -299,7 +299,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         SyncHelper.syncRunData();
         SyncHelper.syncMessageCenterData(this);
         SyncHelper.syncLeaderBoardData(this);
-        SyncHelper.syncCauseData(this);
+        SyncHelper.scheduleCauseDataSync(this);
     }
 
     public DbWrapper getDbWrapper() {

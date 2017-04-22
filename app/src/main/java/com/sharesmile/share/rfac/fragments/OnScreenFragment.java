@@ -28,10 +28,10 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLButton;
@@ -134,7 +134,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         Logger.d(TAG, "fetchPageData");
         if (MainApplication.getInstance().getActiveCauses().isEmpty()){
             showProgressDialog();
-            SyncHelper.syncCauseData(getContext().getApplicationContext());
+            EventBus.getDefault().post(new TriggerCauseDataSync());
         }else {
             setCausedata(MainApplication.getInstance().getActiveCauses());
         }
@@ -183,9 +183,20 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
+        Logger.d(TAG, "onEvent: CauseDataUpdated");
         if (isAdded()){
             setCausedata(MainApplication.getInstance().getActiveCauses());
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onEvent(TriggerCauseDataSync triggerSync) {
+        Logger.d(TAG, "onEvent: triggerSync");
+        SyncService.updateCauseData();
+    }
+
+    private static class TriggerCauseDataSync {
+
     }
 
     @Override

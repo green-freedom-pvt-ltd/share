@@ -29,10 +29,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
@@ -77,6 +79,10 @@ public class Utils {
         DecimalFormat df = new DecimalFormat("0.0");
         df.setGroupingUsed(false);
         return df.format(distance);
+    }
+
+    public static String formatIndianCommaSeparated(float value){
+        return NumberFormat.getNumberInstance(Locale.ENGLISH).format((int) value);
     }
 
     /**
