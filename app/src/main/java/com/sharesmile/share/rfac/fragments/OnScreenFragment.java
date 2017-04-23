@@ -76,7 +76,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onStart() {
         super.onStart();
         Logger.d(TAG, "onstart");
-
     }
 
 
@@ -184,7 +183,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
         Logger.d(TAG, "onEvent: CauseDataUpdated");
-        if (isAttachedToActivity()){
+        if (isAdded()){
             setCausedata(MainApplication.getInstance().getActiveCauses());
         }
     }
