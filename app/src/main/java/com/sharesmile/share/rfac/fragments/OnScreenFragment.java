@@ -184,7 +184,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
         Logger.d(TAG, "onEvent: CauseDataUpdated");
-        if (isAdded()){
+        if (isAttachedToActivity()){
             setCausedata(MainApplication.getInstance().getActiveCauses());
         }
     }
@@ -207,6 +207,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     }
 
     public void setCausedata(List<CauseData> causes) {
+        Logger.d(TAG, "setCausedata");
         addCauses(causes);
         hideProgressDialog();
         mRunButton.setVisibility(View.VISIBLE);

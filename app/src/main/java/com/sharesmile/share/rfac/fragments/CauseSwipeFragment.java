@@ -16,6 +16,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
@@ -27,6 +28,7 @@ import butterknife.ButterKnife;
  */
 public class CauseSwipeFragment extends BaseFragment implements View.OnClickListener {
     public static final String ARG_OBJECT = "object";
+    private static final String TAG = "CauseSwipeFragment";
 
     private CauseData cause;
 
@@ -62,7 +64,6 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
 
 
     public static Fragment getInstance(CauseData causeData) {
-
         Fragment fragment = new CauseSwipeFragment();
         Bundle arg = new Bundle();
         arg.putSerializable(ARG_OBJECT, causeData);
@@ -88,7 +89,14 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Logger.d(TAG, "onStart");
+    }
+
     private void init() {
+        Logger.d(TAG, "init with cause: " + cause.getTitle() +", and amount raised: " + cause.getAmountRaised());
         mDescription.setText(cause.getDetailText());
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());

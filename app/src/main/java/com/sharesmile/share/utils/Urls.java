@@ -5,7 +5,7 @@ package com.sharesmile.share.utils;
  */
 public class Urls {
 
-    private static final String BASE_URL = "http://139.59.243.247";
+    private static final String BASE_URL = "http://dev.impactrun.com";
 
     private static final String CAUSE_LIST_URL = "/api/causes.json";
     private static final String RUN_URL = "/api/runs/";
