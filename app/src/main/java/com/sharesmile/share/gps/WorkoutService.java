@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Binder;
@@ -25,6 +26,7 @@ import com.sharesmile.share.Events.ResumeWorkoutEvent;
 import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
+import com.sharesmile.share.Events.UsainBoltForceExit;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -58,8 +60,10 @@ import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
+import static com.sharesmile.share.rfac.RunFragment.NOTIFICATION_TIMER_TICK;
 
 
 /**
@@ -142,6 +146,7 @@ public class WorkoutService extends Service implements
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
         ActivityDetector.getInstance().workoutIdle();
+        stopTimer();
     }
 
     private void persistWorkoutInDb(WorkoutData data){
@@ -152,7 +157,7 @@ public class WorkoutService extends Service implements
         workout.setIsValidRun(true);
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
-        workout.setElapsedTime(Utils.secondsToString((int) data.getElapsedTime()));
+        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
 
         //data.getDistance()
         String distDecimal = Utils.formatToKmsWithOneDecimal(data.getDistance());
@@ -657,6 +662,7 @@ public class WorkoutService extends Service implements
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
         manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
+        manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
         manager.cancel(WORKOUT_NOTIFICATION_STILL_ID);
         manager.cancel(WORKOUT_NOTIFICATION_DISABLE_MOCK_ID);
     }
@@ -687,18 +693,29 @@ public class WorkoutService extends Service implements
             distReductionString =
                     (distanceReduction == 0) ? null : Utils.formatToKmsWithOneDecimal(Math.abs(distanceReduction));
         }
-        pause("usain_bolt");
-        Bundle bundle = new Bundle();
-        bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
-        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
-                Constants.BROADCAST_PAUSE_WORKOUT_CODE);
-        if (!TextUtils.isEmpty(distReductionString)){
-            bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
+
+        WorkoutSingleton.getInstance().incrementUsainBoltsCounter();
+
+        if (!WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()){
+            pause("usain_bolt");
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
+            bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
+                    Constants.BROADCAST_PAUSE_WORKOUT_CODE);
+            if (!TextUtils.isEmpty(distReductionString)){
+                bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
+            }
+            sendBroadcast(bundle);
+            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID,
+                    getString(R.string.notification_usain_bolt), getString(R.string.notification_action_stop)
+            );
+        }else {
+            // Force stop workout, show notif, And blocking exit popup on UI
+            stopWorkout();
+            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID,
+                    getString(R.string.notification_usain_bolt_force_exit));
+            EventBus.getDefault().post(new UsainBoltForceExit());
         }
-        sendBroadcast(bundle);
-        MainApplication.showRunNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID,
-                getString(R.string.notification_usain_bolt), getString(R.string.notification_action_stop)
-        );
     }
 
     @Override
@@ -770,20 +787,21 @@ public class WorkoutService extends Service implements
 
 
     private void makeForegroundAndSticky() {
-        Notification notification = getNotificationBuilder().build();
+        Notification notification = getForegroundNotificationBuilder().build();
         startForeground(WORKOUT_TRACK_NOTIFICATION_ID, notification);
+        stopTimer();
+        handler.postDelayed(timer, NOTIFICATION_TIMER_TICK);
     }
 
     private void updateStickyNotification() {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (tracker != null && tracker.isActive()){
-            mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getNotificationBuilder().build());
+            mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getForegroundNotificationBuilder().build());
         }
-
     }
 
-    private NotificationCompat.Builder getNotificationBuilder() {
+    private NotificationCompat.Builder getForegroundNotificationBuilder() {
         String distDecimal = Utils.formatToKmsWithOneDecimal(mDistance);
         float fDistance = Float.parseFloat(distDecimal);
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
@@ -793,7 +811,7 @@ public class WorkoutService extends Service implements
         if (tracker.isRunning()){
             pauseResumeAction = getString(R.string.notification_action_pause);
             pauseResumeLabel = "Pause";
-            contentTitle = "Running";
+            contentTitle = "Impact";
             pauseResumeDrawable = R.drawable.ic_pause_black_24px;
         }else {
             pauseResumeAction = getString(R.string.notification_action_resume);
@@ -809,10 +827,13 @@ public class WorkoutService extends Service implements
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle(contentTitle)
-                        .setContentText("Raised  : " + getString(R.string.rs_symbol) + rupees)
+                        .setContentText(getString(R.string.rs_symbol) + rupees
+                                + ((getWorkoutElapsedTimeInSecs() >= 60)
+                                        ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
+                                        : "")
+                        )
                         .setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue))
-                        .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(),
-                                R.mipmap.ic_launcher))
+                        .setLargeIcon(getLargeIcon())
                         .setTicker(getBaseContext().getResources().getString(R.string.app_name))
                         .setOngoing(true)
                         .setVisibility(1);
@@ -830,7 +851,26 @@ public class WorkoutService extends Service implements
         return mBuilder;
     }
 
+    private Bitmap largeIcon;
 
+    private Bitmap getLargeIcon(){
+        if (largeIcon == null){
+            largeIcon = BitmapFactory.decodeResource(getBaseContext().getResources(), R.mipmap.ic_launcher);
+        }
+        return largeIcon;
+    }
+
+    private void stopTimer(){
+        handler.removeCallbacks(timer);
+    }
+
+    private Runnable timer = new Runnable() {
+        @Override
+        public void run() {
+            updateStickyNotification();
+            handler.postDelayed(this, NOTIFICATION_TIMER_TICK);
+        }
+    };
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);

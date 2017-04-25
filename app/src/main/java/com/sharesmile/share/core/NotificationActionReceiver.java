@@ -21,9 +21,10 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private static final String TAG = "NotificationActionReceiver";
 
     public static final int WORKOUT_NOTIFICATION_GPS_INACTIVE_ID = 103;
-    public static final int WORKOUT_NOTIFICATION_DISABLE_MOCK_ID = 103;
-    public static final int WORKOUT_NOTIFICATION_USAIN_BOLT_ID = 103;
-    public static final int WORKOUT_NOTIFICATION_STILL_ID = 103;
+    public static final int WORKOUT_NOTIFICATION_DISABLE_MOCK_ID = 104;
+    public static final int WORKOUT_NOTIFICATION_USAIN_BOLT_ID = 105;
+    public static final int WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID = 106;
+    public static final int WORKOUT_NOTIFICATION_STILL_ID = 107;
 
 
     public static final int WORKOUT_NOTIFICATION_ID = 101;

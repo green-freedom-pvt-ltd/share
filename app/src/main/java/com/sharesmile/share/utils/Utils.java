@@ -181,7 +181,7 @@ public class Utils {
         return "";
     }
 
-    public static final String secondsToString(int secs) {
+    public static final String secondsToHHMMSS(int secs) {
 
         if (secs >= 3600) {
             int sec = secs % 60;
@@ -191,6 +191,18 @@ public class Utils {
             return String.format("%02d:%02d:%02d", hour, min, sec);
         } else {
             return String.format("%02d:%02d", secs / 60, secs % 60);
+        }
+    }
+
+    public static final String secondsToHoursAndMins(int secs) {
+        if (secs >= 3600) {
+            int totalMins = secs / 60;
+            int hour = totalMins / 60;
+            int min = totalMins % 60;
+            return String.format("%d hr %d min", hour, min);
+        } else {
+            int totalMins = secs / 60;
+            return String.format("%d min", totalMins);
         }
     }
 

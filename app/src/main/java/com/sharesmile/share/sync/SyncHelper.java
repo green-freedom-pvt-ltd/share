@@ -11,6 +11,8 @@ import com.onesignal.OneSignal;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
+import com.sharesmile.share.User;
+import com.sharesmile.share.UserDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Constants;
@@ -20,6 +22,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.RunList;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
@@ -32,7 +35,11 @@ import java.util.List;
 import Models.CampaignList;
 import Models.MessageList;
 
+import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
+import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
+import static com.sharesmile.share.core.Constants.PREF_USER_NAME;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_CAUSE_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
 /**
  * Created by Shine on 20/07/16.
@@ -183,6 +190,8 @@ public class SyncHelper {
         SyncTaskManger.fetchLeaderBoardData(context);
     }
 
+
+
     public static void scheduleCauseDataSync(Context context) {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
@@ -196,12 +205,56 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
+    public static void scheduleUserDataSync(Context context) {
+        Logger.d(TAG, "scheduleUserDataSync");
+        // TODO: UserDetails: Revise the frequencies of this periodic task
+        PeriodicTask task = new PeriodicTask.Builder()
+                .setService(SyncService.class)
+                .setTag(UPLOAD_USER_DATA)
+                .setPeriod(5L) // in secs
+                .setPersisted(true)
+                .setFlex(2)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        mGcmNetworkManager.schedule(task);
+    }
+
     // get leader board for the list
     public static boolean fetchLeaderBoard() {
 //        LeaderBoardDao leaderBoardDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getLeaderBoardDao();
         String url = Urls.getLeaderboardUrl();
         return fetchLeaderBoardList(url);
 
+    }
+
+    public static void syncUserFromDB(){
+        if (MainApplication.getInstance().getUserDetails() == null){
+            int user_id = MainApplication.getInstance().getUserID();
+            SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
+            if (user_id != 0){
+                UserDao mUserDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
+                // TODO: UserDetails: Remove DB code for User everywhere, but DB should not be removed
+                User user;
+                List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(user_id)).list();
+                if (userList != null && !userList.isEmpty()) {
+                    user = userList.get(0);
+                    UserDetails details = new UserDetails();
+                    details.setUserId(user_id);
+                    details.setFirstName(prefsManager.getString(PREF_USER_NAME));
+                    details.setPhoneNumber(user.getMobileNO());
+                    details.setBirthday(user.getBirthday());
+                    details.setEmail(prefsManager.getString(PREF_USER_EMAIL));
+                    details.setAuthToken(prefsManager.getString(PREF_AUTH_TOKEN));
+                    details.setGenderUser(user.getGender());
+                    details.setSignUp(prefsManager.getBoolean(Constants.PREF_IS_SIGN_UP_USER));
+                    details.setTeamCode(prefsManager.getInt(Constants.PREF_LEAGUE_TEAM_ID));
+                    details.setSocialThumb(user.getProfileImageUrl());
+
+                    MainApplication.getInstance().setUserDetails(details);
+                }
+            }
+        }
     }
 
 

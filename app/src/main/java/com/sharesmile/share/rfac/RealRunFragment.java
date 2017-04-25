@@ -17,6 +17,7 @@ import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -112,24 +113,32 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void onWorkoutResult(WorkoutData data) {
         //Workout completed and results obtained, time to show the next Fragment
+        Logger.d(TAG, "onWorkoutResult");
         if (isAttachedToActivity()) {
             String distanceString = Utils.formatToKmsWithOneDecimal(data.getDistance());
             Float fDistance = Float.parseFloat(distanceString);
+
+            boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
+            if (WorkoutSingleton.getInstance().isMockLocationEnabled()){
+                // Do nothing, DisableMock blocking popup is on display
+                return;
+            }
+
+            if (WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()){
+                // Do nothing, ConsecutiveUsainBolts force exit blocking popup is on display
+                return;
+            }
+
             if (mCauseData.getMinDistance() > (fDistance * 1000)
                     && !WorkoutSingleton.getInstance().isMockLocationEnabled()) {
                 myActivity.exit();
+                stopTimer();
                 return;
             }
 
             Boolean hasPreviousRun =SharedPrefsManager.getInstance().getBoolean(Constants.PREF_HAS_RUN, false);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_RUN_FEEDBACK, !hasPreviousRun);
-
-            boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
-
-            if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
-                getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
-            }
-
+            getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
 
         }
@@ -159,6 +168,7 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void onEndRun() {
         // Will wait for workout result broadcast
+        Logger.d(TAG, "onEndRun");
     }
 
     @Override

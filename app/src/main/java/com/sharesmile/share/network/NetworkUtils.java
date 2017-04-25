@@ -101,7 +101,6 @@ public class NetworkUtils {
 
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
-
         try{
             return gson.fromJson(responseString, tClass);
         }catch(JsonSyntaxException jse){

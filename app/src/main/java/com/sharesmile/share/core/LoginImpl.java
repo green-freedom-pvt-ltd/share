@@ -24,25 +24,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.User;
-import com.sharesmile.share.UserDao;
-import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.GoogleOauthResponse;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.BasicNameValuePair;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.NameValuePair;
-import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
@@ -58,6 +56,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.R.attr.name;
 
 /**
  * Created by Shine on 19/05/16.
@@ -223,86 +223,21 @@ public class LoginImpl {
     }
 
     private void userLoginSuccess(JsonObject response, final boolean isFbLogin) {
-        SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
-        String name = "";
-        if (response.has("first_name")) {
-            name = response.get("first_name").getAsString();
-            prefsManager.setString(Constants.PREF_USER_NAME, name);
-            Analytics.getInstance().setUserName(name);
-        }
-        String userEmail = response.get("email").getAsString();
-        prefsManager.setString(Constants.PREF_USER_EMAIL, userEmail);
-        Analytics.getInstance().setUserEmail(userEmail);
 
-        prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
-        int user_id = response.get("user_id").getAsInt();
-        prefsManager.setInt(Constants.PREF_USER_ID, user_id);
-        Analytics.getInstance().setUserId(user_id);
 
-        String token = response.get("auth_token").getAsString();
-        prefsManager.setString(Constants.PREF_AUTH_TOKEN, token);
-        Logger.i(TAG, "token : " + token);
-
-        String mobile_number = "";
-        if (response.has("phone_number")) {
-            mobile_number = JsonHelper.getValueOrNone(response, "phone_number");
-            if (!TextUtils.isEmpty(mobile_number)){
-                Analytics.getInstance().setUserPhone(mobile_number);
-            }
-        }
-        String gender = "";
-        if (response.has("gender_user")) {
-            gender = JsonHelper.getValueOrNone(response, "gender_user");
-        }
-        Boolean isSignUpUser = false;
-        if (response.has("sign_up")) {
-            isSignUpUser = response.get("sign_up").getAsBoolean();
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_SIGN_UP_USER, isSignUpUser);
-        }
-
-        if (response.has("team_code")) {
-            int teamCode = response.get("team_code").getAsInt();
-            SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamCode);
-
-            if (teamCode > 0){
-                Analytics.getInstance().setUserImpactLeagueTeamCode(teamCode);
-            }
-        }
-
-        User user = new User((long) user_id);
-        user.setName(name);
-        user.setEmailId(userEmail);
-        user.setMobileNO(mobile_number);
-
-        if (!TextUtils.isEmpty(gender)){
-            if (gender.startsWith("M") || gender.startsWith("m")){
-                user.setGender("M");
-                Analytics.getInstance().setUserGender("M");
-            }else if (gender.startsWith("F") || gender.startsWith("f")){
-                user.setGender("F");
-                Analytics.getInstance().setUserGender("F");
-            }
-        }
-
-        String profilePictureUri = JsonHelper.getValueOrNone(response, "social_thumb");
-        if (!TextUtils.isEmpty(profilePictureUri)) {
-            prefsManager.setString(Constants.PREF_USER_IMAGE, profilePictureUri);
-            user.setProfileImageUrl(profilePictureUri.toString());
-            Analytics.getInstance().setUserPhoto(profilePictureUri);
-        }
-
-        UserDao userDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-        userDao.insertOrReplace(user);
+        Gson gson = new Gson();
+        UserDetails userDetails = gson.fromJson(response, UserDetails.class);
+        MainApplication.getInstance().setUserDetails(userDetails);
 
         //show Toast confirmation
         Toast.makeText(MainApplication.getContext(), "Logged in as " + name, Toast.LENGTH_SHORT).show();
 
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)
-                .put("user_id", user_id)
-                .put("user_name", name)
-                .put("user_email", userEmail)
-                .put("is_sign_up_user", isSignUpUser)
+                .put("user_id", userDetails.getUserId())
+                .put("user_name", userDetails.getFirstName())
+                .put("user_email", userDetails.getEmail())
+                .put("is_sign_up_user", userDetails.isSignUp())
                 .put("medium", medium)
                 .buildAndDispatch();
 
@@ -310,7 +245,6 @@ public class LoginImpl {
         SyncHelper.fetchRunData();
 
         mListener.onLoginSuccess();
-
 
     }
 

@@ -64,7 +64,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import Models.CampaignList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import fragments.FaqFragment;
 
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -207,9 +206,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void loadInitialFragment() {
         addFragment(new OnScreenFragment(), false);
-        boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_PROFILE, false);
+        boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
-            replaceFragment(new ProfileFragment(), true);
+            int leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
+            if (leagueTeamId != 0){
+                // Belongs to an Impact League team, will show League team leaderboard
+                LeaderBoardFragment teamLeaderBoardFragment
+                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMLEADERBAORD, leagueTeamId);
+                replaceFragment(teamLeaderBoardFragment , true);
+            }else {
+                replaceFragment(new ProfileFragment(), true);
+            }
         }
         boolean showFeedBackDialog = getIntent().getBooleanExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, false);
         if (showFeedBackDialog) {

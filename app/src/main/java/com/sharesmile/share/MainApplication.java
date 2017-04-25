@@ -33,6 +33,7 @@ import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -44,6 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
+import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 
 
 /**
@@ -60,7 +64,6 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     private int visibleActiviesCount = 0;
     private DbWrapper mDbWrapper;
     private String mToken;
-    private int mUserId = 0;
 
     private AppLifecycleHelper lifecycleHelper;
 
@@ -295,12 +298,16 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT, String.valueOf(total_runs));
     }
 
-    private void startSyncTasks() {
+    public void startSyncTasks() {
+        Logger.d(TAG, "startSyncTasks");
+        SyncHelper.syncUserFromDB();
         SyncHelper.syncRunData();
         SyncHelper.syncMessageCenterData(this);
         SyncHelper.syncLeaderBoardData(this);
         SyncHelper.scheduleCauseDataSync(this);
+        SyncHelper.scheduleUserDataSync(this);
     }
+
 
     public DbWrapper getDbWrapper() {
         return mDbWrapper;
@@ -314,11 +321,56 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     }
 
     public int getUserID() {
-        if (mUserId == 0) {
-            mUserId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
+        return SharedPrefsManager.getInstance().getInt(PREF_USER_ID);
+    }
 
+    /**
+     * @return UserDetails object if user is logged in, NULL otherwise
+     */
+    public UserDetails getUserDetails(){
+        return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
+    }
+
+    public void setUserDetails(UserDetails details){
+        Logger.d(TAG, "setUserDetails");
+        SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
+
+        SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
+
+        if (!TextUtils.isEmpty(details.getFirstName())){
+            prefsManager.setString(Constants.PREF_USER_NAME, details.getFirstName());
+            Analytics.getInstance().setUserName(details.getFirstName());
         }
-        return mUserId;
+
+        if (!TextUtils.isEmpty(details.getEmail())){
+            prefsManager.setString(Constants.PREF_USER_EMAIL, details.getEmail());
+            Analytics.getInstance().setUserEmail(details.getEmail());
+        }
+
+        prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
+
+        prefsManager.setInt(Constants.PREF_USER_ID, details.getUserId());
+        Analytics.getInstance().setUserId(details.getUserId());
+
+        prefsManager.setString(Constants.PREF_AUTH_TOKEN, details.getAuthToken());
+        Logger.i(TAG, "AuthToken : " + details.getAuthToken());
+
+        Logger.d(TAG, "PhoneNum: " + details.getPhoneNumber());
+        if (!TextUtils.isEmpty(details.getPhoneNumber())){
+            Analytics.getInstance().setUserPhone(details.getPhoneNumber());
+        }
+
+        if (!TextUtils.isEmpty(details.getGenderUser())){
+            Analytics.getInstance().setUserGender(details.getGenderUser());
+        }
+
+        prefsManager.setBoolean(Constants.PREF_IS_SIGN_UP_USER, details.isSignUp());
+
+        if (details.getTeamCode() != 0){
+            prefsManager.setInt(Constants.PREF_LEAGUE_TEAM_ID, details.getTeamCode());
+            Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamCode());
+        }
+
     }
 
     public static boolean isLogin() {
@@ -352,7 +404,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
 
     @Override
     public void onStart() {
-        Logger.i(TAG, "onStart");
+        Logger.i(TAG, "onStart, auth token " + MainApplication.getInstance().getToken());
         GoogleLocationTracker.getInstance().startLocationTracking(false);
         AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
     }

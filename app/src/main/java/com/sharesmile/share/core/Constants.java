@@ -97,6 +97,8 @@ public class Constants {
 
     public static final String PREF_WORKOUT_MOCK_LOCATION_ENABLED = "pref_workout_mock_location_enabled";
 
+    public static final String PREF_USAIN_BOLT_COUNT = "pref_usain_bolt_count";
+
     public static final String PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN = "pref_workout_data_num_steps_when_batch_begin";
 
     public static final String PREF_WORKOUT_LIFETIME_DISTANCE = "pref_workout_lifetime_distance_new";
@@ -123,6 +125,7 @@ public class Constants {
     public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
     public static final String PREF_LEAGUE_TEAM_ID="pref_league_team_id";
+    public static final String PREF_USER_DETAILS="pref_user_details";
 
 
     //app Update
@@ -135,7 +138,7 @@ public class Constants {
 
     //Bundle
     public static final String BUNDLE_FIRST_RUN_FEEDBACK = "bundle_first_run_feedback";
-    public static final String BUNDLE_SHOW_PROFILE = "bundle_show_profile";
+    public static final String BUNDLE_SHOW_RUN_STATS = "bundle_show_profile";
 
     public static final String GOOGLE_PROJECT_ID = "159550091621";
 

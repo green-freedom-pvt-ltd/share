@@ -69,7 +69,7 @@ public class ThankYouActivity extends AppCompatActivity implements View.OnClickL
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         boolean showFirstRunFeedBack = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_RUN_FEEDBACK, false);
         intent.putExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, showFirstRunFeedBack);
-        intent.putExtra(Constants.BUNDLE_SHOW_PROFILE, true);
+        intent.putExtra(Constants.BUNDLE_SHOW_RUN_STATS, true);
         startActivity(intent);
     }
 }

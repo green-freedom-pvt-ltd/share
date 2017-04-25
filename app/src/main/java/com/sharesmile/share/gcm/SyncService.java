@@ -4,11 +4,9 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
-import com.sharesmile.share.CustomJSONObject;
+import com.google.gson.Gson;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.User;
-import com.sharesmile.share.UserDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -18,6 +16,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -39,7 +38,7 @@ public class SyncService extends GcmTaskService {
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-        Logger.d(TAG, "runtask started ");
+        Logger.d(TAG, "runtask started: " + taskParams.getTag());
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false)) {
             return GcmNetworkManager.RESULT_FAILURE;
         }
@@ -58,7 +57,7 @@ public class SyncService extends GcmTaskService {
     @Override
     public void onInitializeTasks() {
         super.onInitializeTasks();
-        // Re-initialize cancelled tasks on update of application OR google play services
+        MainApplication.getInstance().startSyncTasks();
     }
 
     public static int updateCauseData() {
@@ -78,27 +77,25 @@ public class SyncService extends GcmTaskService {
     private int uploadUserData() {
 
         int user_id = MainApplication.getInstance().getUserID();
+        Logger.d(TAG, "uploadUserData for userId: " + user_id );
         try {
 
-            UserDao mUserDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-            User user;
-            List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(user_id)).list();
-            if (userList != null && !userList.isEmpty()) {
-                user = userList.get(0);
-            } else {
-                return GcmNetworkManager.RESULT_FAILURE;
-            }
+            UserDetails prev = MainApplication.getInstance().getUserDetails();
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("first_name", user.getName());
-            jsonObject.put("gender_user", user.getGender());
-            jsonObject.put("phone_number", user.getMobileNO());
-            jsonObject.put("birthday", user.getBirthday());
-            Logger.d(TAG, jsonObject.toString());
+            jsonObject.put("first_name", prev.getFirstName());
+            jsonObject.put("gender_user", prev.getGenderUser());
+            jsonObject.put("phone_number", prev.getPhoneNumber());
+            jsonObject.put("user_id", user_id);
 
-            CustomJSONObject response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject, CustomJSONObject.class);
+            Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
-            Logger.d(TAG, response.toString());
+            Gson gson = new Gson();
+            UserDetails response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject, UserDetails.class);
+            Logger.d(TAG, "Response for getUser:" + gson.toJson(response));
+
+            MainApplication.getInstance().setUserDetails(response);
+
             return GcmNetworkManager.RESULT_SUCCESS;
 
         } catch (NetworkException e) {

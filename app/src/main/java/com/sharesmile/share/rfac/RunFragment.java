@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
+import com.sharesmile.share.Events.UsainBoltForceExit;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -38,6 +39,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     private static final String TAG = "RunFragment";
     public static final long TIMER_TICK = 1000; // in millis
+    public static final long NOTIFICATION_TIMER_TICK = 60000; // in millis
 
 
     TrackerActivity myActivity;
@@ -45,7 +47,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     Handler handler = new Handler();
 
-    private int secsSinceRunBegan = -1;
+    private boolean isTimerRunning = false;
 
     public RunFragment() {
         // Required empty public constructor
@@ -71,6 +73,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Logger.d(TAG, "onCreateView");
         // Inflate the layout for this fragment
         baseView = inflater.inflate(getLayoutResId(), container, false);
         populateViews(baseView);
@@ -88,28 +91,24 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs){
         Logger.d(TAG, "showUpdate: distanceCovered = " + distanceCovered
-                + ", elapsedTimeInSecs " + elapsedTimeInSecs
-                + ", secsSinceRunBegan = " + secsSinceRunBegan);
-        if (secsSinceRunBegan == -1){
+                + ", elapsedTimeInSecs " + elapsedTimeInSecs);
+        if (!isTimerRunning){
             startTimer(elapsedTimeInSecs);
-        }else if (Math.abs(elapsedTimeInSecs - secsSinceRunBegan) > 1){
-            secsSinceRunBegan = elapsedTimeInSecs;
         }
     }
 
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs ){
-        if (secsSinceRunBegan == -1){
+        if (!isTimerRunning){
             startTimer(elapsedTimeInSecs);
-        }else if (Math.abs(elapsedTimeInSecs - secsSinceRunBegan) > 1){
-            secsSinceRunBegan = elapsedTimeInSecs;
         }
     }
 
     private void startTimer(int initialSecs){
-        secsSinceRunBegan = initialSecs;
+        Logger.d(TAG, "startTimer");
         handler.removeCallbacks(timer);
         handler.postDelayed(timer, TIMER_TICK);
-        updateTimeView(Utils.secondsToString(secsSinceRunBegan));
+        isTimerRunning = true;
+        updateTimeView(Utils.secondsToHHMMSS(initialSecs));
     }
 
     protected abstract void onEndRun();
@@ -131,14 +130,14 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
             myActivity.endRun();
         }
         SharedPrefsManager.getInstance().removeKey(Constants.KEY_WORKOUT_TEST_MODE_ON);
-        handler.removeCallbacks(timer);
+        stopTimer();
         onEndRun();
     }
 
 
     public void pauseRun(boolean userPaused) {
         Logger.d(TAG, "pauseRun");
-        handler.removeCallbacks(timer);
+        stopTimer();
         if (userPaused) {
             myActivity.pauseWorkout();
         }
@@ -156,7 +155,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateUiOnWorkoutPauseEvent updateUiOnWorkoutPauseEvent) {
         Logger.d(TAG, "onEvent: UpdateUiOnWorkoutPauseEvent");
-        handler.removeCallbacks(timer);
+
         onPauseRun();
     }
 
@@ -170,13 +169,31 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateUiOnMockLocation updateUiOnMockLocation) {
         Logger.d(TAG, "onEvent: UpdateUiOnMockLocation");
-        showDisableMockDialog();
+        showForceExitDialogAfterStopRun("Mock location detected!", "Please disable mock location to proceed");
+        AnalyticsEvent.create(Event.ON_LOAD_DISBALE_MOCK_LOCATION)
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
     }
 
-    private void showDisableMockDialog() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UsainBoltForceExit usainBoltForceExit) {
+        Logger.d(TAG, "onEvent: UsainBoltForceExit");
+        showForceExitDialogAfterStopRun("You are in a vehicle", "Stopping your run. Please start tracking while running/walking");
+        AnalyticsEvent.create(Event.ON_LOAD_USAIN_BOLT_FORCE_EXIT)
+                .addBundle(getWorkoutBundle())
+                .buildAndDispatch();
+    }
+
+    public void stopTimer(){
+        Logger.d(TAG, "stopTimer");
+        handler.removeCallbacks(timer);
+        isTimerRunning = false;
+    }
+
+    private void showForceExitDialogAfterStopRun(String title, String content) {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("Mock location detected!");
-        alertDialog.setMessage("Please disable mock location to proceed");
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(content);
         alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -186,9 +203,6 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
             }
         });
         alertDialog.show();
-        AnalyticsEvent.create(Event.ON_LOAD_DISBALE_MOCK_LOCATION)
-                .addBundle(getWorkoutBundle())
-                .buildAndDispatch();
     }
 
     public boolean isRunActive() {
@@ -211,12 +225,13 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
-        secsSinceRunBegan = (int) WorkoutSingleton.getInstance().getDataStore().getElapsedTime();
+        int elapsedTImeInSecs = (int) WorkoutSingleton.getInstance().getDataStore().getElapsedTime();
         myActivity.continuedRun();
         if (!isRunning()){
-            updateTimeView(Utils.secondsToString(secsSinceRunBegan));
+            // If the run is in paused state then don't start timer
+            updateTimeView(Utils.secondsToHHMMSS(elapsedTImeInSecs));
         }else {
-            startTimer(secsSinceRunBegan);
+            startTimer(elapsedTImeInSecs);
         }
         onContinuedRun(!isRunning());
     }
@@ -235,15 +250,19 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     @Override
     public void onDestroyView() {
+        Logger.d(TAG, "onDestroyView");
         super.onDestroyView();
+        stopTimer();
         EventBus.getDefault().unregister(this);
     }
 
     private Runnable timer = new Runnable() {
         @Override
         public void run() {
-            secsSinceRunBegan++;
-            updateTimeView(Utils.secondsToString(secsSinceRunBegan));
+            if (isAttachedToActivity()){
+                int elapsedTimeInSecs = (int) myActivity.getElapsedTimeInSecs();
+                updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs));
+            }
             handler.postDelayed(this, TIMER_TICK);
         }
     };
