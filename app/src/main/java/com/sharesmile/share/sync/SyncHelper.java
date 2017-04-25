@@ -207,13 +207,12 @@ public class SyncHelper {
 
     public static void scheduleUserDataSync(Context context) {
         Logger.d(TAG, "scheduleUserDataSync");
-        // TODO: UserDetails: Revise the frequencies of this periodic task
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(UPLOAD_USER_DATA)
-                .setPeriod(5L) // in secs
+                .setPeriod(18000L) // in secs, i.e. sync every 5 hours
                 .setPersisted(true)
-                .setFlex(2)
+                .setFlex(3600)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
@@ -234,7 +233,6 @@ public class SyncHelper {
             SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
             if (user_id != 0){
                 UserDao mUserDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-                // TODO: UserDetails: Remove DB code for User everywhere, but DB should not be removed
                 User user;
                 List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(user_id)).list();
                 if (userList != null && !userList.isEmpty()) {

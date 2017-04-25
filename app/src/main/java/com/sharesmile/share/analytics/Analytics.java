@@ -4,14 +4,9 @@ import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.User;
-import com.sharesmile.share.UserDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
-
-import java.util.List;
 
 /**
  * Created by ankitm on 11/04/16.
@@ -69,19 +64,16 @@ public class Analytics {
     }
 
     public void setUserProperties(){
-        UserDao mUserDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-        int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
-        List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(user_id)).list();
-        if (userList != null && !userList.isEmpty()) {
-            User mUser = userList.get(0);
-            setUserName(mUser.getName());
-            setUserId(mUser.getId().intValue());
-            setUserEmail(mUser.getEmailId());
-            setUserPhone(mUser.getMobileNO());
-            setUserGender(mUser.getGender());
-            setUserPhoto(mUser.getProfileImageUrl());
-            setUserImpactLeagueTeamCode(SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID));
-        }
+
+        UserDetails details = MainApplication.getInstance().getUserDetails();
+        setUserName(details.getFirstName());
+        setUserId(details.getUserId());
+        setUserEmail(details.getEmail());
+        setUserPhone(details.getPhoneNumber());
+        setUserGender(details.getGenderUser());
+        setUserPhoto(details.getSocialThumb());
+        setUserImpactLeagueTeamCode(details.getTeamCode());
+
     }
 
     public void setUserProperty(String propertyName, Object value){

@@ -20,17 +20,13 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.User;
-import com.sharesmile.share.UserDao;
 import com.sharesmile.share.analytics.Analytics;
-import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,20 +55,13 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
 
     @BindView(R.id.rb_share_female)
     RadioButton mFemaleRadioBtn;
-    private User mUser;
-    private UserDao mUserDao;
 
+    private UserDetails userDetails;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getUserDao();
-        int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
-        List<User> userList = mUserDao.queryBuilder().where(UserDao.Properties.Id.eq(user_id)).list();
-        if (userList != null && !userList.isEmpty()) {
-            mUser = userList.get(0);
-        }
-
+        userDetails = MainApplication.getInstance().getUserDetails();
     }
 
     @Nullable
@@ -95,26 +84,26 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
 
     private void fillUserDetails() {
 
-        if (mUser == null) {
+        if (userDetails == null) {
             return;
         }
-        if (!TextUtils.isEmpty(mUser.getName())) {
-            mName.setText(mUser.getName());
+        if (!TextUtils.isEmpty(userDetails.getFirstName())) {
+            mName.setText(userDetails.getFirstName());
         }
 
-        if (!TextUtils.isEmpty(mUser.getEmailId())) {
-            mEmail.setText(mUser.getEmailId());
+        if (!TextUtils.isEmpty(userDetails.getEmail())) {
+            mEmail.setText(userDetails.getEmail());
         }
 
-        if (!TextUtils.isEmpty(mUser.getMobileNO())) {
-            mNumber.setText(mUser.getMobileNO());
+        if (!TextUtils.isEmpty(userDetails.getPhoneNumber())) {
+            mNumber.setText(userDetails.getPhoneNumber());
         }
 
-        if (!TextUtils.isEmpty(mUser.getBirthday())) {
-            mBirthday.setText(mUser.getBirthday());
+        if (!TextUtils.isEmpty(userDetails.getBirthday())) {
+            mBirthday.setText(userDetails.getBirthday());
         }
-        if (!TextUtils.isEmpty(mUser.getGender())) {
-            if (mUser.getGender().equalsIgnoreCase("m")) {
+        if (!TextUtils.isEmpty(userDetails.getGenderUser())) {
+            if (userDetails.getGenderUser().equalsIgnoreCase("m")) {
                 mMaleRadioBtn.setChecked(true);
             } else {
                 mFemaleRadioBtn.setChecked(true);
@@ -136,36 +125,35 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
     }
 
     private void saveUserDetails() {
-        if (mUser == null) {
+        if (userDetails == null) {
             return;
         }
         if (!TextUtils.isEmpty(mName.getText())) {
-            mUser.setName(mName.getText().toString());
+            userDetails.setFirstName(mName.getText().toString());
             Analytics.getInstance().setUserName(mName.getText().toString());
         }
 
         if (!TextUtils.isEmpty(mBirthday.getText())) {
-            mUser.setBirthday(mBirthday.getText().toString());
+            userDetails.setBirthday(mBirthday.getText().toString());
         }
 
         if (!TextUtils.isEmpty(mNumber.getText())) {
             if (Utils.isValidPhoneNumber(mNumber.getText().toString())){
-                mUser.setMobileNO(mNumber.getText().toString());
+                userDetails.setPhoneNumber(mNumber.getText().toString());
                 Analytics.getInstance().setUserPhone(mNumber.getText().toString());
             }
         }
 
         if (mFemaleRadioBtn.isChecked() || mMaleRadioBtn.isChecked()) {
             if (mFemaleRadioBtn.isChecked()){
-                mUser.setGender("f");
+                userDetails.setGenderUser("f");
                 Analytics.getInstance().setUserGender("F");
             }else {
-                mUser.setGender("m");
+                userDetails.setGenderUser("m");
                 Analytics.getInstance().setUserGender("M");
             }
         }
 
-        mUserDao.insertOrReplace(mUser);
         syncUserData();
 
     }
