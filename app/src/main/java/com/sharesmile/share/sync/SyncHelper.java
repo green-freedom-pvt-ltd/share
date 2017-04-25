@@ -187,16 +187,15 @@ public class SyncHelper {
 
 
     public static void syncLeaderBoardData(Context context) {
-        SyncTaskManger.fetchLeaderBoardData(context);
+        // TODO: Leaderboad: Sync latest leaderboard from server and store it in SharedPreferences
+        // Right now fresh Leaderboard is fetched everytime a user opens leaderboard
     }
-
-
 
     public static void scheduleCauseDataSync(Context context) {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(SYNC_CAUSE_DATA)
-                .setPeriod(7200L) // in secs
+                .setPeriod(7200L) // in secs , i.e. every two hours
                 .setPersisted(true)
                 .setFlex(2400)
                 .build();
@@ -217,14 +216,6 @@ public class SyncHelper {
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
         mGcmNetworkManager.schedule(task);
-    }
-
-    // get leader board for the list
-    public static boolean fetchLeaderBoard() {
-//        LeaderBoardDao leaderBoardDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getLeaderBoardDao();
-        String url = Urls.getLeaderboardUrl();
-        return fetchLeaderBoardList(url);
-
     }
 
     public static void syncUserFromDB(){
@@ -253,12 +244,6 @@ public class SyncHelper {
                 }
             }
         }
-    }
-
-
-    private static boolean fetchLeaderBoardList(String url) {
-        //TODO: Fetch Leaderboard and sync in SharedPreferences, not in DB
-        return true;
     }
 
     public static void syncCampaignData(Context context) {

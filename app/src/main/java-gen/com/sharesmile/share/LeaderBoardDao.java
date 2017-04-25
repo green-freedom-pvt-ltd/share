@@ -12,6 +12,7 @@ import de.greenrobot.dao.internal.DaoConfig;
 /** 
  * DAO for table "LEADER_BOARD".
 */
+@Deprecated
 public class LeaderBoardDao extends AbstractDao<LeaderBoard, Long> {
 
     public static final String TABLENAME = "LEADER_BOARD";
