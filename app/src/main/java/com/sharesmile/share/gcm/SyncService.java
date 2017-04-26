@@ -140,12 +140,15 @@ public class SyncService extends GcmTaskService {
 
             if (workout.getBeginTimeStamp() != null){
                 jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+                jsonObject.put("start_time_epoch", workout.getBeginTimeStamp());
             }else if (workout.getDate() != null){
                 jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
+                jsonObject.put("start_time_epoch", workout.getDate().getTime());
             }
 
             if (workout.getEndTimeStamp() != null){
                 jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+                jsonObject.put("end_time_epoch", workout.getEndTimeStamp());
             }
             jsonObject.put("run_amount", workout.getRunAmount());
             jsonObject.put("run_duration", workout.getElapsedTime());
@@ -156,6 +159,8 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("start_location_long", workout.getStartPointLongitude());
             jsonObject.put("end_location_lat", workout.getEndPointLatitude());
             jsonObject.put("end_location_long", workout.getEndPointLongitude());
+            jsonObject.put("version", workout.getVersion());
+
             Logger.d(TAG, jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
@@ -166,6 +171,7 @@ public class SyncService extends GcmTaskService {
             workout.setId(response.getId());
             workout.setIs_sync(true);
             workout.setIsValidRun(!response.isFlag());
+            workout.setVersion(response.getVersion());
             mWorkoutDao.insertOrReplace(workout);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "success")

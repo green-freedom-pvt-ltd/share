@@ -21,8 +21,14 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("start_time")
     String startTime;
 
+    @SerializedName("start_time_epoch")
+    Long startTimeEpoch;
+
     @SerializedName("end_time")
     String endTime;
+
+    @SerializedName("end_time_epoch")
+    String endTimeEpoch;
 
     @SerializedName("distance")
     float distance;
@@ -56,6 +62,9 @@ public class Run implements UnObfuscable, Serializable {
 
     @SerializedName("end_location_long")
     double endLocationLong;
+
+    @SerializedName("version")
+    long version;
 
     public long getId() {
         return id;
@@ -181,6 +190,30 @@ public class Run implements UnObfuscable, Serializable {
         this.numSteps = numSteps;
     }
 
+    public Long getStartTimeEpoch() {
+        return startTimeEpoch;
+    }
+
+    public void setStartTimeEpoch(Long startTimeEpoch) {
+        this.startTimeEpoch = startTimeEpoch;
+    }
+
+    public String getEndTimeEpoch() {
+        return endTimeEpoch;
+    }
+
+    public void setEndTimeEpoch(String endTimeEpoch) {
+        this.endTimeEpoch = endTimeEpoch;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "Run{" +
@@ -192,6 +225,7 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t numSteps=" + numSteps +
                 ",\n\t is_flag=" + is_flag +
                 ",\n\t clientRunId='" + clientRunId + '\'' +
+                ",\n\t version='" + version + '\'' +
                 "\n}";
     }
 }
