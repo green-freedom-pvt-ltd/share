@@ -303,7 +303,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
         SyncHelper.syncUserFromDB();
         SyncHelper.syncRunData();
         SyncHelper.syncMessageCenterData(this);
-        SyncHelper.syncLeaderBoardData(this);
+        SyncHelper.syncLeaderBoardData(this); // TODO: Leaderboard: Need to implement sync for Leaderboard
         SyncHelper.scheduleCauseDataSync(this);
         SyncHelper.scheduleUserDataSync(this);
     }

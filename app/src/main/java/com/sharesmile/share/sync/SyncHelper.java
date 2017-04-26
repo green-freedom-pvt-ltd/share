@@ -53,6 +53,9 @@ public class SyncHelper {
         pushRunData();
     }
 
+    /**
+     * Sets up a periodic task to fetch the diff of Workout data
+     */
     public static void fetchRunData() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
@@ -70,8 +73,14 @@ public class SyncHelper {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPLOAD_WORKOUT_DATA)
-                .setExecutionWindow(0L, 60L)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                /*
+                    Mandatory setter for creating a one-off task.
+                    You specify the earliest point in time in the future from which your task might start executing,
+                    as well as the latest point in time in the future at which your task must have executed.
+                 */
+                .setExecutionWindow(0L, 3600L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
