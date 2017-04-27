@@ -21,6 +21,7 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.sync.SyncHelper;
+import com.sharesmile.share.utils.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,6 +39,8 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     HistoryAdapter mHistoryAdapter;
 
+    private static String TAG = "ProfileHistoryFragment";
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,11 +56,11 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         mProgress = (ProgressBar) v.findViewById(R.id.progress_bar);
         init();
         EventBus.getDefault().register(this);
-        showProgressDialog();
         return v;
     }
 
     private void init() {
+        Logger.d(TAG, "init");
         mHistoryAdapter = new HistoryAdapter(this);
         mRecyclerView.setAdapter(mHistoryAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -70,12 +73,14 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
     }
 
     public void fetchRunDataFromDb() {
+        Logger.d(TAG, "fetchRunDataFromDb");
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
         if (mWorkoutList == null || mWorkoutList.isEmpty()){
             SyncHelper.pullEntireWorkoutHistory();
             showProgressDialog();
         }else {
+            Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");
             mHistoryAdapter.setData(mWorkoutList);
             hideProgressDialog();
         }
