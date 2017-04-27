@@ -211,6 +211,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             int leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
             if (leagueTeamId != 0){
                 // Belongs to an Impact League team, will show League team leaderboard
+                LeaderBoardFragment leageBoardFragment
+                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMBAORD);
+                replaceFragment(leageBoardFragment , true);
                 LeaderBoardFragment teamLeaderBoardFragment
                         = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMLEADERBAORD, leagueTeamId);
                 replaceFragment(teamLeaderBoardFragment , true);

@@ -3,8 +3,6 @@ package Models
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.LeaderBoard
 import com.sharesmile.share.core.UnObfuscable
-import com.sharesmile.share.utils.SharedPrefsManager
-import org.json.JSONObject
 import java.io.Serializable
 import java.util.*
 
@@ -32,6 +30,15 @@ class TeamBoard : UnObfuscable, Serializable {
 
         @SerializedName("team_name")
         var teamName: String? = "";
+
+        @SerializedName("impactleague")
+        var leagueName: String? = "";
+
+        @SerializedName("team_captain")
+        var teamCaptain: String? = "";
+
+        @SerializedName("team_captain_email_id")
+        var teamCaptainEmailId: String? = "";
 
         @SerializedName("total_distance")
         private var total_distance: TotalDistance? = null;

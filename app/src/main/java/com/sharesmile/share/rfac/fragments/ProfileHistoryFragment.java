@@ -20,6 +20,7 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.sync.SyncHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -58,9 +59,9 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     private void init() {
         mHistoryAdapter = new HistoryAdapter(this);
-        mHistoryAdapter.setData(mWorkoutList);
         mRecyclerView.setAdapter(mHistoryAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        fetchRunDataFromDb();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -71,8 +72,13 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
     public void fetchRunDataFromDb() {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
-        mHistoryAdapter.setData(mWorkoutList);
-        hideProgressDialog();
+        if (mWorkoutList == null || mWorkoutList.isEmpty()){
+            SyncHelper.pullEntireWorkoutHistory();
+            showProgressDialog();
+        }else {
+            mHistoryAdapter.setData(mWorkoutList);
+            hideProgressDialog();
+        }
     }
 
     private void showProgressDialog() {

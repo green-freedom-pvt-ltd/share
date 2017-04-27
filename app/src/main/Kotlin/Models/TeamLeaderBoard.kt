@@ -1,10 +1,8 @@
 package Models
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.LeaderBoard
 import com.sharesmile.share.core.UnObfuscable
-import org.json.JSONObject
 import java.io.Serializable
 import java.util.*
 
@@ -30,7 +28,13 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
         var user: User? = null;
 
         @SerializedName("league_total_distance")
-        public val leagueTotalDistance: User.TotalDistance? = null
+        public val leagueTotalDistance: TotalDistance? = null
+
+        @SerializedName("league_total_amount")
+        public val totalLeagueAmount: TotalLeagueAmount? = null
+
+        @SerializedName("team")
+        public var teamName: String? = null
 
     }
 
@@ -60,11 +64,16 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
             board.social_thumb = imageUrl;
             return board;
         }
+    }
 
-        class TotalDistance : Serializable {
-            @SerializedName("total_distance")
-            public val totalDistance: Float? = 0f;
-        }
+    class TotalDistance : Serializable {
+        @SerializedName("total_distance")
+        public val totalDistance: Float? = 0f;
+    }
+
+    class TotalLeagueAmount : Serializable {
+        @SerializedName("total_amount")
+        public val totalAmount: Float? = 0f;
     }
 
 }

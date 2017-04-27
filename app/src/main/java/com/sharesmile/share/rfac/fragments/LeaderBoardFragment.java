@@ -76,8 +76,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     TextView mylastWeekDistance;
 
-    private String toolbarTitle;
-
     private boolean mShowLeagueBoard = false;
     private BOARD_TYPE mBoard;
     private String mBannerUrl;
@@ -195,16 +193,20 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     private void setupToolbar() {
         setHasOptionsMenu(true);
         if (mBoard == BOARD_TYPE.LEADERBOARD) {
-            toolbarTitle = getResources().getString(R.string.leaderboard);
+            setToolbarTitle(getResources().getString(R.string.leaderboard));
         } else {
             mInfoView.setVisibility(View.GONE);
             if (mBoard == BOARD_TYPE.TEAMBAORD) {
-                toolbarTitle = getResources().getString(R.string.impact_league);
+                setToolbarTitle(getResources().getString(R.string.impact_league));
             } else {
-                toolbarTitle = getResources().getString(R.string.team_leader_board);
+                setToolbarTitle(getResources().getString(R.string.team_leader_board));
             }
         }
-        getFragmentController().updateToolBar(toolbarTitle, true);
+    }
+
+    private void setToolbarTitle(String title){
+        Logger.d(TAG, "setToolbarTitle: " + title);
+        getFragmentController().updateToolBar(title, true);
     }
 
     @Override
@@ -310,12 +312,19 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             public void onNetworkSuccess(TeamLeaderBoard board) {
                 if (isAttachedToActivity()){
                     mleaderBoardList.clear();
+                    String teamName = "";
                     for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
                         Float distance = 0f;
                         if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
                             distance = team.getLeagueTotalDistance().getTotalDistance();
                         }
+                        if (TextUtils.isEmpty(teamName)){
+                            teamName = team.getTeamName();
+                        }
                         mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
+                    }
+                    if (!TextUtils.isEmpty(teamName)){
+                        setToolbarTitle(teamName);
                     }
                     hideProgressDialog();
                     mLeaderBoardAdapter.setData(mleaderBoardList);
@@ -361,13 +370,21 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
                 if (isAttachedToActivity()){
                     mleaderBoardList.clear();
                     mBannerUrl = null;
+                    String leagueName = "";
                     for (TeamBoard.Team team : board.getTeamList()) {
+                        if (TextUtils.isEmpty(leagueName)){
+                            leagueName = team.getLeagueName();
+                        }
                         mleaderBoardList.add(team.convertToLeaderBoard());
                         mBannerUrl = team.getBanner();
                     }
                     setBannerImage();
                     hideProgressDialog();
+                    if (!TextUtils.isEmpty(leagueName)){
+                        setToolbarTitle(leagueName);
+                    }
                     mLeaderBoardAdapter.setData(mleaderBoardList);
+
                 }
             }
         });
