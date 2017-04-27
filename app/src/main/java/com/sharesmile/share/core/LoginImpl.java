@@ -241,8 +241,8 @@ public class LoginImpl {
                 .put("medium", medium)
                 .buildAndDispatch();
 
-        //Sync run data;
-        SyncHelper.fetchRunData();
+        //Pull historical run data;
+        SyncHelper.pullEntireWorkoutHistory();
 
         mListener.onLoginSuccess();
 

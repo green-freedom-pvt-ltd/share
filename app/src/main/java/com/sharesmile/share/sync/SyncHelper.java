@@ -21,7 +21,6 @@ import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.pushNotification.NotificationConsts;
-import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -39,6 +38,7 @@ import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
 import static com.sharesmile.share.core.Constants.PREF_USER_NAME;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_CAUSE_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.SYNC_WORKOUT_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
 /**
@@ -48,20 +48,31 @@ public class SyncHelper {
 
     private static final String TAG = SyncHelper.class.getSimpleName();
 
-    public static void syncRunData() {
-        fetchRunData();
-        pushRunData();
+    public static void scheduleRunDataSync(Context context) {
+
+        PeriodicTask task = new PeriodicTask.Builder()
+                .setService(SyncService.class)
+                .setTag(SYNC_WORKOUT_DATA)
+                .setPeriod(3600L) // in secs , i.e. every one hour
+                .setPersisted(true)
+                .setFlex(600)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        mGcmNetworkManager.schedule(task);
+
     }
 
     /**
-     * Sets up a periodic task to fetch the diff of Workout data
+     * One time task to fetch the diff of WorkoutData from server
      */
-    public static void fetchRunData() {
+    public static void pullEntireWorkoutHistory() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
-                .setTag(TaskConstants.UPDATE_WORKOUT_DATA)
-                .setExecutionWindow(0L, 1L)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                .setTag(TaskConstants.PULL_ENTIRE_WORKOUT_HISTORY)
+                .setExecutionWindow(0L, 10L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager
@@ -69,75 +80,26 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
+    /**
+     * One time task to push all the dirty runs (is_sync false) from client to server
+     * It will retry if the upload fails for some reason
+     */
     public static void pushRunData() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
-                .setTag(TaskConstants.UPLOAD_WORKOUT_DATA)
+                .setTag(TaskConstants.PUSH_WORKOUT_DATA)
                 /*
                     Mandatory setter for creating a one-off task.
                     You specify the earliest point in time in the future from which your task might start executing,
                     as well as the latest point in time in the future at which your task must have executed.
                  */
-                .setExecutionWindow(0L, 3600L)
+                .setExecutionWindow(0L, 300L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
         mGcmNetworkManager.schedule(task);
-    }
-
-    public static int pullRunData() {
-        int result = updateWorkoutData(false);
-        int flaggedResult = updateWorkoutData(true);
-
-        return (result == GcmNetworkManager.RESULT_RESCHEDULE || flaggedResult == GcmNetworkManager.RESULT_RESCHEDULE) ? GcmNetworkManager.RESULT_RESCHEDULE : GcmNetworkManager.RESULT_SUCCESS;
-
-    }
-
-    public static int updateWorkoutData(boolean fetch_flagged_run) {
-
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        long workoutCount;
-        String runUrl;
-        if (fetch_flagged_run) {
-            workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true), WorkoutDao.Properties.IsValidRun.eq(false)).count();
-            runUrl = Urls.getFlaggedRunUrl(fetch_flagged_run);
-        } else {
-            workoutCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
-            runUrl = Urls.getFlaggedRunUrl(fetch_flagged_run);
-        }
-        return updateWorkoutData(runUrl, workoutCount);
-    }
-
-    private static int updateWorkoutData(String runUrl, long workoutCount) {
-
-        try {
-            RunList runList = NetworkDataProvider.doGetCall(runUrl, RunList.class);
-            if (workoutCount >= runList.getTotalRunCount()) {
-                Logger.d(TAG, "update success" + workoutCount + " : " + runList.getTotalRunCount());
-                EventBus.getDefault().post(new DBEvent.RunDataUpdated());
-                updateUserImpact();
-                return GcmNetworkManager.RESULT_SUCCESS;
-            } else {
-                WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-                mWorkoutDao.insertOrReplaceInTx(runList);
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
-                Logger.d(TAG, "update success" + runList.toString());
-                if (!TextUtils.isEmpty(runList.getNextUrl())) {
-                    updateWorkoutData(runList.getNextUrl(), workoutCount);
-                } else {
-                    updateUserImpact();
-                }
-            }
-        } catch (NetworkException e) {
-            e.printStackTrace();
-            Logger.d(TAG, "update NetworkException, messageFromServer " + e.getMessageFromServer()
-                    + " exceptionMessage: " + e.getMessage());
-        }
-        EventBus.getDefault().post(new DBEvent.RunDataUpdated());
-
-        return 0;
     }
 
     public static void syncMessageCenterData(Context context) {

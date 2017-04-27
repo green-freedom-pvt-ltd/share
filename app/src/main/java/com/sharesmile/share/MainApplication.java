@@ -301,7 +301,7 @@ public class MainApplication extends Application implements AppLifecycleHelper.L
     public void startSyncTasks() {
         Logger.d(TAG, "startSyncTasks");
         SyncHelper.syncUserFromDB();
-        SyncHelper.syncRunData();
+        SyncHelper.scheduleRunDataSync(this);
         SyncHelper.syncMessageCenterData(this);
         SyncHelper.syncLeaderBoardData(this); // TODO: Leaderboard: Need to implement sync for Leaderboard
         SyncHelper.scheduleCauseDataSync(this);

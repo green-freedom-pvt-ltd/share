@@ -20,7 +20,6 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.Run;
-import com.sharesmile.share.sync.SyncTaskManger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -53,7 +52,6 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         mProgress = (ProgressBar) v.findViewById(R.id.progress_bar);
         init();
         EventBus.getDefault().register(this);
-        SyncTaskManger.startRunDataUpdate(getContext());
         showProgressDialog();
         return v;
     }
@@ -89,7 +87,6 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     @Override
     public void onDestroyView() {
-        SyncTaskManger.startRunDataUpdate(getContext());
         EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }

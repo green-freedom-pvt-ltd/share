@@ -2,7 +2,6 @@ package com.sharesmile.share.network;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.UnObfuscable;
@@ -221,7 +220,7 @@ public class NetworkDataProvider {
     /**
      * Returns the raw response for GET call
      */
-    private static Response getResponseForGetCall(String url)
+    public static Response getResponseForGetCall(String url)
             throws NetworkException {
         if (TextUtils.isEmpty(url)) {
             throw new IllegalArgumentException("Empty URL " + url);

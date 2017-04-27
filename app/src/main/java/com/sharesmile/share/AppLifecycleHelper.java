@@ -63,7 +63,7 @@ public class AppLifecycleHelper implements Application.ActivityLifecycleCallback
 
             // And this is the very first activity which is coming into foreground
             listener.onStart();
-//            Logger.d(TAG, "AppVisibilityCheck: first activity to become visible LAUNCH_APP will be triggered");
+//            Logger.PUSH_WORKOUT_DATA(TAG, "AppVisibilityCheck: first activity to become visible LAUNCH_APP will be triggered");
 //            AnalyticsEvent.Builder builder = new AnalyticsEvent
 //                    .Builder(activity.getApplicationContext())
 //                    .event(Event.LAUNCH_APP)

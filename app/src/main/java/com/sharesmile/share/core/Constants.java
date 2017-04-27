@@ -107,6 +107,8 @@ public class Constants {
 
     public static final String PREF_WORKOUT_LIFETIME_WORKING_OUT = "pref_workout_lifetime_working_out_new";
 
+    public static final String PREF_WORKOUT_DATA_SYNC_VERSION = "pref_workout_data_sync_version";
+
     public static final String PREF_IS_LOGIN = "pref_user_login";
     public static final String PREF_USER_ID = "pref_user_id";
     public static final String PREF_FIRST_TIME_USER = "pref_first_time_user";

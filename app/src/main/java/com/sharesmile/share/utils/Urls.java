@@ -45,6 +45,11 @@ public class Urls {
         return url;
     }
 
+    public static String getSyncRunUrl(long clientVersion) {
+        String url = getBaseUrl() + RUN_URL + "?client_version=" + clientVersion;
+        return url;
+    }
+
     public static String getLoginUrl(String email) {
         String url = getBaseUrl() + LOGIN_URL;
         url = url + "?" + email;
