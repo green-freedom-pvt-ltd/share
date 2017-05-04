@@ -1,6 +1,5 @@
 package com.sharesmile.share;
 
-import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -53,7 +53,7 @@ import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
  */
-public class MainApplication extends Application implements AppLifecycleHelper.LifeCycleCallbackListener{
+public class MainApplication extends MultiDexApplication implements AppLifecycleHelper.LifeCycleCallbackListener{
 
     private static final String TAG = "MainApplication";
 

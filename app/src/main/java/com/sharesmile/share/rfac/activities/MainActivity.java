@@ -46,6 +46,7 @@ import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.LeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileFragment;
+import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.sync.SyncHelper;
@@ -344,7 +345,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void showProfileScreen() {
-        replaceFragment(new ProfileFragment(), true);
+        replaceFragment(new ProfileStatsFragment(), true);
     }
 
     private void showLoginActivity() {
