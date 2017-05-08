@@ -39,7 +39,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
     private boolean isInVehicle = false;
     private boolean isOnFoot = false;
-    private int stillOccurredCounter = 0;
+    private int stillNotificationOccurredCounter = 0;
 
     private boolean isWorkoutActive;
 
@@ -123,7 +123,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }else {
             connectToLocationServices();
         }
-        handler.removeCallbacks(handleStillRunnable);
+        handler.removeCallbacks(handleStillNotificationRunnable);
     }
 
     public void workoutIdle(){
@@ -133,7 +133,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }else {
             connectToLocationServices();
         }
-        handler.removeCallbacks(handleStillRunnable);
+        handler.removeCallbacks(handleStillNotificationRunnable);
     }
 
     public boolean isWorkoutActive(){
@@ -158,7 +158,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    final Runnable handleStillRunnable = new Runnable() {
+    final Runnable handleStillNotificationRunnable = new Runnable() {
         @Override
         public void run() {
             // Show notification and increment still occurred counter
@@ -169,8 +169,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             );
             AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
                     .buildAndDispatch();
-            handler.removeCallbacks(handleStillRunnable);
-            stillOccurredCounter = 1;
+            handler.removeCallbacks(handleStillNotificationRunnable);
+            stillNotificationOccurredCounter = 1;
         }
     };
 
@@ -181,7 +181,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
         Logger.d(TAG, "handleActivityRecognitionResult: inVehicleConfidence = " + inVehicleConfidence
                     + ", stillConfidence = " + stillConfidence + ", onFootConfidence = " + onFootConfidence
-                    + ", stillOccurredCounter " + stillOccurredCounter);
+                    + ", stillNotificationOccurredCounter " + stillNotificationOccurredCounter);
 
         if (isWorkoutActive()){
             if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
@@ -193,12 +193,12 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
         if (isWorkoutActive()){
             if (stillConfidence > CONFIDENCE_THRESHOLD){
-                if (stillOccurredCounter == 0){
-                    handler.postDelayed(handleStillRunnable, 10000);
+                if (stillNotificationOccurredCounter == 0){
+                    handler.postDelayed(handleStillNotificationRunnable, 10000);
                     Logger.d(TAG, "Scheduling Still notification.");
                 }
             }else {
-                handler.removeCallbacks(handleStillRunnable);
+                handler.removeCallbacks(handleStillNotificationRunnable);
                 Logger.d(TAG, "Removing Still notification.");
             }
         }
@@ -238,7 +238,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
             if (avgOnFootConfidence > CONFIDENCE_THRESHOLD){
                 isOnFoot = true;
-                stillOccurredCounter = 0;
+                stillNotificationOccurredCounter = 0;
             }else {
                 isOnFoot = false;
             }

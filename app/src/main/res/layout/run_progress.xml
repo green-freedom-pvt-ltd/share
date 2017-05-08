@@ -36,44 +36,104 @@
         android:text="IMPACT"
         android:textSize="22dp" />
 
-    <FrameLayout
-        android:layout_width="180dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:layout_below="@+id/tv_impact"
-        android:layout_centerHorizontal="true"
-        android:clipToPadding="false">
+        android:orientation="horizontal"
+        android:layout_below="@+id/tv_impact">
 
-        <ProgressBar
-            android:id="@+id/run_progress_bar"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:indeterminate="true"
-            android:indeterminateDrawable="@drawable/progress" />
+            android:layout_weight="2"
+            android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="Cal1"
+                android:gravity="center_horizontal|bottom"
+                android:textSize="18sp"
+                android:paddingBottom="3dp"/>
 
-            <TextView
-                android:id="@+id/tv_run_progress_impact"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="0"
-                android:textSize="30dp" />
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/tv_cal_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|top"
+                android:textSize="18sp"
+                android:paddingTop="3dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_run_progress_impact"
-                android:layout_centerHorizontal="true"
-                android:text="RUPEES"
-                android:textSize="12sp" />
+        </LinearLayout>
 
-        </RelativeLayout>
-    </FrameLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="180dp"
+            android:layout_centerHorizontal="true"
+            android:clipToPadding="false"
+            android:layout_weight="6.5">
+
+            <ProgressBar
+                android:id="@+id/run_progress_bar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/progress" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tv_run_progress_impact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="0"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_run_progress_impact"
+                    android:layout_centerHorizontal="true"
+                    android:text="RUPEES"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="Cal2"
+                android:gravity="center_horizontal|bottom"
+                android:textSize="18sp"
+                android:paddingBottom="3dp"/>
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/tv_cal_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|top"
+                android:textSize="18sp"
+                android:paddingTop="3dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linear_btn_layout"

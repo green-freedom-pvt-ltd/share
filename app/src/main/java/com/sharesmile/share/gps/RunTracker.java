@@ -3,6 +3,7 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -409,6 +410,8 @@ public class RunTracker implements Tracker {
                     if (toRecord){
                         DistRecord record = new DistRecord(point, prevLocation, dist);
                         Logger.d(TAG, "Distance Recording: " + record.toString());
+                        Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed());
+                        MainApplication.showToast("GPS Speed: " + point.getSpeed() * 3.6 + ", Provider: " + point.getProvider());
                         dataStore.addRecord(record);
                         recordHistoryQueue.add(record);
                         SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);

@@ -380,6 +380,7 @@ public class WorkoutService extends Service implements
     @Override
     public synchronized void onLocationChanged(Location location) {
         Logger.i(TAG, "onLocationChanged with \n" + location.toString());
+        Logger.i(TAG, "Speed obtained from location object = " + location.getSpeed());
         if (location == null){
             return;
         }

@@ -57,8 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.R.attr.name;
-
 /**
  * Created by Shine on 19/05/16.
  */
@@ -230,7 +228,7 @@ public class LoginImpl {
         MainApplication.getInstance().setUserDetails(userDetails);
 
         //show Toast confirmation
-        Toast.makeText(MainApplication.getContext(), "Logged in as " + name, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainApplication.getContext(), "Logged in as " + userDetails.getFirstName(), Toast.LENGTH_SHORT).show();
 
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)
