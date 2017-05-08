@@ -313,10 +313,16 @@ public class WorkoutService extends Service implements
         }
     }
 
+
     @Override
     public void onStepCount(int deltaSteps) {
         if (tracker != null && tracker.isActive()) {
             tracker.feedSteps(deltaSteps);
+            if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
+                // User is stepping with average cadence of 1 step per sec for the past few (StepCounter.STEP_COUNT_READING_VALID_INTERVAL) secs
+                // Lets notify the ActivityDetector about it
+
+            }
         }
     }
 
@@ -387,36 +393,41 @@ public class WorkoutService extends Service implements
         cancelWorkoutNotification(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
         handler.removeCallbacks(handleGpsInactivityRunnable);
         handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
-        if (tracker != null && tracker.isRunning()){
-            if (acceptedLocationFix == null){
-                if (beginningLocationsRotatingQueue == null){
-                    Logger.d(TAG, "Hunt for first accepted location begins");
-                    beginningLocationsRotatingQueue = new CircularQueue<>(3);
-                    beginningLocationsRotatingQueue.add(location);
-                    // Will not send to tracker as it is the very first location fix received
-                    // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
-                    // Will start sending subsequent location fixes, only after they are approved by spike filter
-                } else {
-                    // First fill
-                    beginningLocationsRotatingQueue.add(location);
-                    if (beginningLocationsRotatingQueue.isFull()){
-                        Logger.d(TAG, "Rotating queue is full, will check if we can " +
-                                "accept the oldest location: "
-                                + beginningLocationsRotatingQueue.peekOldest().toString());
-                        // Check if oldest location is a fit
-                        if (isOldestLocationAccepted()){
-                            Logger.d(TAG, "Oldest location accepted, will feed to tracker");
-                            acceptedLocationFix = beginningLocationsRotatingQueue.peekOldest();
-                            tracker.feedLocation(acceptedLocationFix);
+        if(tracker != null && tracker.isRunning()) {
+            if (!ActivityDetector.getInstance().isStill()){
+                // Process GPS fix only when the device is not Still
+                if (acceptedLocationFix == null){
+                    if (beginningLocationsRotatingQueue == null){
+                        Logger.d(TAG, "Hunt for first accepted location begins");
+                        beginningLocationsRotatingQueue = new CircularQueue<>(3);
+                        beginningLocationsRotatingQueue.add(location);
+                        // Will not send to tracker as it is the very first location fix received
+                        // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
+                        // Will start sending subsequent location fixes, only after they are approved by spike filter
+                    } else {
+                        // First fill
+                        beginningLocationsRotatingQueue.add(location);
+                        if (beginningLocationsRotatingQueue.isFull()){
+                            Logger.d(TAG, "Rotating queue is full, will check if we can " +
+                                    "accept the oldest location: "
+                                    + beginningLocationsRotatingQueue.peekOldest().toString());
+                            // Check if oldest location is a fit
+                            if (isOldestLocationAccepted()){
+                                Logger.d(TAG, "Oldest location accepted, will feed to tracker");
+                                acceptedLocationFix = beginningLocationsRotatingQueue.peekOldest();
+                                tracker.feedLocation(acceptedLocationFix);
+                            }
                         }
                     }
+                } else {
+                    // Spike filter check
+                    if (!checkForSpike(acceptedLocationFix, location)){
+                        tracker.feedLocation(location);
+                        acceptedLocationFix = location;
+                    }
                 }
-            } else {
-                // Spike filter check
-                if (!checkForSpike(acceptedLocationFix, location)){
-                    tracker.feedLocation(location);
-                    acceptedLocationFix = location;
-                }
+            }else {
+                Logger.d(TAG, "Will ignore the GPS fix because the device is STILL");
             }
         }
 

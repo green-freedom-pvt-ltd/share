@@ -59,9 +59,13 @@ public class Config {
 
     // Activity Detector Config
 
-    public static final int CONFIDENCE_THRESHOLD = 80;
-    public static final int CONFIDENCE_THRESHOLD_EVENT = 60;
-    public static final long ACTIVITY_VALID_INTERVAL = 24000; // in millisecs
+    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 80;
+    public static final int CONFIDENCE_THRESHOLD_ON_FOOT = 75;
+    public static final int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
+    public static final int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
+    public static final int CONFIDENCE_THRESHOLD_EVENT = 70;
+    public static final long ACTIVITY_VALID_INTERVAL_IDLE = 32000; // in millisecs
+    public static final long ACTIVITY_VALID_INTERVAL_ACTIVE = 15000; // in millisecs
     public static final long DETECTED_INTERVAL_IDLE = 7000; // in millisecs
     public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 

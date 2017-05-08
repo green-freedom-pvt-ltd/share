@@ -21,9 +21,13 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 
-import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL;
-import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD;
+import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
+import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
+import static com.sharesmile.share.core.Config.CONFIDENCE_LOWER_THRESHOLD_STILL;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_EVENT;
+import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_ON_FOOT;
+import static com.sharesmile.share.core.Config.CONFIDENCE_UPPER_THRESHOLD_STILL;
+import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_VEHICLE;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
@@ -39,6 +43,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
     private boolean isInVehicle = false;
     private boolean isOnFoot = false;
+    private boolean isStill = false;
     private int stillNotificationOccurredCounter = 0;
 
     private boolean isWorkoutActive;
@@ -112,7 +117,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private void registerForActivityUpdates(){
         Intent intent = new Intent(appContext, ActivityRecognizedService.class);
         PendingIntent pendingIntent = PendingIntent.getService( appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        long detectionIntervalMillis = isWorkoutActive ? DETECTED_INTERVAL_ACTIVE : DETECTED_INTERVAL_IDLE;
+        long detectionIntervalMillis = isWorkoutActive() ? DETECTED_INTERVAL_ACTIVE : DETECTED_INTERVAL_IDLE;
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, detectionIntervalMillis, pendingIntent );
     }
 
@@ -191,8 +196,65 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             }
         }
 
+        // Add the fresh result in HistoryQueue
+        long currentTime = result.getTime();
+        historyQueue.add(result);
+        if (historyQueue.isFull()){
+            int i = historyQueue.getMaxSize() - 1;
+            int count = 0;
+            float cumulativeVehicleConfidence = 0;
+            float cumulativeOnFootConfidence = 0;
+            float cumulativeStillConfidence = 0;
+            long validInterval = isWorkoutActive() ? ACTIVITY_VALID_INTERVAL_ACTIVE : ACTIVITY_VALID_INTERVAL_IDLE;
+            while (i >= 0){
+                ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
+                if (currentTime - elem.getTime() > validInterval){
+                    // This is elem is way too old to be considered
+                    break;
+                }
+                cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
+                cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
+                cumulativeStillConfidence += elem.getActivityConfidence(DetectedActivity.STILL);
+                count++;
+                i--;
+            }
+            float avgVehilceConfidence = cumulativeVehicleConfidence / count;
+            float avgOnFootConfidence = cumulativeOnFootConfidence / count;
+            float avgStillConfidence = cumulativeStillConfidence / count;
+
+            Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
+                    + avgVehilceConfidence + ", Foot: " + avgOnFootConfidence + ", Still: " + avgStillConfidence);
+
+            if (avgStillConfidence > CONFIDENCE_UPPER_THRESHOLD_STILL){
+                isStill = true;
+            }else if (avgStillConfidence < CONFIDENCE_LOWER_THRESHOLD_STILL){
+                isStill = false;
+                stillNotificationOccurredCounter = 0;
+            }
+
+            if (avgVehilceConfidence > CONFIDENCE_THRESHOLD_VEHICLE){
+                isInVehicle = true;
+                isStill = false; // isStill is forced set as false if the user is supposedly in vehicle
+                stillNotificationOccurredCounter = 0;
+                if (isWorkoutActive()){
+                    AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
+                            .buildAndDispatch();
+                }
+            }else {
+                isInVehicle = false;
+            }
+
+            if (avgOnFootConfidence > CONFIDENCE_THRESHOLD_ON_FOOT){
+                isOnFoot = true;
+                isStill = false; // isStill is forced set as false if the user is supposedly on foot
+                stillNotificationOccurredCounter = 0;
+            }else {
+                isOnFoot = false;
+            }
+        }
+
         if (isWorkoutActive()){
-            if (stillConfidence > CONFIDENCE_THRESHOLD){
+            if (isStill){
                 if (stillNotificationOccurredCounter == 0){
                     handler.postDelayed(handleStillNotificationRunnable, 10000);
                     Logger.d(TAG, "Scheduling Still notification.");
@@ -203,45 +265,12 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             }
         }
 
-        // Add the fresh result in HistoryQueue
-        long currentTime = result.getTime();
-        historyQueue.add(result);
-        if (historyQueue.isFull()){
-            int i = historyQueue.getMaxSize() - 1;
-            int count = 0;
-            float cumulativeVehicleConfidence = 0;
-            float cumulativeOnFootConfidence = 0;
-            while (i >= 0){
-                ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
-                if (currentTime - elem.getTime() > ACTIVITY_VALID_INTERVAL){
-                    // This is elem is way too old to be considered
-                    break;
-                }
-                cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
-                cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
-                count++;
-                i--;
-            }
-            float avgVehilceConfidence = cumulativeVehicleConfidence / count;
-            float avgOnFootConfidence = cumulativeOnFootConfidence / count;
+    }
 
-            if (avgVehilceConfidence > CONFIDENCE_THRESHOLD){
-                isInVehicle = true;
-                if (isWorkoutActive()){
-//                    MainApplication.showRunNotification("We have detected that you are in a vehicle.");
-                    AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
-                            .buildAndDispatch();
-                }
-            }else {
-                isInVehicle = false;
-            }
-
-            if (avgOnFootConfidence > CONFIDENCE_THRESHOLD){
-                isOnFoot = true;
-                stillNotificationOccurredCounter = 0;
-            }else {
-                isOnFoot = false;
-            }
+    public void persistentMovementDetectedFromOutside(){
+        if (isStill){
+            isStill = false;
+            stillNotificationOccurredCounter = 0;
         }
     }
 
@@ -251,6 +280,10 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
     public boolean isOnFoot(){
         return isOnFoot;
+    }
+
+    public boolean isStill(){
+        return isStill;
     }
 
     private void reset(){

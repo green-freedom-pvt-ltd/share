@@ -80,7 +80,7 @@ android {
 
     productFlavors {
         prod {
-            minSdkVersion 16
+            minSdkVersion 21
         }
         beta {
             minSdkVersion 16

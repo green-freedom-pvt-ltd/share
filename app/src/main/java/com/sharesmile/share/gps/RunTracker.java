@@ -410,7 +410,7 @@ public class RunTracker implements Tracker {
                     if (toRecord){
                         DistRecord record = new DistRecord(point, prevLocation, dist);
                         Logger.d(TAG, "Distance Recording: " + record.toString());
-                        Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed());
+                        Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed() + ", provider is " + point.getProvider());
                         MainApplication.showToast("GPS Speed: " + point.getSpeed() * 3.6 + ", Provider: " + point.getProvider());
                         dataStore.addRecord(record);
                         recordHistoryQueue.add(record);
