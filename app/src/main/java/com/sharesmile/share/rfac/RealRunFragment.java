@@ -14,6 +14,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton;
+import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -49,6 +50,13 @@ public class RealRunFragment extends RunFragment {
 
     @BindView(R.id.timer_indicator)
     TextView mTimerIndicator;
+
+    @BindView(R.id.tv_cal_1)
+    TextView tvCalorieMets;
+
+    @BindView(R.id.tv_cal_2)
+    TextView tvCalorieKarkanen;
+
     private CauseData mCauseData;
 
 
@@ -151,6 +159,9 @@ public class RealRunFragment extends RunFragment {
         distance.setText(distanceString);
         int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));
+        Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
+        tvCalorieMets.setText(String.valueOf(Math.round(calorie.getCalories())));
+        tvCalorieKarkanen.setText(String.valueOf(Math.round(calorie.getCaloriesKarkanen())));
     }
 
 

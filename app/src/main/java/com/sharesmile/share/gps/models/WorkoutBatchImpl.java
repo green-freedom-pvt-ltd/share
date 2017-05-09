@@ -163,4 +163,6 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 			return new WorkoutBatchImpl[size];
 		}
 	};
+
+
 }

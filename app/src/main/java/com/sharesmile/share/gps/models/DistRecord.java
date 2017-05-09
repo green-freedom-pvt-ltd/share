@@ -19,7 +19,7 @@ public class DistRecord implements UnObfuscable, Serializable{
     private Location location;
     private Location prevLocation;
     private float dist; // in meters
-    private float interval; // in secs
+    private long interval; // in millis
     private float speed; // in m/s
     private float bearing; // bearing of location in degrees, irrespective of the prevLocation
 
@@ -34,7 +34,7 @@ public class DistRecord implements UnObfuscable, Serializable{
         bearing = location.getBearing();
         // distanceTo() method, though not blocking but is very computationally intensive
         this.dist = dist;
-        interval = ((float) (getElapsedTimeMs())) / 1000;
+        interval = getElapsedTimeMs();
         speed = (dist * 1000) / getElapsedTimeMs();
     }
 
@@ -81,7 +81,10 @@ public class DistRecord implements UnObfuscable, Serializable{
         return dist;
     }
 
-    public float getInterval() {
+    /**
+     * @return interval in millis between two geolocation points in this DistRecord
+     */
+    public long getInterval() {
         return interval;
     }
 
@@ -102,22 +105,21 @@ public class DistRecord implements UnObfuscable, Serializable{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DistRecord record = (DistRecord) o;
+        DistRecord that = (DistRecord) o;
 
-        if (Float.compare(record.dist, dist) != 0) return false;
-        if (Float.compare(record.interval, interval) != 0) return false;
-        if (Double.compare(record.getLocation().getLatitude(), location.getLatitude()) != 0) return false;
-        if (Double.compare(record.getLocation().getLongitude(), location.getLongitude()) != 0) return false;
-
-        return true;
+        if (Float.compare(that.dist, dist) != 0) return false;
+        if (interval != that.interval) return false;
+        if (!location.equals(that.location)) return false;
+        return prevLocation != null ? prevLocation.equals(that.prevLocation) : that.prevLocation == null;
 
     }
 
     @Override
     public int hashCode() {
         int result = location.hashCode();
+        result = 31 * result + (prevLocation != null ? prevLocation.hashCode() : 0);
         result = 31 * result + (dist != +0.0f ? Float.floatToIntBits(dist) : 0);
-        result = 31 * result + (interval != +0.0f ? Float.floatToIntBits(interval) : 0);
+        result = 31 * result + (int) (interval ^ (interval >>> 32));
         return result;
     }
 }

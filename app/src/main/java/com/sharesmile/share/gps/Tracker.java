@@ -2,6 +2,7 @@ package com.sharesmile.share.gps;
 
 import android.location.Location;
 
+import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 
@@ -26,6 +27,7 @@ public interface Tracker {
 	float getRecordedTimeInSecs();
 	int getTotalSteps();
 	float getTotalDistanceCovered();
+	Calorie getCalories();
 	float getDistanceCoveredSinceLastResume();
 	float getAvgSpeed();
 	float getCurrentSpeed();

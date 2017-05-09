@@ -21,6 +21,5 @@ public interface IWorkoutService {
 	float getAvgSpeed();
 	Tracker getTracker();
 	Properties getWorkoutBundle();
-//	DetectedActivity getDetectedActivity();
 
 }

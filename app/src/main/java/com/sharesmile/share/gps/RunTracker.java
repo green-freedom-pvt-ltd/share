@@ -12,6 +12,7 @@ import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton.State;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.CircularQueue;
@@ -166,7 +167,7 @@ public class RunTracker implements Tracker {
     @Override
     public float getCurrentSpeed() {
         float distCovered = 0f; // in meters
-        float timeTaken = 0; // in millis
+        long timeTaken = 0; // in millis
         if (!recordHistoryQueue.isEmpty()){
             if (recordHistoryQueue.getCurrentSize() == 1){
                 // Only one record is present
@@ -256,6 +257,14 @@ public class RunTracker implements Tracker {
     }
 
     @Override
+    public Calorie getCalories() {
+        if (isActive() && dataStore != null){
+            return dataStore.getCalories();
+        }
+        return null;
+    }
+
+    @Override
     public void feedLocation(final Location point){
         if (!isActive()){
             throw new IllegalStateException("Can't feed locations without beginning run");
@@ -307,14 +316,16 @@ public class RunTracker implements Tracker {
 
         float distBeforeDiscard = dataStore.getTotalDistance();
         float recordedTimeBeforeDiscard = dataStore.getRecordedTime();
+        double caloriesBeforeDiscard = dataStore.getCalories().getCalories();
 
         dataStore.discardApprovalQueue();
 
         float deltaDistance = dataStore.getTotalDistance() - distBeforeDiscard; // in meters, should be negative
         float deltaTime = dataStore.getRecordedTime() - recordedTimeBeforeDiscard; // in secs
         float deltaSpeed = (deltaDistance / deltaTime) * 3.6f; // in km/hrs
+        double deltaCalories = dataStore.getCalories().getCalories() - caloriesBeforeDiscard;
         listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
-                deltaDistance, Math.round(deltaTime), deltaSpeed);
+                deltaDistance, Math.round(deltaTime), deltaSpeed, deltaCalories);
         return deltaDistance;
     }
 
@@ -412,14 +423,16 @@ public class RunTracker implements Tracker {
                         Logger.d(TAG, "Distance Recording: " + record.toString());
                         Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed() + ", provider is " + point.getProvider());
                         MainApplication.showToast("GPS Speed: " + point.getSpeed() * 3.6 + ", Provider: " + point.getProvider());
+                        double prevCalories = dataStore.getCalories().getCalories();
                         dataStore.addRecord(record);
                         recordHistoryQueue.add(record);
                         SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);
                         float deltaDistance = dist; // in meters
-                        int deltaTime = Math.round(record.getInterval()); // in secs
+                        int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs
                         float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs
+                        double deltaCalories = dataStore.getCalories().getCalories() - prevCalories;
                         listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
-                                deltaDistance, deltaTime, deltaSpeed);
+                                deltaDistance, deltaTime, deltaSpeed, deltaCalories);
                     }
                 }
             }
@@ -457,7 +470,7 @@ public class RunTracker implements Tracker {
 
         void updateWorkoutRecord(float totalDistance, float avgSpeed,
                                  float deltaDistance, int deltaTime,
-                                 float deltaSpeed);
+                                 float deltaSpeed, double deltaCalories);
 
         void updateStepsRecord(long timeStampMillis);
 

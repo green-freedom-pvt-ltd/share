@@ -24,10 +24,9 @@ import com.sharesmile.share.utils.Logger;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.CONFIDENCE_LOWER_THRESHOLD_STILL;
-import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_EVENT;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_ON_FOOT;
-import static com.sharesmile.share.core.Config.CONFIDENCE_UPPER_THRESHOLD_STILL;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_VEHICLE;
+import static com.sharesmile.share.core.Config.CONFIDENCE_UPPER_THRESHOLD_STILL;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
@@ -45,6 +44,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private boolean isOnFoot = false;
     private boolean isStill = false;
     private int stillNotificationOccurredCounter = 0;
+
+    private float runningConfidenceRecentAvg;
+    private float walkingConfidenceRecentAvg;
 
     private boolean isWorkoutActive;
 
@@ -179,22 +181,25 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }
     };
 
+    final Runnable resetConfidenceValuesRunnable = new Runnable() {
+        @Override
+        public void run() {
+            runningConfidenceRecentAvg = 0;
+            walkingConfidenceRecentAvg = 0;
+            handler.removeCallbacks(resetConfidenceValuesRunnable);
+        }
+    };
+
     public void handleActivityRecognitionResult(ActivityRecognitionResult result){
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
         float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
         float onFootConfidence = result.getActivityConfidence(DetectedActivity.ON_FOOT);
+        float runningConfidence = result.getActivityConfidence(DetectedActivity.RUNNING);
+        float walkingConfidence = result.getActivityConfidence(DetectedActivity.WALKING);
 
         Logger.d(TAG, "handleActivityRecognitionResult: inVehicleConfidence = " + inVehicleConfidence
                     + ", stillConfidence = " + stillConfidence + ", onFootConfidence = " + onFootConfidence
                     + ", stillNotificationOccurredCounter " + stillNotificationOccurredCounter);
-
-        if (isWorkoutActive()){
-            if (inVehicleConfidence > CONFIDENCE_THRESHOLD_EVENT){
-                AnalyticsEvent.create(Event.ACTIVITY_RCOGNIZED_IN_VEHICLE)
-                        .put("confidence_value", inVehicleConfidence)
-                        .buildAndDispatch();
-            }
-        }
 
         // Add the fresh result in HistoryQueue
         long currentTime = result.getTime();
@@ -205,6 +210,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             float cumulativeVehicleConfidence = 0;
             float cumulativeOnFootConfidence = 0;
             float cumulativeStillConfidence = 0;
+            float cumulativeRunningConfidence = 0;
+            float cumulativeWalkingConfidence = 0;
             long validInterval = isWorkoutActive() ? ACTIVITY_VALID_INTERVAL_ACTIVE : ACTIVITY_VALID_INTERVAL_IDLE;
             while (i >= 0){
                 ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
@@ -215,12 +222,19 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
                 cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
                 cumulativeStillConfidence += elem.getActivityConfidence(DetectedActivity.STILL);
+                cumulativeRunningConfidence += elem.getActivityConfidence(DetectedActivity.RUNNING);
+                cumulativeWalkingConfidence += elem.getActivityConfidence(DetectedActivity.WALKING);
                 count++;
                 i--;
             }
             float avgVehilceConfidence = cumulativeVehicleConfidence / count;
             float avgOnFootConfidence = cumulativeOnFootConfidence / count;
             float avgStillConfidence = cumulativeStillConfidence / count;
+            runningConfidenceRecentAvg = cumulativeRunningConfidence / count;
+            walkingConfidenceRecentAvg = cumulativeWalkingConfidence / count;
+            handler.removeCallbacks(resetConfidenceValuesRunnable);
+            // Resetting these confidence values back to 0, if we don't receive activity recognition updates for sufficiently long period
+            handler.postDelayed(resetConfidenceValuesRunnable, 25000);
 
             Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
                     + avgVehilceConfidence + ", Foot: " + avgOnFootConfidence + ", Still: " + avgStillConfidence);
@@ -272,6 +286,14 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             isStill = false;
             stillNotificationOccurredCounter = 0;
         }
+    }
+
+    public float getRunningConfidence(){
+        return runningConfidenceRecentAvg;
+    }
+
+    public float getWalkingConfidence(){
+        return walkingConfidenceRecentAvg;
     }
 
     public boolean isIsInVehicle(){

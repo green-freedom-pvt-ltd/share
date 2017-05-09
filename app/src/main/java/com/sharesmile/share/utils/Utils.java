@@ -18,8 +18,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.rfac.models.Run;
 
 import java.io.File;
@@ -316,4 +318,143 @@ public class Utils {
         return run;
     }
 
+    /**
+     * Calculates DeltaCalories as per METS formula
+     * @param deltaTimeMillis time interval in millis in which this distance is covered
+     * @param deltaSpeed speed in m/s during which the distance was covered
+     * @return Kcal calculated using METS formula
+     */
+    public static double getDeltaCaloriesMets(long deltaTimeMillis, float deltaSpeed){
+        double mets = getMetsValue(deltaSpeed);
+        float bodyWeightKgs = MainApplication.getInstance().getUserDetails().getBodyWeight();
+        // TODO: CaloriesCalculation Put a check for 0 bodyweight over here
+        return mets * bodyWeightKgs * ( ((double)(deltaTimeMillis)) / (1000*60*60) );
     }
+
+    public static double getMetsValue(float deltaSpeed){
+        double mph = 2.23694*deltaSpeed;
+
+        // Referring Compendium of Physical Activities over here
+        // https://sites.google.com/site/compendiumofphysicalactivities/Activity-Categories/walking
+        // and here
+        // https://sites.google.com/site/compendiumofphysicalactivities/Activity-Categories/running
+
+        if (mph <= 0) {
+            return 0;
+        }else if (mph <= 1){
+            return 1.3;
+        }else if (mph <= 2){
+            return (1.3 + 1.5*(mph - 1)); // 2.8 at 2 mph
+        }else if (mph <= 2.5){
+            return 2.8 + 0.4*(mph - 2); // 3.0 at 2.5 mph
+        }else if (mph <= 3.5){
+            return 3.0 + 1.3*(mph - 2.5); // 4.3 at 3.5 mph
+        }else if (mph <= 4){
+            return 4.3 + 1.4*(mph - 3.5); // 5 at 4 mph
+        }
+        /// All walking values uptill here, range 4-5 mph is ambiguous range need to decide between running and walking
+        else if (mph <= 5){
+            if (ActivityDetector.getInstance().getRunningConfidence()
+                    >= ActivityDetector.getInstance().getWalkingConfidence()){
+                // User is running
+                return 6 + 2.3*(mph - 4); // 8.3 at 5 mph
+            }else {
+                // User is Walking
+                if (mph <= 4.5){
+                    // 4 - 4.5 mph
+                    return 5 + 4*(mph - 4); // 7.0 at 4.5 mph
+                }else {
+                    // 4.5 - 5 mph
+                    return 7 + 2.6*(mph - 4.5); // 8.3 at 5 mph
+                }
+            }
+        }else if (mph <= 6){
+            return 8.3 + 1.5*(mph - 5); // 9.8 at 6 mph
+        }else if (mph <= 7){
+            return 9.8 + 1.2*(mph - 6); // 11.0 at 7mph
+        }else if (mph <= 7.7){
+            return 11 + 1.143*(mph - 7); // 11.8 at 7.7 mph
+        }else if (mph <= 9){
+            return 11.8 + 0.77*(mph - 7.7); // 12.8 at 9 mph
+        }else if (mph <= 10){
+            return 12.8 + 1.7*(mph - 9); // 14.5 at 10 mph
+        }else if (mph <= 11){
+            return 14.5 + 1.5*(mph - 10); // 16 at 11 mph
+        }else if (mph <= 12){
+            return 16 + 3*(mph - 11); // 19 at 12 mph
+        }else if (mph <= 14){
+            return 19 + 2*(mph - 12); // 23 at 14 mph
+        }else if (mph <= 15){
+            return 23 + 1*(mph - 14); // 24 at 15 mph
+        }else {
+            // For speeds greater than 15 mph (23 kmph) we assume that the person is driving so we don't add calories
+            return 1.3;
+        }
+    }
+
+    public static double getDeltaCaloriesKarkanen(long deltaTimeMillis, float deltaSpeed){
+        double mph = 2.23694*deltaSpeed;
+        float bodyWeightKgs = MainApplication.getInstance().getUserDetails().getBodyWeight();
+        if (bodyWeightKgs == 0){
+            return 0;
+        }
+        double bodyWeightLbs = 2.205*bodyWeightKgs;
+        double mins = ((double) deltaTimeMillis) / (1000 * 60);
+
+        if (mph <= 0){
+            return 0;
+        }else if (mph <= 1){
+            // METS formula for the case when speed is extremely low
+            return 1.3 * bodyWeightKgs * (mins / 60);
+        }else if (mph <= 3){
+            return bodyWeightLbs * mins * karkanenCalorieRateForWalking(mph, bodyWeightLbs);
+        }else if (mph <= 5){
+            // Range 3-5 mph is ambiguous range need to decide between running and walking
+            if (ActivityDetector.getInstance().getRunningConfidence()
+                    >= ActivityDetector.getInstance().getWalkingConfidence()){
+                // User is Running
+                return bodyWeightLbs * mins * karkanenCalorieRateForRunning(mph, bodyWeightLbs);
+            }else {
+                // User is Walking
+                return bodyWeightLbs * mins * karkanenCalorieRateForWalking(mph, bodyWeightLbs);
+            }
+        }else if (mph <= 14){
+            // User is assumed to be running
+            return bodyWeightLbs * mins * karkanenCalorieRateForRunning(mph, bodyWeightLbs);
+        }else {
+            // Too fast, user must be in a vehicle
+            // Hence METS formula for calculating calories burned for a static user
+            return 1.3 * bodyWeightKgs * (mins / 60);
+        }
+
+    }
+
+    /**
+     * Calculates Karkanen rate of burning calories per lb per min for a Walking user
+     * @param speed in mph
+     * @param weightInLbs in lbs
+     * @return Returns Kcal/lb-min
+     */
+    public static double karkanenCalorieRateForWalking(double speed, double weightInLbs){
+        double a = 0.0195;
+        double b = (-1)*0.00436;
+        double c = 0.00245;
+        double d = ( 0.000801*Math.pow(weightInLbs/154, 0.425) ) / weightInLbs;
+        return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
+    }
+
+    /**
+     * Calculates Karkanen rate of burning calories per lb per min for a Running user
+     * @param speed in mph
+     * @param weightInLbs in lbs
+     * @return Returns Kcal/lb-min
+     */
+    public static double karkanenCalorieRateForRunning(double speed, double weightInLbs){
+        double a = 0.0395;
+        double b = 0.00327;
+        double c = 0.000455;
+        double d = ( 0.00801*Math.pow(weightInLbs/154, 0.425) ) / weightInLbs;
+        return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
+    }
+
+}

@@ -327,7 +327,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-            performOperation(SHOW_FAQ_FRAGMENT,false);
+            replaceFragment(new ProfileStatsFragment(), true);
+//            performOperation(SHOW_FAQ_FRAGMENT,false);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
@@ -345,7 +346,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void showProfileScreen() {
-        replaceFragment(new ProfileStatsFragment(), true);
+        replaceFragment(new ProfileFragment(), true);
     }
 
     private void showLoginActivity() {

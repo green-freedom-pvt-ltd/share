@@ -32,6 +32,11 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	float getElapsedTime();
 
 	/**
+	 * @return Calorie object which holds calories burned since the beginning of the batch
+	 */
+	Calorie getCalories();
+
+	/**
 	 * @return Avg speed of the workout in meter/sec
 	 */
 	float getAvgSpeed();

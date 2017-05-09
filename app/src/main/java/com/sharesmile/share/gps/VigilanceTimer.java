@@ -120,12 +120,14 @@ public class VigilanceTimer implements Runnable {
 			return false;
 		}
 
+		float recentSpeed = workoutService.getCurrentSpeed();
 		if (ActivityDetector.getInstance().isIsInVehicle()
-				&& workoutService.getCurrentSpeed() > Config.UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION){
+				&& recentSpeed > Config.UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION){
 			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
 			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 					.addBundle(workoutService.getWorkoutBundle())
 					.put("detected_by", "activity_recognition")
+					.put("recent_speed", recentSpeed*3.6)
 					.buildAndDispatch();
 			return true;
 		}
@@ -174,6 +176,8 @@ public class VigilanceTimer implements Runnable {
 						AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 								.addBundle(workoutService.getWorkoutBundle())
 								.put("detected_by", "speed_logic")
+								.put("speed_in_session", speedInSession*3.6)
+								.put("recent_speed", workoutService.getCurrentSpeed()*3.6)
 								.buildAndDispatch();
 						return true;
 					}

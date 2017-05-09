@@ -9,6 +9,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
@@ -60,6 +61,11 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public float getTotalDistance(){
         return dirtyWorkoutData.getDistance();
+    }
+
+    @Override
+    public Calorie getCalories() {
+        return dirtyWorkoutData.getCalories();
     }
 
     @Override
@@ -127,6 +133,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         p.put("avg_speed", getAvgSpeed() * (3.6f));
         p.put("num_steps", getTotalSteps());
         p.put("client_run_id", getWorkoutId());
+        p.put("calories", getCalories().getCalories());
         return p;
     }
 

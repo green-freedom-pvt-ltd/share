@@ -257,6 +257,7 @@ public class WorkoutService extends Service implements
             p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
             p.put("client_run_id", tracker.getCurrentWorkoutId());
+            p.put("calories", tracker.getCalories().getCalories());
             return p;
         }
         return  null;
@@ -321,7 +322,7 @@ public class WorkoutService extends Service implements
             if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
                 // User is stepping with average cadence of 1 step per sec for the past few (StepCounter.STEP_COUNT_READING_VALID_INTERVAL) secs
                 // Lets notify the ActivityDetector about it
-
+                ActivityDetector.getInstance().persistentMovementDetectedFromOutside();
             }
         }
     }
@@ -544,9 +545,10 @@ public class WorkoutService extends Service implements
 
     @Override
     public void updateWorkoutRecord(float totalDistance, float avgSpeed, float deltaDistance,
-                                    int deltaTime, float deltaSpeed) {
+                                    int deltaTime, float deltaSpeed, double deltaCalories) {
         Logger.d(TAG, "updateWorkoutRecord: totalDistance = " + totalDistance
-                + " avgSpeed = " + avgSpeed + ", deltaSpeed = " + deltaSpeed + ", deltaTime = " + deltaTime);
+                + " avgSpeed = " + avgSpeed + ", deltaSpeed = " + deltaSpeed
+                + ", deltaTime = " + deltaTime + ", deltaCalories = " + deltaCalories);
         // Send an update broadcast to Activity
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
@@ -566,6 +568,7 @@ public class WorkoutService extends Service implements
                     .put("delta_distance", deltaDistance) // in meters
                     .put("delta_time", deltaTime) // in secs
                     .put("delta_speed", deltaSpeed) // in km/hrs
+                    .put("delta_calories", deltaCalories) // in Kcals
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsOneDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);

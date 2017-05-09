@@ -29,6 +29,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private LatLng startPoint;
 	private String workoutId;
 	private LatLng latestPoint;
+	private Calorie calories;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -43,6 +44,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		this.beginTimeStamp = beginTimeStamp;
 		invokeNewBatch(beginTimeStamp);
 		this.workoutId = workoutId;
+		this.calories = new Calorie(0,0);
 	}
 
 	private WorkoutDataImpl(WorkoutDataImpl source){
@@ -60,6 +62,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		for (WorkoutBatch batch : source.batches){
 			batches.add((WorkoutBatchImpl)batch.copy());
 		}
+		calories = new Calorie(source.calories.getCalories(),
+				source.calories.getCaloriesKarkanen());
 	}
 
 	private void invokeNewBatch(long startTimeStamp){
@@ -102,6 +106,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	public float getElapsedTime(){
 		setElapsedTime();
 		return elapsedTime;
+	}
+
+	@Override
+	public Calorie getCalories() {
+		return calories;
 	}
 
 	private void setRecordedTime(){
@@ -214,6 +223,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			// Add record over here
 			getCurrentBatch().addRecord(record);
 			this.distance += record.getDist();
+			this.calories.incrementCaloriesMets(Utils.getDeltaCaloriesMets(record.getInterval(), record.getSpeed()));
+			this.calories.incrementCaloriesKarkanen(Utils.getDeltaCaloriesKarkanen(record.getInterval(), record.getSpeed()));
 		}
 		latestPoint = new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude());
 	}
@@ -263,6 +274,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		p.put("avg_speed", getAvgSpeed()*(3.6f));
 		p.put("num_steps", getTotalSteps());
 		p.put("client_run_id", getWorkoutId());
+		p.put("calories", getCalories().getCalories());
 		return p;
 	}
 
@@ -289,6 +301,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", startPoint=" + startPoint +
 				", workoutId=" + workoutId +
 				", latestPoint=" + latestPoint +
+				", calories=" + calories +
 				'}';
 	}
 
@@ -303,6 +316,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		startPoint = (LatLng) in.readValue(LatLng.class.getClassLoader());
 		workoutId = in.readString();
 		latestPoint = (LatLng) in.readValue(LatLng.class.getClassLoader());
+		calories = (Calorie) in.readValue(Calorie.class.getClassLoader());
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
@@ -328,6 +342,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeValue(startPoint);
 		dest.writeString(workoutId);
 		dest.writeValue(latestPoint);
+		dest.writeValue(calories);
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {
@@ -348,4 +363,5 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			return new WorkoutDataImpl[size];
 		}
 	};
+
 }
