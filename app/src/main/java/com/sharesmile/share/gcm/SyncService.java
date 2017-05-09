@@ -146,6 +146,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("first_name", prev.getFirstName());
             jsonObject.put("gender_user", prev.getGenderUser());
             jsonObject.put("phone_number", prev.getPhoneNumber());
+            jsonObject.put("body_weight", prev.getBodyWeight());
             jsonObject.put("user_id", user_id);
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
@@ -153,6 +154,11 @@ public class SyncService extends GcmTaskService {
             Gson gson = new Gson();
             UserDetails response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject, UserDetails.class);
             Logger.d(TAG, "Response for getUser:" + gson.toJson(response));
+
+            //TODO: CalorieCalculation, remove this weight hack after the API returns weight of the user
+            if (response.getBodyWeight() == 0f){
+                response.setBodyWeight(prev.getBodyWeight());
+            }
 
             MainApplication.getInstance().setUserDetails(response);
 

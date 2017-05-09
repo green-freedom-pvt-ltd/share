@@ -24,6 +24,7 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Calendar;
@@ -46,6 +47,9 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
 
     @BindView(R.id.et_profile_general_number)
     EditText mNumber;
+
+    @BindView(R.id.et_body_weight_kg)
+    EditText bodyWeightKgs;
 
     @BindView(R.id.gender_group)
     RadioGroup mRadioGroup;
@@ -99,6 +103,10 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
             mNumber.setText(userDetails.getPhoneNumber());
         }
 
+        if (userDetails.getBodyWeight() > 0f) {
+            bodyWeightKgs.setText(userDetails.getBodyWeight() + "");
+        }
+
         if (!TextUtils.isEmpty(userDetails.getBirthday())) {
             mBirthday.setText(userDetails.getBirthday());
         }
@@ -144,6 +152,17 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
             }
         }
 
+        if (!TextUtils.isEmpty(bodyWeightKgs.getText())) {
+            try {
+                float bodyWeightEntered = Float.parseFloat(bodyWeightKgs.getText().toString());
+                userDetails.setBodyWeight(bodyWeightEntered);
+                Analytics.getInstance().setUserProperty("body_weight", bodyWeightEntered);
+            }catch (Exception e){
+                Logger.e("ProfileGeneralFragment", "Exception while parsing body weight: " + e.getMessage() );
+                e.printStackTrace();
+            }
+        }
+
         if (mFemaleRadioBtn.isChecked() || mMaleRadioBtn.isChecked()) {
             if (mFemaleRadioBtn.isChecked()){
                 userDetails.setGenderUser("f");
@@ -153,6 +172,8 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
                 Analytics.getInstance().setUserGender("M");
             }
         }
+
+        MainApplication.getInstance().setUserDetails(userDetails);
 
         syncUserData();
 

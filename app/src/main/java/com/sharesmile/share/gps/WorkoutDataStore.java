@@ -23,6 +23,12 @@ public interface WorkoutDataStore {
 	 */
 	float getTotalDistance();
 
+	/**
+	 * Get total calories burned (in Kcal) since the beginning of run
+	 * @return
+	 */
+	float getTotalCaloriesBurned();
+
 	long getBeginTimeStamp();
 
 	void addSteps(int numSteps);
