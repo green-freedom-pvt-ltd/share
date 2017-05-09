@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 71
-        versionName "1.9.5"
+        versionCode 72
+        versionName "1.9.6"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
