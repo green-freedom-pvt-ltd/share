@@ -128,6 +128,9 @@ public class Constants {
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
     public static final String PREF_LEAGUE_TEAM_ID="pref_league_team_id";
     public static final String PREF_USER_DETAILS="pref_user_details";
+    public static final String PREF_GLOBAL_LEADERBOARD_CACHED_DATA="pref_global_leaderboard_cached_data";
+    public static final String PREF_LEAGUEBOARD_CACHED_DATA="pref_leagueboard_cached_data";
+    public static final String PREF_MY_TEAM_LEADERBOARD_CACHED_DATA="pref_my_team_leaderboard_cached_data";
 
 
     //app Update

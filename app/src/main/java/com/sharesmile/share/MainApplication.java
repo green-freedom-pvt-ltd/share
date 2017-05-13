@@ -222,6 +222,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         mDbWrapper = new DbWrapper(this);
         GoogleLocationTracker.initialize(this);
         ActivityDetector.initialize(this);
+        LeaderBoardDataStore.initialize(this);
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
 
@@ -303,7 +304,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         SyncHelper.syncUserFromDB();
         SyncHelper.scheduleRunDataSync(this);
         SyncHelper.syncMessageCenterData(this);
-        SyncHelper.syncLeaderBoardData(this); // TODO: Leaderboard: Need to implement sync for Leaderboard
+        SyncHelper.syncLeaderBoardData(this);
         SyncHelper.scheduleCauseDataSync(this);
         SyncHelper.scheduleUserDataSync(this);
     }
@@ -366,9 +367,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         prefsManager.setBoolean(Constants.PREF_IS_SIGN_UP_USER, details.isSignUp());
 
-        if (details.getTeamCode() != 0){
-            prefsManager.setInt(Constants.PREF_LEAGUE_TEAM_ID, details.getTeamCode());
-            Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamCode());
+        if (details.getTeamId() != 0){
+            prefsManager.setInt(Constants.PREF_LEAGUE_TEAM_ID, details.getTeamId());
+            Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamId());
         }
 
     }

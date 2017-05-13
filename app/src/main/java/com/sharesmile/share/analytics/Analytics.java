@@ -72,7 +72,7 @@ public class Analytics {
         setUserPhone(details.getPhoneNumber());
         setUserGender(details.getGenderUser());
         setUserPhoto(details.getSocialThumb());
-        setUserImpactLeagueTeamCode(details.getTeamCode());
+        setUserImpactLeagueTeamCode(details.getTeamId());
 
     }
 

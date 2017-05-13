@@ -13,5 +13,7 @@ public class TaskConstants {
 
     public static String SYNC_CAUSE_DATA = "sync_cause_data";
 
+    public static String SYNC_LEADERBOARD_DATA = "sync_leaderboard_data";
+
     public static String SYNC_WORKOUT_DATA = "sync_workout_data";
 }

@@ -18,6 +18,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Config;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 
@@ -270,7 +271,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         if (isWorkoutActive()){
             if (isStill){
                 if (stillNotificationOccurredCounter == 0){
-                    handler.postDelayed(handleStillNotificationRunnable, 10000);
+                    handler.postDelayed(handleStillNotificationRunnable, Config.STILL_NOTIFICATION_DISPLAY_INTERVAL);
                     Logger.d(TAG, "Scheduling Still notification.");
                 }
             }else {

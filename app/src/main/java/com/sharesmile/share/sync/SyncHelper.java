@@ -38,6 +38,7 @@ import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
 import static com.sharesmile.share.core.Constants.PREF_USER_NAME;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_CAUSE_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.SYNC_LEADERBOARD_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_WORKOUT_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
@@ -158,8 +159,19 @@ public class SyncHelper {
 
 
     public static void syncLeaderBoardData(Context context) {
-        // TODO: Leaderboad: Sync latest leaderboard from server and store it in SharedPreferences
-        // Right now fresh Leaderboard is fetched everytime a user opens leaderboard
+        PeriodicTask task = new PeriodicTask.Builder()
+                .setService(SyncService.class)
+                .setTag(SYNC_LEADERBOARD_DATA)
+                // TODO Reset these params
+                .setPeriod(60) // in secs , i.e. every hour
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setFlex(5)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        mGcmNetworkManager.schedule(task);
+
     }
 
     public static void scheduleCauseDataSync(Context context) {
@@ -208,7 +220,7 @@ public class SyncHelper {
                     details.setAuthToken(prefsManager.getString(PREF_AUTH_TOKEN));
                     details.setGenderUser(user.getGender());
                     details.setSignUp(prefsManager.getBoolean(Constants.PREF_IS_SIGN_UP_USER));
-                    details.setTeamCode(prefsManager.getInt(Constants.PREF_LEAGUE_TEAM_ID));
+                    details.setTeamId(prefsManager.getInt(Constants.PREF_LEAGUE_TEAM_ID));
                     details.setSocialThumb(user.getProfileImageUrl());
 
                     MainApplication.getInstance().setUserDetails(details);

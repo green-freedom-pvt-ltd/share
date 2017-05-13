@@ -44,7 +44,7 @@ public class UserDetails implements UnObfuscable{
     @SerializedName("sign_up")
     private boolean signUp;
     @SerializedName("team_code")
-    private int teamCode;
+    private int teamId;
     @SerializedName("body_weight")
     private float bodyWeight;
     @SerializedName("body_height")
@@ -118,8 +118,8 @@ public class UserDetails implements UnObfuscable{
         return signUp;
     }
 
-    public int getTeamCode() {
-        return teamCode;
+    public int getTeamId() {
+        return teamId;
     }
 
     public void setUserId(int userId) {
@@ -192,8 +192,8 @@ public class UserDetails implements UnObfuscable{
         this.signUp = signUp;
     }
 
-    public void setTeamCode(int teamCode) {
-        this.teamCode = teamCode;
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
     }
 
     public float getBodyWeight() {

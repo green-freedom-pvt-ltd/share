@@ -8,6 +8,10 @@ import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
+import com.sharesmile.share.Events.LeagueBoardDataUpdated;
+import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
@@ -18,6 +22,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.models.CauseList;
+import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.rfac.models.UserDetails;
@@ -33,7 +38,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import Models.TeamBoard;
+import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.sync.SyncHelper.updateUserImpact;
 
@@ -59,6 +69,8 @@ public class SyncService extends GcmTaskService {
             return updateCauseData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_WORKOUT_DATA)) {
             return syncWorkoutData();
+        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_LEADERBOARD_DATA)) {
+            return syncLeaderBoardData();
         }
         return GcmNetworkManager.RESULT_SUCCESS;
     }
@@ -67,6 +79,56 @@ public class SyncService extends GcmTaskService {
     public void onInitializeTasks() {
         super.onInitializeTasks();
         MainApplication.getInstance().startSyncTasks();
+    }
+
+    public static int syncLeaderBoardData(){
+        Logger.d(TAG, "syncLeaderBoardData");
+
+        int result = GcmNetworkManager.RESULT_SUCCESS;
+        try {
+            TeamBoard leagueBoard = NetworkDataProvider.doGetCall(Urls.getTeamBoardUrl(), TeamBoard.class);
+            // Store this in LeaderBoardDataStore
+            LeaderBoardDataStore.getInstance().setLeagueBoardData(leagueBoard);
+            // Notify LeaderBoardFragment about it
+            EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
+        } catch (NetworkException e) {
+            Logger.e(TAG, "Exception occurred while syncing LeagueBoard data from network: " + e.getMessage());
+            e.printStackTrace();
+            result = GcmNetworkManager.RESULT_FAILURE;
+        }
+
+        try {
+            LeaderBoardList leaderBoardList = NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(), LeaderBoardList.class);
+            // Store this in LeaderBoardDataStore
+            LeaderBoardDataStore.getInstance().setGlobalLeaderBoardData(leaderBoardList);
+            // Notify LeaderBoardFragment about it
+            EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true));
+        } catch (NetworkException e) {
+            Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data from network: " + e.getMessage());
+            e.printStackTrace();
+            result = GcmNetworkManager.RESULT_FAILURE;
+        }
+
+        try {
+            int leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
+            if (leagueTeamId > 0){
+                Map<String, String> queryParams = new HashMap<>();
+                queryParams.put("team_id", String.valueOf(leagueTeamId));
+                TeamLeaderBoard myTeamLeaderBoard = NetworkDataProvider
+                        .doGetCall(Urls.getTeamLeaderBoardUrl(), queryParams, TeamLeaderBoard.class);
+                // Store this in LeaderBoardDataStore
+                LeaderBoardDataStore.getInstance().setMyTeamLeaderBoardData(myTeamLeaderBoard);
+                // Notify LeaderBoardFragment about it
+                EventBus.getDefault().post(new TeamLeaderBoardDataFetched(leagueTeamId, true, myTeamLeaderBoard));
+            }
+        } catch (NetworkException e) {
+            Logger.e(TAG, "Exception occurred while syncing MyTeamLeaderBoardData from network: " + e.getMessage());
+            e.printStackTrace();
+            result = GcmNetworkManager.RESULT_FAILURE;
+        }
+
+        return result;
+
     }
 
     public static int updateCauseData() {

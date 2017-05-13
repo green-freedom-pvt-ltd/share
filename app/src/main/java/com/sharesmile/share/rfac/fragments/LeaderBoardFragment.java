@@ -18,28 +18,29 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
+import com.sharesmile.share.Events.LeagueBoardDataUpdated;
+import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.LeaderBoard;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.network.NetworkAsyncCallback;
-import com.sharesmile.share.network.NetworkDataProvider;
-import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Urls;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
@@ -83,32 +84,32 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     private LeaderBoard myLeaderBoard;
 
     public enum BOARD_TYPE {
-        LEADERBOARD,
-        TEAMBAORD,
-        TEAMLEADERBAORD;
+        GLOBAL_LEADERBOARD,
+        LEAGUEBOARD,
+        TEAM_LEADERBAORD;
 
         public static BOARD_TYPE getBoardType(int board) {
 
             switch (board) {
                 case 1:
-                    return LEADERBOARD;
+                    return GLOBAL_LEADERBOARD;
                 case 2:
-                    return TEAMBAORD;
+                    return LEAGUEBOARD;
                 case 3:
-                    return TEAMLEADERBAORD;
+                    return TEAM_LEADERBAORD;
                 default:
-                    return LEADERBOARD;
+                    return GLOBAL_LEADERBOARD;
             }
         }
 
         public static int getBoardID(BOARD_TYPE board) {
 
             switch (board) {
-                case LEADERBOARD:
+                case GLOBAL_LEADERBOARD:
                     return 1;
-                case TEAMBAORD:
+                case LEAGUEBOARD:
                     return 2;
-                case TEAMLEADERBAORD:
+                case TEAM_LEADERBAORD:
                     return 3;
                 default:
                     return 1;
@@ -128,7 +129,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     public static LeaderBoardFragment getInstance(BOARD_TYPE board,int teamId) {
         LeaderBoardFragment fragment = getInstance(board);
         Bundle bundle = fragment.getArguments();
-        if (board == BOARD_TYPE.TEAMLEADERBAORD) {
+        if (board == BOARD_TYPE.TEAM_LEADERBAORD) {
             bundle.putInt(BUNDLE_TEAM_ID, teamId);
         }
         fragment.setArguments(bundle);
@@ -141,7 +142,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         Bundle arg = getArguments();
         if (arg != null) {
             mBoard = BOARD_TYPE.getBoardType(arg.getInt(BUNDLE_LEAGUE_BOARD));
-            mShowLeagueBoard = mBoard == BOARD_TYPE.TEAMBAORD ? true : false;
+            mShowLeagueBoard = mBoard == BOARD_TYPE.LEAGUEBOARD ? true : false;
             mTeamId = arg.getInt(BUNDLE_TEAM_ID);
         }
     }
@@ -169,7 +170,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             @Override
             public void onRefresh() {
                 refreshItems();
-
             }
         });
         mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
@@ -177,26 +177,42 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     private void fetchData() {
-        if (mBoard == BOARD_TYPE.LEADERBOARD) {
-            fetchGlobalLeaderBoardData();
+        if (mBoard == BOARD_TYPE.GLOBAL_LEADERBOARD) {
+            // GlobalLeaderBoard
+            if (LeaderBoardDataStore.getInstance().getGlobalLeaderBoard() != null){
+                showGlobalLeaderBoardData(LeaderBoardDataStore.getInstance()
+                        .getGlobalLeaderBoard());
+                MainApplication.showToast("Swipe to Refresh");
+            }else {
+                LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData();
+                showProgressDialog();
+            }
         } else {
+            // LeagueBoard
             mInfoView.setVisibility(View.GONE);
-            if (mBoard == BOARD_TYPE.TEAMBAORD) {
-                fetchTeamBoardData();
+            if (mBoard == BOARD_TYPE.LEAGUEBOARD) {
+                if (LeaderBoardDataStore.getInstance().getLeagueBoard() != null){
+                    showLeagueBoardData(LeaderBoardDataStore.getInstance().getLeagueBoard());
+                    MainApplication.showToast("Swipe to Refresh");
+                }else {
+                    LeaderBoardDataStore.getInstance().updateLeagueBoardData();
+                    showProgressDialog();
+                }
             } else {
-                fetchTeamLeaderBoardData();
+                // League's Team LeaderBoard
+                LeaderBoardDataStore.getInstance().updateTeamLeaderBoardData(mTeamId);
+                showProgressDialog();
             }
         }
-        showProgressDialog();
     }
 
     private void setupToolbar() {
         setHasOptionsMenu(true);
-        if (mBoard == BOARD_TYPE.LEADERBOARD) {
+        if (mBoard == BOARD_TYPE.GLOBAL_LEADERBOARD) {
             setToolbarTitle(getResources().getString(R.string.leaderboard));
         } else {
             mInfoView.setVisibility(View.GONE);
-            if (mBoard == BOARD_TYPE.TEAMBAORD) {
+            if (mBoard == BOARD_TYPE.LEAGUEBOARD) {
                 setToolbarTitle(getResources().getString(R.string.impact_league));
             } else {
                 setToolbarTitle(getResources().getString(R.string.team_leader_board));
@@ -211,7 +227,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mBoard == BOARD_TYPE.LEADERBOARD) {
+        if (mBoard == BOARD_TYPE.GLOBAL_LEADERBOARD) {
             inflater.inflate(R.menu.menu_leaderboard, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -223,7 +239,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             case R.id.item_league:
                 int teamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID, 0);
                 if (teamId > 0) {
-                    getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAMBAORD), true);
+                    getFragmentController().replaceFragment(getInstance(BOARD_TYPE.LEAGUEBOARD), true);
                 } else {
                     getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
                 }
@@ -240,12 +256,13 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             Logger.i(TAG, "LeaderBoard list cleared");
         }
         mLeaderBoardAdapter.notifyDataSetChanged();
-        if (mBoard == BOARD_TYPE.TEAMBAORD) {
-            fetchTeamBoardData();
-        } else if (mBoard == BOARD_TYPE.TEAMLEADERBAORD) {
-            fetchTeamLeaderBoardData();
+        showProgressDialog();
+        if (mBoard == BOARD_TYPE.LEAGUEBOARD) {
+            LeaderBoardDataStore.getInstance().updateLeagueBoardData();
+        } else if (mBoard == BOARD_TYPE.TEAM_LEADERBAORD) {
+            LeaderBoardDataStore.getInstance().updateTeamLeaderBoardData(mTeamId);
         } else {
-            fetchGlobalLeaderBoardData();
+            LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData();
         }
     }
 
@@ -255,7 +272,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         myListItem.setVisibility(View.GONE);
     }
 
-    public void showGLobalLeaderBoardData(LeaderBoardList list) {
+    public void showGlobalLeaderBoardData(LeaderBoardList list) {
         mleaderBoardList.clear();
         int userId = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
         boolean isShowingMyRank = false;
@@ -279,6 +296,25 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         hideProgressDialog();
     }
 
+    private void showLeagueBoardData(TeamBoard board){
+        mleaderBoardList.clear();
+        mBannerUrl = null;
+        String leagueName = "";
+        for (TeamBoard.Team team : board.getTeamList()) {
+            if (TextUtils.isEmpty(leagueName)){
+                leagueName = team.getLeagueName();
+            }
+            mleaderBoardList.add(team.convertToLeaderBoard());
+            mBannerUrl = team.getBanner();
+        }
+        setBannerImage();
+        hideProgressDialog();
+        if (!TextUtils.isEmpty(leagueName)){
+            setToolbarTitle(leagueName);
+        }
+        mLeaderBoardAdapter.setData(mleaderBoardList);
+    }
+
     private void showMyRank(LeaderBoard myLeaderBoard){
         // Need to show rank at the bottom
         myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
@@ -295,99 +331,77 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
     }
 
-    private void fetchTeamLeaderBoardData() {
-        Map<String, String> header = new HashMap<>();
-        header.put("team_id", String.valueOf(mTeamId));
-        NetworkDataProvider.doGetCallAsync(Urls.getTeamLeaderBoardUrl(), header, null, new NetworkAsyncCallback<TeamLeaderBoard>() {
-            @Override
-            public void onNetworkFailure(NetworkException ne) {
-                if (isAttachedToActivity()){
-                    hideProgressDialog();
-                    MainApplication.showToast("Network Error, Please Refresh");
-                    ne.printStackTrace();
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(GlobalLeaderBoardDataUpdated event){
+        if (isAttachedToActivity()){
+            hideProgressDialog();
+            LeaderBoardList globalLeaderBoardData = LeaderBoardDataStore.getInstance().getGlobalLeaderBoard();
+            if (event.isSuccess()){
+                showGlobalLeaderBoardData(globalLeaderBoardData);
+            }else {
+                if (globalLeaderBoardData != null){
+                    showGlobalLeaderBoardData(globalLeaderBoardData);
+                    MainApplication.showToast("Network Error, Couldn't refresh");
+                }else {
+                    MainApplication.showToast("Network Error, Please try again");
                 }
             }
-
-            @Override
-            public void onNetworkSuccess(TeamLeaderBoard board) {
-                if (isAttachedToActivity()){
-                    mleaderBoardList.clear();
-                    String teamName = "";
-                    for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
-                        Float distance = 0f;
-                        if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
-                            distance = team.getLeagueTotalDistance().getTotalDistance();
-                        }
-                        if (TextUtils.isEmpty(teamName)){
-                            teamName = team.getTeamName();
-                        }
-                        mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
-                    }
-                    if (!TextUtils.isEmpty(teamName)){
-                        setToolbarTitle(teamName);
-                    }
-                    hideProgressDialog();
-                    mLeaderBoardAdapter.setData(mleaderBoardList);
-                }
-            }
-        });
+        }
     }
 
-    private void fetchGlobalLeaderBoardData(){
-        NetworkDataProvider.doGetCallAsync(Urls.getLeaderboardUrl(), new NetworkAsyncCallback<LeaderBoardList>() {
-            @Override
-            public void onNetworkFailure(NetworkException ne) {
-                if (isAttachedToActivity()){
-                    hideProgressDialog();
-                    MainApplication.showToast("Network Error, Please Refresh");
-                    ne.printStackTrace();
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(LeagueBoardDataUpdated event){
+        if (isAttachedToActivity()){
+            hideProgressDialog();
+            TeamBoard board = LeaderBoardDataStore.getInstance().getLeagueBoard();
+            if (event.isSuccess()){
+                showLeagueBoardData(board);
+            }else {
+                if (board != null){
+                    showLeagueBoardData(board);
+                    MainApplication.showToast("Network Error, Couldn't refresh");
+                }else {
+                    MainApplication.showToast("Network Error, Please try again");
                 }
             }
-
-            @Override
-            public void onNetworkSuccess(LeaderBoardList list) {
-                if (isAttachedToActivity()){
-                    showGLobalLeaderBoardData(list);
-                }
-            }
-        });
+        }
     }
 
-
-    private void fetchTeamBoardData() {
-        NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
-            @Override
-            public void onNetworkFailure(NetworkException ne) {
-                if (isAttachedToActivity()){
-                    hideProgressDialog();
-                    MainApplication.showToast("Network Error, Please Refresh");
-                    ne.printStackTrace();
-                }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(TeamLeaderBoardDataFetched event){
+        if (mTeamId == event.getTeamId() && isAttachedToActivity()){
+            // Check if we received TeamLeaderBoard data for the correct teamId
+            // &&
+            // Check if fragment is still on display
+            TeamLeaderBoard board = null;
+            if (event.isSuccess()){
+                board = event.getTeamLeaderBoard();
+            }else if (mTeamId == SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID)){
+                board = LeaderBoardDataStore.getInstance().getMyTeamLeaderBoard();
             }
-
-            @Override
-            public void onNetworkSuccess(TeamBoard board) {
-                if (isAttachedToActivity()){
-                    mleaderBoardList.clear();
-                    mBannerUrl = null;
-                    String leagueName = "";
-                    for (TeamBoard.Team team : board.getTeamList()) {
-                        if (TextUtils.isEmpty(leagueName)){
-                            leagueName = team.getLeagueName();
-                        }
-                        mleaderBoardList.add(team.convertToLeaderBoard());
-                        mBannerUrl = team.getBanner();
+            mleaderBoardList.clear();
+            hideProgressDialog();
+            if (board != null){
+                // We have something to display
+                String teamName = "";
+                for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
+                    Float distance = 0f;
+                    if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
+                        distance = team.getLeagueTotalDistance().getTotalDistance();
                     }
-                    setBannerImage();
-                    hideProgressDialog();
-                    if (!TextUtils.isEmpty(leagueName)){
-                        setToolbarTitle(leagueName);
+                    if (TextUtils.isEmpty(teamName)){
+                        teamName = team.getTeamName();
                     }
-                    mLeaderBoardAdapter.setData(mleaderBoardList);
-
+                    mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
                 }
+                if (!TextUtils.isEmpty(teamName)){
+                    setToolbarTitle(teamName);
+                }
+                mLeaderBoardAdapter.setData(mleaderBoardList);
+            }else {
+                MainApplication.showToast("Network Error, Please try again");
             }
-        });
+        }
     }
 
     private void setBannerImage() {
@@ -399,7 +413,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     @Override
     public void onItemClick(long id) {
-        getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAMLEADERBAORD,(int)id), true);
+        getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAM_LEADERBAORD,(int)id), true);
     }
 
     private void hideProgressDialog() {

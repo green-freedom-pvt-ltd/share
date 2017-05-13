@@ -35,12 +35,12 @@ public class WorkoutSingleton {
     /**
      Throws IllegalStateException if this class is not initialized
 
-     @return unique ActivityDetector instance
+     @return unique WorkoutSingleton instance
      */
     public static WorkoutSingleton getInstance() {
         if (uniqueInstance == null) {
             throw new IllegalStateException(
-                    "ActivityDetector is not initialized, call initialize(applicationContext) " +
+                    "WorkoutSingleton is not initialized, call initialize(applicationContext) " +
                             "static method first");
         }
         return uniqueInstance;

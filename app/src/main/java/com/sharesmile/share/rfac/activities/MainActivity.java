@@ -213,10 +213,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if (leagueTeamId != 0){
                 // Belongs to an Impact League team, will show League team leaderboard
                 LeaderBoardFragment leageBoardFragment
-                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMBAORD);
+                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD);
                 replaceFragment(leageBoardFragment , true);
                 LeaderBoardFragment teamLeaderBoardFragment
-                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMLEADERBAORD, leagueTeamId);
+                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAM_LEADERBAORD, leagueTeamId);
                 replaceFragment(teamLeaderBoardFragment , true);
             }else {
                 replaceFragment(new ProfileFragment(), true);
@@ -342,7 +342,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void showLeaderBoard() {
-        replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEADERBOARD), true);
+        replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.GLOBAL_LEADERBOARD), true);
     }
 
     private void showProfileScreen() {
@@ -374,7 +374,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             updateNavigationMenu();
         } else if (requestCode == REQUEST_LEAGUE_REGISTRATION) {
             if (resultCode == RESULT_OK) {
-                replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAMBAORD), true);
+                replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD), true);
             }
         }
     }

@@ -69,6 +69,8 @@ public class Config {
     public static final long DETECTED_INTERVAL_IDLE = 7000; // in millisecs
     public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 
+    public static final long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
+
     public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 12000; // in millisecs
 
 

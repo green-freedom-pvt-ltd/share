@@ -20,6 +20,15 @@ class TeamBoard : UnObfuscable, Serializable {
     @SerializedName("previous")
     var previousUrl: String = ""
 
+    @SerializedName("impactleague_is_active")
+    var isLeagueActive: Boolean = false
+
+    @SerializedName("impactleague_start_date")
+    var leagueStartDateEpoch: Long = 0
+
+    @SerializedName("duration")
+    var durationInDays: Int = 0
+
     @SerializedName("results")
     var teamList: ArrayList<Team>? = null;
 
