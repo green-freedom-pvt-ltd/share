@@ -237,7 +237,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_league:
-                int teamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID, 0);
+                int teamId = LeaderBoardDataStore.getInstance().getLeagueTeamId();
                 if (teamId > 0) {
                     getFragmentController().replaceFragment(getInstance(BOARD_TYPE.LEAGUEBOARD), true);
                 } else {
@@ -376,7 +376,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             TeamLeaderBoard board = null;
             if (event.isSuccess()){
                 board = event.getTeamLeaderBoard();
-            }else if (mTeamId == SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID)){
+            }else if (mTeamId == LeaderBoardDataStore.getInstance().getLeagueTeamId()){
                 board = LeaderBoardDataStore.getInstance().getMyTeamLeaderBoard();
             }
             mleaderBoardList.clear();

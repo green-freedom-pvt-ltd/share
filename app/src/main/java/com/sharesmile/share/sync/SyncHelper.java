@@ -9,6 +9,7 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.User;
@@ -220,7 +221,7 @@ public class SyncHelper {
                     details.setAuthToken(prefsManager.getString(PREF_AUTH_TOKEN));
                     details.setGenderUser(user.getGender());
                     details.setSignUp(prefsManager.getBoolean(Constants.PREF_IS_SIGN_UP_USER));
-                    details.setTeamId(prefsManager.getInt(Constants.PREF_LEAGUE_TEAM_ID));
+                    details.setTeamId(LeaderBoardDataStore.getInstance().getLeagueTeamId());
                     details.setSocialThumb(user.getProfileImageUrl());
 
                     MainApplication.getInstance().setUserDetails(details);

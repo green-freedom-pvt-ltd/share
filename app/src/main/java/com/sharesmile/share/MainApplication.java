@@ -367,11 +367,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         prefsManager.setBoolean(Constants.PREF_IS_SIGN_UP_USER, details.isSignUp());
 
-        if (details.getTeamId() != 0){
-            prefsManager.setInt(Constants.PREF_LEAGUE_TEAM_ID, details.getTeamId());
+        if (LeaderBoardDataStore.getInstance().getLeagueTeamId() != details.getTeamId()){
+            LeaderBoardDataStore.getInstance().setLeagueTeamId(details.getTeamId());
             Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamId());
         }
-
     }
 
     public static boolean isLogin() {

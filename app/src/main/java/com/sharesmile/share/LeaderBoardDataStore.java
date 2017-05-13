@@ -6,10 +6,12 @@ import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
@@ -35,10 +37,12 @@ public class LeaderBoardDataStore {
     private TeamBoard leagueBoard;
     private LeaderBoardList globalLeaderBoard;
     private TeamLeaderBoard myTeamLeaderBoard;
+    private int leagueTeamId;
     private Context context;
 
     private LeaderBoardDataStore(Context appContext){
         this.context = appContext;
+        this.leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
         this.globalLeaderBoard = SharedPrefsManager.getInstance()
                 .getObject(Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA, LeaderBoardList.class);
         this.leagueBoard = SharedPrefsManager.getInstance()
@@ -80,11 +84,63 @@ public class LeaderBoardDataStore {
         }
     }
 
+    public TeamBoard getLeagueBoard() {
+        return leagueBoard;
+    }
+
+    public LeaderBoardList getGlobalLeaderBoard() {
+        return globalLeaderBoard;
+    }
+
+    public TeamLeaderBoard getMyTeamLeaderBoard() {
+        return myTeamLeaderBoard;
+    }
+
+    public int getLeagueTeamId() {
+        return leagueTeamId;
+    }
+
     public boolean isLeagueActive(){
         if (leagueBoard != null){
             return leagueBoard.isLeagueActive();
         }
         return false;
+    }
+
+    public boolean toShowLeague(){
+        if (leagueBoard != null){
+            if (isLeagueActive()){
+                return true;
+            }else {
+                long leagueStartDateEpoch = leagueBoard.getLeagueStartDateEpoch();
+                long leagueDurationInSecs = ((long)leagueBoard.getDurationInDays())*86400;
+                long threedaysBufferInSecs = 259200;
+                return (DateUtil.getServerTimeInMillis() / 1000) < leagueStartDateEpoch + leagueDurationInSecs + threedaysBufferInSecs;
+            }
+        }
+        return false;
+    }
+
+    public void clearLeagueData(){
+        this.leagueBoard = null;
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_LEAGUEBOARD_CACHED_DATA);
+        this.myTeamLeaderBoard = null;
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA);
+    }
+
+    public void setLeagueTeamId(int teamId){
+        // LeagueTeamId is set only when it is changed
+        leagueTeamId = teamId;
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamId);
+        // LeagueTeamId has changed, clear existing League data and immediately start the sync process
+        clearLeagueData();
+        Thread syncThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SyncService.syncLeaderBoardData();
+            }
+        });
+        syncThread.start();
     }
 
     public void setLeagueBoardData(TeamBoard leagueBoard){
@@ -100,18 +156,6 @@ public class LeaderBoardDataStore {
     public void setMyTeamLeaderBoardData(TeamLeaderBoard board){
         LeaderBoardDataStore.this.myTeamLeaderBoard = board;
         SharedPrefsManager.getInstance().setObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, board);
-    }
-
-    public TeamBoard getLeagueBoard() {
-        return leagueBoard;
-    }
-
-    public LeaderBoardList getGlobalLeaderBoard() {
-        return globalLeaderBoard;
-    }
-
-    public TeamLeaderBoard getMyTeamLeaderBoard() {
-        return myTeamLeaderBoard;
     }
 
     public void updateLeagueBoardData() {
@@ -166,7 +210,7 @@ public class LeaderBoardDataStore {
             @Override
             public void onNetworkSuccess(TeamLeaderBoard board) {
                 Logger.d(TAG, "Successfully fetched TeamLeaderBoardData for teamId: " + teamId);
-                if (teamId == SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID)){
+                if (teamId == getLeagueTeamId()){
                     // It is myTeamLeaderBoard, will cache it for future use
                     setMyTeamLeaderBoardData(board);
                 }

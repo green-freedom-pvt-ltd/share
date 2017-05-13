@@ -17,6 +17,11 @@
         android:icon="@drawable/svg_ic_face_black_24_px"
         android:title="@string/login" />
     <item
+        android:id="@+id/nav_item_impact_league"
+        android:icon="@drawable/cup"
+        android:visible="false"
+        android:title="@string/impact_league" />
+    <item
         android:id="@+id/nav_item_leaderboard"
         android:icon="@drawable/ic_stars_black_24dp"
         android:visible="false"

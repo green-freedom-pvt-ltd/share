@@ -85,19 +85,9 @@ public class SyncService extends GcmTaskService {
         Logger.d(TAG, "syncLeaderBoardData");
 
         int result = GcmNetworkManager.RESULT_SUCCESS;
-        try {
-            TeamBoard leagueBoard = NetworkDataProvider.doGetCall(Urls.getTeamBoardUrl(), TeamBoard.class);
-            // Store this in LeaderBoardDataStore
-            LeaderBoardDataStore.getInstance().setLeagueBoardData(leagueBoard);
-            // Notify LeaderBoardFragment about it
-            EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
-        } catch (NetworkException e) {
-            Logger.e(TAG, "Exception occurred while syncing LeagueBoard data from network: " + e.getMessage());
-            e.printStackTrace();
-            result = GcmNetworkManager.RESULT_FAILURE;
-        }
 
         try {
+            Logger.d(TAG, "Will sync GlobalLeaderBoard");
             LeaderBoardList leaderBoardList = NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(), LeaderBoardList.class);
             // Store this in LeaderBoardDataStore
             LeaderBoardDataStore.getInstance().setGlobalLeaderBoardData(leaderBoardList);
@@ -109,22 +99,42 @@ public class SyncService extends GcmTaskService {
             result = GcmNetworkManager.RESULT_FAILURE;
         }
 
-        try {
-            int leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
-            if (leagueTeamId > 0){
-                Map<String, String> queryParams = new HashMap<>();
-                queryParams.put("team_id", String.valueOf(leagueTeamId));
-                TeamLeaderBoard myTeamLeaderBoard = NetworkDataProvider
-                        .doGetCall(Urls.getTeamLeaderBoardUrl(), queryParams, TeamLeaderBoard.class);
+        if (LeaderBoardDataStore.getInstance().getLeagueBoard() == null
+                || LeaderBoardDataStore.getInstance().toShowLeague()){
+            // Go for sync only when an active league is present and is still visible to team members
+
+            try {
+                Logger.d(TAG, "Will sync LeagueBoard");
+                TeamBoard leagueBoard = NetworkDataProvider.doGetCall(Urls.getTeamBoardUrl(), TeamBoard.class);
                 // Store this in LeaderBoardDataStore
-                LeaderBoardDataStore.getInstance().setMyTeamLeaderBoardData(myTeamLeaderBoard);
+                LeaderBoardDataStore.getInstance().setLeagueBoardData(leagueBoard);
                 // Notify LeaderBoardFragment about it
-                EventBus.getDefault().post(new TeamLeaderBoardDataFetched(leagueTeamId, true, myTeamLeaderBoard));
+                EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
+            } catch (NetworkException e) {
+                Logger.e(TAG, "Exception occurred while syncing LeagueBoard data from network: " + e.getMessage());
+                e.printStackTrace();
+                result = GcmNetworkManager.RESULT_FAILURE;
             }
-        } catch (NetworkException e) {
-            Logger.e(TAG, "Exception occurred while syncing MyTeamLeaderBoardData from network: " + e.getMessage());
-            e.printStackTrace();
-            result = GcmNetworkManager.RESULT_FAILURE;
+
+            try {
+                Logger.d(TAG, "Will sync MyTeamLeaderBoard");
+                int leagueTeamId = LeaderBoardDataStore.getInstance().getLeagueTeamId();
+                if (leagueTeamId > 0){
+                    Map<String, String> queryParams = new HashMap<>();
+                    queryParams.put("team_id", String.valueOf(leagueTeamId));
+                    TeamLeaderBoard myTeamLeaderBoard = NetworkDataProvider
+                            .doGetCall(Urls.getTeamLeaderBoardUrl(), queryParams, TeamLeaderBoard.class);
+                    // Store this in LeaderBoardDataStore
+                    LeaderBoardDataStore.getInstance().setMyTeamLeaderBoardData(myTeamLeaderBoard);
+                    // Notify LeaderBoardFragment about it
+                    EventBus.getDefault().post(new TeamLeaderBoardDataFetched(leagueTeamId, true, myTeamLeaderBoard));
+                }
+            } catch (NetworkException e) {
+                Logger.e(TAG, "Exception occurred while syncing MyTeamLeaderBoardData from network: " + e.getMessage());
+                e.printStackTrace();
+                result = GcmNetworkManager.RESULT_FAILURE;
+            }
+
         }
 
         return result;

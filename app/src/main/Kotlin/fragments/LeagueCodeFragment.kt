@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import base.BaseFragment2
+import com.sharesmile.share.LeaderBoardDataStore
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
 import com.sharesmile.share.analytics.Analytics
@@ -95,8 +96,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
                 department.add(it.department!!)
             }
         }
-
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, leagueData.teamCode!!);
+        LeaderBoardDataStore.getInstance().setLeagueTeamId(leagueData.teamCode!!);
         // Setting team code for Analytics
         Analytics.getInstance().setUserImpactLeagueTeamCode(leagueData.teamCode!!);
         activity.setResult(Activity.RESULT_OK);

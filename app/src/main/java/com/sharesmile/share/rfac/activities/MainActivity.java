@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
@@ -113,6 +114,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Analytics.getInstance().setUserProperties();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateNavigationMenu();
+    }
+
     private void handleNotificationIntent() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -179,14 +186,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         MenuItem loginMenu = menu.findItem(R.id.nav_item_login);
         MenuItem profileMenu = menu.findItem(R.id.nav_item_profile);
         MenuItem leaderboardMenu = menu.findItem(R.id.nav_item_leaderboard);
+        MenuItem impactLeagueMenu = menu.findItem(R.id.nav_item_impact_league);
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)) {
             loginMenu.setVisible(false);
             profileMenu.setVisible(true);
             leaderboardMenu.setVisible(true);
+            if (LeaderBoardDataStore.getInstance().toShowLeague()){
+                impactLeagueMenu.setVisible(true);
+            }else {
+                impactLeagueMenu.setVisible(false);
+            }
         } else {
             loginMenu.setVisible(true);
             profileMenu.setVisible(false);
             leaderboardMenu.setVisible(false);
+            impactLeagueMenu.setVisible(false);
         }
 
         Menu m = mNavigationView.getMenu();
@@ -209,15 +223,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         addFragment(new OnScreenFragment(), false);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
-            int leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
-            if (leagueTeamId != 0){
-                // Belongs to an Impact League team, will show League team leaderboard
-                LeaderBoardFragment leageBoardFragment
-                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD);
-                replaceFragment(leageBoardFragment , true);
-                LeaderBoardFragment teamLeaderBoardFragment
-                        = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.TEAM_LEADERBAORD, leagueTeamId);
-                replaceFragment(teamLeaderBoardFragment , true);
+            if (LeaderBoardDataStore.getInstance().isLeagueActive()){
+                // Impact League still active, will show League team leaderboard
+                showLeagueBoard();
             }else {
                 replaceFragment(new ProfileFragment(), true);
             }
@@ -226,6 +234,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (showFeedBackDialog) {
             showFeedBackDialog();
         }
+    }
+
+    private void showLeagueBoard(){
+        LeaderBoardFragment leageBoardFragment
+                = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD);
+        replaceFragment(leageBoardFragment , true);
+        LeaderBoardFragment teamLeaderBoardFragment =
+                LeaderBoardFragment.getInstance(
+                        LeaderBoardFragment.BOARD_TYPE.TEAM_LEADERBAORD,
+                        LeaderBoardDataStore.getInstance().getLeagueTeamId()
+                );
+        replaceFragment(teamLeaderBoardFragment , true);
     }
 
     @Override
@@ -333,8 +353,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
             showLeaderBoard();
+        } else if (menuItem.getItemId() == R.id.nav_item_impact_league) {
+            showLeagueBoard();
         }
-
 
         mDrawerLayout.closeDrawers();
 

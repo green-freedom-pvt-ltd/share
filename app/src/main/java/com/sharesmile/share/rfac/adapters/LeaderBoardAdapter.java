@@ -10,10 +10,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sharesmile.share.LeaderBoard;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -113,7 +112,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
             final int id;
             if (isLeagueBoard) {
-                id = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
+                id = LeaderBoardDataStore.getInstance().getLeagueTeamId();
             } else {
                 id = MainApplication.getInstance().getUserID();
             }
