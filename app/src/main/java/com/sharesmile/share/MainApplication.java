@@ -138,6 +138,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume", pendingIntent);
                 }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
                     builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createStopRunIntent());
+                }else if (getContext().getString(R.string.notification_action_start).equals(action)){
+                    builder.addAction(R.drawable.ic_play_arrow_black_24px, "Start", getInstance().createAppIntent());
                 }
             }
         }

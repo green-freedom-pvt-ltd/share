@@ -1,5 +1,6 @@
 package com.sharesmile.share.gps.activityrecognition;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -22,15 +23,20 @@ import com.sharesmile.share.core.Config;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.CONFIDENCE_LOWER_THRESHOLD_STILL;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_ON_FOOT;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_VEHICLE;
+import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT;
 import static com.sharesmile.share.core.Config.CONFIDENCE_UPPER_THRESHOLD_STILL;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
+import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_COUNTER_INTERVAL;
+import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_NOTIFICATION_INTERVAL;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 /**
  * Created by ankitmaheshwari on 3/10/17.
@@ -48,6 +54,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
     private float runningConfidenceRecentAvg;
     private float walkingConfidenceRecentAvg;
+    private float onFootConfidenceRecentAvg;
 
     private boolean isWorkoutActive;
 
@@ -64,7 +71,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         this.appContext = appContext;
         this.handler = new Handler();
         this.historyQueue = new CircularQueue<>(3);
-        connectToLocationServices();
+        connectGoogleApiClient();
     }
 
     /**
@@ -100,7 +107,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    private void connectToLocationServices(){
+    private void connectGoogleApiClient(){
 
         if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(appContext) == ConnectionResult.SUCCESS) {
             googleApiClient = new GoogleApiClient.Builder(appContext)
@@ -122,6 +129,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         PendingIntent pendingIntent = PendingIntent.getService( appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
         long detectionIntervalMillis = isWorkoutActive() ? DETECTED_INTERVAL_ACTIVE : DETECTED_INTERVAL_IDLE;
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, detectionIntervalMillis, pendingIntent );
+        if (!isWorkoutActive()){
+            startWalkEngagementDetectionCounter();
+        }
     }
 
     public void workoutActive(){
@@ -129,9 +139,10 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         if (googleApiClient != null && googleApiClient.isConnected()){
             registerForActivityUpdates();
         }else {
-            connectToLocationServices();
+            connectGoogleApiClient();
         }
         handler.removeCallbacks(handleStillNotificationRunnable);
+        stopWalkEngagementDetectionCounter();
     }
 
     public void workoutIdle(){
@@ -139,9 +150,30 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         if (googleApiClient != null && googleApiClient.isConnected()){
             registerForActivityUpdates();
         }else {
-            connectToLocationServices();
+            connectGoogleApiClient();
         }
         handler.removeCallbacks(handleStillNotificationRunnable);
+        startWalkEngagementDetectionCounter();
+    }
+
+    private void stopWalkEngagementDetectionCounter(){
+        if (isWalkEngagementNotificationOnDisplay){
+            cancelWalkEngagementNotif();
+        }
+        handler.removeCallbacks(handleEngagementNotificationRunnable);
+        timeOnFootContinuously = 0;
+    }
+
+    public void cancelWalkEngagementNotif(){
+        NotificationManager manager = (NotificationManager) appContext.getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(WORKOUT_NOTIFICATION_WALK_ENGAGEMENT);
+        isWalkEngagementNotificationOnDisplay = false;
+    }
+
+    private void startWalkEngagementDetectionCounter(){
+        handler.removeCallbacks(handleEngagementNotificationRunnable);
+        timeOnFootContinuously = 0;
+        handler.postDelayed(handleEngagementNotificationRunnable, WALK_ENGAGEMENT_COUNTER_INTERVAL);
     }
 
     public boolean isWorkoutActive(){
@@ -182,11 +214,42 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         }
     };
 
+    private long timeOnFootContinuously = 0;
+    private boolean isWalkEngagementNotificationOnDisplay = false;
+
+    final Runnable handleEngagementNotificationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT){
+                // If on foot currently increase timeOnFootContinuously
+                timeOnFootContinuously += WALK_ENGAGEMENT_COUNTER_INTERVAL;
+            }else {
+                // If not on foot then reset timeOnFootContinuously to 0
+                timeOnFootContinuously = 0;
+                if (isWalkEngagementNotificationOnDisplay){
+                    cancelWalkEngagementNotif();
+                }
+            }
+            if (timeOnFootContinuously > WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
+                // User has been walking continuously for the past 4 mins without switching on ImpactRun
+                // Lets notify him/her to start the app
+                MainApplication.showRunNotification(WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
+                        appContext.getString(R.string.notification_walk_engagement),
+                        appContext.getString(R.string.notification_action_start)
+                );
+                isWalkEngagementNotificationOnDisplay = true;
+                timeOnFootContinuously = 0;
+            }
+            handler.postDelayed(handleEngagementNotificationRunnable, WALK_ENGAGEMENT_COUNTER_INTERVAL);
+        }
+    };
+
     final Runnable resetConfidenceValuesRunnable = new Runnable() {
         @Override
         public void run() {
             runningConfidenceRecentAvg = 0;
             walkingConfidenceRecentAvg = 0;
+            onFootConfidenceRecentAvg = 0;
             handler.removeCallbacks(resetConfidenceValuesRunnable);
         }
     };
@@ -233,6 +296,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             float avgStillConfidence = cumulativeStillConfidence / count;
             runningConfidenceRecentAvg = cumulativeRunningConfidence / count;
             walkingConfidenceRecentAvg = cumulativeWalkingConfidence / count;
+            onFootConfidenceRecentAvg = cumulativeOnFootConfidence / count;
             handler.removeCallbacks(resetConfidenceValuesRunnable);
             // Resetting these confidence values back to 0, if we don't receive activity recognition updates for sufficiently long period
             handler.postDelayed(resetConfidenceValuesRunnable, 25000);
@@ -297,6 +361,10 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         return walkingConfidenceRecentAvg;
     }
 
+    public float getOnFootConfidence(){
+        return onFootConfidenceRecentAvg;
+    }
+
     public boolean isIsInVehicle(){
         return isInVehicle;
     }
@@ -338,7 +406,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    connectToLocationServices();
+                    connectGoogleApiClient();
                 }
             }, 500);
             retryAttempt++;
