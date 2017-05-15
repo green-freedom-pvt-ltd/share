@@ -220,6 +220,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     final Runnable handleEngagementNotificationRunnable = new Runnable() {
         @Override
         public void run() {
+            Logger.d(TAG, "handleEngagementNotificationRunnable: run called");
             MainApplication.showToast("OnFoot: " + onFootConfidenceRecentAvg);
             if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT){
                 // If on foot currently increase timeOnFootContinuously
@@ -228,17 +229,27 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 // If not on foot then reset timeOnFootContinuously to 0
                 timeOnFootContinuously = 0;
                 if (isWalkEngagementNotificationOnDisplay){
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            cancelWalkEngagementNotif();
+                        }
+                    }, WALK_ENGAGEMENT_COUNTER_INTERVAL);
                     cancelWalkEngagementNotif();
                 }
             }
             if (timeOnFootContinuously > WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
                 // User has been walking continuously for the past 4 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
-                MainApplication.showRunNotification(WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
-                        appContext.getString(R.string.notification_walk_engagement),
-                        appContext.getString(R.string.notification_action_start)
-                );
-                isWalkEngagementNotificationOnDisplay = true;
+                if (!isWalkEngagementNotificationOnDisplay){
+                    MainApplication.showRunNotification("Start ImpactRun",
+                            WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
+                            appContext.getString(R.string.notification_walk_engagement),
+                            appContext.getString(R.string.notification_action_start),
+                            appContext.getString(R.string.notification_action_cancel)
+                    );
+                    isWalkEngagementNotificationOnDisplay = true;
+                }
                 timeOnFootContinuously = 0;
             }
             handler.postDelayed(handleEngagementNotificationRunnable, WALK_ENGAGEMENT_COUNTER_INTERVAL);

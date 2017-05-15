@@ -74,7 +74,6 @@ public class Config {
     public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 12000; // in millisecs
 
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 10000; // in millisecs
-    // TODO: Change this threshold to b/w 4 and 5 mins
-    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 60000;// in millisecs
+    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 240000;// in millisecs
 
 }

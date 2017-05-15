@@ -49,6 +49,7 @@ import io.fabric.sdk.android.Fabric;
 
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
 
 
 /**
@@ -114,14 +115,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         showToast(getContext().getResources().getString(stringId));
     }
 
-    public static void showRunNotification(int notificationId, String notifText, String... args){
-
+    public static void showRunNotification(String notifTitle, int notificationId, String notifText, String... args){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
         builder.setContentText( notifText)
                 .setSmallIcon(getNotificationIcon())
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
-                .setContentTitle(getContext().getResources().getString(R.string.app_name))
+                .setContentTitle(notifTitle)
                 .setVibrate(new long[]{0, 200, 100, 400}) // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText))
                 .setAutoCancel(true);
@@ -129,23 +129,35 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
             for (String action : args){
                 Logger.i(TAG, "Setting pendingIntent for " + action);
-                Intent intent = new Intent(getInstance(), NotificationActionReceiver.class);
-                intent.setAction(action);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 100, intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
                 if (getContext().getString(R.string.notification_action_pause).equals(action)){
-                    builder.addAction(R.drawable.ic_pause_black_24px, "Pause", pendingIntent);
+                    builder.addAction(R.drawable.ic_pause_black_24px, "Pause",
+                            createNotificationActionReceiverPendingIntent(action, notificationId));
                 }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
-                    builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume", pendingIntent);
+                    builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume",
+                            createNotificationActionReceiverPendingIntent(action, notificationId));
                 }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
                     builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createStopRunIntent());
                 }else if (getContext().getString(R.string.notification_action_start).equals(action)){
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Start", getInstance().createAppIntent());
+                }else if (getContext().getString(R.string.notification_action_cancel).equals(action)){
+                    builder.addAction(R.drawable.ic_close_black_24dp, "Cancel",
+                            createNotificationActionReceiverPendingIntent(action, notificationId));
                 }
             }
         }
         builder.setContentIntent(getInstance().createAppIntent());
         NotificationManagerCompat.from(getContext()).notify(notificationId, builder.build());
+    }
+
+    private static PendingIntent createNotificationActionReceiverPendingIntent(String action, int notifId){
+        Intent intent = new Intent(getInstance(), NotificationActionReceiver.class);
+        intent.setAction(action);
+        intent.putExtra(NOTIFICATION_ID, notifId);
+        return PendingIntent.getBroadcast(getContext(), 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public static void showRunNotification(int notificationId, String notifText, String... args){
+        showRunNotification(getContext().getResources().getString(R.string.app_name), notificationId, notifText, args);
     }
 
     private static int getNotificationIcon() {
