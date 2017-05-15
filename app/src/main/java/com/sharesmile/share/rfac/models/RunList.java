@@ -129,6 +129,8 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setStartPointLongitude(run.getStartLocationLong());
         workout.setEndPointLatitude(run.getEndLocationLat());
         workout.setEndPointLongitude(run.getEndLocationLong());
+        workout.setVersion(run.getVersion());
+        workout.setCalories(run.getCalories());
         return workout;
     }
 }

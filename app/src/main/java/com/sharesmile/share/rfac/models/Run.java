@@ -66,6 +66,9 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("version")
     long version;
 
+    @SerializedName("calories_burnt")
+    double calories;
+
     public long getId() {
         return id;
     }
@@ -214,6 +217,14 @@ public class Run implements UnObfuscable, Serializable {
         this.version = version;
     }
 
+    public double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(double calories) {
+        this.calories = calories;
+    }
+
     @Override
     public String toString() {
         return "Run{" +
@@ -226,6 +237,7 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t is_flag=" + is_flag +
                 ",\n\t clientRunId='" + clientRunId + '\'' +
                 ",\n\t version='" + version + '\'' +
+                ",\n\t calories='" + calories + '\'' +
                 "\n}";
     }
 }

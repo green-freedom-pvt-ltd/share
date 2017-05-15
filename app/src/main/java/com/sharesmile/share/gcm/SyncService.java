@@ -300,8 +300,9 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("end_location_lat", workout.getEndPointLatitude());
             jsonObject.put("end_location_long", workout.getEndPointLongitude());
             jsonObject.put("version", workout.getVersion());
+            jsonObject.put("calories_burnt", workout.getCalories());
 
-            Logger.d(TAG, jsonObject.toString());
+            Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
 
