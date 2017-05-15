@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -335,7 +336,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public void setUserDetails(UserDetails details){
-        Logger.d(TAG, "setUserDetails");
+        Gson gson = new Gson();
+        Logger.d(TAG, "setUserDetails as: " + gson.toJson(details));
         SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
 
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();

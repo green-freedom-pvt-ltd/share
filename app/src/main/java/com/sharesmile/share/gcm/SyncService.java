@@ -219,6 +219,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("gender_user", prev.getGenderUser());
             jsonObject.put("phone_number", prev.getPhoneNumber());
             jsonObject.put("body_weight", prev.getBodyWeight());
+            jsonObject.put("body_height", prev.getBodyHeight());
             jsonObject.put("user_id", user_id);
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
@@ -229,7 +230,7 @@ public class SyncService extends GcmTaskService {
 
             //TODO: CalorieCalculation, remove this weight hack after the API returns weight of the user
             if (response.getBodyWeight() == 0f){
-                response.setBodyWeight(prev.getBodyWeight());
+                Logger.d(TAG, "Users API returned null body_weight after update");
             }
 
             MainApplication.getInstance().setUserDetails(response);
