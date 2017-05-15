@@ -220,6 +220,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     final Runnable handleEngagementNotificationRunnable = new Runnable() {
         @Override
         public void run() {
+            MainApplication.showToast("OnFoot: " + onFootConfidenceRecentAvg);
             if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT){
                 // If on foot currently increase timeOnFootContinuously
                 timeOnFootContinuously += WALK_ENGAGEMENT_COUNTER_INTERVAL;
