@@ -180,6 +180,7 @@ public class WorkoutService extends Service implements
         }
         workout.setBeginTimeStamp(data.getBeginTimeStamp());
         workout.setEndTimeStamp(DateUtil.getServerTimeInMillis());
+        workout.setCalories(data.getCalories().getCalories());
         workoutDao.insertOrReplace(workout);
 
         //update userImpact

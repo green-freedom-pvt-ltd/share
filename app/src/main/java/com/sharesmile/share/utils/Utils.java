@@ -350,7 +350,14 @@ public class Utils {
         }else if (mph <= 3.5){
             return 3.0 + 1.3*(mph - 2.5); // 4.3 at 3.5 mph
         }else if (mph <= 4){
-            return 4.3 + 1.4*(mph - 3.5); // 5 at 4 mph
+            if (ActivityDetector.getInstance().getRunningConfidence()
+                    >= ActivityDetector.getInstance().getWalkingConfidence()){
+                // User is running
+                return 4.5 + 3*(mph - 3.5); // 6.0 at 4 mph
+            }else {
+                // User is Walking
+                return 4.3 + 1.4*(mph - 3.5); // 5.0 at 4 mph
+            }
         }
         /// All walking values uptill here, range 4-5 mph is ambiguous range need to decide between running and walking
         else if (mph <= 5){
