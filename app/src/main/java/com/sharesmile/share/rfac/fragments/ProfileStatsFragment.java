@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -57,23 +56,21 @@ public class ProfileStatsFragment extends BaseFragment {
         entries.add(new BarEntry(14, 19));
 
         BarDataSet dataSet = new BarDataSet(entries, "LastWeek");
-        dataSet.setColor(R.color.bright_blue);
+        dataSet.setColor(R.color.neon_red);
         dataSet.setValueTextColor(R.color.orange);
 
         BarData data = new BarData(dataSet);
         barChart.setData(data);
         barChart.setDrawGridBackground(false);
         barChart.getXAxis().setDrawGridLines(false);
+        barChart.getAxisLeft().setSpaceBottom(30);
         barChart.getAxisLeft().setDrawGridLines(false);
         barChart.getAxisLeft().setDrawAxisLine(false);
 
         barChart.setDrawBorders(false);
 
-        XAxis xAxis = barChart.getXAxis();
-
         barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
                 barChart.getViewPortHandler()));
-
 
 
         barChart.invalidate();

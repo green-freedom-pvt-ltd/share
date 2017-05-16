@@ -178,10 +178,12 @@ public class SyncService extends GcmTaskService {
     private int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao){
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(syncUrl);
-            if (syncWorkoutTimeStamp == 0){
+            if (syncWorkoutTimeStamp == 0 && response.headers().getDate("Date") != null){
                 syncWorkoutTimeStamp = response.headers().getDate("Date").getTime();
-                Logger.d(TAG, "syncWorkoutData, fetched SyncedTimeStampMillis as: " + syncWorkoutTimeStamp);
+            }else {
+                syncWorkoutTimeStamp = DateUtil.getServerTimeInMillis();
             }
+            Logger.d(TAG, "syncWorkoutData, fetched SyncedTimeStampMillis as: " + syncWorkoutTimeStamp);
             RunList runList = NetworkUtils.handleResponse(response, RunList.class);
 
             Gson gson = new Gson();
@@ -365,10 +367,12 @@ public class SyncService extends GcmTaskService {
 
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(runUrl);
-            if (fetchAllTimeStamp == 0){
+            if (fetchAllTimeStamp == 0 && response.headers().getDate("Date") != null){
                 fetchAllTimeStamp = response.headers().getDate("Date").getTime();
-                Logger.d(TAG, "fetchAllWorkoutData, fetched SyncedTimeStampMillis as: " + fetchAllTimeStamp);
+            }else {
+                fetchAllTimeStamp = DateUtil.getServerTimeInMillis();
             }
+            Logger.d(TAG, "fetchAllWorkoutData, fetched SyncedTimeStampMillis as: " + fetchAllTimeStamp);
             RunList runList = NetworkUtils.handleResponse(response, RunList.class);
             // If num of synced run on client is same as total run count on server then no need to update
             if (syncedCount >= runList.getTotalRunCount()) {

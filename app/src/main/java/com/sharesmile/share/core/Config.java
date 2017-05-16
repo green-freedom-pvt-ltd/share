@@ -47,8 +47,6 @@ public class Config {
 
     public static float THRESHOLD_FACTOR = 4.75f;
 
-    public static float SMALLEST_DISPLACEMENT = 0.1f;// in m
-
     public static boolean TOO_SLOW_CHECK = false;
 
     public static boolean LAZY_ASS_CHECK = false;

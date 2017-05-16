@@ -54,6 +54,7 @@ proguard/
 .idea/compiler.xml
 .idea/modules.xml
 .idea/runConfigurations.xml
+.idea/inspectionProfiles/
 
 # Windows thumbnail db
 Thumbs.db
