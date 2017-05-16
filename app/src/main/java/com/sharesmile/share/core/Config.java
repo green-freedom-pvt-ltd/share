@@ -63,7 +63,7 @@ public class Config {
     public static final int CONFIDENCE_THRESHOLD_ON_FOOT = 75;
     public static final int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
     public static final int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
-    public static final int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 70;
+    public static final int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 67;
     public static final long ACTIVITY_VALID_INTERVAL_IDLE = 32000; // in millisecs
     public static final long ACTIVITY_VALID_INTERVAL_ACTIVE = 15000; // in millisecs
     public static final long DETECTED_INTERVAL_IDLE = 7000; // in millisecs
@@ -74,6 +74,6 @@ public class Config {
     public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 12000; // in millisecs
 
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 10000; // in millisecs
-    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 240000;// in millisecs
+    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 180000;// in millisecs
 
 }

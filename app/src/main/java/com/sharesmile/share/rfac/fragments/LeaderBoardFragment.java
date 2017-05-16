@@ -28,6 +28,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
@@ -169,7 +170,12 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         mswipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshItems();
+                if (NetworkUtils.isNetworkConnected(getContext())){
+                    refreshItems();
+                }else {
+                    MainApplication.showToast("Please connect to Internet");
+                }
+
             }
         });
         mswipeRefresh.setColorSchemeResources(R.color.sky_blue);

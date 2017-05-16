@@ -333,7 +333,8 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "onEvent: MockLocationDetected");
         if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
             stopWorkout();
-            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
+            MainApplication.showRunNotification("Mock location detected",
+                    WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
                     getString(R.string.notification_disable_mock_location));
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
             WorkoutSingleton.getInstance().mockLocationDetected();
@@ -722,7 +723,8 @@ public class WorkoutService extends Service implements
                 bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
             }
             sendBroadcast(bundle);
-            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID,
+            MainApplication.showRunNotification("In a vehicle",
+                    WORKOUT_NOTIFICATION_USAIN_BOLT_ID,
                     getString(R.string.notification_usain_bolt), getString(R.string.notification_action_stop)
             );
         }else {
@@ -900,7 +902,7 @@ public class WorkoutService extends Service implements
             // But will do it only when user is on the move
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
             if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
-                MainApplication.showRunNotification(
+                MainApplication.showRunNotification("GPS location not available",
                         WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
                         getString(R.string.notification_gps_inactivity),
                         getString(R.string.notification_action_pause),

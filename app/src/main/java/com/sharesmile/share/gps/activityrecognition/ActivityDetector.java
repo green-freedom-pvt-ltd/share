@@ -202,7 +202,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             // Show notification and increment still occurred counter
-            MainApplication.showRunNotification(WORKOUT_NOTIFICATION_STILL_ID,
+            MainApplication.showRunNotification("Not moving",
+                    WORKOUT_NOTIFICATION_STILL_ID,
                     appContext.getString(R.string.notification_standing_still),
                     appContext.getString(R.string.notification_action_pause),
                     appContext.getString(R.string.notification_action_stop)
@@ -221,7 +222,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             Logger.d(TAG, "handleEngagementNotificationRunnable: run called");
-            MainApplication.showToast("OnFoot: " + onFootConfidenceRecentAvg);
             if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT){
                 // If on foot currently increase timeOnFootContinuously
                 timeOnFootContinuously += WALK_ENGAGEMENT_COUNTER_INTERVAL;
@@ -238,7 +238,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     cancelWalkEngagementNotif();
                 }
             }
-            if (timeOnFootContinuously > WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
+            if (timeOnFootContinuously >= WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
                 // User has been walking continuously for the past 4 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
                 if (!isWalkEngagementNotificationOnDisplay){
@@ -270,8 +270,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
         float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
         float onFootConfidence = result.getActivityConfidence(DetectedActivity.ON_FOOT);
-        float runningConfidence = result.getActivityConfidence(DetectedActivity.RUNNING);
-        float walkingConfidence = result.getActivityConfidence(DetectedActivity.WALKING);
 
         Logger.d(TAG, "handleActivityRecognitionResult: inVehicleConfidence = " + inVehicleConfidence
                     + ", stillConfidence = " + stillConfidence + ", onFootConfidence = " + onFootConfidence
@@ -280,6 +278,21 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         // Add the fresh result in HistoryQueue
         long currentTime = result.getTime();
         historyQueue.add(result);
+        calculateRecentAvgAndSetBooleans(currentTime);
+        if (isWorkoutActive()){
+            if (isStill){
+                if (stillNotificationOccurredCounter == 0){
+                    handler.postDelayed(handleStillNotificationRunnable, Config.STILL_NOTIFICATION_DISPLAY_INTERVAL);
+                    Logger.d(TAG, "Scheduling Still notification.");
+                }
+            }else {
+                handler.removeCallbacks(handleStillNotificationRunnable);
+                Logger.d(TAG, "Removing Still notification.");
+            }
+        }
+    }
+
+    private void calculateRecentAvgAndSetBooleans(long currentTime){
         if (historyQueue.isFull()){
             int i = historyQueue.getMaxSize() - 1;
             int count = 0;
@@ -304,7 +317,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 i--;
             }
             float avgVehilceConfidence = cumulativeVehicleConfidence / count;
-            float avgOnFootConfidence = cumulativeOnFootConfidence / count;
             float avgStillConfidence = cumulativeStillConfidence / count;
             runningConfidenceRecentAvg = cumulativeRunningConfidence / count;
             walkingConfidenceRecentAvg = cumulativeWalkingConfidence / count;
@@ -314,7 +326,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             handler.postDelayed(resetConfidenceValuesRunnable, 25000);
 
             Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
-                    + avgVehilceConfidence + ", Foot: " + avgOnFootConfidence + ", Still: " + avgStillConfidence);
+                    + avgVehilceConfidence + ", Foot: " + onFootConfidenceRecentAvg + ", Still: " + avgStillConfidence);
 
             if (avgStillConfidence > CONFIDENCE_UPPER_THRESHOLD_STILL){
                 isStill = true;
@@ -335,7 +347,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 isInVehicle = false;
             }
 
-            if (avgOnFootConfidence > CONFIDENCE_THRESHOLD_ON_FOOT){
+            if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_ON_FOOT){
                 isOnFoot = true;
                 isStill = false; // isStill is forced set as false if the user is supposedly on foot
                 stillNotificationOccurredCounter = 0;
@@ -343,19 +355,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 isOnFoot = false;
             }
         }
-
-        if (isWorkoutActive()){
-            if (isStill){
-                if (stillNotificationOccurredCounter == 0){
-                    handler.postDelayed(handleStillNotificationRunnable, Config.STILL_NOTIFICATION_DISPLAY_INTERVAL);
-                    Logger.d(TAG, "Scheduling Still notification.");
-                }
-            }else {
-                handler.removeCallbacks(handleStillNotificationRunnable);
-                Logger.d(TAG, "Removing Still notification.");
-            }
-        }
-
     }
 
     public void persistentMovementDetectedFromOutside(){
