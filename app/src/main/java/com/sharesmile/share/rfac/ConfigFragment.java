@@ -70,12 +70,6 @@ public class ConfigFragment extends BaseFragment {
 					tf.setText(Config.THRESHOLD_FACTOR + "");
 					configValuesMap.put(viewId, tf);
 					break;
-				case R.id.edit_smallest_displacement:
-					((TextView) v.findViewById(R.id.tv_param_name)).setText("SMALLEST_DISPLACEMENT");
-					EditText sd = (EditText) v.findViewById(R.id.et_param_value);
-					sd.setText(Config.SMALLEST_DISPLACEMENT + "");
-					configValuesMap.put(viewId, sd);
-					break;
 				case R.id.edit_vigilance_timer_interval:
 					((TextView) v.findViewById(R.id.tv_param_name)).setText("VIGILANCE_TIMER_INTERVAL");
 					EditText vti = (EditText) v.findViewById(R.id.et_param_value);
@@ -131,10 +125,6 @@ public class ConfigFragment extends BaseFragment {
 					case R.id.edit_threshold_factor:
 						EditText etf = (EditText) configValuesMap.get(viewId);
 						Config.THRESHOLD_FACTOR = Float.parseFloat(etf.getText().toString());
-						break;
-					case R.id.edit_smallest_displacement:
-						EditText esd = (EditText) configValuesMap.get(viewId);
-						Config.SMALLEST_DISPLACEMENT = Float.parseFloat(esd.getText().toString());
 						break;
 					case R.id.edit_vigilance_timer_interval:
 						EditText evti = (EditText) configValuesMap.get(viewId);

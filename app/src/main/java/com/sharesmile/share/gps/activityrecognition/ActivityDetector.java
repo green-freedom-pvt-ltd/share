@@ -202,7 +202,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             // Show notification and increment still occurred counter
-            MainApplication.showRunNotification("Not moving",
+            MainApplication.showRunNotification(
+                    appContext.getString(R.string.notification_standing_still_title),
                     WORKOUT_NOTIFICATION_STILL_ID,
                     appContext.getString(R.string.notification_standing_still),
                     appContext.getString(R.string.notification_action_pause),
@@ -242,7 +243,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 // User has been walking continuously for the past 4 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
                 if (!isWalkEngagementNotificationOnDisplay){
-                    MainApplication.showRunNotification("Start ImpactRun",
+                    MainApplication.showRunNotification(
+                            appContext.getString(R.string.notification_walk_engagement_title),
                             WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
                             appContext.getString(R.string.notification_walk_engagement),
                             appContext.getString(R.string.notification_action_start),

@@ -37,6 +37,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -157,8 +158,15 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         mRecyclerView = (RecyclerView) l.findViewById(R.id.recycler_view);
         mProgressBar = (ProgressBar) l.findViewById(R.id.progress_bar);
         mswipeRefresh = (SwipeRefreshLayout) l.findViewById(R.id.swipeRefreshLayout);
+        EventBus.getDefault().register(this);
         init();
         return l;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     private void init() {

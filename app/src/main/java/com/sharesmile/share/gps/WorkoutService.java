@@ -333,7 +333,8 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "onEvent: MockLocationDetected");
         if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
             stopWorkout();
-            MainApplication.showRunNotification("Mock location detected",
+            MainApplication.showRunNotification(
+                    getString(R.string.notification_disable_mock_location_title),
                     WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
                     getString(R.string.notification_disable_mock_location));
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
@@ -723,9 +724,11 @@ public class WorkoutService extends Service implements
                 bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
             }
             sendBroadcast(bundle);
-            MainApplication.showRunNotification("In a vehicle",
+            MainApplication.showRunNotification(
+                    getString(R.string.notification_usain_bolt_title),
                     WORKOUT_NOTIFICATION_USAIN_BOLT_ID,
-                    getString(R.string.notification_usain_bolt), getString(R.string.notification_action_stop)
+                    getString(R.string.notification_usain_bolt),
+                    getString(R.string.notification_action_stop)
             );
         }else {
             // Force stop workout, show notif, And blocking exit popup on UI
@@ -902,7 +905,8 @@ public class WorkoutService extends Service implements
             // But will do it only when user is on the move
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
             if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
-                MainApplication.showRunNotification("GPS location not available",
+                MainApplication.showRunNotification(
+                        getString(R.string.notification_gps_inactivity_title),
                         WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
                         getString(R.string.notification_gps_inactivity),
                         getString(R.string.notification_action_pause),

@@ -259,7 +259,6 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         sb.append("\nUPPER_SPEED_LIMIT : " + Config.UPPER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nMIN_STEPS_PER_SECOND_FACTOR : " + Config.MIN_STEPS_PER_SECOND_FACTOR);
-        sb.append("\nSMALLEST_DISPLACEMENT : " + Config.SMALLEST_DISPLACEMENT + " m");
         if (workoutData != null) {
             sb.append("\nWorkoutData:\n" + workoutData);
         }
