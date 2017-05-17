@@ -189,7 +189,7 @@ public class LeaderBoardDataStore {
             public void onNetworkSuccess(LeaderBoardList list) {
                 Logger.d(TAG, "Successfully fetched LeagueBoardData");
                 setGlobalLeaderBoardData(list);
-                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(false));
+                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true));
             }
         });
     }
