@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.os.Build;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.buffer.BarBuffer;
@@ -71,8 +72,11 @@ public class CustomBarChartRenderer extends BarChartRenderer {
                 mBarShadowRectBuffer.top = mViewPortHandler.contentTop();
                 mBarShadowRectBuffer.bottom = mViewPortHandler.contentBottom();
 
-//                c.drawRect(mBarShadowRectBuffer, mShadowPaint);
-                c.drawRoundRect(mBarShadowRectBuffer, 5, 5, mShadowPaint);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    c.drawRoundRect(mBarShadowRectBuffer, 5, 5, mShadowPaint);
+                }else {
+                    c.drawRect(mBarShadowRectBuffer, mShadowPaint);
+                }
             }
         }
 
@@ -107,16 +111,22 @@ public class CustomBarChartRenderer extends BarChartRenderer {
                 mRenderPaint.setColor(dataSet.getColor(j / 4));
             }
 
-            c.drawRoundRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
-                    buffer.buffer[j + 3], 5, 5, mRenderPaint);
-//            c.drawRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
-//                    buffer.buffer[j + 3], mRenderPaint);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                c.drawRoundRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
+                        buffer.buffer[j + 3], 5, 5, mRenderPaint);
+            }else {
+                c.drawRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
+                        buffer.buffer[j + 3], mRenderPaint);
+            }
 
             if (drawBorder) {
-                c.drawRoundRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
-                        buffer.buffer[j + 3], 5, 5, mBarBorderPaint);
-//                c.drawRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
-//                        buffer.buffer[j + 3], mBarBorderPaint);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    c.drawRoundRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
+                            buffer.buffer[j + 3], 5, 5, mBarBorderPaint);
+                }else {
+                    c.drawRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
+                            buffer.buffer[j + 3], mBarBorderPaint);
+                }
             }
         }
     }
