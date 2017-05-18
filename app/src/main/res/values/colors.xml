@@ -32,6 +32,7 @@
     <color name="MontserratRegular">#4a4a4a</color>
 
     <color name="white_50">#7fffffff</color>
+    <color name="black_very_light">#0f000000</color>
     <color name="very_light_grey">#f0f0f0</color>
     <color name="white_dark">#eeeeee</color>
 
@@ -43,6 +44,7 @@
     <color name="seafoam_blue">#50d2c2</color>
     <color name="ice_blue">#e6f8ff</color>
     <color name="black_50">#7f000000</color>
+    <color name="black_57">#91000000</color>
     <color name="black_four">#141414</color>
     <color name="dark_blue">#55acee</color>
     <color name="denim_blue">#3c55a2</color>

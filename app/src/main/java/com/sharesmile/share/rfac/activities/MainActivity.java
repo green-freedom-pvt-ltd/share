@@ -240,12 +240,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         LeaderBoardFragment leageBoardFragment
                 = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD);
         replaceFragment(leageBoardFragment , true);
-        LeaderBoardFragment teamLeaderBoardFragment =
-                LeaderBoardFragment.getInstance(
-                        LeaderBoardFragment.BOARD_TYPE.TEAM_LEADERBAORD,
-                        LeaderBoardDataStore.getInstance().getLeagueTeamId()
-                );
-        replaceFragment(teamLeaderBoardFragment , true);
     }
 
     @Override

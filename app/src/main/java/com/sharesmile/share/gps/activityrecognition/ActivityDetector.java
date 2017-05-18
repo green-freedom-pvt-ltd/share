@@ -24,6 +24,7 @@ import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.CONFIDENCE_LOWER_THRESHOLD_STILL;
@@ -33,6 +34,7 @@ import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_WALK_ENGAGEM
 import static com.sharesmile.share.core.Config.CONFIDENCE_UPPER_THRESHOLD_STILL;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
+import static com.sharesmile.share.core.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
 import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_COUNTER_INTERVAL;
 import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_NOTIFICATION_INTERVAL;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
@@ -235,7 +237,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                         public void run() {
                             cancelWalkEngagementNotif();
                         }
-                    }, WALK_ENGAGEMENT_COUNTER_INTERVAL);
+                    }, REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL);
                     cancelWalkEngagementNotif();
                 }
             }
@@ -325,7 +327,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             onFootConfidenceRecentAvg = cumulativeOnFootConfidence / count;
             handler.removeCallbacks(resetConfidenceValuesRunnable);
             // Resetting these confidence values back to 0, if we don't receive activity recognition updates for sufficiently long period
-            handler.postDelayed(resetConfidenceValuesRunnable, 25000);
+            handler.postDelayed(resetConfidenceValuesRunnable, ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL);
 
             Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
                     + avgVehilceConfidence + ", Foot: " + onFootConfidenceRecentAvg + ", Still: " + avgStillConfidence);

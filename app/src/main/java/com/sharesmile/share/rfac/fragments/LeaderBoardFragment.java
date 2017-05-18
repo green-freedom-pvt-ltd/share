@@ -196,7 +196,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             if (LeaderBoardDataStore.getInstance().getGlobalLeaderBoard() != null){
                 showGlobalLeaderBoardData(LeaderBoardDataStore.getInstance()
                         .getGlobalLeaderBoard());
-                MainApplication.showToast("Swipe to Refresh");
             }else {
                 LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData();
                 showProgressDialog();
@@ -207,7 +206,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             if (mBoard == BOARD_TYPE.LEAGUEBOARD) {
                 if (LeaderBoardDataStore.getInstance().getLeagueBoard() != null){
                     showLeagueBoardData(LeaderBoardDataStore.getInstance().getLeagueBoard());
-                    MainApplication.showToast("Swipe to Refresh");
                 }else {
                     LeaderBoardDataStore.getInstance().updateLeagueBoardData();
                     showProgressDialog();
@@ -347,7 +345,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(GlobalLeaderBoardDataUpdated event){
-        if (isAttachedToActivity()){
+        if (isAttachedToActivity() && BOARD_TYPE.GLOBAL_LEADERBOARD.equals(mBoard)){
             hideProgressDialog();
             LeaderBoardList globalLeaderBoardData = LeaderBoardDataStore.getInstance().getGlobalLeaderBoard();
             if (event.isSuccess()){
@@ -365,7 +363,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(LeagueBoardDataUpdated event){
-        if (isAttachedToActivity()){
+        if (isAttachedToActivity() && BOARD_TYPE.LEAGUEBOARD.equals(mBoard)){
             hideProgressDialog();
             TeamBoard board = LeaderBoardDataStore.getInstance().getLeagueBoard();
             if (event.isSuccess()){
@@ -383,7 +381,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(TeamLeaderBoardDataFetched event){
-        if (mTeamId == event.getTeamId() && isAttachedToActivity()){
+        if (mTeamId == event.getTeamId() && isAttachedToActivity() && BOARD_TYPE.TEAM_LEADERBAORD.equals(mBoard)){
             // Check if we received TeamLeaderBoard data for the correct teamId
             // &&
             // Check if fragment is still on display

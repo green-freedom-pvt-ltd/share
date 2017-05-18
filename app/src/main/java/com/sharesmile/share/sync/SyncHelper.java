@@ -55,9 +55,9 @@ public class SyncHelper {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(SYNC_WORKOUT_DATA)
-                .setPeriod(3600L) // in secs , i.e. every one hour
+                .setPeriod(7200L) // in secs , i.e. every two hour
                 .setPersisted(true)
-                .setFlex(600)
+                .setFlex(2400)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
@@ -163,11 +163,10 @@ public class SyncHelper {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(SYNC_LEADERBOARD_DATA)
-                // TODO Reset these params
-                .setPeriod(60) // in secs , i.e. every hour
+                .setPeriod(7200) // in secs , i.e. every two hours
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
-                .setFlex(5)
+                .setFlex(2400)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
@@ -193,9 +192,9 @@ public class SyncHelper {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(UPLOAD_USER_DATA)
-                .setPeriod(18000L) // in secs, i.e. sync every 5 hours
+                .setPeriod(21600L) // in secs, i.e. sync every 6 hours
                 .setPersisted(true)
-                .setFlex(3600)
+                .setFlex(2400)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
