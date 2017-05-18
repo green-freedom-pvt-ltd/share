@@ -49,18 +49,20 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	private WorkoutDataImpl(WorkoutDataImpl source){
 		distance = source.distance;
-		recordedTime = source.recordedTime;
-		elapsedTime = source.elapsedTime;
+		recordedTime = source.getRecordedTime();
+		elapsedTime = source.getElapsedTime();
 		totalSteps = source.totalSteps;
 		beginTimeStamp = source.beginTimeStamp;
 		isActive = source.isActive;
 		paused = source.paused;
-		this.startPoint = (startPoint != null) ? new LatLng(source.startPoint.latitude, source.startPoint.longitude) : null;
+		this.startPoint = (source.startPoint != null) ? new LatLng(source.startPoint.latitude, source.startPoint.longitude) : null;
 		this.workoutId = source.workoutId;
-		this.latestPoint = (latestPoint != null) ? new LatLng(source.latestPoint.latitude, source.latestPoint.longitude) : null;
+		this.latestPoint = (source.latestPoint != null) ? new LatLng(source.latestPoint.latitude, source.latestPoint.longitude) : null;
 		batches = new ArrayList<>();
-		for (WorkoutBatch batch : source.batches){
-			batches.add((WorkoutBatchImpl)batch.copy());
+		if (source.batches != null){
+			for (int i = 0; i < source.batches.size(); i++){
+				batches.add(i, (WorkoutBatchImpl) source.batches.get(i).copy());
+			}
 		}
 		calories = new Calorie(source.calories.getCalories(),
 				source.calories.getCaloriesKarkanen());
