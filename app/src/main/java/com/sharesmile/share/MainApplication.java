@@ -50,6 +50,7 @@ import io.fabric.sdk.android.Fabric;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 
 /**
@@ -117,12 +118,21 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     public static void showRunNotification(String notifTitle, int notificationId, String notifText, String... args){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
+
+        long[] vibratePattern;
+        if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
+            // Long vibration for walk engagement notification
+            vibratePattern = new long[]{0, 300, 200, 600}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+        }else {
+            vibratePattern = new long[]{0, 200, 100, 400}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+        }
+
         builder.setContentText( notifText)
                 .setSmallIcon(getNotificationIcon())
                 .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(notifTitle)
-                .setVibrate(new long[]{0, 200, 100, 400}) // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+                .setVibrate(vibratePattern)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notifText))
                 .setAutoCancel(true);
 

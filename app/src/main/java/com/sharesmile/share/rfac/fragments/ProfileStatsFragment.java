@@ -2,28 +2,20 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.rfac.CustomBarChartRenderer;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
+import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.views.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,13 +28,34 @@ public class ProfileStatsFragment extends BaseFragment {
 
     private static final String TAG = "ProfileStatsFragment";
 
-    @BindView(R.id.chart)
-    BarChart barChart;
+    @BindView(R.id.img_profile_stats)
+    CircularImageView imageView;
+
+    @BindView(R.id.tv_profile_name)
+    TextView name;
+
+    @BindView(R.id.tv_level_min)
+    TextView levelMinDist;
+
+    @BindView(R.id.tv_level_max)
+    TextView levelMaxDist;
+
+    @BindView(R.id.tv_level_num)
+    TextView levelNum;
+
+    @BindView(R.id.level_progress_bar)
+    View levelProgressBar;
+
+    @BindView(R.id.stats_view_pager)
+    ViewPager viewPager;
+
+    @BindView(R.id.bt_see_runs)
+    View runHistoryButton;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.fragment_profile_stats, null);
         ButterKnife.bind(this, v);
         return v;
@@ -51,73 +64,14 @@ public class ProfileStatsFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setUpBarChart();
+        init();
     }
 
-    private void setUpBarChart(){
-
-        List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 10));
-        entries.add(new BarEntry(1, 15));
-        entries.add(new BarEntry(2, 23));
-        entries.add(new BarEntry(3, 28));
-        entries.add(new BarEntry(4, 5));
-        entries.add(new BarEntry(5, 12));
-        entries.add(new BarEntry(6, 19));
-
-        BarDataSet dataSet = new BarDataSet(entries, "LastWeek");
-        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-        dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-
-        BarData data = new BarData(dataSet);
-        barChart.setData(data);
-        barChart.setDrawGridBackground(false);
-
-
-        barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisRight().setDrawGridLines(false);
-        Description desc = new Description();
-        desc.setText("");
-        barChart.setDescription(desc);
-
-        YAxis yAxis = barChart.getAxisLeft();
-
-        yAxis.setSpaceBottom(25);
-        yAxis.setLabelCount(3, true);
-
-        yAxis.setCenterAxisLabels(true);
-        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
-        yAxis.setDrawAxisLine(false);
-        yAxis.setGridLineWidth(0.5f);
-
-        yAxis.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                if (value > 0){
-                    return "\u20B9 " + Math.round(value);
-                }else {
-                    return "";
-                }
-            }
-        });
-
-        XAxis xAxis = barChart.getXAxis();
-
-        xAxis.setDrawGridLines(false);
-        xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
-        xAxis.setAxisLineWidth(1.5f);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
-        List<String> list = Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
-        IAxisValueFormatter valueFormatter = new IndexAxisValueFormatter(list);
-        xAxis.setValueFormatter(valueFormatter);
-
-        barChart.setDrawBorders(false);
-
-        barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
-                barChart.getViewPortHandler()));
-
-
-        barChart.invalidate();
+    private void init(){
+        String url = SharedPrefsManager.getInstance().getString(Constants.PREF_USER_IMAGE);
+        Picasso.with(getActivity()).load(url).placeholder(R.drawable.placeholder_profile).into(imageView);
+        name.setText(MainApplication.getInstance().getUserDetails().getFirstName());
+        viewPager.setAdapter(new ProfileStatsViewAdapter(getChildFragmentManager()));
     }
+
 }

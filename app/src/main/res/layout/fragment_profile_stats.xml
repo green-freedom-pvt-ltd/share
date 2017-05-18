@@ -27,6 +27,7 @@
             android:orientation="vertical">
 
             <com.sharesmile.share.views.MSBTextView
+                android:id="@+id/tv_profile_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -87,6 +88,7 @@
             </FrameLayout>
 
             <com.sharesmile.share.views.MSBTextView
+                android:id="@+id/tv_level_num"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
@@ -105,6 +107,7 @@
     </android.support.v4.view.ViewPager>
     
     <android.support.v7.widget.CardView
+        android:id="@+id/bt_see_runs"
         android:layout_width="280dp"
         android:layout_height="45dp"
         android:layout_gravity="center_horizontal"
