@@ -35,10 +35,13 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		distance = source.distance;
 		startTimeStamp = source.startTimeStamp;
 		isRunning = source.isRunning;
-		elapsedTime = source.elapsedTime;
+		elapsedTime = source.getElapsedTime();
 		points = new ArrayList<>();
-		for (LatLng latLong : points){
-			points.add(new LatLng(latLong.latitude, latLong.longitude));
+		if (source.points != null){
+			for (int i = 0; i < source.points.size(); i++){
+				LatLng latLng = source.points.get(i);
+				points.add(i, new LatLng(latLng.latitude, latLng.longitude));
+			}
 		}
 		lastRecordAddedTs = source.lastRecordAddedTs;
 	}

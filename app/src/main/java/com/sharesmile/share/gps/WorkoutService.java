@@ -345,10 +345,6 @@ public class WorkoutService extends Service implements
         }
     }
 
-    public static boolean isCurrentlyTracking() {
-        return currentlyTracking;
-    }
-
     public static boolean isCurrentlyProcessingSteps() {
         return currentlyProcessingSteps;
     }

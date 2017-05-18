@@ -44,10 +44,6 @@ public class AnalyticsEvent implements UnObfuscable {
         return String.valueOf(eventProperties.get(Properties.EVENT_NAME));
     }
 
-    public static AnalyticsEvent copy(AnalyticsEvent event) {
-        return new AnalyticsEvent(event.getProperties());
-    }
-
     public static class Builder implements UnObfuscable {
 
         private Properties allProps;

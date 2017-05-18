@@ -129,6 +129,9 @@ public class RunTracker implements Tracker {
         WorkoutSingleton.getInstance().pauseWorkout();
     }
 
+    /**
+     * Called when Workout is resumed, also called when workout begins
+     */
     @Override
     public synchronized void resumeRun() {
         Logger.d(TAG, "resumeRun");
