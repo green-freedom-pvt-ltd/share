@@ -7,21 +7,17 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
-import com.onesignal.OneSignal;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
-import com.sharesmile.share.Workout;
-import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -141,23 +137,6 @@ public class SyncHelper {
 
         return true;
     }
-
-    // get user total Impact
-    public static void updateUserImpact() {
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        List<Workout> list = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.IsValidRun.eq(true)).list();
-        int workoutCount = list.size();
-        float totalImpact = 0;
-        for (Workout data : list) {
-            totalImpact = totalImpact + data.getRunAmount();
-        }
-
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, workoutCount);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
-
-        OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT, String.valueOf(workoutCount));
-    }
-
 
     public static void syncLeaderBoardData(Context context) {
         PeriodicTask task = new PeriodicTask.Builder()

@@ -238,7 +238,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                             cancelWalkEngagementNotif();
                         }
                     }, REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL);
-                    cancelWalkEngagementNotif();
                 }
             }
             if (timeOnFootContinuously >= WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){

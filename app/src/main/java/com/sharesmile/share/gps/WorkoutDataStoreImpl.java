@@ -92,8 +92,8 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
                 stepsRanWhileSearchingForSource = 0;
             }
 
-            float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
-                        ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+            float averageStrideLength = (Utils.getAverageStrideLength() == 0)
+                        ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
 
             // Normalising averageStrideLength obtained
             if (averageStrideLength < 0.25f){

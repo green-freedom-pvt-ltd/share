@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="320dp"
+    android:layout_height="350dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="6dp"
     android:paddingBottom="6dp">
 
@@ -10,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:text="Last 7 days"
         android:textSize="10sp"
         android:layout_marginTop="4dp"
         android:layout_alignParentLeft="true"
@@ -30,7 +30,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="16dp"
-        android:text="All time >"
         android:textSize="10sp"
         android:layout_marginTop="4dp"
         android:layout_alignParentRight="true"
@@ -69,27 +68,59 @@
         android:layout_marginLeft="30dp"
         android:gravity="left">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="30dp">
 
-            <com.sharesmile.share.views.LBTextView
-                android:id="@+id/tv_cal"
+            <LinearLayout
+                android:id="@+id/cal_not_available_container"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:text="729"
-                android:textColor="@color/black_57"/>
+                android:layout_height="match_parent"
+                android:gravity="bottom"
+                android:orientation="horizontal">
 
-            <com.sharesmile.share.views.LBTextView
+                <com.sharesmile.share.views.MRTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="add info"
+                    android:textColor="@color/dark_sky_blue"/>
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginBottom="3dp"
+                    app:srcCompat="@drawable/ic_pencil_edit_blue"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/cal_available_container"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:text="cal"
-                android:textColor="@color/black_38"/>
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:visibility="invisible">
 
-        </LinearLayout>
+                <com.sharesmile.share.views.LBTextView
+                    android:id="@+id/tv_cal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:text="729"
+                    android:textColor="@color/black_57"/>
+
+                <com.sharesmile.share.views.LBTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:text="kcal"
+                    android:textColor="@color/black_38"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
 
         <com.sharesmile.share.views.MRTextView
             android:layout_width="wrap_content"
@@ -113,8 +144,9 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:gravity="bottom">
 
             <com.sharesmile.share.views.LBTextView
                 android:id="@+id/tv_distance"

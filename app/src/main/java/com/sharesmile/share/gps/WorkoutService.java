@@ -182,23 +182,10 @@ public class WorkoutService extends Service implements
         workout.setEndTimeStamp(DateUtil.getServerTimeInMillis());
         workout.setCalories(data.getCalories().getCalories());
         workoutDao.insertOrReplace(workout);
-
-        //update userImpact
-        updateUserImpact(workout);
-
+        Utils.updateTrackRecordFromDb();
         SyncHelper.pushRunData();
     }
 
-    private void updateUserImpact(Workout data) {
-        int totalRun = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
-        float totalImpact = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT, 0);
-
-        totalImpact = totalImpact + data.getRunAmount();
-        totalRun = totalRun + 1;
-
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRun);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, (int) totalImpact);
-    }
 
     @Override
     public void startWorkout() {

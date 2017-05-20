@@ -38,6 +38,7 @@ import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
@@ -122,7 +123,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         long[] vibratePattern;
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
             // Long vibration for walk engagement notification
-            vibratePattern = new long[]{0, 300, 200, 600}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+            vibratePattern = new long[]{0, 400, 200,1000}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }else {
             vibratePattern = new long[]{0, 200, 100, 400}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }
@@ -255,9 +256,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
 
-//        Bugfender.init(this, "tCMmpKrIgAqf4ZgfOA6Z1x00P7pugWna", BuildConfig.DEBUG);
-//        Bugfender.enableLogcatLogging();
-//        Bugfender.enableUIEventLogging(this);
+        //TODO: Temporarily added to test, will remove
+        Utils.updateTrackRecordFromDb();
+
     }
 
     public void updateCauseList(CauseList updated){

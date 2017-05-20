@@ -31,6 +31,7 @@ import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Response;
 
 import org.greenrobot.eventbus.EventBus;
@@ -44,8 +45,6 @@ import java.util.Map;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
-
-import static com.sharesmile.share.sync.SyncHelper.updateUserImpact;
 
 /**
  * Created by Shine on 15/05/16.
@@ -178,14 +177,14 @@ public class SyncService extends GcmTaskService {
     private int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao){
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(syncUrl);
-            if (syncWorkoutTimeStamp == 0 && response.headers().getDate("Date") != null){
-                syncWorkoutTimeStamp = response.headers().getDate("Date").getTime();
-            }else {
-                syncWorkoutTimeStamp = DateUtil.getServerTimeInMillis();
+            if (syncWorkoutTimeStamp == 0){
+                if (response.headers().getDate("Date") != null){
+                    syncWorkoutTimeStamp = response.headers().getDate("Date").getTime();
+                }else {
+                    syncWorkoutTimeStamp = DateUtil.getServerTimeInMillis();
+                }
             }
-            Logger.d(TAG, "syncWorkoutData, fetched SyncedTimeStampMillis as: " + syncWorkoutTimeStamp);
             RunList runList = NetworkUtils.handleResponse(response, RunList.class);
-
             Gson gson = new Gson();
             Logger.d(TAG, "Syncing these runs in DB " + gson.toJson(runList));
             mWorkoutDao.insertOrReplaceInTx(runList);
@@ -194,9 +193,11 @@ public class SyncService extends GcmTaskService {
                 // Recursive call to fetch the runs of next page
                 return syncWorkoutData(runList.getNextUrl(), mWorkoutDao);
             } else {
-                updateUserImpact();
+                // Update User's track record
+                Utils.updateTrackRecordFromDb();
                 Logger.d(TAG, "syncWorkoutData, Setting SyncedTimeStampMillis as: " + syncWorkoutTimeStamp);
-                SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION, (syncWorkoutTimeStamp / 1000));
+                SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION,
+                        (syncWorkoutTimeStamp / 1000));
                 return GcmNetworkManager.RESULT_SUCCESS;
             }
         } catch (NetworkException e) {
@@ -378,7 +379,6 @@ public class SyncService extends GcmTaskService {
             if (syncedCount >= runList.getTotalRunCount()) {
                 Logger.d(TAG, "fetchAllWorkoutData, update success " + syncedCount + " : " + runList.getTotalRunCount());
                 EventBus.getDefault().post(new DBEvent.RunDataUpdated());
-                updateUserImpact();
                 return GcmNetworkManager.RESULT_SUCCESS;
             } else {
                 Gson gson = new Gson();
@@ -392,7 +392,7 @@ public class SyncService extends GcmTaskService {
                     SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION, (fetchAllTimeStamp / 1000));
                     return fetchAllWorkoutData(runList.getNextUrl(), syncedCount);
                 } else {
-                    updateUserImpact();
+                    Utils.updateTrackRecordFromDb();
                 }
                 EventBus.getDefault().post(new DBEvent.RunDataUpdated());
                 return GcmNetworkManager.RESULT_SUCCESS;

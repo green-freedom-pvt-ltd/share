@@ -3,6 +3,8 @@ package com.sharesmile.share.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -17,11 +19,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.onesignal.OneSignal;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.Run;
 
 import java.io.File;
@@ -35,8 +41,12 @@ import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import Models.Level;
 
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
@@ -462,6 +472,112 @@ public class Utils {
         double c = 0.000455;
         double d = ( 0.00801*Math.pow(weightInLbs/154, 0.425) ) / weightInLbs;
         return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
+    }
+
+    public static final Level getLevel(float kmsCovered){
+        Iterator<Map.Entry<Integer, Level>> iter = Constants.LEVELS_MAP.entrySet().iterator();
+        Level result = null;
+        while (iter.hasNext()){
+            Map.Entry<Integer, Level> entry = iter.next();
+            Level level = entry.getValue();
+            if (kmsCovered >= level.getMinKm() && kmsCovered < level.getMaxKm()){
+                result = level;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static void updateTrackRecordFromDb(){
+
+        // SQL Fiddle to refer: http://sqlfiddle.com/#!7/f0aed/1
+
+        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        int totalRuns = (int) mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.IsValidRun.eq(true)).count();
+
+        SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+        // Calculate total_amount_raised, total_distance, total_steps, total_recorded_time, and total_calories
+        Cursor cursor = database.rawQuery("SELECT "
+                + "SUM(" +WorkoutDao.Properties.RunAmount.columnName + "), "
+                + "SUM("+ WorkoutDao.Properties.Distance.columnName +"), "
+                + "SUM("+ WorkoutDao.Properties.Steps.columnName +"), "
+                + "SUM("+ WorkoutDao.Properties.RecordedTime.columnName +"), "
+                + "SUM("+ WorkoutDao.Properties.Calories.columnName +") "
+                + "FROM " + WorkoutDao.TABLENAME + " where "
+                + WorkoutDao.Properties.IsValidRun.columnName + " is 1", new String []{});
+        cursor.moveToFirst();
+        int totalAmountRaised = Math.round(cursor.getFloat(0));
+        long totalDistance = Math.round(cursor.getDouble(1));
+        long totalSteps = cursor.getLong(2);
+        long totalRecordedTime = Math.round(cursor.getDouble(3));
+        long totalCalories = Math.round(cursor.getDouble(4));
+
+        Logger.d(TAG, "updateTrackRecordFromDb: totalAmountRaised: " + totalAmountRaised
+                + ", totalDistance: " + totalDistance + ", totalSteps: " + totalSteps
+                + ", totalRecordedTime: " + totalRecordedTime + ", totalCalories: " + totalCalories
+                + ", totalRuns:  " + totalRuns);
+
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE, totalDistance); // in Kms
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_STEPS, totalSteps);
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT, totalRecordedTime); // in secs
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_TOTAL_CALORIES, totalCalories);
+
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_RUN, totalRuns);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_TOTAL_IMPACT, totalAmountRaised);
+
+        setTrackRecordForAnalytics();
+
+    }
+
+    private static void setTrackRecordForAnalytics(){
+        Analytics.getInstance().setUserProperty("LifeTimeDistance",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE));
+        Analytics.getInstance().setUserProperty("LifeTimeSteps",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS));
+        Analytics.getInstance().setUserProperty("AvgStrideLength", getAverageStrideLength());
+        Analytics.getInstance().setUserProperty("AvgSpeed", getLifetimeAverageSpeed());
+        Analytics.getInstance().setUserProperty("AvgCadence", getLifetimeAverageStepsPerSec());
+        Analytics.getInstance().setUserProperty("TotalCalories",
+                SharedPrefsManager.getInstance().getLong(Constants.PREF_TOTAL_CALORIES));
+
+        Analytics.getInstance().setUserProperty("TotalRuns",
+                SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN));
+        Analytics.getInstance().setUserProperty("TotalAmountRaised",
+                SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT));
+
+        OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT,
+                String.valueOf(SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN)));
+    }
+
+    public static float getAverageStrideLength(){
+        long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE); // in Kms
+        long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
+
+        if (lifetimeDistance == 0 || lifetimeSteps == 0){
+            return 0;
+        }
+        return ((float) lifetimeDistance*1000 ) / ((float) lifetimeSteps); // in meter/step
+    }
+
+    public static float getLifetimeAverageSpeed(){
+        long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE); // in Kms
+        long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT); // in secs
+
+        if (lifetimeDistance == 0 || lifetimeWorkingOut == 0){
+            return 0;
+        }
+        float lifeTimeHours = ((float) lifetimeWorkingOut) / 3600;
+        return ((float) lifetimeDistance ) / lifeTimeHours; // in Km/hr
+    }
+
+    public static float getLifetimeAverageStepsPerSec(){
+        long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
+        long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT);
+
+        if (lifetimeSteps == 0 || lifetimeWorkingOut == 0){
+            return 0;
+        }
+        return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);
     }
 
 }

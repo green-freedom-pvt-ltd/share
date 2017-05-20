@@ -3,7 +3,11 @@ package com.sharesmile.share.core;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import Models.Level;
 
 /**
  * Created by ankitmaheshwari1 on 20/02/16.
@@ -105,6 +109,8 @@ public class Constants {
 
     public static final String PREF_WORKOUT_LIFETIME_STEPS = "pref_workout_lifetime_steps_new";
 
+    public static final String PREF_TOTAL_CALORIES = "pref_total_calories";
+
     public static final String PREF_WORKOUT_LIFETIME_WORKING_OUT = "pref_workout_lifetime_working_out_new";
 
     public static final String PREF_WORKOUT_DATA_SYNC_VERSION = "pref_workout_data_sync_version";
@@ -165,6 +171,16 @@ public class Constants {
         add(new LatLng(19.118086, 72.911555));
         add(new LatLng(19.117179, 72.910924));
         add(new LatLng(19.116917, 72.910417));
+    }};
+
+    public static final Map<Integer, Level> LEVELS_MAP = new HashMap<Integer, Level>(){{
+        put(1, new Level(1, 0, 50));
+        put(2, new Level(2, 50, 250));
+        put(3, new Level(3, 250, 1000));
+        put(4, new Level(4, 1000, 2500));
+        put(5, new Level(5, 2500, 5000));
+        put(6, new Level(6, 5000, 10000));
+        put(7, new Level(7, 10000, Integer.MAX_VALUE));
     }};
 
 }

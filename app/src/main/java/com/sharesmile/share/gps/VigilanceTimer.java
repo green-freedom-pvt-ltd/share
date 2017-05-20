@@ -8,6 +8,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -156,8 +157,8 @@ public class VigilanceTimer implements Runnable {
 					// Running faster than Usain Bolt
 					Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
 
-					float averageStrideLength = (RunTracker.getAverageStrideLength() == 0)
-							? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : RunTracker.getAverageStrideLength();
+					float averageStrideLength = (Utils.getAverageStrideLength() == 0)
+							? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
 
 					// Normalising averageStrideLength obtained
 					if (averageStrideLength < 0.25f){

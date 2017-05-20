@@ -18,11 +18,11 @@ public class ProfileStatsViewAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return ProfileStatsViewFragment.getInstance(0);
+        return ProfileStatsViewFragment.getInstance(position);
     }
 
     @Override
     public int getCount() {
-        return 1;
+        return 2;
     }
 }
