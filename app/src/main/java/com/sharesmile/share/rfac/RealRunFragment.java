@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -22,8 +23,6 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +42,6 @@ public class RealRunFragment extends RunFragment {
     ProgressBar runProgressBar;
     Button pauseButton;
     Button stopButton;
-    SimpleDateFormat simpleDateFormat;
 
     @BindView(R.id.img_sponsor_logo)
     ImageView mSponsorLogo;
@@ -51,11 +49,11 @@ public class RealRunFragment extends RunFragment {
     @BindView(R.id.timer_indicator)
     TextView mTimerIndicator;
 
-    @BindView(R.id.tv_cal_1)
+    @BindView(R.id.tv_calories_progress)
     TextView tvCalorieMets;
 
-    @BindView(R.id.tv_cal_2)
-    TextView tvCalorieKarkanen;
+    @BindView(R.id.live_calories_container)
+    View caloriesContainer;
 
     private CauseData mCauseData;
 
@@ -87,6 +85,9 @@ public class RealRunFragment extends RunFragment {
         stopButton = (Button) baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
+        if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0){
+            caloriesContainer.setVisibility(View.VISIBLE);
+        }
         Picasso.with(getContext()).load(mCauseData.getSponsor().getLogoUrl()).into(mSponsorLogo);
 
     }
@@ -162,7 +163,6 @@ public class RealRunFragment extends RunFragment {
         Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
         if (calorie != null){
             tvCalorieMets.setText(String.valueOf(Math.round(calorie.getCalories())));
-            tvCalorieKarkanen.setText(String.valueOf(Math.round(calorie.getCaloriesKarkanen())));
         }
     }
 
@@ -189,8 +189,6 @@ public class RealRunFragment extends RunFragment {
         pauseButton.setText(R.string.resume);
         runProgressBar.setVisibility(View.INVISIBLE);
     }
-
-    //TODO: Remove persistence of distance and impact on Pause.
 
     @Override
     protected void onResumeRun() {

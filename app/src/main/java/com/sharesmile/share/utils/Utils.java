@@ -1,6 +1,7 @@
 package com.sharesmile.share.utils;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -8,11 +9,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -88,6 +92,12 @@ public class Utils {
     }
 
     public static String formatWithOneDecimal(float distance){
+        DecimalFormat df = new DecimalFormat("0.0");
+        df.setGroupingUsed(false);
+        return df.format(distance);
+    }
+
+    public static String formatWithOneDecimal(double distance){
         DecimalFormat df = new DecimalFormat("0.0");
         df.setGroupingUsed(false);
         return df.format(distance);
@@ -204,6 +214,25 @@ public class Utils {
         } else {
             return String.format("%02d:%02d", secs / 60, secs % 60);
         }
+    }
+
+    public static final long hhmmssToSecs(String hhmmss) {
+        Long secs = 0L;
+        String[] parts = hhmmss.split(":");
+        switch (parts.length){
+            case 3:
+                secs += 3600*Long.parseLong(parts[0]);
+                secs += 60*Long.parseLong(parts[1]);
+                secs += Long.parseLong(parts[2]);
+                break;
+            case 2:
+                secs += 60*Long.parseLong(parts[0]);
+                secs += Long.parseLong(parts[1]);
+                break;
+            case 1:
+                secs += Long.parseLong(parts[0]);
+        }
+        return secs;
     }
 
     public static final String secondsToHoursAndMins(int secs) {
@@ -578,6 +607,47 @@ public class Utils {
             return 0;
         }
         return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);
+    }
+
+    public static void showWeightInputDialog(Context context){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Body Weight in Kg");
+
+        // Set up the input
+        final EditText input = new EditText(context);
+        int dp_80 = Math.round(Utils.convertDpToPixel(context, 80));
+        int dp_15 = Math.round(Utils.convertDpToPixel(context, 15));
+        input.setPadding(dp_80, dp_15, dp_80, dp_15);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String inputWeight = input.getText().toString();
+                if (TextUtils.isEmpty(inputWeight)){
+                    MainApplication.showToast("Please input your actual weight");
+                }else {
+                    float weight = Float.parseFloat(inputWeight);
+                    if (weight < 10 || weight > 200){
+                        MainApplication.showToast("Please input your actual weight");
+                    }else {
+                        MainApplication.getInstance().setBodyWeight(weight);
+                        dialog.dismiss();
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
 }

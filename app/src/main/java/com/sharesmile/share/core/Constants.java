@@ -137,6 +137,7 @@ public class Constants {
     public static final String PREF_GLOBAL_LEADERBOARD_CACHED_DATA="pref_global_leaderboard_cached_data";
     public static final String PREF_LEAGUEBOARD_CACHED_DATA="pref_leagueboard_cached_data";
     public static final String PREF_MY_TEAM_LEADERBOARD_CACHED_DATA="pref_my_team_leaderboard_cached_data";
+    public static final String PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB="pref_is_workout_data_up_to_date_in_db";
 
 
     //app Update

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="60dp">
+        android:layout_marginTop="50dp">
 
 
         <com.sharesmile.share.views.MRTextView
@@ -43,8 +43,8 @@
             android:layout_height="23.5dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tv_share_screen_rupee"
-            android:layout_marginLeft="72dp"
-            android:layout_marginTop="17dp"
+            android:layout_marginLeft="62dp"
+            android:layout_marginTop="27dp"
             app:srcCompat="@drawable/ic_directions_run_black_24px" />
 
         <com.sharesmile.share.views.MRTextView
@@ -52,11 +52,64 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_screen_distance"
-            android:layout_marginLeft="50.5dp"
+            android:layout_marginLeft="40.5dp"
             android:layout_marginTop="14.5dp"
             android:shadowColor="@color/greyish_brown_two"
             android:textSize="16sp"
             tools:text="12 Kms" />
+
+        <FrameLayout
+            android:id="@+id/img_calorie_container"
+            android:layout_width="wrap_content"
+            android:layout_height="23.5dp"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/tv_share_screen_rupee"
+            android:layout_marginTop="27dp">
+
+            <LinearLayout
+                android:id="@+id/share_cal_not_available_container"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <com.sharesmile.share.views.MRTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:text="add info"
+                    android:textColor="@color/dark_sky_blue"/>
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginBottom="3dp"
+                    app:srcCompat="@drawable/ic_pencil_edit_blue"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/img_share_calories"
+                android:layout_width="18dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_calories_heart"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_share_screen_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/img_calorie_container"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="14.5dp"
+            android:shadowColor="@color/greyish_brown_two"
+            android:textSize="16sp"
+            tools:text="@string/for_calories" />
 
         <ImageView
             android:id="@+id/img_screen_time"
@@ -64,8 +117,8 @@
             android:layout_height="23.5dp"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_share_screen_rupee"
-            android:layout_marginRight="70.8dp"
-            android:layout_marginTop="17dp"
+            android:layout_marginRight="61dp"
+            android:layout_marginTop="27dp"
             android:src="@drawable/timer" />
 
         <com.sharesmile.share.views.MRTextView
@@ -75,10 +128,10 @@
             android:layout_alignBaseline="@+id/tv_share_screen_distance"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/img_screen_time"
-            android:layout_marginRight="35dp"
+            android:layout_marginRight="26dp"
             android:shadowColor="@color/greyish_brown_two"
             android:textSize="16sp"
-            tools:text="1hr 2mins" />
+            tools:text="1hr 2min" />
 
     </RelativeLayout>
 

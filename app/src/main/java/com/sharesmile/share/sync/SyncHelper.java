@@ -62,12 +62,12 @@ public class SyncHelper {
     }
 
     /**
-     * One time task to fetch the diff of WorkoutData from server
+     * One time task to forcefully fetch all WorkoutData from server
      */
-    public static void pullEntireWorkoutHistory() {
+    public static void forceRefreshEntireWorkoutHistory() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
-                .setTag(TaskConstants.PULL_ENTIRE_WORKOUT_HISTORY)
+                .setTag(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)
                 .setExecutionWindow(0L, 10L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)

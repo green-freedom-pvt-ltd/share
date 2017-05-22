@@ -29,6 +29,7 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -101,6 +102,16 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     @BindView(R.id.progress_container)
     LinearLayout mProgressContainer;
+
+    @BindView(R.id.share_cal_not_available_container)
+    View caloriesNotAvailableContainer;
+
+    @BindView(R.id.img_share_calories)
+    View caloriesIcon;
+
+    @BindView(R.id.tv_share_screen_calories)
+    TextView caloriesText;
+
     private LoginImpl mLoginHandler;
 
     public enum SHARE_MEDIUM {
@@ -196,19 +207,35 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         float distanceInMeters = mWorkoutData.getDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
+
         String distanceCovered = Utils.formatToKmsWithOneDecimal(distanceInMeters);
         mDistance.setText(distanceCovered + " km");
 
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
         mContributionAmount.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
-
-
-        mTime.setText(getTimeInHHMMFormat((int) (elapsedTimeInSecs * 1000)));
+        initCaloriesContainer();
+        mTime.setText(Utils.secondsToHoursAndMins(Math.round(elapsedTimeInSecs)));
 
         initShareLayout();
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
                 .addBundle(mWorkoutData.getWorkoutBundle())
                 .buildAndDispatch();
+    }
+
+    private void initCaloriesContainer(){
+        if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0){
+            double caloriesBurned = mWorkoutData.getCalories().getCalories();
+            caloriesNotAvailableContainer.setVisibility(View.GONE);
+            caloriesIcon.setVisibility(View.VISIBLE);
+            caloriesText.setText(Utils.formatWithOneDecimal(caloriesBurned) + " Kcal");
+        }else {
+            caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Utils.showWeightInputDialog(getContext());
+                }
+            });
+        }
     }
 
     private void initShareLayout() {

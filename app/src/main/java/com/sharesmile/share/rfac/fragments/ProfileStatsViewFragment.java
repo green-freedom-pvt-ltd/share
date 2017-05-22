@@ -29,6 +29,7 @@ import com.sharesmile.share.rfac.CustomBarChartRenderer;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,7 +162,7 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
                 + "SUM("+ WorkoutDao.Properties.Calories.columnName +") "
                 + "FROM " + WorkoutDao.TABLENAME + " where "
                 + WorkoutDao.Properties.IsValidRun.columnName + " is 1" +
-                " and " + WorkoutDao.Properties.BeginTimeStamp.columnName + " between "
+                " and " + WorkoutDao.Properties.Date.columnName + " between "
                 + beginningOfFirstDayTsMillis + " and " + currentTimeStampMillis, new String []{});
         cursor.moveToFirst();
         totalAmountRaised = Math.round(cursor.getFloat(0));
@@ -198,7 +199,15 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
     private void displayStats(){
         impactInRupees.setText("\u20B9 " + totalAmountRaised);
         resolveCaloriesContainer();
-        distance.setText(String.valueOf(totalDistance));
+        String totalDistanceString;
+        if (totalDistance > 100){
+            totalDistanceString = String.valueOf(Math.round(totalDistance));
+        } else if (totalDistance % 1 == 0){
+            totalDistanceString = String.valueOf(totalDistance);
+        } else {
+            totalDistanceString = String.valueOf(Utils.formatWithOneDecimal(totalDistance));
+        }
+        distance.setText(String.valueOf(totalDistanceString));
     }
 
     private void resolveCaloriesContainer(){
@@ -206,7 +215,15 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
             // Weight set, so calories must be available
             caloriesAvailableContainer.setVisibility(View.VISIBLE);
             caloriesNotAvailableContainer.setVisibility(View.GONE);
-            calories.setText(String.valueOf(totalCalories));
+            String totalCaloriesString;
+            if (totalCalories > 100){
+                totalCaloriesString = String.valueOf(Math.round(totalCalories));
+            } else if (totalCalories % 1 == 0){
+                totalCaloriesString = String.valueOf(totalCalories);
+            } else {
+                totalCaloriesString = String.valueOf(Utils.formatWithOneDecimal(totalCalories));
+            }
+            calories.setText(String.valueOf(totalCaloriesString));
         }else {
             // Weight not set yet
             caloriesAvailableContainer.setVisibility(View.GONE);
@@ -292,8 +309,7 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.cal_not_available_container:
-                // TODO: Open WeightInputDialog
-
+                Utils.showWeightInputDialog(getContext());
                 break;
         }
     }

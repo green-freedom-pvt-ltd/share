@@ -9,27 +9,27 @@ package com.sharesmile.share;
  */
 public class Workout {
 
-    private Long id;
-    private float distance;
+    private Long id; //
+    private float distance; // in Kms
     /** Not-null value. */
-    private String elapsedTime;
-    private Integer steps;
-    private float recordedTime;
-    private float avgSpeed;
-    private String causeBrief;
-    private java.util.Date date;
-    private Float runAmount;
+    private String elapsedTime; // HH:MM:SS or MM:SS format
+    private Integer steps; //
+    private float recordedTime; // in secs, not present
+    private float avgSpeed; // in m/s
+    private String causeBrief; //
+    private java.util.Date date; // BeginTimeStamp in date format
+    private Float runAmount; // in Rs
     private Boolean is_sync;
     private String workoutId;
     private Double startPointLatitude;
     private Double startPointLongitude;
     private Double endPointLatitude;
     private Double endPointLongitude;
-    private Long beginTimeStamp;
-    private Long endTimeStamp;
+    private Long beginTimeStamp; // Epoch in millis
+    private Long endTimeStamp; // Epoch in millis
     private Boolean isValidRun;
-    private Long version;
-    private Double calories;
+    private Long version; // Epoch in secs
+    private Double calories; // in Kcals
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END

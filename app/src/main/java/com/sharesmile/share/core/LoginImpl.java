@@ -240,7 +240,7 @@ public class LoginImpl {
                 .buildAndDispatch();
 
         //Pull historical run data;
-        SyncHelper.pullEntireWorkoutHistory();
+        SyncHelper.forceRefreshEntireWorkoutHistory();
 
         mListener.onLoginSuccess();
 

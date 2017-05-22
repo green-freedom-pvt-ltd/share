@@ -46,7 +46,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <com.sharesmile.share.views.MRTextView
                 android:layout_width="match_parent"
@@ -111,7 +112,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <com.sharesmile.share.views.MRTextView
                 android:layout_width="match_parent"
@@ -199,6 +201,42 @@
             android:textAllCaps="true"
             android:text="MIN:SEC"/>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/live_calories_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linear_btn_layout"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="40dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/img_calories_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="true"
+            app:srcCompat="@drawable/ic_calories_heart"/>
+
+        <TextView
+            android:id="@+id/tv_calories_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/img_calories_icon"
+            android:layout_centerHorizontal="true"
+            android:text="0.00"
+            android:textSize="30dp" />
+
+        <com.sharesmile.share.views.MLTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/greyish_brown_two"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tv_calories_progress"
+            android:textAllCaps="true"
+            android:text="Kcal"/>
     </RelativeLayout>
 
     <RelativeLayout

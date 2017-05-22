@@ -328,7 +328,8 @@ public class RunTracker implements Tracker {
                         spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
                         thresholdApplied = "in_vehicle";
                     }else {
-                        if (isCurrentlyProcessingSteps() && listener.getMovingAverageOfStepsPerSec() >= 1){
+                        if ( (isCurrentlyProcessingSteps() && listener.getMovingAverageOfStepsPerSec() >= 1)
+                                    || ActivityDetector.getInstance().isOnFoot()){
                             // Can make a safe assumption that the person is on foot
                             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                             thresholdApplied = "on_foot";

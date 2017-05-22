@@ -78,7 +78,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         Logger.d(TAG, "onstart");
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

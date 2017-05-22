@@ -28,7 +28,7 @@ public class Run implements UnObfuscable, Serializable {
     String endTime;
 
     @SerializedName("end_time_epoch")
-    String endTimeEpoch;
+    Long endTimeEpoch;
 
     @SerializedName("distance")
     float distance;
@@ -38,6 +38,9 @@ public class Run implements UnObfuscable, Serializable {
 
     @SerializedName("run_duration")
     String runDuration;
+
+    @SerializedName("run_duration_epoch")
+    Long runDurationEpoch;
 
     @SerializedName("no_of_steps")
     float numSteps;
@@ -201,11 +204,11 @@ public class Run implements UnObfuscable, Serializable {
         this.startTimeEpoch = startTimeEpoch;
     }
 
-    public String getEndTimeEpoch() {
+    public Long getEndTimeEpoch() {
         return endTimeEpoch;
     }
 
-    public void setEndTimeEpoch(String endTimeEpoch) {
+    public void setEndTimeEpoch(Long endTimeEpoch) {
         this.endTimeEpoch = endTimeEpoch;
     }
 
@@ -225,6 +228,14 @@ public class Run implements UnObfuscable, Serializable {
         this.calories = calories;
     }
 
+    public Long getRunDurationEpoch() {
+        return runDurationEpoch;
+    }
+
+    public void setRunDurationEpoch(Long runDurationEpoch) {
+        this.runDurationEpoch = runDurationEpoch;
+    }
+
     @Override
     public String toString() {
         return "Run{" +
@@ -238,6 +249,8 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t clientRunId='" + clientRunId + '\'' +
                 ",\n\t version='" + version + '\'' +
                 ",\n\t calories='" + calories + '\'' +
+                ",\n\t startTimeEpoch='" + startTimeEpoch + '\'' +
+                ",\n\t endTimeEpoch='" + endTimeEpoch + '\'' +
                 "\n}";
     }
 }

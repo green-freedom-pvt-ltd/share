@@ -333,6 +333,11 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         SyncHelper.syncLeaderBoardData(this);
         SyncHelper.scheduleCauseDataSync(this);
         SyncHelper.scheduleUserDataSync(this);
+        boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
+        if (!isWorkoutDataUpToDate){
+            // Need to forcefully refresh workout data now
+            SyncHelper.forceRefreshEntireWorkoutHistory();
+        }
     }
 
 
@@ -356,6 +361,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
      */
     public UserDetails getUserDetails(){
         return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
+    }
+
+    public void setBodyWeight(float bodyWeight){
+        UserDetails details = getUserDetails();
+        details.setBodyWeight(bodyWeight);
+        SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
     }
 
     public void setUserDetails(UserDetails details){

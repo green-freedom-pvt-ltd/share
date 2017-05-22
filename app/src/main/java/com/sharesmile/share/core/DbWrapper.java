@@ -10,10 +10,6 @@ import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.UserDao;
-import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.gps.models.WorkoutData;
 
 /**
  * Created by Shine on 07/05/16.

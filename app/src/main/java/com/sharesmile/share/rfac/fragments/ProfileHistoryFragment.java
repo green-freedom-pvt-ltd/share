@@ -76,7 +76,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
         if (mWorkoutList == null || mWorkoutList.isEmpty()){
-            SyncHelper.pullEntireWorkoutHistory();
+            SyncHelper.forceRefreshEntireWorkoutHistory();
             showProgressDialog();
         }else {
             Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");

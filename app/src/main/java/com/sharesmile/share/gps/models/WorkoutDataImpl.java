@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -225,8 +226,10 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			// Add record over here
 			getCurrentBatch().addRecord(record);
 			this.distance += record.getDist();
-			this.calories.incrementCaloriesMets(Utils.getDeltaCaloriesMets(record.getInterval(), record.getSpeed()));
-			this.calories.incrementCaloriesKarkanen(Utils.getDeltaCaloriesKarkanen(record.getInterval(), record.getSpeed()));
+			if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0){
+				this.calories.incrementCaloriesMets(Utils.getDeltaCaloriesMets(record.getInterval(), record.getSpeed()));
+				this.calories.incrementCaloriesKarkanen(Utils.getDeltaCaloriesKarkanen(record.getInterval(), record.getSpeed()));
+			}
 		}
 		latestPoint = new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude());
 	}

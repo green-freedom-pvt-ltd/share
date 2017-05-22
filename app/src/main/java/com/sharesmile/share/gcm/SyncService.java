@@ -60,8 +60,8 @@ public class SyncService extends GcmTaskService {
         }
         if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_WORKOUT_DATA)) {
             return uploadWorkoutData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PULL_ENTIRE_WORKOUT_HISTORY)) {
-            return pullEntireWorkoutHistory();
+        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)) {
+            return forceRefreshEntireWorkoutHistory();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_CAUSE_DATA)) {
@@ -158,7 +158,8 @@ public class SyncService extends GcmTaskService {
     private int syncWorkoutData(){
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         long clientVersion = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
-        if (clientVersion > 0){
+        boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
+        if (isWorkoutDataUpToDate && clientVersion > 0){
             String syncUrl;
             syncUrl = Urls.getSyncRunUrl(clientVersion);
             Logger.d(TAG, "Starting sync with client_version: " + clientVersion);
@@ -166,10 +167,12 @@ public class SyncService extends GcmTaskService {
             int result = syncWorkoutData(syncUrl, mWorkoutDao);
             return result;
         }else {
-            Logger.e(TAG, "Client Version not present, must fetch historical runs before");
-            SyncHelper.pullEntireWorkoutHistory();
+            // Need to force refresh Workout Data
+            Logger.e(TAG, "Must fetch historical runs before");
+            SyncHelper.forceRefreshEntireWorkoutHistory();
             return  GcmNetworkManager.RESULT_FAILURE;
         }
+
     }
 
     private long syncWorkoutTimeStamp;
@@ -295,6 +298,7 @@ public class SyncService extends GcmTaskService {
             }
             jsonObject.put("run_amount", workout.getRunAmount());
             jsonObject.put("run_duration", workout.getElapsedTime());
+            jsonObject.put("run_duration_epoch", Utils.hhmmssToSecs(workout.getElapsedTime()));
             jsonObject.put("no_of_steps", workout.getSteps());
             jsonObject.put("avg_speed", workout.getAvgSpeed());
             jsonObject.put("client_run_id", workout.getWorkoutId());
@@ -347,62 +351,56 @@ public class SyncService extends GcmTaskService {
                     .buildAndDispatch();
             return false;
         }
-
     }
 
-    public int pullEntireWorkoutHistory() {
-        Logger.d(TAG, "pullEntireWorkoutHistory");
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        long syncedCount;
+    public int forceRefreshEntireWorkoutHistory() {
+        Logger.d(TAG, "forceRefreshEntireWorkoutHistory");
         String runUrl;
-        syncedCount = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(true)).count();
         runUrl = Urls.getFlaggedRunUrl(false);
-        fetchAllTimeStamp = 0;
-        int result = fetchAllWorkoutData(runUrl, syncedCount);
-        return result;
+        refreshAllTimeStamp = 0;
+        return forceRefreshAllWorkoutData(runUrl);
     }
 
-    private long fetchAllTimeStamp;
+    private long refreshAllTimeStamp;
 
-    private int fetchAllWorkoutData(String runUrl, final long syncedCount) {
+    private int forceRefreshAllWorkoutData(String runUrl) {
 
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(runUrl);
-            if (fetchAllTimeStamp == 0 && response.headers().getDate("Date") != null){
-                fetchAllTimeStamp = response.headers().getDate("Date").getTime();
-            }else {
-                fetchAllTimeStamp = DateUtil.getServerTimeInMillis();
-            }
-            Logger.d(TAG, "fetchAllWorkoutData, fetched SyncedTimeStampMillis as: " + fetchAllTimeStamp);
-            RunList runList = NetworkUtils.handleResponse(response, RunList.class);
-            // If num of synced run on client is same as total run count on server then no need to update
-            if (syncedCount >= runList.getTotalRunCount()) {
-                Logger.d(TAG, "fetchAllWorkoutData, update success " + syncedCount + " : " + runList.getTotalRunCount());
-                EventBus.getDefault().post(new DBEvent.RunDataUpdated());
-                return GcmNetworkManager.RESULT_SUCCESS;
-            } else {
-                Gson gson = new Gson();
-                Logger.d(TAG, "Updating these runs in DB " + gson.toJson(runList));
-                WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-                mWorkoutDao.insertOrReplaceInTx(runList);
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
-                if (!TextUtils.isEmpty(runList.getNextUrl())) {
-                    // Recursive call to fetch the runs of next page
-                    Logger.d(TAG, "fetchAllWorkoutData, Setting SyncedTimeStampMillis as: " + fetchAllTimeStamp);
-                    SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION, (fetchAllTimeStamp / 1000));
-                    return fetchAllWorkoutData(runList.getNextUrl(), syncedCount);
-                } else {
-                    Utils.updateTrackRecordFromDb();
+            if (refreshAllTimeStamp == 0){
+                if (response.headers().getDate("Date") != null){
+                    refreshAllTimeStamp = response.headers().getDate("Date").getTime();
+                }else {
+                    refreshAllTimeStamp = DateUtil.getServerTimeInMillis();
                 }
+            }
+            Logger.d(TAG, "forceRefreshAllWorkoutData, fetched SyncedTimeStampMillis as: " + refreshAllTimeStamp);
+            RunList runList = NetworkUtils.handleResponse(response, RunList.class);
+
+            Gson gson = new Gson();
+            Logger.d(TAG, "Updating these runs in DB " + gson.toJson(runList));
+            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            mWorkoutDao.insertOrReplaceInTx(runList);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
+            if (!TextUtils.isEmpty(runList.getNextUrl())) {
+                // Recursive call to fetch the runs of next page
+                return forceRefreshAllWorkoutData(runList.getNextUrl());
+            } else {
+                // All the runs are pulled from server and written into DB
+                Logger.d(TAG, "forceRefreshAllWorkoutData, Setting SyncedTimeStampMillis as: " + refreshAllTimeStamp);
+                SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION, (refreshAllTimeStamp / 1000));
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, true);
+                Utils.updateTrackRecordFromDb();
                 EventBus.getDefault().post(new DBEvent.RunDataUpdated());
                 return GcmNetworkManager.RESULT_SUCCESS;
             }
         } catch (NetworkException e) {
+            Logger.d(TAG, "NetworkException while force refreshing all workoutData from server, " +
+                    "messageFromServer " + e.getMessageFromServer() + " exceptionMessage: " + e.getMessage());
             e.printStackTrace();
-            Logger.d(TAG, "update NetworkException, messageFromServer " + e.getMessageFromServer()
-                    + " exceptionMessage: " + e.getMessage());
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
 
     }
+
 }
