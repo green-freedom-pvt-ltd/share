@@ -169,6 +169,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                         .addBundle(causeData.getCauseBundle())
                         .put("cause_index", viewPager.getCurrentItem())
                         .buildAndDispatch();
+//                weightInputDialog = Utils.showWeightInputDialog(this.getContext());
                 break;
 
             case R.id.badge_layout:
@@ -178,6 +179,16 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
         }
     }
+
+//    AlertDialog weightInputDialog;
+//
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        if (weightInputDialog != null && weightInputDialog.isShowing()){
+//            weightInputDialog.dismiss();
+//        }
+//    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {

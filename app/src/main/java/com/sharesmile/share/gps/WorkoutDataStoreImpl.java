@@ -128,7 +128,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public Properties getWorkoutBundle(){
         Properties p = new Properties();
-        p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistance()));
+        p.put("distance", Utils.formatToKmsWithTwoDecimal(getTotalDistance()));
         p.put("time_elapsed", getElapsedTime());
         p.put("avg_speed", getAvgSpeed() * (3.6f));
         p.put("num_steps", getTotalSteps());

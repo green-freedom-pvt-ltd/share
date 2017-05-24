@@ -274,7 +274,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public Properties getWorkoutBundle() {
 		Properties p = new Properties();
-		p.put("distance", Utils.formatToKmsWithOneDecimal(getDistance()));
+		p.put("distance", Utils.formatToKmsWithTwoDecimal(getDistance()));
 		p.put("time_elapsed", getElapsedTime());
 		p.put("avg_speed", getAvgSpeed()*(3.6f));
 		p.put("num_steps", getTotalSteps());

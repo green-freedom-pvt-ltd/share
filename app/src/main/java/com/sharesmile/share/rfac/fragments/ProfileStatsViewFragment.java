@@ -1,7 +1,5 @@
 package com.sharesmile.share.rfac.fragments;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -17,37 +15,28 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.Workout;
-import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.CustomBarChartRenderer;
-import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.rfac.models.BarChartDataSet;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.sharesmile.share.core.Constants.PREF_TOTAL_CALORIES;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
+import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
 import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
+import static com.sharesmile.share.rfac.models.BarChartDataSet.TYPE_WEEKLY;
 
 /**
  * Created by ankitmaheshwari on 5/18/17.
  */
 
-public class ProfileStatsViewFragment extends BaseFragment implements View.OnClickListener{
+public class ProfileStatsViewFragment extends BaseFragment {
 
     private static final String TAG = "ProfileStatsViewFragment";
     private static final String POSITION = "position";
@@ -70,14 +59,8 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
     @BindView(R.id.tv_impact)
     TextView impactInRupees;
 
-    @BindView(R.id.cal_not_available_container)
-    View caloriesNotAvailableContainer;
-
-    @BindView(R.id.cal_available_container)
-    View caloriesAvailableContainer;
-
-    @BindView(R.id.tv_cal)
-    TextView calories;
+    @BindView(R.id.tv_total_runs)
+    TextView totalRuns;
 
     @BindView(R.id.tv_distance)
     TextView distance;
@@ -85,8 +68,9 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
     int position;
 
     private int totalAmountRaised;
+    private int numRuns;
     private double totalDistance;
-    private double totalCalories;
+    private BarChartDataSet barChartDataSet;
 
     public static ProfileStatsViewFragment getInstance(int position) {
         ProfileStatsViewFragment fragment = new ProfileStatsViewFragment();
@@ -115,7 +99,9 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (position == POSITION_WEEKLY){
-            setUpWeeklyStats();
+            // TODO: Setting Al time stats as we will have only one stats page
+            setUpAllTimeStats();
+//            setUpWeeklyStats();
         }else if (position == POSITION_ALL_TIME){
             setUpAllTimeStats();
         }
@@ -123,6 +109,8 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
         displayStats();
         setUpBarChart();
     }
+
+    /*
 
     private void setUpWeeklyStats(){
         toTheRight.setText("All Time >");
@@ -174,31 +162,22 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
 
     }
 
-
-
-    private long getMillisElapsedSinceBeginningOfDay(Calendar day){
-        long hour = day.get(Calendar.HOUR_OF_DAY);
-        long minute = day.get(Calendar.MINUTE);
-        long secs = day.get(Calendar.SECOND);
-        long millis = day.get(Calendar.MILLISECOND);
-        return hour*3600000 + minute*60000 + secs*1000 + millis;
-    }
-
-
+    */
 
     private void setUpAllTimeStats(){
-        toTheLeft.setText("< Last 7 Days");
-        duration.setText("All Time");
+        toTheLeft.setVisibility(View.GONE);
+        toTheRight.setVisibility(View.GONE);
+        duration.setText(R.string.profile_stats_all_time);
         totalAmountRaised = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
-        totalCalories = SharedPrefsManager.getInstance().getLong(PREF_TOTAL_CALORIES);
+        numRuns = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_RUN);
         totalDistance = SharedPrefsManager.getInstance().getLong(PREF_WORKOUT_LIFETIME_DISTANCE);
         Logger.d(TAG, "Fetched All time stats from Preferences: totalAmountRaised: " + totalAmountRaised
-                + ", totalDistance: " + totalDistance + ", totalCalories: " + totalCalories);
+                + ", totalDistance: " + totalDistance + ", numRuns: " + numRuns);
     }
 
     private void displayStats(){
         impactInRupees.setText("\u20B9 " + totalAmountRaised);
-        resolveCaloriesContainer();
+        totalRuns.setText(numRuns + "");
         String totalDistanceString;
         if (totalDistance > 100){
             totalDistanceString = String.valueOf(Math.round(totalDistance));
@@ -210,40 +189,10 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
         distance.setText(String.valueOf(totalDistanceString));
     }
 
-    private void resolveCaloriesContainer(){
-        if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0f){
-            // Weight set, so calories must be available
-            caloriesAvailableContainer.setVisibility(View.VISIBLE);
-            caloriesNotAvailableContainer.setVisibility(View.GONE);
-            String totalCaloriesString;
-            if (totalCalories > 100){
-                totalCaloriesString = String.valueOf(Math.round(totalCalories));
-            } else if (totalCalories % 1 == 0){
-                totalCaloriesString = String.valueOf(totalCalories);
-            } else {
-                totalCaloriesString = String.valueOf(Utils.formatWithOneDecimal(totalCalories));
-            }
-            calories.setText(String.valueOf(totalCaloriesString));
-        }else {
-            // Weight not set yet
-            caloriesAvailableContainer.setVisibility(View.GONE);
-            caloriesNotAvailableContainer.setVisibility(View.VISIBLE);
-            caloriesNotAvailableContainer.setOnClickListener(this);
-        }
-    }
-
     private void setUpBarChart(){
+        barChartDataSet = new BarChartDataSet(TYPE_WEEKLY);
 
-        List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 10));
-        entries.add(new BarEntry(1, 15));
-        entries.add(new BarEntry(2, 23));
-        entries.add(new BarEntry(3, 28));
-        entries.add(new BarEntry(4, 5));
-        entries.add(new BarEntry(5, 12));
-        entries.add(new BarEntry(6, 19));
-
-        BarDataSet dataSet = new BarDataSet(entries, "Stats");
+        BarDataSet dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
         dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
 
@@ -261,7 +210,7 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
 
         YAxis yAxis = barChart.getAxisLeft();
 
-        yAxis.setSpaceBottom(25);
+        yAxis.setSpaceBottom(5);
         yAxis.setLabelCount(3, true);
 
         yAxis.setCenterAxisLabels(true);
@@ -286,17 +235,17 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
         xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
         xAxis.setAxisLineWidth(1.5f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
-        List<String> list = Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
-        IAxisValueFormatter valueFormatter = new IndexAxisValueFormatter(list);
+        IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                int index = (int) value;
+                return barChartDataSet.getLabelForIndex(index);
+            }
+        } ;
         xAxis.setValueFormatter(valueFormatter);
-
         barChart.setDrawBorders(false);
-
         barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
                 barChart.getViewPortHandler()));
-
-
         barChart.invalidate();
         barChart.setTouchEnabled(false);
 //        barChart.getData().setHighlightEnabled(false);
@@ -304,13 +253,4 @@ public class ProfileStatsViewFragment extends BaseFragment implements View.OnCli
 //        barChart.setDoubleTapToZoomEnabled(false);
     }
 
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.cal_not_available_container:
-                Utils.showWeightInputDialog(getContext());
-                break;
-        }
-    }
 }

@@ -75,5 +75,6 @@ public class Config {
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
     public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs
     public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 120000;// in millisecs
+    public static final long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 43200000;// in millisecs, i.e. 12 hours
 
 }

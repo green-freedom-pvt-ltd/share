@@ -10,9 +10,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -25,7 +25,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.Events.BodyWeightChangedEvent;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
@@ -33,6 +35,8 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.Run;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,8 +89,8 @@ public class Utils {
         return true;
     }
 
-    public static String formatToKmsWithOneDecimal(float distanceInMeters){
-        DecimalFormat df = new DecimalFormat("0.0");
+    public static String formatToKmsWithTwoDecimal(float distanceInMeters){
+        DecimalFormat df = new DecimalFormat("0.00");
         df.setGroupingUsed(false);
         return df.format(distanceInMeters / 1000);
     }
@@ -609,35 +613,21 @@ public class Utils {
         return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);
     }
 
-    public static void showWeightInputDialog(Context context){
+    public static AlertDialog showWeightInputDialog(final Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Body Weight in Kg");
+        builder.setTitle(context.getString(R.string.enter_weight));
 
         // Set up the input
-        final EditText input = new EditText(context);
-        int dp_80 = Math.round(Utils.convertDpToPixel(context, 80));
-        int dp_15 = Math.round(Utils.convertDpToPixel(context, 15));
-        input.setPadding(dp_80, dp_15, dp_80, dp_15);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        builder.setView(input);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        final View container = inflater.inflate(R.layout.dialog_weight_input_container, null);
+        final EditText editText = (EditText) container.findViewById(R.id.et_body_weight_kg);
+        builder.setView(container);
 
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String inputWeight = input.getText().toString();
-                if (TextUtils.isEmpty(inputWeight)){
-                    MainApplication.showToast("Please input your actual weight");
-                }else {
-                    float weight = Float.parseFloat(inputWeight);
-                    if (weight < 10 || weight > 200){
-                        MainApplication.showToast("Please input your actual weight");
-                    }else {
-                        MainApplication.getInstance().setBodyWeight(weight);
-                        dialog.dismiss();
-                    }
-                }
+                // This method is overridden below
             }
         });
         builder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
@@ -647,7 +637,31 @@ public class Utils {
             }
         });
 
-        builder.show();
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String inputWeight = editText.getText().toString();
+                if (TextUtils.isEmpty(inputWeight)){
+                    MainApplication.showToast(R.string.enter_actual_weight);
+                }else {
+                    float weight = Float.parseFloat(inputWeight);
+                    if (weight < 10 || weight > 200){
+                        MainApplication.showToast(R.string.enter_actual_weight);
+                    }else {
+                        MainApplication.getInstance().setBodyWeight(weight);
+                        EventBus.getDefault().post(new BodyWeightChangedEvent());
+                        dialog.dismiss();
+                    }
+                }
+            }
+        });
+
+        return dialog;
     }
 
 }

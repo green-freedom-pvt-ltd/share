@@ -9,8 +9,8 @@ import android.os.Parcelable;
 
 public class Calorie implements Parcelable {
 
-    private double caloriesMets; // in Kcals
-    private double caloriesKarkanen; // in Kcals
+    private double caloriesMets; // in Cals
+    private double caloriesKarkanen; // in Cals
 
     public Calorie(double caloriesMets, double caloriesKarkanen){
         this.caloriesMets = caloriesMets;

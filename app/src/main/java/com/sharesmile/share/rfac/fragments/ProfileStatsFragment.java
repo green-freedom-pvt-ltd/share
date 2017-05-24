@@ -1,8 +1,12 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,28 +16,41 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
+import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.sync.SyncHelper;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
+
 import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.sharesmile.share.R.id.bt_see_runs;
 import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
 
 /**
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileStatsFragment extends BaseFragment implements View.OnClickListener{
+public class ProfileStatsFragment extends BaseFragment implements HistoryAdapter.AdapterInterface{
 
     private static final String TAG = "ProfileStatsFragment";
 
@@ -58,8 +75,12 @@ public class ProfileStatsFragment extends BaseFragment implements View.OnClickLi
     @BindView(R.id.stats_view_pager)
     ViewPager viewPager;
 
-    @BindView(bt_see_runs)
-    View runHistoryButton;
+    @BindView(R.id.rv_profile_history)
+    RecyclerView historyRecyclerView;
+
+    private List<Workout> mWorkoutList;
+
+    HistoryAdapter mHistoryAdapter;
 
 
     @Nullable
@@ -67,7 +88,14 @@ public class ProfileStatsFragment extends BaseFragment implements View.OnClickLi
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile_stats, null);
         ButterKnife.bind(this, v);
+        EventBus.getDefault().register(this);
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
     @Override
@@ -86,7 +114,7 @@ public class ProfileStatsFragment extends BaseFragment implements View.OnClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_edit_profile:
-                //TODO: Open Edit Profile Fragment
+                getFragmentController().replaceFragment(new ProfileGeneralFragment(), true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -114,13 +142,46 @@ public class ProfileStatsFragment extends BaseFragment implements View.OnClickLi
 
         viewPager.setAdapter(new ProfileStatsViewAdapter(getChildFragmentManager()));
 
-        runHistoryButton.setOnClickListener(this);
+        mHistoryAdapter = new HistoryAdapter(this);
+        historyRecyclerView.setAdapter(mHistoryAdapter);
+        historyRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        historyRecyclerView.setNestedScrollingEnabled(false);
+        fetchRunDataFromDb();
+        setupToolbar();
+    }
+
+    private void setupToolbar() {
+        setHasOptionsMenu(true);
+        setToolbarTitle(getResources().getString(R.string.profile));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(DBEvent.RunDataUpdated runDataUpdated) {
+        fetchRunDataFromDb();
+    }
+
+    public void fetchRunDataFromDb() {
+        Logger.d(TAG, "fetchRunDataFromDb");
+        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
+        if (mWorkoutList == null || mWorkoutList.isEmpty()){
+            SyncHelper.forceRefreshEntireWorkoutHistory();
+        }else {
+            Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");
+            mHistoryAdapter.setData(mWorkoutList);
+        }
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.bt_see_runs){
-            //TODO: Show Run History Screen
-        }
+    public void showInvalidRunDialog(final Run invalidRun) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(getString(R.string.invalid_run_title))
+                .setMessage(getString(R.string.invalid_run_message))
+                .setPositiveButton(getString(R.string.feedback), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getFragmentController().performOperation(IFragmentController.SHOW_FEEDBACK_FRAGMENT, invalidRun);
+                    }
+                }).setNegativeButton(getString(R.string.ok), null).show();
     }
 }

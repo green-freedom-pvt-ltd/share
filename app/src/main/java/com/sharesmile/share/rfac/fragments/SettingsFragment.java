@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,11 +25,13 @@ import com.sharesmile.share.utils.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
+
 
 /**
  * Created by shine on 5/15/2016.
  */
-public class SettingsFragment extends BaseFragment implements View.OnClickListener {
+public class SettingsFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     @BindView(R.id.share)
     TextView mShare;
@@ -43,6 +47,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     @BindView(R.id.tv_app_version)
     TextView appVersionText;
 
+    @BindView(R.id.notif_toggle)
+    Switch notifToggle;
+
     private FragmentInterface mListener;
 
     @Nullable
@@ -55,6 +62,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mTos.setOnClickListener(this);
         mRate.setOnClickListener(this);
         mLogout.setOnClickListener(this);
+        notifToggle.setOnCheckedChangeListener(this);
+        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
+            notifToggle.setChecked(false);
+        }else {
+            notifToggle.setChecked(true);
+        }
         getFragmentController().updateToolBar(getString(R.string.action_settings), true);
         String version = "";
         try {
@@ -123,6 +136,17 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         });
         builder.show();
 
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked){
+            // Enabled Alerts and Reminders
+            SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+        }else {
+            // Disable Alerts and Reminders
+            SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
+        }
     }
 
     public interface FragmentInterface {

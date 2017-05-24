@@ -124,7 +124,7 @@ public class RealRunFragment extends RunFragment {
         //Workout completed and results obtained, time to show the next Fragment
         Logger.d(TAG, "onWorkoutResult");
         if (isAttachedToActivity()) {
-            String distanceString = Utils.formatToKmsWithOneDecimal(data.getDistance());
+            String distanceString = Utils.formatToKmsWithTwoDecimal(data.getDistance());
             Float fDistance = Float.parseFloat(distanceString);
 
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
@@ -156,7 +156,7 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
-        String distanceString = Utils.formatToKmsWithOneDecimal(distanceCovered);
+        String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
         distance.setText(distanceString);
         int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));
@@ -168,7 +168,7 @@ public class RealRunFragment extends RunFragment {
 
 
     private String getImpactInRupees(float distanceCovered){
-        String distanceString = Utils.formatToKmsWithOneDecimal(distanceCovered);
+        String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
         int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
         return String.valueOf(rupees);
     }
@@ -214,7 +214,7 @@ public class RealRunFragment extends RunFragment {
 
         float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
         impact.setText(getImpactInRupees(distanceCovered));
-        distance.setText(Utils.formatToKmsWithOneDecimal(distanceCovered));
+        distance.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
 
         if (WorkoutSingleton.getInstance().toShowEndRunDialog()){
             showRunEndDialog();

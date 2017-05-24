@@ -46,7 +46,6 @@ import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.LeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
-import com.sharesmile.share.rfac.fragments.ProfileFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.rfac.fragments.WebViewFragment;
@@ -131,7 +130,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     if (!MainApplication.isLogin()) {
                         showLoginActivity();
                     } else {
-                        showProfileScreen();
+                        replaceFragment(new ProfileStatsFragment(), true);
                     }
                 } else if (screen.equals(NotificationConsts.Screen.LEADERBOARD)) {
                     if (!MainApplication.isLogin()) {
@@ -227,7 +226,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 // Impact League still active, will show League team leaderboard
                 showLeagueBoard();
             }else {
-                replaceFragment(new ProfileFragment(), true);
+                replaceFragment(new ProfileStatsFragment(), true);
             }
         }
         boolean showFeedBackDialog = getIntent().getBooleanExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, false);
@@ -321,7 +320,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Logger.d(TAG, "onNavigationItemSelected");
 
         if (menuItem.getItemId() == R.id.nav_item_profile) {
-            showProfileScreen();
+            replaceFragment(new ProfileStatsFragment(), true);
         }
 
         if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
@@ -341,8 +340,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-            replaceFragment(new ProfileStatsFragment(), true);
-//            performOperation(SHOW_FAQ_FRAGMENT,false);
+            performOperation(SHOW_FAQ_FRAGMENT,false);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
@@ -358,10 +356,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void showLeaderBoard() {
         replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.GLOBAL_LEADERBOARD), true);
-    }
-
-    private void showProfileScreen() {
-        replaceFragment(new ProfileFragment(), true);
     }
 
     private void showLoginActivity() {

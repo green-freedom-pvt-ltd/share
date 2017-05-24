@@ -3,6 +3,8 @@ package com.sharesmile.share.core;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+import com.sharesmile.share.utils.Logger;
+
 /**
  * Created by ankitmaheshwari1 on 11/01/16.
  */
@@ -22,6 +24,11 @@ public class BaseFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         this.controller = null;
+    }
+
+    public void setToolbarTitle(String title){
+        Logger.d(TAG, "setToolbarTitle: " + title);
+        getFragmentController().updateToolBar(title, true);
     }
 
     public boolean isAttachedToActivity(){

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="400dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="6dp"
     android:paddingBottom="6dp">
@@ -68,64 +68,27 @@
         android:layout_marginLeft="30dp"
         android:gravity="left">
 
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/total_runs_container"
             android:layout_width="wrap_content"
-            android:layout_height="30dp">
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:gravity="bottom">
 
-            <LinearLayout
-                android:id="@+id/cal_not_available_container"
+            <com.sharesmile.share.views.LBTextView
+                android:id="@+id/tv_total_runs"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="bottom"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:text="729"
+                android:textColor="@color/black_57"/>
 
-                <com.sharesmile.share.views.MRTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:text="add info"
-                    android:textColor="@color/dark_sky_blue"/>
-
-                <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginBottom="3dp"
-                    app:srcCompat="@drawable/ic_pencil_edit_blue"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cal_available_container"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="bottom"
-                android:visibility="invisible">
-
-                <com.sharesmile.share.views.LBTextView
-                    android:id="@+id/tv_cal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:text="729"
-                    android:textColor="@color/black_57"/>
-
-                <com.sharesmile.share.views.LBTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:text="kcal"
-                    android:textColor="@color/black_38"/>
-
-            </LinearLayout>
-
-        </FrameLayout>
+        </LinearLayout>
 
         <com.sharesmile.share.views.MRTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calories burned"
+            android:text="ImpactRuns"
             android:textSize="12sp"
             android:textColor="@color/black_38"/>
 
@@ -159,6 +122,7 @@
             <com.sharesmile.share.views.LBTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
                 android:textSize="16sp"
                 android:text="km"
                 android:textColor="@color/black_38"/>
@@ -172,12 +136,25 @@
             android:textColor="@color/black_38"/>
     </LinearLayout>
 
+    <com.sharesmile.share.views.MSBTextView
+        android:id="@+id/tv_last_week"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="@string/profile_stats_last_week"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/cal_container"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/black_57"/>
+
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:layout_below="@id/cal_container">
+        android:layout_marginTop="12dp"
+        android:layout_below="@id/tv_last_week"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
     </com.github.mikephil.charting.charts.BarChart>
 

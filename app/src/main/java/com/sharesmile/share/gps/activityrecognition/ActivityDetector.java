@@ -21,7 +21,9 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.utils.CircularQueue;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
@@ -37,6 +39,7 @@ import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
 import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_COUNTER_INTERVAL;
 import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_NOTIFICATION_INTERVAL;
+import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
@@ -172,6 +175,17 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         isWalkEngagementNotificationOnDisplay = false;
     }
 
+    /**
+     * Called when user explicitly dismissed walk engagement notification, either by swiping OR by clicking on cancel
+     * Need to make sure that we do not show walk engagement in near future
+     */
+    public void userDismissedWalkEngagementNotif(){
+        // Do not show walk engagement notification until the next 12 hours
+        long currentTs = DateUtil.getServerTimeInMillis();
+        long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
+        SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
+    }
+
     private void startWalkEngagementDetectionCounter(){
         handler.removeCallbacks(handleEngagementNotificationRunnable);
         timeOnFootContinuously = 0;
@@ -241,7 +255,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 }
             }
             if (timeOnFootContinuously >= WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
-                // User has been walking continuously for the past 4 mins without switching on ImpactRun
+                // User has been walking continuously for the past 2 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
                 if (!isWalkEngagementNotificationOnDisplay){
                     MainApplication.showRunNotification(

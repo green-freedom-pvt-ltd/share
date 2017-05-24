@@ -3,9 +3,11 @@ package com.sharesmile.share.rfac.fragments;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -21,6 +23,7 @@ import com.google.android.gms.gcm.Task;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.rfac.models.UserDetails;
@@ -35,7 +38,7 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 3/29/2016.
  */
-public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
     @BindView(R.id.et_profile_general_birthday)
     TextView mBirthday;
 
@@ -80,10 +83,33 @@ public class ProfileGeneralFragment extends Fragment implements RadioGroup.OnChe
         return v;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_profile_save, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_save_profile:
+                getActivity().onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void init() {
         mRadioGroup.setOnCheckedChangeListener(this);
         mBirthday.setOnClickListener(this);
         fillUserDetails();
+        setupToolbar();
+    }
+
+    private void setupToolbar() {
+        setHasOptionsMenu(true);
+        setToolbarTitle(getResources().getString(R.string.edit_profile));
     }
 
     private void fillUserDetails() {

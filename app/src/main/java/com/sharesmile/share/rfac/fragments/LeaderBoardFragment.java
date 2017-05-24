@@ -232,11 +232,6 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         }
     }
 
-    private void setToolbarTitle(String title){
-        Logger.d(TAG, "setToolbarTitle: " + title);
-        getFragmentController().updateToolBar(title, true);
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (mBoard == BOARD_TYPE.GLOBAL_LEADERBOARD) {

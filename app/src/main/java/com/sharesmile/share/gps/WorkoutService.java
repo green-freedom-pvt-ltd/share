@@ -57,6 +57,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
@@ -160,7 +161,7 @@ public class WorkoutService extends Service implements
         workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
 
         //data.getDistance()
-        String distDecimal = Utils.formatToKmsWithOneDecimal(data.getDistance());
+        String distDecimal = Utils.formatToKmsWithTwoDecimal(data.getDistance());
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distDecimal));
 
         workout.setRunAmount((float) rupees);
@@ -234,13 +235,17 @@ public class WorkoutService extends Service implements
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = 0f;
             cancelAllWorkoutNotifications();
+            // Do not show walk engagement notification until the next 12 hours
+            long currentTs = DateUtil.getServerTimeInMillis();
+            long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
+            SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
         }
     }
 
     public Properties getWorkoutBundle(){
         if (tracker != null){
             Properties p = new Properties();
-            p.put("distance", Utils.formatToKmsWithOneDecimal(getTotalDistanceCoveredInMeters()));
+            p.put("distance", Utils.formatToKmsWithTwoDecimal(getTotalDistanceCoveredInMeters()));
             p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
             p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
             p.put("num_steps", getTotalStepsInWorkout());
@@ -545,8 +550,8 @@ public class WorkoutService extends Service implements
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
         updateStickyNotification();
-        float totalDistanceKmsOneDecimal = Float.parseFloat(Utils.formatToKmsWithOneDecimal(totalDistance));
-        if (totalDistanceKmsOneDecimal != distanceInKmsOnLastUpdateEvent){
+        float totalDistanceKmsTwoDecimal = Float.parseFloat(Utils.formatToKmsWithTwoDecimal(totalDistance));
+        if (totalDistanceKmsTwoDecimal != distanceInKmsOnLastUpdateEvent){
             // Send event only when the distance counter increment by one unit
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(mCauseData.getCauseBundle())
@@ -554,9 +559,9 @@ public class WorkoutService extends Service implements
                     .put("delta_distance", deltaDistance) // in meters
                     .put("delta_time", deltaTime) // in secs
                     .put("delta_speed", deltaSpeed) // in km/hrs
-                    .put("delta_calories", deltaCalories) // in Kcals
+                    .put("delta_calories", deltaCalories) // in Cals
                     .buildAndDispatch();
-            distanceInKmsOnLastUpdateEvent = totalDistanceKmsOneDecimal;
+            distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
         }
     }
@@ -692,7 +697,7 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isActive()) {
             distanceReduction = tracker.discardApprovalQueue();
             distReductionString =
-                    (distanceReduction == 0) ? null : Utils.formatToKmsWithOneDecimal(Math.abs(distanceReduction));
+                    (distanceReduction == 0) ? null : Utils.formatToKmsWithTwoDecimal(Math.abs(distanceReduction));
         }
 
         WorkoutSingleton.getInstance().incrementUsainBoltsCounter();
@@ -806,7 +811,7 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
-        String distDecimal = Utils.formatToKmsWithOneDecimal(mDistance);
+        String distDecimal = Utils.formatToKmsWithTwoDecimal(mDistance);
         float fDistance = Float.parseFloat(distDecimal);
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
 

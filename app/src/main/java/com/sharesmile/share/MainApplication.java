@@ -36,6 +36,7 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -48,9 +49,12 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
+import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 
@@ -118,6 +122,23 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public static void showRunNotification(String notifTitle, int notificationId, String notifText, String... args){
+
+        if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT || notificationId == WORKOUT_NOTIFICATION_STILL_ID){
+            if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS)){
+                Logger.i(TAG, "Won't show notification with id:" + notificationId + ", as alerts are disabled");
+                return;
+            }
+            if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
+                long currentTsMillis = DateUtil.getServerTimeInMillis();
+                long scheduleWalkEngagementAfter = SharedPrefsManager.getInstance().getLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER);
+                if (currentTsMillis < scheduleWalkEngagementAfter){
+                    // Won't show walk engagement notif, can only show it after "scheduleWalkEngagementAfter" time
+                    Logger.i(TAG, "Won't show walk engagement notif, can only show it after " + scheduleWalkEngagementAfter + " time");
+                    return;
+                }
+            }
+        }
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
 
         long[] vibratePattern;
@@ -156,6 +177,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                 }
             }
         }
+        builder.setDeleteIntent(getDeleteIntent(notificationId));
         builder.setContentIntent(getInstance().createAppIntent());
         NotificationManagerCompat.from(getContext()).notify(notificationId, builder.build());
     }
@@ -165,6 +187,15 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         intent.setAction(action);
         intent.putExtra(NOTIFICATION_ID, notifId);
         return PendingIntent.getBroadcast(getContext(), 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+
+    private static PendingIntent getDeleteIntent(int notifId)
+    {
+        Intent intent = new Intent(getInstance(), NotificationActionReceiver.class);
+        intent.setAction(getContext().getString(R.string.notification_action_dismiss));
+        intent.putExtra(NOTIFICATION_ID, notifId);
+        return PendingIntent.getBroadcast(getContext(), 101, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     public static void showRunNotification(int notificationId, String notifText, String... args){

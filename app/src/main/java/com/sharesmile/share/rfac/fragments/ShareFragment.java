@@ -29,6 +29,7 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.plus.PlusShare;
+import com.sharesmile.share.Events.BodyWeightChangedEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -38,10 +39,15 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.concurrent.TimeUnit;
 
@@ -163,7 +169,14 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             public void onPrepareLoad(Drawable placeHolderDrawable) {
             }
         });
+        EventBus.getDefault().register(this);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     private void init() {
@@ -208,7 +221,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         float distanceInMeters = mWorkoutData.getDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
 
-        String distanceCovered = Utils.formatToKmsWithOneDecimal(distanceInMeters);
+        String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
         mDistance.setText(distanceCovered + " km");
 
         int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
@@ -227,7 +240,12 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             double caloriesBurned = mWorkoutData.getCalories().getCalories();
             caloriesNotAvailableContainer.setVisibility(View.GONE);
             caloriesIcon.setVisibility(View.VISIBLE);
-            caloriesText.setText(Utils.formatWithOneDecimal(caloriesBurned) + " Kcal");
+            String caloriesString = Utils.formatWithOneDecimal(caloriesBurned);
+            if ("0.0".equals(caloriesString)){
+                caloriesText.setText("--");
+            }else {
+                caloriesText.setText(caloriesString + " Cal");
+            }
         }else {
             caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -236,6 +254,13 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
                 }
             });
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(BodyWeightChangedEvent event) {
+        Logger.d(TAG, "onEvent: BodyWeightChangedEvent");
+        initCaloriesContainer();
+        MainApplication.showToast("Will track calories for future walks/runs.");
     }
 
     private void initShareLayout() {
@@ -394,11 +419,11 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
         if (msg.contains(SHARE_PLACEHOLDER_DISTANCE)) {
             msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE,
-                    Utils.formatToKmsWithOneDecimal(mWorkoutData.getDistance()));
+                    Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance()));
         }
 
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
-            String rDistance = Utils.formatToKmsWithOneDecimal(mWorkoutData.getDistance());
+            String rDistance = Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance());
             Float fDistance = Float.parseFloat(rDistance);
             int rs = (int) Math.ceil(fDistance * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));

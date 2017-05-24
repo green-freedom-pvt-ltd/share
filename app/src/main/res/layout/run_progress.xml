@@ -236,7 +236,7 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@id/tv_calories_progress"
             android:textAllCaps="true"
-            android:text="Kcal"/>
+            android:text="Cal"/>
     </RelativeLayout>
 
     <RelativeLayout

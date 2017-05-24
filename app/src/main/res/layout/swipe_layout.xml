@@ -20,7 +20,8 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="196dp">
+                android:layout_height="0dp"
+                android:layout_weight="0.46">
 
                 <ImageView
                     android:id="@+id/img_run"
@@ -52,18 +53,20 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.54"
+                android:layout_marginBottom="12dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginTop="9dp"
                 android:background="@color/white"
                 android:orientation="vertical">
 
                 <com.sharesmile.share.views.MSBTextView
                     android:id="@+id/run_screen_title"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="33"
+                    android:paddingTop="11dp"
                     android:text="Sponsor a Child, Foster a Future!"
                     android:textColor="@color/greyish_brown_two"
                     android:textSize="18sp" />
@@ -71,7 +74,9 @@
                 <com.sharesmile.share.views.MRTextView
                     android:id="@+id/run_screen_sponsor"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="18"
+                    android:paddingTop="2dp"
                     tools:text="by Shwas Foundation"
                     android:textColor="@color/warm_grey_three"
                     android:textSize="12sp" />
@@ -79,18 +84,20 @@
                 <com.sharesmile.share.views.MRTextView
                     android:id="@+id/run_screen_description"
                     android:layout_width="wrap_content"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="64"
+                    android:paddingTop="8dp"
                     android:ellipsize="end"
                     android:maxLines="4"
                     android:text="@string/mini_description"
                     android:textColor="@color/greyish_brown_two"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    android:layout_height="0dp"
+                    android:layout_weight="28"
+                    android:paddingTop="13dp">
 
                     <com.sharesmile.share.views.MRTextView
                         android:id="@+id/amount_raised_rupees"
@@ -113,8 +120,9 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:layout_marginTop="6dp">
+                    android:layout_height="0dp"
+                    android:layout_weight="15"
+                    android:paddingTop="6dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -143,11 +151,12 @@
                 <com.sharesmile.share.views.MRTextView
                     android:id="@+id/num_impact_runs"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="9dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="22"
+                    android:paddingTop="12dp"
                     android:text="15,492 ImpactRuns"
                     android:textColor="@color/greyish_brown_two"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
