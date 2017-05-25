@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -108,7 +107,7 @@ public class ProfileStatsFragment extends BaseFragment {
 
     private void initUi(){
         // Setting Profile Picture
-        String url = SharedPrefsManager.getInstance().getString(Constants.PREF_USER_IMAGE);
+        String url = MainApplication.getInstance().getUserDetails().getSocialThumb();
         Picasso.with(getActivity()).load(url).placeholder(R.drawable.placeholder_profile).into(imageView);
 
         // Name of user

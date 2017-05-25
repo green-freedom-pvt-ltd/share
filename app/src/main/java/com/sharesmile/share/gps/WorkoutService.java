@@ -165,7 +165,7 @@ public class WorkoutService extends Service implements
 
         //data.getDistance()
         String distDecimal = Utils.formatToKmsWithTwoDecimal(data.getDistance());
-        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distDecimal));
+        int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distDecimal));
 
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
@@ -816,7 +816,7 @@ public class WorkoutService extends Service implements
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
         String distDecimal = Utils.formatToKmsWithTwoDecimal(mDistance);
         float fDistance = Float.parseFloat(distDecimal);
-        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * fDistance);
+        int rupees = Math.round(mCauseData.getConversionRate() * fDistance);
 
         String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeDrawable;

@@ -95,7 +95,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             mCause.setText(workout.getCauseBrief());
             String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
-            mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + (int) Math.ceil(workout.getRunAmount()));
+            mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + Math.round(workout.getRunAmount()));
             String caloriesString = "";
             if (workout.getCalories() > 100){
                 caloriesString = Math.round(workout.getCalories()) + " Cal";

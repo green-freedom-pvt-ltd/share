@@ -224,7 +224,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
         mDistance.setText(distanceCovered + " km");
 
-        int rupees = (int) Math.ceil(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
+        int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
         mContributionAmount.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
         initCaloriesContainer();
         mTime.setText(Utils.secondsToHoursAndMins(Math.round(elapsedTimeInSecs)));
@@ -425,7 +425,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
             String rDistance = Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance());
             Float fDistance = Float.parseFloat(rDistance);
-            int rs = (int) Math.ceil(fDistance * mCauseData.getConversionRate());
+            int rs = Math.round(fDistance * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
         }
 

@@ -225,7 +225,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
 
         YAxis yAxis = barChart.getAxisLeft();
 
-        yAxis.setSpaceBottom(5);
+        yAxis.setSpaceBottom(4);
         yAxis.setLabelCount(3, true);
 
         yAxis.setCenterAxisLabels(true);

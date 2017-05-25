@@ -158,7 +158,7 @@ public class RealRunFragment extends RunFragment {
         super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
         String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
         distance.setText(distanceString);
-        int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
+        int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));
         Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
         if (calorie != null){
@@ -169,7 +169,7 @@ public class RealRunFragment extends RunFragment {
 
     private String getImpactInRupees(float distanceCovered){
         String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
-        int rupees = (int) Math.ceil(getConversionFactor() * Float.parseFloat(distanceString));
+        int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
         return String.valueOf(rupees);
     }
 

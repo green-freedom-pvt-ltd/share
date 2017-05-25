@@ -94,7 +94,7 @@
                 android:layout_width="18dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_calories_heart"
+                app:srcCompat="@drawable/ic_calories_fire"
                 android:visibility="gone"/>
 
         </FrameLayout>
