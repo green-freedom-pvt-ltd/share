@@ -31,6 +31,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private String workoutId;
 	private LatLng latestPoint;
 	private Calorie calories;
+	private int usainBoltCount;
+	private boolean mockLocationDetected;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -46,6 +48,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		invokeNewBatch(beginTimeStamp);
 		this.workoutId = workoutId;
 		this.calories = new Calorie(0,0);
+		this.usainBoltCount = 0;
+		this.mockLocationDetected = false;
 	}
 
 	private WorkoutDataImpl(WorkoutDataImpl source){
@@ -67,6 +71,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		}
 		calories = new Calorie(source.calories.getCalories(),
 				source.calories.getCaloriesKarkanen());
+		usainBoltCount = source.usainBoltCount;
+		mockLocationDetected = source.mockLocationDetected;
 	}
 
 	private void invokeNewBatch(long startTimeStamp){
@@ -92,6 +98,26 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public String getWorkoutId() {
 		return workoutId;
+	}
+
+	@Override
+	public int getUsainBoltCount() {
+		return usainBoltCount;
+	}
+
+	@Override
+	public void incrementUsainBoltCounter() {
+		usainBoltCount++;
+	}
+
+	@Override
+	public void setMockLocationDetected(boolean detected) {
+		mockLocationDetected = detected;
+	}
+
+	@Override
+	public boolean isMockLocationDetected() {
+		return mockLocationDetected;
 	}
 
 	@Override
@@ -283,16 +309,6 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		return p;
 	}
 
-	public static WorkoutDataImpl getTestWorkoutData(){
-		WorkoutDataImpl data = new WorkoutDataImpl(DateUtil.getServerTimeInMillis(), "test");
-		data.distance = 3240; // meters
-		data.elapsedTime = 1400; // secs
-		data.recordedTime = 1400;
-		data.totalSteps = 4321;
-		return data;
-	}
-
-
 	@Override
 	public String toString() {
 		return "WorkoutDataImpl{" +
@@ -307,6 +323,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", workoutId=" + workoutId +
 				", latestPoint=" + latestPoint +
 				", calories=" + calories +
+				", usainBoltCount=" + usainBoltCount +
+				", isMockLocationDetected=" + mockLocationDetected +
 				'}';
 	}
 
@@ -322,6 +340,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		workoutId = in.readString();
 		latestPoint = (LatLng) in.readValue(LatLng.class.getClassLoader());
 		calories = (Calorie) in.readValue(Calorie.class.getClassLoader());
+		usainBoltCount = in.readInt();
+		mockLocationDetected = in.readByte() != 0x00;
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
@@ -348,6 +368,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeString(workoutId);
 		dest.writeValue(latestPoint);
 		dest.writeValue(calories);
+		dest.writeInt(usainBoltCount);
+		dest.writeByte((byte) (mockLocationDetected ? 0x01 : 0x00));
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

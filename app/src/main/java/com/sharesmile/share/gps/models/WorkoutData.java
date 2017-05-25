@@ -156,4 +156,25 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
      */
 	String getWorkoutId();
 
+	/**
+	 * Gets the number of times Usain Bolt ocurred for this workout
+	 * @return
+	 */
+	int getUsainBoltCount();
+
+	/**
+	 * Increments the count of Usain Bolts in this workout
+	 */
+	void incrementUsainBoltCounter();
+
+	/**
+	 * Sets mockLocation boolean for this workout
+	 */
+	void setMockLocationDetected(boolean detected);
+
+	/**
+	 * @return true if mock location was detected in this workout, false otherwise
+	 */
+	boolean isMockLocationDetected();
+
 }

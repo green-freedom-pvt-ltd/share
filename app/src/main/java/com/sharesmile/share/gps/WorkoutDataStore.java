@@ -60,6 +60,8 @@ public interface WorkoutDataStore {
 
 	void workoutResume();
 
+	void incrementUsainBoltCounter();
+
 	boolean isWorkoutRunning();
 
 	void approveWorkoutData();
@@ -73,4 +75,10 @@ public interface WorkoutDataStore {
 	Properties getWorkoutBundle();
 
 	WorkoutData clear();
+
+	int getUsainBoltCount();
+
+	void setMockLocationDetected(boolean detected);
+
+	boolean isMockLocationDetected();
 }

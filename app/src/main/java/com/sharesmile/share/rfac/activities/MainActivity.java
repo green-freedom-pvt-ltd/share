@@ -231,7 +231,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
         boolean showFeedBackDialog = getIntent().getBooleanExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, false);
         if (showFeedBackDialog) {
-            showFeedBackDialog();
+//            showFeedBackDialog();
         }
     }
 

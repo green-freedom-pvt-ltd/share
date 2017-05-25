@@ -1,9 +1,13 @@
 package com.sharesmile.share.rfac.fragments;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +42,12 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 3/29/2016.
  */
-public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, View.OnClickListener {
+public class ProfileGeneralFragment extends BaseFragment implements
+        RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener,
+        View.OnClickListener, TextWatcher {
+
+    private static final String TAG = "ProfileGeneralFragment";
+
     @BindView(R.id.et_profile_general_birthday)
     TextView mBirthday;
 
@@ -93,7 +102,11 @@ public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_save_profile:
-                getActivity().onBackPressed();
+                if (validateUserDetails()){
+                    saveUserDetails();
+                    isEdited = false;
+                    getActivity().onBackPressed();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -105,11 +118,18 @@ public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.O
         mBirthday.setOnClickListener(this);
         fillUserDetails();
         setupToolbar();
+        setTextWatcher();
     }
 
     private void setupToolbar() {
         setHasOptionsMenu(true);
         setToolbarTitle(getResources().getString(R.string.edit_profile));
+    }
+
+    private void setTextWatcher(){
+        mName.addTextChangedListener(this);
+        mNumber.addTextChangedListener(this);
+        mBirthday.addTextChangedListener(this);
     }
 
     private void fillUserDetails() {
@@ -140,7 +160,7 @@ public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.O
             if (userDetails.getGenderUser().equalsIgnoreCase("m")) {
                 mMaleRadioBtn.setChecked(true);
             } else {
-                mFemaleRadioBtn.setChecked(true);
+                mFemaleRadioBtn.setChecked(false);
             }
         }
     }
@@ -150,12 +170,34 @@ public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.O
 
     }
 
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveUserDetails();
-
+    private boolean validateUserDetails(){
+        if (mName.getText().toString().isEmpty()){
+            // Name not valid
+            MainApplication.showToast("Please enter a valid name");
+            return false;
+        }
+        if (!Utils.isValidPhoneNumber(mNumber.getText().toString())){
+            MainApplication.showToast("Please enter a valid 10 digit phone number");
+            return false;
+        }
+        try {
+            String inputWeight = bodyWeightKgs.getText().toString();
+            if (TextUtils.isEmpty(inputWeight)){
+                MainApplication.showToast(R.string.enter_actual_weight);
+                return false;
+            }else {
+                float weight = Float.parseFloat(inputWeight);
+                if (weight < 10 || weight > 200){
+                    MainApplication.showToast(R.string.enter_actual_weight);
+                    return false;
+                }
+            }
+        }catch (Exception e){
+            Logger.e(TAG, "Exception while parsing body weight: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private void saveUserDetails() {
@@ -198,11 +240,9 @@ public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.O
                 Analytics.getInstance().setUserGender("M");
             }
         }
-
         MainApplication.getInstance().setUserDetails(userDetails);
-
         syncUserData();
-
+        MainApplication.showToast("Saved!");
     }
 
     @Override
@@ -247,6 +287,70 @@ public class ProfileGeneralFragment extends BaseFragment implements RadioGroup.O
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getContext().getApplicationContext());
         mGcmNetworkManager.schedule(task);
+    }
+
+    @Override
+    protected boolean handleBackPress() {
+        Logger.d(TAG, "handleBackPress");
+        if (isEdited){
+            // Show Discard changes dialog
+            discardChangesDialog = showDiscardChangesDialog();
+            return true;
+        }else {
+            return super.handleBackPress();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (discardChangesDialog != null){
+            discardChangesDialog.dismiss();
+        }
+        super.onDestroyView();
+    }
+
+    private AlertDialog discardChangesDialog;
+
+    public AlertDialog showDiscardChangesDialog() {
+        Logger.d(TAG, "showDiscardChangesDialog");
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(getString(R.string.edit_profile)).setMessage(getString(R.string.discard_changes));
+        builder.setPositiveButton("DISCARD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                isEdited = false;
+                getActivity().onBackPressed();
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing
+                return;
+            }
+        });
+        discardChangesDialog = builder.create();
+        discardChangesDialog.show();
+        return discardChangesDialog;
+    }
+
+    private boolean isEdited = false;
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        // Some text is changed
+        Logger.i(TAG, "afterTextChanged: " + s.toString());
+        isEdited = true;
     }
 }
 

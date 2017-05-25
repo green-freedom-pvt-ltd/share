@@ -242,8 +242,11 @@ public class Run implements UnObfuscable, Serializable {
                 "id=" + id +
                 ",\n\t startTime='" + startTime + '\'' +
                 ",\n\t entTime='" + endTime + '\'' +
+                ",\n\t date='" + getDate() + '\'' +
                 ",\n\t distance=" + distance +
+                ",\n\t amount=" + runAmount +
                 ",\n\t runDuration='" + runDuration + '\'' +
+                ",\n\t avgSpeed='" + avgSpeed + '\'' +
                 ",\n\t numSteps=" + numSteps +
                 ",\n\t is_flag=" + is_flag +
                 ",\n\t clientRunId='" + clientRunId + '\'' +
@@ -251,6 +254,10 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t calories='" + calories + '\'' +
                 ",\n\t startTimeEpoch='" + startTimeEpoch + '\'' +
                 ",\n\t endTimeEpoch='" + endTimeEpoch + '\'' +
+                ",\n\t startLocationLatitude='" + startLocationLat + '\'' +
+                ",\n\t startLocationLongitute='" + startLocationLong + '\'' +
+                ",\n\t endLocationLatitude='" + endLocationLat + '\'' +
+                ",\n\t startLocationLongiture='" + endLocationLong + '\'' +
                 "\n}";
     }
 }

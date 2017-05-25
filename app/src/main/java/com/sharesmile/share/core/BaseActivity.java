@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -304,13 +305,34 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    public Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(getFrameLayoutId());
+    }
+
+    @Override
+    public void onBackPressed() {
+        // if current fragment is null, or has not handled backpress, handle activity back press
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment != null && currentFragment instanceof BaseFragment) {
+            final BaseFragment baseFragment = (BaseFragment) currentFragment;
+            Logger.d(TAG, "onBackPressed: Current fragment is "
+                    + baseFragment.getName());
+            if (baseFragment.handleBackPress()) {
+                Logger.d(TAG, "Current fragment handled back press");
+                return;
+            }
+        }
+        super.onBackPressed();
+    }
 
     public void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
     }
 
+    /**
+     * Not being used anymore
+     */
     public void showFeedBackDialog() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.post_fun_feedback_title)).setMessage(getString(R.string.post_fun_feedback_msg));
         builder.setPositiveButton("Great", new DialogInterface.OnClickListener() {
@@ -325,9 +347,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 replaceFragment(new FeedbackFragment(), true);
             }
         });
-
         builder.show();
-
     }
 
     @Override

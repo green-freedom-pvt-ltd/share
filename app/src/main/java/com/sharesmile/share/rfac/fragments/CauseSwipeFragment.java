@@ -102,7 +102,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         mCategory.setText(cause.getCategory());
         if (cause.getExecutor() != null) {
             if(cause.getExecutor().getType().equalsIgnoreCase("ngo")){
-                mSponsor.setText("with " + cause.getExecutor().getPartnerNgo());
+                mSponsor.setText("with " + cause.getExecutor().getPartnerNgo() + " & " + cause.getSponsor().getName());
             }else {
                 mSponsor.setText("with " + cause.getExecutor().getPartnerCompany());
             }

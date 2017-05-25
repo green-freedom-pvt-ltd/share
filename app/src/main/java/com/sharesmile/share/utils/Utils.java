@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,21 +91,23 @@ public class Utils {
     }
 
     public static String formatToKmsWithTwoDecimal(float distanceInMeters){
-        DecimalFormat df = new DecimalFormat("0.00");
-        df.setGroupingUsed(false);
-        return df.format(distanceInMeters / 1000);
+        return getDecimalFormat("0.00").format(distanceInMeters / 1000);
     }
 
     public static String formatWithOneDecimal(float distance){
-        DecimalFormat df = new DecimalFormat("0.0");
-        df.setGroupingUsed(false);
-        return df.format(distance);
+        return getDecimalFormat("0.0").format(distance);
     }
 
     public static String formatWithOneDecimal(double distance){
-        DecimalFormat df = new DecimalFormat("0.0");
+        return getDecimalFormat("0.0").format(distance);
+    }
+
+    private static DecimalFormat getDecimalFormat(String pattern){
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat(pattern, dfs);
         df.setGroupingUsed(false);
-        return df.format(distance);
+        return df;
     }
 
     public static String formatIndianCommaSeparated(float value){

@@ -74,6 +74,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         @BindView(R.id.duration)
         TextView mDuration;
 
+        @BindView(R.id.calories)
+        TextView calories;
+
         @BindView(R.id.error_indicator)
         ImageView mIndicator;
 
@@ -93,7 +96,18 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
             mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + (int) Math.ceil(workout.getRunAmount()));
-
+            String caloriesString = "";
+            if (workout.getCalories() > 100){
+                caloriesString = Math.round(workout.getCalories()) + " Cal";
+            }else {
+                String cals = Utils.formatWithOneDecimal(workout.getCalories());
+                if ("0.0".equals(cals)){
+                    caloriesString = "--";
+                }else {
+                    caloriesString = cals + " Cal";
+                }
+            }
+            calories.setText(caloriesString);
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());
             if (timeInSec >= 60) {
                 int timeInMin = (int) (Utils.stringToSec(workout.getElapsedTime()) / 60);
@@ -127,6 +141,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     }
 
     public interface AdapterInterface {
-        public void showInvalidRunDialog(Run invalidRun);
+        void showInvalidRunDialog(Run invalidRun);
     }
 }

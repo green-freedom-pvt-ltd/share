@@ -8,150 +8,132 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#fafafa"
+        android:background="@color/off_white"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:orientation="vertical">
 
         <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="24dp"
             android:text="Name"
-            android:textSize="12sp" />
+            style="@style/edit_profile_text_style_label"/>
 
         <EditText
             android:id="@+id/et_profile_general_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
-            android:background="#00000000"
             android:hint="Your name"
             android:imeOptions="actionDone"
-            android:singleLine="true"
-            android:textSize="14sp" />
+            style="@style/edit_profile_text_style_value"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="24dp"
             android:text="Email"
-            android:textSize="12sp" />
+            style="@style/edit_profile_text_style_label"/>
 
         <EditText
             android:id="@+id/et_profile_general_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
-            android:background="#00000000"
-            android:editable="false"
-            android:hint="xyz@abc.com"
-            android:textColor="@color/black_50"
-            android:textSize="14sp" />
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            style="@style/edit_profile_text_style_value" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="24dp"
             android:text="Phone Number"
-            android:textSize="12sp" />
+            style="@style/edit_profile_text_style_label"/>
 
         <EditText
             android:id="@+id/et_profile_general_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
-            android:background="#00000000"
-            android:phoneNumber="true"
-            android:textSize="14sp" />
+            android:inputType="phone"
+            style="@style/edit_profile_text_style_value" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="13dp"
+            android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="24dp"
             android:text="Body Weight in KGs"
-            android:textSize="12sp" />
+            style="@style/edit_profile_text_style_label" />
 
         <EditText
             android:id="@+id/et_body_weight_kg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
             android:inputType="number"
-            android:background="#00000000"
-            android:textSize="14sp" />
-
+            style="@style/edit_profile_text_style_value"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="24dp"
             android:text="Birthday"
-            android:textSize="12sp" />
+            style="@style/edit_profile_text_style_label"/>
 
         <TextView
             android:id="@+id/et_profile_general_birthday"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="14dp"
-            android:background="#00000000"
             android:hint="DD-MM-YYYY "
-            android:textSize="14sp" />
+            style="@style/edit_profile_text_style_value" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="24dp"
             android:text="Gender"
-            android:textSize="12sp" />
+            style="@style/edit_profile_text_style_label"/>
 
         <RadioGroup
             android:id="@+id/gender_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
@@ -160,7 +142,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="Male" />
+                android:text="Male"
+                android:textColor="@color/greyish_brown_two"/>
 
             <RadioButton
                 android:id="@+id/rb_share_female"
@@ -169,7 +152,8 @@
                 android:layout_marginLeft="40dp"
                 android:layout_toRightOf="@+id/rb_share_male"
                 android:checked="false"
-                android:text="Female" />
+                android:text="Female"
+                android:textColor="@color/greyish_brown_two"/>
         </RadioGroup>
 
 

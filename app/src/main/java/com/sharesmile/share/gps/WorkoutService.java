@@ -126,7 +126,6 @@ public class WorkoutService extends Service implements
         vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         mDistance = tracker.getTotalDistanceCovered();
         makeForegroundAndSticky();
-        ActivityDetector.getInstance().workoutActive();
     }
 
 
@@ -134,7 +133,12 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
-            if (result.getDistance() >= mCauseData.getMinDistance()) {
+            // Persist run only when distance is more than 100m
+            //      & Usain Bolt count is less than 3 and
+            //      & MockLocation is not enabled
+            if (result.getDistance() >= mCauseData.getMinDistance()
+                    && result.getUsainBoltCount() < 3
+                    && !result.isMockLocationDetected()) {
                 persistWorkoutInDb(result);
             }
             tracker = null;
@@ -146,7 +150,6 @@ public class WorkoutService extends Service implements
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
-        ActivityDetector.getInstance().workoutIdle();
         stopTimer();
     }
 
@@ -208,6 +211,7 @@ public class WorkoutService extends Service implements
                     stepCounter = new GoogleFitStepCounter(this, this);
                 }
             }
+            ActivityDetector.getInstance().workoutActive();
             AnalyticsEvent.create(Event.ON_WORKOUT_START)
                     .addBundle(mCauseData.getCauseBundle())
                     .buildAndDispatch();
@@ -239,6 +243,7 @@ public class WorkoutService extends Service implements
             long currentTs = DateUtil.getServerTimeInMillis();
             long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
             SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
+            ActivityDetector.getInstance().workoutIdle();
         }
     }
 
@@ -324,13 +329,13 @@ public class WorkoutService extends Service implements
     public void onEvent(MockLocationDetected mockLocationDetected) {
         Logger.d(TAG, "onEvent: MockLocationDetected");
         if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
+            WorkoutSingleton.getInstance().mockLocationDetected();
             stopWorkout();
             MainApplication.showRunNotification(
                     getString(R.string.notification_disable_mock_location_title),
                     WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
                     getString(R.string.notification_disable_mock_location));
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
-            WorkoutSingleton.getInstance().mockLocationDetected();
         }
     }
 
@@ -630,7 +635,6 @@ public class WorkoutService extends Service implements
                     .put("reason", reason)
                     .buildAndDispatch();
         }
-        ActivityDetector.getInstance().workoutIdle();
         updateStickyNotification();
         cancelAllWorkoutNotifications();
     }
@@ -652,7 +656,6 @@ public class WorkoutService extends Service implements
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
             }
-            ActivityDetector.getInstance().workoutActive();
             updateStickyNotification();
             cancelAllWorkoutNotifications();
             return true;

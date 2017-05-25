@@ -67,8 +67,6 @@ public class WorkoutSingleton {
 
     public WorkoutDataStore beginWorkout(){
         setState(State.RUNNING);
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_WORKOUT_MOCK_LOCATION_ENABLED, false);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_USAIN_BOLT_COUNT, 0);
         NotificationManager manager = (NotificationManager) MainApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(WORKOUT_NOTIFICATION_ID);
         dataStore = new WorkoutDataStoreImpl(DateUtil.getServerTimeInMillis());
@@ -95,8 +93,7 @@ public class WorkoutSingleton {
     }
 
     public void incrementUsainBoltsCounter(){
-        int current = SharedPrefsManager.getInstance().getInt(Constants.PREF_USAIN_BOLT_COUNT);
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_USAIN_BOLT_COUNT, current+1);
+        dataStore.incrementUsainBoltCounter();
     }
 
     public void setToShowEndRunDialog(boolean value){
@@ -108,15 +105,15 @@ public class WorkoutSingleton {
     }
 
     public void mockLocationDetected(){
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_WORKOUT_MOCK_LOCATION_ENABLED, true);
+        dataStore.setMockLocationDetected(true);
     }
 
     public boolean isMockLocationEnabled(){
-        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_WORKOUT_MOCK_LOCATION_ENABLED);
+        return dataStore.isMockLocationDetected();
     }
 
     public boolean hasConsecutiveUsainBolts(){
-        return SharedPrefsManager.getInstance().getInt(Constants.PREF_USAIN_BOLT_COUNT) >= 3;
+        return dataStore.getUsainBoltCount() >= 3;
     }
 
     private void setState(State state){

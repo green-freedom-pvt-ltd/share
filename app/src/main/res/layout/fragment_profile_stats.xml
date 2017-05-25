@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="90dp"
+            android:layout_height="0dp"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp">
+            android:layout_marginRight="30dp"
+            android:layout_weight="90">
 
             <com.sharesmile.share.views.CircularImageView
                 android:id="@+id/img_profile_stats"
@@ -106,47 +103,33 @@
         <android.support.v4.view.ViewPager
             android:id="@+id/stats_view_pager"
             android:layout_width="match_parent"
-            android:layout_height="400dp">
+            android:layout_height="0dp"
+            android:layout_weight="345">
         </android.support.v4.view.ViewPager>
 
-        <com.sharesmile.share.views.LBTextView
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="History"
-            android:layout_marginTop="12dp"
-            android:paddingLeft="16dp"/>
+            android:layout_height="0dp"
+            android:layout_weight="70">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_profile_history"
-            android:layout_width="match_parent"
-            android:layout_marginTop="12dp"
-            android:layout_height="match_parent" />
+            <android.support.v7.widget.CardView
+                android:id="@+id/bt_see_runs"
+                android:layout_width="280dp"
+                android:layout_height="44dp"
+                android:layout_centerInParent="true"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="3dp">
 
+            <com.sharesmile.share.views.MSBTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="SEE RUNS"
+                android:layout_gravity="center"
+                android:textColor="@color/black_57"/>
+            </android.support.v7.widget.CardView>
 
-        <!--<RelativeLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_weight="70">-->
+        </RelativeLayout>
 
-        <!--<android.support.v7.widget.CardView-->
-        <!--android:id="@+id/bt_see_runs"-->
-        <!--android:layout_width="280dp"-->
-        <!--android:layout_height="44dp"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--app:cardCornerRadius="5dp"-->
-        <!--app:cardElevation="3dp">-->
-
-        <!--<com.sharesmile.share.views.MSBTextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textSize="14sp"-->
-        <!--android:text="SEE RUNS"-->
-        <!--android:layout_gravity="center"-->
-        <!--android:textColor="@color/black_57"/>-->
-        <!--</android.support.v7.widget.CardView>-->
-
-        <!--</RelativeLayout>-->
-    </LinearLayout>
-
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>

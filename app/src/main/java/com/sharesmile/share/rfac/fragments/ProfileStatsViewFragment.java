@@ -15,7 +15,10 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.CustomBarChartRenderer;
@@ -195,6 +198,18 @@ public class ProfileStatsViewFragment extends BaseFragment {
         BarDataSet dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
         dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+        IValueFormatter intValueFormatter = new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                int val = Math.round(value);
+                if (val > 0){
+                    return "\u20B9 " + String.valueOf(val);
+                }else {
+                    return "";
+                }
+            }
+        };
+        dataSet.setValueFormatter(intValueFormatter);
 
         BarData data = new BarData(dataSet);
         barChart.setData(data);
@@ -233,7 +248,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
 
         xAxis.setDrawGridLines(false);
         xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
-        xAxis.setAxisLineWidth(1.5f);
+        xAxis.setAxisLineWidth(1.0f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
             @Override

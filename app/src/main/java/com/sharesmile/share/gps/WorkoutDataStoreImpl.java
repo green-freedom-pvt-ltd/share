@@ -200,6 +200,14 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     @Override
+    public void incrementUsainBoltCounter() {
+        // increment UsainBoltCount in both the workoutDataObjects
+        dirtyWorkoutData.incrementUsainBoltCounter();
+        approvedWorkoutData.incrementUsainBoltCounter();
+        persistBothWorkoutData();
+    }
+
+    @Override
     public boolean isWorkoutRunning() {
         return dirtyWorkoutData.isRunning();
     }
@@ -262,6 +270,23 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         approvePendingSteps();
         clearPersistentStorage();
         return approvedWorkoutData.close();
+    }
+
+    @Override
+    public int getUsainBoltCount() {
+        return dirtyWorkoutData.getUsainBoltCount();
+    }
+
+    @Override
+    public void setMockLocationDetected(boolean detected) {
+        dirtyWorkoutData.setMockLocationDetected(detected);
+        approvedWorkoutData.setMockLocationDetected(detected);
+        persistBothWorkoutData();
+    }
+
+    @Override
+    public boolean isMockLocationDetected() {
+        return dirtyWorkoutData.isMockLocationDetected();
     }
 
     private void persistBothWorkoutData() {

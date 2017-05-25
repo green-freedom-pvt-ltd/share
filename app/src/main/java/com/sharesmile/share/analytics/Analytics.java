@@ -64,16 +64,16 @@ public class Analytics {
     }
 
     public void setUserProperties(){
-
         UserDetails details = MainApplication.getInstance().getUserDetails();
-        setUserName(details.getFirstName());
-        setUserId(details.getUserId());
-        setUserEmail(details.getEmail());
-        setUserPhone(details.getPhoneNumber());
-        setUserGender(details.getGenderUser());
-        setUserPhoto(details.getSocialThumb());
-        setUserImpactLeagueTeamCode(details.getTeamId());
-
+        if (details != null){
+            setUserName(details.getFirstName());
+            setUserId(details.getUserId());
+            setUserEmail(details.getEmail());
+            setUserPhone(details.getPhoneNumber());
+            setUserGender(details.getGenderUser());
+            setUserPhoto(details.getSocialThumb());
+            setUserImpactLeagueTeamCode(details.getTeamId());
+        }
     }
 
     public void setUserProperty(String propertyName, Object value){

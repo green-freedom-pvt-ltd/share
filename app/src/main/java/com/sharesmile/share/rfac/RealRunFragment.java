@@ -128,18 +128,18 @@ public class RealRunFragment extends RunFragment {
             Float fDistance = Float.parseFloat(distanceString);
 
             boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
-            if (WorkoutSingleton.getInstance().isMockLocationEnabled()){
-                // Do nothing, DisableMock blocking popup is on display
+            if (data.isMockLocationDetected()){
+                // Do nothing, DisableMock blocking popup is on display on the screen
                 return;
             }
 
-            if (WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()){
-                // Do nothing, ConsecutiveUsainBolts force exit blocking popup is on display
+            if (data.getUsainBoltCount() >= 3){
+                // Do nothing, ConsecutiveUsainBoltsForceExit blocking popup is on display
                 return;
             }
 
             if (mCauseData.getMinDistance() > (fDistance * 1000)
-                    && !WorkoutSingleton.getInstance().isMockLocationEnabled()) {
+                    && !data.isMockLocationDetected()) {
                 myActivity.exit();
                 stopTimer();
                 return;

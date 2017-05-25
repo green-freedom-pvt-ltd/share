@@ -114,8 +114,8 @@ public class LeaderBoardDataStore {
             }else {
                 long leagueStartDateEpoch = leagueBoard.getLeagueStartDateEpoch();
                 long leagueDurationInSecs = ((long)leagueBoard.getDurationInDays())*86400;
-                long threedaysBufferInSecs = 259200;
-                return (DateUtil.getServerTimeInMillis() / 1000) < leagueStartDateEpoch + leagueDurationInSecs + threedaysBufferInSecs;
+                long oneWeekBufferInSecs = 604800;
+                return (DateUtil.getServerTimeInMillis() / 1000) < leagueStartDateEpoch + leagueDurationInSecs + oneWeekBufferInSecs;
             }
         }
         return false;
