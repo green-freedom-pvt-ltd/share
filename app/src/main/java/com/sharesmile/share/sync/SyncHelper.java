@@ -1,12 +1,14 @@
 package com.sharesmile.share.sync;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
+import com.google.gson.Gson;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
@@ -18,6 +20,7 @@ import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.FraudData;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -94,6 +97,30 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 300L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
+    /**
+     *
+     */
+    public static void pushFraudData(FraudData data) {
+        Gson gson = new Gson();
+        Bundle bundle = new Bundle();
+        bundle.putString(TaskConstants.FRAUD_DATA_JSON, gson.toJson(data));
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.PUSH_FRAUD_DATA)
+                .setExtras(bundle)
+                /*
+                    Mandatory setter for creating a one-off task.
+                    You specify the earliest point in time in the future from which your task might start executing,
+                    as well as the latest point in time in the future at which your task must have executed.
+                 */
+                .setExecutionWindow(0L, 1L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());

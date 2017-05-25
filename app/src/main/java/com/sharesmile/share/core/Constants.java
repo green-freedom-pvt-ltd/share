@@ -99,6 +99,8 @@ public class Constants {
 
     public static final String PREF_WORKOUT_DATA_APPROVED = "pref_workout_data_approved";
 
+    public static final String PREF_USAIN_BOLT_OCURRED_TIME_STAMPS = "pref_usain_bolt_ocurred_time_stamps";
+
     public static final String PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN = "pref_workout_data_num_steps_when_batch_begin";
 
     public static final String PREF_WORKOUT_LIFETIME_DISTANCE = "pref_workout_lifetime_distance_new";

@@ -4,6 +4,7 @@ import android.location.Location;
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -18,6 +19,8 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -36,14 +39,18 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     Queue<DistRecord> waitingForApprovalQueue = new ConcurrentLinkedQueue<>();
     volatile float extraPolatedDistanceToBeApproved = 0f;
     volatile int numStepsToBeApproved = 0;
+    private List<Long> usainBoltOcurredTimeStamps;
 
     WorkoutDataStoreImpl(){
+        Logger.d(TAG, "Empty constructor called");
         dirtyWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_DIRTY);
         approvedWorkoutData = retrieveFromPersistentStorage(Constants.PREF_WORKOUT_DATA_APPROVED);
         if (dirtyWorkoutData == null){
             init(DateUtil.getServerTimeInMillis());
         }
         numStepsWhenBatchBegan = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
+        usainBoltOcurredTimeStamps = SharedPrefsManager.getInstance().getCollection(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS,
+                new TypeToken<ArrayList<Long>>(){}.getType());
     }
 
     WorkoutDataStoreImpl(long beginTimeStamp){
@@ -54,6 +61,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         String workoutId = UUID.randomUUID().toString();
         dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
         approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
+        usainBoltOcurredTimeStamps = new ArrayList<>();
         //Persist dirtyWorkoutData object over here
         persistBothWorkoutData();
     }
@@ -204,6 +212,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         // increment UsainBoltCount in both the workoutDataObjects
         dirtyWorkoutData.incrementUsainBoltCounter();
         approvedWorkoutData.incrementUsainBoltCounter();
+        usainBoltOcurredTimeStamps.add(DateUtil.getServerTimeInMillis());
         persistBothWorkoutData();
     }
 
@@ -278,6 +287,25 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     @Override
+    public boolean hasConsecutiveUsainBolts() {
+        if (getUsainBoltCount() < 3){
+            return false;
+        }else {
+            int count = getUsainBoltCount();
+            if (usainBoltOcurredTimeStamps.size() != count){
+                return false;
+            }
+            long latestTimeStamp = usainBoltOcurredTimeStamps.get(count - 1);
+            long firstTimeStamp = usainBoltOcurredTimeStamps.get(count - 3);
+            if (latestTimeStamp - firstTimeStamp <  1200000){
+                // If three consecutive usain bolts have ocurred within 20 mins then user must be in a vehicle
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void setMockLocationDetected(boolean detected) {
         dirtyWorkoutData.setMockLocationDetected(detected);
         approvedWorkoutData.setMockLocationDetected(detected);
@@ -295,6 +323,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             SharedPrefsManager.getInstance().setObject(Constants.PREF_WORKOUT_DATA_APPROVED, approvedWorkoutData.copy());
         }
         SharedPrefsManager.getInstance().setInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN, numStepsWhenBatchBegan);
+        SharedPrefsManager.getInstance().setCollection(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS, usainBoltOcurredTimeStamps);
     }
 
     private void persistDirtyWorkoutData(){
@@ -316,5 +345,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_DIRTY);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_APPROVED);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS);
     }
 }

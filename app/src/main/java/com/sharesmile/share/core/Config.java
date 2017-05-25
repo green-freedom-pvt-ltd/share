@@ -15,6 +15,8 @@ public class Config {
 
     public static final float MIN_DISTANCE_FOR_VIGILANCE = 50; // in meters
 
+    public static final float MIN_CADENCE_FOR_WALK = 0.65f; // in steps per sec
+
     public static final float SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE = 52f; // in m/s, i.e. 187 km/hr
 
     public static final float SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 32f; // in m/s, i.e. 115.2 km/hr
@@ -35,7 +37,7 @@ public class Config {
 
     public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
 
-    public static long VIGILANCE_TIMER_INTERVAL = 10000; // in millisecs
+    public static long VIGILANCE_TIMER_INTERVAL = 22000; // in millisecs
 
     public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
 
@@ -57,7 +59,7 @@ public class Config {
 
     // Activity Detector Config
 
-    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 80;
+    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 70;
     public static final int CONFIDENCE_THRESHOLD_ON_FOOT = 70;
     public static final int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
     public static final int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
@@ -70,7 +72,7 @@ public class Config {
 
     public static final long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
 
-    public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 12000; // in millisecs
+    public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 20000; // in millisecs
 
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
     public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs

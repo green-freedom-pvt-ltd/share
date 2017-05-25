@@ -385,7 +385,7 @@ public class Utils {
         // and here
         // https://sites.google.com/site/compendiumofphysicalactivities/Activity-Categories/running
 
-        if (mph <= 0) {
+        if (mph <= 0.625) {
             return 0;
         }else if (mph <= 1){
             return 1.3;

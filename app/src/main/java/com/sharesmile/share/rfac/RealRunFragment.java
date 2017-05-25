@@ -160,9 +160,11 @@ public class RealRunFragment extends RunFragment {
         distance.setText(distanceString);
         int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
         impact.setText(String.valueOf(rupees));
-        Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
-        if (calorie != null){
-            tvCalorieMets.setText(String.valueOf(Math.round(calorie.getCalories())));
+        if (WorkoutSingleton.getInstance().getDataStore() != null){
+            Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
+            if (calorie != null){
+                tvCalorieMets.setText(String.valueOf(Math.round(calorie.getCalories())));
+            }
         }
     }
 

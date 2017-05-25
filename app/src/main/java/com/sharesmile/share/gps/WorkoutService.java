@@ -41,6 +41,8 @@ import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.rfac.models.FraudData;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
@@ -328,14 +330,21 @@ public class WorkoutService extends Service implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MockLocationDetected mockLocationDetected) {
         Logger.d(TAG, "onEvent: MockLocationDetected");
-        if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
-            WorkoutSingleton.getInstance().mockLocationDetected();
-            stopWorkout();
-            MainApplication.showRunNotification(
-                    getString(R.string.notification_disable_mock_location_title),
-                    WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
-                    getString(R.string.notification_disable_mock_location));
-            EventBus.getDefault().post(new UpdateUiOnMockLocation());
+        try{
+            if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
+                WorkoutSingleton.getInstance().mockLocationDetected();
+                pushFraudDataOnServer();
+                Logger.d(TAG, "MockLocation detected, Will stop workout");
+                stopWorkout();
+                MainApplication.showRunNotification(
+                        getString(R.string.notification_disable_mock_location_title),
+                        WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
+                        getString(R.string.notification_disable_mock_location));
+                EventBus.getDefault().post(new UpdateUiOnMockLocation());
+            }
+        }catch (Exception e) {
+            Logger.e(TAG, "Problem while handling MockLocationDetected event: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -464,11 +473,12 @@ public class WorkoutService extends Service implements
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if (isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() >= 1){
+            if ((isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() >= Config.MIN_CADENCE_FOR_WALK)
+                        || ActivityDetector.getInstance().isOnFoot()){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
-            }else {
+            } else {
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
                 thresholdApplied = "default";
             }
@@ -556,7 +566,7 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
         updateStickyNotification();
         float totalDistanceKmsTwoDecimal = Float.parseFloat(Utils.formatToKmsWithTwoDecimal(totalDistance));
-        if (totalDistanceKmsTwoDecimal != distanceInKmsOnLastUpdateEvent){
+        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= 0.1){
             // Send event only when the distance counter increment by one unit
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(mCauseData.getCauseBundle())
@@ -704,6 +714,7 @@ public class WorkoutService extends Service implements
         }
 
         WorkoutSingleton.getInstance().incrementUsainBoltsCounter();
+        pushFraudDataOnServer();
 
         if (!WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()){
             pause("usain_bolt");
@@ -728,6 +739,25 @@ public class WorkoutService extends Service implements
                     getString(R.string.notification_usain_bolt_force_exit));
             EventBus.getDefault().post(new UsainBoltForceExit());
         }
+    }
+
+    private void pushFraudDataOnServer(){
+        Logger.d(TAG, "pushFraudDataOnServer");
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        if (userDetails == null){
+            Logger.e(TAG, "Can't push fraud data as UserDetails are not present");
+            return;
+        }
+        FraudData data = new FraudData();
+        data.setUserId(userDetails.getUserId());
+        data.setCauseId((int) mCauseData.getId());
+        data.setClientRunId(WorkoutSingleton.getInstance().getDataStore().getWorkoutId());
+        data.setMockLocationUsed(WorkoutSingleton.getInstance().isMockLocationEnabled());
+        data.setTeamId(userDetails.getTeamId());
+        data.setTimeStamp(DateUtil.getServerTimeInMillis() / 1000); // epoch in secs
+        data.setUsainBoltCount(WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount());
+
+        SyncHelper.pushFraudData(data);
     }
 
     @Override

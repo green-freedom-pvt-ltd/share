@@ -39,7 +39,7 @@ public class RunTracker implements Tracker {
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
-            recordHistoryQueue = new CircularQueue<>(5);
+            recordHistoryQueue = new CircularQueue<>(6);
             if (isActive()){
                 dataStore = WorkoutSingleton.getInstance().getDataStore();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
@@ -121,6 +121,7 @@ public class RunTracker implements Tracker {
             if (recordHistoryQueue.getCurrentSize() == 1){
                 // Only one record is present
                 if (!getLastRecord().isFirstRecordAfterResume() && !getLastRecord().isTooOld()){
+                    // If a record is older than 12 secs then it is considered as too old
                     return getLastRecord().getSpeed();
                 }
             }else {
@@ -328,7 +329,7 @@ public class RunTracker implements Tracker {
                         spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
                         thresholdApplied = "in_vehicle";
                     }else {
-                        if ( (isCurrentlyProcessingSteps() && listener.getMovingAverageOfStepsPerSec() >= 1)
+                        if ( (isCurrentlyProcessingSteps() && listener.getMovingAverageOfStepsPerSec() >= Config.MIN_CADENCE_FOR_WALK)
                                     || ActivityDetector.getInstance().isOnFoot()){
                             // Can make a safe assumption that the person is on foot
                             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;

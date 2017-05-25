@@ -92,10 +92,6 @@ public class WorkoutSingleton {
         return State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()));
     }
 
-    public void incrementUsainBoltsCounter(){
-        dataStore.incrementUsainBoltCounter();
-    }
-
     public void setToShowEndRunDialog(boolean value){
         this.toShowEndRunDialog = value;
     }
@@ -113,7 +109,11 @@ public class WorkoutSingleton {
     }
 
     public boolean hasConsecutiveUsainBolts(){
-        return dataStore.getUsainBoltCount() >= 3;
+        return dataStore.hasConsecutiveUsainBolts();
+    }
+
+    public void incrementUsainBoltsCounter(){
+        dataStore.incrementUsainBoltCounter();
     }
 
     private void setState(State state){

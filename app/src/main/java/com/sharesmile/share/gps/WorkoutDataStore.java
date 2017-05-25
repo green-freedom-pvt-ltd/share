@@ -78,6 +78,8 @@ public interface WorkoutDataStore {
 
 	int getUsainBoltCount();
 
+	boolean hasConsecutiveUsainBolts();
+
 	void setMockLocationDetected(boolean detected);
 
 	boolean isMockLocationDetected();

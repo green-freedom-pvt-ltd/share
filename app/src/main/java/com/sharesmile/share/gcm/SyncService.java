@@ -1,5 +1,6 @@
 package com.sharesmile.share.gcm;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
@@ -22,6 +23,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.models.CauseList;
+import com.sharesmile.share.rfac.models.FraudData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunList;
@@ -70,6 +72,10 @@ public class SyncService extends GcmTaskService {
             return syncWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_LEADERBOARD_DATA)) {
             return syncLeaderBoardData();
+        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
+            Bundle extras = taskParams.getExtras();
+            String fraudDataString = extras.getString(TaskConstants.FRAUD_DATA_JSON);
+            pushFraudData(fraudDataString);
         }
         return GcmNetworkManager.RESULT_SUCCESS;
     }
@@ -212,8 +218,44 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private int uploadUserData() {
+    private int pushFraudData(String fraudDataString){
+        if (TextUtils.isEmpty(fraudDataString)){
+            Logger.d(TAG, "Can't push FraudDtaString in TaskParams is empty");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+        Logger.d(TAG, "Will pushFraudData: " + fraudDataString);
+        try {
+            Gson gson = new Gson();
+            FraudData fraudData = gson.fromJson(fraudDataString, FraudData.class);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("user_id", fraudData.getUserId());
+            jsonObject.put("client_run_id", fraudData.getClientRunId());
+            jsonObject.put("cause_id", fraudData.getCauseId());
+            jsonObject.put("usain_bolt_count", fraudData.getUsainBoltCount());
+            jsonObject.put("team_id", fraudData.getTeamId());
+            jsonObject.put("timestamp", fraudData.getTimeStamp());
+            jsonObject.put("mock_location_used", fraudData.isMockLocationUsed());
 
+            NetworkDataProvider.doPostCall(Urls.getFraudstersUrl(), jsonObject, FraudData.class);
+
+            return GcmNetworkManager.RESULT_SUCCESS;
+
+        }catch (JSONException e){
+            e.printStackTrace();
+            Logger.d(TAG, "JSONException: " + e.getMessage());
+            Crashlytics.logException(e);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }catch (NetworkException ne){
+            ne.printStackTrace();
+            Logger.d(TAG, "NetworkException: " + ne.getMessageFromServer());
+            Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne.getMessageFromServer());
+            Crashlytics.logException(ne);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }
+    }
+
+
+    private int uploadUserData() {
         int user_id = MainApplication.getInstance().getUserID();
         Logger.d(TAG, "uploadUserData for userId: " + user_id );
         try {
@@ -234,11 +276,6 @@ public class SyncService extends GcmTaskService {
             UserDetails response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject, UserDetails.class);
             Logger.d(TAG, "Response for getUser:" + gson.toJson(response));
 
-            //TODO: CalorieCalculation, remove this weight hack after the API returns weight of the user
-            if (response.getBodyWeight() == 0f){
-                Logger.d(TAG, "Users API returned null body_weight after update");
-            }
-
             MainApplication.getInstance().setUserDetails(response);
 
             return GcmNetworkManager.RESULT_SUCCESS;
@@ -252,7 +289,6 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "NetworkException");
             return GcmNetworkManager.RESULT_FAILURE;
         }
-
     }
 
     private int uploadWorkoutData() {

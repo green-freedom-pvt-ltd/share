@@ -15,6 +15,7 @@ public class Urls {
     private static final String FAQ_URL = "/api/faq/";
     private static final String MESSAGE_URL = "/api/messageCenter/";
     private static final String LEADERBOARD_URL = "/api/leaderBoard/";
+    private static final String FRAUDSTERS_URL = "/api/fraudsters/";
 
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
@@ -38,6 +39,10 @@ public class Urls {
     public static String getRunUrl() {
         String url = getBaseUrl() + RUN_URL;
         return url;
+    }
+
+    public static String getFraudstersUrl(){
+        return getBaseUrl() + FRAUDSTERS_URL;
     }
 
     public static String getFlaggedRunUrl(boolean fetch_flagged_run) {
