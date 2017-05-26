@@ -9,7 +9,7 @@ import com.sharesmile.share.core.UnObfuscable;
 
 public class FraudData implements UnObfuscable{
 
-    @SerializedName("id")
+    @SerializedName("user_id")
     private int userId;
 
     @SerializedName("client_run_id")

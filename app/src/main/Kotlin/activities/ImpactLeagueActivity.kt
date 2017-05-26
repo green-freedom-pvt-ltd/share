@@ -8,6 +8,9 @@ import com.sharesmile.share.R
 import fragments.LeagueCodeFragment
 
 class ImpactLeagueActivity : BaseActivity2() {
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        return false
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,11 +37,6 @@ class ImpactLeagueActivity : BaseActivity2() {
 
     override fun setUpNavigationView() {
 
-    }
-
-
-    override fun onNavigationItemSelected(item: MenuItem?): Boolean {
-        return false
     }
 
     override fun getFrameLayoutId(): Int {

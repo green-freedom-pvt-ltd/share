@@ -127,26 +127,23 @@ public class NetworkUtils {
     }
 
     private static NetworkException convertResponseToException(Response response) {
+        String requestUrl = response.request().urlString();
+        String method = response.request().method();
+        int responseCode = response.code();
         String messageFromServer = response.message();
         try {
-            ServerErrorResponse errorObject = parseSuccessResponse(response, ServerErrorResponse.class);
-            if (errorObject != null) {
-                //Update message from server
-                messageFromServer = errorObject.getMessage();
-            }
-        }catch (NetworkException ne){
-            Logger.e(TAG, "Can't fetch server error message from response");
+            messageFromServer = response.body().string();
+        }catch (IOException ioe){
+            Logger.e(TAG, "Can't fetch response body");
         }
 
         String why = null;
         int failureType;
-        if (TOKEN_EXPIRED_CODE == response.code()) {
+        if (TOKEN_EXPIRED_CODE == responseCode) {
             // Login auth token expired, special handling
             why = "Login Auth Token expired";
             failureType = FailureType.TOKEN_EXPIRED;
         } else {
-            String requestUrl = response.request().urlString();
-            String method = response.request().method();
             why = method + " response not successful for URL: " + requestUrl;
             failureType = FailureType.RESPONSE_FAILURE;
         }

@@ -248,6 +248,9 @@ public class SyncService extends GcmTaskService {
         }catch (NetworkException ne){
             ne.printStackTrace();
             Logger.d(TAG, "NetworkException: " + ne.getMessageFromServer());
+            String log= "Couldn't post fraudData to URL: " + Urls.getFraudstersUrl() + ", FraudData: " + fraudDataString;
+            Logger.e(TAG, log);
+            Crashlytics.log(log);
             Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne.getMessageFromServer());
             Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
