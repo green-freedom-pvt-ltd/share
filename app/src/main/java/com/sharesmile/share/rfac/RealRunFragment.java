@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -37,7 +38,7 @@ public class RealRunFragment extends RunFragment {
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
     TextView time;
-    TextView distance;
+    TextView distanceTextView;
     TextView impact;
     ProgressBar runProgressBar;
     Button pauseButton;
@@ -78,7 +79,7 @@ public class RealRunFragment extends RunFragment {
     protected void populateViews(View baseView) {
         ButterKnife.bind(this, baseView);
         time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
-        distance = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
+        distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
         impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
         runProgressBar = (ProgressBar) baseView.findViewById(R.id.run_progress_bar);
         pauseButton = (Button) baseView.findViewById(R.id.btn_pause);
@@ -154,16 +155,34 @@ public class RealRunFragment extends RunFragment {
     }
 
     @Override
-    public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs) {
-        super.showUpdate(speed, distanceCovered, elapsedTimeInSecs);
-        String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
-        distance.setText(distanceString);
-        int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
-        impact.setText(String.valueOf(rupees));
-        if (WorkoutSingleton.getInstance().getDataStore() != null){
-            Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
-            if (calorie != null){
-                tvCalorieMets.setText(String.valueOf(Math.round(calorie.getCalories())));
+    public void showUpdate(float speed, float distanceCoveredMeters, int elapsedTimeInSecs) {
+        super.showUpdate(speed, distanceCoveredMeters, elapsedTimeInSecs);
+        float distanceOnDisplay = 0f;
+        try {
+            distanceOnDisplay = 1000*Float.parseFloat(distanceTextView.getText().toString());
+        }catch (NumberFormatException nfe){
+            String message = "NumberFormatException while parsing distanceTextView on display: " + nfe.getMessage();
+            Logger.e(TAG, message);
+            Crashlytics.log(message);
+            nfe.printStackTrace();
+        }
+        if (distanceCoveredMeters - distanceOnDisplay >= 40){
+            // Only when the delta is greater than 0.04 km we show the update
+            String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
+            distanceTextView.setText(distanceString);
+            int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
+            impact.setText(String.valueOf(rupees));
+            if (WorkoutSingleton.getInstance().getDataStore() != null){
+                Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
+                if (calorie != null){
+                    String caloriesString = "";
+                    if (calorie.getCalories() > 100){
+                        caloriesString = String.valueOf(Math.round(calorie.getCalories()));
+                    }else {
+                        caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
+                    }
+                    tvCalorieMets.setText(caloriesString);
+                }
             }
         }
     }
@@ -201,7 +220,8 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void onBeginRun() {
         impact.setText("0");
-        distance.setText("0.0");
+        distanceTextView.setText("0.00");
+        tvCalorieMets.setText("0.0");
     }
 
     @Override
@@ -216,7 +236,7 @@ public class RealRunFragment extends RunFragment {
 
         float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
         impact.setText(getImpactInRupees(distanceCovered));
-        distance.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
+        distanceTextView.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
 
         if (WorkoutSingleton.getInstance().toShowEndRunDialog()){
             showRunEndDialog();
@@ -264,7 +284,7 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
-        String rDistance = distance.getText().toString();
+        String rDistance = distanceTextView.getText().toString();
         Float fDistance = Float.parseFloat(rDistance);
         if (mCauseData.getMinDistance() > (fDistance * 1000)) {
             showMinDistanceDialog();

@@ -27,6 +27,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
@@ -55,6 +56,8 @@ import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 
@@ -423,9 +426,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         Analytics.getInstance().setUserId(details.getUserId());
 
         prefsManager.setString(Constants.PREF_AUTH_TOKEN, details.getAuthToken());
-        Logger.i(TAG, "AuthToken : " + details.getAuthToken());
-
-        Logger.d(TAG, "PhoneNum: " + details.getPhoneNumber());
         if (!TextUtils.isEmpty(details.getPhoneNumber())){
             Analytics.getInstance().setUserPhone(details.getPhoneNumber());
         }
@@ -473,9 +473,15 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     @Override
     public void onStart() {
-        Logger.i(TAG, "onStart, auth token " + MainApplication.getInstance().getToken());
+        Logger.i(TAG, "onStart");
         GoogleLocationTracker.getInstance().startLocationTracking(false);
         AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
+
+        Logger.d(TAG, "Cancelling certain notifications");
+        ActivityDetector.getInstance().cancelWalkEngagementNotif();
+        WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
+        WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
+        WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
     }
 
     @Override

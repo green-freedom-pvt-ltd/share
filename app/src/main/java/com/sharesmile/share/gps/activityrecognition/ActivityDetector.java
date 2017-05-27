@@ -162,9 +162,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private void stopWalkEngagementDetectionCounter(){
-        if (isWalkEngagementNotificationOnDisplay){
-            cancelWalkEngagementNotif();
-        }
+        cancelWalkEngagementNotif();
         handler.removeCallbacks(handleEngagementNotificationRunnable);
         timeOnFootContinuously = 0;
     }
@@ -184,6 +182,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         long currentTs = DateUtil.getServerTimeInMillis();
         long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
         SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
+        isWalkEngagementNotificationOnDisplay = false;
     }
 
     private void startWalkEngagementDetectionCounter(){

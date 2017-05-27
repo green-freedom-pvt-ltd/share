@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
+import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
@@ -78,6 +79,8 @@ public class ProfileGeneralFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userDetails = MainApplication.getInstance().getUserDetails();
+        Gson gson = new Gson();
+        Logger.d(TAG, "onCreate, UserDetails: " + gson.toJson(userDetails));
     }
 
     @Nullable
@@ -157,7 +160,7 @@ public class ProfileGeneralFragment extends BaseFragment implements
             mBirthday.setText(userDetails.getBirthday());
         }
         if (!TextUtils.isEmpty(userDetails.getGenderUser())) {
-            if (userDetails.getGenderUser().equalsIgnoreCase("m")) {
+            if (userDetails.getGenderUser().toLowerCase().startsWith("m")) {
                 mMaleRadioBtn.setChecked(true);
             } else {
                 mFemaleRadioBtn.setChecked(false);
@@ -281,7 +284,7 @@ public class ProfileGeneralFragment extends BaseFragment implements
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPLOAD_USER_DATA)
-                .setExecutionWindow(0L, 3600L)
+                .setExecutionWindow(0L, 3600L) // Within one hour
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
                 .build();
 

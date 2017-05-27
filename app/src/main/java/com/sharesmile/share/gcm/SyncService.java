@@ -232,7 +232,10 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("client_run_id", fraudData.getClientRunId());
             jsonObject.put("cause_id", fraudData.getCauseId());
             jsonObject.put("usain_bolt_count", fraudData.getUsainBoltCount());
-            jsonObject.put("team_id", fraudData.getTeamId());
+            // Send team_id only when it is greater than 0
+            if (fraudData.getTeamId() > 0){
+                jsonObject.put("team_id", fraudData.getTeamId());
+            }
             jsonObject.put("timestamp", fraudData.getTimeStamp());
             jsonObject.put("mock_location_used", fraudData.isMockLocationUsed());
 

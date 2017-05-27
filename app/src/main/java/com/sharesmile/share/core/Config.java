@@ -37,7 +37,7 @@ public class Config {
 
     public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
 
-    public static long VIGILANCE_TIMER_INTERVAL = 22000; // in millisecs
+    public static long VIGILANCE_TIMER_INTERVAL = 20000; // in millisecs
 
     public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
 

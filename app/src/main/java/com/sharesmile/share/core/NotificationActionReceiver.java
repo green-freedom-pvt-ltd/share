@@ -52,11 +52,10 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             Logger.i(TAG,"Action Stop");
         } else if(context.getString(R.string.notification_action_cancel).equals(action)) {
             Logger.i(TAG,"Action Cancel");
+            NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+            manager.cancel(notifId);
             if (notifId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
-                ActivityDetector.getInstance().cancelWalkEngagementNotif();
-            }else {
-                NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-                manager.cancel(notifId);
+                ActivityDetector.getInstance().userDismissedWalkEngagementNotif();
             }
         } else if (context.getString(R.string.notification_action_dismiss).equals(action)){
             Logger.i(TAG, "Action Dismiss");

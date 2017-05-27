@@ -102,6 +102,21 @@ public class Utils {
         return getDecimalFormat("0.0").format(distance);
     }
 
+    public static String formatCalories(double calories){
+        String caloriesString = "";
+        if (calories > 100){
+            caloriesString = Math.round(calories) + " Cal";
+        }else {
+            String cals = Utils.formatWithOneDecimal(calories);
+            if ("0.0".equals(cals)){
+                caloriesString = "--";
+            }else {
+                caloriesString = cals + " Cal";
+            }
+        }
+        return caloriesString;
+    }
+
     private static DecimalFormat getDecimalFormat(String pattern){
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
@@ -217,7 +232,12 @@ public class Utils {
             int totalMins = secs / 60;
             int hour = totalMins / 60;
             int min = totalMins % 60;
-            return String.format("%02d:%02d:%02d", hour, min, sec);
+            String formatted = String.format("%02d:%02d:%02d", hour, min, sec);
+            if (formatted.startsWith("0")){
+                return formatted.substring(1);
+            }else {
+                return formatted;
+            }
         } else {
             return String.format("%02d:%02d", secs / 60, secs % 60);
         }
