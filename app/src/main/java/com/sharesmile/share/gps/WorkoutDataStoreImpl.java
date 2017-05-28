@@ -142,6 +142,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         p.put("num_steps", getTotalSteps());
         p.put("client_run_id", getWorkoutId());
         p.put("calories", getCalories().getCalories());
+        p.put("bolt_count", getUsainBoltCount());
         return p;
     }
 

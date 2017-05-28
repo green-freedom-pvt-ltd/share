@@ -258,6 +258,7 @@ public class WorkoutService extends Service implements
             p.put("num_steps", getTotalStepsInWorkout());
             p.put("client_run_id", tracker.getCurrentWorkoutId());
             p.put("calories", tracker.getCalories().getCalories());
+            p.put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount());
             return p;
         }
         return  null;

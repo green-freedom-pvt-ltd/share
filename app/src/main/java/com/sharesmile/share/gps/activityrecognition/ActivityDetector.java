@@ -20,6 +20,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -76,6 +77,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         this.appContext = appContext;
         this.handler = new Handler();
         this.historyQueue = new CircularQueue<>(3);
+        this.isWorkoutActive = WorkoutSingleton.getInstance().isWorkoutActive();
         connectGoogleApiClient();
     }
 
@@ -265,6 +267,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                             appContext.getString(R.string.notification_action_cancel)
                     );
                     isWalkEngagementNotificationOnDisplay = true;
+                    AnalyticsEvent.create(Event.DISP_WALK_ENGAGEMENT_NOTIF)
+                            .buildAndDispatch();
                 }
                 timeOnFootContinuously = 0;
             }
@@ -355,10 +359,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 isInVehicle = true;
                 isStill = false; // isStill is forced set as false if the user is supposedly in vehicle
                 stillNotificationOccurredCounter = 0;
-                if (isWorkoutActive()){
-                    AnalyticsEvent.create(Event.DISP_YOU_ARE_DRIVING_NOTIF)
-                            .buildAndDispatch();
-                }
             }else {
                 isInVehicle = false;
             }

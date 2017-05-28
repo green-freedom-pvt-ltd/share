@@ -281,12 +281,11 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         initOneSignal();
         mDbWrapper = new DbWrapper(this);
         GoogleLocationTracker.initialize(this);
+        WorkoutSingleton.initialize(getApplicationContext());
         ActivityDetector.initialize(this);
         LeaderBoardDataStore.initialize(this);
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
-
-        WorkoutSingleton.initialize(getApplicationContext());
 
         causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
 

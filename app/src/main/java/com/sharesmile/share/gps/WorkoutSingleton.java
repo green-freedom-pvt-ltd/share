@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
@@ -57,7 +56,7 @@ public class WorkoutSingleton {
             throw new NullPointerException("Provided application context is null");
         }
         if (uniqueInstance == null) {
-            synchronized (ActivityDetector.class) {
+            synchronized (WorkoutSingleton.class) {
                 if (uniqueInstance == null) {
                     uniqueInstance = new WorkoutSingleton(appContext);
                 }
