@@ -1,6 +1,5 @@
 package com.sharesmile.share.rfac.fragments;
 
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -173,12 +173,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBus.getDefault().unregister(this);
-    }
-
     private void init() {
         if (mShowLogin) {
             mShare_container.setVisibility(View.GONE);
@@ -248,9 +242,20 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utils.showWeightInputDialog(getContext());
+                    weightInputDialog = Utils.showWeightInputDialog(getContext());
                 }
             });
+        }
+    }
+
+    AlertDialog weightInputDialog;
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+        if (weightInputDialog != null && weightInputDialog.isShowing()){
+            weightInputDialog.dismiss();
         }
     }
 
@@ -258,7 +263,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     public void onEvent(BodyWeightChangedEvent event) {
         Logger.d(TAG, "onEvent: BodyWeightChangedEvent");
         initCaloriesContainer();
-        MainApplication.showToast("Will track calories for future walks/runs.");
     }
 
     private void initShareLayout() {

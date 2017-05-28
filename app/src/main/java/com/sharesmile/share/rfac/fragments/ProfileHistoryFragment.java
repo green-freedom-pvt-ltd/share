@@ -22,6 +22,7 @@ import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -82,6 +83,10 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
             Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");
             mHistoryAdapter.setData(mWorkoutList);
             hideProgressDialog();
+            // Show WeightInputDialog if weight is not present
+            if (MainApplication.getInstance().getUserDetails().getBodyWeight() <= 0){
+                weightInputDialog = Utils.showWeightInputDialog(getContext());
+            }
         }
     }
 
@@ -95,9 +100,14 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    AlertDialog weightInputDialog;
+
     @Override
     public void onDestroyView() {
         EventBus.getDefault().unregister(this);
+        if (weightInputDialog != null && weightInputDialog.isShowing()){
+            weightInputDialog.dismiss();
+        }
         super.onDestroyView();
     }
 

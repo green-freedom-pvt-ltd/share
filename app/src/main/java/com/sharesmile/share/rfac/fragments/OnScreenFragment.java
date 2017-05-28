@@ -180,16 +180,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
-//    AlertDialog weightInputDialog;
-//
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        if (weightInputDialog != null && weightInputDialog.isShowing()){
-//            weightInputDialog.dismiss();
-//        }
-//    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
         Logger.d(TAG, "onEvent: CauseDataUpdated");

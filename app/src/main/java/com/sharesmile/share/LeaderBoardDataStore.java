@@ -1,6 +1,7 @@
 package com.sharesmile.share;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
@@ -19,10 +20,13 @@ import com.sharesmile.share.utils.Urls;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
+
+import static com.sharesmile.share.R.string.team;
 
 /**
  * Created by ankitmaheshwari on 5/12/17.
@@ -96,8 +100,47 @@ public class LeaderBoardDataStore {
         return myTeamLeaderBoard;
     }
 
-    public int getLeagueTeamId() {
+    public int getMyTeamId() {
         return leagueTeamId;
+    }
+
+    public String getLeagueName(){
+        if (leagueBoard != null ){
+            Iterator<TeamBoard.Team> iter = leagueBoard.getTeamList().iterator();
+            while (iter.hasNext()){
+                TeamBoard.Team team = iter.next();
+                if (!TextUtils.isEmpty(team.getLeagueName())){
+                    return team.getLeagueName();
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getMyTeamName(){
+        if (myTeamLeaderBoard != null && myTeamLeaderBoard.getTeamList().get(0) != null){
+            Iterator<TeamLeaderBoard.UserDetails> iter = myTeamLeaderBoard.getTeamList().iterator();
+            while (iter.hasNext()){
+                TeamLeaderBoard.UserDetails team = iter.next();
+                if (!TextUtils.isEmpty(team.getTeamName())){
+                    return team.getTeamName();
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getTeamName(int teamId){
+        if (leagueBoard != null){
+            Iterator<TeamBoard.Team> iter = leagueBoard.getTeamList().iterator();
+            while (iter.hasNext()){
+                TeamBoard.Team team = iter.next();
+                if (team.getId() == teamId){
+                    return team.getTeamName();
+                }
+            }
+        }
+        return null;
     }
 
     public boolean isLeagueActive(){
@@ -210,7 +253,7 @@ public class LeaderBoardDataStore {
             @Override
             public void onNetworkSuccess(TeamLeaderBoard board) {
                 Logger.d(TAG, "Successfully fetched TeamLeaderBoardData for teamId: " + teamId);
-                if (teamId == getLeagueTeamId()){
+                if (teamId == getMyTeamId()){
                     // It is myTeamLeaderBoard, will cache it for future use
                     setMyTeamLeaderBoardData(board);
                 }

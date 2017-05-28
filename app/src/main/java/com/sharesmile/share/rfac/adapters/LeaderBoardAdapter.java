@@ -112,7 +112,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
             final int id;
             if (isLeagueBoard) {
-                id = LeaderBoardDataStore.getInstance().getLeagueTeamId();
+                id = LeaderBoardDataStore.getInstance().getMyTeamId();
             } else {
                 id = MainApplication.getInstance().getUserID();
             }

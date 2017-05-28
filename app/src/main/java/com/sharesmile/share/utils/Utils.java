@@ -31,6 +31,8 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
@@ -109,7 +111,7 @@ public class Utils {
         }else {
             String cals = Utils.formatWithOneDecimal(calories);
             if ("0.0".equals(cals)){
-                caloriesString = "--";
+                caloriesString = "0 Cal";
             }else {
                 caloriesString = cals + " Cal";
             }
@@ -663,6 +665,9 @@ public class Utils {
         final AlertDialog dialog = builder.create();
         dialog.show();
 
+        AnalyticsEvent.create(Event.ON_LOAD_WEIGHT_INPUT_DIALOG)
+                .buildAndDispatch();
+
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -679,6 +684,7 @@ public class Utils {
                         MainApplication.getInstance().setBodyWeight(weight);
                         EventBus.getDefault().post(new BodyWeightChangedEvent());
                         dialog.dismiss();
+                        MainApplication.showToast("Will track calories for future walks/runs.");
                     }
                 }
             }

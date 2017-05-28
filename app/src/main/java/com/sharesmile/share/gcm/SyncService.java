@@ -123,7 +123,7 @@ public class SyncService extends GcmTaskService {
 
             try {
                 Logger.d(TAG, "Will sync MyTeamLeaderBoard");
-                int leagueTeamId = LeaderBoardDataStore.getInstance().getLeagueTeamId();
+                int leagueTeamId = LeaderBoardDataStore.getInstance().getMyTeamId();
                 if (leagueTeamId > 0){
                     Map<String, String> queryParams = new HashMap<>();
                     queryParams.put("team_id", String.valueOf(leagueTeamId));

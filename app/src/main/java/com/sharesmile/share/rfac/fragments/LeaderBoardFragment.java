@@ -25,6 +25,8 @@ import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
@@ -244,12 +246,16 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_league:
-                int teamId = LeaderBoardDataStore.getInstance().getLeagueTeamId();
+                int teamId = LeaderBoardDataStore.getInstance().getMyTeamId();
                 if (teamId > 0) {
                     getFragmentController().replaceFragment(getInstance(BOARD_TYPE.LEAGUEBOARD), true);
                 } else {
                     getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
                 }
+                AnalyticsEvent.create(Event.ON_CLICK_CUP_ICON)
+                        .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
+                        .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+                        .buildAndDispatch();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -383,7 +389,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             TeamLeaderBoard board = null;
             if (event.isSuccess()){
                 board = event.getTeamLeaderBoard();
-            }else if (mTeamId == LeaderBoardDataStore.getInstance().getLeagueTeamId()){
+            }else if (mTeamId == LeaderBoardDataStore.getInstance().getMyTeamId()){
                 board = LeaderBoardDataStore.getInstance().getMyTeamLeaderBoard();
             }
             mleaderBoardList.clear();
@@ -421,6 +427,21 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     @Override
     public void onItemClick(long id) {
         getFragmentController().replaceFragment(getInstance(BOARD_TYPE.TEAM_LEADERBAORD,(int)id), true);
+        int myTeamId = LeaderBoardDataStore.getInstance().getMyTeamId();
+        if (myTeamId == id){
+            AnalyticsEvent.create(Event.ON_CLICK_SELF_TEAM_LEAGUE_BOARD)
+                    .put("team_id", id)
+                    .put("team_name", LeaderBoardDataStore.getInstance().getMyTeamName())
+                    .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+                    .buildAndDispatch();
+        }else {
+            AnalyticsEvent.create(Event.ON_CLICK_OTHER_TEAM_LEAGUE_BOARD)
+                    .put("team_id", id)
+                    .put("team_name", LeaderBoardDataStore.getInstance().getTeamName((int) id))
+                    .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+                    .buildAndDispatch();
+        }
+
     }
 
     private void hideProgressDialog() {

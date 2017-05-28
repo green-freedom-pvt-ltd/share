@@ -400,6 +400,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         UserDetails details = getUserDetails();
         details.setBodyWeight(bodyWeight);
         SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
+        Analytics.getInstance().setUserProperty("body_weight", bodyWeight);
+        AnalyticsEvent.create(Event.ON_SET_BODY_WEIGHT)
+                .put("body_weight", bodyWeight)
+                .buildAndDispatch();
     }
 
     public void setUserDetails(UserDetails details){
@@ -435,7 +439,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         prefsManager.setBoolean(Constants.PREF_IS_SIGN_UP_USER, details.isSignUp());
 
-        if (LeaderBoardDataStore.getInstance().getLeagueTeamId() != details.getTeamId()){
+        if (LeaderBoardDataStore.getInstance().getMyTeamId() != details.getTeamId()){
             LeaderBoardDataStore.getInstance().setLeagueTeamId(details.getTeamId());
             Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamId());
         }

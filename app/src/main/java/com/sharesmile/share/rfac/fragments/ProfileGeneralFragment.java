@@ -28,6 +28,8 @@ import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
@@ -210,16 +212,25 @@ public class ProfileGeneralFragment extends BaseFragment implements
         if (!TextUtils.isEmpty(mName.getText())) {
             userDetails.setFirstName(mName.getText().toString());
             Analytics.getInstance().setUserName(mName.getText().toString());
+            AnalyticsEvent.create(Event.ON_SET_NAME)
+                    .put("user_name", mName.getText().toString())
+                    .buildAndDispatch();
         }
 
         if (!TextUtils.isEmpty(mBirthday.getText())) {
             userDetails.setBirthday(mBirthday.getText().toString());
+            AnalyticsEvent.create(Event.ON_SET_BIRTTHDAY)
+                    .put("user_birthday", mBirthday.getText().toString())
+                    .buildAndDispatch();
         }
 
         if (!TextUtils.isEmpty(mNumber.getText())) {
             if (Utils.isValidPhoneNumber(mNumber.getText().toString())){
                 userDetails.setPhoneNumber(mNumber.getText().toString());
                 Analytics.getInstance().setUserPhone(mNumber.getText().toString());
+                AnalyticsEvent.create(Event.ON_SET_PHONE_NUM)
+                        .put("user_phone_num", mNumber.getText().toString())
+                        .buildAndDispatch();
             }
         }
 
@@ -228,6 +239,9 @@ public class ProfileGeneralFragment extends BaseFragment implements
                 float bodyWeightEntered = Float.parseFloat(bodyWeightKgs.getText().toString());
                 userDetails.setBodyWeight(bodyWeightEntered);
                 Analytics.getInstance().setUserProperty("body_weight", bodyWeightEntered);
+                AnalyticsEvent.create(Event.ON_SET_BODY_WEIGHT)
+                        .put("body_weight", bodyWeightEntered)
+                        .buildAndDispatch();
             }catch (Exception e){
                 Logger.e("ProfileGeneralFragment", "Exception while parsing body weight: " + e.getMessage() );
                 e.printStackTrace();

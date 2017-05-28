@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
@@ -56,10 +57,10 @@ public class RealRunFragment extends RunFragment {
     TextView tvCalorieMets;
 
     @BindView(R.id.live_calories_container)
-    View caloriesContainer;
+    RelativeLayout caloriesContainer;
 
     @BindView(R.id.live_distance_container)
-    View distanceContainer;
+    RelativeLayout distanceContainer;
 
     @BindView(R.id.live_timer_container)
     View timerContainer;
@@ -94,21 +95,23 @@ public class RealRunFragment extends RunFragment {
         stopButton = (Button) baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
+
         if (MainApplication.getInstance().getUserDetails().getBodyWeight() <= 0){
             // Need to hide caloriesContainer and reset distanceContainer LayoutParams
             caloriesContainer.setVisibility(View.GONE);
+            distanceContainer.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) distanceContainer.getLayoutParams();
             params.weight = 4;
-            params.gravity = Gravity.CENTER;
             distanceContainer.setLayoutParams(params);
         }else {
             // Need to show caloriesContainer and set distanceContainer LayoutParams
             caloriesContainer.setVisibility(View.VISIBLE);
+            distanceContainer.setGravity(Gravity.LEFT);
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) distanceContainer.getLayoutParams();
             params.weight = 3;
-            params.gravity = Gravity.LEFT;
             distanceContainer.setLayoutParams(params);
         }
+
         Picasso.with(getContext()).load(mCauseData.getSponsor().getLogoUrl()).into(mSponsorLogo);
 
     }

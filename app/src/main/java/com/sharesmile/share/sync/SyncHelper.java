@@ -226,7 +226,7 @@ public class SyncHelper {
                     details.setAuthToken(prefsManager.getString(PREF_AUTH_TOKEN));
                     details.setGenderUser(user.getGender());
                     details.setSignUp(prefsManager.getBoolean(Constants.PREF_IS_SIGN_UP_USER));
-                    details.setTeamId(LeaderBoardDataStore.getInstance().getLeagueTeamId());
+                    details.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
                     details.setSocialThumb(user.getProfileImageUrl());
 
                     MainApplication.getInstance().setUserDetails(details);

@@ -39,6 +39,8 @@ import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
@@ -347,6 +349,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             showLeaderBoard();
         } else if (menuItem.getItemId() == R.id.nav_item_impact_league) {
             showLeagueBoard();
+            AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_NAVIGATION_MENU)
+                    .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
+                    .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+                    .buildAndDispatch();
         }
 
         mDrawerLayout.closeDrawers();
