@@ -61,7 +61,7 @@
         <FrameLayout
             android:id="@+id/img_calorie_container"
             android:layout_width="wrap_content"
-            android:layout_height="23.5dp"
+            android:layout_height="38dp"
             android:layout_centerInParent="true"
             android:layout_below="@+id/tv_share_screen_rupee"
             android:layout_marginTop="27dp">
@@ -70,6 +70,7 @@
                 android:id="@+id/share_cal_not_available_container"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:paddingBottom="14.5dp"
                 android:gravity="bottom"
                 android:orientation="horizontal">
 
@@ -95,6 +96,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 app:srcCompat="@drawable/ic_calories_fire"
+                android:paddingBottom="14.5dp"
                 android:visibility="gone"/>
 
         </FrameLayout>
@@ -106,7 +108,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_calorie_container"
             android:layout_centerInParent="true"
-            android:layout_marginTop="14.5dp"
             android:shadowColor="@color/greyish_brown_two"
             android:textSize="16sp"
             tools:text="@string/for_calories" />

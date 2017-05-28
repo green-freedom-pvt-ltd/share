@@ -244,7 +244,7 @@ public class ProfileGeneralFragment extends BaseFragment implements
             }
         }
         MainApplication.getInstance().setUserDetails(userDetails);
-        syncUserData();
+        oneTimeUploadUserData();
         MainApplication.showToast("Saved!");
     }
 
@@ -280,11 +280,11 @@ public class ProfileGeneralFragment extends BaseFragment implements
         }
     }
 
-    private void syncUserData() {
+    private void oneTimeUploadUserData() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPLOAD_USER_DATA)
-                .setExecutionWindow(0L, 3600L) // Within one hour
+                .setExecutionWindow(0L, 300) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
                 .build();
 

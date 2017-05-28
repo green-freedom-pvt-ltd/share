@@ -242,6 +242,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
             caloriesIcon.setVisibility(View.VISIBLE);
             caloriesText.setText(Utils.formatCalories(caloriesBurned));
         }else {
+            caloriesIcon.setVisibility(View.GONE);
+            caloriesNotAvailableContainer.setVisibility(View.VISIBLE);
+            caloriesText.setText(getString(R.string.for_calories));
             caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -3,9 +3,11 @@ package com.sharesmile.share.rfac;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -56,6 +58,12 @@ public class RealRunFragment extends RunFragment {
     @BindView(R.id.live_calories_container)
     View caloriesContainer;
 
+    @BindView(R.id.live_distance_container)
+    View distanceContainer;
+
+    @BindView(R.id.live_timer_container)
+    View timerContainer;
+
     private CauseData mCauseData;
 
 
@@ -86,8 +94,20 @@ public class RealRunFragment extends RunFragment {
         stopButton = (Button) baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
-        if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0){
+        if (MainApplication.getInstance().getUserDetails().getBodyWeight() <= 0){
+            // Need to hide caloriesContainer and reset distanceContainer LayoutParams
+            caloriesContainer.setVisibility(View.GONE);
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) distanceContainer.getLayoutParams();
+            params.weight = 4;
+            params.gravity = Gravity.CENTER;
+            distanceContainer.setLayoutParams(params);
+        }else {
+            // Need to show caloriesContainer and set distanceContainer LayoutParams
             caloriesContainer.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) distanceContainer.getLayoutParams();
+            params.weight = 3;
+            params.gravity = Gravity.LEFT;
+            distanceContainer.setLayoutParams(params);
         }
         Picasso.with(getContext()).load(mCauseData.getSponsor().getLogoUrl()).into(mSponsorLogo);
 
