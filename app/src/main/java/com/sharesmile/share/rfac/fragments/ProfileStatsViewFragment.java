@@ -27,6 +27,9 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -113,60 +116,6 @@ public class ProfileStatsViewFragment extends BaseFragment {
         setUpBarChart();
     }
 
-    /*
-
-    private void setUpWeeklyStats(){
-        toTheRight.setText("All Time >");
-        duration.setText("Last 7 Days");
-        long currentTimeStampMillis = DateUtil.getServerTimeInMillis();
-
-        Calendar today = Calendar.getInstance();
-        today.setTimeInMillis(currentTimeStampMillis);
-        int thisDayOfLastWeek = today.get(Calendar.DAY_OF_WEEK); // SUNDAY:1 MONDAY:2 and so on
-
-        long timeStamp6DaysBefore = currentTimeStampMillis - 518400000;
-        Calendar firstDay = Calendar.getInstance();
-        firstDay.setTimeInMillis(timeStamp6DaysBefore);
-        int firstDayOfLastWeek = firstDay.get(Calendar.DAY_OF_WEEK);
-
-        long beginningOfFirstDayTsMillis = timeStamp6DaysBefore - getMillisElapsedSinceBeginningOfDay(firstDay);
-
-        // So the time period is beginningOfFirstDayTsMillis to currentTimeStampMillis
-
-        Logger.d(TAG, "setUpWeeklyStats: beginningOfFirstDayTsMillis = " + beginningOfFirstDayTsMillis + ", and currentTimeStampMillis = " + currentTimeStampMillis);
-        Logger.d(TAG, "setUpWeeklyStats: thisDayOfLastWeek = " + thisDayOfLastWeek + ", and firstDayOfLastWeek = " + firstDayOfLastWeek);
-
-        WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        List<Workout> workouts = workoutDao.queryBuilder().where(WorkoutDao.Properties.IsValidRun.eq(true))
-                .orderDesc(WorkoutDao.Properties.Distance).limit(10).build().list();
-
-        for (Workout workout : workouts){
-            Logger.d(TAG, "WorkoutId: " + workout.getId() + ", distance: " + workout.getDistance()
-                    + ", beginTimeStamp = " + workout.getBeginTimeStamp() + ", endTimeStamp: " + workout.getEndTimeStamp());
-        }
-
-        SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
-        // Calculate total_amount_raised, total_distance, total_steps, total_recorded_time, and total_calories
-        Cursor cursor = database.rawQuery("SELECT "
-                + "SUM(" +WorkoutDao.Properties.RunAmount.columnName + "), "
-                + "SUM("+ WorkoutDao.Properties.Distance.columnName +"), "
-                + "SUM("+ WorkoutDao.Properties.Calories.columnName +") "
-                + "FROM " + WorkoutDao.TABLENAME + " where "
-                + WorkoutDao.Properties.IsValidRun.columnName + " is 1" +
-                " and " + WorkoutDao.Properties.Date.columnName + " between "
-                + beginningOfFirstDayTsMillis + " and " + currentTimeStampMillis, new String []{});
-        cursor.moveToFirst();
-        totalAmountRaised = Math.round(cursor.getFloat(0));
-        totalDistance = cursor.getDouble(1);
-        totalCalories = cursor.getDouble(2);
-
-        Logger.d(TAG, "Fetched Weekly stats from DB: totalAmountRaised: " + totalAmountRaised
-                + ", totalDistance: " + totalDistance + ", totalCalories: " + totalCalories);
-
-    }
-
-    */
-
     private void setUpAllTimeStats(){
         toTheLeft.setVisibility(View.GONE);
         toTheRight.setVisibility(View.GONE);
@@ -229,7 +178,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
         yAxis.setLabelCount(3, true);
 
         yAxis.setCenterAxisLabels(true);
-        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
+        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.pale_red));
         yAxis.setDrawAxisLine(false);
         yAxis.setGridLineWidth(0.5f);
 
@@ -237,7 +186,9 @@ public class ProfileStatsViewFragment extends BaseFragment {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 if (value > 0){
-                    return "\u20B9 " + Math.round(value);
+                    DecimalFormat df = new DecimalFormat("#.#");
+                    df.setRoundingMode(RoundingMode.CEILING);
+                    return "\u20B9 " + df.format(value);
                 }else {
                     return "";
                 }

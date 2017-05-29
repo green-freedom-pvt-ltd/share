@@ -230,7 +230,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private void initCaloriesContainer(){
-        if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0){
+        if (MainApplication.getInstance().getBodyWeight() > 0){
             double caloriesBurned = mWorkoutData.getCalories().getCalories();
             caloriesNotAvailableContainer.setVisibility(View.GONE);
             caloriesIcon.setVisibility(View.VISIBLE);

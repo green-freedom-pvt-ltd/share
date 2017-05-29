@@ -69,8 +69,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				batches.add(i, (WorkoutBatchImpl) source.batches.get(i).copy());
 			}
 		}
-		calories = new Calorie(source.calories.getCalories(),
-				source.calories.getCaloriesKarkanen());
+		calories = (source.calories != null) ? new Calorie(source.calories.getCalories(),
+				source.calories.getCaloriesKarkanen()) : null;
 		usainBoltCount = source.usainBoltCount;
 		mockLocationDetected = source.mockLocationDetected;
 	}
@@ -252,7 +252,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			// Add record over here
 			getCurrentBatch().addRecord(record);
 			this.distance += record.getDist();
-			if (MainApplication.getInstance().getUserDetails().getBodyWeight() > 0){
+			if (MainApplication.getInstance().getBodyWeight() > 0){
 				this.calories.incrementCaloriesMets(Utils.getDeltaCaloriesMets(record.getInterval(), record.getSpeed()));
 				this.calories.incrementCaloriesKarkanen(Utils.getDeltaCaloriesKarkanen(record.getInterval(), record.getSpeed()));
 			}

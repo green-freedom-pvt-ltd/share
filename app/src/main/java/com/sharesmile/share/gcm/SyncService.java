@@ -89,6 +89,10 @@ public class SyncService extends GcmTaskService {
     public static int syncLeaderBoardData(){
         Logger.d(TAG, "syncLeaderBoardData");
 
+        if (!MainApplication.isLogin()){
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+
         int result = GcmNetworkManager.RESULT_SUCCESS;
 
         try {
@@ -267,6 +271,10 @@ public class SyncService extends GcmTaskService {
         try {
 
             UserDetails prev = MainApplication.getInstance().getUserDetails();
+            if (prev == null){
+                Logger.d(TAG, "Can't UPLOAD, UserDetails not present");
+                return GcmNetworkManager.RESULT_FAILURE;
+            }
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("first_name", prev.getFirstName());

@@ -396,14 +396,23 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
     }
 
+    public float getBodyWeight(){
+        if (isLogin() && getUserDetails() != null){
+            return getUserDetails().getBodyWeight();
+        }
+        return 0;
+    }
+
     public void setBodyWeight(float bodyWeight){
         UserDetails details = getUserDetails();
-        details.setBodyWeight(bodyWeight);
-        SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
-        Analytics.getInstance().setUserProperty("body_weight", bodyWeight);
-        AnalyticsEvent.create(Event.ON_SET_BODY_WEIGHT)
-                .put("body_weight", bodyWeight)
-                .buildAndDispatch();
+        if (details != null){
+            details.setBodyWeight(bodyWeight);
+            SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
+            Analytics.getInstance().setUserProperty("body_weight", bodyWeight);
+            AnalyticsEvent.create(Event.ON_SET_BODY_WEIGHT)
+                    .put("body_weight", bodyWeight)
+                    .buildAndDispatch();
+        }
     }
 
     public void setUserDetails(UserDetails details){

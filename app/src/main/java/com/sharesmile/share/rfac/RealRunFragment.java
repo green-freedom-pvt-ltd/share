@@ -96,7 +96,7 @@ public class RealRunFragment extends RunFragment {
         pauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
 
-        if (MainApplication.getInstance().getUserDetails().getBodyWeight() <= 0){
+        if (MainApplication.getInstance().getBodyWeight() <= 0){
             // Need to hide caloriesContainer and reset distanceContainer LayoutParams
             caloriesContainer.setVisibility(View.GONE);
             distanceContainer.setGravity(Gravity.CENTER);
@@ -260,6 +260,18 @@ public class RealRunFragment extends RunFragment {
         float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
         impact.setText(getImpactInRupees(distanceCovered));
         distanceTextView.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
+        if (WorkoutSingleton.getInstance().getDataStore() != null){
+            Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
+            if (calorie != null){
+                String caloriesString = "";
+                if (calorie.getCalories() > 100){
+                    caloriesString = String.valueOf(Math.round(calorie.getCalories()));
+                }else {
+                    caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
+                }
+                tvCalorieMets.setText(caloriesString);
+            }
+        }
 
         if (WorkoutSingleton.getInstance().toShowEndRunDialog()){
             showRunEndDialog();
