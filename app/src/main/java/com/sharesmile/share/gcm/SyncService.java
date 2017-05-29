@@ -349,7 +349,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("end_location_lat", workout.getEndPointLatitude());
             jsonObject.put("end_location_long", workout.getEndPointLongitude());
             jsonObject.put("version", workout.getVersion());
-            jsonObject.put("calories_burnt", workout.getCalories());
+            jsonObject.put("calories_burnt", workout.getCalories() == null ? 0 : workout.getCalories());
 
             Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 

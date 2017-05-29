@@ -96,7 +96,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
             mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + Math.round(workout.getRunAmount()));
-            calories.setText(Utils.formatCalories(workout.getCalories()));
+            calories.setText(Utils.formatCalories(workout.getCalories() == null ? 0 : workout.getCalories()));
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());
             if (timeInSec >= 60) {
                 int timeInMin = (int) (Utils.stringToSec(workout.getElapsedTime()) / 60);
