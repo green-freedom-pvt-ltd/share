@@ -59,7 +59,7 @@
             tools:text="12 Kms" />
 
         <FrameLayout
-            android:id="@+id/img_calorie_container"
+            android:id="@+id/share_calorie_container"
             android:layout_width="wrap_content"
             android:layout_height="38dp"
             android:layout_centerInParent="true"
@@ -106,11 +106,11 @@
             android:id="@+id/tv_share_screen_calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/img_calorie_container"
+            android:layout_below="@+id/share_calorie_container"
             android:layout_centerInParent="true"
             android:shadowColor="@color/greyish_brown_two"
             android:textSize="16sp"
-            tools:text="@string/for_calories" />
+            tools:text="@string/for_calories"/>
 
         <ImageView
             android:id="@+id/img_screen_time"

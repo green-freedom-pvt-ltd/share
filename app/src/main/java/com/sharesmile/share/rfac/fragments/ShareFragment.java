@@ -112,6 +112,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     @BindView(R.id.share_cal_not_available_container)
     View caloriesNotAvailableContainer;
 
+    @BindView(R.id.share_calorie_container)
+    View caloriesBox;
+
     @BindView(R.id.img_share_calories)
     View caloriesIcon;
 
@@ -230,21 +233,28 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private void initCaloriesContainer(){
-        if (MainApplication.getInstance().getBodyWeight() > 0){
-            double caloriesBurned = mWorkoutData.getCalories().getCalories();
-            caloriesNotAvailableContainer.setVisibility(View.GONE);
-            caloriesIcon.setVisibility(View.VISIBLE);
-            caloriesText.setText(Utils.formatCalories(caloriesBurned));
-        }else {
-            caloriesIcon.setVisibility(View.GONE);
-            caloriesNotAvailableContainer.setVisibility(View.VISIBLE);
-            caloriesText.setText(getString(R.string.for_calories));
-            caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    weightInputDialog = Utils.showWeightInputDialog(getContext());
-                }
-            });
+        if (!MainApplication.isLogin()){
+            caloriesBox.setVisibility(View.GONE);
+            caloriesText.setVisibility(View.GONE);
+        } else {
+            caloriesBox.setVisibility(View.VISIBLE);
+            caloriesText.setVisibility(View.VISIBLE);
+            if (MainApplication.getInstance().getBodyWeight() > 0){
+                double caloriesBurned = mWorkoutData.getCalories().getCalories();
+                caloriesNotAvailableContainer.setVisibility(View.GONE);
+                caloriesIcon.setVisibility(View.VISIBLE);
+                caloriesText.setText(Utils.formatCalories(caloriesBurned));
+            }else {
+                caloriesIcon.setVisibility(View.GONE);
+                caloriesNotAvailableContainer.setVisibility(View.VISIBLE);
+                caloriesText.setText(getString(R.string.for_calories));
+                caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        weightInputDialog = Utils.showWeightInputDialog(getContext());
+                    }
+                });
+            }
         }
     }
 

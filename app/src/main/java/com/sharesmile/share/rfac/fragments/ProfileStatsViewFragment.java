@@ -178,14 +178,17 @@ public class ProfileStatsViewFragment extends BaseFragment {
         yAxis.setLabelCount(3, true);
 
         yAxis.setCenterAxisLabels(true);
-        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.pale_red));
+        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
         yAxis.setDrawAxisLine(false);
         yAxis.setGridLineWidth(0.5f);
 
         yAxis.setValueFormatter(new IAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                if (value > 0){
+                if (value > 10){
+                    return "\u20B9 " + Math.round(value);
+                }
+                else if (value > 0){
                     DecimalFormat df = new DecimalFormat("#.#");
                     df.setRoundingMode(RoundingMode.CEILING);
                     return "\u20B9 " + df.format(value);
