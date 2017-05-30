@@ -8,19 +8,19 @@
     android:orientation="vertical">
 
     <android.support.v4.view.ViewPager
-        android:layout_marginTop="16dp"
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
         android:layout_weight="1" />
 
     <com.sharesmile.share.views.MLButton
         android:id="@+id/btn_lets_run"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_marginBottom="40dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="46dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:layout_marginRight="46dp"
         android:background="@drawable/rounded_corner"
         android:text="@string/let_go"

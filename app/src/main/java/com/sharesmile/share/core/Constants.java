@@ -31,6 +31,8 @@ public class Constants {
 
     public static final int CODE_REQUEST_WRITE_PERMISSION = 103;
 
+    public static final int CODE_GOOGLE_PLAY_SERVICES_RESOLUTION = 104;
+
     public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
 
     public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.gps.location.tracker";
@@ -58,6 +60,8 @@ public class Constants {
     public static final int BROADCAST_REQUEST_PERMISSION_CODE = 209;
 
     public static final int BROADCAST_RESUME_WORKOUT_CODE = 210;
+
+    public static final int BROADCAST_FIX_GOOGLE_PLAY_SERVICES_CODE = 211;
 
     public static final int PROBELM_NOT_MOVING = 0;
 

@@ -1,6 +1,7 @@
 package com.sharesmile.share.core;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -36,6 +39,8 @@ import com.sharesmile.share.utils.Utils;
 import activities.ImpactLeagueActivity;
 import fragments.FaqFragment;
 import fragments.MessageCenterFragment;
+
+import static com.sharesmile.share.core.Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION;
 
 /**
  * Created by ankitmaheshwari1 on 29/01/16.
@@ -228,6 +233,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
                 GoogleLocationTracker.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
+            case Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION:
+                GoogleLocationTracker.getInstance().onActivityResult(requestCode, resultCode, data);
+                break;
         }
     }
 
@@ -240,6 +248,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     private static boolean blockRequestPermission = false;
     private static boolean blockLocationEnablePopup = false;
+    private static boolean blockGooglePlayServicesResolutionPopup = false;
 
     private BroadcastReceiver locationTrackerReceiver = new BroadcastReceiver() {
         @Override
@@ -258,10 +267,38 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                         handleRequestPermissionBroadcast();
                         break;
 
+                    case Constants.BROADCAST_FIX_GOOGLE_PLAY_SERVICES_CODE:
+                        handleFixGooglePlayServiceBroadcast();;
+                        break;
+
                 }
             }
         }
     };
+
+    private void handleFixGooglePlayServiceBroadcast(){
+        synchronized (BaseActivity.class){
+            if (!blockGooglePlayServicesResolutionPopup){
+                GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+                int code = api.isGooglePlayServicesAvailable(this);
+                if (code == ConnectionResult.SUCCESS) {
+                    // Everything good
+                    GoogleLocationTracker.getInstance().onActivityResult(CODE_GOOGLE_PLAY_SERVICES_RESOLUTION, Activity.RESULT_OK, null);
+                } else if (api.isUserResolvableError(code)) {
+                    // Show resolution dialog to user and wait for onActivityResult
+                    api.showErrorDialogFragment(this, code, CODE_GOOGLE_PLAY_SERVICES_RESOLUTION);
+                }
+                // Hack to block subsequent location enable broadcast for 1 sec
+                blockGooglePlayServicesResolutionPopup = true;
+                MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        blockGooglePlayServicesResolutionPopup = false;
+                    }
+                }, 1000);
+            }
+        }
+    }
 
     private void handleFixLocationSettingsBroadcast(Bundle bundle) {
         synchronized (BaseActivity.class) {

@@ -251,7 +251,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
                 caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        weightInputDialog = Utils.showWeightInputDialog(getContext());
+                        weightInputDialog = Utils.showWeightInputDialog(getActivity());
                     }
                 });
             }

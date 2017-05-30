@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -115,20 +115,23 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private void connectGoogleApiClient(){
-
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(appContext) == ConnectionResult.SUCCESS) {
-            googleApiClient = new GoogleApiClient.Builder(appContext)
-                    .addApi(ActivityRecognition.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-            if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
-                googleApiClient.connect();
+        if (googleApiClient == null){
+            GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+            int availabilityCode = api.isGooglePlayServicesAvailable(appContext);
+            if (availabilityCode == ConnectionResult.SUCCESS){
+                googleApiClient = new GoogleApiClient.Builder(appContext)
+                        .addApi(ActivityRecognition.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+            }else {
+                Logger.e(TAG, "GooglePlayServices not available!");
+                return;
             }
-        } else {
-            Logger.e(TAG, "unable to connect to google play services.");
         }
-
+        if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
+            googleApiClient.connect();
+        }
     }
 
     private void registerForActivityUpdates(){

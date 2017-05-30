@@ -85,7 +85,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
             hideProgressDialog();
             // Show WeightInputDialog if weight is not present
             if (MainApplication.getInstance().getBodyWeight() <= 0){
-                weightInputDialog = Utils.showWeightInputDialog(getContext());
+                weightInputDialog = Utils.showWeightInputDialog(getActivity());
             }
         }
     }

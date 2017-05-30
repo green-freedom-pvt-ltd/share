@@ -1,5 +1,6 @@
 package com.sharesmile.share.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -638,12 +639,15 @@ public class Utils {
         return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);
     }
 
-    public static AlertDialog showWeightInputDialog(final Context context){
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.enter_weight));
+    public static AlertDialog showWeightInputDialog(final Activity activity){
+        if (activity == null || activity.isFinishing()){
+            return null;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(activity.getString(R.string.enter_weight));
 
         // Set up the input
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(activity);
         final View container = inflater.inflate(R.layout.dialog_weight_input_container, null);
         final EditText editText = (EditText) container.findViewById(R.id.et_body_weight_kg);
         builder.setView(container);

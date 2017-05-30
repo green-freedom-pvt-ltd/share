@@ -20,7 +20,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -252,21 +252,37 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         }
     }
 
+    private void sendUpdateGooglePlayServicesBroadcast(){
+        Logger.d(TAG, "sendUpdateGooglePlayServicesBroadcast");
+        Bundle bundle = new Bundle();
+        bundle.putInt(Constants.LOCATION_TRACKER_BROADCAST_CATEGORY,
+                Constants.BROADCAST_FIX_GOOGLE_PLAY_SERVICES_CODE);
+        Intent intent = new Intent(Constants.LOCATION_TRACKER_BROADCAST_ACTION);
+        LocalBroadcastManager.getInstance(appContext).sendBroadcast(intent);
+    }
+
     private void connectToLocationServices(){
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(appContext) == ConnectionResult.SUCCESS) {
-            if (googleApiClient == null){
+        if (googleApiClient == null){
+            GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+            int code = api.isGooglePlayServicesAvailable(appContext);
+            if (code == ConnectionResult.SUCCESS){
                 googleApiClient = new GoogleApiClient.Builder(appContext)
                         .addApi(LocationServices.API)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
                         .build();
+            }else if (api.isUserResolvableError(code)){
+                Logger.e(TAG, "GooglePlayServices not available, will ask the user to update Google play service");
+                sendUpdateGooglePlayServicesBroadcast();
+                return;
+            }else {
+                Logger.e(TAG, "GooglePlayServices not available, nothing can't be done");
+                Toast.makeText(appContext, "Unable to connect to google play services", Toast.LENGTH_SHORT);
+                return;
             }
-            if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
-                googleApiClient.connect();
-            }
-        } else {
-            Logger.e(TAG, "unable to connect to google play services.");
-            Toast.makeText(appContext, "Unable to connect to google play services", Toast.LENGTH_SHORT);
+        }
+        if (!googleApiClient.isConnected() || !googleApiClient.isConnecting()) {
+            googleApiClient.connect();
         }
     }
 
@@ -295,13 +311,17 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.CODE_LOCATION_SETTINGS_RESOLUTION){
-            if (resultCode == Activity.RESULT_OK) {
-                // Can startWorkout with location requests
-                state = State.LOCATION_ENABLED;
-                requestLocationUpdates();
-            } else {
-                // Can't do nothing
+        if (resultCode == Activity.RESULT_OK){
+            switch (requestCode){
+                case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
+                    // Can startWorkout with location requests
+                    state = State.LOCATION_ENABLED;
+                    requestLocationUpdates();
+                    break;
+                case Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION:
+                    // GooglePlayServices resolved can connect GoogleApiClient
+                    connectToLocationServices();
+                    break;
             }
         }
     }
