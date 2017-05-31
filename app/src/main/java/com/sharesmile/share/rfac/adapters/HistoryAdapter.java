@@ -108,14 +108,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             if (workout.getIsValidRun()) {
                 mIndicator.setVisibility(View.GONE);
                 mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white));
-                mCard.setOnClickListener(null);
+                if (workout.getCalories() == null || workout.getCalories() <= 0){
+                    mCard.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Logger.d("HistoryAdapter", "Run card without calories clicked: " + Utils.createJSONStringFromObject(workout));
+                            mInterface.showCaloriesNotAvailableRationale();
+                        }
+                    });
+                }else {
+                    mCard.setOnClickListener(null);
+                }
                 mImpact.setPaintFlags(mImpact.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 mIndicator.setVisibility(View.VISIBLE);
                 mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.very_light_grey));
                 mImpact.setPaintFlags(mImpact.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-
-
                 mCard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -131,5 +139,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     public interface AdapterInterface {
         void showInvalidRunDialog(Run invalidRun);
+        void showCaloriesNotAvailableRationale();
     }
 }

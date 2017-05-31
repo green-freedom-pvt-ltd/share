@@ -112,7 +112,7 @@ public class Utils {
         }else {
             String cals = Utils.formatWithOneDecimal(calories);
             if ("0.0".equals(cals)){
-                caloriesString = "0 Cal";
+                caloriesString = "--";
             }else {
                 caloriesString = cals + " Cal";
             }
@@ -688,7 +688,7 @@ public class Utils {
                         MainApplication.getInstance().setBodyWeight(weight);
                         EventBus.getDefault().post(new BodyWeightChangedEvent());
                         dialog.dismiss();
-                        MainApplication.showToast("Will track calories for future walks/runs.");
+                        MainApplication.showToast("Will count calories for future walks/runs.");
                     }
                 }
             }
