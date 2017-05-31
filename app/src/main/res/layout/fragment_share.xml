@@ -43,7 +43,7 @@
             android:layout_height="23.5dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tv_share_screen_rupee"
-            android:layout_marginLeft="62dp"
+            android:layout_marginLeft="51dp"
             android:layout_marginTop="27dp"
             app:srcCompat="@drawable/ic_directions_run_black_24px" />
 
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img_screen_distance"
-            android:layout_marginLeft="40.5dp"
+            android:layout_marginLeft="28.5dp"
             android:layout_marginTop="14.5dp"
             android:shadowColor="@color/greyish_brown_two"
             android:textSize="16sp"
@@ -118,7 +118,7 @@
             android:layout_height="23.5dp"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_share_screen_rupee"
-            android:layout_marginRight="61dp"
+            android:layout_marginRight="51dp"
             android:layout_marginTop="27dp"
             android:src="@drawable/timer" />
 
@@ -129,7 +129,7 @@
             android:layout_alignBaseline="@+id/tv_share_screen_distance"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/img_screen_time"
-            android:layout_marginRight="26dp"
+            android:layout_marginRight="16dp"
             android:shadowColor="@color/greyish_brown_two"
             android:textSize="16sp"
             tools:text="1hr 2min" />
