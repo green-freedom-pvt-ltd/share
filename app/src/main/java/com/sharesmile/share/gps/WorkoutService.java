@@ -442,11 +442,13 @@ public class WorkoutService extends Service implements
     }
 
     private boolean isOldestLocationAccepted(){
-        Location oldest = beginningLocationsRotatingQueue.peekOldest();
-        for (int i=1; i<beginningLocationsRotatingQueue.getMaxSize(); i++){
-            if (checkForSpike(oldest, beginningLocationsRotatingQueue.getElemAtPosition(i))){
-                // There is a spike, must discard Oldest
-                return false;
+        synchronized (beginningLocationsRotatingQueue){
+            Location oldest = beginningLocationsRotatingQueue.peekOldest();
+            for (int i=1; i<beginningLocationsRotatingQueue.getMaxSize(); i++){
+                if (checkForSpike(oldest, beginningLocationsRotatingQueue.getElemAtPosition(i))){
+                    // There is a spike, must discard Oldest
+                    return false;
+                }
             }
         }
         return true;

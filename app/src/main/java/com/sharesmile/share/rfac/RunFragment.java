@@ -212,8 +212,10 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     }
 
     public void refreshWorkoutData(){
-        showUpdate(myActivity.getCurrentSpeed(), myActivity.getTotalDistanceInMeters(),
-                (int) myActivity.getElapsedTimeInSecs());
+        if (isAttachedToActivity()){
+            showUpdate(myActivity.getCurrentSpeed(), myActivity.getTotalDistanceInMeters(),
+                    (int) myActivity.getElapsedTimeInSecs());
+        }
     }
 
     public Properties getWorkoutBundle(){

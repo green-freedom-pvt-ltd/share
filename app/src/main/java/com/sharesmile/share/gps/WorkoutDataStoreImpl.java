@@ -48,6 +48,10 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         if (dirtyWorkoutData == null){
             init(DateUtil.getServerTimeInMillis());
         }
+        if (dirtyWorkoutData.getCalories() == null){
+            dirtyWorkoutData.setCalories(new Calorie(0,0));
+            approvedWorkoutData.setCalories(new Calorie(0,0));
+        }
         numStepsWhenBatchBegan = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
         usainBoltOcurredTimeStamps = SharedPrefsManager.getInstance().getCollection(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS,
                 new TypeToken<ArrayList<Long>>(){}.getType());

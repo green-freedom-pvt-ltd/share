@@ -26,7 +26,7 @@ public class CircularQueue<E> {
         rear=0;
     }
 
-    public E getElemAtPosition(int pos){
+    public synchronized E getElemAtPosition(int pos){
         if (pos >= circularQueueAr.length){
             throw new IndexOutOfBoundsException("Index value " + pos
                     + " is greater than queue max size " + circularQueueAr.length);
@@ -37,7 +37,7 @@ public class CircularQueue<E> {
         return circularQueueAr[actualIndex];
     }
 
-    public E peekLatest(){
+    public synchronized E peekLatest(){
         if (!isEmpty()){
             int latestPos = ((rear - 1) + circularQueueAr.length) % circularQueueAr.length;
             return circularQueueAr[latestPos];
@@ -46,7 +46,7 @@ public class CircularQueue<E> {
     }
 
 
-    public E peekOldest(){
+    public synchronized E peekOldest(){
         if (!isEmpty()){
             return circularQueueAr[front];
         }
@@ -61,14 +61,14 @@ public class CircularQueue<E> {
         return number;
     }
 
-    public void add(E item){
+    public synchronized void add(E item){
         if (isFull()){
             dequeue();
         }
         enqueue(item);
     }
 
-    public void clear(){
+    public synchronized void clear(){
         while (!isEmpty()){
             dequeue();
         }
@@ -78,7 +78,7 @@ public class CircularQueue<E> {
     /**
      * Adds element in Circular Queue(at rear)
      */
-    public void enqueue(E item) throws IllegalStateException {
+    public synchronized void enqueue(E item) throws IllegalStateException {
         if(isFull()){
             throw new IllegalStateException("Circular Queue is full");
         }else{
@@ -92,7 +92,7 @@ public class CircularQueue<E> {
     /**
      * Removes element from Circular Queue(from front)
      */
-    public E dequeue() throws IllegalStateException {
+    public synchronized E dequeue() throws IllegalStateException {
         E deQueuedElement;
         if(isEmpty()){
             throw new IllegalStateException("Circular Queue is empty");

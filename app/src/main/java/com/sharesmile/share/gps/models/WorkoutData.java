@@ -37,6 +37,11 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	Calorie getCalories();
 
 	/**
+	 * Sets the calories object for this WorkoutData
+	 */
+	void setCalories(Calorie calories);
+
+	/**
 	 * @return Avg speed of the workout in meter/sec
 	 */
 	float getAvgSpeed();

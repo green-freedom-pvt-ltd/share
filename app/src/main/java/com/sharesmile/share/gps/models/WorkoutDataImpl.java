@@ -70,7 +70,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			}
 		}
 		calories = (source.calories != null) ? new Calorie(source.calories.getCalories(),
-				source.calories.getCaloriesKarkanen()) : null;
+				source.calories.getCaloriesKarkanen()) : new Calorie(0,0);
 		usainBoltCount = source.usainBoltCount;
 		mockLocationDetected = source.mockLocationDetected;
 	}
@@ -140,6 +140,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public Calorie getCalories() {
 		return calories;
+	}
+
+	@Override
+	public void setCalories(Calorie calories) {
+		this.calories = calories;
 	}
 
 	private void setRecordedTime(){

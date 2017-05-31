@@ -325,19 +325,21 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             float cumulativeRunningConfidence = 0;
             float cumulativeWalkingConfidence = 0;
             long validInterval = isWorkoutActive() ? ACTIVITY_VALID_INTERVAL_ACTIVE : ACTIVITY_VALID_INTERVAL_IDLE;
-            while (i >= 0){
-                ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
-                if (currentTime - elem.getTime() > validInterval){
-                    // This is elem is way too old to be considered
-                    break;
+            synchronized (historyQueue){
+                while (i >= 0){
+                    ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
+                    if (currentTime - elem.getTime() > validInterval){
+                        // This is elem is way too old to be considered
+                        break;
+                    }
+                    cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
+                    cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
+                    cumulativeStillConfidence += elem.getActivityConfidence(DetectedActivity.STILL);
+                    cumulativeRunningConfidence += elem.getActivityConfidence(DetectedActivity.RUNNING);
+                    cumulativeWalkingConfidence += elem.getActivityConfidence(DetectedActivity.WALKING);
+                    count++;
+                    i--;
                 }
-                cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
-                cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
-                cumulativeStillConfidence += elem.getActivityConfidence(DetectedActivity.STILL);
-                cumulativeRunningConfidence += elem.getActivityConfidence(DetectedActivity.RUNNING);
-                cumulativeWalkingConfidence += elem.getActivityConfidence(DetectedActivity.WALKING);
-                count++;
-                i--;
             }
             float avgVehilceConfidence = cumulativeVehicleConfidence / count;
             float avgStillConfidence = cumulativeStillConfidence / count;

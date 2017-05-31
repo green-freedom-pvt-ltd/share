@@ -126,14 +126,16 @@ public class RunTracker implements Tracker {
                 }
             }else {
                 // More than one record present in the list
-                for (int i=recordHistoryQueue.getCurrentSize()-1; i >= 0; i--){
-                    // latest record first
-                    DistRecord qRecord = recordHistoryQueue.getElemAtPosition(i);
-                    if (qRecord.isTooOld()){
-                        break;
-                    }else {
-                        distCovered += qRecord.getDist();
-                        timeTaken += qRecord.getInterval();
+                synchronized (recordHistoryQueue){
+                    for (int i=recordHistoryQueue.getCurrentSize()-1; i >= 0; i--){
+                        // latest record first
+                        DistRecord qRecord = recordHistoryQueue.getElemAtPosition(i);
+                        if (qRecord.isTooOld()){
+                            break;
+                        }else {
+                            distCovered += qRecord.getDist();
+                            timeTaken += qRecord.getInterval();
+                        }
                     }
                 }
             }

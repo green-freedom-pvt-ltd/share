@@ -77,41 +77,43 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         if (historyQueue.isEmpty() || historyQueue.size() == 1){
             return -1;
         }else {
-            Iterator iterator = historyQueue.entrySet().iterator();
-            Map.Entry<Long, Long> first = null;
-            Map.Entry<Long, Long> last = null;
-            while (iterator.hasNext()){
-                Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
+            synchronized (historyQueue){
+                Iterator iterator = historyQueue.entrySet().iterator();
+                Map.Entry<Long, Long> first = null;
+                Map.Entry<Long, Long> last = null;
+                while (iterator.hasNext()){
+                    Map.Entry<Long, Long> thisEntry = (Map.Entry<Long, Long>) iterator.next();
 
-                if ( ((DateUtil.getServerTimeInMillis() / 1000) - thisEntry.getKey())
-                        > STEP_COUNT_READING_VALID_INTERVAL){
-                    // This entry is too old to be considered in calculation
-                    continue;
+                    if ( ((DateUtil.getServerTimeInMillis() / 1000) - thisEntry.getKey())
+                            > STEP_COUNT_READING_VALID_INTERVAL){
+                        // This entry is too old to be considered in calculation
+                        continue;
+                    }
+
+                    if (first == null){
+                        first = thisEntry;
+                        last = thisEntry;
+                    }else {
+                        if (thisEntry.getKey() < first.getKey()){
+                            first = thisEntry;
+                        }
+                        if (thisEntry.getKey() > last.getKey()){
+                            last = thisEntry;
+                        }
+                    }
                 }
 
                 if (first == null){
-                    first = thisEntry;
-                    last = thisEntry;
-                }else {
-                    if (thisEntry.getKey() < first.getKey()){
-                        first = thisEntry;
-                    }
-                    if (thisEntry.getKey() > last.getKey()){
-                        last = thisEntry;
-                    }
+                    // No entry picked for calculation
+                    return 0;
                 }
-            }
 
-            if (first == null){
-                // No entry picked for calculation
-                return 0;
+                Long numSteps = last.getValue() - first.getValue();
+                //In a rare scenario when queue has just two entries with same keys (i.e. epoch in secs) we are considering delta as 1
+                Long deltaTime = (last.getKey() - first.getKey()) > 0
+                        ? last.getKey() - first.getKey() : 1;
+                return (numSteps.floatValue() / deltaTime);
             }
-
-            Long numSteps = last.getValue() - first.getValue();
-            //In a rare scenario when queue has just two entries with same keys (i.e. epoch in secs) we are considering delta as 1
-            Long deltaTime = (last.getKey() - first.getKey()) > 0
-                    ? last.getKey() - first.getKey() : 1;
-            return (numSteps.floatValue() / deltaTime);
         }
 
     }
@@ -144,7 +146,9 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             //i.e. fresh reading after creation of runtracker
             lastStepsRecordTs = DateUtil.getServerTimeInMillis();
             stepsSinceReboot = Math.round(event.values[0]);
-            historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
+            synchronized (historyQueue){
+                historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
+            }
             Logger.d(TAG, "Setting stepsSinceReboot for first time, stepsSinceReboot = "
                     + stepsSinceReboot);
             return;
@@ -163,13 +167,17 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         }
         stepsSinceReboot = Math.round(event.values[0]);
         lastStepsRecordTs = DateUtil.getServerTimeInMillis();
-        historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
+        synchronized (historyQueue){
+            historyQueue.put(Long.valueOf(DateUtil.getServerTimeInMillis() / 1000), Long.valueOf(stepsSinceReboot));
+        }
         listener.onStepCount(deltaSteps);
     }
 
     private void resetCounters(){
         stepsSinceReboot = 0;
-        historyQueue.clear();
+        synchronized (historyQueue){
+            historyQueue.clear();
+        }
     }
 
 

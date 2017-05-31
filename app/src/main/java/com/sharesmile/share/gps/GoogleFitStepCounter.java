@@ -252,7 +252,9 @@ public class GoogleFitStepCounter implements StepCounter,
                 String message = "Field: " + field.getName() + " Value: " + value;
                 Logger.d(TAG, message);
                 Long deltaSteps = Long.parseLong(value.toString());
-                historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
+                synchronized (historyQueue){
+                    historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
+                }
                 listener.onStepCount(deltaSteps.intValue());
             }
         }
