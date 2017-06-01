@@ -308,12 +308,9 @@ public class RunTracker implements Tracker {
                 }
             }else{
                 Logger.d(TAG,"Processing Location: " + point.toString());
-                long ts = point.getTime();
                 Location prevLocation = getLastRecord().getLocation();
-                long prevTs = prevLocation.getTime();
-                float interval = ((float) (ts - prevTs)) / 1000;
+                float interval = ((float) (point.getTime() - prevLocation.getTime())) / 1000;
                 float dist = prevLocation.distanceTo(point);
-                Logger.d(TAG, "Processing Location5: prevTs = " + prevTs  + ", interval = " + interval + " dist = " + dist);
 
                 // Step 1: Check whether threshold interval for recording has elapsed
                 if (interval > Config.THRESHOLD_INTEVAL){

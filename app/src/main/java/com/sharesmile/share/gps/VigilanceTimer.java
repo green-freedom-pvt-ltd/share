@@ -120,21 +120,21 @@ public class VigilanceTimer implements Runnable {
 		if (!Config.USAIN_BOLT_CHECK){
 			return false;
 		}
-
 		float recentSpeed = workoutService.getCurrentSpeed();
-		if (ActivityDetector.getInstance().isIsInVehicle()
-				&& recentSpeed > Config.UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION){
-			Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
-			AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
-					.addBundle(workoutService.getWorkoutBundle())
-					.put("detected_by", "activity_recognition")
-					.put("recent_speed", recentSpeed*3.6)
-					.buildAndDispatch();
-			return true;
+		// If recentSpeed is above lower bounds then only enter the check.
+		if (recentSpeed > Config.USAIN_BOLT_RECENT_SPEED_LOWER_BOUND){
+			if (ActivityDetector.getInstance().isIsInVehicle()){
+				Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
+				AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+						.addBundle(workoutService.getWorkoutBundle())
+						.put("detected_by", "activity_recognition")
+						.put("recent_speed", recentSpeed*3.6)
+						.buildAndDispatch();
+				return true;
+			}
+			return tooFastSecondaryCheck();
 		}
-
-		return tooFastSecondaryCheck();
-
+		return false;
 	}
 
 	private boolean tooFastSecondaryCheck(){

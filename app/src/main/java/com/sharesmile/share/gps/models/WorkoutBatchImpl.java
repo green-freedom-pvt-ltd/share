@@ -50,7 +50,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	public void addRecord(DistRecord record) {
 		addDistance(record.getDist());
 		points.add(new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude()));
-		lastRecordAddedTs = record.getLocation().getTime();
+		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 
 	@Override
