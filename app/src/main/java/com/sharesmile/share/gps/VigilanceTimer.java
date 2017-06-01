@@ -153,7 +153,10 @@ public class VigilanceTimer implements Runnable {
 			if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
 				// Distance is above the threshold minimum to apply Usain Bolt Filter
 				float speedInSession = distanceInSession / timeElapsedInSecs;
-				if (speedInSession > Config.UPPER_SPEED_LIMIT){
+				float upperSpeedLimit = ActivityDetector.getInstance().isOnFoot()
+						? Config.USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT : Config.USAIN_BOLT_UPPER_SPEED_LIMIT;
+				// Speed limit is greater for ON_FOOT cases to reduces Usain Bolt false positive occurrences
+				if (speedInSession > upperSpeedLimit){
 					// Running faster than Usain Bolt
 					Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
 

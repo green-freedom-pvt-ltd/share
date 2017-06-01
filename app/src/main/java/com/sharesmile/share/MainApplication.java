@@ -74,7 +74,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     private boolean isModelShown = false;
     private int visibleActiviesCount = 0;
     private DbWrapper mDbWrapper;
-    private String mToken;
 
     private AppLifecycleHelper lifecycleHelper;
 
@@ -379,10 +378,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public String getToken() {
-        if (mToken == null) {
-            mToken = SharedPrefsManager.getInstance().getString(Constants.PREF_AUTH_TOKEN);
-        }
-        return mToken;
+        return SharedPrefsManager.getInstance().getString(Constants.PREF_AUTH_TOKEN);
     }
 
     public int getUserID() {

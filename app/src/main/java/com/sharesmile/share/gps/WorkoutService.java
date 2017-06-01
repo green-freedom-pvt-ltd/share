@@ -125,7 +125,9 @@ public class WorkoutService extends Service implements
             acceptedLocationFix = null;
             beginningLocationsRotatingQueue = null;
         }
-        vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
+        if (vigilanceTimer == null){
+            vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
+        }
         mDistance = tracker.getTotalDistanceCovered();
         makeForegroundAndSticky();
     }

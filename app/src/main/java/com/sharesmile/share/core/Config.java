@@ -23,7 +23,9 @@ public class Config {
 
     public static final float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 7f; // in m/s, i.e. 25.2 km/hr
 
-    public static final float UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
+    public static final float USAIN_BOLT_UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
+
+    public static final float USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT = 12.5f; // in m/s, i.e. 45 km/hr
 
     public static final float UPPER_SPEED_LIMIT_WITH_ACTIVITY_DETECTION = 4.1f; // in m/s, i.e. 14.8 km/hr
 

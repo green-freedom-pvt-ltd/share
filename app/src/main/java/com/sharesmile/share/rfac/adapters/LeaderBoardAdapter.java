@@ -102,10 +102,6 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
             String firstName = leaderboard.getFirst_name().substring(0, 1).toUpperCase() + leaderboard.getFirst_name().substring(1);
             String name = firstName;
-            if (!TextUtils.isEmpty(leaderboard.getLast_name())) {
-                String lastName = leaderboard.getLast_name().substring(0, 1).toUpperCase() + leaderboard.getLast_name().substring(1);
-                name = firstName + ' ' + lastName;
-            }
             mProfileName.setText(name);
             String last_Week_Distance = String.format("%.2f", leaderboard.getLast_week_distance());
             mlastWeekDistance.setText(last_Week_Distance + " Km");
