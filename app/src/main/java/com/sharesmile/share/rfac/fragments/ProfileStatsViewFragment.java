@@ -105,9 +105,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (position == POSITION_WEEKLY){
-            // TODO: Setting Al time stats as we will have only one stats page
             setUpAllTimeStats();
-//            setUpWeeklyStats();
         }else if (position == POSITION_ALL_TIME){
             setUpAllTimeStats();
         }

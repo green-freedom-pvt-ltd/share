@@ -120,7 +120,6 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
     }
 
     private Workout getWorkoutData(Run run) {
-        // TODO: Store start and end timestamp
         Workout workout = new Workout(run.getId()); //
         workout.setWorkoutId(run.getClientRunId()); //
         workout.setSteps(Math.round(run.getNumSteps()));

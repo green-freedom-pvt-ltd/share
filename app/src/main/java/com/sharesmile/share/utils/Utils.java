@@ -396,7 +396,6 @@ public class Utils {
     public static double getDeltaCaloriesMets(long deltaTimeMillis, float deltaSpeed){
         double mets = getMetsValue(deltaSpeed);
         float bodyWeightKgs = MainApplication.getInstance().getBodyWeight();
-        // TODO: CaloriesCalculation Put a check for 0 bodyweight over here
         return mets * bodyWeightKgs * ( ((double)(deltaTimeMillis)) / (1000*60*60) );
     }
 

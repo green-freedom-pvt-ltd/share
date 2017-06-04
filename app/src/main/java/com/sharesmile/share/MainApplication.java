@@ -40,7 +40,6 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Utils;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
@@ -287,9 +286,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         checkForFirstLaunchAfterInstall();
 
         causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
-
-        //TODO: Temporarily added to test, will remove
-        Utils.updateTrackRecordFromDb();
 
     }
 
