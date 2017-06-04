@@ -97,7 +97,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="23"
-                    android:paddingTop="10dp">
+                    android:paddingTop="5dp">
 
                     <com.sharesmile.share.views.MRTextView
                         android:id="@+id/amount_raised_rupees"
@@ -122,7 +122,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="14"
-                    android:paddingTop="5dp">
+                    android:paddingTop="6dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
