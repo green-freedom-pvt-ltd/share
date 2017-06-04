@@ -35,11 +35,11 @@ public class Config {
 
     public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
 
-    public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.4f;
+    public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.27f;
 
     public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
 
-    public static long VIGILANCE_TIMER_INTERVAL = 20000; // in millisecs
+    public static long VIGILANCE_TIMER_INTERVAL = 17000; // in millisecs
 
     public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
 
@@ -57,7 +57,7 @@ public class Config {
 
     public static boolean USAIN_BOLT_CHECK = true;
 
-    public static long GPS_INACTIVITY_NOTIFICATION_DELAY = 55000; // in Millisecs
+    public static long GPS_INACTIVITY_NOTIFICATION_DELAY = 50000; // in Millisecs
 
     // Activity Detector Config
 
@@ -74,7 +74,7 @@ public class Config {
 
     public static final long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
 
-    public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 20000; // in millisecs
+    public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
 
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
     public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs

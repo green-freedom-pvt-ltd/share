@@ -39,7 +39,7 @@ public class RunTracker implements Tracker {
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
-            recordHistoryQueue = new CircularQueue<>(6);
+            recordHistoryQueue = new CircularQueue<>(8);
             if (isActive()){
                 dataStore = WorkoutSingleton.getInstance().getDataStore();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);

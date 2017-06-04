@@ -86,7 +86,7 @@ public class GoogleFitStepCounter implements StepCounter,
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        if (status.isSuccess()) {
+                        if (status.isSuccess() && mApiClient.isConnected()) {
                             mApiClient.disconnect();
                         }
                     }

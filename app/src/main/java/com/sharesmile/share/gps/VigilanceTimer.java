@@ -132,12 +132,12 @@ public class VigilanceTimer implements Runnable {
 						.buildAndDispatch();
 				return true;
 			}
-			return tooFastSecondaryCheck();
+			return tooFastSecondaryCheck(recentSpeed);
 		}
 		return false;
 	}
 
-	private boolean tooFastSecondaryCheck(){
+	private boolean tooFastSecondaryCheck(float recentSpeed){
 
 		float currentRecordedTime = workoutService.getTracker().getRecordedTimeInSecs();
 		float currentDistanceCovered = workoutService.getTotalDistanceCoveredInMeters();
@@ -155,8 +155,10 @@ public class VigilanceTimer implements Runnable {
 				float speedInSession = distanceInSession / timeElapsedInSecs;
 				float upperSpeedLimit = ActivityDetector.getInstance().isOnFoot()
 						? Config.USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT : Config.USAIN_BOLT_UPPER_SPEED_LIMIT;
+				float ratio = ((float) Config.VIGILANCE_TIMER_INTERVAL) / Config.CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL;
+				float recentSpeedFactor = ratio + (1-ratio)*0.25f;
 				// Speed limit is greater for ON_FOOT cases to reduces Usain Bolt false positive occurrences
-				if (speedInSession > upperSpeedLimit){
+				if ( (speedInSession > upperSpeedLimit) && (recentSpeed > upperSpeedLimit*recentSpeedFactor) ){
 					// Running faster than Usain Bolt
 					Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
 
@@ -176,12 +178,14 @@ public class VigilanceTimer implements Runnable {
 							+ " expectedNumOfSteps = " + expectedNumOfSteps + ", but actual number of steps are "
 							+ stepsInSession);
 
-					if ( ( (float) stepsInSession / (float) expectedNumOfSteps) < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
+					float stepsRatio = ( (float) stepsInSession / (float) expectedNumOfSteps);
+					if (stepsRatio < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
 						AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 								.addBundle(workoutService.getWorkoutBundle())
 								.put("detected_by", "speed_logic")
 								.put("speed_in_session", speedInSession*3.6)
-								.put("recent_speed", workoutService.getCurrentSpeed()*3.6)
+								.put("recent_speed", recentSpeed*3.6)
+								.put("steps_ratio", stepsRatio)
 								.buildAndDispatch();
 						return true;
 					}

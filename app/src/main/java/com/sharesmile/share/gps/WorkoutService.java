@@ -59,6 +59,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
@@ -90,7 +91,6 @@ public class WorkoutService extends Service implements
     private ScheduledExecutorService backgroundExecutorService;
 
     private Tracker tracker;
-    private float mDistance;
     private CauseData mCauseData;
     private Handler handler;
 
@@ -128,7 +128,6 @@ public class WorkoutService extends Service implements
         if (vigilanceTimer == null){
             vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         }
-        mDistance = tracker.getTotalDistanceCovered();
         makeForegroundAndSticky();
     }
 
@@ -479,7 +478,7 @@ public class WorkoutService extends Service implements
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if ((isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() >= Config.MIN_CADENCE_FOR_WALK)
+            if ((isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)
                         || ActivityDetector.getInstance().isOnFoot()){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
@@ -567,7 +566,6 @@ public class WorkoutService extends Service implements
                 Constants.BROADCAST_WORKOUT_UPDATE_CODE);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_SPEED, deltaSpeed);
         bundle.putFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE, totalDistance);
-        mDistance = totalDistance;
         bundle.putInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS, tracker.getElapsedTimeInSecs());
         sendBroadcast(bundle);
         updateStickyNotification();
@@ -850,7 +848,7 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
-        String distDecimal = Utils.formatToKmsWithTwoDecimal(mDistance);
+        String distDecimal = Utils.formatToKmsWithTwoDecimal(getTotalDistanceCoveredInMeters());
         float fDistance = Float.parseFloat(distDecimal);
         int rupees = Math.round(mCauseData.getConversionRate() * fDistance);
 
@@ -931,7 +929,8 @@ public class WorkoutService extends Service implements
             // GoogleLocationTracker has not sent GPS fix since a long time, need to notify the user about it
             // But will do it only when user is on the move
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
-            if ( stepCounter.getMovingAverageOfStepsPerSec() > 1 || ActivityDetector.getInstance().isOnFoot() ){
+            if ( stepCounter.getMovingAverageOfStepsPerSec() > MIN_CADENCE_FOR_WALK
+                    || ActivityDetector.getInstance().isOnFoot() ){
                 MainApplication.showRunNotification(
                         getString(R.string.notification_gps_inactivity_title),
                         WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
@@ -939,6 +938,8 @@ public class WorkoutService extends Service implements
                         getString(R.string.notification_action_pause),
                         getString(R.string.notification_action_stop)
                 );
+                AnalyticsEvent.create(Event.DISP_GPS_NOT_ACTIVE_NOTIF)
+                        .buildAndDispatch();
             }
         }
     };

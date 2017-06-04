@@ -189,7 +189,7 @@ public class RealRunFragment extends RunFragment {
             Crashlytics.log(message);
             nfe.printStackTrace();
         }
-        if (distanceCoveredMeters - distanceOnDisplay >= 40){
+        if (distanceCoveredMeters < distanceOnDisplay || distanceCoveredMeters - distanceOnDisplay >= 40){
             // Only when the delta is greater than 0.04 km we show the update
             String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
             distanceTextView.setText(distanceString);
