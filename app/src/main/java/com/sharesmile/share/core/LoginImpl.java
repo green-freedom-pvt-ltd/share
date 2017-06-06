@@ -152,7 +152,7 @@ public class LoginImpl {
                     Logger.d("facebook", "Error");
                     error.printStackTrace();
                     MainApplication.getInstance().showToast(R.string.login_error);
-                    sendLoginFailureEvent(error.getMessage(), true);
+                    sendLoginFailureEvent(-1, error.getMessage(), true);
                 }
             });
         }
@@ -178,7 +178,7 @@ public class LoginImpl {
                         mListener.showHideProgress(false, null);
                     }
                 });
-                sendLoginFailureEvent("", isFbLogin);
+                sendLoginFailureEvent(-1, "Request Failed", isFbLogin);
             }
 
             @Override
@@ -194,7 +194,7 @@ public class LoginImpl {
                             mListener.showHideProgress(false, null);
                         }
                     });
-                    sendLoginFailureEvent(responseString, isFbLogin);
+                    sendLoginFailureEvent(response.code(), responseString, isFbLogin);
                     return;
                 }
 
@@ -212,10 +212,12 @@ public class LoginImpl {
 
     }
 
-    private void sendLoginFailureEvent(String optionalErrorMessage, final boolean isFbLogin){
+    private void sendLoginFailureEvent(int responseCode, String optionalErrorMessage,
+                                       final boolean isFbLogin){
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_FAILED)
                 .put("error", optionalErrorMessage)
+                .put("response_code", responseCode)
                 .put("medium", medium)
                 .buildAndDispatch();
     }
@@ -303,7 +305,8 @@ public class LoginImpl {
         } else {
             Logger.d(TAG, "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
-            sendLoginFailureEvent("", false);
+            sendLoginFailureEvent(result.getStatus().getStatusCode(),
+                    result.getStatus().getStatusMessage(), false);
         }
     }
 
@@ -336,7 +339,7 @@ public class LoginImpl {
                                 MainApplication.getInstance().showToast(R.string.login_error);
                             }
                         });
-                        sendLoginFailureEvent(ne.getMessage(), false);
+                        sendLoginFailureEvent(ne.getHttpStatusCode(), ne.getMessage(), false);
                     }
 
 

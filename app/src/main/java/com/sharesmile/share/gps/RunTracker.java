@@ -351,6 +351,7 @@ public class RunTracker implements Tracker {
                                 .put("threshold_applied", thresholdApplied)
                                 .put("steps_per_sec_moving_average", listener.getMovingAverageOfStepsPerSec())
                                 .put("is_secondary_check", true)
+                                .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
                                 .buildAndDispatch();
                     }else {
                         /*

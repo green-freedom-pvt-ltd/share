@@ -400,6 +400,7 @@ public class Utils {
     }
 
     public static double getMetsValue(float deltaSpeed){
+        // deltaSpeed is in m/s
         double mph = 2.23694*deltaSpeed;
 
         // Referring Compendium of Physical Activities over here
@@ -621,7 +622,7 @@ public class Utils {
         long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE); // in Kms
         long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT); // in secs
 
-        if (lifetimeDistance == 0 || lifetimeWorkingOut == 0){
+        if (lifetimeDistance <= 0 || lifetimeWorkingOut <= 0){
             return 0;
         }
         float lifeTimeHours = ((float) lifetimeWorkingOut) / 3600;
@@ -632,7 +633,7 @@ public class Utils {
         long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
         long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT);
 
-        if (lifetimeSteps == 0 || lifetimeWorkingOut == 0){
+        if (lifetimeSteps <= 0 || lifetimeWorkingOut <= 0){
             return 0;
         }
         return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);

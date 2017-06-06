@@ -129,6 +129,7 @@ public class VigilanceTimer implements Runnable {
 						.addBundle(workoutService.getWorkoutBundle())
 						.put("detected_by", "activity_recognition")
 						.put("recent_speed", recentSpeed*3.6)
+						.put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
 						.buildAndDispatch();
 				return true;
 			}
@@ -150,35 +151,30 @@ public class VigilanceTimer implements Runnable {
 			Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
 					+ ", timeElapsedInSecs = " + timeElapsedInSecs
 					+ ", total distanceCovered = " +  workoutService.getTracker().getTotalDistanceCovered());
+
+			float speedInSession = distanceInSession / timeElapsedInSecs;
+
+			float averageStrideLength = (Utils.getAverageStrideLength() == 0)
+					? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
+			// Normalising averageStrideLength obtained
+			if (averageStrideLength < 0.3f){
+				averageStrideLength = 0.3f;
+			}
+			if (averageStrideLength > 1f){
+				averageStrideLength = 1f;
+			}
+			int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
+			float stepsRatio = ( (float) stepsInSession / (float) expectedNumOfSteps);
+
 			if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
 				// Distance is above the threshold minimum to apply Usain Bolt Filter
-				float speedInSession = distanceInSession / timeElapsedInSecs;
 				float upperSpeedLimit = ActivityDetector.getInstance().isOnFoot()
 						? Config.USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT : Config.USAIN_BOLT_UPPER_SPEED_LIMIT;
-				float ratio = ((float) Config.VIGILANCE_TIMER_INTERVAL) / Config.CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL;
+				float ratio = ((float) Config.VIGILANCE_TIMER_INTERVAL) / ((float) Config.CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL);
 				float recentSpeedFactor = ratio + (1-ratio)*0.25f;
 				// Speed limit is greater for ON_FOOT cases to reduces Usain Bolt false positive occurrences
 				if ( (speedInSession > upperSpeedLimit) && (recentSpeed > upperSpeedLimit*recentSpeedFactor) ){
 					// Running faster than Usain Bolt
-					Logger.d(TAG, "Speed " + speedInSession + " m/s is too fast, will check if runner covered sufficient steps");
-
-					float averageStrideLength = (Utils.getAverageStrideLength() == 0)
-							? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
-
-					// Normalising averageStrideLength obtained
-					if (averageStrideLength < 0.25f){
-						averageStrideLength = 0.25f;
-					}
-					if (averageStrideLength > 1f){
-						averageStrideLength = 1f;
-					}
-
-					int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
-					Logger.d(TAG, "averageStrideLength = " + averageStrideLength + " meters hence "
-							+ " expectedNumOfSteps = " + expectedNumOfSteps + ", but actual number of steps are "
-							+ stepsInSession);
-
-					float stepsRatio = ( (float) stepsInSession / (float) expectedNumOfSteps);
 					if (stepsRatio < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
 						AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
 								.addBundle(workoutService.getWorkoutBundle())
@@ -186,6 +182,7 @@ public class VigilanceTimer implements Runnable {
 								.put("speed_in_session", speedInSession*3.6)
 								.put("recent_speed", recentSpeed*3.6)
 								.put("steps_ratio", stepsRatio)
+								.put("activity", ActivityDetector.getInstance().getCurrentActivity())
 								.buildAndDispatch();
 						return true;
 					}
@@ -193,6 +190,16 @@ public class VigilanceTimer implements Runnable {
 				lastValidatedRecordedTimeInSecs = currentRecordedTime;
 				lastValidatedDistance = currentDistanceCovered;
 				lastValidatedNumSteps = currentNumSteps;
+			}
+			if (speedInSession > Config.USAIN_BOLT_UPPER_SPEED_LIMIT){
+				// Potential Usain Bolt Which was missed
+				AnalyticsEvent.create(Event.ON_POTENTIAL_USAIN_BOLT_MISSED)
+						.addBundle(workoutService.getWorkoutBundle())
+						.put("speed_in_session", speedInSession*3.6)
+						.put("recent_speed", recentSpeed*3.6)
+						.put("steps_ratio", stepsRatio)
+						.put("activity", ActivityDetector.getInstance().getCurrentActivity())
+						.buildAndDispatch();
 			}
 		}
 		return false;

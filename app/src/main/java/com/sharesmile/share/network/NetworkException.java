@@ -80,4 +80,13 @@ public class NetworkException extends Exception {
         }
     }
 
+    @Override
+    public String toString() {
+        return "NetworkException{" +
+                "errorMessage='" + errorMessage + '\'' +
+                ", failureType=" + failureType +
+                ", httpStatusCode=" + httpStatusCode +
+                ", messageFromServer='" + messageFromServer + '\'' +
+                '}';
+    }
 }

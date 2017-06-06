@@ -266,6 +266,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         CleverTapAPI.setDebugLevel(1277182231);
         ActivityLifecycleCallback.register(this);
         super.onCreate();
+
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
 

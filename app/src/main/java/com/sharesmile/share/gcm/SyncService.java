@@ -103,7 +103,7 @@ public class SyncService extends GcmTaskService {
             // Notify LeaderBoardFragment about it
             EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true));
         } catch (NetworkException e) {
-            Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data from network: " + e.getMessage());
+            Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data from network: " + e);
             e.printStackTrace();
             result = GcmNetworkManager.RESULT_FAILURE;
         }
@@ -120,7 +120,7 @@ public class SyncService extends GcmTaskService {
                 // Notify LeaderBoardFragment about it
                 EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
             } catch (NetworkException e) {
-                Logger.e(TAG, "Exception occurred while syncing LeagueBoard data from network: " + e.getMessage());
+                Logger.e(TAG, "Exception occurred while syncing LeagueBoard data from network: " + e);
                 e.printStackTrace();
                 result = GcmNetworkManager.RESULT_FAILURE;
             }
@@ -139,7 +139,7 @@ public class SyncService extends GcmTaskService {
                     EventBus.getDefault().post(new TeamLeaderBoardDataFetched(leagueTeamId, true, myTeamLeaderBoard));
                 }
             } catch (NetworkException e) {
-                Logger.e(TAG, "Exception occurred while syncing MyTeamLeaderBoardData from network: " + e.getMessage());
+                Logger.e(TAG, "Exception occurred while syncing MyTeamLeaderBoardData from network: " + e);
                 e.printStackTrace();
                 result = GcmNetworkManager.RESULT_FAILURE;
             }
@@ -215,9 +215,7 @@ public class SyncService extends GcmTaskService {
             }
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException while syncing runs with URL: "+syncUrl+"," +
-                    " messageFromServer " + e.getMessageFromServer()
-                    + " exceptionMessage: " + e.getMessage());
+            Logger.d(TAG, "NetworkException while syncing runs with URL: "+syncUrl+", Exception: " + e);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
     }
@@ -254,11 +252,11 @@ public class SyncService extends GcmTaskService {
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }catch (NetworkException ne){
             ne.printStackTrace();
-            Logger.d(TAG, "NetworkException: " + ne.getMessageFromServer());
+            Logger.d(TAG, "NetworkException: " + ne);
             String log= "Couldn't post fraudData to URL: " + Urls.getFraudstersUrl() + ", FraudData: " + fraudDataString;
             Logger.e(TAG, log);
             Crashlytics.log(log);
-            Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne.getMessageFromServer());
+            Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne);
             Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
@@ -296,7 +294,7 @@ public class SyncService extends GcmTaskService {
 
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException" + e.getMessageFromServer());
+            Logger.d(TAG, "NetworkException" + e);
             return GcmNetworkManager.RESULT_FAILURE;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -380,8 +378,8 @@ public class SyncService extends GcmTaskService {
 
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException: " + e.getMessageFromServer());
-            Crashlytics.log("Run sync networkException, messageFromServer: " + e.getMessageFromServer());
+            Logger.d(TAG, "NetworkException: " + e);
+            Crashlytics.log("Run sync networkException, messageFromServer: " + e);
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "failure")
@@ -445,8 +443,7 @@ public class SyncService extends GcmTaskService {
                 return GcmNetworkManager.RESULT_SUCCESS;
             }
         } catch (NetworkException e) {
-            Logger.d(TAG, "NetworkException while force refreshing all workoutData from server, " +
-                    "messageFromServer " + e.getMessageFromServer() + " exceptionMessage: " + e.getMessage());
+            Logger.d(TAG, "NetworkException while force refreshing all workoutData from server: " + e);
             e.printStackTrace();
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }

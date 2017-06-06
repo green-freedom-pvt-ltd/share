@@ -68,6 +68,7 @@ public class Config {
     public static final int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 60;
     public static final long ACTIVITY_VALID_INTERVAL_IDLE = 35000; // in millisecs
     public static final long ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL = 30000; // in millisecs
+    public static final long ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE = 40000; // in millisecs
     public static final long ACTIVITY_VALID_INTERVAL_ACTIVE = 15000; // in millisecs
     public static final long DETECTED_INTERVAL_IDLE = 10000; // in millisecs
     public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs

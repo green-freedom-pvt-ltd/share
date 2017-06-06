@@ -26,8 +26,6 @@ import java.util.Map;
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
 
-import static com.sharesmile.share.R.string.team;
-
 /**
  * Created by ankitmaheshwari on 5/12/17.
  */
@@ -205,7 +203,7 @@ public class LeaderBoardDataStore {
         NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
-                Logger.e(TAG, "Couldn't fetch LeagueBoard data: " + ne.getMessage());
+                Logger.e(TAG, "Couldn't fetch LeagueBoard data: " + ne);
                 ne.printStackTrace();
                 EventBus.getDefault().post(new LeagueBoardDataUpdated(false));
             }
@@ -223,7 +221,7 @@ public class LeaderBoardDataStore {
         NetworkDataProvider.doGetCallAsync(Urls.getLeaderboardUrl(), new NetworkAsyncCallback<LeaderBoardList>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
-                Logger.e(TAG, "Couldn't fetch GlobalLeaderBoard data: " + ne.getMessage());
+                Logger.e(TAG, "Couldn't fetch GlobalLeaderBoard data: " + ne);
                 ne.printStackTrace();
                 EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(false));
             }
@@ -245,7 +243,7 @@ public class LeaderBoardDataStore {
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 Logger.e(TAG, "Couldn't fetch TeamLeaderBoardData for teamId: "+teamId+", because: "
-                        + ne.getMessage());
+                        + ne);
                 ne.printStackTrace();
                 EventBus.getDefault().post(new TeamLeaderBoardDataFetched(teamId, false, null));
             }

@@ -28,6 +28,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
+import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.CONFIDENCE_LOWER_THRESHOLD_STILL;
@@ -61,6 +62,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private float runningConfidenceRecentAvg;
     private float walkingConfidenceRecentAvg;
     private float onFootConfidenceRecentAvg;
+    private long timeCoveredByHistoryQueue;
 
     private boolean isWorkoutActive;
 
@@ -230,6 +232,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     appContext.getString(R.string.notification_action_stop)
             );
             AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
+                    .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
                     .buildAndDispatch();
             handler.removeCallbacks(handleStillNotificationRunnable);
             stillNotificationOccurredCounter = 1;
@@ -271,6 +274,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     );
                     isWalkEngagementNotificationOnDisplay = true;
                     AnalyticsEvent.create(Event.DISP_WALK_ENGAGEMENT_NOTIF)
+                            .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
                             .buildAndDispatch();
                 }
                 timeOnFootContinuously = 0;
@@ -285,6 +289,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             runningConfidenceRecentAvg = 0;
             walkingConfidenceRecentAvg = 0;
             onFootConfidenceRecentAvg = 0;
+            timeCoveredByHistoryQueue = 0;
             handler.removeCallbacks(resetConfidenceValuesRunnable);
         }
     };
@@ -328,9 +333,13 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             synchronized (historyQueue){
                 while (i >= 0){
                     ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
-                    if (currentTime - elem.getTime() > validInterval){
+                    long timeDiff = currentTime - elem.getTime();
+                    if (timeDiff > validInterval){
                         // This is elem is way too old to be considered
                         break;
+                    }
+                    if (timeDiff > timeCoveredByHistoryQueue){
+                        timeCoveredByHistoryQueue = timeDiff;
                     }
                     cumulativeVehicleConfidence += elem.getActivityConfidence(DetectedActivity.IN_VEHICLE);
                     cumulativeOnFootConfidence += elem.getActivityConfidence(DetectedActivity.ON_FOOT);
@@ -346,9 +355,12 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             runningConfidenceRecentAvg = cumulativeRunningConfidence / count;
             walkingConfidenceRecentAvg = cumulativeWalkingConfidence / count;
             onFootConfidenceRecentAvg = cumulativeOnFootConfidence / count;
+
             handler.removeCallbacks(resetConfidenceValuesRunnable);
             // Resetting these confidence values back to 0, if we don't receive activity recognition updates for sufficiently long period
-            handler.postDelayed(resetConfidenceValuesRunnable, ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL);
+            long resetInterval = isWorkoutActive() ? ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL
+                    : ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
+            handler.postDelayed(resetConfidenceValuesRunnable, resetInterval);
 
             Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
                     + avgVehilceConfidence + ", Foot: " + onFootConfidenceRecentAvg + ", Still: " + avgStillConfidence);
@@ -397,6 +409,10 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         return onFootConfidenceRecentAvg;
     }
 
+    public int getTimeCoveredByHistoryQueueInSecs(){
+        return (int) (timeCoveredByHistoryQueue / 1000);
+    }
+
     public boolean isIsInVehicle(){
         return isInVehicle;
     }
@@ -404,6 +420,19 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     public boolean isOnFoot(){
         return isOnFoot;
     }
+
+    public String getCurrentActivity(){
+        if (isInVehicle){
+            return "in_vehicle";
+        }else if (isOnFoot){
+            return "on_foot";
+        }else if (isStill){
+            return "still";
+        }else {
+            return "not_known";
+        }
+    }
+
 
     public boolean isStill(){
         return isStill;

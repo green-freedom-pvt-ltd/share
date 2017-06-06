@@ -478,7 +478,8 @@ public class WorkoutService extends Service implements
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if ((isCurrentlyProcessingSteps() && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)
+            if ((isCurrentlyProcessingSteps()
+                    && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)
                         || ActivityDetector.getInstance().isOnFoot()){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
@@ -503,6 +504,7 @@ public class WorkoutService extends Service implements
                     .put("threshold_applied", thresholdApplied)
                     .put("steps_per_sec_moving_average", stepCounter.getMovingAverageOfStepsPerSec())
                     .put("is_secondary_check", false)
+                    .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
                     .buildAndDispatch();
             return true;
         }else {
@@ -579,6 +581,7 @@ public class WorkoutService extends Service implements
                     .put("delta_time", deltaTime) // in secs
                     .put("delta_speed", deltaSpeed) // in km/hrs
                     .put("delta_calories", deltaCalories) // in Cals
+                    .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
@@ -939,6 +942,7 @@ public class WorkoutService extends Service implements
                         getString(R.string.notification_action_stop)
                 );
                 AnalyticsEvent.create(Event.DISP_GPS_NOT_ACTIVE_NOTIF)
+                        .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
                         .buildAndDispatch();
             }
         }
