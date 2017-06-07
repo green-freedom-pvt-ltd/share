@@ -62,7 +62,7 @@ public class StartRunFragment extends BaseFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_start_run, null);
         ButterKnife.bind(this,v);
@@ -87,9 +87,9 @@ public class StartRunFragment extends BaseFragment {
 
             public void onFinish() {
                 proceedToRunProgress();
+                cancel();
             }
         };
-
 
         Count.start();
 

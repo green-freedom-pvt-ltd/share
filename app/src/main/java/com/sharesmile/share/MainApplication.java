@@ -68,7 +68,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     private static final String TAG = "MainApplication";
 
     private static MainApplication instance;
-    private static Handler sMainThreadHandler;
     public static final long MINUTE_INTEVAL = 60000;
     private boolean isModelShown = false;
     private int visibleActiviesCount = 0;
@@ -217,12 +216,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
      * @return a {@link Handler} tied to the main thread.
      */
     public static Handler getMainThreadHandler() {
-        if (sMainThreadHandler == null) {
-            // No need to synchronize -- it's okay to create an extra Handler,
-            // which will be used only once and then thrown away.
-            sMainThreadHandler = new Handler(Looper.getMainLooper());
-        }
-        return sMainThreadHandler;
+        return new Handler(Looper.getMainLooper());
     }
 
     /**
