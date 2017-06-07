@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -20,6 +21,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
+import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
@@ -41,6 +43,7 @@ import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
 import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_COUNTER_INTERVAL;
 import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_NOTIFICATION_INTERVAL;
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
@@ -50,7 +53,7 @@ import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIF
  */
 
 public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener, GoogleLocationTracker.SilentListener{
 
     private static final String TAG = "ActivityDetector";
 
@@ -144,6 +147,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         if (!isWorkoutActive()){
             startWalkEngagementDetectionCounter();
         }
+        GoogleLocationTracker.getInstance().silentRegister(this);
     }
 
     public void workoutActive(){
@@ -476,5 +480,16 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             // Connection Failure, notify listeners
 
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Logger.d(TAG, "onLocationChanged");
+        // Check GPS speed over here
+        if (!SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_GPS_UPDATES, true)){
+            // GPS updates are enabled
+            MainApplication.showToast("GPS Speed: " + location.getSpeed()*3.6);
+        }
+
     }
 }

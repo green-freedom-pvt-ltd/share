@@ -62,6 +62,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     private State state;
     private Handler handler;
     Set<WeakReference<Listener>> listeners;
+    Set<WeakReference<SilentListener>> silentListeners;
     private LocationManager locationManager;
     private int numSatellitesConnected;
 
@@ -69,6 +70,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         this.appContext = appContext;
         this.handler = new Handler();
         this.listeners = new HashSet<>();
+        this.silentListeners = new HashSet<>();
         if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
@@ -127,7 +129,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         Logger.i(TAG, "register");
         if (listener != null){
             boolean toAdd = true;
-            for (WeakReference<Listener> reference : listeners){
+            for (WeakReference<Listener> reference : listeners) {
                 if (listener.equals(reference.get())){
                     toAdd = false;
                 }
@@ -144,6 +146,23 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             }
             if (state != State.FETCHING_LOCATION){
                 startLocationTracking(true);
+            }
+        }
+    }
+
+    public void silentRegister(SilentListener silentListener){
+        if (silentListener != null){
+            boolean toAdd = true;
+            for (WeakReference<SilentListener> reference : silentListeners){
+                if (silentListener.equals(reference.get())){
+                    toAdd = false;
+                }
+            }
+            if (toAdd){
+                WeakReference<SilentListener> reference = new WeakReference<>(silentListener);
+                synchronized (GoogleLocationTracker.class){
+                    this.silentListeners.add(reference);
+                }
             }
         }
     }
@@ -460,6 +479,13 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     reference.get().onLocationChanged(location);
                 }
             }
+            Iterator<WeakReference<SilentListener>> sIterator = silentListeners.iterator();
+            while (sIterator.hasNext()){
+                WeakReference<SilentListener> reference = sIterator.next();
+                if (reference.get() != null){
+                    reference.get().onLocationChanged(location);
+                }
+            }
         }
     }
 
@@ -578,6 +604,10 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         void onConnectionFailure();
         void onGpsEnabled();
         void onGpsDisabled();
+    }
+
+    public interface SilentListener{
+        void onLocationChanged(Location location);
     }
 
     public enum State{

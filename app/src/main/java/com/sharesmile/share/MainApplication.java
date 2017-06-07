@@ -40,6 +40,8 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
@@ -255,11 +257,26 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }, timeInMillis);
     }
 
+    public static RefWatcher getRefWatcher(Context context) {
+        MainApplication application = (MainApplication) context.getApplicationContext();
+        return application.refWatcher;
+    }
+
+    private RefWatcher refWatcher;
+
     @Override
     public void onCreate() {
         CleverTapAPI.setDebugLevel(1277182231);
         ActivityLifecycleCallback.register(this);
+
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        refWatcher = LeakCanary.install(this);
+        // Normal app init code...
 
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());

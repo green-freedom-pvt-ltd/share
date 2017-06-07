@@ -49,6 +49,7 @@ import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
+import com.squareup.leakcanary.RefWatcher;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -295,6 +296,8 @@ public class WorkoutService extends Service implements
         backgroundExecutorService = null;
         stopForeground(true);
         EventBus.getDefault().unregister(this);
+        RefWatcher refWatcher = MainApplication.getRefWatcher(getApplicationContext());
+        refWatcher.watch(this);
     }
 
     final IBinder mBinder = new MyBinder();

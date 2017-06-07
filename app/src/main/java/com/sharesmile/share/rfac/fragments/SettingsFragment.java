@@ -26,6 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 
 
 /**
@@ -50,6 +51,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     @BindView(R.id.notif_toggle)
     Switch notifToggle;
 
+    @BindView(R.id.gps_speed_updates)
+    Switch gpsSpeedUpdates;
+
     private FragmentInterface mListener;
 
     @Nullable
@@ -63,10 +67,16 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mRate.setOnClickListener(this);
         mLogout.setOnClickListener(this);
         notifToggle.setOnCheckedChangeListener(this);
+        gpsSpeedUpdates.setOnCheckedChangeListener(this);
         if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
             notifToggle.setChecked(false);
         }else {
             notifToggle.setChecked(true);
+        }
+        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_GPS_UPDATES, true)){
+            gpsSpeedUpdates.setChecked(false);
+        }else {
+            gpsSpeedUpdates.setChecked(true);
         }
         getFragmentController().updateToolBar(getString(R.string.action_settings), true);
         String version = "";
@@ -141,12 +151,25 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked){
-            // Enabled Alerts and Reminders
-            SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
-        }else {
-            // Disable Alerts and Reminders
-            SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
+        switch (buttonView.getId()){
+            case R.id.gps_speed_updates:
+                if (isChecked){
+                    // Enabled GPS speed updates
+                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_GPS_UPDATES, false);
+                }else {
+                    // Disable GPS speed updates
+                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_GPS_UPDATES, true);
+                }
+                break;
+            case R.id.notif_toggle:
+                if (isChecked){
+                    // Enabled Alerts and Reminders
+                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+                }else {
+                    // Disable Alerts and Reminders
+                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
+                }
+                break;
         }
     }
 

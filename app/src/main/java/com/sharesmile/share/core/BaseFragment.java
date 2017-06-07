@@ -3,7 +3,9 @@ package com.sharesmile.share.core;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.utils.Logger;
+import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by ankitmaheshwari1 on 11/01/16.
@@ -29,6 +31,13 @@ public class BaseFragment extends Fragment {
     public void setToolbarTitle(String title){
         Logger.d(TAG, "setToolbarTitle: " + title);
         getFragmentController().updateToolBar(title, true);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        RefWatcher refWatcher = MainApplication.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 
     public boolean isAttachedToActivity(){
