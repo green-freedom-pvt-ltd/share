@@ -97,6 +97,11 @@ public class StartRunFragment extends BaseFragment {
         return v;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Count.cancel();
+    }
 
     private void proceedToRunProgress() {
         if (isAttachedToActivity()) {

@@ -11,6 +11,7 @@ import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -19,6 +20,8 @@ import com.sharesmile.share.utils.Urls;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -190,6 +193,12 @@ public class LeaderBoardDataStore {
     }
 
     public void setGlobalLeaderBoardData(LeaderBoardList globalLeaderBoard){
+        Collections.sort(globalLeaderBoard.getLeaderBoardList(), new Comparator<LeaderBoardData>() {
+            @Override
+            public int compare(LeaderBoardData o1, LeaderBoardData o2) {
+                return o1.getRank() - o2.getRank();
+            }
+        });
         this.globalLeaderBoard = globalLeaderBoard;
         SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA, globalLeaderBoard);
     }

@@ -66,13 +66,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     private View badgeIndictor;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-        mAdapter = new CausePageAdapter(getChildFragmentManager());
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         Logger.d(TAG, "onstart");
@@ -81,6 +74,8 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mAdapter = new CausePageAdapter(getChildFragmentManager());
+        EventBus.getDefault().register(this);
         View view = inflater.inflate(R.layout.fragment_cause, container, false);
         ButterKnife.bind(this, view);
         mRunButton.setOnClickListener(this);
@@ -199,10 +194,9 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroyView() {
         EventBus.getDefault().unregister(this);
-        super.onDestroy();
-
+        super.onDestroyView();
     }
 
     public void setCausedata(List<CauseData> causes) {

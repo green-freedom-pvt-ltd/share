@@ -294,7 +294,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
                 myLeaderBoard = data.getLeaderBoardDbObject();
                 isShowingMyRank = true;
             }else if (data.getRank() > 0 && data.getRank() <= 50){
-                mleaderBoardList.add(data.getRank() - 1, data.getLeaderBoardDbObject());
+                mleaderBoardList.add(data.getLeaderBoardDbObject());
             }
         }
 
