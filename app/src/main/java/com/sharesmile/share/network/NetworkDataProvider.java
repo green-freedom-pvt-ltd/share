@@ -7,6 +7,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.NameValuePair;
+import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -233,7 +234,12 @@ public class NetworkDataProvider {
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for GET request: " + url);
         try {
-            return call.execute();
+            Response response = call.execute();
+            if (response.headers().getDate("Date") != null){
+                ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
+                        (response.headers().getDate("Date").getTime());
+            }
+            return response;
         } catch (IOException e) {
             throw NetworkUtils.wrapIOException(request, e);
         }
@@ -251,7 +257,12 @@ public class NetworkDataProvider {
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for POST request: " + url + " Header " + request.headers().toString());
         try {
-            return call.execute();
+            Response response = call.execute();
+            if (response.headers().getDate("Date") != null){
+                ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
+                        (response.headers().getDate("Date").getTime());
+            }
+            return response;
         } catch (IOException ioe) {
             throw NetworkUtils.wrapIOException(request, ioe);
         }
@@ -269,7 +280,12 @@ public class NetworkDataProvider {
         Call call = getSingleOkHttpClient().newCall(request);
         Logger.d(TAG, "Url for Put request: " + url + " Header " + request.headers().toString());
         try {
-            return call.execute();
+            Response response = call.execute();
+            if (response.headers().getDate("Date") != null){
+                ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
+                        (response.headers().getDate("Date").getTime());
+            }
+            return response;
         } catch (IOException ioe) {
             throw NetworkUtils.wrapIOException(request, ioe);
         }

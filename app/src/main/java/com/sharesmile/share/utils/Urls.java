@@ -26,6 +26,7 @@ public class Urls {
     private static final String LEAGUE_URL = "/api/employeetoteam/";
     private static final String TEAMBOARD_URL = "/api/teamboard/";
     private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboard/";
+    private static final String SERVER_TIME_URL = "/api/servertime/";
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -102,6 +103,11 @@ public class Urls {
 
     public static String getLeagueUrl() {
         String url = getBaseUrl() + LEAGUE_URL;
+        return url;
+    }
+
+    public static String getServerTimeUrl() {
+        String url = getBaseUrl() + SERVER_TIME_URL;
         return url;
     }
 

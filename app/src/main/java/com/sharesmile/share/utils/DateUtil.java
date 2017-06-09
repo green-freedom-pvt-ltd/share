@@ -61,7 +61,7 @@ public class DateUtil {
     }
 
     public static long getServerTimeInMillis(){
-        return System.currentTimeMillis();
+        return ServerTimeKeeper.getServerTimeStampInMillis();
     }
 
     public static Date getDefaultFormattedDate(String dateString, String format) {

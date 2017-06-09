@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -64,6 +65,10 @@ public abstract class NetworkAsyncCallback<Wrapper extends UnObfuscable> impleme
             return;
         }
         try {
+            if (response.headers().getDate("Date") != null){
+                ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
+                        (response.headers().getDate("Date").getTime());
+            }
             final Wrapper responseObject = NetworkUtils.handleResponse(response, mWrapperClass);
             getMainThreadHandler().post(new Runnable() {
                 @Override
@@ -75,7 +80,7 @@ public abstract class NetworkAsyncCallback<Wrapper extends UnObfuscable> impleme
             getMainThreadHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    Logger.e(TAG, ne.getMessage(), ne);
+                    Logger.e(TAG, "NetworkException: " + ne.getMessage(), ne);
                     onNetworkFailure(ne);
                     if (ne.getFailureType() == FailureType.TOKEN_EXPIRED){
                         onNetworkTokenExpired(ne);
