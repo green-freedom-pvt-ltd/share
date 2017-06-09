@@ -268,7 +268,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                         break;
 
                     case Constants.BROADCAST_FIX_GOOGLE_PLAY_SERVICES_CODE:
-                        handleFixGooglePlayServiceBroadcast();;
+                        handleFixGooglePlayServiceBroadcast();
                         break;
 
                 }

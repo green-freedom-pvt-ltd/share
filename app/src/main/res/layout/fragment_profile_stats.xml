@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ll_profile_stats"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -107,7 +112,6 @@
             android:layout_weight="345">
         </android.support.v4.view.ViewPager>
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -121,15 +125,24 @@
                 app:cardCornerRadius="5dp"
                 app:cardElevation="3dp">
 
-            <com.sharesmile.share.views.MSBTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:text="SEE RUNS"
-                android:layout_gravity="center"
-                android:textColor="@color/black_57"/>
+                <com.sharesmile.share.views.MSBTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="SEE RUNS"
+                    android:layout_gravity="center"
+                    android:textColor="@color/black_57"/>
             </android.support.v7.widget.CardView>
 
         </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/profile_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+</FrameLayout>

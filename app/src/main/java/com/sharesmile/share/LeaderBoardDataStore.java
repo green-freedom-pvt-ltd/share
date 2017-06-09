@@ -155,7 +155,7 @@ public class LeaderBoardDataStore {
         if (leagueBoard != null){
             if (isLeagueActive()){
                 return true;
-            }else {
+            } else {
                 long leagueStartDateEpoch = leagueBoard.getLeagueStartDateEpoch();
                 long leagueDurationInSecs = ((long)leagueBoard.getDurationInDays())*86400;
                 long oneWeekBufferInSecs = 604800;

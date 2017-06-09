@@ -32,6 +32,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.Events.MockLocationDetected;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.Logger;
@@ -292,11 +293,12 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                         .build();
             }else if (api.isUserResolvableError(code)){
                 Logger.e(TAG, "GooglePlayServices not available, will ask the user to update Google play service");
+                MainApplication.showToast("Please update Google Play Services");
                 sendUpdateGooglePlayServicesBroadcast();
                 return;
             }else {
                 Logger.e(TAG, "GooglePlayServices not available, nothing can't be done");
-                Toast.makeText(appContext, "Unable to connect to google play services", Toast.LENGTH_SHORT);
+                MainApplication.showToast("Unable to connect to google play services");
                 return;
             }
         }
@@ -330,6 +332,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.d(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + resultCode);
         if (resultCode == Activity.RESULT_OK){
             switch (requestCode){
                 case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
@@ -581,8 +584,6 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                         count++;
                     }
                     numSatellitesConnected = count;
-                    Logger.i(TAG, "GPS_EVENT_SATELLITE_STATUS: Total number of GPS satellites connected = "
-                            + numSatellitesConnected);
                 }
                 break;
             case GpsStatus.GPS_EVENT_STARTED:

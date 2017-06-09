@@ -547,6 +547,10 @@ public class Utils {
         return result;
     }
 
+    /**
+     * Updates the overall metrics related to historical run data
+     * For e.g. lifetime_impact, lifetime_distance, etc.
+     */
     public static void updateTrackRecordFromDb(){
 
         // SQL Fiddle to refer: http://sqlfiddle.com/#!7/f0aed/1

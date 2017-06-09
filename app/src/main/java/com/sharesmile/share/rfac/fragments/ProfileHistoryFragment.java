@@ -17,11 +17,13 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -74,20 +76,28 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     public void fetchRunDataFromDb() {
         Logger.d(TAG, "fetchRunDataFromDb");
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
-        if (mWorkoutList == null || mWorkoutList.isEmpty()){
-            SyncHelper.forceRefreshEntireWorkoutHistory();
-            showProgressDialog();
-        }else {
-            Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");
-            mHistoryAdapter.setData(mWorkoutList);
-            hideProgressDialog();
-            // Show WeightInputDialog if weight is not present
-            if (MainApplication.getInstance().getBodyWeight() <= 0){
-                weightInputDialog = Utils.showWeightInputDialog(getActivity());
+        boolean isWorkoutDataUpToDate =
+                SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
+        if (isWorkoutDataUpToDate){
+            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            mWorkoutList = mWorkoutDao.queryBuilder().orderDesc(WorkoutDao.Properties.Date).list();
+            if (mWorkoutList == null || mWorkoutList.isEmpty()){
+                // No runs to show yet, Do nothing
+            }else {
+                Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");
+                mHistoryAdapter.setData(mWorkoutList);
+                hideProgressDialog();
+                // Show WeightInputDialog if weight is not present
+                if (MainApplication.getInstance().getBodyWeight() <= 0){
+                    weightInputDialog = Utils.showWeightInputDialog(getActivity());
+                }
             }
+        }else {
+            // Need to force refresh Workout Data
+            Logger.e(TAG, "Must fetch historical runs before");
+            SyncHelper.forceRefreshEntireWorkoutHistory();
         }
+
     }
 
     private void showProgressDialog() {

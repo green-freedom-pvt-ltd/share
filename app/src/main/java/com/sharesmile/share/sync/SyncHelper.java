@@ -71,7 +71,7 @@ public class SyncHelper {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)
-                .setExecutionWindow(0L, 10L)
+                .setExecutionWindow(0L, 5L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
                 .build();

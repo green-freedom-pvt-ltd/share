@@ -108,10 +108,9 @@ public class SyncService extends GcmTaskService {
             result = GcmNetworkManager.RESULT_FAILURE;
         }
 
-        if (LeaderBoardDataStore.getInstance().getLeagueBoard() == null
-                || LeaderBoardDataStore.getInstance().toShowLeague()){
+        if (LeaderBoardDataStore.getInstance().getLeagueBoard() != null
+                && LeaderBoardDataStore.getInstance().toShowLeague()){
             // Go for sync only when an active league is present and is still visible to team members
-
             try {
                 Logger.d(TAG, "Will sync LeagueBoard");
                 TeamBoard leagueBoard = NetworkDataProvider.doGetCall(Urls.getTeamBoardUrl(), TeamBoard.class);
@@ -182,7 +181,6 @@ public class SyncService extends GcmTaskService {
             SyncHelper.forceRefreshEntireWorkoutHistory();
             return  GcmNetworkManager.RESULT_FAILURE;
         }
-
     }
 
     private long syncWorkoutTimeStamp;
@@ -201,13 +199,13 @@ public class SyncService extends GcmTaskService {
             Gson gson = new Gson();
             Logger.d(TAG, "Syncing these runs in DB " + gson.toJson(runList));
             mWorkoutDao.insertOrReplaceInTx(runList);
+            // Update User's track record
+            Utils.updateTrackRecordFromDb();
 
             if (!TextUtils.isEmpty(runList.getNextUrl())) {
                 // Recursive call to fetch the runs of next page
                 return syncWorkoutData(runList.getNextUrl(), mWorkoutDao);
             } else {
-                // Update User's track record
-                Utils.updateTrackRecordFromDb();
                 Logger.d(TAG, "syncWorkoutData, Setting SyncedTimeStampMillis as: " + syncWorkoutTimeStamp);
                 SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION,
                         (syncWorkoutTimeStamp / 1000));
