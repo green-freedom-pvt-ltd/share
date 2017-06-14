@@ -363,6 +363,9 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("end_location_long", workout.getEndPointLongitude());
             jsonObject.put("version", workout.getVersion());
             jsonObject.put("calories_burnt", workout.getCalories() == null ? 0 : workout.getCalories());
+            if (workout.getTeamId() != null && workout.getTeamId() > 0){
+                jsonObject.put("team_id", workout.getTeamId());
+            }
 
             Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 

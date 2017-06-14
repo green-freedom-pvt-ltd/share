@@ -27,6 +27,7 @@ import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.Events.UsainBoltForceExit;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -189,6 +190,9 @@ public class WorkoutService extends Service implements
         workout.setBeginTimeStamp(data.getBeginTimeStamp());
         workout.setEndTimeStamp(DateUtil.getServerTimeInMillis());
         workout.setCalories(data.getCalories().getCalories());
+        if (LeaderBoardDataStore.getInstance().isLeagueActive()){
+            workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
+        }
         workoutDao.insertOrReplace(workout);
         Utils.updateTrackRecordFromDb();
         SyncHelper.pushRunData();

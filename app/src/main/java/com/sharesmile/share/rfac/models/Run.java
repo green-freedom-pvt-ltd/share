@@ -72,6 +72,9 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("calories_burnt")
     double calories;
 
+    @SerializedName("team_id")
+    int teamId;
+
     public long getId() {
         return id;
     }
@@ -236,6 +239,14 @@ public class Run implements UnObfuscable, Serializable {
         this.runDurationEpoch = runDurationEpoch;
     }
 
+    public int getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
+    }
+
     @Override
     public String toString() {
         return "Run{" +
@@ -255,9 +266,10 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t startTimeEpoch='" + startTimeEpoch + '\'' +
                 ",\n\t endTimeEpoch='" + endTimeEpoch + '\'' +
                 ",\n\t startLocationLatitude='" + startLocationLat + '\'' +
-                ",\n\t startLocationLongitute='" + startLocationLong + '\'' +
+                ",\n\t startLocationLongitude='" + startLocationLong + '\'' +
                 ",\n\t endLocationLatitude='" + endLocationLat + '\'' +
-                ",\n\t startLocationLongiture='" + endLocationLong + '\'' +
+                ",\n\t startLocationLongitude='" + endLocationLong + '\'' +
+                ",\n\t teamId='" + teamId + '\'' +
                 "\n}";
     }
 }
