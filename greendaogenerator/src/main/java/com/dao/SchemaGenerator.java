@@ -32,18 +32,19 @@ public class SchemaGenerator {
         versions.add(new Version5(false));
         versions.add(new Version6(false));
         versions.add(new Version7(false));
-        versions.add(new Version8(true));
+        versions.add(new Version8(false));
+        versions.add(new Version9(true));
 
 
         validateSchemas(versions);
-        toFileForceExists("../Share/app/src/main/java-gen");
+        toFileForceExists("../../Share/app/src/main/java-gen");
 
         for (SchemaVersion version : versions) {
             // NB: Test output creates stubs, we have an established testing
             // standard which should be followed in preference to generating
             // these stubs.
             new DaoGenerator().generateAll(version.getSchema(),
-                    "../Share/app/src/main/java-gen");
+                    "../../Share/app/src/main/java-gen");
         }
     }
 
