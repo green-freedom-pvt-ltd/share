@@ -94,14 +94,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     /**
-     * A thread safe way to show a Toast. Can be called from any thread. uses resource id of the
-     * message string
-     */
-    public static void showToast(int stringId, final int duration) {
-        showToast(getContext().getResources().getString(stringId), duration);
-    }
-
-    /**
      * A thread safe way to show a Toast. Can be called from any thread.
      */
     public static void showToast(final String message, final int duration) {
@@ -109,11 +101,19 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             @Override
             public void run() {
                 if (TextUtils.isEmpty(message) == false) {
-                    Toast.makeText(getContext(), message, duration).show();
+                    if (getInstance().appToast == null){
+                        getInstance().appToast = Toast.makeText(getContext(), message, duration);
+                    }else {
+                        getInstance().appToast.setDuration(duration);
+                        getInstance().appToast.setText(message);
+                    }
+                    getInstance().appToast.show();
                 }
             }
         });
     }
+
+    private Toast appToast;
 
     /**
      * A thread safe way to show a Toast. Can be called from any thread. uses resource id of the
@@ -373,6 +373,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         SyncHelper.syncLeaderBoardData(this);
         SyncHelper.scheduleCauseDataSync(this);
         SyncHelper.scheduleUserDataSync(this);
+        SyncHelper.scheduleServerTimeSync(this);
         boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         if (!isWorkoutDataUpToDate){
             // Need to forcefully refresh workout data now

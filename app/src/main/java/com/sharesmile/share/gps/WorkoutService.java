@@ -503,6 +503,7 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .put("spikey_distance", deltaDistance)
                     .put("time_interval", deltaTime)
+                    .put("delta_speed", deltaSpeed*3.6)
                     .put("accuracy", loc2.getAccuracy())
                     .put("threshold_applied", thresholdApplied)
                     .put("steps_per_sec_moving_average", stepCounter.getMovingAverageOfStepsPerSec())

@@ -235,7 +235,8 @@ public class NetworkDataProvider {
         Logger.d(TAG, "Url for GET request: " + url);
         try {
             Response response = call.execute();
-            if (response.headers().getDate("Date") != null){
+            if (!ServerTimeKeeper.getInstance().isInSyncWithServer() &&
+                    response.headers().getDate("Date") != null){
                 ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
                         (response.headers().getDate("Date").getTime());
             }
@@ -258,7 +259,8 @@ public class NetworkDataProvider {
         Logger.d(TAG, "Url for POST request: " + url + " Header " + request.headers().toString());
         try {
             Response response = call.execute();
-            if (response.headers().getDate("Date") != null){
+            if (!ServerTimeKeeper.getInstance().isInSyncWithServer() &&
+                    response.headers().getDate("Date") != null) {
                 ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
                         (response.headers().getDate("Date").getTime());
             }
@@ -281,7 +283,8 @@ public class NetworkDataProvider {
         Logger.d(TAG, "Url for Put request: " + url + " Header " + request.headers().toString());
         try {
             Response response = call.execute();
-            if (response.headers().getDate("Date") != null){
+            if (!ServerTimeKeeper.getInstance().isInSyncWithServer() &&
+                    response.headers().getDate("Date") != null){
                 ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
                         (response.headers().getDate("Date").getTime());
             }

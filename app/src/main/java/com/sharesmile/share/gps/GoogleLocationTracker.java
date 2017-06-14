@@ -35,7 +35,10 @@ import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.utils.CircularQueue;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -43,6 +46,9 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import static com.sharesmile.share.core.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 
 
 /**
@@ -66,12 +72,14 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     Set<WeakReference<SilentListener>> silentListeners;
     private LocationManager locationManager;
     private int numSatellitesConnected;
+    private CircularQueue<Location> locationQueue;
 
     private GoogleLocationTracker(Context appContext) {
         this.appContext = appContext;
         this.handler = new Handler();
         this.listeners = new HashSet<>();
         this.silentListeners = new HashSet<>();
+        this.locationQueue = new CircularQueue<>(8);
         if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
@@ -199,6 +207,9 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             if (state == State.FETCHING_LOCATION){
                 LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
                 state = State.LOCATION_ENABLED;
+            }
+            synchronized (locationQueue){
+                locationQueue.clear();
             }
             isActive = false;
         }
@@ -490,12 +501,51 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 }
             }
         }
+        // Recent GPS speed calculation :
+        if (location.hasSpeed()){
+            // Consider only the fixes which have speed
+            if (!SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_GPS_UPDATES, true)){
+                // GPS speed updates are enabled
+                MainApplication.showToast("GPS Speed: " + location.getSpeed()*3.6);
+            }
+            synchronized (locationQueue){
+                locationQueue.add(location);
+            }
+        }
+    }
+
+
+    public float getRecentGpsSpeed(){
+        if (isActive){
+            // Calculate recent GPS speed in a synchronised block
+            synchronized (locationQueue){
+                float cumulativeSpeed = 0;
+                int i = locationQueue.getCurrentSize() - 1;
+                int count = 0;
+                while (i >= 0){
+                    Location loc = locationQueue.getElemAtPosition(i);
+                    long deltaMillis = DateUtil.getServerTimeInMillis() - loc.getTime();
+                    if (deltaMillis < CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL){
+                        // If the location object is not old enough then we consider its speed
+                        cumulativeSpeed += loc.getSpeed();
+                        count++;
+                    }
+                    i--;
+                }
+                if (count > 0){
+                    return cumulativeSpeed / count;
+                }else {
+                    return 0;
+                }
+            }
+        }else {
+            return 0;
+        }
     }
 
     public boolean isMockLocationEnabled(){
         return !Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ALLOW_MOCK_LOCATION).equals("0");
     }
-
 
 
     public boolean isFetchingLocation(){

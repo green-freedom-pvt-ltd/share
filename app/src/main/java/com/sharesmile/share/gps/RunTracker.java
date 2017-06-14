@@ -347,6 +347,7 @@ public class RunTracker implements Tracker {
                                 .addBundle(getWorkoutBundle())
                                 .put("spikey_distance", dist)
                                 .put("time_interval", interval)
+                                .put("delta_speed", deltaSpeedMs*3.6)
                                 .put("accuracy", point.getAccuracy())
                                 .put("threshold_applied", thresholdApplied)
                                 .put("steps_per_sec_moving_average", listener.getMovingAverageOfStepsPerSec())

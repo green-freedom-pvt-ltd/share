@@ -39,6 +39,7 @@ import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
 import static com.sharesmile.share.core.Constants.PREF_USER_NAME;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_CAUSE_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_LEADERBOARD_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.SYNC_SERVER_TIME;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_WORKOUT_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
@@ -200,6 +201,21 @@ public class SyncHelper {
                 .setTag(UPLOAD_USER_DATA)
                 .setPeriod(21600L) // in secs, i.e. sync every 6 hours
                 .setPersisted(true)
+                .setFlex(2400)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        mGcmNetworkManager.schedule(task);
+    }
+
+    public static void scheduleServerTimeSync(Context context) {
+        Logger.d(TAG, "scheduleServerTimeSync");
+        PeriodicTask task = new PeriodicTask.Builder()
+                .setService(SyncService.class)
+                .setTag(SYNC_SERVER_TIME)
+                .setPeriod(21600L) // in secs, i.e. sync every 6 hours
+                .setPersisted(true)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setFlex(2400)
                 .build();
 

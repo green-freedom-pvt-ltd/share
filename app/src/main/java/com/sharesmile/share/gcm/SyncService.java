@@ -31,6 +31,7 @@ import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 import com.sharesmile.share.utils.Utils;
@@ -72,7 +73,10 @@ public class SyncService extends GcmTaskService {
             return syncWorkoutData();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_LEADERBOARD_DATA)) {
             return syncLeaderBoardData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
+        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_SERVER_TIME)) {
+            return syncServerTime();
+        }
+        else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
             Bundle extras = taskParams.getExtras();
             String fraudDataString = extras.getString(TaskConstants.FRAUD_DATA_JSON);
             pushFraudData(fraudDataString);
@@ -84,6 +88,11 @@ public class SyncService extends GcmTaskService {
     public void onInitializeTasks() {
         super.onInitializeTasks();
         MainApplication.getInstance().startSyncTasks();
+    }
+
+    public static int syncServerTime(){
+        ServerTimeKeeper.getInstance().syncTimerWithServerTime();
+        return GcmNetworkManager.RESULT_SUCCESS;
     }
 
     public static int syncLeaderBoardData(){

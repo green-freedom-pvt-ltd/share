@@ -13,6 +13,8 @@ import com.sharesmile.share.utils.Utils;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
+
 /**
  * Created by ankitm on 18/03/16.
  */
@@ -120,9 +122,23 @@ public class VigilanceTimer implements Runnable {
 		if (!Config.USAIN_BOLT_CHECK){
 			return false;
 		}
+
 		float recentSpeed = workoutService.getCurrentSpeed();
 		// If recentSpeed is above lower bounds then only enter the check.
 		if (recentSpeed > Config.USAIN_BOLT_RECENT_SPEED_LOWER_BOUND){
+
+			float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
+			if (recentGpsSpeed > USAIN_BOLT_GPS_SPEED_LIMIT){
+				Logger.d(TAG, "Recent GPS speed is greater than threshold, must be Usain Bolt");
+				AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
+						.addBundle(workoutService.getWorkoutBundle())
+						.put("detected_by", "gps_speed")
+						.put("recent_speed", recentSpeed*3.6)
+						.put("recent_gps_speed", recentGpsSpeed*3.6)
+						.buildAndDispatch();
+				return true;
+			}
+
 			if (ActivityDetector.getInstance().isIsInVehicle()){
 				Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
 				AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)

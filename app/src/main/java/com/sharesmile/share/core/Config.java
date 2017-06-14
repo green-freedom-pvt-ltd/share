@@ -21,13 +21,15 @@ public class Config {
 
     public static final float SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 32f; // in m/s, i.e. 115.2 km/hr
 
-    public static final float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 8.76f; // in m/s, i.e. 31.5 km/hr
+    public static final float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 9.7f; // in m/s, i.e. 35 km/hr
 
     public static final float USAIN_BOLT_UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
     public static final float USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT = 12.5f; // in m/s, i.e. 45 km/hr
 
     public static final float USAIN_BOLT_RECENT_SPEED_LOWER_BOUND = 4.1f; // in m/s, i.e. 14.8 km/hr
+
+    public static final float USAIN_BOLT_GPS_SPEED_LIMIT = 7.78f; // in m/s, i.e. 28 km/hr
 
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s,
 
@@ -76,6 +78,7 @@ public class Config {
     public static final long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
 
     public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
+    public static final long CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
 
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
     public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs

@@ -65,7 +65,8 @@ public abstract class NetworkAsyncCallback<Wrapper extends UnObfuscable> impleme
             return;
         }
         try {
-            if (response.headers().getDate("Date") != null){
+            if (!ServerTimeKeeper.getInstance().isInSyncWithServer() &&
+                    response.headers().getDate("Date") != null){
                 ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime
                         (response.headers().getDate("Date").getTime());
             }

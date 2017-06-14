@@ -100,6 +100,8 @@ public class ServerTimeKeeper {
                 @Override
                 public void onNetworkSuccess(ServerTimeResponse response) {
                     // Will do nothing as times are already synced in onResponse method of NetworkAsyncCallback
+                    long currentServerTimeMillis = response.getTimeEpoch();
+                    syncServerAndSystemMilliTime(currentServerTimeMillis);
                     isFetchingServerTime.set(false);
                 }
             });
