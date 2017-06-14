@@ -586,6 +586,7 @@ public class WorkoutService extends Service implements
                     .put("delta_speed", deltaSpeed) // in km/hrs
                     .put("delta_calories", deltaCalories) // in Cals
                     .put("activity", ActivityDetector.getInstance().getCurrentActivity())
+                    .put("steps_per_sec_moving_average", getMovingAverageOfStepsPerSec())
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
