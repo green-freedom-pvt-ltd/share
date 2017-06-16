@@ -368,6 +368,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     public void startSyncTasks() {
         Logger.d(TAG, "startSyncTasks");
         SyncHelper.syncUserFromDB();
+        SyncHelper.scheduleDataSync(this);
         SyncHelper.scheduleRunDataSync(this);
         SyncHelper.syncMessageCenterData(this);
         SyncHelper.syncLeaderBoardData(this);

@@ -25,7 +25,6 @@ import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
-import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -37,10 +36,7 @@ import Models.MessageList;
 import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
 import static com.sharesmile.share.core.Constants.PREF_USER_NAME;
-import static com.sharesmile.share.gcm.TaskConstants.SYNC_CAUSE_DATA;
-import static com.sharesmile.share.gcm.TaskConstants.SYNC_LEADERBOARD_DATA;
-import static com.sharesmile.share.gcm.TaskConstants.SYNC_SERVER_TIME;
-import static com.sharesmile.share.gcm.TaskConstants.SYNC_WORKOUT_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
 /**
@@ -50,14 +46,15 @@ public class SyncHelper {
 
     private static final String TAG = SyncHelper.class.getSimpleName();
 
-    public static void scheduleRunDataSync(Context context) {
+    public static void scheduleDataSync(Context context) {
 
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
-                .setTag(SYNC_WORKOUT_DATA)
-                .setPeriod(7200L) // in secs , i.e. every two hour
+                .setTag(SYNC_DATA)
+                .setPeriod(12600L) // in secs , i.e. every 3.5 hours
                 .setPersisted(true)
-                .setFlex(2400)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setFlex(5400) // 1.5 hours
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
@@ -166,57 +163,14 @@ public class SyncHelper {
         return true;
     }
 
-    public static void syncLeaderBoardData(Context context) {
-        PeriodicTask task = new PeriodicTask.Builder()
-                .setService(SyncService.class)
-                .setTag(SYNC_LEADERBOARD_DATA)
-                .setPeriod(7200) // in secs , i.e. every two hours
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setPersisted(true)
-                .setFlex(2400)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
-        mGcmNetworkManager.schedule(task);
-
-    }
-
-    public static void scheduleCauseDataSync(Context context) {
-        PeriodicTask task = new PeriodicTask.Builder()
-                .setService(SyncService.class)
-                .setTag(SYNC_CAUSE_DATA)
-                .setPeriod(7200L) // in secs , i.e. every two hours
-                .setPersisted(true)
-                .setFlex(2400)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
-        mGcmNetworkManager.schedule(task);
-    }
-
     public static void scheduleUserDataSync(Context context) {
         Logger.d(TAG, "scheduleUserDataSync");
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(UPLOAD_USER_DATA)
-                .setPeriod(21600L) // in secs, i.e. sync every 6 hours
+                .setPeriod(25200L) // in secs, i.e. sync every 7 hours
                 .setPersisted(true)
-                .setFlex(2400)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
-        mGcmNetworkManager.schedule(task);
-    }
-
-    public static void scheduleServerTimeSync(Context context) {
-        Logger.d(TAG, "scheduleServerTimeSync");
-        PeriodicTask task = new PeriodicTask.Builder()
-                .setService(SyncService.class)
-                .setTag(SYNC_SERVER_TIME)
-                .setPeriod(21600L) // in secs, i.e. sync every 6 hours
-                .setPersisted(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setFlex(2400)
+                .setFlex(7200) // 2 hours
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
@@ -265,7 +219,6 @@ public class SyncHelper {
             if (campaignList.getTotalCount() > 0) {
                 SharedPrefsManager.getInstance().setObject(Constants.PREF_CAMPAIGN_DATA, campaignList.getCampaignList().get(0));
                 campaign = campaignList.getCampaignList().get(0);
-                Picasso.with(context).load(campaign.getImageUrl()).fetch();
                 if (oldCampaign != null && oldCampaign.getId() != campaign.getId()) {
                     SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CAMPAIGN_SHOWN_ONCE, false);
                 }

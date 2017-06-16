@@ -1,14 +1,16 @@
 package adapters
 
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.sharesmile.share.MainApplication.getContext
 import com.sharesmile.share.Message
 import com.sharesmile.share.R
 import com.sharesmile.share.utils.DateUtil
-import com.squareup.picasso.Picasso
+import com.sharesmile.share.utils.ShareImageLoader
 import kotlinx.android.synthetic.main.item_message_center.view.*
 import java.util.*
 
@@ -47,7 +49,9 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
 
             itemView.date.text = DateUtil.getCustomFormattedDate(DateUtil.getDefaultFormattedDate(data.message_date, DateUtil.DEFAULT_DATE_FORMAT_DATE_ONLY), DateUtil.USER_FORMAT_DATE_DATE_ONLY);
             itemView.description.text = data.messageBrief
-            Picasso.with(itemView.context).load(data.message_image).placeholder(R.drawable.cause_image_placeholder).into(itemView.message_image)
+
+            ShareImageLoader.getInstance().loadImage(data.message_image, itemView.message_image,
+                    ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder))
 
             if (!TextUtils.isEmpty(data.videoId)) {
                 itemView.play_icon.visibility = View.VISIBLE

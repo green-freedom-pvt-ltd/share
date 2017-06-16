@@ -3,12 +3,10 @@ package com.sharesmile.share.rfac.fragments;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,8 +39,6 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import org.greenrobot.eventbus.EventBus;
@@ -158,20 +154,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         View view = inflater.inflate(R.layout.fragment_share, null);
         ButterKnife.bind(this, view);
         init();
-        Picasso.with(getContext()).load(R.drawable.share_background).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mContentView.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-        });
+        mContentView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.share_background));
         EventBus.getDefault().register(this);
         return view;
     }

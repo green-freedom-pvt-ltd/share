@@ -93,8 +93,6 @@ class MessageList : UnObfuscable, Serializable, Iterable<Message> {
         message.shareTemplate = data.shareTemplate
         message.messageBrief=data.brief
         message.videoId=data.videoId
-        // Save image Offline cache
-        Picasso.with(MainApplication.getContext()).load(data.imageUrl).fetch()
 
         return message
     }

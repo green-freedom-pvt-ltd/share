@@ -67,14 +67,8 @@ public class SyncService extends GcmTaskService {
             return forceRefreshEntireWorkoutHistory();
         } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
             return uploadUserData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_CAUSE_DATA)) {
-            return updateCauseData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_WORKOUT_DATA)) {
-            return syncWorkoutData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_LEADERBOARD_DATA)) {
-            return syncLeaderBoardData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_SERVER_TIME)) {
-            return syncServerTime();
+        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_DATA)){
+            return syncData();
         }
         else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
             Bundle extras = taskParams.getExtras();
@@ -89,6 +83,18 @@ public class SyncService extends GcmTaskService {
         super.onInitializeTasks();
         MainApplication.getInstance().startSyncTasks();
     }
+
+    private int syncData(){
+
+        syncServerTime() ;
+        syncLeaderBoardData();
+        updateCauseData();
+        syncWorkoutData();
+
+        // Returning success as result does not matter
+        return GcmNetworkManager.RESULT_SUCCESS;
+    }
+
 
     public static int syncServerTime(){
         ServerTimeKeeper.getInstance().syncTimerWithServerTime();
@@ -182,8 +188,7 @@ public class SyncService extends GcmTaskService {
             syncUrl = Urls.getSyncRunUrl(clientVersion);
             Logger.d(TAG, "Starting sync with client_version: " + clientVersion);
             syncWorkoutTimeStamp = 0;
-            int result = syncWorkoutData(syncUrl, mWorkoutDao);
-            return result;
+            return syncWorkoutData(syncUrl, mWorkoutDao);
         }else {
             // Need to force refresh Workout Data
             Logger.e(TAG, "Must fetch historical runs before");

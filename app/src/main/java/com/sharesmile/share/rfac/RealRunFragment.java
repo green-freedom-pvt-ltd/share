@@ -24,9 +24,9 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,7 +81,6 @@ public class RealRunFragment extends RunFragment {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
         mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
-        loadThankYouImage();
     }
 
     @Override
@@ -112,7 +111,7 @@ public class RealRunFragment extends RunFragment {
             distanceContainer.setLayoutParams(params);
         }
 
-        Picasso.with(getContext()).load(mCauseData.getSponsor().getLogoUrl()).into(mSponsorLogo);
+        ShareImageLoader.getInstance().loadImage(mCauseData.getSponsor().getLogoUrl(), mSponsorLogo);
 
     }
 
@@ -380,12 +379,6 @@ public class RealRunFragment extends RunFragment {
     /*  Rs per km*/
     public float getConversionFactor() {
         return mCauseData.getConversionRate();
-    }
-
-    private void loadThankYouImage() {
-        if (mCauseData != null) {
-            Picasso.with(getActivity()).load(mCauseData.getCauseThankYouImage()).fetch();
-        }
     }
 
     private void showErrorDialog(String msg) {

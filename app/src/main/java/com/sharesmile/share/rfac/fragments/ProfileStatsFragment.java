@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,10 +23,10 @@ import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
-import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -137,7 +138,8 @@ public class ProfileStatsFragment extends BaseFragment {
         if (isWorkoutDataUpToDate){
             hideProgressDialog();
             String url = MainApplication.getInstance().getUserDetails().getSocialThumb();
-            Picasso.with(getActivity()).load(url).placeholder(R.drawable.placeholder_profile).into(imageView);
+            ShareImageLoader.getInstance().loadImage(url, imageView,
+                    ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
             // Name of user
             name.setText(MainApplication.getInstance().getUserDetails().getFirstName());
 

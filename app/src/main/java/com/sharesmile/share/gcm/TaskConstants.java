@@ -13,13 +13,7 @@ public class TaskConstants {
 
     public static String UPLOAD_USER_DATA = "upload_user_data";
 
-    public static String SYNC_SERVER_TIME = "sync_server_time";
-
-    public static String SYNC_CAUSE_DATA = "sync_cause_data";
-
-    public static String SYNC_LEADERBOARD_DATA = "sync_leaderboard_data";
-
-    public static String SYNC_WORKOUT_DATA = "sync_workout_data";
+    public static String SYNC_DATA = "sync_data";
 
     public static String FRAUD_DATA_JSON = "fraud_data_parcelable";
 }

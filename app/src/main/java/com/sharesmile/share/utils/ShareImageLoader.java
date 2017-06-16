@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.sharesmile.share.MainApplication;
@@ -13,7 +14,9 @@ import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -77,7 +80,7 @@ public class ShareImageLoader {
         Picasso.Builder builder =  new Picasso.Builder(MainApplication.getContext());
         builder.downloader(new OkHttpDownloader(httpClient));
         Picasso built = builder.build();
-        //built.setIndicatorsEnabled(true);
+//        built.setIndicatorsEnabled(true);
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
         return built;
@@ -127,8 +130,9 @@ public class ShareImageLoader {
      * @param drawableWhileLoading displayed while image is downloading
      * @param drawableOnFailure    displayed if download fails
      */
-    public void loadImage(String url, ImageView imageView, Drawable drawableWhileLoading,
-                          Drawable drawableOnFailure) {
+    public void loadImage(final String url, final ImageView imageView, final Drawable drawableWhileLoading,
+                          final Drawable drawableOnFailure) {
+
         if (isAdequateMemoryAvailable()) {
             if (imageView != null && !TextUtils.isEmpty(url)) {
                 RequestCreator request = picasso.load(url);
@@ -139,10 +143,33 @@ public class ShareImageLoader {
                     request.error(drawableOnFailure);
                 }
                 request.config(BITMAP_CONFIG);
+                request.networkPolicy(NetworkPolicy.OFFLINE);
                 if (!USE_MEMORY_CACHE) {
                     request.memoryPolicy(MemoryPolicy.NO_CACHE);
                 }
-                request.into(imageView);
+                request.into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "Image loaded successfully from Disk, url = " + url);
+                    }
+
+                    @Override
+                    public void onError() {
+                        Log.d(TAG, "Image could not be loaded from Disk, lets try network. url = " + url);
+                        RequestCreator secondRequest = picasso.load(url);
+                        if (drawableWhileLoading != null) {
+                            secondRequest.placeholder(drawableWhileLoading);
+                        }
+                        if (drawableOnFailure != null) {
+                            secondRequest.error(drawableOnFailure);
+                        }
+                        secondRequest.config(BITMAP_CONFIG);
+                        if (!USE_MEMORY_CACHE) {
+                            secondRequest.memoryPolicy(MemoryPolicy.NO_CACHE);
+                        }
+                        secondRequest.into(imageView);
+                    }
+                });
                 return;
             }
         }
@@ -158,7 +185,7 @@ public class ShareImageLoader {
      * @param url       URL string
      * @param imageView ImageView for loading image
      */
-    public void loadSquareImage(String url, ImageView imageView, Drawable backupDrawable,
+    public void loadSquareImage(final String url, final ImageView imageView, final Drawable backupDrawable,
                                 int dimension) {
         if (isAdequateMemoryAvailable()) {
             if (imageView != null && !TextUtils.isEmpty(url)) {
@@ -168,26 +195,41 @@ public class ShareImageLoader {
                     request.placeholder(backupDrawable).error(backupDrawable);
                 }
                 request.config(BITMAP_CONFIG);
+                request.networkPolicy(NetworkPolicy.OFFLINE);
                 if (!USE_MEMORY_CACHE) {
                     request.memoryPolicy(MemoryPolicy.NO_CACHE);
                 }
-                request.into(imageView);
-            } else {
-                if (imageView != null && backupDrawable != null) {
-                    imageView.setImageDrawable(backupDrawable);
-                }
+                request.into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "Image loaded successfully from Disk, url = " + url);
+                    }
+
+                    @Override
+                    public void onError() {
+                        Log.d(TAG, "Image could not be loaded from Disk, lets try network. url = " + url);
+                        RequestCreator secondRequest = picasso.load(url);
+                        if (backupDrawable != null) {
+                            secondRequest.placeholder(backupDrawable).error(backupDrawable);
+                        }
+                        secondRequest.config(BITMAP_CONFIG);
+                        if (!USE_MEMORY_CACHE) {
+                            secondRequest.memoryPolicy(MemoryPolicy.NO_CACHE);
+                        }
+                        secondRequest.into(imageView);
+                    }
+                });
+                return;
             }
-        } else {
-            if (imageView != null && backupDrawable != null) {
-                imageView.setImageDrawable(backupDrawable);
-            }
+        }
+        if (imageView != null && backupDrawable != null) {
+            imageView.setImageDrawable(backupDrawable);
         }
     }
 
     /**
      * Loads and decodes image synchronously
      * Default display image options from provided configuration will be used
-     *
      * @return Result image Bitmap. Can be <b>null</b> if image loading/decoding was failed or
      * cancelled.
      */

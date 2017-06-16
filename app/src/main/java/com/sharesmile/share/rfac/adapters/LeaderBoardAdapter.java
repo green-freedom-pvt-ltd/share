@@ -1,9 +1,9 @@
 package com.sharesmile.share.rfac.adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +13,8 @@ import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.views.CircularImageView;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -91,14 +91,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         public void bindData(final LeaderBoard leaderboard, int rank) {
             mleaderBoard.setText(String.valueOf(rank));
 
-            if (!TextUtils.isEmpty(leaderboard.getSocial_thumb())) {
-                Picasso.with(mContext).
-                        load(leaderboard.getSocial_thumb()).
-                        placeholder(R.drawable.placeholder_profile).
-                        into(mProfileImage);
-            } else {
-                mProfileImage.setImageResource(R.drawable.placeholder_profile);
-            }
+            ShareImageLoader.getInstance().loadImage(leaderboard.getSocial_thumb(), mProfileImage,
+                    ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
             String firstName = leaderboard.getFirst_name().substring(0, 1).toUpperCase() + leaderboard.getFirst_name().substring(1);
             String name = firstName;

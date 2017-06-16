@@ -17,7 +17,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.squareup.picasso.Picasso;
+import com.sharesmile.share.utils.ShareImageLoader;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -92,8 +92,7 @@ public class StartRunFragment extends BaseFragment {
         };
 
         Count.start();
-
-        Picasso.with(getActivity()).load(mCauseData.getSponsor().getLogoUrl()).into(mSponsorImage);
+        ShareImageLoader.getInstance().loadImage(mCauseData.getSponsor().getLogoUrl(), mSponsorImage);
         return v;
     }
 

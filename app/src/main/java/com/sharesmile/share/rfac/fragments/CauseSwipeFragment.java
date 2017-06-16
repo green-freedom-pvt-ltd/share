@@ -3,6 +3,7 @@ package com.sharesmile.share.rfac.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +18,8 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -126,7 +127,8 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         numImpactRuns.setText(getString(R.string.num_impact_runs, numRuns));
 
         //load image
-        Picasso.with(getContext()).load(cause.getImageUrl()).placeholder(R.drawable.cause_image_placeholder).into(mCauseImage);
+        ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,
+                ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
     }
 
     @Override

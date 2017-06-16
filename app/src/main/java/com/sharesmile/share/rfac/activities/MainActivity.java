@@ -54,6 +54,7 @@ import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.ShareUtils;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -465,7 +466,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         });
 
-        Picasso.with(this).load(campaign.getImageUrl()).into(image);
+        ShareImageLoader.getInstance().loadImage(campaign.getImageUrl(), image);
         share.setText(campaign.getButtonText());
         title.setText(campaign.getTitle());
         message.setText(campaign.getDescritption());

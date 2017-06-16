@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,10 +20,10 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLTextView;
 import com.sharesmile.share.views.MRTextView;
-import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -120,8 +121,8 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
             }
         }
 
-        //load image
-        Picasso.with(getContext()).load(cause.getImageUrl()).placeholder(R.drawable.cause_image_placeholder).into(mCauseImage);
+        ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,
+                ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
 
         updateActionbar();
     }

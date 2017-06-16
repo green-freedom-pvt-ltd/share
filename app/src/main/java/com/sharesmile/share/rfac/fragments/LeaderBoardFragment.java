@@ -35,9 +35,9 @@ import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -419,7 +419,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
 
     private void setBannerImage() {
         if (!TextUtils.isEmpty(mBannerUrl)) {
-            Picasso.with(getContext()).load(mBannerUrl).placeholder(R.drawable.cause_image_placeholder).into(mBanner);
+            ShareImageLoader.getInstance().loadImage(mBannerUrl, mBanner,
+                    ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
             mBanner.setVisibility(View.VISIBLE);
         }
     }

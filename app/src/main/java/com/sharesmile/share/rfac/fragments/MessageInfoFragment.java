@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.google.gson.Gson;
 import com.sharesmile.share.Message;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
 import com.squareup.picasso.Picasso;
@@ -78,7 +80,8 @@ public class MessageInfoFragment extends BaseFragment implements View.OnClickLis
         mTitle.setText(message.getMessage_title());
         mShareBtn.setOnClickListener(this);
         //load image
-        Picasso.with(getContext()).load(message.getMessage_image()).placeholder(R.drawable.cause_image_placeholder).into(mMessageImage);
+        ShareImageLoader.getInstance().loadImage(message.getMessage_image(), mMessageImage,
+                ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
         updateActionbar();
     }
 

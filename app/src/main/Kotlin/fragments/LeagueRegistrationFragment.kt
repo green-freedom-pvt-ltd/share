@@ -4,7 +4,6 @@ import Models.LeagueTeam
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.support.annotation.LayoutRes
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import base.BaseFragment2
 import com.sharesmile.share.MainApplication
@@ -21,11 +21,10 @@ import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
 import com.sharesmile.share.utils.BasicNameValuePair
 import com.sharesmile.share.utils.NameValuePair
+import com.sharesmile.share.utils.ShareImageLoader
 import com.sharesmile.share.utils.Urls
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_league_registration.view.*
 import java.util.*
-import android.widget.TextView
 
 
 /**
@@ -113,7 +112,8 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
         }
 
         view!!.findViewById(R.id.submit).setOnClickListener(this);
-        Picasso.with(context).load(mBanner).into(view!!.league_image);
+
+        ShareImageLoader.getInstance().loadImage(mBanner, view!!.league_image)
     }
 
     private fun onSubmit() {
