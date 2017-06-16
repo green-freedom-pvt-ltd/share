@@ -19,7 +19,6 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MLTextView;
 import com.sharesmile.share.views.MRTextView;
@@ -100,14 +99,15 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
 
 
         mRunButton.setOnClickListener(this);
-        mRunButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Logger.d(TAG, "onClick of Begin Run, will start Tracker Activity flow");
-                getFragmentController().performOperation(IFragmentController.START_RUN_TEST, cause);
-                return true;
-            }
-        });
+
+//        mRunButton.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                Logger.d(TAG, "onClick of Begin Run, will start Tracker Activity flow");
+//                getFragmentController().performOperation(IFragmentController.START_RUN_TEST, cause);
+//                return true;
+//            }
+//        });
 
         mDescription.setText(cause.getCauseDescription());
         mTitle.setText(cause.getTitle());

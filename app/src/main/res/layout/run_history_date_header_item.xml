@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="@drawable/rounded_rectangle_blue_vertical_gradient">
+
+    <com.sharesmile.share.views.MLTextView
+        android:id="@+id/tv_run_history_date_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:text="17-JUN-2017"/>
+
+    <com.sharesmile.share.views.MLTextView
+        android:id="@+id/tv_header_total_raised"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:text="45"
+        android:gravity="center"/>
+
+    <com.sharesmile.share.views.MLTextView
+        android:id="@+id/tv_header_calories"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:text="560 Cal"
+        android:gravity="right"/>
+
+</LinearLayout>

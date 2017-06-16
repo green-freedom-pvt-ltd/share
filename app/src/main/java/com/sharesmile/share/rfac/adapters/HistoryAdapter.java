@@ -12,57 +12,86 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.rfac.models.RunHistoryDateHeaderItem;
+import com.sharesmile.share.rfac.models.RunHistoryDetailsItem;
+import com.sharesmile.share.rfac.models.RunHistoryItem;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.sharesmile.share.utils.DateUtil.HH_MM_AMPM;
+import static com.sharesmile.share.utils.DateUtil.USER_FORMAT_DATE_DATE_ONLY;
+
 /**
  * Created by Shine on 13/05/16.
  */
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
+public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final AdapterInterface mInterface;
-    private List<Workout> mData;
+    private List<RunHistoryItem> mItems;
 
     public HistoryAdapter(AdapterInterface adapterInterface) {
         mInterface = adapterInterface;
     }
 
     @Override
-    public HistoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.history_list_item, parent, false);
-
-        return new HistoryViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == RunHistoryItem.DATE_HEADER){
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.run_history_date_header_item, parent, false);
+            return new RunHistoryDateHeaderViewHolder(view);
+        }else if (viewType == RunHistoryItem.RUN_ITEM){
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.run_history_details_item, parent, false);
+            return new RunHistoryDetailsViewHolder(view);
+        }else {
+            throw new IllegalStateException("Invalid RunHistoryItem viewtype: " + viewType);
+        }
     }
 
     @Override
-    public void onBindViewHolder(HistoryViewHolder holder, int position) {
-
-        holder.bindData(mData.get(position));
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        int type = getItemViewType(position);
+        if (type == RunHistoryItem.DATE_HEADER){
+            RunHistoryDateHeaderItem dateHeaderItem = (RunHistoryDateHeaderItem) mItems.get(position);
+            RunHistoryDateHeaderViewHolder headerViewHolder = (RunHistoryDateHeaderViewHolder) holder;
+            headerViewHolder.bindData(dateHeaderItem);
+        }else if (type == RunHistoryItem.RUN_ITEM){
+            RunHistoryDetailsItem detailsItem = (RunHistoryDetailsItem) mItems.get(position);
+            RunHistoryDetailsViewHolder detailsViewHolder = (RunHistoryDetailsViewHolder) holder;
+            detailsViewHolder.bindData(detailsItem.getWorkout());
+        }else {
+            throw new IllegalStateException("Invalid RunHistoryItem viewtype: " + type);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mData != null ? mData.size() : 0;
+        return mItems != null ? mItems.size() : 0;
     }
 
-    public void setData(List<Workout> data) {
-        this.mData = data;
+    @Override
+    public int getItemViewType(int position) {
+        return mItems.get(position).getType();
+    }
+
+    public void setData(List<RunHistoryItem> data) {
+        this.mItems = data;
         notifyDataSetChanged();
     }
 
 
-    class HistoryViewHolder extends RecyclerView.ViewHolder {
+    class RunHistoryDetailsViewHolder extends RecyclerView.ViewHolder {
 
 
-        @BindView(R.id.date)
-        TextView mDate;
+        @BindView(R.id.tv_run_time)
+        TextView mRunTime;
         @BindView(R.id.cause_name)
         TextView mCause;
         @BindView(R.id.distance)
@@ -83,15 +112,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         @BindView(R.id.content_view)
         CardView mCard;
 
-        public HistoryViewHolder(View itemView) {
+        public RunHistoryDetailsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         public void bindData(final Workout workout) {
-            if (workout.getDate() != null) {
-                mDate.setText(DateUtil.getUserFormattedDate(workout.getDate()));
+            long startEpochMillis;
+            if (workout.getBeginTimeStamp() != null && workout.getBeginTimeStamp() > 0){
+                startEpochMillis = workout.getBeginTimeStamp();
+            }else {
+                startEpochMillis = workout.getDate().getTime();
             }
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(startEpochMillis);
+            mRunTime.setText(DateUtil.getCustomFormattedDate(cal.getTime(), HH_MM_AMPM));
             mCause.setText(workout.getCauseBrief());
             String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
@@ -134,6 +169,30 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             }
 
 
+        }
+    }
+
+    class RunHistoryDateHeaderViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.tv_run_history_date_header)
+        TextView dateView;
+
+        @BindView(R.id.tv_header_total_raised)
+        TextView totalRaised;
+
+        @BindView(R.id.tv_header_calories)
+        TextView calories;
+
+        public RunHistoryDateHeaderViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void bindData(RunHistoryDateHeaderItem dateHeaderItem){
+            String dateString = DateUtil.getCustomFormattedDate(dateHeaderItem.getCalendar().getTime(), USER_FORMAT_DATE_DATE_ONLY);
+            dateView.setText(dateString);
+            totalRaised.setText(totalRaised.getContext().getString(R.string.rs_symbol) + " " + Math.round(dateHeaderItem.getImpactInDay()));
+            calories.setText(Utils.formatCalories(dateHeaderItem.getCaloriesInDay()));
         }
     }
 

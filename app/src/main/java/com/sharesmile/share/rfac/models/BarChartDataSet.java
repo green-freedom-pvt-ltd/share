@@ -96,17 +96,21 @@ public class BarChartDataSet {
                 + beginTsMillis + " and " + endTsMillis, new String []{});
         cursor.moveToFirst();
         int amountRaised = Math.round(cursor.getFloat(0));
-        if (amountRaised == 0){
-            // Let's try with "Date" column instead
-            Cursor cursorDate = database.rawQuery("SELECT "
-                    + "SUM(" +WorkoutDao.Properties.RunAmount.columnName + ") "
-                    + "FROM " + WorkoutDao.TABLENAME + " where "
-                    + WorkoutDao.Properties.IsValidRun.columnName + " is 1" +
-                    " and " + WorkoutDao.Properties.Date.columnName + " between "
-                    + beginTsMillis + " and " + endTsMillis, new String []{});
-            cursorDate.moveToFirst();
-            amountRaised = Math.round(cursorDate.getFloat(0));
+
+        // Let's try with "Date" column also
+        Cursor cursorDate = database.rawQuery("SELECT "
+                + "SUM(" +WorkoutDao.Properties.RunAmount.columnName + ") "
+                + "FROM " + WorkoutDao.TABLENAME + " where "
+                + WorkoutDao.Properties.IsValidRun.columnName + " is 1" +
+                " and " + WorkoutDao.Properties.Date.columnName + " between "
+                + beginTsMillis + " and " + endTsMillis, new String []{});
+        cursorDate.moveToFirst();
+        int amountRaisedWithDateColumn = Math.round(cursorDate.getFloat(0));
+
+        if (amountRaisedWithDateColumn > amountRaised){
+            amountRaised = amountRaisedWithDateColumn;
         }
+
         Logger.d(TAG, "Amount raised between " + beginTsMillis + " and " + endTsMillis + " is " + amountRaised);
         return amountRaised;
     }

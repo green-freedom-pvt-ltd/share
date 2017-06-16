@@ -21,6 +21,9 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.rfac.models.RunHistoryDateHeaderItem;
+import com.sharesmile.share.rfac.models.RunHistoryDetailsItem;
+import com.sharesmile.share.rfac.models.RunHistoryItem;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -30,7 +33,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Created by apurvgandhwani on 3/29/2016.
@@ -39,6 +46,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
     RecyclerView mRecyclerView;
     ProgressBar mProgress;
     private List<Workout> mWorkoutList;
+    private List<RunHistoryItem> mHistoryItemsList;
 
     HistoryAdapter mHistoryAdapter;
 
@@ -85,7 +93,8 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
                 // No runs to show yet, Do nothing
             }else {
                 Logger.d(TAG, "fetchRunDataFromDb, setting rundata in historyAdapter");
-                mHistoryAdapter.setData(mWorkoutList);
+                mHistoryItemsList = extractListItemsFromWorkouts();
+                mHistoryAdapter.setData(mHistoryItemsList);
                 hideProgressDialog();
                 // Show WeightInputDialog if weight is not present
                 if (MainApplication.getInstance().getBodyWeight() <= 0){
@@ -98,6 +107,55 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
             SyncHelper.forceRefreshEntireWorkoutHistory();
         }
 
+    }
+
+    private List<RunHistoryItem> extractListItemsFromWorkouts(){
+        TreeMap<Calendar, List<Workout>> treeMap = new TreeMap<>(Collections.reverseOrder());
+        for (Workout workout : mWorkoutList){
+            Calendar calendarInWorkout = Calendar.getInstance();
+            if (workout.getBeginTimeStamp() != null && workout.getBeginTimeStamp() > 0){
+                calendarInWorkout.setTimeInMillis(workout.getBeginTimeStamp());
+            }else {
+                calendarInWorkout.setTimeInMillis(workout.getDate().getTime());
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            int year = calendarInWorkout.get(Calendar.YEAR);
+            calendar.set(Calendar.YEAR, year);
+            int month = calendarInWorkout.get(Calendar.MONTH);
+            calendar.set(Calendar.MONTH, month);
+            int dayOfMonth = calendarInWorkout.get(Calendar.DAY_OF_MONTH);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+//            Logger.d(TAG, "Calendar entry for year = " + year +", month = " + month
+//                    + ", dayOfMonth = " + dayOfMonth + " is" + calendar.getTime());
+
+            if (treeMap.containsKey(calendar)){
+                treeMap.get(calendar).add(workout);
+            }else {
+                List<Workout> list = new ArrayList<>();
+                list.add(workout);
+                treeMap.put(calendar, list);
+            }
+        }
+
+        List<RunHistoryItem> items = new ArrayList<>();
+        for (Calendar calendar : treeMap.keySet()){
+            RunHistoryDateHeaderItem dateHeaderItem = new RunHistoryDateHeaderItem();
+            dateHeaderItem.setCalendar(calendar);
+            items.add(dateHeaderItem);
+            float impact = 0;
+            float calories = 0;
+            for (Workout workout : treeMap.get(calendar)){
+                items.add(new RunHistoryDetailsItem(workout));
+                impact += workout.getRunAmount();
+                calories += (workout.getCalories() != null ? workout.getCalories() : 0);
+            }
+            dateHeaderItem.setImpactInDay(impact);
+            dateHeaderItem.setCaloriesInDay(calories);
+        }
+        return items;
     }
 
     private void showProgressDialog() {

@@ -1,12 +1,14 @@
 package com.sharesmile.share.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.network.HttpClientManager;
+import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -16,6 +18,7 @@ import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -26,10 +29,10 @@ public class ShareImageLoader {
     private static final String TAG = "ShareImageLoader";
 
     private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.RGB_565;
-    private static final MemoryPolicy MEMORY_POLICY = MemoryPolicy.NO_CACHE;
     private static final boolean USE_MEMORY_CACHE = true;
     private static final float LOW_MEMORY_THRESHOLD_PERCENTAGE = 5;
     private final Picasso picasso;
+    private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
 
     private static ShareImageLoader instance;
@@ -45,10 +48,20 @@ public class ShareImageLoader {
         return instance;
     }
 
+    private static File createDefaultCacheDir(Context context) {
+        File cache = new File(context.getApplicationContext().getCacheDir(), "picasso-cache");
+        if (!cache.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            cache.mkdirs();
+        }
+        return cache;
+    }
+
     private Picasso getImageLoader() {
 
-        OkHttpClient picassoClient = new OkHttpClient();
-        picassoClient.interceptors().add(new Interceptor() {
+        OkHttpClient httpClient = HttpClientManager.getDefaultHttpClient();
+
+        httpClient.interceptors().add(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
 
@@ -57,9 +70,31 @@ public class ShareImageLoader {
                 return chain.proceed(newRequest);
             }
         });
-        return new Picasso.Builder(MainApplication.getContext())
-                .downloader(new OkHttpDownloader(picassoClient)).build();
+
+        httpClient.networkInterceptors().add(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+        httpClient.setCache(new Cache(createDefaultCacheDir(MainApplication.getContext()), MAX_DISK_CACHE_SIZE));
+
+        Picasso.Builder builder =  new Picasso.Builder(MainApplication.getContext());
+        builder.downloader(new OkHttpDownloader(httpClient));
+        Picasso built = builder.build();
+        //built.setIndicatorsEnabled(true);
+        built.setLoggingEnabled(true);
+        Picasso.setSingletonInstance(built);
+        return built;
+
     }
+
+
+    private static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
+        @Override public Response intercept(Interceptor.Chain chain) throws IOException {
+            Response originalResponse = chain.proceed(chain.request());
+            return originalResponse.newBuilder()
+                    .removeHeader("Cache-Control")
+                    .removeHeader("Pragma")
+                    .header("Cache-Control", "max-age="+60*60*24*7 +", public") // 1 week cache.
+                    .build();
+        }
+    };
 
 
     /**
@@ -105,7 +140,7 @@ public class ShareImageLoader {
                 }
                 request.config(BITMAP_CONFIG);
                 if (!USE_MEMORY_CACHE) {
-                    request.memoryPolicy(MEMORY_POLICY);
+                    request.memoryPolicy(MemoryPolicy.NO_CACHE);
                 }
                 request.into(imageView);
                 return;
@@ -134,7 +169,7 @@ public class ShareImageLoader {
                 }
                 request.config(BITMAP_CONFIG);
                 if (!USE_MEMORY_CACHE) {
-                    request.memoryPolicy(MEMORY_POLICY);
+                    request.memoryPolicy(MemoryPolicy.NO_CACHE);
                 }
                 request.into(imageView);
             } else {
