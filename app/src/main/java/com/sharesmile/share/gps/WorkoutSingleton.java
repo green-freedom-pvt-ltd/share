@@ -4,9 +4,11 @@ import android.app.NotificationManager;
 import android.content.Context;
 
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
@@ -147,6 +149,22 @@ public class WorkoutSingleton {
 
     public WorkoutDataStore getDataStore(){
         return this.dataStore;
+    }
+
+    public Properties getWorkoutBundle() {
+        if (dataStore != null){
+            Properties p = new Properties();
+            p.put("distance", Utils.formatToKmsWithTwoDecimal(dataStore.getTotalDistance()));
+            p.put("time_elapsed", dataStore.getElapsedTime());
+            p.put("avg_speed", dataStore.getAvgSpeed()*(3.6f));
+            p.put("num_steps", dataStore.getTotalSteps());
+            p.put("client_run_id", dataStore.getWorkoutId());
+            p.put("calories", dataStore.getCalories().getCalories());
+            p.put("bolt_count", dataStore.getUsainBoltCount());
+            p.put("num_spikes", dataStore.getNumGpsSpikes());
+            return p;
+        }
+        return null;
     }
 
     enum State{

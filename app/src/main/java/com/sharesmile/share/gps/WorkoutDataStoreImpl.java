@@ -139,15 +139,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     @Override
     public Properties getWorkoutBundle(){
-        Properties p = new Properties();
-        p.put("distance", Utils.formatToKmsWithTwoDecimal(getTotalDistance()));
-        p.put("time_elapsed", getElapsedTime());
-        p.put("avg_speed", getAvgSpeed() * (3.6f));
-        p.put("num_steps", getTotalSteps());
-        p.put("client_run_id", getWorkoutId());
-        p.put("calories", getCalories().getCalories());
-        p.put("bolt_count", getUsainBoltCount());
-        return p;
+        return WorkoutSingleton.getInstance().getWorkoutBundle();
     }
 
     @Override
@@ -320,6 +312,16 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public boolean isMockLocationDetected() {
         return dirtyWorkoutData.isMockLocationDetected();
+    }
+
+    @Override
+    public int getNumGpsSpikes() {
+        return dirtyWorkoutData.getNumGpsSpikes();
+    }
+
+    @Override
+    public void incrementGpsSpike() {
+        dirtyWorkoutData.incrementGpsSpike();
     }
 
     private void persistBothWorkoutData() {

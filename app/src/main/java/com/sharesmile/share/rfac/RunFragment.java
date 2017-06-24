@@ -301,10 +301,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     }
 
     public Properties getWorkoutBundle(){
-        if (myActivity != null){
-            return myActivity.getWorkoutBundle();
-        }
-        return null;
+        return WorkoutSingleton.getInstance().getWorkoutBundle();
     }
 
     protected void continuedRun(){

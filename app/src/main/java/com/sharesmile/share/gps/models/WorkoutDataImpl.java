@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -33,6 +34,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private Calorie calories;
 	private int usainBoltCount;
 	private boolean mockLocationDetected;
+	private int numGpsSpikes;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -73,6 +75,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				source.calories.getCaloriesKarkanen()) : new Calorie(0,0);
 		usainBoltCount = source.usainBoltCount;
 		mockLocationDetected = source.mockLocationDetected;
+		numGpsSpikes = source.numGpsSpikes;
 	}
 
 	private void invokeNewBatch(long startTimeStamp){
@@ -140,6 +143,16 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public Calorie getCalories() {
 		return calories;
+	}
+
+	@Override
+	public int getNumGpsSpikes() {
+		return numGpsSpikes;
+	}
+
+	@Override
+	public void incrementGpsSpike() {
+		numGpsSpikes++;
 	}
 
 	@Override
@@ -304,15 +317,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public Properties getWorkoutBundle() {
-		Properties p = new Properties();
-		p.put("distance", Utils.formatToKmsWithTwoDecimal(getDistance()));
-		p.put("time_elapsed", getElapsedTime());
-		p.put("avg_speed", getAvgSpeed()*(3.6f));
-		p.put("num_steps", getTotalSteps());
-		p.put("client_run_id", getWorkoutId());
-		p.put("calories", getCalories().getCalories());
-		p.put("bolt_count", getUsainBoltCount());
-		return p;
+		return WorkoutSingleton.getInstance().getWorkoutBundle();
 	}
 
 	@Override
@@ -331,6 +336,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", calories=" + calories +
 				", usainBoltCount=" + usainBoltCount +
 				", isMockLocationDetected=" + mockLocationDetected +
+				", numGpsSpikes=" + numGpsSpikes +
 				'}';
 	}
 
@@ -348,6 +354,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		calories = (Calorie) in.readValue(Calorie.class.getClassLoader());
 		usainBoltCount = in.readInt();
 		mockLocationDetected = in.readByte() != 0x00;
+		numGpsSpikes = in.readInt();
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
@@ -376,6 +383,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeValue(calories);
 		dest.writeInt(usainBoltCount);
 		dest.writeByte((byte) (mockLocationDetected ? 0x01 : 0x00));
+		dest.writeInt(numGpsSpikes);
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

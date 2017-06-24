@@ -259,19 +259,7 @@ public class WorkoutService extends Service implements
     }
 
     public Properties getWorkoutBundle(){
-        if (tracker != null){
-            Properties p = new Properties();
-            p.put("distance", Utils.formatToKmsWithTwoDecimal(getTotalDistanceCoveredInMeters()));
-            p.put("time_elapsed", getWorkoutElapsedTimeInSecs());
-            p.put("avg_speed", tracker.getAvgSpeed() * (3.6f));
-            p.put("num_steps", getTotalStepsInWorkout());
-            p.put("client_run_id", tracker.getCurrentWorkoutId());
-            p.put("calories", tracker.getCalories() != null ? tracker.getCalories() : null);
-            p.put("bolt_count", WorkoutSingleton.getInstance().getDataStore() != null ?
-                    WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount() : null);
-            return p;
-        }
-        return  null;
+        return WorkoutSingleton.getInstance().getWorkoutBundle();
     }
 
     private void unBindFromActivityAndStop() {
@@ -506,6 +494,7 @@ public class WorkoutService extends Service implements
             Logger.e(TAG, "Detected GPS spike, between locations loc1:\n" + loc1.toString()
                         + "\n, loc2:\n" + loc2.toString()
                         + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
+            tracker.incrementGpsSpike();
             AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
                     .addBundle(getWorkoutBundle())
                     .put("spikey_distance", deltaDistance)

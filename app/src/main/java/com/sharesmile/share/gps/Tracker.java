@@ -34,5 +34,6 @@ public interface Tracker {
 	DistRecord getLastRecord();
 	String getCurrentWorkoutId();
 	WorkoutSingleton.State getState();
+	void incrementGpsSpike();
 
 }

@@ -182,4 +182,15 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 */
 	boolean isMockLocationDetected();
 
+	/**
+	 * @return Number of GPS spikes which occurred during the run
+	 */
+	int getNumGpsSpikes();
+
+	/**
+	 * Increments the number of GPS spikes in this run
+	 * @return
+	 */
+	void incrementGpsSpike();
+
 }

@@ -71,6 +71,13 @@ public class RunTracker implements Tracker {
     }
 
     @Override
+    public void incrementGpsSpike() {
+        if (isRunning() && dataStore != null){
+            dataStore.incrementGpsSpike();
+        }
+    }
+
+    @Override
     public synchronized void pauseRun() {
         Logger.d(TAG, "pauseRun");
         WorkoutSingleton.getInstance().pauseWorkout();
@@ -343,6 +350,7 @@ public class RunTracker implements Tracker {
                         // Insanely high velocity, must be a GPS spike
                         toRecord = false;
                         Logger.i(TAG, "GPS spike detected in RunTracker, through secondary check");
+                        dataStore.incrementGpsSpike();
                         AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
                                 .addBundle(getWorkoutBundle())
                                 .put("spikey_distance", dist)
@@ -391,10 +399,7 @@ public class RunTracker implements Tracker {
     }
 
     public Properties getWorkoutBundle(){
-        if (dataStore != null){
-            return dataStore.getWorkoutBundle();
-        }
-        return null;
+        return WorkoutSingleton.getInstance().getWorkoutBundle();
     }
 
     private boolean checkUsingFormula(float dist, float accuracy){

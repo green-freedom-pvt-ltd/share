@@ -290,10 +290,7 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public Properties getWorkoutBundle(){
-        if (isBoundToLocationService()) {
-            return locationService.getWorkoutBundle();
-        }
-        return null;
+        return WorkoutSingleton.getInstance().getWorkoutBundle();
     }
 
     public float getTotalDistanceInMeters(){

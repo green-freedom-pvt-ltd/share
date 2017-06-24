@@ -83,4 +83,9 @@ public interface WorkoutDataStore {
 	void setMockLocationDetected(boolean detected);
 
 	boolean isMockLocationDetected();
+
+	int getNumGpsSpikes();
+
+	void incrementGpsSpike();
+
 }
