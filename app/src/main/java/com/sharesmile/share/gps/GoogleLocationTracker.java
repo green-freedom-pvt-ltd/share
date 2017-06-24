@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import static com.sharesmile.share.core.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
+import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 
 
@@ -512,6 +513,10 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 locationQueue.add(location);
             }
         }
+    }
+
+    public boolean isInVehicleAsPerGpsSpeed(){
+        return getRecentGpsSpeed() > USAIN_BOLT_GPS_SPEED_LIMIT;
     }
 
 

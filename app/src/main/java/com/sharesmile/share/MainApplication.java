@@ -146,7 +146,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         long[] vibratePattern;
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
             // Long vibration for walk engagement notification
-            vibratePattern = new long[]{0, 400, 200,1000}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+            vibratePattern = new long[]{0, 500, 300, 1500}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }else {
             vibratePattern = new long[]{0, 200, 100, 400}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }
@@ -369,12 +369,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         Logger.d(TAG, "startSyncTasks");
         SyncHelper.syncUserFromDB();
         SyncHelper.scheduleDataSync(this);
-        SyncHelper.scheduleRunDataSync(this);
         SyncHelper.syncMessageCenterData(this);
-        SyncHelper.syncLeaderBoardData(this);
-        SyncHelper.scheduleCauseDataSync(this);
         SyncHelper.scheduleUserDataSync(this);
-        SyncHelper.scheduleServerTimeSync(this);
         boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         if (!isWorkoutDataUpToDate){
             // Need to forcefully refresh workout data now
