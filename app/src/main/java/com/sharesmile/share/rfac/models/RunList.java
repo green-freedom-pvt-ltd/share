@@ -144,6 +144,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         if (run.getTeamId() > 0){
             workout.setTeamId(run.getTeamId());
         }
+        workout.setNumSpikes(run.getNumSpikes());
         return workout;
     }
 

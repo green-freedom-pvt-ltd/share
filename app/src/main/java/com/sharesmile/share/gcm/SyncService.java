@@ -371,6 +371,7 @@ public class SyncService extends GcmTaskService {
             if (workout.getTeamId() != null && workout.getTeamId() > 0){
                 jsonObject.put("team_id", workout.getTeamId());
             }
+            jsonObject.put("num_spikes", workout.getNumSpikes());
 
             Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 

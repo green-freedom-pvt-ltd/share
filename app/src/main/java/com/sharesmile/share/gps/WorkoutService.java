@@ -196,6 +196,7 @@ public class WorkoutService extends Service implements
         if (LeaderBoardDataStore.getInstance().isLeagueActive()){
             workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
         }
+        workout.setNumSpikes(data.getNumGpsSpikes());
         workoutDao.insertOrReplace(workout);
         Utils.updateTrackRecordFromDb();
         SyncHelper.pushRunData();

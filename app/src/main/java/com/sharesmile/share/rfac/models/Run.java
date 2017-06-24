@@ -75,6 +75,9 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("team_id")
     int teamId;
 
+    @SerializedName("num_spikes")
+    int numSpikes;
+
     public long getId() {
         return id;
     }
@@ -247,6 +250,14 @@ public class Run implements UnObfuscable, Serializable {
         this.teamId = teamId;
     }
 
+    public int getNumSpikes() {
+        return numSpikes;
+    }
+
+    public void setNumSpikes(int numSpikes) {
+        this.numSpikes = numSpikes;
+    }
+
     @Override
     public String toString() {
         return "Run{" +
@@ -270,6 +281,7 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t endLocationLatitude='" + endLocationLat + '\'' +
                 ",\n\t startLocationLongitude='" + endLocationLong + '\'' +
                 ",\n\t teamId='" + teamId + '\'' +
+                ",\n\t numSpikes='" + numSpikes + '\'' +
                 "\n}";
     }
 }
