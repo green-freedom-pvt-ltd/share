@@ -18,7 +18,9 @@ public class MigrateV8ToV9 extends MigrationImpl {
     public int applyMigration(@NonNull SQLiteDatabase db,
                               int currentVersion) {
         prepareMigration(db, currentVersion);
-        db.execSQL(getSqlStringForMigration());
+
+        db.execSQL(getSqlQueryForAddingColumn(" 'TEAM_ID' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'NUM_SPIKES' INTEGER"));
 
         return getMigratedVersion();
     }
@@ -47,8 +49,8 @@ public class MigrateV8ToV9 extends MigrationImpl {
         return new MigrateV7ToV8();
     }
 
-    private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN 'TEAM_ID' INTEGER";
+    private String getSqlQueryForAddingColumn(String columnDef) {
+        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN " + columnDef;
     }
 
 }

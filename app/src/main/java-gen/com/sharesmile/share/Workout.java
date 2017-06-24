@@ -31,6 +31,7 @@ public class Workout {
     private Long version;
     private Double calories;
     private Integer teamId;
+    private Integer numSpikes;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -42,7 +43,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun, Long version, Double calories, Integer teamId) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun, Long version, Double calories, Integer teamId, Integer numSpikes) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -64,6 +65,7 @@ public class Workout {
         this.version = version;
         this.calories = calories;
         this.teamId = teamId;
+        this.numSpikes = numSpikes;
     }
 
     public Long getId() {
@@ -234,6 +236,14 @@ public class Workout {
 
     public void setTeamId(Integer teamId) {
         this.teamId = teamId;
+    }
+
+    public Integer getNumSpikes() {
+        return numSpikes;
+    }
+
+    public void setNumSpikes(Integer numSpikes) {
+        this.numSpikes = numSpikes;
     }
 
     // KEEP METHODS - put your custom methods here

@@ -44,6 +44,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         public final static Property Version = new Property(18, Long.class, "version", false, "VERSION");
         public final static Property Calories = new Property(19, Double.class, "calories", false, "CALORIES");
         public final static Property TeamId = new Property(20, Integer.class, "teamId", false, "TEAM_ID");
+        public final static Property NumSpikes = new Property(21, Integer.class, "numSpikes", false, "NUM_SPIKES");
     };
 
 
@@ -79,7 +80,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"IS_VALID_RUN\" INTEGER," + // 17: isValidRun
                 "\"VERSION\" INTEGER," + // 18: version
                 "\"CALORIES\" REAL," + // 19: calories
-                "\"TEAM_ID\" INTEGER);"); // 20: teamId
+                "\"TEAM_ID\" INTEGER," + // 20: teamId
+                "\"NUM_SPIKES\" INTEGER);"); // 21: numSpikes
     }
 
     /** Drops the underlying database table. */
@@ -181,6 +183,11 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (teamId != null) {
             stmt.bindLong(21, teamId);
         }
+ 
+        Integer numSpikes = entity.getNumSpikes();
+        if (numSpikes != null) {
+            stmt.bindLong(22, numSpikes);
+        }
     }
 
     /** @inheritdoc */
@@ -213,7 +220,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             cursor.isNull(offset + 17) ? null : cursor.getShort(offset + 17) != 0, // isValidRun
             cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18), // version
             cursor.isNull(offset + 19) ? null : cursor.getDouble(offset + 19), // calories
-            cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20) // teamId
+            cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20), // teamId
+            cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21) // numSpikes
         );
         return entity;
     }
@@ -242,6 +250,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         entity.setVersion(cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18));
         entity.setCalories(cursor.isNull(offset + 19) ? null : cursor.getDouble(offset + 19));
         entity.setTeamId(cursor.isNull(offset + 20) ? null : cursor.getInt(offset + 20));
+        entity.setNumSpikes(cursor.isNull(offset + 21) ? null : cursor.getInt(offset + 21));
      }
     
     /** @inheritdoc */

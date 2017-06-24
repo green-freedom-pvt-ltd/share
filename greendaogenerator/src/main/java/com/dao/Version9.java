@@ -48,6 +48,7 @@ public class Version9 extends SchemaVersion{
         workout.addLongProperty("version");
         workout.addDoubleProperty("calories");
         workout.addIntProperty("teamId");
+        workout.addIntProperty("numSpikes");
     }
 
     private static void addUserData(Schema schema) {
