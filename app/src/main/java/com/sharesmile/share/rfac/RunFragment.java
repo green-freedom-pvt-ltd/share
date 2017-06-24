@@ -10,10 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sharesmile.share.Events.GpsStateChangeEvent;
 import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.Events.UsainBoltForceExit;
+import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -29,6 +31,10 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_BAD;
+import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_INACTIVE;
+import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_OK;
 
 ;
 
@@ -184,6 +190,82 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
                 .buildAndDispatch();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        isOnDisplay = true;
+        if (WorkoutSingleton.getInstance().toShowWeakGpsPopup()){
+            showGpsWeakDialog();
+        }else {
+            hideGpsWeakDialog();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        isOnDisplay = false;
+    }
+
+    boolean isOnDisplay = false;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(GpsStateChangeEvent gpsStateChangeEvent) {
+        Logger.d(TAG, "onEvent: GpsStateChangeEvent");
+        if (isOnDisplay){
+            if (WorkoutSingleton.getInstance().toShowWeakGpsPopup()){
+                showGpsWeakDialog();
+            }else {
+                hideGpsWeakDialog();
+            }
+        }
+    }
+
+    AlertDialog gpsWeakDialog;
+
+    private void showGpsWeakDialog(){
+        if (gpsWeakDialog == null){
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    WorkoutSingleton.getInstance().setGpsState(GPS_STATE_OK);
+
+                }
+            });
+            alertDialog.setCancelable(false);
+            gpsWeakDialog = alertDialog.create();
+        }else {
+            gpsWeakDialog.dismiss();
+        }
+        switch (WorkoutSingleton.getInstance().getGpsState()){
+            case GPS_STATE_BAD:
+                gpsWeakDialog.setTitle(getString(R.string.notification_gps_weak_title));
+                gpsWeakDialog.setMessage(getString(R.string.notification_gps_weak_description));
+                gpsWeakDialog.show();
+                AnalyticsEvent.create(Event.ON_LOAD_GPS_INACTIVE_POPUP)
+                        .addBundle(getWorkoutBundle())
+                        .buildAndDispatch();
+                break;
+            case GPS_STATE_INACTIVE:
+                gpsWeakDialog.setTitle(getString(R.string.notification_gps_inactivity_title));
+                gpsWeakDialog.setMessage(getString(R.string.notification_gps_inactivity_description));
+                gpsWeakDialog.show();
+                AnalyticsEvent.create(Event.ON_LOAD_GPS_WEAK_POPUP)
+                        .addBundle(getWorkoutBundle())
+                        .buildAndDispatch();
+                break;
+            default:
+                throw new IllegalStateException("Inconsistent GPS state");
+        }
+    }
+
+    private void hideGpsWeakDialog(){
+        if (gpsWeakDialog != null && gpsWeakDialog.isShowing()){
+            gpsWeakDialog.dismiss();
+        }
+    }
+
     public void stopTimer(){
         Logger.d(TAG, "stopTimer");
         handler.removeCallbacks(timer);
@@ -256,6 +338,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         super.onDestroyView();
         stopTimer();
         EventBus.getDefault().unregister(this);
+        hideGpsWeakDialog();
     }
 
     private Runnable timer = new Runnable() {

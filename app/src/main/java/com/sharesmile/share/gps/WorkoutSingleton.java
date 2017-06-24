@@ -25,6 +25,12 @@ public class WorkoutSingleton {
 
     private boolean toShowEndRunDialog;
 
+    private int gpsState = 0;
+
+    public static final int GPS_STATE_BAD = 1;
+    public static final int GPS_STATE_INACTIVE = 2;
+    public static final int GPS_STATE_OK = 0;
+
     private WorkoutSingleton(Context appContext){
         if (isWorkoutActive()){
             dataStore = new WorkoutDataStoreImpl();
@@ -97,6 +103,18 @@ public class WorkoutSingleton {
 
     public boolean toShowEndRunDialog(){
         return toShowEndRunDialog;
+    }
+
+    public boolean toShowWeakGpsPopup() {
+        return gpsState > 0;
+    }
+
+    public void setGpsState(int state) {
+        this.gpsState = state;
+    }
+
+    public int getGpsState(){
+        return gpsState;
     }
 
     public void mockLocationDetected(){

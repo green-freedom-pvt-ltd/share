@@ -20,6 +20,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.sharesmile.share.Events.GpsStateChangeEvent;
 import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
@@ -69,6 +70,8 @@ import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIF
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
+import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_INACTIVE;
+import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_OK;
 import static com.sharesmile.share.rfac.RunFragment.NOTIFICATION_TIMER_TICK;
 
 
@@ -406,7 +409,7 @@ public class WorkoutService extends Service implements
         if (location == null){
             return;
         }
-        cancelWorkoutNotification(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
+        cancelGpsInactiveNotification();
         handler.removeCallbacks(handleGpsInactivityRunnable);
         handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
         if(tracker != null && tracker.isRunning()) {
@@ -696,7 +699,7 @@ public class WorkoutService extends Service implements
     private void cancelAllWorkoutNotifications(){
         Logger.d(TAG, "cancelAllWorkoutNotifications");
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.cancel(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
+        cancelGpsInactiveNotification();
         manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
         manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
         manager.cancel(WORKOUT_NOTIFICATION_STILL_ID);
@@ -722,7 +725,7 @@ public class WorkoutService extends Service implements
     @Override
     public void workoutVigilanceSessiondefaulted(int problem) {
         Logger.d(TAG, "workoutVigilanceSessiondefaulted");
-        float distanceReduction = 0f;
+        float distanceReduction;
         String distReductionString = null;
         if (tracker != null && tracker.isActive()) {
             distanceReduction = tracker.discardApprovalQueue();
@@ -940,22 +943,36 @@ public class WorkoutService extends Service implements
         @Override
         public void run() {
             // GoogleLocationTracker has not sent GPS fix since a long time, need to notify the user about it
-            // But will do it only when user is on the move
+            // But will do it only when user is on the move on foot
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
-            if ( stepCounter.getMovingAverageOfStepsPerSec() > MIN_CADENCE_FOR_WALK
-                    || ActivityDetector.getInstance().isOnFoot() ){
-                MainApplication.showRunNotification(
-                        getString(R.string.notification_gps_inactivity_title),
-                        WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
-                        getString(R.string.notification_gps_inactivity),
-                        getString(R.string.notification_action_pause),
-                        getString(R.string.notification_action_stop)
-                );
-                AnalyticsEvent.create(Event.DISP_GPS_NOT_ACTIVE_NOTIF)
-                        .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
-                        .buildAndDispatch();
+            if ( ActivityDetector.getInstance().isOnFoot()
+                    || stepCounter.getMovingAverageOfStepsPerSec() > MIN_CADENCE_FOR_WALK){
+                notifyUserAboutGpsInactivity();
             }
         }
     };
+
+    public void notifyUserAboutGpsInactivity(){
+        MainApplication.showRunNotification(
+                getString(R.string.notification_gps_inactivity_title),
+                WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
+                getString(R.string.notification_gps_inactivity_content),
+                getString(R.string.notification_action_pause),
+                getString(R.string.notification_action_stop)
+        );
+        WorkoutSingleton.getInstance().setGpsState(WorkoutSingleton.GPS_STATE_INACTIVE);
+        EventBus.getDefault().post(new GpsStateChangeEvent());
+        AnalyticsEvent.create(Event.DISP_GPS_NOT_ACTIVE_NOTIF)
+                .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
+                .buildAndDispatch();
+    }
+
+    public void cancelGpsInactiveNotification(){
+        cancelWorkoutNotification(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
+        if (WorkoutSingleton.getInstance().getGpsState() == GPS_STATE_INACTIVE){
+            WorkoutSingleton.getInstance().setGpsState(GPS_STATE_OK);
+            EventBus.getDefault().post(new GpsStateChangeEvent());
+        }
+    }
 
 }
