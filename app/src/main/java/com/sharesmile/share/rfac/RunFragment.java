@@ -240,8 +240,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         }
         switch (WorkoutSingleton.getInstance().getGpsState()){
             case GPS_STATE_BAD:
-                gpsWeakDialog.setTitle(getString(R.string.notification_gps_weak_title));
-                gpsWeakDialog.setMessage(getString(R.string.notification_gps_weak_description));
+                gpsWeakDialog.setTitle(getString(R.string.notification_bad_gps_title));
+                gpsWeakDialog.setMessage(getString(R.string.notification_bad_gps_description));
                 gpsWeakDialog.show();
                 AnalyticsEvent.create(Event.ON_LOAD_GPS_INACTIVE_POPUP)
                         .addBundle(getWorkoutBundle())

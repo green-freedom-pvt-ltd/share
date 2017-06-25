@@ -28,6 +28,9 @@ import org.json.JSONObject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.sharesmile.share.core.Constants.FEEDBACK_TAG_DRAWER;
+import static com.sharesmile.share.core.Constants.FEEDBACK_TAG_FLAGGED_RUN;
+
 
 /**
  * Created by apurvgandhwani on 3/26/2016.
@@ -86,18 +89,33 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         MainApplication.showToast(R.string.feedback_thanks);
         String feedbackText = mFeedbackText.getText().toString();
         StringBuilder stringBuilder = new StringBuilder("Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n");
-        if (concernedRun != null){
-            String concernedRunDetails = concernedRun.toString();
-            stringBuilder.append("Concerned Run:\n" + concernedRunDetails
-                    + "\n Feedback Message: " + feedbackText) ;
-        }else {
-            stringBuilder.append("Feedback Message: " + feedbackText) ;
-        }
-
         try {
+
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("user_id", MainApplication.getInstance().getUserID());
+
+            if (MainApplication.isLogin()){
+                jsonObject.put("email", MainApplication.getInstance().getUserDetails().getEmail());
+                jsonObject.put("phone_number", MainApplication.getInstance().getUserDetails().getPhoneNumber());
+            }
+
+            if (concernedRun != null){
+                String concernedRunDetails = concernedRun.toString();
+                stringBuilder.append("Concerned Run:\n" + concernedRunDetails
+                        + "\n Feedback Message: " + feedbackText) ;
+                jsonObject.put("tag", FEEDBACK_TAG_FLAGGED_RUN);
+                if (concernedRun.getId() > 0){
+                    jsonObject.put("run_id", concernedRun.getId());
+                }
+                jsonObject.put("client_run_id", concernedRun.getClientRunId());
+            }else {
+                stringBuilder.append("Feedback Message: " + feedbackText) ;
+                jsonObject.put("tag", FEEDBACK_TAG_DRAWER);
+            }
+
             jsonObject.put("feedback", stringBuilder.toString());
+
+            // TODO: Launch in a OneOffTask to ensure guaranteed delivery of feedback
             NetworkDataProvider.doPostCallAsync(Urls.getFeedBackUrl(), jsonObject, new NetworkAsyncCallback<CustomJSONObject>() {
                 @Override
                 public void onNetworkFailure(NetworkException ne) {

@@ -77,7 +77,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private ActivityDetector(Context appContext){
         this.appContext = appContext;
         this.handler = new Handler();
-        this.historyQueue = new CircularQueue<>(3);
+        this.historyQueue = new CircularQueue<>(5);
         this.isWorkoutActive = WorkoutSingleton.getInstance().isWorkoutActive();
         connectGoogleApiClient();
     }

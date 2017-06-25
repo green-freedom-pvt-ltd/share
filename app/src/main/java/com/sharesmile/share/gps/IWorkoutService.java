@@ -21,5 +21,8 @@ public interface IWorkoutService {
 	float getAvgSpeed();
 	Tracker getTracker();
 	Properties getWorkoutBundle();
+	float getMovingAverageOfStepsPerSec();
+	void notifyUserAboutBadGps();
+	void cancelBadGpsNotification();
 
 }

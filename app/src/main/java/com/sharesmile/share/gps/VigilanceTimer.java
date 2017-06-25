@@ -1,19 +1,18 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
+import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT;
+import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
+import static com.sharesmile.share.core.Config.MIN_NUM_SPIKES_RATE_FOR_BAD_GPS;
 
 /**
  * Created by ankitm on 18/03/16.
@@ -23,18 +22,28 @@ public class VigilanceTimer implements Runnable {
 	private static final String TAG = "VigilanceTimer";
 	private ScheduledExecutorService scheduledExecutor;
 	private IWorkoutService workoutService;
+	private UsainBolt usainBolt;
+
+//	private CircularQueue<RecentPerformance> recentPerformanceQueue;
 
 	private int stepsTillNow = -1;
-	private float lastValidatedRecordedTimeInSecs; // in secs
-	private float lastValidatedDistance;
-	private int lastValidatedNumSteps;
+	private int numSpikesAtLastVigilance;
+	private long lastVigilanceTimeStamp;
+
+	private long timeWithContinuousBadGpsBehaviour;
+
+	private static final int RECENT_PERF_QUEUE_SIZE = 4;
 
 	public VigilanceTimer(IWorkoutService workoutService,
 						  ScheduledExecutorService executorService){
 		this.scheduledExecutor = executorService;
 		this.workoutService = workoutService;
-		scheduledExecutor.scheduleAtFixedRate(this, 0, Config.VIGILANCE_TIMER_INTERVAL, TimeUnit.MILLISECONDS);
-		resetCounters();
+		scheduledExecutor.scheduleAtFixedRate(this, Config.VIGILANCE_TIMER_INTERVAL,
+				Config.VIGILANCE_TIMER_INTERVAL, TimeUnit.MILLISECONDS);
+		usainBolt = new UsainBolt(workoutService);
+//		recentPerformanceQueue = new CircularQueue<>(RECENT_PERF_QUEUE_SIZE);
+		numSpikesAtLastVigilance = WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes();
+		lastVigilanceTimeStamp = DateUtil.getServerTimeInMillis();
 	}
 
 	@Override
@@ -57,20 +66,25 @@ public class VigilanceTimer implements Runnable {
 	}
 
 	public synchronized void pauseTimer(){
-		resetCounters();
+		usainBolt.resetCounters();
+		timeWithContinuousBadGpsBehaviour = 0;
+//		synchronized (recentPerformanceQueue){
+//			recentPerformanceQueue.clear();
+//		}
 	}
 
-	private void resetCounters(){
-		Logger.d(TAG, "resetCounters");
-		this.lastValidatedRecordedTimeInSecs = workoutService.getTracker().getRecordedTimeInSecs(); // in secs
-		this.lastValidatedDistance = workoutService.getTracker().getTotalDistanceCovered();
-		this.lastValidatedNumSteps = workoutService.getTracker().getTotalSteps();
+	public synchronized void resumeTimer(){
+		numSpikesAtLastVigilance = WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes();
+		lastVigilanceTimeStamp = DateUtil.getServerTimeInMillis();
+		timeWithContinuousBadGpsBehaviour = 0;
 	}
 
 	private synchronized void onTimerTick(){
-
 		Logger.d(TAG, "onTimerTick");
 
+		if (WorkoutSingleton.getInstance().isRunning()){
+			handleRecentPerformance();
+		}
 
 		//check for slow speed
 		if (checkForTooSlow()){
@@ -81,7 +95,7 @@ public class VigilanceTimer implements Runnable {
 		}
 
 		//check for high speed
-		if (checkForTooFast()){
+		if (usainBolt.checkForTooFast()){
 			workoutService.workoutVigilanceSessiondefaulted(Constants.PROBELM_TOO_FAST);
 			return;
 		}
@@ -101,6 +115,57 @@ public class VigilanceTimer implements Runnable {
 
 	}
 
+	private void handleRecentPerformance(){
+		// calculate current time
+		long currentTime = DateUtil.getServerTimeInMillis();
+		int currentNumSpikes = WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes();
+
+		// Record recent performance
+		long deltaMillis = currentTime - lastVigilanceTimeStamp;
+		if (deltaMillis <= 0){
+			return;
+		}
+		float recentSpeed = workoutService.getCurrentSpeed();
+		float onFootConfidence = ActivityDetector.getInstance().getOnFootConfidence();
+		float recentCadence = workoutService.getMovingAverageOfStepsPerSec();
+		int recentNumSpikes = currentNumSpikes - numSpikesAtLastVigilance;
+
+		RecentPerformance recentPerformance = new RecentPerformance();
+		recentPerformance.setDeltaMillis(deltaMillis);
+		recentPerformance.setRecentSpeed(recentSpeed);
+		recentPerformance.setOnFootConfidenceRecentAvg(onFootConfidence);
+		recentPerformance.setRecentCadence(recentCadence);
+		recentPerformance.setRecentNumGpsSpikes(recentNumSpikes);
+
+//		synchronized (recentPerformanceQueue){
+//			recentPerformanceQueue.add(recentPerformance);
+//
+//		}
+
+		lastVigilanceTimeStamp = currentTime;
+		numSpikesAtLastVigilance = currentNumSpikes;
+
+		// Check for possibilities of GPS misbehaviour
+		float spikesPerSec = ((float) (recentNumSpikes * 1000)) / deltaMillis;
+
+		if (recentSpeed < Config.GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD
+				&& spikesPerSec > MIN_NUM_SPIKES_RATE_FOR_BAD_GPS
+				&& ( onFootConfidence > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT || recentCadence > MIN_CADENCE_FOR_WALK))
+		{
+			// GPS misbehaved for this session
+			timeWithContinuousBadGpsBehaviour += deltaMillis;
+		} else {
+			// GPS seems OK
+			timeWithContinuousBadGpsBehaviour = 0;
+			workoutService.cancelBadGpsNotification();
+		}
+
+		if (timeWithContinuousBadGpsBehaviour > 60000){
+			// Time to show GPS signal Weak popup
+			workoutService.notifyUserAboutBadGps();
+		}
+	}
+
 	private boolean checkForTooSlow(){
 		if (!Config.TOO_SLOW_CHECK){
 			return false;
@@ -114,148 +179,6 @@ public class VigilanceTimer implements Runnable {
 				&& workoutService.getTracker().getDistanceCoveredSinceLastResume() < inSecs*Config.LOWER_SPEED_LIMIT
 				){
 			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * This check is triggered after every VIGILANCE_TIMER_INTERVAL (17 secs)
-	 * @return true if we believe that user is in a vehicle
-	 */
-	private boolean checkForTooFast(){
-		if (!Config.USAIN_BOLT_CHECK){
-			return false;
-		}
-
-		// recentSpeed is avg speed from recent few samples of accepted GPS points in the past 24 secs
-		float recentSpeed = workoutService.getCurrentSpeed();
-		// If recentSpeed is above USAIN_BOLT_RECENT_SPEED_LOWER_BOUND (14.8 km/hr) then only enter the check for USAIN_BOLT
-		if (recentSpeed > Config.USAIN_BOLT_RECENT_SPEED_LOWER_BOUND){
-
-			// recent is avg GPS speed from recent few samples of accepted GPS points in the past 24 secs
-			// GPS speed is obtained directly from location object and is calculated using doppler shift
-			float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
-			// If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (24 km/hr) then user must be in a vehicle
-			if (recentGpsSpeed > USAIN_BOLT_GPS_SPEED_LIMIT){
-				Logger.d(TAG, "Recent GPS speed is greater than threshold, must be Usain Bolt");
-				AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
-						.addBundle(workoutService.getWorkoutBundle())
-						.put("detected_by", "gps_speed")
-						.put("recent_speed", recentSpeed*3.6)
-						.put("recent_gps_speed", recentGpsSpeed*3.6)
-						.buildAndDispatch();
-				return true;
-			}
-
-			// If ActivityDetector says that user is in a vehicle with confidence then user must be in a vehicle
-			if (ActivityDetector.getInstance().isIsInVehicle()){
-				Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
-				AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
-						.addBundle(workoutService.getWorkoutBundle())
-						.put("detected_by", "activity_recognition")
-						.put("recent_speed", recentSpeed*3.6)
-						.put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
-						.buildAndDispatch();
-				return true;
-			}
-			// Go for speed logic based check with recent speed as input
-			return tooFastSecondaryCheck(recentSpeed);
-		}
-		return false;
-	}
-
-	/**
-	 * Returns true if it thinks the user is in a vehicle as per speed calculations
-	 * @param recentSpeed
-	 * @return
-	 */
-	private boolean tooFastSecondaryCheck(float recentSpeed){
-		/*
-		  We store recordedTime (as lastValidatedRecordedTimeInSecs), distanceCovered (as lastValidatedDistance)
-		  and numSteps (as lastValidatedNumSteps) every time this check is cleared successfully
-		  */
-		float currentRecordedTime = workoutService.getTracker().getRecordedTimeInSecs();
-		float currentDistanceCovered = workoutService.getTotalDistanceCoveredInMeters();
-		int currentNumSteps = workoutService.getTotalStepsInWorkout();
-
-		// Proceed for check only when we have recorded more distance after the last time recorded distance was validated
-		if (currentRecordedTime > lastValidatedRecordedTimeInSecs){
-			float distanceInSession = currentDistanceCovered - lastValidatedDistance;
-			int stepsInSession = currentNumSteps - lastValidatedNumSteps;
-			float timeElapsedInSecs = currentRecordedTime - lastValidatedRecordedTimeInSecs;
-			Logger.d(TAG, "onTick Upper speed limit check, Distance in last session = " + distanceInSession
-					+ ", timeElapsedInSecs = " + timeElapsedInSecs
-					+ ", total distanceCovered = " +  workoutService.getTracker().getTotalDistanceCovered());
-
-			// Calculate speed in the last recorded session
-			float speedInSession = distanceInSession / timeElapsedInSecs;
-
-			// Calculate avgStrideLength (distance covered in one foot step) of the user
-			float averageStrideLength = (Utils.getAverageStrideLength() == 0)
-					? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
-			// Normalising averageStrideLength obtained
-			if (averageStrideLength < 0.3f){
-				averageStrideLength = 0.3f;
-			}
-			if (averageStrideLength > 1f){
-				averageStrideLength = 1f;
-			}
-			// Calculate expected num of steps in the recorded session based on speed and avgStrideLength
-			int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
-			// ratio between actual steps counted and the expected num of steps in recorded session
-			float stepsRatio = ( (float) stepsInSession / (float) expectedNumOfSteps);
-
-			// Distance is above the threshold minimum MIN_DISTANCE_FOR_VIGILANCE (50 m) to apply Usain Bolt Filter
-			if (distanceInSession > Config.MIN_DISTANCE_FOR_VIGILANCE){
-
-				// If user is onFoot (less probability of user being in vehicle) then
-				// speed limit is different then when the user is not onFoot (more probability of being in vehicle).
-				// speed limit is greater for ON_FOOT cases to reduces Usain Bolt false positive occurrences
-				float upperSpeedLimit;
-				if (ActivityDetector.getInstance().isOnFoot()){
-					upperSpeedLimit = Config.USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT; // 45 km/hr
-				}else {
-					upperSpeedLimit = Config.USAIN_BOLT_UPPER_SPEED_LIMIT; // 25.2 km/hr
-				}
-
-				// Check if the speed is greater than allowed limit
-				if ( speedInSession > upperSpeedLimit ){
-					/*
-						 Running faster than Usain Bolt, but we have to give benefit of doubt
-						 and waive the user from USAIN_BOLT if he/she has covered
-						 a fraction (USAIN_BOLT_WAIVER_STEPS_RATIO = 0.27) of expected num of steps
-						 during this recorded session.
-						 This is done to avoid false USAIN_BOLT cases where the user is actually walking
-						 and speed goes above limit because of GPS spikes
-					 */
-					if (stepsRatio < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
-						// Speed more than limit, and insufficient num of steps,
-						// user definitely must be inside a vehicle
-						AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
-								.addBundle(workoutService.getWorkoutBundle())
-								.put("detected_by", "speed_logic")
-								.put("speed_in_session", speedInSession*3.6)
-								.put("recent_speed", recentSpeed*3.6)
-								.put("steps_ratio", stepsRatio)
-								.put("activity", ActivityDetector.getInstance().getCurrentActivity())
-								.buildAndDispatch();
-						return true;
-					}
-				}
-				lastValidatedRecordedTimeInSecs = currentRecordedTime;
-				lastValidatedDistance = currentDistanceCovered;
-				lastValidatedNumSteps = currentNumSteps;
-			}
-			if (speedInSession > Config.USAIN_BOLT_UPPER_SPEED_LIMIT){
-				// Potential Usain Bolt Which was missed
-				AnalyticsEvent.create(Event.ON_POTENTIAL_USAIN_BOLT_MISSED)
-						.addBundle(workoutService.getWorkoutBundle())
-						.put("speed_in_session", speedInSession*3.6)
-						.put("recent_speed", recentSpeed*3.6)
-						.put("steps_ratio", stepsRatio)
-						.put("activity", ActivityDetector.getInstance().getCurrentActivity())
-						.buildAndDispatch();
-			}
 		}
 		return false;
 	}
@@ -280,5 +203,55 @@ public class VigilanceTimer implements Runnable {
 			}
 		}
 		return false;
+	}
+
+	public class RecentPerformance {
+
+		long deltaMillis;
+		float onFootConfidenceRecentAvg;
+		float recentCadence;
+		float recentSpeed;
+		int recentNumGpsSpikes;
+
+
+		public long getDeltaMillis() {
+			return deltaMillis;
+		}
+
+		public void setDeltaMillis(long deltaMillis) {
+			this.deltaMillis = deltaMillis;
+		}
+
+		public float getOnFootConfidenceRecentAvg() {
+			return onFootConfidenceRecentAvg;
+		}
+
+		public void setOnFootConfidenceRecentAvg(float onFootConfidenceRecentAvg) {
+			this.onFootConfidenceRecentAvg = onFootConfidenceRecentAvg;
+		}
+
+		public float getRecentCadence() {
+			return recentCadence;
+		}
+
+		public void setRecentCadence(float recentCadence) {
+			this.recentCadence = recentCadence;
+		}
+
+		public float getRecentSpeed() {
+			return recentSpeed;
+		}
+
+		public void setRecentSpeed(float recentSpeed) {
+			this.recentSpeed = recentSpeed;
+		}
+
+		public int getRecentNumGpsSpikes() {
+			return recentNumGpsSpikes;
+		}
+
+		public void setRecentNumGpsSpikes(int recentNumGpsSpikes) {
+			this.recentNumGpsSpikes = recentNumGpsSpikes;
+		}
 	}
 }

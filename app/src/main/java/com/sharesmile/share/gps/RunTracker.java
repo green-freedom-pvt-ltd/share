@@ -310,7 +310,9 @@ public class RunTracker implements Tracker {
                     Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
                     DistRecord startRecord = new DistRecord(point);
                     dataStore.addRecord(startRecord);
-                    recordHistoryQueue.add(startRecord);
+                    synchronized (recordHistoryQueue){
+                        recordHistoryQueue.add(startRecord);
+                    }
                     SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, startRecord);
                 }
             }else{
@@ -384,7 +386,9 @@ public class RunTracker implements Tracker {
                         Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed() + ", provider is " + point.getProvider());
                         double prevCalories = dataStore.getCalories().getCalories();
                         dataStore.addRecord(record);
-                        recordHistoryQueue.add(record);
+                        synchronized (recordHistoryQueue){
+                            recordHistoryQueue.add(record);
+                        }
                         SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);
                         float deltaDistance = dist; // in meters
                         int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs

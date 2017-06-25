@@ -63,7 +63,7 @@ public class Config {
 
     // Activity Detector Config
 
-    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 70;
+    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 72;
     public static final int CONFIDENCE_THRESHOLD_ON_FOOT = 70;
     public static final int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
     public static final int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
@@ -84,5 +84,8 @@ public class Config {
     public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs
     public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 120000;// in millisecs
     public static final long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 43200000;// in millisecs, i.e. 12 hours
+
+    public static final float GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD = 0.305f; // in m/s, i.e. 1.1 km/hr
+    public static final float MIN_NUM_SPIKES_RATE_FOR_BAD_GPS = 0.083f; // in spikes/sec, i.e. 5 spikes per min
 
 }

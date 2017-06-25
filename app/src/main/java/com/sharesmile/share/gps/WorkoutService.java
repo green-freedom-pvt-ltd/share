@@ -64,12 +64,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
+import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_BAD;
 import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_INACTIVE;
 import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_OK;
 import static com.sharesmile.share.rfac.RunFragment.NOTIFICATION_TIMER_TICK;
@@ -664,6 +666,9 @@ public class WorkoutService extends Service implements
         Logger.i(TAG, "resume");
         if (GoogleLocationTracker.getInstance().isFetchingLocation()){
             Logger.d(TAG, "resume: LocationFetching going on");
+            if (vigilanceTimer != null) {
+                vigilanceTimer.resumeTimer();
+            }
             if (tracker != null && !tracker.isRunning()) {
                 synchronized (this){
                     acceptedLocationFix = null;
@@ -690,6 +695,7 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "cancelAllWorkoutNotifications");
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         cancelGpsInactiveNotification();
+        cancelBadGpsNotification();
         manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
         manager.cancel(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
         manager.cancel(WORKOUT_NOTIFICATION_STILL_ID);
@@ -955,6 +961,31 @@ public class WorkoutService extends Service implements
         AnalyticsEvent.create(Event.DISP_GPS_NOT_ACTIVE_NOTIF)
                 .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
                 .buildAndDispatch();
+    }
+
+    @Override
+    public void notifyUserAboutBadGps(){
+        MainApplication.showRunNotification(
+                getString(R.string.notification_bad_gps_title),
+                WORKOUT_NOTIFICATION_BAD_GPS_ID,
+                getString(R.string.notification_bad_gps_content),
+                getString(R.string.notification_action_pause),
+                getString(R.string.notification_action_stop)
+        );
+        WorkoutSingleton.getInstance().setGpsState(WorkoutSingleton.GPS_STATE_BAD);
+        EventBus.getDefault().post(new GpsStateChangeEvent());
+        AnalyticsEvent.create(Event.DISP_BAD_GPS_NOTIF)
+                .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
+                .buildAndDispatch();
+    }
+
+    @Override
+    public void cancelBadGpsNotification() {
+        cancelWorkoutNotification(WORKOUT_NOTIFICATION_BAD_GPS_ID);
+        if (WorkoutSingleton.getInstance().getGpsState() == GPS_STATE_BAD){
+            WorkoutSingleton.getInstance().setGpsState(GPS_STATE_OK);
+            EventBus.getDefault().post(new GpsStateChangeEvent());
+        }
     }
 
     public void cancelGpsInactiveNotification(){
