@@ -88,4 +88,6 @@ public class Config {
     public static final float GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD = 0.305f; // in m/s, i.e. 1.1 km/hr
     public static final float MIN_NUM_SPIKES_RATE_FOR_BAD_GPS = 0.083f; // in spikes/sec, i.e. 5 spikes per min
 
+    public static final float MIN_DISTANCE_FOR_FEEDBACK_POPUP = 5.0f;// in Kms
+
 }

@@ -26,8 +26,8 @@ public class WorkoutSingleton {
     private WorkoutDataStore dataStore;
 
     private boolean toShowEndRunDialog;
-
     private int gpsState = 0;
+    private boolean toShowFeedbackDialog;
 
     public static final int GPS_STATE_BAD = 1;
     public static final int GPS_STATE_INACTIVE = 2;
@@ -77,6 +77,9 @@ public class WorkoutSingleton {
         NotificationManager manager = (NotificationManager) MainApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(WORKOUT_NOTIFICATION_ID);
         dataStore = new WorkoutDataStoreImpl(DateUtil.getServerTimeInMillis());
+        setToShowEndRunDialog(false);
+        setToShowFeedbackDialog(false);
+        setGpsState(GPS_STATE_OK);
         return dataStore;
     }
 
@@ -99,6 +102,14 @@ public class WorkoutSingleton {
         return State.valueOf(SharedPrefsManager.getInstance().getString(Constants.PREF_WORKOUT_STATE, State.IDLE.name()));
     }
 
+    public boolean toShowFeedbackDialog() {
+        return toShowFeedbackDialog;
+    }
+
+    public void setToShowFeedbackDialog(boolean toShowFeedbackDialog) {
+        this.toShowFeedbackDialog = toShowFeedbackDialog;
+    }
+
     public void setToShowEndRunDialog(boolean value){
         this.toShowEndRunDialog = value;
     }
@@ -113,6 +124,10 @@ public class WorkoutSingleton {
 
     public void setGpsState(int state) {
         this.gpsState = state;
+        if (gpsState != GPS_STATE_OK){
+            // Some GPS signal issue has triggered, will show feedback popup in the end
+            setToShowFeedbackDialog(true);
+        }
     }
 
     public int getGpsState(){
@@ -133,6 +148,7 @@ public class WorkoutSingleton {
 
     public void incrementUsainBoltsCounter(){
         dataStore.incrementUsainBoltCounter();
+        setToShowFeedbackDialog(true);
     }
 
     private void setState(State state){

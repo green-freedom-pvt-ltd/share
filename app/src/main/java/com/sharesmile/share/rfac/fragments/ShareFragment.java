@@ -58,7 +58,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     public static final String WORKOUT_DATA = "workout_data";
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private static final String TAG = "ShareFragment";
-    private static final String BUNDLE_SHOW_LOGIN = "bundle_show_login";
     private static final int REQUEST_SHARE = 101;
     private CauseData mCauseData;
 
@@ -128,12 +127,11 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     private SHARE_MEDIUM mSelectedShareMedium = SHARE_MEDIUM.FB;
 
-    public static ShareFragment newInstance(WorkoutData data, CauseData causeData, boolean showLoginScreen) {
+    public static ShareFragment newInstance(WorkoutData data, CauseData causeData) {
         ShareFragment fragment = new ShareFragment();
         Bundle args = new Bundle();
         args.putParcelable(WORKOUT_DATA, data);
         args.putSerializable(BUNDLE_CAUSE_DATA, causeData);
-        args.putBoolean(BUNDLE_SHOW_LOGIN, showLoginScreen);
         fragment.setArguments(args);
         return fragment;
     }
@@ -144,13 +142,12 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         Bundle arg = getArguments();
         mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
         mWorkoutData = arg.getParcelable(WORKOUT_DATA);
-        mShowLogin = arg.getBoolean(BUNDLE_SHOW_LOGIN);
+        mShowLogin = !MainApplication.isLogin();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_share, null);
         ButterKnife.bind(this, view);
         init();
@@ -449,7 +446,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     @Override
     public void onLoginSuccess() {
-        getFragmentController().replaceFragment(ShareFragment.newInstance(mWorkoutData, mCauseData, false), false);
+        getFragmentController().replaceFragment(ShareFragment.newInstance(mWorkoutData, mCauseData), false);
     }
 
     @Override

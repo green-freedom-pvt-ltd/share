@@ -232,10 +232,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 replaceFragment(new ProfileStatsFragment(), true);
             }
         }
-        boolean showFeedBackDialog = getIntent().getBooleanExtra(Constants.BUNDLE_FIRST_RUN_FEEDBACK, false);
-        if (showFeedBackDialog) {
-//            showFeedBackDialog();
-        }
     }
 
     private void showLeagueBoard(){

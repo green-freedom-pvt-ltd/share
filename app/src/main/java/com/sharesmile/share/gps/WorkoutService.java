@@ -211,7 +211,7 @@ public class WorkoutService extends Service implements
         if (!currentlyTracking) {
             currentlyTracking = true;
             Logger.d(TAG, "startWorkout");
-
+            WorkoutServiceRetainerAlarm.setRepeatingAlarm(this);
             GoogleLocationTracker.getInstance().registerForWorkout(this);
             handler.removeCallbacks(handleGpsInactivityRunnable);
             handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
@@ -241,6 +241,7 @@ public class WorkoutService extends Service implements
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
+            WorkoutServiceRetainerAlarm.cancelAlarm(this);
             if (stepCounter != null) {
                 stepCounter.stopCounting();
             }
@@ -590,6 +591,9 @@ public class WorkoutService extends Service implements
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
+        }
+        if (totalDistanceKmsTwoDecimal > Config.MIN_DISTANCE_FOR_FEEDBACK_POPUP){
+            WorkoutSingleton.getInstance().setToShowFeedbackDialog(true);
         }
     }
 

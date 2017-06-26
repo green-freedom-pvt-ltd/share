@@ -193,4 +193,10 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 */
 	void incrementGpsSpike();
 
+	/**
+	 * Converts this object to string
+	 * @return
+	 */
+	String toString();
+
 }

@@ -192,6 +192,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".gps.WorkoutServiceRetainerAlarm" android:exported="true">
+            <intent-filter>
+                <action android:name="com.sharesmile.share.gps.START_ALARM" >
+                </action>
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name="activities.MessageVideoActivity"

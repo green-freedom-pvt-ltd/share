@@ -19,8 +19,8 @@ public class DateUtil {
 
 
     public static String getCurrentDate() {
-
         Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getServerTimeInMillis());
         Date date = calendar.getTime();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
         return simpleDateFormat.format(date);

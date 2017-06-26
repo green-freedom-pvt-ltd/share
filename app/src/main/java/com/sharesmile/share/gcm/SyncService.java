@@ -28,6 +28,7 @@ import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunList;
 import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -74,6 +75,10 @@ public class SyncService extends GcmTaskService {
             Bundle extras = taskParams.getExtras();
             String fraudDataString = extras.getString(TaskConstants.FRAUD_DATA_JSON);
             pushFraudData(fraudDataString);
+        }else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_USER_FEEDBACK)) {
+            Bundle extras = taskParams.getExtras();
+            String feedbackString = extras.getString(TaskConstants.FEEDBACK_DATA_JSON);
+            pushUserFeedback(feedbackString);
         }
         return GcmNetworkManager.RESULT_SUCCESS;
     }
@@ -228,6 +233,44 @@ public class SyncService extends GcmTaskService {
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException while syncing runs with URL: "+syncUrl+", Exception: " + e);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }
+    }
+
+    private int pushUserFeedback(String feedbackString){
+        if (TextUtils.isEmpty(feedbackString)){
+            Logger.d(TAG, "Can't push FeedbackString in TaskParams is empty");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+        Logger.d(TAG, "Will pushUserFeedback: " + feedbackString);
+        try {
+            Gson gson = new Gson();
+            UserFeedback feedback = gson.fromJson(feedbackString, UserFeedback.class);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("user_id", feedback.getUserId());
+            jsonObject.put("email", feedback.getEmail());
+            jsonObject.put("phone_number", feedback.getPhoneNumber());
+            jsonObject.put("tag", feedback.getTag());
+            jsonObject.put("run_id", feedback.getRunId());
+            jsonObject.put("client_run_id", feedback.getClientRunId());
+            jsonObject.put("feedback", feedback.getMessage());
+
+            NetworkDataProvider.doPostCall(Urls.getFeedBackUrl(), jsonObject, UserFeedback.class);
+            return GcmNetworkManager.RESULT_SUCCESS;
+
+        }catch (JSONException e){
+            e.printStackTrace();
+            Logger.d(TAG, "JSONException: " + e.getMessage());
+            Crashlytics.logException(e);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }catch (NetworkException ne){
+            ne.printStackTrace();
+            Logger.d(TAG, "NetworkException: " + ne);
+            String log= "Couldn't post user feedback to URL: " + Urls.getFraudstersUrl() + ", Feedback: " + feedbackString;
+            Logger.e(TAG, log);
+            Crashlytics.log(log);
+            Crashlytics.log("Push user feedback networkException, messageFromServer: " + ne);
+            Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
     }
@@ -445,7 +488,6 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "Updating these runs in DB " + gson.toJson(runList));
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             mWorkoutDao.insertOrReplaceInTx(runList);
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
             if (!TextUtils.isEmpty(runList.getNextUrl())) {
                 // Recursive call to fetch the runs of next page
                 return forceRefreshAllWorkoutData(runList.getNextUrl());

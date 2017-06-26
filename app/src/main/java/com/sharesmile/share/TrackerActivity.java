@@ -343,11 +343,10 @@ public class TrackerActivity extends BaseActivity {
 
     public void invokeWorkoutService() {
         Log.d(TAG, "invokeWorkoutService");
-        Bundle bundle = new Bundle();
         Intent intent = new Intent(this, WorkoutService.class);
-        intent.putExtras(bundle);
         startService(intent);
-        bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE
+                | Context.BIND_IMPORTANT);
     }
 
     /**

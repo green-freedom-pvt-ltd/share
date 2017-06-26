@@ -129,7 +129,6 @@ public class Constants {
     public static final String PREF_LOGIN_SKIP = "pref_login_skip";
     public static final String PREF_AUTH_TOKEN = "pref_auth_token";
     public static final String PREF_CAUSE_DATA = "perf_cause_data";
-    public static final String PREF_HAS_RUN = "perf_has_run";
     public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
     public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
@@ -150,7 +149,6 @@ public class Constants {
     public static final String PREF_CAMPAIGN_SHOWN_ONCE = "pref_campaign_shown_once";
 
     //Bundle
-    public static final String BUNDLE_FIRST_RUN_FEEDBACK = "bundle_first_run_feedback";
     public static final String BUNDLE_SHOW_RUN_STATS = "bundle_show_profile";
 
     public static final String GOOGLE_PROJECT_ID = "159550091621";
@@ -161,10 +159,10 @@ public class Constants {
     public static final String PREF_DISABLE_GPS_UPDATES = "pref_disable_gps_updates";
     public static final String PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER = "pref_schedule_walk_engagement_notif_after";
 
-    public static final String FEEDBACK_TAG_FLAGGED_RUN = "FLAGGED_RUN";
-    public static final String FEEDBACK_TAG_DRAWER = "DRAWER";
-    public static final String FEEDBACK_TAG_POST_RUN_HAPPY = "POST_RUN_HAPPY";
-    public static final String FEEDBACK_TAG_POST_RUN_SAD = "POST_RUN_SAD";
+    public static final String FEEDBACK_TAG_FLAGGED_RUN = "flag";
+    public static final String FEEDBACK_TAG_DRAWER = "drawer";
+    public static final String FEEDBACK_TAG_POST_RUN_HAPPY = "happy";
+    public static final String FEEDBACK_TAG_POST_RUN_SAD = "sad";
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));

@@ -11,19 +11,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.sharesmile.share.CustomJSONObject;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.network.NetworkAsyncCallback;
-import com.sharesmile.share.network.NetworkDataProvider;
-import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.rfac.models.UserFeedback;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.utils.Urls;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,49 +81,30 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         }
         hideKeyboard(mFeedbackText);
         MainApplication.showToast(R.string.feedback_thanks);
+
+        UserFeedback feedback = new UserFeedback();
+        if (MainApplication.isLogin()){
+            feedback.setUserId(MainApplication.getInstance().getUserID());
+            feedback.setEmail(MainApplication.getInstance().getUserDetails().getEmail());
+            feedback.setPhoneNumber(MainApplication.getInstance().getUserDetails().getPhoneNumber());
+        }
         String feedbackText = mFeedbackText.getText().toString();
         StringBuilder stringBuilder = new StringBuilder("Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n");
-        try {
-
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("user_id", MainApplication.getInstance().getUserID());
-
-            if (MainApplication.isLogin()){
-                jsonObject.put("email", MainApplication.getInstance().getUserDetails().getEmail());
-                jsonObject.put("phone_number", MainApplication.getInstance().getUserDetails().getPhoneNumber());
+        if (concernedRun != null){
+            String concernedRunDetails = concernedRun.toString();
+            stringBuilder.append("Concerned Run:\n" + concernedRunDetails
+                    + "\n Feedback Message: " + feedbackText) ;
+            feedback.setTag(FEEDBACK_TAG_FLAGGED_RUN);
+            if (concernedRun.getId() > 0){
+                feedback.setRunId((int)concernedRun.getId());
             }
-
-            if (concernedRun != null){
-                String concernedRunDetails = concernedRun.toString();
-                stringBuilder.append("Concerned Run:\n" + concernedRunDetails
-                        + "\n Feedback Message: " + feedbackText) ;
-                jsonObject.put("tag", FEEDBACK_TAG_FLAGGED_RUN);
-                if (concernedRun.getId() > 0){
-                    jsonObject.put("run_id", concernedRun.getId());
-                }
-                jsonObject.put("client_run_id", concernedRun.getClientRunId());
-            }else {
-                stringBuilder.append("Feedback Message: " + feedbackText) ;
-                jsonObject.put("tag", FEEDBACK_TAG_DRAWER);
-            }
-
-            jsonObject.put("feedback", stringBuilder.toString());
-
-            // TODO: Launch in a OneOffTask to ensure guaranteed delivery of feedback
-            NetworkDataProvider.doPostCallAsync(Urls.getFeedBackUrl(), jsonObject, new NetworkAsyncCallback<CustomJSONObject>() {
-                @Override
-                public void onNetworkFailure(NetworkException ne) {
-
-                }
-
-                @Override
-                public void onNetworkSuccess(CustomJSONObject unObfuscable) {
-
-                }
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
+            feedback.setClientRunId(concernedRun.getClientRunId());
+        }else {
+            stringBuilder.append("Feedback Message: " + feedbackText) ;
+            feedback.setTag(FEEDBACK_TAG_DRAWER);
         }
+        feedback.setMessage(stringBuilder.toString());
+        SyncHelper.pushUserFeedback(feedback);
         getFragmentController().replaceFragment(new OnScreenFragment(), true);
     }
 

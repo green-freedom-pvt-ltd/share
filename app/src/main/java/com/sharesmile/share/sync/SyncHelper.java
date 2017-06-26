@@ -22,6 +22,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.FraudData;
 import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
@@ -118,6 +119,27 @@ public class SyncHelper {
                     as well as the latest point in time in the future at which your task must have executed.
                  */
                 .setExecutionWindow(0L, 1L)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
+    public static void pushUserFeedback(UserFeedback feedback) {
+        Gson gson = new Gson();
+        Bundle bundle = new Bundle();
+        bundle.putString(TaskConstants.FEEDBACK_DATA_JSON, gson.toJson(feedback));
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.PUSH_USER_FEEDBACK)
+                .setExtras(bundle)
+                /*
+                    Mandatory setter for creating a one-off task.
+                    You specify the earliest point in time in the future from which your task might start executing,
+                    as well as the latest point in time in the future at which your task must have executed.
+                 */
+                .setExecutionWindow(0L, 60L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .build();
 

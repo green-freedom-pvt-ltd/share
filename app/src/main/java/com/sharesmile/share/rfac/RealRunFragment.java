@@ -17,17 +17,18 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.rfac.models.RateUsDialog;
+import com.sharesmile.share.rfac.models.TakeFeedbackDialog;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
-import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import base.BaseDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -147,10 +148,6 @@ public class RealRunFragment extends RunFragment {
         //Workout completed and results obtained, time to show the next Fragment
         Logger.d(TAG, "onWorkoutResult");
         if (isAttachedToActivity()) {
-            String distanceString = Utils.formatToKmsWithTwoDecimal(data.getDistance());
-            Float fDistance = Float.parseFloat(distanceString);
-
-            boolean isLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN);
             if (data.isMockLocationDetected()){
                 // Do nothing, DisableMock blocking popup is on display on the screen
                 return;
@@ -161,19 +158,27 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            if (mCauseData.getMinDistance() > (fDistance * 1000)
-                    && !data.isMockLocationDetected()) {
-                myActivity.exit();
-                stopTimer();
+            if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
+                // Need to show post run feedback dialog before
+                showPostRunFeedbackDialog(data);
+                // ShareScreen will be launched after taking feedback from user
                 return;
             }
-
-            Boolean hasPreviousRun =SharedPrefsManager.getInstance().getBoolean(Constants.PREF_HAS_RUN, false);
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_RUN_FEEDBACK, !hasPreviousRun);
-            getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData, !isLogin), false);
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_HAS_RUN, true);
-
+            exit(data);
         }
+    }
+
+    private void exit(WorkoutData data){
+        Logger.d(TAG, "exit");
+        String distanceString = Utils.formatToKmsWithTwoDecimal(data.getDistance());
+        Float fDistance = Float.parseFloat(distanceString);
+        if (mCauseData.getMinDistance() > (fDistance * 1000)
+                && !data.isMockLocationDetected()) {
+            myActivity.exit();
+            stopTimer();
+            return;
+        }
+        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData), false);
     }
 
     @Override
@@ -408,4 +413,98 @@ public class RealRunFragment extends RunFragment {
         alertDialog.show();
     }
 
+    BaseDialog feedbackDialog;
+
+    private void showPostRunFeedbackDialog(final WorkoutData workoutData){
+        if (feedbackDialog != null){
+            feedbackDialog.dismiss();
+        }
+        feedbackDialog = new PostRunFeedbackDialog(getActivity(), R.style.BackgroundDimDialog);
+        feedbackDialog.show();
+        feedbackDialog.setListener(new BaseDialog.Listener() {
+            @Override
+            public void onPrimaryClick(BaseDialog dialog) {
+                // Happy
+                dialog.dismiss();
+                showRateUsDialog(workoutData);
+            }
+
+            @Override
+            public void onSecondaryClick(BaseDialog dialog) {
+                // Sad
+                dialog.dismiss();
+                showTakeFeedbackDialog(workoutData);
+            }
+        });
+        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Logger.d(TAG, "PostRunFeedbackDialog: onCancel");
+                // User cancelled the dialog without acting on it, lets just trigger exit
+                exit(workoutData);
+            }
+        });
+    }
+
+    private void showRateUsDialog(final WorkoutData workoutData){
+        feedbackDialog = new RateUsDialog(getActivity(), R.style.BackgroundDimDialog);
+        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Logger.d(TAG, "TakeFeedbackDialog: onCancel");
+                // User cancelled the dialog without acting on it, lets just trigger exit
+                exit(workoutData);
+            }
+        });
+        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Logger.d(TAG, "TakeFeedbackDialog: onDismiss");
+                // Dialog dismissed explicitly
+                exit(workoutData);
+            }
+        });
+
+        feedbackDialog.setListener(new BaseDialog.Listener() {
+            @Override
+            public void onPrimaryClick(BaseDialog dialog) {
+                Utils.redirectToPlayStore(getContext());
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onSecondaryClick(BaseDialog dialog) {
+                // Will never be called
+            }
+        });
+    }
+
+    private void showTakeFeedbackDialog(final WorkoutData workoutData){
+        feedbackDialog = new TakeFeedbackDialog(getActivity(), R.style.BackgroundDimDialog, workoutData);
+        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Logger.d(TAG, "TakeFeedbackDialog: onCancel");
+                // User cancelled the dialog without acting on it, lets just trigger exit
+                exit(workoutData);
+            }
+        });
+        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Logger.d(TAG, "TakeFeedbackDialog: onDismiss");
+                // Dialog dismissed explicitly
+                exit(workoutData);
+            }
+        });
+        feedbackDialog.show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (feedbackDialog != null) {
+            feedbackDialog.dismiss();
+        }
+    }
 }
