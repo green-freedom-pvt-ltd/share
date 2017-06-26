@@ -235,7 +235,7 @@ public class LoginImpl {
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)
                 .put("user_id", userDetails.getUserId())
-                .put("user_name", userDetails.getFirstName())
+                .put("user_name", userDetails.getFullName())
                 .put("user_email", userDetails.getEmail())
                 .put("is_sign_up_user", userDetails.isSignUp())
                 .put("medium", medium)

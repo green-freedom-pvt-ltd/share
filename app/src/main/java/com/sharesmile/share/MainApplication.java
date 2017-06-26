@@ -425,8 +425,11 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
 
         if (!TextUtils.isEmpty(details.getFirstName())){
-            prefsManager.setString(Constants.PREF_USER_NAME, details.getFirstName());
-            Analytics.getInstance().setUserName(details.getFirstName());
+            Analytics.getInstance().setUserName(details.getFullName());
+        }
+
+        if (!TextUtils.isEmpty(details.getLastName())){
+            Analytics.getInstance().setUserName(details.getFullName());
         }
 
         if (!TextUtils.isEmpty(details.getEmail())){

@@ -124,7 +124,6 @@ public class Constants {
     public static final String PREF_TOTAL_IMPACT = "pref_total_impact";
 
     //User Data
-    public static final String PREF_USER_NAME = "pref_user_name";
     public static final String PREF_USER_EMAIL = "pref_user_email";
     public static final String PREF_LOGIN_SKIP = "pref_login_skip";
     public static final String PREF_AUTH_TOKEN = "pref_auth_token";

@@ -17,15 +17,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Name"
+            android:text="First Name"
             style="@style/edit_profile_text_style_label"/>
 
         <EditText
-            android:id="@+id/et_profile_general_name"
+            android:id="@+id/et_profile_first_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:hint="Your name"
+            android:imeOptions="actionDone"
+            style="@style/edit_profile_text_style_value"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="13dp"
+            android:background="#c0c0c0" />
+
+        <com.sharesmile.share.views.MLTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Last Name"
+            style="@style/edit_profile_text_style_label"/>
+
+        <EditText
+            android:id="@+id/et_profile_last_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:imeOptions="actionDone"
             style="@style/edit_profile_text_style_value"/>
 

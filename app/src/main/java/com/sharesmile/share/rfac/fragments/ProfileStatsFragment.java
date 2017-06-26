@@ -141,7 +141,7 @@ public class ProfileStatsFragment extends BaseFragment {
             ShareImageLoader.getInstance().loadImage(url, imageView,
                     ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
             // Name of user
-            name.setText(MainApplication.getInstance().getUserDetails().getFirstName());
+            name.setText(MainApplication.getInstance().getUserDetails().getFullName());
 
             // Level and Level's progress
             long lifetimeDistance = SharedPrefsManager.getInstance().getLong(PREF_WORKOUT_LIFETIME_DISTANCE);

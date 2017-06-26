@@ -66,7 +66,7 @@ public class Analytics {
     public void setUserProperties(){
         UserDetails details = MainApplication.getInstance().getUserDetails();
         if (details != null){
-            setUserName(details.getFirstName());
+            setUserName(details.getFullName());
             setUserId(details.getUserId());
             setUserEmail(details.getEmail());
             setUserPhone(details.getPhoneNumber());

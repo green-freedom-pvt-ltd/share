@@ -36,7 +36,6 @@ import Models.MessageList;
 
 import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
-import static com.sharesmile.share.core.Constants.PREF_USER_NAME;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
@@ -211,7 +210,6 @@ public class SyncHelper {
                     user = userList.get(0);
                     UserDetails details = new UserDetails();
                     details.setUserId(user_id);
-                    details.setFirstName(prefsManager.getString(PREF_USER_NAME));
                     details.setPhoneNumber(user.getMobileNO());
                     details.setBirthday(user.getBirthday());
                     details.setEmail(prefsManager.getString(PREF_USER_EMAIL));

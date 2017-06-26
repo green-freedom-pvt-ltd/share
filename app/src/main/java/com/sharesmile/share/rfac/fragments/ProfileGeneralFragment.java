@@ -57,8 +57,11 @@ public class ProfileGeneralFragment extends BaseFragment implements
     @BindView(R.id.et_profile_general_email)
     EditText mEmail;
 
-    @BindView(R.id.et_profile_general_name)
-    EditText mName;
+    @BindView(R.id.et_profile_first_name)
+    EditText mFirstName;
+
+    @BindView(R.id.et_profile_last_name)
+    EditText mLastName;
 
     @BindView(R.id.et_profile_general_number)
     EditText mNumber;
@@ -132,7 +135,8 @@ public class ProfileGeneralFragment extends BaseFragment implements
     }
 
     private void setTextWatcher(){
-        mName.addTextChangedListener(this);
+        mFirstName.addTextChangedListener(this);
+        mLastName.addTextChangedListener(this);
         mNumber.addTextChangedListener(this);
         mBirthday.addTextChangedListener(this);
     }
@@ -143,7 +147,11 @@ public class ProfileGeneralFragment extends BaseFragment implements
             return;
         }
         if (!TextUtils.isEmpty(userDetails.getFirstName())) {
-            mName.setText(userDetails.getFirstName());
+            mFirstName.setText(userDetails.getFirstName());
+        }
+
+        if (!TextUtils.isEmpty(userDetails.getLastName())) {
+            mLastName.setText(userDetails.getLastName());
         }
 
         if (!TextUtils.isEmpty(userDetails.getEmail())) {
@@ -176,7 +184,12 @@ public class ProfileGeneralFragment extends BaseFragment implements
     }
 
     private boolean validateUserDetails(){
-        if (mName.getText().toString().isEmpty()){
+        if (mFirstName.getText().toString().isEmpty()){
+            // Name not valid
+            MainApplication.showToast("Please enter a valid name");
+            return false;
+        }
+        if (mLastName.getText().toString().isEmpty()){
             // Name not valid
             MainApplication.showToast("Please enter a valid name");
             return false;
@@ -209,13 +222,28 @@ public class ProfileGeneralFragment extends BaseFragment implements
         if (userDetails == null) {
             return;
         }
-        if (!TextUtils.isEmpty(mName.getText())) {
-            userDetails.setFirstName(mName.getText().toString());
-            Analytics.getInstance().setUserName(mName.getText().toString());
+
+        StringBuilder fullNameBuilder = new StringBuilder();
+
+        if (!TextUtils.isEmpty(mFirstName.getText())) {
+            userDetails.setFirstName(mFirstName.getText().toString());
+            fullNameBuilder.append(mFirstName.getText().toString());
+        }
+
+        if (!TextUtils.isEmpty(mLastName.getText())) {
+            userDetails.setLastName(mLastName.getText().toString());
+            fullNameBuilder.append(" ");
+            fullNameBuilder.append(mLastName.getText().toString());
+        }
+
+        String fullName = fullNameBuilder.toString();
+        if (!TextUtils.isEmpty(fullName)){
+            Analytics.getInstance().setUserName(fullName);
             AnalyticsEvent.create(Event.ON_SET_NAME)
-                    .put("user_name", mName.getText().toString())
+                    .put("user_name", fullName)
                     .buildAndDispatch();
         }
+
 
         if (!TextUtils.isEmpty(mBirthday.getText())) {
             userDetails.setBirthday(mBirthday.getText().toString());

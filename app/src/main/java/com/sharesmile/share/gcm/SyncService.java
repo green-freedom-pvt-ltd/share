@@ -331,6 +331,7 @@ public class SyncService extends GcmTaskService {
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("first_name", prev.getFirstName());
+            jsonObject.put("last_name", prev.getLastName());
             jsonObject.put("gender_user", prev.getGenderUser());
             jsonObject.put("phone_number", prev.getPhoneNumber());
             jsonObject.put("body_weight", prev.getBodyWeight());

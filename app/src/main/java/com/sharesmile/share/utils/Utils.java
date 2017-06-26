@@ -340,6 +340,35 @@ public class Utils {
         }
     }
 
+    public static String dedupName(String firstName, String lastName){
+        if (TextUtils.isEmpty(lastName)){
+            return firstName;
+        }else if (TextUtils.isEmpty(firstName)){
+            return lastName;
+        }
+        // If both the names are present
+        String name = firstName + " " + lastName;
+        String[] parts = name.split(" ");
+        StringBuilder sb = new StringBuilder();
+
+        // De dup logic
+        int len = parts.length;
+        if (len > 1){
+            sb.append(parts[0]);
+            for (int i=1; i<len; i++){
+                if (!parts[i-1].equalsIgnoreCase(parts[i])){
+                    sb.append(parts[i]);
+                }
+            }
+            return sb.toString();
+        }else if (len == 1){
+            return parts[0];
+        }else {
+            return "";
+        }
+    }
+
+
     public static void hideKeyboard(View view, Context context) {
         if (view == null || context == null) {
             return;

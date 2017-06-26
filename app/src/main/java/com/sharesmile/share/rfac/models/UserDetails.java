@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.utils.Utils;
 
 /**
  * Created by ankitmaheshwari on 4/24/17.
@@ -64,6 +65,10 @@ public class UserDetails implements UnObfuscable{
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getFullName(){
+        return Utils.dedupName(getFirstName(), getLastName());
     }
 
     public String getGenderUser() {
