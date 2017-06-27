@@ -4,13 +4,18 @@ package com.sharesmile.share.utils;
  * Created by ankitmaheshwari on 6/9/17.
  */
 
-import com.sharesmile.share.network.NetworkAsyncCallback;
+import android.os.AsyncTask;
+
+import com.google.gson.reflect.TypeToken;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.network.ServerTimeResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -81,28 +86,38 @@ public class ServerTimeKeeper {
 
     public static void setTimerOutOfSync() {
         getInstance().isInSyncWithServer.set(false);
-        getInstance().syncTimerWithServerTime();
     }
 
     public synchronized void syncTimerWithServerTime() {
+        Logger.d(TAG, "syncTimerWithServerTime");
         if (!isFetchingServerTime.get()) {
             //Start Server time fetching logic if network is connected and server time is not
             // being fetched already
+            if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+                return;
+            }
             isFetchingServerTime.set(true);
-
-            NetworkDataProvider.doGetCallAsync(Urls.getServerTimeUrl(), new NetworkAsyncCallback<ServerTimeResponse>() {
+            Logger.d(TAG, "Will invoke servertime GET call");
+            AsyncTask.execute(new Runnable() {
                 @Override
-                public void onNetworkFailure(NetworkException ne) {
-                    isFetchingServerTime.set(false);
-                    Logger.d(TAG, "Failure while fetching servertime:\n" + ne);
-                    ne.printStackTrace();
-                }
-                @Override
-                public void onNetworkSuccess(ServerTimeResponse response) {
-                    // Will do nothing as times are already synced in onResponse method of NetworkAsyncCallback
-                    long currentServerTimeMillis = response.getTimeEpoch();
-                    syncServerAndSystemMilliTime(currentServerTimeMillis);
-                    isFetchingServerTime.set(false);
+                public void run() {
+                    try {
+                        List<ServerTimeResponse> list =
+                                NetworkDataProvider.doGetCall(Urls.getServerTimeUrl(),
+                                        new TypeToken<List<ServerTimeResponse>>(){}.getType());
+                        if (list.size() > 0){
+                            long currentServerTimeMillis = list.get(0).getTimeEpoch();
+                            Logger.d(TAG, "Successfully fetched serverTime: " + currentServerTimeMillis);
+                            syncServerAndSystemMilliTime(currentServerTimeMillis);
+                        }else {
+                            Logger.e(TAG, "Failure fetching servertime, response list empty");
+                        }
+                    }catch (NetworkException e) {
+                        Logger.e(TAG, "Failure while fetching servertime:\n" + e);
+                        e.printStackTrace();
+                    }finally {
+                        isFetchingServerTime.set(false);
+                    }
                 }
             });
         }

@@ -104,7 +104,8 @@ public class NetworkUtils {
         try{
             return gson.fromJson(responseString, tClass);
         }catch(JsonSyntaxException jse){
-            String message = "JsonSyntaxException while parsing response string to " + tClass.getSimpleName();
+            String message = "JsonSyntaxException while parsing response string to " + tClass.getSimpleName()
+                    + ", responseString: " + responseString;
             Logger.e(TAG, message, jse);
             throw new NetworkException.Builder().cause(jse)
                     .httpStatusCode(response.code())
@@ -120,7 +121,8 @@ public class NetworkUtils {
         try{
             return gson.fromJson(responseString, typeOfT);
         }catch(JsonSyntaxException jse){
-            String message = "JsonSyntaxException while parsing response string to " + typeOfT.toString();
+            String message = "JsonSyntaxException while parsing response string to " + typeOfT.toString()
+                    + ", responseString: " + responseString;
             Logger.e(TAG, message, jse);
             throw new NetworkException.Builder().cause(jse).httpStatusCode(response.code()).errorMessage(message).build();
         }

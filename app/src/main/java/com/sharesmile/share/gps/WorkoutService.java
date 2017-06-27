@@ -49,6 +49,7 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.leakcanary.RefWatcher;
@@ -396,10 +397,12 @@ public class WorkoutService extends Service implements
 
     @Override
     public synchronized void onLocationChanged(Location location) {
-        Logger.i(TAG, "onLocationChanged with \n" + location.toString());
-        Logger.i(TAG, "Speed obtained from location object = " + location.getSpeed());
         if (location == null){
             return;
+        }
+        Logger.i(TAG, "onLocationChanged with \n" + location.toString());
+        if (!ServerTimeKeeper.getInstance().isInSyncWithServer()){
+            ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime(location.getTime());
         }
         cancelGpsInactiveNotification();
         handler.removeCallbacks(handleGpsInactivityRunnable);

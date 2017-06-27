@@ -199,6 +199,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".core.TimeChangedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" >
+                </action>
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name="activities.MessageVideoActivity"
             android:screenOrientation="portrait"

@@ -39,6 +39,7 @@ import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
@@ -491,6 +492,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     @Override
     public void onStart() {
         Logger.i(TAG, "onStart");
+        if (!ServerTimeKeeper.isInSyncWithServer()){
+            ServerTimeKeeper.getInstance().syncTimerWithServerTime();
+        }
         GoogleLocationTracker.getInstance().startLocationTracking(false);
         AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
 
