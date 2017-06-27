@@ -50,7 +50,6 @@ import com.sharesmile.share.rfac.fragments.LeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
-import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
@@ -340,9 +339,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-            replaceFragment(ShareFragment.newInstance(null, null), true);
-            //TODO: remove this hack
-//            performOperation(SHOW_FAQ_FRAGMENT,false);
+            performOperation(SHOW_FAQ_FRAGMENT,false);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {

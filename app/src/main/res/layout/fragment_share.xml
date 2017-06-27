@@ -137,9 +137,10 @@
                 android:text="01:28:29"/>
 
             <com.sharesmile.share.views.MRTextView
+                android:id="@+id/tv_duration_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_share_duration"
+                android:layout_below="@id/tv_share_duration"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="30dp"
                 android:shadowColor="@color/black_38"

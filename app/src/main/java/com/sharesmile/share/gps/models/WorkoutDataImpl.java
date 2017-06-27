@@ -325,6 +325,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		workoutData.distance = 4248;
 		workoutData.elapsedTime = 1834;
 		workoutData.calories = new Calorie(439, 389);
+		workoutData.isActive = false;
 		return workoutData;
 	}
 

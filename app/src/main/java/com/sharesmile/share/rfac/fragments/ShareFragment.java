@@ -21,7 +21,6 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseImageData;
 import com.sharesmile.share.utils.Logger;
@@ -31,8 +30,6 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,6 +71,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     // Duration
     @BindView(R.id.tv_share_duration)
     TextView durationInHHMMSS;
+
+    @BindView(R.id.tv_duration_label)
+    TextView durationLabel;
 
 
     // ThankYouImage
@@ -140,11 +140,8 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
-        // TODO: Remove this hack
-//        mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
-//        mWorkoutData = arg.getParcelable(WORKOUT_DATA);
-        mCauseData = MainApplication.getInstance().getActiveCauses().get(0);
-        mWorkoutData = WorkoutDataImpl.getDummyWorkoutData();
+        mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
+        mWorkoutData = arg.getParcelable(WORKOUT_DATA);
         mShowLogin = !MainApplication.isLogin();
     }
 
@@ -202,12 +199,14 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         float distanceInMeters = mWorkoutData.getDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
 
+        Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
+
         String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
         int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
         impactInRupees.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
         initCaloriesContainer();
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
-
+        durationLabel.setText(getString(R.string.duration));
         initImageData();
 
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
@@ -264,9 +263,10 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     private void initImageData(){
         CauseImageData causeImageData = mCauseData.getRandomCauseImageData();
         String titleTemplate = causeImageData.getTitleTemplate();
+
         String imageUrl = causeImageData.getImage();
 
-        if (MainApplication.isLogin()){
+        if (!MainApplication.isLogin()){
             shareScreenTitle.setText(getString(R.string.thank_you));
         }else {
             shareScreenTitle.setText(replacePlaceHolders(titleTemplate));
@@ -438,19 +438,6 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
             msg = msg.replaceAll(SHARE_PLACEHOLDER_PARTNER, mCauseData.getExecutor().getPartnerNgo());
         }
         return msg;
-    }
-
-    private String getTimeInHHMMFormat(long millis) {
-
-        int secs = (int) (millis / 1000);
-        if (secs >= 3600) {
-            return String.format("%02dhr %02dmin", TimeUnit.MILLISECONDS.toHours(millis),
-                    TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
-        } else {
-            return String.format("%02dmin",
-                    TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
-
-        }
     }
 
     @Override
