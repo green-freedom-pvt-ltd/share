@@ -36,6 +36,7 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -62,35 +63,42 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     private CauseData mCauseData;
 
 
-    @BindView(R.id.skip_layout)
-    LinearLayout mSkipLayout;
+    // Stats
 
-    @BindView(R.id.btn_share_screen)
-    Button mShareButton;
+    @BindView(R.id.tv_share_screen_title)
+    TextView shareScreenTitle;
 
-    @BindView(R.id.tv_share_screen_rupee)
-    TextView mContributionAmount;
+    @BindView(R.id.tv_impact_rupees)
+    TextView impactInRupees;
 
-    @BindView(R.id.tv_share_screen_distance)
-    TextView mDistance;
+    // Calories container
 
-    @BindView(R.id.tv_share_screen_time)
-    TextView mTime;
+    @BindView(R.id.tv_calories_burned)
+    TextView caloriesBurned;
 
-    @BindView(R.id.share_layout)
-    RadioGroup mShareGroup;
+    @BindView(R.id.share_cal_not_available_container)
+    View caloriesNotAvailableContainer;
 
-    @BindView(R.id.content)
-    RelativeLayout mContentView;
+    @BindView(R.id.share_cal_available_container)
+    View caloriesAvailableContainer;
 
-    @BindView(R.id.share_container)
-    RelativeLayout mShare_container;
+    @BindView(R.id.tv_share_screen_calories_label)
+    TextView caloriesLabel;
+
+    // Duration
+    @BindView(R.id.tv_share_duration)
+    TextView durationInHHMMSS;
+
+
+    // ThankYouImage
+    @BindView(R.id.img_thank_you)
+    TextView thankYouImage;
+
+
+    // Login Container
 
     @BindView(R.id.login_container)
     LinearLayout mLoginContainer;
-
-    private WorkoutData mWorkoutData;
-    private boolean mShowLogin;
 
     @BindView(R.id.btn_login_fb)
     LinearLayout mFbLoginButton;
@@ -101,20 +109,35 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     @BindView(R.id.tv_welcome_skip)
     LinearLayout tv_skip;
 
+
+    // Progress Container
+
     @BindView(R.id.progress_container)
     LinearLayout mProgressContainer;
 
-    @BindView(R.id.share_cal_not_available_container)
-    View caloriesNotAvailableContainer;
 
-    @BindView(R.id.share_calorie_container)
-    View caloriesBox;
+    // Control Panel
 
-    @BindView(R.id.img_share_calories)
-    View caloriesIcon;
+    @BindView(R.id.control_panel)
+    LinearLayout controlPanel;
 
-    @BindView(R.id.tv_share_screen_calories)
-    TextView caloriesText;
+    @BindView(R.id.btn_give_feedback)
+    View giveFeedbackButton;
+
+    @BindView(R.id.btn_share)
+    View shareButton;
+
+    @BindView(R.id.tv_share_skip)
+    View shareSkipButton;
+
+    // Sharable Content
+
+    @BindView(R.id.sharable_content)
+    LinearLayout sharableContent;
+
+
+    private WorkoutData mWorkoutData;
+    private boolean mShowLogin;
 
     private LoginImpl mLoginHandler;
 
@@ -140,8 +163,11 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
-        mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
-        mWorkoutData = arg.getParcelable(WORKOUT_DATA);
+        // TODO: Remove this hack
+//        mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
+//        mWorkoutData = arg.getParcelable(WORKOUT_DATA);
+        mCauseData = MainApplication.getInstance().getActiveCauses().get(0);
+        mWorkoutData = WorkoutDataImpl.getDummyWorkoutData();
         mShowLogin = !MainApplication.isLogin();
     }
 
@@ -151,7 +177,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         View view = inflater.inflate(R.layout.fragment_share, null);
         ButterKnife.bind(this, view);
         init();
-        mContentView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.share_background));
         EventBus.getDefault().register(this);
         return view;
     }

@@ -1,13 +1,12 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
-import com.sharesmile.share.Cause;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Shine on 01/05/16..
@@ -44,9 +43,6 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("is_active")
     private boolean isActive;
 
-    @SerializedName("cause_thank_you_image")
-    private String causeThankYouImage;
-
     @SerializedName("cause_share_message_template")
     private String causeShareMessageTemplate;
 
@@ -67,6 +63,9 @@ public class CauseData implements UnObfuscable, Serializable {
 
     @SerializedName("total_runs")
     private int totalRuns;
+
+    @SerializedName("cause_thank_you_image_v2")
+    private List<CauseImageData> causeImageDataList;
 
     public long getId() {
         return id;
@@ -126,10 +125,6 @@ public class CauseData implements UnObfuscable, Serializable {
         return causeDescription;
     }
 
-    public String getCauseThankYouImage() {
-        return causeThankYouImage;
-    }
-
     public void setCauseShareMessageTemplate(String causeShareMessageTemplate) {
         this.causeShareMessageTemplate = causeShareMessageTemplate;
     }
@@ -174,10 +169,6 @@ public class CauseData implements UnObfuscable, Serializable {
         isActive = active;
     }
 
-    public void setCauseThankYouImage(String causeThankYouImage) {
-        this.causeThankYouImage = causeThankYouImage;
-    }
-
     /**
      * Gets min distance in meters
      * @return
@@ -214,51 +205,24 @@ public class CauseData implements UnObfuscable, Serializable {
         this.totalRuns = totalRuns;
     }
 
-    public Cause getCauseDbObject() {
-
-        Cause cause = new Cause((long) getId(), getTitle(), getCauseDescription(), getConversionRate(), getMinDistance(), getCategory(), getDetailText(),
-                getImageUrl(), getCauseThankYouImage(), getCauseShareMessageTemplate(),
-                isActive(), getSponsor().getId(), getSponsor().getName(), getSponsor().getSponsorNgo(), getSponsor().getLogoUrl(), getExecutor().getId(), getExecutor().getPartnerCompany(),
-                getExecutor().getPartnerNgo(), getExecutor().getType(), getOrderPriority());
-        return cause;
-
+    public List<CauseImageData> getCauseImageDataList() {
+        return causeImageDataList;
     }
 
-    public CauseData(Cause cause) {
+    public CauseImageData getRandomCauseImageData(){
+        if (causeImageDataList != null){
+            int size = causeImageDataList.size();
+            if (size > 0){
+                Random random = new Random();
+                int randIndex = random.nextInt(size);
+                return causeImageDataList.get(randIndex);
+            }
+        }
+        return null;
+    }
 
-        setId(cause.getId());
-        setTitle(cause.getCauseTitle());
-        setCauseDescription(cause.getCauseDescription());
-        setConversionRate(cause.getConversionRate());
-        setMinDistance(cause.getMinDistance());
-        setCategory(cause.getCauseCategory());
-        setDetailText(cause.getCauseBrief());
-        setImageUrl(cause.getCauseImage());
-        setCauseThankYouImage(cause.getCauseThankyouImage());
-        setCauseShareMessageTemplate(cause.getShare_template());
-        setActive(cause.getIsActive());
-
-        //Sponsors
-        Sponsor sponsor = new Sponsor();
-        sponsor.setId(cause.getSponsorId());
-        sponsor.setName(cause.getSponsorCompany());
-        sponsor.setSponsorNgo(cause.getSponsorNgo());
-        sponsor.setLogoUrl(cause.getSponsorLogo());
-        List<Sponsor> sponsors = new ArrayList<>();
-        sponsors.add(sponsor);
-        setSponsors(sponsors);
-
-        //Partners
-        Partner partner = new Partner();
-        partner.setId(cause.getPartnerId());
-        partner.setType(cause.getPartnerType());
-        partner.setPartnerNgo(cause.getPartnerNgo());
-        partner.setPartnerCompany(cause.getPartnerCompany());
-
-        List<Partner> partners = new ArrayList<>();
-        partners.add(partner);
-        setExecutors(partners);
-        setOrderPriority(cause.getOrder_priority());
+    public void setCauseImageDataList(List<CauseImageData> causeImageDataList) {
+        this.causeImageDataList = causeImageDataList;
     }
 
     public ApplicationUpdate getApplicationUpdate() {

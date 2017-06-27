@@ -320,6 +320,14 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		return WorkoutSingleton.getInstance().getWorkoutBundle();
 	}
 
+	public static WorkoutDataImpl getDummyWorkoutData(){
+		WorkoutDataImpl workoutData = new WorkoutDataImpl(1498570023000L, "dwaidw-dwai-dwannu-dwa19n-2inhhb2");
+		workoutData.distance = 4248;
+		workoutData.elapsedTime = 1834;
+		workoutData.calories = new Calorie(439, 389);
+		return workoutData;
+	}
+
 	@Override
 	public String toString() {
 		return "WorkoutDataImpl{" +

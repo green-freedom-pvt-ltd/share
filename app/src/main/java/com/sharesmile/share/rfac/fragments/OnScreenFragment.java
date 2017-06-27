@@ -159,12 +159,10 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
             case R.id.btn_lets_run:
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
                 getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
-
                 AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                         .addBundle(causeData.getCauseBundle())
                         .put("cause_index", viewPager.getCurrentItem())
                         .buildAndDispatch();
-//                weightInputDialog = Utils.showWeightInputDialog(this.getContext());
                 break;
 
             case R.id.badge_layout:
