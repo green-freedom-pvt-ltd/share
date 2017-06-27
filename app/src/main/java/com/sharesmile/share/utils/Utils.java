@@ -357,6 +357,7 @@ public class Utils {
             sb.append(parts[0]);
             for (int i=1; i<len; i++){
                 if (!parts[i-1].equalsIgnoreCase(parts[i])){
+                    sb.append(" ");
                     sb.append(parts[i]);
                 }
             }
