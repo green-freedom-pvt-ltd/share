@@ -4,12 +4,12 @@ import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Schema;
 
 /**
- * Created by ankitmaheshwari on 6/14/17.
+ * Created by ankitmaheshwari on 6/27/17.
  */
 
-public class Version9 extends SchemaVersion{
+public class Version10 extends SchemaVersion {
 
-    public Version9(boolean current) {
+    public Version10(boolean current) {
         super(current);
         Schema schema = getSchema();
         addWorkoutData(schema);
@@ -48,6 +48,7 @@ public class Version9 extends SchemaVersion{
         workout.addLongProperty("version");
         workout.addDoubleProperty("calories");
         workout.addIntProperty("teamId");
+        workout.addIntProperty("numSpikes");
     }
 
     private static void addUserData(Schema schema) {
