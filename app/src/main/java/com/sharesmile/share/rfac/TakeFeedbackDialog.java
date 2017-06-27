@@ -1,4 +1,4 @@
-package com.sharesmile.share.rfac.models;
+package com.sharesmile.share.rfac;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.EditText;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;

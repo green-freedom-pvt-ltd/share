@@ -231,6 +231,11 @@ public class Utils {
         return "";
     }
 
+    /**
+     * Returns time in HH:MM:SS format
+     * @param secs time interval in secs
+     * @return
+     */
     public static final String secondsToHHMMSS(int secs) {
 
         if (secs >= 3600) {

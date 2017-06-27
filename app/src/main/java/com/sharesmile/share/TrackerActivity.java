@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -136,18 +137,6 @@ public class TrackerActivity extends BaseActivity {
             case END_RUN_START_COUNTDOWN:
                 runFragment = createRunFragment();
                 replaceFragment(runFragment, false);
-                break;
-            case SAY_THANK_YOU:
-                if (input instanceof String) {
-                    Intent intent = new Intent(this, ThankYouActivity.class);
-                    intent.putExtra(ThankYouActivity.BUNDLE_THANKYOU_IMAGE_URL, (String) input);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    if (BuildConfig.DEBUG) {
-                        Logger.d(TAG, "Thankyou image URL is missing");
-                    }
-                }
                 break;
             default:
                 super.performOperation(operationId, input);

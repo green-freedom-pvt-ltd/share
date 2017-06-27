@@ -203,6 +203,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    @Override
+    public void goBack() {
+        onBackPressed();
+    }
+
     private void showFeedbackFragment(Run concernedRun) {
         replaceFragment(FeedbackFragment.newInstance(concernedRun), true);
     }

@@ -265,4 +265,9 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
         return sb.toString();
     }
+
+    @Override
+    protected void exitFeedback(WorkoutData workoutData) {
+        getActivity().finish();
+    }
 }

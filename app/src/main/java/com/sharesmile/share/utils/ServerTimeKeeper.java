@@ -79,8 +79,6 @@ public class ServerTimeKeeper {
             timeStampToReturn = System.currentTimeMillis();
         }
         String syncUnsync = (isInSyncWithServer()) ? "SYNCED" : "UNSYNCED";
-        Logger.d(TAG, "getServerTimeStampInMillis: returning " + syncUnsync
-                + " timeStamp " + timeStampToReturn);
         return timeStampToReturn;
     }
 

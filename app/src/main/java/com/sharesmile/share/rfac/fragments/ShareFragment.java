@@ -1,9 +1,8 @@
 package com.sharesmile.share.rfac.fragments;
 
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -11,36 +10,23 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.internal.CallbackManagerImpl;
-import com.facebook.share.Sharer;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.widget.ShareDialog;
-import com.google.android.gms.plus.PlusShare;
 import com.sharesmile.share.Events.BodyWeightChangedEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.rfac.models.CauseImageData;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
-import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,16 +36,16 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by Shine on 8/5/2016.
  */
-public class ShareFragment extends BaseFragment implements View.OnClickListener, LoginImpl.LoginListener {
+public class ShareFragment extends FeedbackDialogHolderFragment implements View.OnClickListener, LoginImpl.LoginListener {
 
     public static final String WORKOUT_DATA = "workout_data";
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private static final String TAG = "ShareFragment";
-    private static final int REQUEST_SHARE = 101;
     private CauseData mCauseData;
 
 
@@ -92,7 +78,7 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     // ThankYouImage
     @BindView(R.id.img_thank_you)
-    TextView thankYouImage;
+    ImageView thankYouImage;
 
 
     // Login Container
@@ -141,15 +127,6 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     private LoginImpl mLoginHandler;
 
-    public enum SHARE_MEDIUM {
-        FB,
-        GOOGLE,
-        WHATS_APP,
-        TWITTER,
-    }
-
-    private SHARE_MEDIUM mSelectedShareMedium = SHARE_MEDIUM.FB;
-
     public static ShareFragment newInstance(WorkoutData data, CauseData causeData) {
         ShareFragment fragment = new ShareFragment();
         Bundle args = new Bundle();
@@ -183,11 +160,13 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     private void init() {
         if (mShowLogin) {
-            mShare_container.setVisibility(View.GONE);
+            thankYouImage.setVisibility(View.GONE);
+            controlPanel.setVisibility(View.GONE);
             mLoginContainer.setVisibility(View.VISIBLE);
             initLogin();
         } else {
-            mShare_container.setVisibility(View.VISIBLE);
+            thankYouImage.setVisibility(View.VISIBLE);
+            controlPanel.setVisibility(View.VISIBLE);
             mLoginContainer.setVisibility(View.GONE);
         }
     }
@@ -224,46 +203,48 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
 
         String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
-        mDistance.setText(distanceCovered + " km");
-
         int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
-        mContributionAmount.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
+        impactInRupees.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
         initCaloriesContainer();
-        mTime.setText(Utils.secondsToHoursAndMins(Math.round(elapsedTimeInSecs)));
+        durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
 
-        initShareLayout();
+        initImageData();
+
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
                 .addBundle(mWorkoutData.getWorkoutBundle())
                 .buildAndDispatch();
     }
 
     private void initCaloriesContainer(){
-        if (!MainApplication.isLogin()){
-            caloriesBox.setVisibility(View.GONE);
-            caloriesText.setVisibility(View.GONE);
-        } else {
-            caloriesBox.setVisibility(View.VISIBLE);
-            caloriesText.setVisibility(View.VISIBLE);
-            if (MainApplication.getInstance().getBodyWeight() > 0){
-                double caloriesBurned = mWorkoutData.getCalories().getCalories();
-                caloriesNotAvailableContainer.setVisibility(View.GONE);
-                caloriesIcon.setVisibility(View.VISIBLE);
-                caloriesText.setText(Utils.formatCalories(caloriesBurned));
-            }else {
-                caloriesIcon.setVisibility(View.GONE);
-                caloriesNotAvailableContainer.setVisibility(View.VISIBLE);
-                caloriesText.setText(getString(R.string.for_calories));
-                caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+        if (MainApplication.getInstance().getBodyWeight() > 0){
+            double calories = mWorkoutData.getCalories().getCalories();
+            caloriesNotAvailableContainer.setVisibility(View.GONE);
+            caloriesAvailableContainer.setVisibility(View.VISIBLE);
+            caloriesBurned.setText(Utils.formatWithOneDecimal(calories));
+            caloriesLabel.setText(getString(R.string.calories_burned));
+        }else {
+            caloriesAvailableContainer.setVisibility(View.GONE);
+            caloriesNotAvailableContainer.setVisibility(View.VISIBLE);
+            caloriesLabel.setText(getString(R.string.for_calories));
+            caloriesNotAvailableContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (MainApplication.isLogin()){
                         weightInputDialog = Utils.showWeightInputDialog(getActivity());
+                    }else {
+                        MainApplication.showToast("Please login to track Calories.");
                     }
-                });
-            }
+                }
+            });
         }
     }
 
     AlertDialog weightInputDialog;
+
+    @Override
+    protected void exitFeedback(WorkoutData workoutData) {
+        // Do nothing
+    }
 
     @Override
     public void onDestroyView() {
@@ -280,50 +261,24 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         initCaloriesContainer();
     }
 
-    private void initShareLayout() {
-        mShareButton.setOnClickListener(this);
-        mSkipLayout.setOnClickListener(this);
+    private void initImageData(){
+        CauseImageData causeImageData = mCauseData.getRandomCauseImageData();
+        String titleTemplate = causeImageData.getTitleTemplate();
+        String imageUrl = causeImageData.getImage();
 
-        mShareGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.fb:
-                        mSelectedShareMedium = SHARE_MEDIUM.FB;
-                        break;
-                    case R.id.google:
-                        mSelectedShareMedium = SHARE_MEDIUM.GOOGLE;
-                        break;
-                    case R.id.whatsapp:
-                        mSelectedShareMedium = SHARE_MEDIUM.WHATS_APP;
-                        break;
-                    case R.id.twitter:
-                        mSelectedShareMedium = SHARE_MEDIUM.TWITTER;
-                        break;
-                }
-            }
-        });
+        if (MainApplication.isLogin()){
+            shareScreenTitle.setText(getString(R.string.thank_you));
+        }else {
+            shareScreenTitle.setText(replacePlaceHolders(titleTemplate));
+        }
+
+        ShareImageLoader.getInstance().loadImage(imageUrl, thankYouImage,
+                ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
     }
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
-
-            case R.id.skip_layout:
-                showThankYouFragment();
-                break;
-            case R.id.btn_share_screen:
-                if (mSelectedShareMedium == SHARE_MEDIUM.WHATS_APP) {
-                    shareOnWhatsApp();
-                } else if (mSelectedShareMedium == SHARE_MEDIUM.GOOGLE) {
-                    shareOnGooglePlus();
-                } else if (mSelectedShareMedium == SHARE_MEDIUM.TWITTER) {
-                    shareOnTwitter();
-                } else {
-                    shareOnFb();
-                }
-                break;
             case R.id.tv_welcome_skip:
                 showLoginSkipDialog();
                 break;
@@ -335,12 +290,26 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
                 mLoginHandler.performGoogleLogin();
                 break;
             default:
-
         }
     }
 
-    private void showThankYouFragment() {
-        getFragmentController().performOperation(IFragmentController.SAY_THANK_YOU, mCauseData.getCauseThankYouImage());
+    @OnClick(R.id.btn_give_feedback)
+    public void onGiveFeedbackClick(){
+        showPostRunFeedbackDialog(mWorkoutData);
+    }
+
+    @OnClick(R.id.btn_share)
+    public void onShareButtonClick(){
+        // Open Share picker with sharable image and custom message
+        Bitmap toShare = Utils.getBitmapFromLiveView(sharableContent);
+        Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()), getShareMsg());
+        // Finish this Activity to reach back to HomeActivity
+        getActivity().finish();
+    }
+
+    @OnClick(R.id.tv_share_skip)
+    public void onSkipClick(){
+        getActivity().finish();
     }
 
     private void showLoginSkipDialog() {
@@ -355,11 +324,15 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         });
         alertDialog.setNegativeButton(getString(R.string.login), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+
             }
         });
 
         alertDialog.show();
     }
+
+
+    /*
 
     private void shareOnGooglePlus() {
         Intent shareIntent = new PlusShare.Builder(getActivity())
@@ -423,6 +396,9 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
         shareDialog.show(content);
     }
 
+    */
+
+    private String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     private String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
     private String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
     private String SHARE_PLACEHOLDER_SPONSOR = "<sponsor_company>";
@@ -430,26 +406,34 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     /*
     *
-    * "Ran <distance> km. and raised Rs. <amount> for <partner_ngo> on ImpactRun. Kudos <sponsor_company> for sponsoring my run. #impactrun #nowisthetime"*/
+    * "Ran <distance> km. and raised Rs. <amount> for <partner_ngo> on ImpactRun. Kudos <sponsor_company> for sponsoring my run. #impactrun"*/
     private String getShareMsg() {
         String msg = mCauseData.getCauseShareMessageTemplate();
+        return replacePlaceHolders(msg);
+    }
 
+    private String replacePlaceHolders(String msg){
+        if (msg.contains(SHARE_PLACEHOLDER_FIRST_NAME)){
+            if (MainApplication.isLogin()){
+                msg = msg.replaceAll(SHARE_PLACEHOLDER_FIRST_NAME,
+                        MainApplication.getInstance().getUserDetails().getFirstName());
+            }else {
+                msg = msg.replaceAll(SHARE_PLACEHOLDER_FIRST_NAME, "");
+            }
+        }
         if (msg.contains(SHARE_PLACEHOLDER_DISTANCE)) {
             msg = msg.replaceAll(SHARE_PLACEHOLDER_DISTANCE,
                     Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance()));
         }
-
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
             String rDistance = Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance());
             Float fDistance = Float.parseFloat(rDistance);
             int rs = Math.round(fDistance * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
         }
-
         if (msg.contains(SHARE_PLACEHOLDER_SPONSOR)) {
             msg = msg.replaceAll(SHARE_PLACEHOLDER_SPONSOR, mCauseData.getSponsor().getName());
         }
-
         if (msg.contains(SHARE_PLACEHOLDER_PARTNER)) {
             msg = msg.replaceAll(SHARE_PLACEHOLDER_PARTNER, mCauseData.getExecutor().getPartnerNgo());
         }
@@ -487,12 +471,8 @@ public class ShareFragment extends BaseFragment implements View.OnClickListener,
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mLoginHandler.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_SHARE) {
-            showThankYouFragment();
-        } else {
-            mLoginHandler.onActivityResult(requestCode, resultCode, data);
-        }
     }
 }
 

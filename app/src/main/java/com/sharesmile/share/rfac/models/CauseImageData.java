@@ -1,12 +1,15 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharesmile.share.core.UnObfuscable;
+
+import java.io.Serializable;
 
 /**
  * Created by ankitmaheshwari on 6/27/17.
  */
 
-public class CauseImageData {
+public class CauseImageData implements UnObfuscable, Serializable {
 
     @SerializedName("cause_thank_you_image")
     private String image;

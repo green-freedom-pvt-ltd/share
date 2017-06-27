@@ -19,8 +19,6 @@ public interface IFragmentController {
 
     int START_RUN_TEST = 102;
 
-    int SAY_THANK_YOU = 103;
-
     int START_MAIN_ACTIVITY = 104;
 
     int SHOW_MESSAGE_CENTER = 105;
@@ -46,6 +44,8 @@ public interface IFragmentController {
     void performOperation(int operationId, Object input);
 
     void exit();
+
+    void goBack();
 
     void requestPermission(int requestCode, PermissionCallback permissionsCallback);
 

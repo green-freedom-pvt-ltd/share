@@ -59,6 +59,19 @@ public class BaseFragment extends Fragment {
         return false;
     }
 
+    /**
+     * Ask activity to trigger back button behaviour
+     * Child fragment can override it and use it as needed
+     * @return true if back behaviour has been honoured, false otherwise
+     */
+    protected boolean goBack(){
+        if (isAttachedToActivity()){
+            getFragmentController().goBack();
+            return true;
+        }
+        return false;
+    }
+
     public String getName(){
         return getClass().getCanonicalName();
     }
