@@ -22,7 +22,7 @@ public class Version10 extends SchemaVersion {
 
     @Override
     public int getVersionNumber() {
-        return 9;
+        return 10;
     }
 
     private static void addWorkoutData(Schema schema) {
