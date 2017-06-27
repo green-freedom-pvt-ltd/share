@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -107,6 +108,11 @@ public class ProfileStatsFragment extends BaseFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.item_share_profile:
+                Bitmap toShare = Utils.getBitmapFromLiveView(viewPager);
+                Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
+                        getString(R.string.share_stats));
+                return true;
             case R.id.item_edit_profile:
                 getFragmentController().replaceFragment(new ProfileGeneralFragment(), true);
                 return true;
