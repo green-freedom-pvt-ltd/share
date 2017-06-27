@@ -6,10 +6,10 @@ import android.support.annotation.NonNull;
 import com.sharesmile.share.WorkoutDao;
 
 /**
- * Created by ankitmaheshwari on 6/15/17.
+ * Created by ankitmaheshwari on 6/27/17.
  */
 
-public class MigrateV8ToV9 extends MigrationImpl {
+public class MigrateV9ToV10 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -17,9 +17,9 @@ public class MigrateV8ToV9 extends MigrationImpl {
     @Override
     public int applyMigration(@NonNull SQLiteDatabase db,
                               int currentVersion) {
-        prepareMigration(db, currentVersion);
 
-        db.execSQL(getSqlQueryForAddingColumn(" 'TEAM_ID' INTEGER"));
+        prepareMigration(db, currentVersion);
+        db.execSQL(getSqlQueryForAddingColumn(" 'NUM_SPIKES' INTEGER"));
 
         return getMigratedVersion();
     }
@@ -29,14 +29,6 @@ public class MigrateV8ToV9 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 8;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getMigratedVersion() {
         return 9;
     }
 
@@ -44,8 +36,16 @@ public class MigrateV8ToV9 extends MigrationImpl {
      * {@inheritDoc}
      */
     @Override
+    public int getMigratedVersion() {
+        return 10;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Migration getPreviousMigration() {
-        return new MigrateV7ToV8();
+        return new MigrateV8ToV9();
     }
 
     private String getSqlQueryForAddingColumn(String columnDef) {
