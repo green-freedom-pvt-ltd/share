@@ -89,11 +89,12 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
             feedback.setPhoneNumber(MainApplication.getInstance().getUserDetails().getPhoneNumber());
         }
         String feedbackText = mFeedbackText.getText().toString();
-        StringBuilder stringBuilder = new StringBuilder("Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n");
+        StringBuilder stringBuilder = new StringBuilder();
         if (concernedRun != null){
             String concernedRunDetails = concernedRun.toString();
-            stringBuilder.append("Concerned Run:\n" + concernedRunDetails
-                    + "\n Feedback Message: " + feedbackText) ;
+            stringBuilder.append( "Feedback Message: " + feedbackText
+                    +"\nTime: " + DateUtil.getCurrentDate()
+                    +"\nConcerned Run:\n" + concernedRunDetails) ;
             feedback.setTag(FEEDBACK_TAG_FLAGGED_RUN);
             if (concernedRun.getId() > 0){
                 feedback.setRunId((int)concernedRun.getId());

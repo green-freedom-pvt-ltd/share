@@ -73,11 +73,12 @@ public class TakeFeedbackDialog extends BaseDialog {
             feedback.setPhoneNumber(MainApplication.getInstance().getUserDetails().getPhoneNumber());
         }
         String feedbackText = message;
-        StringBuilder stringBuilder = new StringBuilder("Feedback by user:\nTime: " + DateUtil.getCurrentDate() + "\n");
+        StringBuilder stringBuilder = new StringBuilder();
         if (concernedWorkout != null){
             String concernedRunDetails = concernedWorkout.toString();
-            stringBuilder.append("Concerned Run:\n" + concernedRunDetails
-                    + "\n Feedback Message: " + feedbackText);
+            stringBuilder.append( "Feedback Message: " + feedbackText
+                    +"\nTime: " + DateUtil.getCurrentDate()
+                    +"\nConcerned Run:\n" + concernedRunDetails) ;
             feedback.setClientRunId(concernedWorkout.getWorkoutId());
         }else {
             stringBuilder.append("Feedback Message: " + feedbackText) ;;

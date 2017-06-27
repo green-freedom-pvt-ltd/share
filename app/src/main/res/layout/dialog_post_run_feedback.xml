@@ -44,9 +44,9 @@
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    app:srcCompat="@drawable/ic_calories_fire"/>
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    app:srcCompat="@drawable/ic_sentiment_neutral_24px"/>
 
                 <com.sharesmile.share.views.MRTextView
                     android:layout_width="wrap_content"
@@ -69,9 +69,9 @@
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    app:srcCompat="@drawable/ic_calories_fire"/>
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    app:srcCompat="@drawable/ic_mood_happy_24px"/>
 
                 <com.sharesmile.share.views.MRTextView
                     android:layout_width="wrap_content"

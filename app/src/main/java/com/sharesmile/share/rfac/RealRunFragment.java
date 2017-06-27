@@ -158,7 +158,7 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
+            if (WorkoutSingleton.getInstance().toShowFeedbackDialog() || true){
                 // Need to show post run feedback dialog before
                 showPostRunFeedbackDialog(data);
                 // ShareScreen will be launched after taking feedback from user
@@ -420,7 +420,6 @@ public class RealRunFragment extends RunFragment {
             feedbackDialog.dismiss();
         }
         feedbackDialog = new PostRunFeedbackDialog(getActivity(), R.style.BackgroundDimDialog);
-        feedbackDialog.show();
         feedbackDialog.setListener(new BaseDialog.Listener() {
             @Override
             public void onPrimaryClick(BaseDialog dialog) {
@@ -444,6 +443,7 @@ public class RealRunFragment extends RunFragment {
                 exit(workoutData);
             }
         });
+        feedbackDialog.show();
     }
 
     private void showRateUsDialog(final WorkoutData workoutData){
@@ -464,7 +464,6 @@ public class RealRunFragment extends RunFragment {
                 exit(workoutData);
             }
         });
-
         feedbackDialog.setListener(new BaseDialog.Listener() {
             @Override
             public void onPrimaryClick(BaseDialog dialog) {
@@ -477,6 +476,7 @@ public class RealRunFragment extends RunFragment {
                 // Will never be called
             }
         });
+        feedbackDialog.show();
     }
 
     private void showTakeFeedbackDialog(final WorkoutData workoutData){
