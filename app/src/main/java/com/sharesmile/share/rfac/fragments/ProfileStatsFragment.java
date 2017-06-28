@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.network.NetworkUtils;
@@ -112,6 +114,8 @@ public class ProfileStatsFragment extends BaseFragment {
                 Bitmap toShare = Utils.getBitmapFromLiveView(viewPager);
                 Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                         getString(R.string.share_stats));
+                AnalyticsEvent.create(Event.ON_CLICK_PROFILE_SHARE)
+                        .buildAndDispatch();
                 return true;
             case R.id.item_edit_profile:
                 getFragmentController().replaceFragment(new ProfileGeneralFragment(), true);

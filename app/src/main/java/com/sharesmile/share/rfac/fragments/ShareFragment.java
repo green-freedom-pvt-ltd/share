@@ -203,7 +203,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
         int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
-        impactInRupees.setText(getString(R.string.rs_symbol) +" "+ String.valueOf(rupees));
+        impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
         durationLabel.setText(getString(R.string.duration));
@@ -295,6 +295,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     @OnClick(R.id.btn_give_feedback)
     public void onGiveFeedbackClick(){
+        AnalyticsEvent.create(Event.ON_CLICK_GIVE_FEEDBACK_BTN)
+                .addBundle(mWorkoutData.getWorkoutBundle())
+                .buildAndDispatch();
         showPostRunFeedbackDialog(mWorkoutData);
     }
 
@@ -303,12 +306,16 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         // Open Share picker with sharable image and custom message
         Bitmap toShare = Utils.getBitmapFromLiveView(sharableContent);
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()), getShareMsg());
+        AnalyticsEvent.create(Event.ON_CLICK_WORKOUT_SHARE)
+                .addBundle(mWorkoutData.getWorkoutBundle())
+                .buildAndDispatch();
         // Finish this Activity to reach back to HomeActivity
         getActivity().finish();
     }
 
     @OnClick(R.id.tv_share_skip)
     public void onSkipClick(){
+
         getActivity().finish();
     }
 

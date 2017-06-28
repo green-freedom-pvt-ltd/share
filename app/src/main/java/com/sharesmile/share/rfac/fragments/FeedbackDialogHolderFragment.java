@@ -3,6 +3,8 @@ package com.sharesmile.share.rfac.fragments;
 import android.content.DialogInterface;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
@@ -35,6 +37,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             public void onPrimaryClick(BaseDialog dialog) {
                 // Happy
                 dialog.dismiss();
+                AnalyticsEvent.create(Event.ON_CLICK_HAPPY_WORKOUT)
+                        .addBundle(workoutData.getWorkoutBundle())
+                        .buildAndDispatch();
                 showRateUsDialog(workoutData);
             }
 
@@ -42,6 +47,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             public void onSecondaryClick(BaseDialog dialog) {
                 // Sad
                 dialog.dismiss();
+                AnalyticsEvent.create(Event.ON_CLICK_SAD_WORKOUT)
+                        .addBundle(workoutData.getWorkoutBundle())
+                        .buildAndDispatch();
                 showTakeFeedbackDialog(workoutData);
             }
         });
@@ -54,6 +62,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             }
         });
         feedbackDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_HAPPY_SAD_POPUP)
+                .addBundle(workoutData.getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     protected void showRateUsDialog(final WorkoutData workoutData){
@@ -79,6 +90,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             public void onPrimaryClick(BaseDialog dialog) {
                 Utils.redirectToPlayStore(getContext());
                 dialog.dismiss();
+                AnalyticsEvent.create(Event.ON_CLICK_RATE_US)
+                        .addBundle(workoutData.getWorkoutBundle())
+                        .buildAndDispatch();
             }
 
             @Override
@@ -87,6 +101,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             }
         });
         feedbackDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_RATE_US_POPUP)
+                .addBundle(workoutData.getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     protected void showTakeFeedbackDialog(final WorkoutData workoutData){
@@ -108,6 +125,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             }
         });
         feedbackDialog.show();
+        AnalyticsEvent.create(Event.ON_LOAD_TAKE_FEEDBACK_POPUP)
+                .addBundle(workoutData.getWorkoutBundle())
+                .buildAndDispatch();
     }
 
     @Override

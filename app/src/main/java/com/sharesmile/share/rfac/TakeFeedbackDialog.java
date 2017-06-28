@@ -9,6 +9,8 @@ import android.widget.EditText;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.sync.SyncHelper;
@@ -62,7 +64,11 @@ public class TakeFeedbackDialog extends BaseDialog {
             MainApplication.showToast(R.string.enter_atleast_50_chars);
         }else {
             pushFeedback(inputMessage);
+            MainApplication.showToast(R.string.feedback_submitted_successfully);
             dismiss();
+            AnalyticsEvent.create(Event.ON_SUBMIT_FEEDBACK)
+                    .addBundle(concernedWorkout.getWorkoutBundle())
+                    .buildAndDispatch();
         }
     }
 

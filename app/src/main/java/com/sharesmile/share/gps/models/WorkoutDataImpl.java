@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -317,7 +316,16 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public Properties getWorkoutBundle() {
-		return WorkoutSingleton.getInstance().getWorkoutBundle();
+		Properties p = new Properties();
+		p.put("distance", Utils.formatToKmsWithTwoDecimal(getDistance()));
+		p.put("time_elapsed", getElapsedTime());
+		p.put("avg_speed", getAvgSpeed()*(3.6f));
+		p.put("num_steps", getTotalSteps());
+		p.put("client_run_id", getWorkoutId());
+		p.put("calories", getCalories().getCalories());
+		p.put("bolt_count", getUsainBoltCount());
+		p.put("num_spikes", getNumGpsSpikes());
+		return p;
 	}
 
 	public static WorkoutDataImpl getDummyWorkoutData(){
