@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/thats_awesome"
                 android:textColor="@color/black_57"
                 android:textSize="21sp" />
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/tv_share_screen_title"
-                android:layout_marginTop="13dp"
+                android:layout_marginTop="8dp"
                 android:textSize="36sp"
                 android:textStyle="bold"
                 android:text="\u20B9 657"
@@ -56,20 +56,79 @@
                 android:textSize="12sp"
                 android:text="@string/impact_camel_case"/>
 
+            <LinearLayout
+                android:id="@+id/share_distance_container"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_below="@+id/share_impact"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <com.sharesmile.share.views.LBTextView
+                    android:id="@+id/tv_share_distance_kms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="5.7"
+                    android:textColor="@color/black_57"/>
+
+                <com.sharesmile.share.views.LBKTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:text=" km"
+                    android:textColor="@color/black_38"/>
+
+            </LinearLayout>
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/tv_share_screen_distance_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/share_calorie_container"
+                android:layout_marginLeft="30dp"
+                android:shadowColor="@color/black_38"
+                android:textSize="10sp"
+                tools:text="@string/distance"/>
+
+            <com.sharesmile.share.views.LBTextView
+                android:id="@+id/tv_share_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_below="@+id/share_impact"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="16dp"
+                android:textSize="20sp"
+                android:textColor="@color/black_57"
+                android:text="01:28:29"/>
+
+            <com.sharesmile.share.views.MRTextView
+                android:id="@+id/tv_duration_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_share_duration"
+                android:layout_centerInParent="true"
+                android:shadowColor="@color/black_38"
+                android:textSize="10sp"
+                tools:text="@string/duration"/>
+
             <FrameLayout
                 android:id="@+id/share_calorie_container"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginLeft="30dp"
-                android:layout_below="@id/share_impact">
+                android:layout_height="28dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="30dp"
+                android:layout_below="@id/share_impact"
+                android:layout_alignParentRight="true">
 
                 <LinearLayout
                     android:id="@+id/share_cal_not_available_container"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:paddingTop="10dp"
+                    android:paddingTop="7dp"
+                    android:layout_gravity="right"
                     android:visibility="invisible">
 
                     <com.sharesmile.share.views.MRTextView
@@ -93,20 +152,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
+                    android:layout_gravity="right"
                     android:visibility="visible">
 
                     <com.sharesmile.share.views.LBTextView
                         android:id="@+id/tv_calories_burned"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="24sp"
+                        android:textSize="20sp"
                         android:text="794"
                         android:textColor="@color/black_57"/>
 
                     <com.sharesmile.share.views.LBKTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
+                        android:textSize="13sp"
                         android:text=" cal"
                         android:textColor="@color/black_38"/>
 
@@ -119,33 +179,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/share_calorie_container"
-                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_alignParentRight="true"
                 android:shadowColor="@color/black_38"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 tools:text="@string/for_calories"/>
-
-            <com.sharesmile.share.views.LBTextView
-                android:id="@+id/tv_share_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/share_impact"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="30dp"
-                android:layout_marginTop="2dp"
-                android:textSize="24sp"
-                android:textColor="@color/black_57"
-                android:text="01:28:29"/>
-
-            <com.sharesmile.share.views.MRTextView
-                android:id="@+id/tv_duration_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_share_duration"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="30dp"
-                android:shadowColor="@color/black_38"
-                android:textSize="12sp"
-                tools:text="@string/duration"/>
 
         </RelativeLayout>
 

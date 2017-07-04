@@ -68,6 +68,10 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     @BindView(R.id.tv_share_screen_calories_label)
     TextView caloriesLabel;
 
+    // Distance
+    @BindView(R.id.tv_share_distance_kms)
+    TextView distance;
+
     // Duration
     @BindView(R.id.tv_share_duration)
     TextView durationInHHMMSS;
@@ -205,6 +209,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
         impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
+        distance.setText(distanceCovered);
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
         durationLabel.setText(getString(R.string.duration));
         initImageData();
@@ -261,10 +266,16 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     }
 
     private void initImageData(){
-        CauseImageData causeImageData = mCauseData.getRandomCauseImageData();
-        String titleTemplate = causeImageData.getTitleTemplate();
 
-        String imageUrl = causeImageData.getImage();
+        CauseImageData causeImageData = mCauseData.getRandomCauseImageData();
+        String titleTemplate = getString(R.string.thank_you);
+        String imageUrl = null;
+
+        if (causeImageData != null){
+            titleTemplate = causeImageData.getTitleTemplate();
+
+            imageUrl = causeImageData.getImage();
+        }
 
         if (!MainApplication.isLogin()){
             shareScreenTitle.setText(getString(R.string.thank_you));

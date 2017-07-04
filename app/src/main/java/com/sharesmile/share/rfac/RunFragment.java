@@ -240,7 +240,7 @@ public abstract class RunFragment extends FeedbackDialogHolderFragment implement
                 gpsWeakDialog.setTitle(getString(R.string.notification_bad_gps_title));
                 gpsWeakDialog.setMessage(getString(R.string.notification_bad_gps_description));
                 gpsWeakDialog.show();
-                AnalyticsEvent.create(Event.ON_LOAD_GPS_INACTIVE_POPUP)
+                AnalyticsEvent.create(Event.ON_LOAD_GPS_WEAK_POPUP)
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
                 break;
@@ -248,9 +248,10 @@ public abstract class RunFragment extends FeedbackDialogHolderFragment implement
                 gpsWeakDialog.setTitle(getString(R.string.notification_gps_inactivity_title));
                 gpsWeakDialog.setMessage(getString(R.string.notification_gps_inactivity_description));
                 gpsWeakDialog.show();
-                AnalyticsEvent.create(Event.ON_LOAD_GPS_WEAK_POPUP)
+                AnalyticsEvent.create(Event.ON_LOAD_GPS_INACTIVE_POPUP)
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
+
                 break;
             default:
                 throw new IllegalStateException("Inconsistent GPS state");
