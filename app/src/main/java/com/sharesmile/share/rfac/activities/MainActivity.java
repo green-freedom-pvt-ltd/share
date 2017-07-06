@@ -252,7 +252,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public void performOperation(int operationId, Object input) {
-        super.performOperation(operationId, input);
+        switch (operationId) {
+            case HIDE_TOOLBAR:
+                if (toolbar != null){
+                    toolbar.setVisibility(View.GONE);
+                }
+                break;
+            default:
+                super.performOperation(operationId, input);
+        }
     }
 
     @Override
@@ -339,6 +347,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
+//            replaceFragment(ShareFragment.newInstance(null, null), true);
             performOperation(SHOW_FAQ_FRAGMENT,false);
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();

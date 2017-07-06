@@ -26,6 +26,8 @@ public interface IFragmentController {
     int SHOW_FAQ_FRAGMENT = 107;
     int SHOW_FEEDBACK_FRAGMENT = 108;
 
+    int HIDE_TOOLBAR = 109;
+
 
     /*
         Common methods which can be implemented either by abstract BaseActivity or by solid child activities

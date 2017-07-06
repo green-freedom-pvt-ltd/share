@@ -19,6 +19,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -71,6 +72,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     // Distance
     @BindView(R.id.tv_share_distance_kms)
     TextView distance;
+
+    @BindView(R.id.tv_share_screen_distance_label)
+    TextView distanceLabel;
 
     // Duration
     @BindView(R.id.tv_share_duration)
@@ -144,8 +148,13 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
+
+//        mCauseData = MainApplication.getInstance().getActiveCauses().get(2);
+//        mWorkoutData = WorkoutDataImpl.getDummyWorkoutData();
+
         mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
         mWorkoutData = arg.getParcelable(WORKOUT_DATA);
+
         mShowLogin = !MainApplication.isLogin();
     }
 
@@ -210,9 +219,12 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
         distance.setText(distanceCovered);
+        distanceLabel.setText(getString(R.string.distance));
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
         durationLabel.setText(getString(R.string.duration));
         initImageData();
+
+        getFragmentController().performOperation(IFragmentController.HIDE_TOOLBAR, null);
 
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
                 .addBundle(mWorkoutData.getWorkoutBundle())
