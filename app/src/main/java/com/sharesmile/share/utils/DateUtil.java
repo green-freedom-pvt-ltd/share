@@ -56,7 +56,7 @@ public class DateUtil {
     }
 
     public static Date getDate(){
-        return new Date();
+        return new Date(getServerTimeInMillis());
     }
 
     public static long getServerTimeInMillis(){

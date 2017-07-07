@@ -63,7 +63,7 @@ public class Config {
 
     // Activity Detector Config
 
-    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 72;
+    public static final int CONFIDENCE_THRESHOLD_VEHICLE = 74;
     public static final int CONFIDENCE_THRESHOLD_ON_FOOT = 70;
     public static final int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
     public static final int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;

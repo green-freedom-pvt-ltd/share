@@ -12,7 +12,7 @@
         android:id="@+id/sharable_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="45"
+        android:layout_weight="47"
         android:orientation="vertical"
         android:background="@color/white">
 
@@ -21,17 +21,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="16"
-            android:paddingTop="16dp">
+            android:gravity="center">
 
             <com.sharesmile.share.views.MRTextView
                 android:id="@+id/tv_share_screen_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="5dp"
                 android:text="@string/thats_awesome"
                 android:textColor="@color/black_57"
-                android:textSize="21sp" />
+                android:textSize="20sp" />
 
             <com.sharesmile.share.views.MSBTextView
                 android:id="@+id/tv_impact_rupees"
@@ -40,7 +39,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/tv_share_screen_title"
                 android:layout_marginTop="8dp"
-                android:textSize="36sp"
+                android:textSize="34sp"
                 android:textStyle="bold"
                 android:text="\u20B9 657"
                 android:textColor="@color/orange" />
@@ -50,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="13dp"
                 android:layout_below="@id/tv_impact_rupees"
                 android:textColor="@color/black_38"
                 android:textSize="12sp"
@@ -68,7 +67,7 @@
                     android:id="@+id/tv_share_distance_kms"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="19sp"
                     android:text="5.7"
                     android:textColor="@color/black_57"/>
 
@@ -97,7 +96,7 @@
                 android:layout_height="28dp"
                 android:layout_below="@+id/share_impact"
                 android:layout_centerInParent="true"
-                android:textSize="20sp"
+                android:textSize="19sp"
                 android:textColor="@color/black_57"
                 android:text="01:28:29"/>
 
@@ -156,7 +155,7 @@
                         android:id="@+id/tv_calories_burned"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="19sp"
                         android:text="794"
                         android:textColor="@color/black_57"/>
 
@@ -187,7 +186,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="23">
+            android:layout_weight="22">
 
             <ImageView
                 android:id="@+id/img_thank_you"
@@ -279,7 +278,7 @@
         android:id="@+id/control_panel"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="13"
+        android:layout_weight="12"
         android:layout_below="@id/sharable_content"
         android:gravity="center"
         android:orientation="vertical">
@@ -292,7 +291,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:orientation="horizontal">
 
             <com.sharesmile.share.views.MRTextView
@@ -318,19 +317,19 @@
             android:id="@+id/btn_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:orientation="horizontal">
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="64dp"
+                android:layout_height="65dp"
                 android:layout_weight="1"
                 android:gravity="center">
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/btn_give_feedback"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="58.5dp"
+                    android:layout_height="58.5dp"
                     app:backgroundTint="@color/white"
                     app:srcCompat="@drawable/ic_thumbs_up_down_black_24px"/>
 
@@ -338,14 +337,14 @@
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="64dp"
+                android:layout_height="65dp"
                 android:layout_weight="1"
                 android:gravity="center">
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/btn_share"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="58.5dp"
+                    android:layout_height="58.5dp"
                     app:backgroundTint="@color/bright_sky_blue"
                     app:srcCompat="@drawable/ic_share_white_24px" />
 
@@ -356,10 +355,10 @@
         <com.sharesmile.share.views.MSBTextView
             android:id="@+id/tv_share_skip"
             android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:textSize="13sp"
+            android:layout_height="21.5dp"
+            android:textSize="14sp"
             android:textColor="@color/dark_blue"
-            android:gravity="center"
+            android:gravity="top|center_horizontal"
             android:text="skip >"/>
 
     </LinearLayout>

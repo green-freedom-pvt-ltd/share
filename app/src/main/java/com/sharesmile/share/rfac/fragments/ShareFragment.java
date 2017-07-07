@@ -19,9 +19,11 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseImageData;
 import com.sharesmile.share.utils.Logger;
@@ -333,13 +335,26 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
                 .addBundle(mWorkoutData.getWorkoutBundle())
                 .buildAndDispatch();
         // Finish this Activity to reach back to HomeActivity
-        getActivity().finish();
+        if (getActivity() != null){
+            getActivity().finish();
+        }
     }
 
     @OnClick(R.id.tv_share_skip)
     public void onSkipClick(){
+        openHomeActivityAndFinish();
+    }
 
-        getActivity().finish();
+    private void openHomeActivityAndFinish(){
+        if (getActivity() != null){
+
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra(Constants.BUNDLE_SHOW_RUN_STATS, true);
+            startActivity(intent);
+
+            getActivity().finish();
+        }
     }
 
     private void showLoginSkipDialog() {
