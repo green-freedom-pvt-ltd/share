@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 104
-        versionName "2.2.0-beta-4"
+        versionCode 105
+        versionName "2.2.0-beta-5"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -109,12 +109,12 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
 
-    compile 'com.google.android.gms:play-services-location:10.2.6'
-    compile 'com.google.android.gms:play-services-maps:10.2.6'
-    compile 'com.google.android.gms:play-services-fitness:10.2.6'
-    compile 'com.google.android.gms:play-services-auth:10.2.6'
-    compile 'com.google.android.gms:play-services-plus:10.2.6'
-    compile 'com.google.android.gms:play-services-gcm:10.2.6'
+    compile 'com.google.android.gms:play-services-location:11.0.2'
+    compile 'com.google.android.gms:play-services-maps:11.0.2'
+    compile 'com.google.android.gms:play-services-fitness:11.0.2'
+    compile 'com.google.android.gms:play-services-auth:11.0.2'
+    compile 'com.google.android.gms:play-services-plus:11.0.2'
+    compile 'com.google.android.gms:play-services-gcm:11.0.2'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'

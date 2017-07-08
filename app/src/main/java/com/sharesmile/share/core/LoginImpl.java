@@ -127,6 +127,7 @@ public class LoginImpl {
                                     try {
                                         userEmail = object.getString("email");
                                     } catch (JSONException e) {
+                                        Logger.e(TAG, "Can't extract email from Facebook response: \n" + object.toString());
                                         e.printStackTrace();
                                     }
                                     if (!TextUtils.isEmpty(userEmail)) {
