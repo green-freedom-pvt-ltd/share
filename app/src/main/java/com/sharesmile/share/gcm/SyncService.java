@@ -455,7 +455,19 @@ public class SyncService extends GcmTaskService {
             Crashlytics.log("Run sync JSONException");
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
-                    .put("upload_result", "JSONException ")
+                    .put("upload_result", "failure")
+                    .put("exception_message", e.getMessage())
+                    .buildAndDispatch();
+            return false;
+        }
+        catch (Exception ex){
+            Logger.e(TAG, "Exception while uploading run: " + ex.getMessage());
+            ex.printStackTrace();
+            Crashlytics.log("Run sync Exception");
+            Crashlytics.logException(ex);
+            AnalyticsEvent.create(Event.ON_RUN_SYNC)
+                    .put("upload_result", "failure")
+                    .put("exception_message", ex.getMessage())
                     .buildAndDispatch();
             return false;
         }

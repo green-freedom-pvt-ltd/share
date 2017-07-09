@@ -12,7 +12,7 @@
         android:id="@+id/sharable_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="47"
+        android:layout_weight="45"
         android:orientation="vertical"
         android:background="@color/white">
 
@@ -291,7 +291,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <com.sharesmile.share.views.MRTextView
@@ -317,19 +317,19 @@
             android:id="@+id/btn_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="65dp"
+                android:layout_height="63dp"
                 android:layout_weight="1"
                 android:gravity="center">
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/btn_give_feedback"
-                    android:layout_width="58.5dp"
-                    android:layout_height="58.5dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     app:backgroundTint="@color/white"
                     app:srcCompat="@drawable/ic_thumbs_up_down_black_24px"/>
 
@@ -337,14 +337,14 @@
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="65dp"
+                android:layout_height="63dp"
                 android:layout_weight="1"
                 android:gravity="center">
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/btn_share"
-                    android:layout_width="58.5dp"
-                    android:layout_height="58.5dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     app:backgroundTint="@color/bright_sky_blue"
                     app:srcCompat="@drawable/ic_share_white_24px" />
 
@@ -356,7 +356,7 @@
             android:id="@+id/tv_share_skip"
             android:layout_width="match_parent"
             android:layout_height="21.5dp"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textColor="@color/dark_blue"
             android:gravity="top|center_horizontal"
             android:text="skip >"/>

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -124,21 +123,19 @@ public class LoginImpl {
                                         GraphResponse response) {
                                     // Application code
                                     String userEmail = "";
+                                    Logger.d(TAG, "Facebook graphrequest response is: " + response.toString());
+                                    Logger.d(TAG, "Facebook graphrequest JSONObject is: " + object.toString());
                                     try {
                                         userEmail = object.getString("email");
                                     } catch (JSONException e) {
                                         Logger.e(TAG, "Can't extract email from Facebook response: \n" + object.toString());
                                         e.printStackTrace();
                                     }
-                                    if (!TextUtils.isEmpty(userEmail)) {
-                                        verifyUserDetails(userEmail, token, true);
-                                    } else {
-                                        MainApplication.getInstance().showToast(R.string.email_id_required);
-                                    }
+                                    verifyUserDetails(userEmail, token, true);
                                 }
                             });
                     Bundle parameters = new Bundle();
-                    parameters.putString("fields", "email");
+                    parameters.putString("fields", "id,name,email");
                     request.setParameters(parameters);
                     request.executeAsync();
                 }

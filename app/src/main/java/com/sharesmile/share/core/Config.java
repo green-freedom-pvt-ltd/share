@@ -29,7 +29,7 @@ public class Config {
 
     public static final float USAIN_BOLT_RECENT_SPEED_LOWER_BOUND = 4.1f; // in m/s, i.e. 14.8 km/hr
 
-    public static final float USAIN_BOLT_GPS_SPEED_LIMIT = 6.67f; // in m/s, i.e. 24 km/hr
+    public static final float USAIN_BOLT_GPS_SPEED_LIMIT = 6.11f; // in m/s, i.e. 22 km/hr
 
     public static final float LOWER_SPEED_LIMIT = 0.7f; // in m/s,
 
@@ -37,7 +37,7 @@ public class Config {
 
     public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
 
-    public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.27f;
+    public static float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.37f;
 
     public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
 

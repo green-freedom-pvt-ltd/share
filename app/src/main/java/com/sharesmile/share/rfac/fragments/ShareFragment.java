@@ -216,7 +216,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
 
-        String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
+        String distanceCovered = Utils.formatWithOneDecimal(distanceInMeters / 1000);
         int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
         impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
@@ -238,7 +238,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
             double calories = mWorkoutData.getCalories().getCalories();
             caloriesNotAvailableContainer.setVisibility(View.GONE);
             caloriesAvailableContainer.setVisibility(View.VISIBLE);
-            caloriesBurned.setText(Utils.formatWithOneDecimal(calories));
+            caloriesBurned.setText(String.valueOf(Math.round(calories)));
             caloriesLabel.setText(getString(R.string.calories_burned));
         }else {
             caloriesAvailableContainer.setVisibility(View.GONE);
@@ -334,10 +334,10 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         AnalyticsEvent.create(Event.ON_CLICK_WORKOUT_SHARE)
                 .addBundle(mWorkoutData.getWorkoutBundle())
                 .buildAndDispatch();
-        // Finish this Activity to reach back to HomeActivity
-        if (getActivity() != null){
-            getActivity().finish();
-        }
+        // Not exiting ShareActivity
+//        if (getActivity() != null){
+//            getActivity().finish();
+//        }
     }
 
     @OnClick(R.id.tv_share_skip)
