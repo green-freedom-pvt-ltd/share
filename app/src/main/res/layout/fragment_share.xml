@@ -61,6 +61,7 @@
                 android:layout_height="28dp"
                 android:layout_below="@+id/share_impact"
                 android:layout_marginLeft="30dp"
+                android:gravity="bottom"
                 android:orientation="horizontal">
 
                 <com.sharesmile.share.views.LBTextView
@@ -84,7 +85,7 @@
                 android:id="@+id/tv_share_screen_distance_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/share_calorie_container"
+                android:layout_below="@+id/share_distance_container"
                 android:layout_marginLeft="30dp"
                 android:shadowColor="@color/black_38"
                 android:textSize="10sp"
@@ -98,6 +99,7 @@
                 android:layout_centerInParent="true"
                 android:textSize="19sp"
                 android:textColor="@color/black_57"
+                android:gravity="bottom"
                 android:text="01:28:29"/>
 
             <com.sharesmile.share.views.MRTextView
@@ -125,6 +127,7 @@
                     android:orientation="horizontal"
                     android:paddingTop="7dp"
                     android:layout_gravity="right"
+                    android:gravity="bottom"
                     android:visibility="invisible">
 
                     <com.sharesmile.share.views.MRTextView
@@ -149,6 +152,7 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
                     android:layout_gravity="right"
+                    android:gravity="bottom"
                     android:visibility="visible">
 
                     <com.sharesmile.share.views.LBTextView
@@ -280,7 +284,6 @@
         android:layout_height="0dp"
         android:layout_weight="12"
         android:layout_below="@id/sharable_content"
-        android:gravity="center"
         android:orientation="vertical">
 
         <View
