@@ -269,7 +269,8 @@ public class SyncService extends GcmTaskService {
             String log= "Couldn't post user feedback to URL: " + Urls.getFraudstersUrl() + ", Feedback: " + feedbackString;
             Logger.e(TAG, log);
             Crashlytics.log(log);
-            Crashlytics.log("Push user feedback networkException, messageFromServer: " + ne);
+            Crashlytics.log("Push user feedback (id="+MainApplication.getInstance().getUserDetails().getUserId()
+                    +") networkException, messageFromServer: " + ne);
             Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
@@ -311,7 +312,8 @@ public class SyncService extends GcmTaskService {
             String log= "Couldn't post fraudData to URL: " + Urls.getFraudstersUrl() + ", FraudData: " + fraudDataString;
             Logger.e(TAG, log);
             Crashlytics.log(log);
-            Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne);
+            Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne
+                    + "\n and FraudData: " + fraudDataString);
             Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
@@ -381,9 +383,8 @@ public class SyncService extends GcmTaskService {
 
         Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId());
         int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
+        JSONObject jsonObject = new JSONObject();
         try {
-
-            JSONObject jsonObject = new JSONObject();
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());
@@ -439,7 +440,8 @@ public class SyncService extends GcmTaskService {
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException: " + e);
-            Crashlytics.log("Run sync networkException, messageFromServer: " + e);
+            Crashlytics.log("Run sync networkException: " + e + "\n Run: "
+                    + jsonObject.toString());
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "failure")
@@ -447,6 +449,7 @@ public class SyncService extends GcmTaskService {
                     .put("exception_message", e.getMessage())
                     .put("message_from_server", e.getMessageFromServer())
                     .put("http_status", e.getHttpStatusCode())
+                    .put("failure_type", e.getFailureType())
                     .buildAndDispatch();
             return false;
         } catch (JSONException e) {
@@ -514,8 +517,29 @@ public class SyncService extends GcmTaskService {
                 return GcmNetworkManager.RESULT_SUCCESS;
             }
         } catch (NetworkException e) {
-            Logger.d(TAG, "NetworkException while force refreshing all workoutData from server: " + e);
+            Logger.d(TAG, "NetworkException in forceRefreshAllWorkoutData: " + e);
             e.printStackTrace();
+            Crashlytics.log("forceRefreshAllWorkoutData networkException for user_id ("
+                    +MainApplication.getInstance().getUserDetails().getUserId() +"), messageFromServer: " + e);
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_FORCE_REFRESH_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
+                    .put("failure_type", e.getFailureType())
+                    .buildAndDispatch();
+
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        } catch (Exception e) {
+            Logger.d(TAG, "Exception in forceRefreshAllWorkoutData: " + e.getMessage());
+            e.printStackTrace();
+            Crashlytics.log("forceRefreshAllWorkoutData Exception for user_id ("
+                    +MainApplication.getInstance().getUserDetails().getUserId() +")");
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_FORCE_REFRESH_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .buildAndDispatch();
+
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
 

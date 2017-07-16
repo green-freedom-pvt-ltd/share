@@ -248,9 +248,14 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         synchronized (GoogleLocationTracker.class){
             Iterator<WeakReference<Listener>> iterator = listeners.iterator();
             while (iterator.hasNext()){
-                WeakReference<Listener> reference = iterator.next();
+                final WeakReference<Listener> reference = iterator.next();
                 if (reference.get() != null){
-                    reference.get().onLocationTrackerReady();
+                    MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            reference.get().onLocationTrackerReady();
+                        }
+                    }, 50);
                 }
             }
         }

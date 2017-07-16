@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.RunPathFragment;
-import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -100,11 +99,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         totalDistanceView.setText(distance);
         avgSpeedView.setText(avgSpeed);
         totalTimeView.setText(time);
-        if (!WorkoutService.isCurrentlyProcessingSteps()){
-            totalStepsView.setText("N.A.");
-        } else {
-            totalStepsView.setText(workoutData.getTotalSteps() + "");
-        }
+        totalStepsView.setText(workoutData.getTotalSteps() + "");
         int size = (int) Utils.convertDpToPixel(getContext(), 300);
         Utils.setStaticGoogleMap(size, size, staticGoogleMapView, workoutData.getPoints());
     }
@@ -153,11 +148,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         logsFile = null;
         liveDistanceView.setText("0.00 m");
         liveSpeedView.setText("0.0 km/hr");
-        if (!WorkoutService.isCurrentlyProcessingSteps()){
-            liveStepsView.setText("N.A.");
-        } else {
-            liveStepsView.setText("0");
-        }
+        liveStepsView.setText("0");
     }
 
     @Override
@@ -172,11 +163,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
         logsFile = null;
         liveDistanceView.setText("0.00 m");
         liveSpeedView.setText("0.0 km/hr");
-        if (!WorkoutService.isCurrentlyProcessingSteps()){
-            liveStepsView.setText("N.A.");
-        } else {
-            liveStepsView.setText("0");
-        }
+        liveStepsView.setText("0");
     }
 
     @Override

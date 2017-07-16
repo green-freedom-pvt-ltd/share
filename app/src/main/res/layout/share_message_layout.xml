@@ -21,9 +21,5 @@
         android:id="@+id/whatsapp"
         layout="@layout/share_item_layout" />
 
-    <include
-        android:id="@+id/twitter"
-        layout="@layout/share_item_layout" />
-
 
 </LinearLayout>

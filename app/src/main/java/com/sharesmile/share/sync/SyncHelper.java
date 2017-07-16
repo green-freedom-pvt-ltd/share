@@ -161,6 +161,9 @@ public class SyncHelper {
 
         try {
             MessageList messageList = NetworkDataProvider.doGetCall(url, MessageList.class);
+            if (messageList == null){
+                return false;
+            }
             if (messageCount >= messageList.getTotalMessageCount()) {
                 Logger.d(TAG, "update success" + messageList + " : " + messageList.getTotalMessageCount());
                 EventBus.getDefault().post(new DBEvent.MessageDataUpdated());

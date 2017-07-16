@@ -513,10 +513,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         View view = getLayoutInflater().from(this).inflate(R.layout.share_message_layout, null);
         View fbView = view.findViewById(R.id.fb);
         View whatsAppView = view.findViewById(R.id.whatsapp);
-        View twitterView = view.findViewById(R.id.twitter);
         bindShareData(fbView, R.drawable.facebook, getString(R.string.facebook));
         bindShareData(whatsAppView, R.drawable.whatsapp, getString(R.string.whatsapp));
-        bindShareData(twitterView, R.drawable.twitter, getString(R.string.twitter));
         dialog.setContentView(view);
 
         fbView.setOnClickListener(new View.OnClickListener() {
@@ -535,14 +533,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(MainActivity.this, "Whats app not installed ", Toast.LENGTH_LONG).show();
                 }
-            }
-        });
-
-        twitterView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ShareUtils.shareOnTwitterIntent(MainActivity.this, message, pathUrl);
-
             }
         });
         dialog.show();

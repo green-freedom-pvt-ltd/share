@@ -286,7 +286,10 @@ public class Utils {
     }
 
     public static String createPrettyJSONStringFromObject(Object object) {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(object);
+        return new GsonBuilder()
+                .setPrettyPrinting()
+                .serializeSpecialFloatingPointValues()
+                .create().toJson(object);
     }
 
     public static final long stringToSec(String time) {

@@ -21,8 +21,6 @@ import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.sharesmile.share.gps.WorkoutService.isCurrentlyProcessingSteps;
-
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
@@ -337,7 +335,7 @@ public class RunTracker implements Tracker {
                         spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
                         thresholdApplied = "in_vehicle";
                     }else {
-                        if ( (isCurrentlyProcessingSteps() && listener.getMovingAverageOfStepsPerSec() >= Config.MIN_CADENCE_FOR_WALK)
+                        if ( (listener.isCountingSteps() && listener.getMovingAverageOfStepsPerSec() >= Config.MIN_CADENCE_FOR_WALK)
                                     || ActivityDetector.getInstance().isOnFoot()){
                             // Can make a safe assumption that the person is on foot
                             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
@@ -435,6 +433,8 @@ public class RunTracker implements Tracker {
         void updateStepsRecord(long timeStampMillis);
 
         float getMovingAverageOfStepsPerSec();
+
+        boolean isCountingSteps();
 
     }
 

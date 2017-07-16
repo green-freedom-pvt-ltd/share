@@ -43,9 +43,6 @@ import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
-import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -286,9 +283,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         registerActivityLifecycleCallbacks(lifecycleHelper);
 
         Analytics.initialize(this);
-
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_comsumer_key), getString(R.string.twitter_comsumer_secret));
-        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
+        Fabric.with(this, new Crashlytics());
         initOneSignal();
         mDbWrapper = new DbWrapper(this);
         GoogleLocationTracker.initialize(this);

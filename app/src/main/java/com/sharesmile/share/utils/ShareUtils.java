@@ -13,21 +13,12 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.sharesmile.share.R;
-import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 /**
  * Created by Shine on 16/01/17.
  */
 
 public class ShareUtils {
-
-    public static void shareOnTwitterIntent(Context context, String message, Uri imageUrl) {
-
-        TweetComposer.Builder builder = new TweetComposer.Builder(context)
-                .text(message).image(imageUrl);
-        builder.show();
-    }
-
 
     public static Intent shareOnWhatsAppIntent(Context context, String message, Uri imageUrl) {
 

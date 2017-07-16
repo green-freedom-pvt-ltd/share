@@ -35,7 +35,7 @@
     <item
         android:id="@+id/nav_item_faq"
         android:icon="@drawable/svg_ic_help_black"
-        android:title="FAQ" />
+        android:title="Help" />
     <item
         android:id="@+id/nav_item_feedback"
         android:icon="@drawable/svg_ic_feedback_black"

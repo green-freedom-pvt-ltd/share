@@ -88,7 +88,7 @@ public class WorkoutService extends Service implements
     private static final String TAG = "WorkoutService";
 
     private static boolean currentlyTracking = false;
-    private static boolean currentlyProcessingSteps = false;
+    private boolean currentlyProcessingSteps = false;
 
     private VigilanceTimer vigilanceTimer;
     private Location acceptedLocationFix;
@@ -367,10 +367,6 @@ public class WorkoutService extends Service implements
         }
     }
 
-    public static boolean isCurrentlyProcessingSteps() {
-        return currentlyProcessingSteps;
-    }
-
     /**
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -483,9 +479,10 @@ public class WorkoutService extends Service implements
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if ((isCurrentlyProcessingSteps()
-                    && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)
-                        || ActivityDetector.getInstance().isOnFoot()){
+            if (
+                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)
+                            || ActivityDetector.getInstance().isOnFoot()
+                    ){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
