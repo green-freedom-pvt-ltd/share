@@ -69,8 +69,8 @@ public class SyncHelper {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)
-                .setExecutionWindow(0L, 5L)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setExecutionWindow(0L, 1L)
+                .setRequiredNetwork(Task.NETWORK_STATE_ANY)
                 .setPersisted(true)
                 .build();
 
@@ -92,7 +92,7 @@ public class SyncHelper {
                     You specify the earliest point in time in the future from which your task might start executing,
                     as well as the latest point in time in the future at which your task must have executed.
                  */
-                .setExecutionWindow(0L, 300L)
+                .setExecutionWindow(0L, 30L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
                 .build();

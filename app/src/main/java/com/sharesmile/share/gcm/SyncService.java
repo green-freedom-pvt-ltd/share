@@ -381,7 +381,8 @@ public class SyncService extends GcmTaskService {
 
     private boolean uploadWorkoutData(Workout workout) {
 
-        Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId());
+        Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId()
+                + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
         int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
         JSONObject jsonObject = new JSONObject();
         try {
@@ -439,9 +440,10 @@ public class SyncService extends GcmTaskService {
 
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException: " + e);
-            Crashlytics.log("Run sync networkException: " + e + "\n Run: "
-                    + jsonObject.toString());
+            String message = "Run sync networkException: " + e + "\n Run: "
+                    + jsonObject.toString();
+            Logger.d(TAG, message);
+            Crashlytics.log(message);
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "failure")
@@ -454,8 +456,9 @@ public class SyncService extends GcmTaskService {
             return false;
         } catch (JSONException e) {
             e.printStackTrace();
-            Logger.d(TAG, "JSONException");
-            Crashlytics.log("Run sync JSONException");
+            String message = "JSONException while syncing run: " + jsonObject.toString();
+            Logger.d(TAG, message);
+            Crashlytics.log(message);
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "failure")
@@ -464,9 +467,10 @@ public class SyncService extends GcmTaskService {
             return false;
         }
         catch (Exception ex){
-            Logger.e(TAG, "Exception while uploading run: " + ex.getMessage());
+            String message = "Run sync Exception: " + ex.getMessage() + "\n Run: " + jsonObject.toString();
+            Logger.e(TAG, message);
             ex.printStackTrace();
-            Crashlytics.log("Run sync Exception");
+            Crashlytics.log(message);
             Crashlytics.logException(ex);
             AnalyticsEvent.create(Event.ON_RUN_SYNC)
                     .put("upload_result", "failure")
