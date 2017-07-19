@@ -17,6 +17,6 @@ public class TimeChangedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Logger.d(TAG, "onReceive");
         // Someone changed system clock time, setTimerOutOfSync
-        ServerTimeKeeper.setTimerOutOfSync();
+        ServerTimeKeeper.getInstance().checkIfTimerIsOutOfSync();
     }
 }

@@ -264,6 +264,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     @Override
     public void onCreate() {
+        Logger.i(TAG, "onCreate");
         CleverTapAPI.setDebugLevel(1277182231);
         ActivityLifecycleCallback.register(this);
 
@@ -278,6 +279,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
+        ServerTimeKeeper.init();
 
         lifecycleHelper = new AppLifecycleHelper(this);
         registerActivityLifecycleCallbacks(lifecycleHelper);
@@ -487,7 +489,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     @Override
     public void onStart() {
         Logger.i(TAG, "onStart");
-        if (!ServerTimeKeeper.isInSyncWithServer()){
+        if (!ServerTimeKeeper.getInstance().isInSyncWithServer()){
             ServerTimeKeeper.getInstance().syncTimerWithServerTime();
         }
         GoogleLocationTracker.getInstance().startLocationTracking(false);

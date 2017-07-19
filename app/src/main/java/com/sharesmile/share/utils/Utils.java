@@ -622,7 +622,7 @@ public class Utils {
                 + "FROM " + WorkoutDao.TABLENAME + " where "
                 + WorkoutDao.Properties.IsValidRun.columnName + " is 1", new String []{});
         cursor.moveToFirst();
-        int totalAmountRaised = Math.round(cursor.getFloat(0));
+        int totalAmountRaised = (int) Math.floor(cursor.getFloat(0));
         long totalDistance = Math.round(cursor.getDouble(1));
         long totalSteps = cursor.getLong(2);
         long totalRecordedTime = Math.round(cursor.getDouble(3));

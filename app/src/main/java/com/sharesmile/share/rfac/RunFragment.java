@@ -274,6 +274,7 @@ public abstract class RunFragment extends FeedbackDialogHolderFragment implement
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setTitle(title);
         alertDialog.setMessage(content);
+        alertDialog.setCancelable(false);
         alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

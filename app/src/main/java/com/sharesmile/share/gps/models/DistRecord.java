@@ -1,7 +1,6 @@
 package com.sharesmile.share.gps.models;
 
 import android.location.Location;
-import android.os.Build;
 
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.UnObfuscable;
@@ -18,6 +17,8 @@ public class DistRecord implements UnObfuscable, Serializable{
 
     private Location location;
     private Location prevLocation;
+    private long timeStamp;
+    private long prevTimeStamp;
     private float dist; // in meters
     private double interval; // in millis
     private float speed; // in m/s
@@ -26,24 +27,24 @@ public class DistRecord implements UnObfuscable, Serializable{
 
     public DistRecord(Location location){
         this.location = location;
+        this.timeStamp = DateUtil.getServerTimeInMillis();
     }
 
-    public DistRecord(Location location, Location prevLocation, float dist){
+    public DistRecord(Location location, Location prevLocation,
+                      long prevTimeStamp, float dist){
         this.location = location;
         this.prevLocation = prevLocation;
+        this.timeStamp = DateUtil.getServerTimeInMillis();
+        this.prevTimeStamp = prevTimeStamp;
         bearing = location.getBearing();
         // distanceTo() method, though not blocking but is very computationally intensive
         this.dist = dist;
         interval = getElapsedTimeMs();
-        speed = (dist * 1000) / getElapsedTimeMs();
+        speed = (getElapsedTimeMs() == 0) ? 0 : ((dist * 1000) / getElapsedTimeMs());
     }
 
     private long getElapsedTimeMs(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
-            return (location.getElapsedRealtimeNanos() - prevLocation.getElapsedRealtimeNanos()) / 1000000;
-        }else{
-            return (location.getTime() - prevLocation.getTime());
-        }
+        return (timeStamp - prevTimeStamp);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class DistRecord implements UnObfuscable, Serializable{
     }
 
     public long getTimeStamp(){
-        return location.getTime();
+        return timeStamp;
     }
 
     public boolean isTooOld(){

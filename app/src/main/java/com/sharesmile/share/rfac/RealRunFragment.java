@@ -195,7 +195,7 @@ public class RealRunFragment extends RunFragment {
             // Only when the delta is greater than 0.04 km we show the update
             String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
             distanceTextView.setText(distanceString);
-            int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
+            int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
             impact.setText(String.valueOf(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
@@ -215,7 +215,7 @@ public class RealRunFragment extends RunFragment {
 
     private String getImpactInRupees(float distanceCovered){
         String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
-        int rupees = Math.round(getConversionFactor() * Float.parseFloat(distanceString));
+        int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
         return String.valueOf(rupees);
     }
 

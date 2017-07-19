@@ -42,7 +42,7 @@ public class WorkoutServiceRetainerAlarm extends BroadcastReceiver {
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, FLAG_UPDATE_CURRENT);
         // Start alarm after 3 mins and repeat after every 2 mins from then on
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, 1000*60*3, 2000*60*3, pi);
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, 1000*60*3, 1000*60*2, pi);
     }
 
     public static void cancelAlarm(Context context) {

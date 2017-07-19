@@ -21,6 +21,8 @@ import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import static com.sharesmile.share.core.Config.DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT;
+
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
@@ -316,6 +318,7 @@ public class RunTracker implements Tracker {
             }else{
                 Logger.d(TAG,"Processing Location: " + point.toString());
                 Location prevLocation = getLastRecord().getLocation();
+                long prevTimeStamp = getLastRecord().getTimeStamp();
                 float interval = ((float) (point.getTime() - prevLocation.getTime())) / 1000;
                 float dist = prevLocation.distanceTo(point);
 
@@ -379,7 +382,11 @@ public class RunTracker implements Tracker {
 
                     // Step 4: Record if needed, else wait for next location
                     if (toRecord){
-                        DistRecord record = new DistRecord(point, prevLocation, dist);
+                        if (dist > DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT){
+                            // If it is making too big a jump in distance then we will not allow, even if the speed is in limit
+                            dist = 0;
+                        }
+                        DistRecord record = new DistRecord(point, prevLocation, prevTimeStamp,  dist);
                         Logger.d(TAG, "Distance Recording: " + record.toString());
                         Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed() + ", provider is " + point.getProvider());
                         double prevCalories = dataStore.getCalories().getCalories();

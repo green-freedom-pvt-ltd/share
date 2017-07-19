@@ -130,7 +130,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             mCause.setText(workout.getCauseBrief());
             String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
             mDistance.setText(distanceCovered + " km");
-            mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + Math.round(workout.getRunAmount()));
+            mImpact.setText(mImpact.getContext().getString(R.string.rs_symbol) + " " + Math.floor(workout.getRunAmount()));
             calories.setText(Utils.formatCalories(workout.getCalories() == null ? 0 : workout.getCalories()));
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());
             if (timeInSec >= 60) {
@@ -191,7 +191,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public void bindData(RunHistoryDateHeaderItem dateHeaderItem){
             String dateString = DateUtil.getCustomFormattedDate(dateHeaderItem.getCalendar().getTime(), USER_FORMAT_DATE_DATE_ONLY);
             dateView.setText(dateString);
-            totalRaised.setText(totalRaised.getContext().getString(R.string.rs_symbol) + " " + Math.round(dateHeaderItem.getImpactInDay()));
+            totalRaised.setText(totalRaised.getContext().getString(R.string.rs_symbol) + " " + Math.floor(dateHeaderItem.getImpactInDay()));
             calories.setText(Utils.formatCalories(dateHeaderItem.getCaloriesInDay()));
         }
     }

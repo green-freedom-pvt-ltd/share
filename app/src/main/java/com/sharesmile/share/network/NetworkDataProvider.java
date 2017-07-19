@@ -40,8 +40,9 @@ public class NetworkDataProvider {
     public static final String HTTP_HEADER_JSON = "application/json";
     public static final String HTTP_HEADER_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String ENCODING = "charset=utf-8";
-    public static final long CONNECTION_TIMEOUT_POST_VALUE = 20;
-    public static final long READ_TIMEOUT_POST_VALUE = 20;
+    public static final long CONNECTION_TIMEOUT_POST_VALUE = 30;
+    public static final long READ_TIMEOUT_POST_VALUE = 30;
+    public static final long WRITE_TIMEOUT_POST_VALUE = 30;
     private static final MediaType JSON = MediaType.parse(HTTP_HEADER_JSON + "; " +
             ENCODING);
     private static final MediaType URLENCODED = MediaType.parse(HTTP_HEADER_FORM_URLENCODED + "; " +
@@ -422,6 +423,7 @@ public class NetworkDataProvider {
             myOkHttpClient = new OkHttpClient();
             myOkHttpClient.setConnectTimeout(CONNECTION_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
             myOkHttpClient.setReadTimeout(READ_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
+            myOkHttpClient.setWriteTimeout(WRITE_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
         }
         return myOkHttpClient;
     }

@@ -217,7 +217,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
 
         String distanceCovered = Utils.formatWithOneDecimal(distanceInMeters / 1000);
-        int rupees = Math.round(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
+        int rupees = (int) Math.floor(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
         impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
         distance.setText(distanceCovered);
@@ -473,7 +473,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
             String rDistance = Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance());
             Float fDistance = Float.parseFloat(rDistance);
-            int rs = Math.round(fDistance * mCauseData.getConversionRate());
+            int rs = (int) Math.floor(fDistance * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
         }
         if (msg.contains(SHARE_PLACEHOLDER_SPONSOR)) {
