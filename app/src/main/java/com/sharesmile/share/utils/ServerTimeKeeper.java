@@ -184,6 +184,12 @@ public class ServerTimeKeeper {
         });
     }
 
+    public long getServerTimeAtSystemTime(long systemTimeMillis){
+        synchronized (ServerTimeKeeper.class){
+            return (serverTimeAtSync - systemTimeAtSync) + systemTimeMillis;
+        }
+    }
+
     public boolean isInSyncWithServer() {
         return isInSyncWithServer.get();
     }

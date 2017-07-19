@@ -3,6 +3,7 @@ package com.sharesmile.share;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
@@ -49,6 +50,7 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
+import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
@@ -279,6 +281,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());
+
         ServerTimeKeeper.init();
 
         lifecycleHelper = new AppLifecycleHelper(this);
@@ -297,6 +300,32 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
 
+        updateAppVersionInPrefs();
+        AnalyticsEvent.create(Event.ON_APPLICATION_CREATE)
+                .buildAndDispatch();
+
+    }
+
+    private void updateAppVersionInPrefs(){
+        try {
+            String currentVersion = "";
+            PackageInfo pInfo = getContext().getPackageManager()
+                    .getPackageInfo(getContext().getPackageName(), 0);
+            currentVersion = pInfo.versionName;
+
+            String storedVersion = SharedPrefsManager.getInstance().getString(PREF_APP_VERSION);
+
+            SharedPrefsManager.getInstance().setString(PREF_APP_VERSION, currentVersion);
+
+            if (!TextUtils.isEmpty(storedVersion) && !storedVersion.equals(currentVersion)){
+                // App update just happened, send app_update event
+                AnalyticsEvent.create(Event.ON_APP_UPDATE)
+                        .buildAndDispatch();
+            }
+
+        }catch (Exception e){
+            Logger.e(TAG, e.getMessage());
+        }
     }
 
     public void updateCauseList(CauseList updated){

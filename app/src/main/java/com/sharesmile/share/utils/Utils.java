@@ -645,6 +645,11 @@ public class Utils {
 
     }
 
+    public static String getAppVersion(){
+        return SharedPrefsManager.getInstance().getString(Constants.PREF_APP_VERSION);
+    }
+
+
     private static void setTrackRecordForAnalytics(){
         Analytics.getInstance().setUserProperty("LifeTimeDistance",
                 SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE));

@@ -2,7 +2,6 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -79,15 +78,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             gpsSpeedUpdates.setChecked(true);
         }
         getFragmentController().updateToolBar(getString(R.string.action_settings), true);
-        String version = "";
-        try {
-            PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
-            version = pInfo.versionName;
-        }catch (Exception e){
-            Logger.e("SettingsFragment", e.getMessage());
-        }
-
-        appVersionText.setText("App Version " + version);
+        appVersionText.setText("App Version " + Utils.getAppVersion());
         return view;
 
     }

@@ -38,6 +38,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -534,7 +535,14 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 int count = 0;
                 while (i >= 0){
                     Location loc = locationQueue.getElemAtPosition(i);
-                    long deltaMillis = DateUtil.getServerTimeInMillis() - loc.getTime();
+                    long locationTimeInMillis = loc.getTime();
+                    // Location returned by NETWORK_PROVIDER
+                    if (LocationManager.NETWORK_PROVIDER.equals(loc.getProvider())){
+                        // Converting it into servertime as timestamp returned by location object is system time stamp
+                        locationTimeInMillis = ServerTimeKeeper.getInstance()
+                                .getServerTimeAtSystemTime(locationTimeInMillis);
+                    }
+                    long deltaMillis = DateUtil.getServerTimeInMillis() - locationTimeInMillis;
                     if (deltaMillis < CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL){
                         // If the location object is not old enough then we consider its speed
                         cumulativeSpeed += loc.getSpeed();

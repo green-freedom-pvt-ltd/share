@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -398,9 +399,6 @@ public class WorkoutService extends Service implements
             return;
         }
         Logger.i(TAG, "onLocationChanged with \n" + location.toString());
-        if (!ServerTimeKeeper.getInstance().isInSyncWithServer()){
-            ServerTimeKeeper.getInstance().syncServerAndSystemMilliTime(location.getTime());
-        }
         cancelGpsInactiveNotification();
         handler.removeCallbacks(handleGpsInactivityRunnable);
         handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
@@ -465,7 +463,22 @@ public class WorkoutService extends Service implements
      */
     public boolean checkForSpike(Location loc1, Location loc2){
 
-        long deltaTimeInMillis = Math.abs(loc2.getTime() - loc1.getTime());
+        long firstLocationTime = loc1.getTime();
+        if (LocationManager.NETWORK_PROVIDER.equals(loc1.getProvider())){
+            // Location returned by NETWORK_PROVIDER
+            // Converting it into servertime as timestamp returned by location object is system time stamp
+            firstLocationTime = ServerTimeKeeper.getInstance()
+                    .getServerTimeAtSystemTime(firstLocationTime);
+        }
+        long secondLocationTime = loc2.getTime();
+        if (LocationManager.NETWORK_PROVIDER.equals(loc2.getProvider())){
+            // Location returned by NETWORK_PROVIDER
+            // Converting it into servertime as timestamp returned by location object is system time stamp
+            secondLocationTime = ServerTimeKeeper.getInstance()
+                    .getServerTimeAtSystemTime(secondLocationTime);
+        }
+
+        long deltaTimeInMillis = Math.abs(secondLocationTime - firstLocationTime);
         long deltaTime = deltaTimeInMillis / 1000;
 
         float deltaDistance = loc1.distanceTo(loc2);

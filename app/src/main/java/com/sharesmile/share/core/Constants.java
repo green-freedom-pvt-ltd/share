@@ -163,6 +163,8 @@ public class Constants {
     public static final String FEEDBACK_TAG_POST_RUN_HAPPY = "happy";
     public static final String FEEDBACK_TAG_POST_RUN_SAD = "sad";
 
+    public static final String PREF_APP_VERSION = "pref_app_version";
+
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));
         add(new LatLng(19.118485, 72.913496));

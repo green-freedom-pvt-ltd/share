@@ -18,6 +18,7 @@ public class Properties {
     public static final String EVENT_NAME = "enanme";
     public static final String EVENT_CATEGORY = "ecat";
     public static final String EVENT_TIME_STAMP = "ets";
+    public static final String EVENT_APP_VERSION = "ver";
 
     private HashMap<String, Object> backingMap;
 
