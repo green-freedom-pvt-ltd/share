@@ -37,7 +37,6 @@ import Models.MessageList;
 import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
-import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
 /**
  * Created by Shine on 20/07/16.
@@ -185,20 +184,6 @@ public class SyncHelper {
         EventBus.getDefault().post(new DBEvent.MessageDataUpdated());
 
         return true;
-    }
-
-    public static void scheduleUserDataSync(Context context) {
-        Logger.d(TAG, "scheduleUserDataSync");
-        PeriodicTask task = new PeriodicTask.Builder()
-                .setService(SyncService.class)
-                .setTag(UPLOAD_USER_DATA)
-                .setPeriod(25200L) // in secs, i.e. sync every 7 hours
-                .setPersisted(true)
-                .setFlex(7200) // 2 hours
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);
-        mGcmNetworkManager.schedule(task);
     }
 
     public static void syncUserFromDB(){

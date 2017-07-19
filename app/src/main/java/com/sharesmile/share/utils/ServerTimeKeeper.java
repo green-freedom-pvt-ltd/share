@@ -125,15 +125,19 @@ public class ServerTimeKeeper {
             Logger.d(TAG, "Already in sync with server, won't do anything");
             return;
         }
+        // Start Server time fetching logic if network is connected
+        if (NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+            forceSyncTimerWithServerTime();
+        }else {
+            // Network not present shall retry after some time, expBackoff
+            expBackoffRetry();
+        }
+    }
+
+    public synchronized void forceSyncTimerWithServerTime(){
+        // Start asynchronous fetching if it is not being fetched already
         if (!isFetchingServerTime.get()) {
-            //Start Server time fetching logic if network is connected and server time is not
-            // being fetched already
-            if (NetworkUtils.isNetworkConnected(MainApplication.getContext())){
-                executeSyncCallAsynchronously();
-            }else {
-                // Network not present shall retry after some time, expBackoff
-                expBackoffRetry();
-            }
+            executeSyncCallAsynchronously();
         }
     }
 

@@ -81,14 +81,17 @@ public class Analytics {
     }
 
     public void setUserName(String name){
+        Crashlytics.setString("Name", name);
         clevertapManager.setUserProperty("Name", name);
     }
 
     public void setUserEmail(String email){
+        Crashlytics.setString("Email", email);
         clevertapManager.setUserProperty("Email", email);
     }
 
     public void setUserId(int userId){
+        Crashlytics.setInt("UserId", userId);
         clevertapManager.setUserProperty("Identity", userId);
     }
 
@@ -109,6 +112,7 @@ public class Analytics {
     }
 
     public void setUserImpactLeagueTeamCode(int teamCode){
+        Crashlytics.setInt("TeamCode", teamCode);
         clevertapManager.setUserProperty("team_code", teamCode);
     }
 

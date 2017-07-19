@@ -368,7 +368,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         SyncHelper.syncUserFromDB();
         SyncHelper.scheduleDataSync(this);
         SyncHelper.syncMessageCenterData(this);
-        SyncHelper.scheduleUserDataSync(this);
         boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         if (!isWorkoutDataUpToDate){
             // Need to forcefully refresh workout data now

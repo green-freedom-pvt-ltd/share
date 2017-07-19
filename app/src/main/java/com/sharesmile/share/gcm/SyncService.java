@@ -59,28 +59,42 @@ public class SyncService extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         Logger.d(TAG, "runtask started: " + taskParams.getTag());
-        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false)) {
+        try {
+            if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false)) {
+                return GcmNetworkManager.RESULT_FAILURE;
+            }
+            if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_WORKOUT_DATA)) {
+                return uploadWorkoutData();
+            } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)) {
+                return forceRefreshEntireWorkoutHistory();
+            } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
+                return uploadUserData();
+            } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_DATA)){
+                return syncData();
+            }
+            else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
+                Bundle extras = taskParams.getExtras();
+                String fraudDataString = extras.getString(TaskConstants.FRAUD_DATA_JSON);
+                pushFraudData(fraudDataString);
+            }else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_USER_FEEDBACK)) {
+                Bundle extras = taskParams.getExtras();
+                String feedbackString = extras.getString(TaskConstants.FEEDBACK_DATA_JSON);
+                pushUserFeedback(feedbackString);
+            }
+            return GcmNetworkManager.RESULT_SUCCESS;
+        } catch (Throwable th){
+            String message = "Exception while performing sync task: " + taskParams.getTag()
+                    + ", exception message: " + th.getMessage();
+            th.printStackTrace();
+            Logger.e(TAG, message);
+            Crashlytics.log(message);
+            Crashlytics.logException(th);
+            AnalyticsEvent.create(Event.ON_EXCEPTION_IN_SYNC_TASK)
+                    .put("task", taskParams.getTag())
+                    .put("exception_message", th.getMessage())
+                    .buildAndDispatch();
             return GcmNetworkManager.RESULT_FAILURE;
         }
-        if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_WORKOUT_DATA)) {
-            return uploadWorkoutData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)) {
-            return forceRefreshEntireWorkoutHistory();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
-            return uploadUserData();
-        } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_DATA)){
-            return syncData();
-        }
-        else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
-            Bundle extras = taskParams.getExtras();
-            String fraudDataString = extras.getString(TaskConstants.FRAUD_DATA_JSON);
-            pushFraudData(fraudDataString);
-        }else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_USER_FEEDBACK)) {
-            Bundle extras = taskParams.getExtras();
-            String feedbackString = extras.getString(TaskConstants.FEEDBACK_DATA_JSON);
-            pushUserFeedback(feedbackString);
-        }
-        return GcmNetworkManager.RESULT_SUCCESS;
     }
 
     @Override
@@ -91,7 +105,8 @@ public class SyncService extends GcmTaskService {
 
     private int syncData(){
 
-        syncServerTime() ;
+        syncServerTime();
+        uploadUserData();
         syncLeaderBoardData();
         updateCauseData();
         syncWorkoutData();
@@ -102,7 +117,7 @@ public class SyncService extends GcmTaskService {
 
 
     public static int syncServerTime(){
-        ServerTimeKeeper.getInstance().syncTimerWithServerTime();
+        ServerTimeKeeper.getInstance().forceSyncTimerWithServerTime();
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
@@ -362,6 +377,8 @@ public class SyncService extends GcmTaskService {
     }
 
     private int uploadWorkoutData() {
+
+        Logger.d(TAG, "uploadWorkoutData");
 
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(false)).list();
