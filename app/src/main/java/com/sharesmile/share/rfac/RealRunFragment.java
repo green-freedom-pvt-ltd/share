@@ -123,7 +123,6 @@ public class RealRunFragment extends RunFragment {
             continuedRun();
         }
         AnalyticsEvent.create(Event.ON_LOAD_TRACKER_SCREEN)
-                .addBundle(mCauseData.getCauseBundle())
                 .buildAndDispatch();
     }
 
@@ -296,13 +295,11 @@ public class RealRunFragment extends RunFragment {
                     if (isRunning()) {
                         pauseRun(true);
                         AnalyticsEvent.create(Event.ON_CLICK_PAUSE_RUN)
-                                .addBundle(mCauseData.getCauseBundle())
                                 .addBundle(getWorkoutBundle())
                                 .buildAndDispatch();
                     } else {
                         resumeRun();
                         AnalyticsEvent.create(Event.ON_CLICK_RESUME_RUN)
-                                .addBundle(mCauseData.getCauseBundle())
                                 .addBundle(getWorkoutBundle())
                                 .buildAndDispatch();
                     }
@@ -312,7 +309,6 @@ public class RealRunFragment extends RunFragment {
             case R.id.btn_stop:
                 showStopDialog();
                 AnalyticsEvent.create(Event.ON_CLICK_STOP_RUN)
-                        .addBundle(mCauseData.getCauseBundle())
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
                 break;
@@ -349,7 +345,6 @@ public class RealRunFragment extends RunFragment {
         });
         alertDialog.show();
         AnalyticsEvent.create(Event.ON_LOAD_FINISH_RUN_POPUP)
-                .addBundle(mCauseData.getCauseBundle())
                 .addBundle(getWorkoutBundle())
                 .buildAndDispatch();
     }
@@ -374,7 +369,6 @@ public class RealRunFragment extends RunFragment {
         });
         alertDialog.show();
         AnalyticsEvent.create(Event.ON_LOAD_TOO_SHORT_POPUP)
-                .addBundle(mCauseData.getCauseBundle())
                 .addBundle(getWorkoutBundle())
                 .buildAndDispatch();
     }

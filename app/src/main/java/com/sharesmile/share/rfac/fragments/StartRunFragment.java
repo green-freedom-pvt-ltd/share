@@ -56,7 +56,6 @@ public class StartRunFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         AnalyticsEvent.create(Event.ON_LOAD_COUNTDOWN_SCREEN)
-                .addBundle(mCauseData.getCauseBundle())
                 .buildAndDispatch();
     }
 
@@ -73,7 +72,6 @@ public class StartRunFragment extends BaseFragment {
             public void onClick(View v) {
                 proceedToRunProgress();
                 AnalyticsEvent.create(Event.ON_SKIP_COUNTDOWN)
-                        .addBundle(mCauseData.getCauseBundle())
                         .buildAndDispatch();
             }
         });

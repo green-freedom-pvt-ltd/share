@@ -65,6 +65,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
+import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
@@ -230,7 +231,6 @@ public class WorkoutService extends Service implements
             }
             ActivityDetector.getInstance().workoutActive();
             AnalyticsEvent.create(Event.ON_WORKOUT_START)
-                    .addBundle(mCauseData.getCauseBundle())
                     .buildAndDispatch();
         }
 
@@ -252,7 +252,6 @@ public class WorkoutService extends Service implements
             unBindFromActivityAndStop();
 
             AnalyticsEvent.create(Event.ON_WORKOUT_END)
-                    .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = 0f;
@@ -489,14 +488,17 @@ public class WorkoutService extends Service implements
         float spikeFilterSpeedThreshold;
         String thresholdApplied;
 
-        if (ActivityDetector.getInstance().isIsInVehicle()){
+        // recent is avg GPS speed from recent few samples of accepted GPS points in the past 24 secs
+        // GPS speed is obtained directly from location object and is calculated using doppler shift
+        float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
+
+        // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
+        if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > USAIN_BOLT_GPS_SPEED_LIMIT){
             spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
-            if (
-                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)
-                            || ActivityDetector.getInstance().isOnFoot()
-                    ){
+            if ( ActivityDetector.getInstance().isOnFoot() ||
+                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)){
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
@@ -593,7 +595,6 @@ public class WorkoutService extends Service implements
         if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= 0.1){
             // Send event only when the distance counter increment by one unit
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
-                    .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
                     .put("delta_distance", deltaDistance) // in meters
                     .put("delta_time", deltaTime) // in secs
@@ -670,7 +671,6 @@ public class WorkoutService extends Service implements
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
-                    .addBundle(mCauseData.getCauseBundle())
                     .addBundle(getWorkoutBundle())
                     .put("reason", reason)
                     .buildAndDispatch();
@@ -695,7 +695,6 @@ public class WorkoutService extends Service implements
                 tracker.resumeRun();
                 Logger.d(TAG, "ResumeWorkout");
                 AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
-                        .addBundle(mCauseData.getCauseBundle())
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
             }
