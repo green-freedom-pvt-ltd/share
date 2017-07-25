@@ -5,13 +5,9 @@ package com.sharesmile.share.gcm;
  */
 public class TaskConstants {
 
-    public static String PUSH_WORKOUT_DATA = "upload_workout_data";
-
     public static String PUSH_FRAUD_DATA = "upload_fraud_data";
 
     public static String PUSH_USER_FEEDBACK = "upload_user_feedback";
-
-    public static String FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY = "force_refresh_entire_workout_history";
 
     public static String UPLOAD_USER_DATA = "upload_user_data";
 

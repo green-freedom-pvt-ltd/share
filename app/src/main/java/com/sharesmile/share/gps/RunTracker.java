@@ -79,6 +79,13 @@ public class RunTracker implements Tracker {
     }
 
     @Override
+    public void incrementNumUpdateEvents() {
+        if (isRunning() && dataStore != null){
+            dataStore.incrementNumUpdateEvents();
+        }
+    }
+
+    @Override
     public synchronized void pauseRun() {
         Logger.d(TAG, "pauseRun");
         WorkoutSingleton.getInstance().pauseWorkout();

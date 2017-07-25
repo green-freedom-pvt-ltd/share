@@ -34,6 +34,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private int usainBoltCount;
 	private boolean mockLocationDetected;
 	private int numGpsSpikes;
+	private int numUpdateEvents;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -75,6 +76,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		usainBoltCount = source.usainBoltCount;
 		mockLocationDetected = source.mockLocationDetected;
 		numGpsSpikes = source.numGpsSpikes;
+		numUpdateEvents = source.numUpdateEvents;
 	}
 
 	private void invokeNewBatch(long startTimeStamp){
@@ -152,6 +154,16 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public void incrementGpsSpike() {
 		numGpsSpikes++;
+	}
+
+	@Override
+	public int getNumUpdateEvents() {
+		return numUpdateEvents;
+	}
+
+	@Override
+	public void incrementNumUpdates() {
+		numUpdateEvents++;
 	}
 
 	@Override
@@ -325,6 +337,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		p.put("calories", getCalories().getCalories());
 		p.put("bolt_count", getUsainBoltCount());
 		p.put("num_spikes", getNumGpsSpikes());
+		p.put("num_updates", getNumUpdateEvents());
 		return p;
 	}
 
@@ -354,6 +367,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 				", usainBoltCount=" + usainBoltCount +
 				", isMockLocationDetected=" + mockLocationDetected +
 				", numGpsSpikes=" + numGpsSpikes +
+				", numUpdateEvents=" + numUpdateEvents +
 				'}';
 	}
 
@@ -372,6 +386,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		usainBoltCount = in.readInt();
 		mockLocationDetected = in.readByte() != 0x00;
 		numGpsSpikes = in.readInt();
+		numUpdateEvents = in.readInt();
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
@@ -401,6 +416,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeInt(usainBoltCount);
 		dest.writeByte((byte) (mockLocationDetected ? 0x01 : 0x00));
 		dest.writeInt(numGpsSpikes);
+		dest.writeInt(numUpdateEvents);
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

@@ -88,4 +88,8 @@ public interface WorkoutDataStore {
 
 	void incrementGpsSpike();
 
+	int getNumUpdateEvents();
+
+	void incrementNumUpdateEvents();
+
 }

@@ -48,7 +48,7 @@ public class MigrateV10ToV11 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV8ToV9();
+        return new MigrateV9ToV10();
     }
 
     private String getSqlQueryForAddingColumn(String columnDef) {
@@ -57,7 +57,7 @@ public class MigrateV10ToV11 extends MigrationImpl {
 
     private String getSqlStringForAddingIndex(){
         // Query to create index on workoutId column
-        return  "CREATE UNIQUE INDEX IF NOT EXISTS IDX_WORKOUT_WORKOUT_ID ON "
+        return  "CREATE UNIQUE INDEX IF NOT EXISTS IDX_WORKOUT_WORKOUT_ID "
                 + WorkoutDao.TABLENAME+ " (\"WORKOUT_ID\");";
     }
 

@@ -19,6 +19,7 @@ import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.network.NetworkUtils;
@@ -62,12 +63,7 @@ public class SyncService extends GcmTaskService {
         try {
             if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false)) {
                 return GcmNetworkManager.RESULT_FAILURE;
-            }
-            if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_WORKOUT_DATA)) {
-                return uploadWorkoutData();
-            } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)) {
-                return forceRefreshEntireWorkoutHistory();
-            } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
+            }else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
                 return uploadUserData();
             } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_DATA)){
                 return syncData();
@@ -200,20 +196,22 @@ public class SyncService extends GcmTaskService {
 
 
     private int syncWorkoutData(){
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        long clientVersion = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
-        boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
-        if (isWorkoutDataUpToDate && clientVersion > 0){
-            String syncUrl;
-            syncUrl = Urls.getSyncRunUrl(clientVersion);
-            Logger.d(TAG, "Starting sync with client_version: " + clientVersion);
-            syncWorkoutTimeStamp = 0;
-            return syncWorkoutData(syncUrl, mWorkoutDao);
-        }else {
-            // Need to force refresh Workout Data
-            Logger.e(TAG, "Must fetch historical runs before");
-            SyncHelper.forceRefreshEntireWorkoutHistory();
-            return  GcmNetworkManager.RESULT_FAILURE;
+        synchronized (SyncService.class){
+            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            long clientVersion = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
+            boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
+            if (isWorkoutDataUpToDate && clientVersion > 0){
+                String syncUrl;
+                syncUrl = Urls.getSyncRunUrl(clientVersion);
+                Logger.d(TAG, "Starting sync with client_version: " + clientVersion);
+                syncWorkoutTimeStamp = 0;
+                return syncWorkoutData(syncUrl, mWorkoutDao);
+            }else {
+                // Need to force refresh Workout Data
+                Logger.e(TAG, "Must fetch historical runs before");
+                SyncHelper.forceRefreshEntireWorkoutHistory();
+                return  GcmNetworkManager.RESULT_FAILURE;
+            }
         }
     }
 
@@ -376,27 +374,41 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private int uploadWorkoutData() {
 
-        Logger.d(TAG, "uploadWorkoutData");
-
-        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-        List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.Is_sync.eq(false)).list();
-
-        if (mWorkoutList != null && mWorkoutList.size() > 0) {
-
-            boolean isSuccess = true;
-            for (Workout workout : mWorkoutList) {
-                isSuccess = isSuccess && uploadWorkoutData(workout);
+    public static void pushWorkoutDataWithBackoff(){
+        ExpoBackoffTask task = new ExpoBackoffTask() {
+            @Override
+            public int performtask() {
+                return uploadWorkoutData();
             }
-            return isSuccess ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
-        } else {
-            return GcmNetworkManager.RESULT_SUCCESS;
+        };
+        task.run();
+    }
+
+
+    private static int uploadWorkoutData() {
+        synchronized (SyncService.class){
+            Logger.d(TAG, "uploadWorkoutData");
+
+            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties
+                    .Is_sync.eq(false)).list();
+
+            if (mWorkoutList != null && mWorkoutList.size() > 0) {
+
+                boolean isSuccess = true;
+                for (Workout workout : mWorkoutList) {
+                    isSuccess = isSuccess && uploadWorkoutData(workout);
+                }
+                return isSuccess ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
+            } else {
+                return GcmNetworkManager.RESULT_SUCCESS;
+            }
         }
 
     }
 
-    private boolean uploadWorkoutData(Workout workout) {
+    private static boolean uploadWorkoutData(Workout workout) {
 
         Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId()
                 + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
@@ -435,14 +447,15 @@ public class SyncService extends GcmTaskService {
                 jsonObject.put("team_id", workout.getTeamId());
             }
             jsonObject.put("num_spikes", workout.getNumSpikes());
+            jsonObject.put("num_updates", workout.getNumUpdates());
 
             Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 
             Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
 
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            //delete row
-            mWorkoutDao.delete(workout);
+            // Commenting delete command as it is not required after adding unique constraint to WORKOUT_ID
+//            mWorkoutDao.delete(workout);
             workout.setId(response.getId());
             workout.setIs_sync(true);
             workout.setIsValidRun(!response.isFlag());
@@ -497,7 +510,17 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    public int forceRefreshEntireWorkoutHistory() {
+    public static void forceRefreshEntireWorkoutHistoryWithBackoff(){
+        ExpoBackoffTask task = new ExpoBackoffTask() {
+            @Override
+            public int performtask() {
+                return forceRefreshEntireWorkoutHistory();
+            }
+        };
+        task.run();
+    }
+
+    private static int forceRefreshEntireWorkoutHistory() {
         Logger.d(TAG, "forceRefreshEntireWorkoutHistory");
         String runUrl;
         runUrl = Urls.getFlaggedRunUrl(false);
@@ -505,9 +528,9 @@ public class SyncService extends GcmTaskService {
         return forceRefreshAllWorkoutData(runUrl);
     }
 
-    private long refreshAllTimeStamp;
+    private static long refreshAllTimeStamp;
 
-    private int forceRefreshAllWorkoutData(String runUrl) {
+    private static int forceRefreshAllWorkoutData(String runUrl) {
 
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(runUrl);

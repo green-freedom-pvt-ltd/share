@@ -324,6 +324,16 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         dirtyWorkoutData.incrementGpsSpike();
     }
 
+    @Override
+    public int getNumUpdateEvents() {
+        return dirtyWorkoutData.getNumUpdateEvents();
+    }
+
+    @Override
+    public void incrementNumUpdateEvents() {
+        dirtyWorkoutData.incrementNumUpdates();
+    }
+
     private void persistBothWorkoutData() {
         persistDirtyWorkoutData();
         if (approvedWorkoutData != null){

@@ -35,5 +35,6 @@ public interface Tracker {
 	String getCurrentWorkoutId();
 	WorkoutSingleton.State getState();
 	void incrementGpsSpike();
+	void incrementNumUpdateEvents();
 
 }

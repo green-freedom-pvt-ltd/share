@@ -41,6 +41,7 @@ import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.NotificationActionReceiver;
+import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -203,9 +204,10 @@ public class WorkoutService extends Service implements
             workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
         }
         workout.setNumSpikes(data.getNumGpsSpikes());
+        workout.setNumUpdates(data.getNumUpdateEvents());
         workoutDao.insertOrReplace(workout);
         Utils.updateTrackRecordFromDb();
-        SyncHelper.pushRunData();
+        SyncService.pushWorkoutDataWithBackoff();
     }
 
 
@@ -606,6 +608,9 @@ public class WorkoutService extends Service implements
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
+            if (tracker != null){
+                tracker.incrementNumUpdateEvents();
+            }
         }
         if (totalDistanceKmsTwoDecimal > Config.MIN_DISTANCE_FOR_FEEDBACK_POPUP){
             WorkoutSingleton.getInstance().setToShowFeedbackDialog(true);

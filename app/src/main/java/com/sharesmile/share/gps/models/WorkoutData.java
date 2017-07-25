@@ -194,6 +194,17 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	void incrementGpsSpike();
 
 	/**
+	 * @return Number of WORKOUT_UPDATE events which were sent during the run
+	 */
+	int getNumUpdateEvents();
+
+	/**
+	 * Increments the number of WORKOUT_UPDATE events in this run
+	 * @return
+	 */
+	void incrementNumUpdates();
+
+	/**
 	 * Converts this object to string
 	 * @return
 	 */

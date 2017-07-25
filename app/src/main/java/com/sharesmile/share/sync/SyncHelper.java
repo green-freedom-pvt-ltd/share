@@ -65,39 +65,7 @@ public class SyncHelper {
      * One time task to forcefully fetch all WorkoutData from server
      */
     public static void forceRefreshEntireWorkoutHistory() {
-        OneoffTask task = new OneoffTask.Builder()
-                .setService(SyncService.class)
-                .setTag(TaskConstants.FORCE_REFRESH_ENTIRE_WORKOUT_HISTORY)
-                .setExecutionWindow(0L, 1L)
-                .setRequiredNetwork(Task.NETWORK_STATE_ANY)
-                .setPersisted(true)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager
-                .getInstance(MainApplication.getContext().getApplicationContext());
-        mGcmNetworkManager.schedule(task);
-    }
-
-    /**
-     * One time task to push all the dirty runs (is_sync false) from client to server
-     * It will retry if the upload fails for some reason
-     */
-    public static void pushRunData() {
-        OneoffTask task = new OneoffTask.Builder()
-                .setService(SyncService.class)
-                .setTag(TaskConstants.PUSH_WORKOUT_DATA)
-                /*
-                    Mandatory setter for creating a one-off task.
-                    You specify the earliest point in time in the future from which your task might start executing,
-                    as well as the latest point in time in the future at which your task must have executed.
-                 */
-                .setExecutionWindow(0L, 30L)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setPersisted(true)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext().getApplicationContext());
-        mGcmNetworkManager.schedule(task);
+        SyncService.forceRefreshEntireWorkoutHistoryWithBackoff();
     }
 
     /**
