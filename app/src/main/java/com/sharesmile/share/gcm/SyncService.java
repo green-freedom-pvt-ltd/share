@@ -45,8 +45,10 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
@@ -230,7 +232,18 @@ public class SyncService extends GcmTaskService {
             RunList runList = NetworkUtils.handleResponse(response, RunList.class);
             Gson gson = new Gson();
             Logger.d(TAG, "Syncing these runs in DB " + gson.toJson(runList));
-            mWorkoutDao.insertOrReplaceInTx(runList);
+
+            Iterator<Workout> iterator = runList.iterator();
+            while (iterator.hasNext()){
+                Workout workout = iterator.next();
+                if (TextUtils.isEmpty(workout.getWorkoutId())){
+                    // Generating new client_run_id and scheduling the run for sync
+                    workout.setWorkoutId(UUID.randomUUID().toString());
+                    workout.setIs_sync(false);
+                    mWorkoutDao.insertOrReplace(workout);
+                }
+            }
+
             // Update User's track record
             Utils.updateTrackRecordFromDb();
 

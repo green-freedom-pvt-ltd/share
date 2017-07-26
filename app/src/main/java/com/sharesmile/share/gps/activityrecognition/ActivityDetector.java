@@ -27,6 +27,7 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.sharesmile.share.MainApplication.showRunNotification;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
@@ -223,7 +224,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             // Show notification and increment still occurred counter
-            MainApplication.showRunNotification(
+            showRunNotification(
                     appContext.getString(R.string.notification_standing_still_title),
                     WORKOUT_NOTIFICATION_STILL_ID,
                     appContext.getString(R.string.notification_standing_still),
@@ -264,17 +265,22 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 // User has been walking continuously for the past 2 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
                 if (!isWalkEngagementNotificationOnDisplay){
-                    MainApplication.showRunNotification(
+
+                    boolean shown = MainApplication.showRunNotification(
                             appContext.getString(R.string.notification_walk_engagement_title),
                             WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
                             appContext.getString(R.string.notification_walk_engagement),
                             appContext.getString(R.string.notification_action_start),
                             appContext.getString(R.string.notification_action_cancel)
                     );
-                    isWalkEngagementNotificationOnDisplay = true;
-                    AnalyticsEvent.create(Event.DISP_WALK_ENGAGEMENT_NOTIF)
-                            .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
-                            .buildAndDispatch();
+
+                    if (shown){
+                        isWalkEngagementNotificationOnDisplay = true;
+                        AnalyticsEvent.create(Event.DISP_WALK_ENGAGEMENT_NOTIF)
+                                .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
+                                .buildAndDispatch();
+                    }
+
                 }
                 timeOnFootContinuously = 0;
             }

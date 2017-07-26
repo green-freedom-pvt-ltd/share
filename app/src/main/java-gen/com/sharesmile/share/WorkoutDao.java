@@ -285,13 +285,5 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
     protected boolean isEntityUpdateable() {
         return true;
     }
-
-
-
-    CREATE TABLE "WORKOUT" ("_id" INTEGER PRIMARY KEY ,
-            "DISTANCE" REAL NOT NULL ,
-            "WORKOUT_ID" TEXT);
-
-
     
 }

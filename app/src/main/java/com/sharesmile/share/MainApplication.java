@@ -123,12 +123,20 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         showToast(getContext().getResources().getString(stringId));
     }
 
-    public static void showRunNotification(String notifTitle, int notificationId, String notifText, String... args){
+    /**
+     *
+     * @param notifTitle
+     * @param notificationId
+     * @param notifText
+     * @param args
+     * @return true if the notification was actually shown, false otherwise
+     */
+    public static boolean showRunNotification(String notifTitle, int notificationId, String notifText, String... args){
 
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT || notificationId == WORKOUT_NOTIFICATION_STILL_ID){
             if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS)){
                 Logger.i(TAG, "Won't show notification with id:" + notificationId + ", as alerts are disabled");
-                return;
+                return false;
             }
             if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
                 long currentTsMillis = DateUtil.getServerTimeInMillis();
@@ -136,7 +144,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                 if (currentTsMillis < scheduleWalkEngagementAfter){
                     // Won't show walk engagement notif, can only show it after "scheduleWalkEngagementAfter" time
                     Logger.i(TAG, "Won't show walk engagement notif, can only show it after " + scheduleWalkEngagementAfter + " time");
-                    return;
+                    return false;
                 }
             }
         }
@@ -182,6 +190,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         builder.setDeleteIntent(getDeleteIntent(notificationId));
         builder.setContentIntent(getInstance().createAppIntent());
         NotificationManagerCompat.from(getContext()).notify(notificationId, builder.build());
+        return true;
     }
 
     private static PendingIntent createNotificationActionReceiverPendingIntent(String action, int notifId){
