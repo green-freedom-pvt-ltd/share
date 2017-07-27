@@ -19,7 +19,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/cause_image_placeholder"
             android:visibility="gone"
-            app:layout_scrollFlags="scroll|enterAlways" />
+            app:layout_scrollFlags="scroll|exitUntilCollapsed" />
 
         <com.sharesmile.share.views.MLTextView
             android:id="@+id/tv_leaderboard_data"

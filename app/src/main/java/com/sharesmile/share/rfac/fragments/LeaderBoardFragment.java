@@ -280,7 +280,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     private void showProgressDialog() {
-        mProgressBar.setVisibility(View.VISIBLE);
+//        mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         myListItem.setVisibility(View.GONE);
     }

@@ -225,12 +225,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         addFragment(new OnScreenFragment(), false);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
-            if (LeaderBoardDataStore.getInstance().isLeagueActive()){
-                // Impact League still active, will show League team leaderboard
-                showLeagueBoard();
-            }else {
-                replaceFragment(new ProfileStatsFragment(), true);
-            }
+            replaceFragment(new ProfileStatsFragment(), true);
         }
     }
 

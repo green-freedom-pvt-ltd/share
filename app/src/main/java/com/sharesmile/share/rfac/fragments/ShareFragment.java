@@ -22,6 +22,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -231,6 +232,12 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
                 .addBundle(mWorkoutData.getWorkoutBundle())
                 .buildAndDispatch();
+
+        if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
+            // Need to show post run feedback dialog before
+            showPostRunFeedbackDialog(mWorkoutData);
+        }
+
     }
 
     private void initCaloriesContainer(){

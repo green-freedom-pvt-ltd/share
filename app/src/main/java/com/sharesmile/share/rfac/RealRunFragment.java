@@ -154,18 +154,19 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
-                // Need to show post run feedback dialog before
-                showPostRunFeedbackDialog(data);
-                // ShareScreen will be launched after taking feedback from user
-                return;
-            }
-            exitFeedback(data);
+            exitRun(data);
+
+//            if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
+//                // Need to show post run feedback dialog before
+//                showPostRunFeedbackDialog(data);
+//                // ShareScreen will be launched after taking feedback from user
+//                return;
+//            }
+//            exitFeedback(data);
         }
     }
 
-    @Override
-    protected void exitFeedback(WorkoutData data){
+    protected void exitRun(WorkoutData data){
         Logger.d(TAG, "exit");
         String distanceString = Utils.formatToKmsWithTwoDecimal(data.getDistance());
         Float fDistance = Float.parseFloat(distanceString);

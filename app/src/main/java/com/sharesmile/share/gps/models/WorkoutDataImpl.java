@@ -148,12 +148,14 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public int getNumGpsSpikes() {
+		Logger.d(TAG, "Returning numGpsSpikes: " + numGpsSpikes);
 		return numGpsSpikes;
 	}
 
 	@Override
 	public void incrementGpsSpike() {
 		numGpsSpikes++;
+		Logger.d(TAG, "NumGpsSpikes after incrementing: " + numGpsSpikes);
 	}
 
 	@Override
@@ -331,11 +333,9 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		Properties p = new Properties();
 		p.put("distance", Utils.formatToKmsWithTwoDecimal(getDistance()));
 		p.put("time_elapsed", getElapsedTime());
-		p.put("avg_speed", getAvgSpeed()*(3.6f));
 		p.put("num_steps", getTotalSteps());
 		p.put("client_run_id", getWorkoutId());
 		p.put("calories", getCalories().getCalories());
-		p.put("bolt_count", getUsainBoltCount());
 		p.put("num_spikes", getNumGpsSpikes());
 		p.put("num_updates", getNumUpdateEvents());
 		return p;

@@ -428,6 +428,12 @@ public class SyncService extends GcmTaskService {
         int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
         JSONObject jsonObject = new JSONObject();
         try {
+
+            if (workout.getId() != null && workout.getId() > 0){
+                // TODO: Need to make a PUT request in this update scenario
+                jsonObject.put("run_id", workout.getId());
+            }
+
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());
             jsonObject.put("distance", workout.getDistance());

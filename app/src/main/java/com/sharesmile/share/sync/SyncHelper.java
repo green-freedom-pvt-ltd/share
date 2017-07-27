@@ -65,7 +65,10 @@ public class SyncHelper {
      * One time task to forcefully fetch all WorkoutData from server
      */
     public static void forceRefreshEntireWorkoutHistory() {
-        SyncService.forceRefreshEntireWorkoutHistoryWithBackoff();
+        if (MainApplication.getInstance().isLogin()){
+            // User is logged in, can go for PULL of workout history
+            SyncService.forceRefreshEntireWorkoutHistoryWithBackoff();
+        }
     }
 
     /**

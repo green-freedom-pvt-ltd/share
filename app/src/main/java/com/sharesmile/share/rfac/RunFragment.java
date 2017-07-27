@@ -20,10 +20,10 @@ import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.rfac.fragments.FeedbackDialogHolderFragment;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -36,7 +36,7 @@ import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_BAD;
 import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_INACTIVE;
 import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_OK;
 
-public abstract class RunFragment extends FeedbackDialogHolderFragment implements View.OnClickListener {
+public abstract class RunFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String PARAM_TITLE = "param_title";
 

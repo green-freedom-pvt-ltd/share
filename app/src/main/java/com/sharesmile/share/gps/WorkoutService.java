@@ -151,7 +151,6 @@ public class WorkoutService extends Service implements
             //      & Usain Bolt count is less than 3 and
             //      & MockLocation is not enabled
             if (result.getDistance() >= mCauseData.getMinDistance()
-                    && result.getUsainBoltCount() < 3
                     && !result.isMockLocationDetected()) {
                 persistWorkoutInDb(result);
             }
@@ -200,9 +199,12 @@ public class WorkoutService extends Service implements
         workout.setBeginTimeStamp(data.getBeginTimeStamp());
         workout.setEndTimeStamp(DateUtil.getServerTimeInMillis());
         workout.setCalories(data.getCalories().getCalories());
-        if (LeaderBoardDataStore.getInstance().isLeagueActive()){
-            workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
-        }
+
+        // TODO: sending team_id in all the runs, filtering of runs for league will happen on Backend. Confirm with Nagle
+        workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
+//        if (LeaderBoardDataStore.getInstance().isLeagueActive()){
+//            workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
+//        }
         workout.setNumSpikes(data.getNumGpsSpikes());
         workout.setNumUpdates(data.getNumUpdateEvents());
         workoutDao.insertOrReplace(workout);
