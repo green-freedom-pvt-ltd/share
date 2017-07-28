@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="7dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,7 +93,7 @@
                 android:id="@+id/duration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="1.035"
                 android:textColor="@color/greyish_brown_two"
                 android:textSize="16sp"
                 android:gravity="right"

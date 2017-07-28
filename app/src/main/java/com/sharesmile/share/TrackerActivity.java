@@ -14,7 +14,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
-import android.support.v4.BuildConfig;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -38,7 +37,6 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.rfac.TestRunFragment;
-import com.sharesmile.share.rfac.activities.ThankYouActivity;
 import com.sharesmile.share.rfac.fragments.StartRunFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
@@ -96,6 +94,16 @@ public class TrackerActivity extends BaseActivity {
             // If workout sesion going on then bind to service
             invokeWorkoutService();
         }
+
+//        Window window = this.getWindow();
+//
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+//        {
+//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            window.setStatusBarColor(Color.TRANSPARENT);
+//        }
+
     }
 
     public boolean isWorkoutActive() {
@@ -393,8 +401,12 @@ public class TrackerActivity extends BaseActivity {
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
                         runFragment.onWorkoutResult(result);
                         AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
-                                .addBundle(mCauseData.getCauseBundle())
                                 .addBundle(result.getWorkoutBundle())
+                                .put("cause_id", mCauseData.getId())
+                                .put("cause_title", mCauseData.getTitle())
+                                .put("num_spikes", result.getNumGpsSpikes())
+                                .put("bolt_count", result.getUsainBoltCount())
+                                .put("num_update_events", result.getNumUpdateEvents())
                                 .buildAndDispatch();
                         break;
 

@@ -224,16 +224,18 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             // Show notification and increment still occurred counter
-            showRunNotification(
+            if (showRunNotification(
                     appContext.getString(R.string.notification_standing_still_title),
                     WORKOUT_NOTIFICATION_STILL_ID,
                     appContext.getString(R.string.notification_standing_still),
                     appContext.getString(R.string.notification_action_pause),
                     appContext.getString(R.string.notification_action_stop)
-            );
-            AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
-                    .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
-                    .buildAndDispatch();
+            )){
+                // Notification shown
+                AnalyticsEvent.create(Event.DISP_YOU_ARE_STILL_NOTIF)
+                        .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
+                        .buildAndDispatch();
+            }
             handler.removeCallbacks(handleStillNotificationRunnable);
             stillNotificationOccurredCounter = 1;
         }

@@ -333,11 +333,12 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		Properties p = new Properties();
 		p.put("distance", Utils.formatToKmsWithTwoDecimal(getDistance()));
 		p.put("time_elapsed", getElapsedTime());
+		p.put("avg_speed", getAvgSpeed()*(3.6f));
 		p.put("num_steps", getTotalSteps());
 		p.put("client_run_id", getWorkoutId());
 		p.put("calories", getCalories().getCalories());
-		p.put("num_spikes", getNumGpsSpikes());
-		p.put("num_updates", getNumUpdateEvents());
+//		p.put("num_spikes", getNumGpsSpikes());
+//		p.put("num_update_events", getNumUpdateEvents());
 		return p;
 	}
 

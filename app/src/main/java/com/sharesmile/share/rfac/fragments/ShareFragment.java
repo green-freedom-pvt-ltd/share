@@ -231,6 +231,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
                 .addBundle(mWorkoutData.getWorkoutBundle())
+                .put("num_spikes", mWorkoutData.getNumGpsSpikes())
+                .put("bolt_count", mWorkoutData.getUsainBoltCount())
+                .put("num_update_events", mWorkoutData.getNumUpdateEvents())
                 .buildAndDispatch();
 
         if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
@@ -329,6 +332,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     public void onGiveFeedbackClick(){
         AnalyticsEvent.create(Event.ON_CLICK_GIVE_FEEDBACK_BTN)
                 .addBundle(mWorkoutData.getWorkoutBundle())
+                .put("num_spikes", mWorkoutData.getNumGpsSpikes())
+                .put("bolt_count", mWorkoutData.getUsainBoltCount())
+                .put("num_update_events", mWorkoutData.getNumUpdateEvents())
                 .buildAndDispatch();
         showPostRunFeedbackDialog(mWorkoutData);
     }
@@ -340,6 +346,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()), getShareMsg());
         AnalyticsEvent.create(Event.ON_CLICK_WORKOUT_SHARE)
                 .addBundle(mWorkoutData.getWorkoutBundle())
+                .put("num_spikes", mWorkoutData.getNumGpsSpikes())
+                .put("bolt_count", mWorkoutData.getUsainBoltCount())
+                .put("num_update_events", mWorkoutData.getNumUpdateEvents())
                 .buildAndDispatch();
         // Not exiting ShareActivity
 //        if (getActivity() != null){

@@ -50,7 +50,7 @@ public class SyncHelper {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(SYNC_DATA)
-                .setPeriod(12600L) // in secs , i.e. every 3.5 hours
+                .setPeriod(10800L) // in secs , i.e. every 3 hours
                 .setPersisted(true)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setFlex(5400) // 1.5 hours

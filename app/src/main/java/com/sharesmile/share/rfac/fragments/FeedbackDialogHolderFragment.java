@@ -39,6 +39,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 dialog.dismiss();
                 AnalyticsEvent.create(Event.ON_CLICK_HAPPY_WORKOUT)
                         .addBundle(workoutData.getWorkoutBundle())
+                        .put("num_spikes", workoutData.getNumGpsSpikes())
+                        .put("bolt_count", workoutData.getUsainBoltCount())
+                        .put("num_update_events", workoutData.getNumUpdateEvents())
                         .buildAndDispatch();
                 showRateUsDialog(workoutData);
             }
@@ -49,6 +52,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 dialog.dismiss();
                 AnalyticsEvent.create(Event.ON_CLICK_SAD_WORKOUT)
                         .addBundle(workoutData.getWorkoutBundle())
+                        .put("num_spikes", workoutData.getNumGpsSpikes())
+                        .put("bolt_count", workoutData.getUsainBoltCount())
+                        .put("num_update_events", workoutData.getNumUpdateEvents())
                         .buildAndDispatch();
                 showTakeFeedbackDialog(workoutData);
             }
@@ -64,6 +70,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.show();
         AnalyticsEvent.create(Event.ON_LOAD_HAPPY_SAD_POPUP)
                 .addBundle(workoutData.getWorkoutBundle())
+                .put("num_spikes", workoutData.getNumGpsSpikes())
+                .put("bolt_count", workoutData.getUsainBoltCount())
+                .put("num_update_events", workoutData.getNumUpdateEvents())
                 .buildAndDispatch();
     }
 
@@ -92,6 +101,8 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 dialog.dismiss();
                 AnalyticsEvent.create(Event.ON_CLICK_RATE_US)
                         .addBundle(workoutData.getWorkoutBundle())
+                        .put("num_spikes", workoutData.getNumGpsSpikes())
+                        .put("bolt_count", workoutData.getUsainBoltCount())
                         .buildAndDispatch();
             }
 
@@ -103,6 +114,8 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.show();
         AnalyticsEvent.create(Event.ON_LOAD_RATE_US_POPUP)
                 .addBundle(workoutData.getWorkoutBundle())
+                .put("num_spikes", workoutData.getNumGpsSpikes())
+                .put("bolt_count", workoutData.getUsainBoltCount())
                 .buildAndDispatch();
     }
 
@@ -127,6 +140,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.show();
         AnalyticsEvent.create(Event.ON_LOAD_TAKE_FEEDBACK_POPUP)
                 .addBundle(workoutData.getWorkoutBundle())
+                .put("num_spikes", workoutData.getNumGpsSpikes())
+                .put("bolt_count", workoutData.getUsainBoltCount())
+                .put("num_update_events", workoutData.getNumUpdateEvents())
                 .buildAndDispatch();
     }
 

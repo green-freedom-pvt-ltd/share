@@ -176,9 +176,9 @@ public class WorkoutSingleton {
             p.put("num_steps", dataStore.getTotalSteps());
             p.put("client_run_id", dataStore.getWorkoutId());
             p.put("calories", dataStore.getCalories().getCalories());
-            p.put("bolt_count", dataStore.getUsainBoltCount());
-            p.put("num_spikes", dataStore.getNumGpsSpikes());
-            p.put("num_updates", dataStore.getNumUpdateEvents());
+//            p.put("bolt_count", dataStore.getUsainBoltCount());
+//            p.put("num_spikes", dataStore.getNumGpsSpikes());
+//            p.put("num_update_events", dataStore.getNumUpdateEvents());
             return p;
         }
         return null;

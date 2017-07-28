@@ -147,6 +147,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                     return false;
                 }
             }
+            if (notificationId == WORKOUT_NOTIFICATION_STILL_ID){
+                if (!WorkoutSingleton.getInstance().isRunning()){
+                    // Don't show STILL notification if workout is paused
+                    Logger.i(TAG, "Won't still notif, because user has paused the workout");
+                    return false;
+                }
+            }
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());

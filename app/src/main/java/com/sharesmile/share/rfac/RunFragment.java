@@ -174,7 +174,6 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         Logger.d(TAG, "onEvent: UpdateUiOnMockLocation");
         showForceExitDialogAfterStopRun("Mock location detected!", "Please disable mock location to proceed");
         AnalyticsEvent.create(Event.ON_LOAD_DISBALE_MOCK_LOCATION)
-                .addBundle(getWorkoutBundle())
                 .buildAndDispatch();
     }
 
@@ -183,7 +182,6 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         Logger.d(TAG, "onEvent: UsainBoltForceExit");
         showForceExitDialogAfterStopRun("You are in a vehicle", "Stopping your run. Please start tracking while running/walking");
         AnalyticsEvent.create(Event.ON_LOAD_USAIN_BOLT_FORCE_EXIT)
-                .addBundle(getWorkoutBundle())
                 .buildAndDispatch();
     }
 
@@ -242,6 +240,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
                 gpsWeakDialog.show();
                 AnalyticsEvent.create(Event.ON_LOAD_GPS_WEAK_POPUP)
                         .addBundle(getWorkoutBundle())
+                        .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
+                        .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                         .buildAndDispatch();
                 break;
             case GPS_STATE_INACTIVE:
@@ -250,6 +250,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
                 gpsWeakDialog.show();
                 AnalyticsEvent.create(Event.ON_LOAD_GPS_INACTIVE_POPUP)
                         .addBundle(getWorkoutBundle())
+                        .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
+                        .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                         .buildAndDispatch();
 
                 break;

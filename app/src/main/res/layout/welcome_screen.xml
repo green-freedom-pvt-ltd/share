@@ -10,8 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="150dp"
-        android:shadowColor="@color/white_50"
+        android:shadowColor="@color/black_50"
         android:shadowDy="2"
+        android:shadowDx="2"
+        android:shadowRadius="2"
         android:text="@string/impact_run"
         android:textAllCaps="true"
         android:textColor="@color/white"
@@ -25,8 +27,6 @@
         android:gravity="bottom|center_horizontal"
         android:orientation="vertical"
         android:visibility="visible">
-
-
 
         <include
             android:id="@+id/btn_login_google"

@@ -110,7 +110,7 @@ public class Utils {
 
     public static String formatCalories(double calories){
         String caloriesString = "";
-        if (calories > 100){
+        if (calories > 10){
             caloriesString = Math.round(calories) + " Cal";
         }else {
             String cals = Utils.formatWithOneDecimal(calories);
@@ -371,25 +371,43 @@ public class Utils {
         }
         // If both the names are present
         String name = firstName + " " + lastName;
-        String[] parts = name.split(" ");
+        String[] parts = name.split("\\s+");
         StringBuilder sb = new StringBuilder();
 
         // De dup logic
         int len = parts.length;
         if (len > 1){
-            sb.append(parts[0]);
+            sb.append(toCamelCase(parts[0]));
             for (int i=1; i<len; i++){
                 if (!parts[i-1].equalsIgnoreCase(parts[i])){
                     sb.append(" ");
-                    sb.append(parts[i]);
+                    sb.append(toCamelCase(parts[i]));
                 }
             }
             return sb.toString();
         }else if (len == 1){
-            return parts[0];
+            return toCamelCase(parts[0]);
         }else {
             return "";
         }
+    }
+
+    public static String toCamelCase(final String init) {
+        if (init==null)
+            return null;
+
+        final StringBuilder ret = new StringBuilder(init.length());
+
+        for (final String word : init.split(" ")) {
+            if (!word.isEmpty()) {
+                ret.append(word.substring(0, 1).toUpperCase());
+                ret.append(word.substring(1).toLowerCase());
+            }
+            if (!(ret.length()==init.length()))
+                ret.append(" ");
+        }
+
+        return ret.toString();
     }
 
 

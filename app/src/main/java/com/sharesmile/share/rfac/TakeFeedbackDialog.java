@@ -68,6 +68,9 @@ public class TakeFeedbackDialog extends BaseDialog {
             dismiss();
             AnalyticsEvent.create(Event.ON_SUBMIT_FEEDBACK)
                     .addBundle(concernedWorkout.getWorkoutBundle())
+                    .put("num_spikes", concernedWorkout.getNumGpsSpikes())
+                    .put("bolt_count", concernedWorkout.getUsainBoltCount())
+                    .put("num_update_events", concernedWorkout.getNumUpdateEvents())
                     .buildAndDispatch();
         }
     }

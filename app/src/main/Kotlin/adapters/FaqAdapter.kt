@@ -113,8 +113,10 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
                 fragmentController.replaceFragment(OnScreenFragment(), true)
 
                 if (MainApplication.isLogin()) {
-                    requestObject.put("user_id", MainApplication.getInstance().userID);
-
+                    requestObject.put("user_id", MainApplication.getInstance().userID)
+                    if (!TextUtils.isEmpty(MainApplication.getInstance().getUserDetails().getEmail())){
+                        requestObject.put("user_email", MainApplication.getInstance().getUserDetails().getEmail())
+                    }
                 }
                 MainApplication.showToast(R.string.faq_thanks)
                 NetworkDataProvider.doPostCallAsync(Urls.getFaqUrl(), requestObject, object : NetworkAsyncCallback<CustomJSONObject>() {

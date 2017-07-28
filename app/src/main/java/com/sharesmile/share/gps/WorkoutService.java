@@ -245,6 +245,13 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopWorkout");
         if (currentlyTracking) {
             handler.removeCallbacks(handleGpsInactivityRunnable);
+
+            AnalyticsEvent.create(Event.ON_WORKOUT_END)
+                    .addBundle(getWorkoutBundle())
+                    .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                    .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                    .buildAndDispatch();
+
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
@@ -254,10 +261,6 @@ public class WorkoutService extends Service implements
             }
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
-
-            AnalyticsEvent.create(Event.ON_WORKOUT_END)
-                    .addBundle(getWorkoutBundle())
-                    .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = 0f;
             cancelAllWorkoutNotifications();
             // Do not show walk engagement notification until the next 12 hours
@@ -520,15 +523,12 @@ public class WorkoutService extends Service implements
                         + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
             tracker.incrementGpsSpike();
             AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
-                    .addBundle(getWorkoutBundle())
                     .put("spikey_distance", deltaDistance)
                     .put("time_interval", deltaTime)
                     .put("delta_speed", deltaSpeed*3.6)
-                    .put("accuracy", loc2.getAccuracy())
                     .put("threshold_applied", thresholdApplied)
-                    .put("steps_per_sec_moving_average", stepCounter.getMovingAverageOfStepsPerSec())
                     .put("is_secondary_check", false)
-                    .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
+                    .addBundle(getWorkoutBundle())
                     .buildAndDispatch();
             return true;
         }else {
@@ -601,11 +601,8 @@ public class WorkoutService extends Service implements
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(getWorkoutBundle())
                     .put("delta_distance", deltaDistance) // in meters
-                    .put("delta_time", deltaTime) // in secs
                     .put("delta_speed", deltaSpeed) // in km/hrs
-                    .put("delta_calories", deltaCalories) // in Cals
                     .put("activity", ActivityDetector.getInstance().getCurrentActivity())
-                    .put("steps_per_sec_moving_average", getMovingAverageOfStepsPerSec())
                     .put("recent_speed", getCurrentSpeed())
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
@@ -680,6 +677,8 @@ public class WorkoutService extends Service implements
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
                     .addBundle(getWorkoutBundle())
                     .put("reason", reason)
+                    .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                    .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                     .buildAndDispatch();
         }
         updateStickyNotification();
@@ -703,6 +702,8 @@ public class WorkoutService extends Service implements
                 Logger.d(TAG, "ResumeWorkout");
                 AnalyticsEvent.create(Event.ON_WORKOUT_RESUME)
                         .addBundle(getWorkoutBundle())
+                        .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                        .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                         .buildAndDispatch();
             }
             updateStickyNotification();

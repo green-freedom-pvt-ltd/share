@@ -269,7 +269,8 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
             Logger.i(TAG, "LeaderBoard list cleared");
         }
         mLeaderBoardAdapter.notifyDataSetChanged();
-        showProgressDialog();
+        mRecyclerView.setVisibility(View.GONE);
+        myListItem.setVisibility(View.GONE);
         if (mBoard == BOARD_TYPE.LEAGUEBOARD) {
             LeaderBoardDataStore.getInstance().updateLeagueBoardData();
         } else if (mBoard == BOARD_TYPE.TEAM_LEADERBAORD) {
@@ -280,7 +281,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     }
 
     private void showProgressDialog() {
-//        mProgressBar.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         myListItem.setVisibility(View.GONE);
     }

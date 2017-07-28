@@ -1,184 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/img_sponsor_logo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/nike" />
-
-    <TextView
-        android:id="@+id/tv_sponsor_tag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/img_sponsor_logo"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        android:text="is proud to sponsor your run"
-        android:textSize="15dp" />
-
-
-    <TextView
-        android:id="@+id/tv_impact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_sponsor_tag"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="50dp"
-        android:text="IMPACT"
-        android:textSize="22dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:orientation="horizontal"
-        android:layout_below="@+id/tv_impact">
+        android:layout_height="0dp"
+        android:layout_weight="200"
+        android:paddingTop="16dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:visibility="gone">
+        <ImageView
+            android:id="@+id/img_sponsor_logo"
+            android:layout_width="120dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/nike" />
 
-            <com.sharesmile.share.views.MRTextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="Cal1"
-                android:gravity="center_horizontal|bottom"
-                android:textSize="18sp"
-                android:paddingBottom="3dp"/>
+        <TextView
+            android:id="@+id/tv_sponsor_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="is proud to sponsor your run"
+            android:textSize="15sp" />
 
-            <com.sharesmile.share.views.MRTextView
-                android:id="@+id/tv_cal_1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_horizontal|top"
-                android:textSize="18sp"
-                android:paddingTop="3dp"/>
 
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="180dp"
-            android:layout_centerHorizontal="true"
-            android:clipToPadding="false"
-            android:layout_weight="6.5">
-
-            <ProgressBar
-                android:id="@+id/run_progress_bar"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:indeterminate="true"
-                android:indeterminateDrawable="@drawable/progress" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/tv_run_progress_impact"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:text="0"
-                    android:textSize="30dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tv_run_progress_impact"
-                    android:layout_centerHorizontal="true"
-                    android:text="RUPEES"
-                    android:textSize="12sp" />
-
-            </RelativeLayout>
-        </FrameLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <com.sharesmile.share.views.MRTextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="Cal2"
-                android:gravity="center_horizontal|bottom"
-                android:textSize="18sp"
-                android:paddingBottom="3dp"/>
-
-            <com.sharesmile.share.views.MRTextView
-                android:id="@+id/tv_cal_2"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center_horizontal|top"
-                android:textSize="18sp"
-                android:paddingTop="3dp"/>
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_impact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="IMPACT"
+            android:textSize="22sp" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linear_btn_layout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="15dp"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="185"
+        android:clipToPadding="false">
 
-        <Button
-            android:id="@+id/btn_pause"
-            android:layout_width="wrap_content"
+        <ProgressBar
+            android:id="@+id/run_progress_bar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:background="@color/sky_blue"
-            android:text="@string/pause"
-            android:textColor="@color/white" />
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/progress" />
 
-        <Button
-            android:id="@+id/btn_stop"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:background="@color/pale_magenta"
-            android:text="@string/stop"
-            android:textColor="@color/white" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_run_progress_impact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="0"
+                android:textSize="42sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_run_progress_impact"
+                android:text="RUPEES"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="170"
         android:orientation="horizontal"
-        android:layout_marginRight="26dp"
-        android:layout_marginLeft="26dp"
-        android:layout_above="@+id/linear_btn_layout"
-        android:layout_marginBottom="40dp">
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:gravity="center_vertical">
 
         <RelativeLayout
             android:id="@+id/live_distance_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="3.2"
             android:gravity="left">
 
             <ImageView
@@ -195,7 +109,7 @@
                 android:layout_below="@+id/img_distance_icon"
                 android:layout_centerHorizontal="true"
                 android:text="0.00"
-                android:textSize="30sp" />
+                android:textSize="29sp" />
 
             <com.sharesmile.share.views.MLTextView
                 android:layout_width="wrap_content"
@@ -228,7 +142,7 @@
                 android:layout_below="@+id/img_timer_icon"
                 android:layout_centerHorizontal="true"
                 android:text="00:00"
-                android:textSize="30sp" />
+                android:textSize="29sp" />
 
             <com.sharesmile.share.views.MLTextView
 
@@ -248,7 +162,7 @@
             android:id="@+id/live_calories_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="3.2"
             android:gravity="right">
 
             <ImageView
@@ -265,7 +179,7 @@
                 android:layout_below="@+id/img_calories_icon"
                 android:layout_centerHorizontal="true"
                 android:text="0.0"
-                android:textSize="30sp" />
+                android:textSize="29sp" />
 
             <com.sharesmile.share.views.MLTextView
                 android:layout_width="wrap_content"
@@ -280,4 +194,33 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+    <LinearLayout
+        android:id="@+id/linear_btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="52"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/sky_blue"
+            android:text="@string/pause"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btn_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/pale_magenta"
+            android:text="@string/stop"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>
