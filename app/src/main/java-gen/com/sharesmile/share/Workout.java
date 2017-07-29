@@ -33,6 +33,9 @@ public class Workout {
     private Integer teamId;
     private Integer numSpikes;
     private Integer numUpdates;
+    private String appVersion;
+    private Integer osVersion;
+    private String deviceId;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -44,7 +47,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun, Long version, Double calories, Integer teamId, Integer numSpikes, Integer numUpdates) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun, Long version, Double calories, Integer teamId, Integer numSpikes, Integer numUpdates, String appVersion, Integer osVersion, String deviceId) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -68,6 +71,9 @@ public class Workout {
         this.teamId = teamId;
         this.numSpikes = numSpikes;
         this.numUpdates = numUpdates;
+        this.appVersion = appVersion;
+        this.osVersion = osVersion;
+        this.deviceId = deviceId;
     }
 
     public Long getId() {
@@ -254,6 +260,30 @@ public class Workout {
 
     public void setNumUpdates(Integer numUpdates) {
         this.numUpdates = numUpdates;
+    }
+
+    public String getAppVersion() {
+        return appVersion;
+    }
+
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
+    }
+
+    public Integer getOsVersion() {
+        return osVersion;
+    }
+
+    public void setOsVersion(Integer osVersion) {
+        this.osVersion = osVersion;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     // KEEP METHODS - put your custom methods here
