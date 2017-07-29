@@ -13,7 +13,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -775,6 +777,52 @@ public class Utils {
         });
 
         return dialog;
+    }
+
+    public static String UNIQUE_ID;
+
+    /**
+     * Returns a unique ID of device that is ANDROID_ID
+     * @param context
+     * @return
+     */
+    public static String getUniqueId(Context context) {
+        if (!TextUtils.isEmpty(UNIQUE_ID)){
+            return UNIQUE_ID;
+        }
+        if (null == context) {
+            context = MainApplication.getContext();
+        }
+        UNIQUE_ID = getAndroidID(context);
+        return UNIQUE_ID;
+    }
+
+    /**
+     * Returns device IMEI, requires READ_PHONE_STATE permission which belongs to Phone group
+     * @param context
+     * @return device IMEI
+     */
+    private static String getDeviceIMEI(Context context) {
+        TelephonyManager telephonyManager = (TelephonyManager) context
+                .getSystemService(Context.TELEPHONY_SERVICE);
+        return telephonyManager.getDeviceId();
+    }
+
+    /**
+     * A 64-bit number (as a hex string) that is randomly generated when the user first sets up the
+     * device and should remain constant for the lifetime of the user's device.
+     * The value may change if a factory reset is performed on the device
+     * @param context
+     * @return
+     */
+    private static String getAndroidID(Context context) {
+        String androidId = Settings.Secure
+                .getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (androidId != null) {
+            return androidId;
+        } else {
+            return "";
+        }
     }
 
 }
