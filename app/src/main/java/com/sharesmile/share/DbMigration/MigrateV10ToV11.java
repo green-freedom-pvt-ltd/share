@@ -26,6 +26,7 @@ public class MigrateV10ToV11 extends MigrationImpl {
         db.execSQL(getSqlQueryForAddingColumn(" 'APP_VERSION' TEXT"));
         db.execSQL(getSqlQueryForAddingColumn(" 'OS_VERSION' INTEGER"));
         db.execSQL(getSqlQueryForAddingColumn(" 'DEVICE_ID' TEXT"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'DEVICE_NAME' TEXT"));
 
         return getMigratedVersion();
     }

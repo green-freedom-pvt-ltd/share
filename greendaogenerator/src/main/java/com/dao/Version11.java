@@ -53,6 +53,7 @@ public class Version11 extends SchemaVersion{
         workout.addStringProperty("appVersion");
         workout.addIntProperty("osVersion");
         workout.addStringProperty("deviceId");
+        workout.addStringProperty("deviceName");
     }
 
     private static void addUserData(Schema schema) {

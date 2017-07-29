@@ -467,6 +467,10 @@ public class SyncService extends GcmTaskService {
             }
             jsonObject.put("num_spikes", workout.getNumSpikes());
             jsonObject.put("num_updates", workout.getNumUpdates());
+            jsonObject.put("app_version", workout.getAppVersion());
+            jsonObject.put("os_version", workout.getOsVersion());
+            jsonObject.put("device_id", workout.getDeviceId());
+            jsonObject.put("device_name", workout.getDeviceName());
 
             Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 

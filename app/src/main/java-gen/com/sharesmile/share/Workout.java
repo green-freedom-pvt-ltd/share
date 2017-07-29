@@ -36,6 +36,7 @@ public class Workout {
     private String appVersion;
     private Integer osVersion;
     private String deviceId;
+    private String deviceName;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -47,7 +48,7 @@ public class Workout {
         this.id = id;
     }
 
-    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun, Long version, Double calories, Integer teamId, Integer numSpikes, Integer numUpdates, String appVersion, Integer osVersion, String deviceId) {
+    public Workout(Long id, float distance, String elapsedTime, Integer steps, float recordedTime, float avgSpeed, String causeBrief, java.util.Date date, Float runAmount, Boolean is_sync, String workoutId, Double startPointLatitude, Double startPointLongitude, Double endPointLatitude, Double endPointLongitude, Long beginTimeStamp, Long endTimeStamp, Boolean isValidRun, Long version, Double calories, Integer teamId, Integer numSpikes, Integer numUpdates, String appVersion, Integer osVersion, String deviceId, String deviceName) {
         this.id = id;
         this.distance = distance;
         this.elapsedTime = elapsedTime;
@@ -74,6 +75,7 @@ public class Workout {
         this.appVersion = appVersion;
         this.osVersion = osVersion;
         this.deviceId = deviceId;
+        this.deviceName = deviceName;
     }
 
     public Long getId() {
@@ -284,6 +286,14 @@ public class Workout {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
     }
 
     // KEEP METHODS - put your custom methods here

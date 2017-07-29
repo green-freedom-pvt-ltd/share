@@ -81,6 +81,18 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("num_updates")
     int numUpdates;
 
+    @SerializedName("app_version")
+    String appVersion ;
+
+    @SerializedName("os_version")
+    int osVersion;
+
+    @SerializedName("device_id")
+    String deviceId ;
+
+    @SerializedName("device_name")
+    String deviceName ;
+
     public long getId() {
         return id;
     }
@@ -269,6 +281,38 @@ public class Run implements UnObfuscable, Serializable {
         this.numUpdates = numUpdates;
     }
 
+    public String getAppVersion() {
+        return appVersion;
+    }
+
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
+    }
+
+    public int getOsVersion() {
+        return osVersion;
+    }
+
+    public void setOsVersion(int osVersion) {
+        this.osVersion = osVersion;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
     @Override
     public String toString() {
         return "Run{" +
@@ -294,6 +338,10 @@ public class Run implements UnObfuscable, Serializable {
                 ",\n\t teamId='" + teamId + '\'' +
                 ",\n\t numSpikes='" + numSpikes + '\'' +
                 ",\n\t numUpdates='" + numUpdates + '\'' +
+                ",\n\t appVersion='" + appVersion + '\'' +
+                ",\n\t osVersion='" + osVersion + '\'' +
+                ",\n\t deviceId='" + deviceId + '\'' +
+                ",\n\t deviceName='" + deviceName + '\'' +
                 "\n}";
     }
 }

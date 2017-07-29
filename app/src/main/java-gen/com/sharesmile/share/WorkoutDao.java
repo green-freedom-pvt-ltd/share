@@ -49,6 +49,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         public final static Property AppVersion = new Property(23, String.class, "appVersion", false, "APP_VERSION");
         public final static Property OsVersion = new Property(24, Integer.class, "osVersion", false, "OS_VERSION");
         public final static Property DeviceId = new Property(25, String.class, "deviceId", false, "DEVICE_ID");
+        public final static Property DeviceName = new Property(26, String.class, "deviceName", false, "DEVICE_NAME");
     };
 
 
@@ -89,7 +90,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"NUM_UPDATES\" INTEGER," + // 22: numUpdates
                 "\"APP_VERSION\" TEXT," + // 23: appVersion
                 "\"OS_VERSION\" INTEGER," + // 24: osVersion
-                "\"DEVICE_ID\" TEXT);"); // 25: deviceId
+                "\"DEVICE_ID\" TEXT," + // 25: deviceId
+                "\"DEVICE_NAME\" TEXT);"); // 26: deviceName
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_WORKOUT_WORKOUT_ID ON WORKOUT" +
                 " (\"WORKOUT_ID\");");
@@ -219,6 +221,11 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         if (deviceId != null) {
             stmt.bindString(26, deviceId);
         }
+ 
+        String deviceName = entity.getDeviceName();
+        if (deviceName != null) {
+            stmt.bindString(27, deviceName);
+        }
     }
 
     /** @inheritdoc */
@@ -256,7 +263,8 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
             cursor.isNull(offset + 22) ? null : cursor.getInt(offset + 22), // numUpdates
             cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23), // appVersion
             cursor.isNull(offset + 24) ? null : cursor.getInt(offset + 24), // osVersion
-            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25) // deviceId
+            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25), // deviceId
+            cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26) // deviceName
         );
         return entity;
     }
@@ -290,6 +298,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
         entity.setAppVersion(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
         entity.setOsVersion(cursor.isNull(offset + 24) ? null : cursor.getInt(offset + 24));
         entity.setDeviceId(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
+        entity.setDeviceName(cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26));
      }
     
     /** @inheritdoc */

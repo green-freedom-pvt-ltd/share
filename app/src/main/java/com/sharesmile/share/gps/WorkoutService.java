@@ -207,6 +207,11 @@ public class WorkoutService extends Service implements
 //        }
         workout.setNumSpikes(data.getNumGpsSpikes());
         workout.setNumUpdates(data.getNumUpdateEvents());
+        workout.setAppVersion(Utils.getAppVersion());
+        workout.setOsVersion(Build.VERSION.SDK_INT);
+        workout.setDeviceId(Utils.getUniqueId(getContext()));
+        workout.setDeviceName(Utils.getDeviceName());
+
         workoutDao.insertOrReplace(workout);
         Utils.updateTrackRecordFromDb();
         SyncService.pushWorkoutDataWithBackoff();
