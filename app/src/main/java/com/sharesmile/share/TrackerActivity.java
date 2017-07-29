@@ -399,6 +399,7 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
+                        Logger.d(TAG, "WorkoutResult after parcelling: " + result);
                         runFragment.onWorkoutResult(result);
                         AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
                                 .addBundle(result.getWorkoutBundle())

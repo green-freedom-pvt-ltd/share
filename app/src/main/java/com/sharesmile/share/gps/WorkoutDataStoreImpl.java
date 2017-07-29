@@ -322,6 +322,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public void incrementGpsSpike() {
         dirtyWorkoutData.incrementGpsSpike();
+        approvedWorkoutData.incrementGpsSpike();
     }
 
     @Override
@@ -332,6 +333,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public void incrementNumUpdateEvents() {
         dirtyWorkoutData.incrementNumUpdates();
+        approvedWorkoutData.incrementNumUpdates();
     }
 
     private void persistBothWorkoutData() {

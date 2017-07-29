@@ -155,6 +155,7 @@ public class WorkoutService extends Service implements
                 persistWorkoutInDb(result);
             }
             tracker = null;
+            Logger.d(TAG, "WorkoutResult before parcelling: " + result);
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_WORKOUT_RESULT_CODE);
@@ -253,6 +254,8 @@ public class WorkoutService extends Service implements
 
             AnalyticsEvent.create(Event.ON_WORKOUT_END)
                     .addBundle(getWorkoutBundle())
+                    .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                    .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
                     .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                     .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                     .buildAndDispatch();
