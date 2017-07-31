@@ -148,14 +148,12 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public int getNumGpsSpikes() {
-		Logger.d(TAG, "Returning numGpsSpikes: " + numGpsSpikes);
 		return numGpsSpikes;
 	}
 
 	@Override
 	public void incrementGpsSpike() {
 		numGpsSpikes++;
-		Logger.d(TAG, "NumGpsSpikes after incrementing: " + numGpsSpikes);
 	}
 
 	@Override

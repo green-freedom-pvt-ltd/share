@@ -61,19 +61,16 @@ public class MigrateV10ToV11 extends MigrationImpl {
 
     private String getSqlStringForAddingIndex(){
         // Query to create index on workoutId column
-        return  "CREATE UNIQUE INDEX IF NOT EXISTS IDX_WORKOUT_WORKOUT_ID ON "
-                + WorkoutDao.TABLENAME+ " (\"WORKOUT_ID\");";
+        return  "CREATE UNIQUE INDEX IF NOT EXISTS IDX_WORKOUT_WORKOUT_ID ON WORKOUT (\"WORKOUT_ID\");";
     }
 
     private String getSqlStringForRemovingDuplicates() {
 
         // Create Query to delete all duplicate records (same workoutId)
-        return "delete   from " + WorkoutDao.TABLENAME + " where rowid not in\n" +
-                "         (\n" +
-                "         select  min(rowid)\n" +
-                "         from  " + WorkoutDao.TABLENAME + "\n" +
-                "         group by WORKOUT_ID\n" +
-                "         )";
+        return "delete from WORKOUT where rowid not in\n" +
+                "( select min(rowid) from  WORKOUT where WORKOUT_ID is not null and WORKOUT_ID != \"\" group by WORKOUT_ID\n" +
+                " union all\n" +
+                " select rowid from WORKOUT where WORKOUT_ID is null or WORKOUT_ID == \"\");";
 
     }
 

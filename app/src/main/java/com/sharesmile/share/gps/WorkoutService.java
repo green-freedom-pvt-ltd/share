@@ -155,7 +155,6 @@ public class WorkoutService extends Service implements
                 persistWorkoutInDb(result);
             }
             tracker = null;
-            Logger.d(TAG, "WorkoutResult before parcelling: " + result);
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_WORKOUT_RESULT_CODE);
