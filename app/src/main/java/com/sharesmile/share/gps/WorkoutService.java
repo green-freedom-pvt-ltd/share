@@ -688,6 +688,9 @@ public class WorkoutService extends Service implements
                     .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                     .buildAndDispatch();
         }
+        if (stepCounter != null ){
+            stepCounter.pauseCounting();
+        }
         updateStickyNotification();
         cancelAllWorkoutNotifications();
     }
@@ -712,6 +715,9 @@ public class WorkoutService extends Service implements
                         .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                         .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                         .buildAndDispatch();
+            }
+            if (stepCounter != null){
+                stepCounter.resumeCounting();
             }
             updateStickyNotification();
             cancelAllWorkoutNotifications();

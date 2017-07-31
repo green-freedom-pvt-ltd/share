@@ -49,6 +49,8 @@ public class GoogleFitStepCounter implements StepCounter,
     private GoogleApiClient mApiClient;
     boolean isPaused;
 
+    long countingbeganTsMillis;
+
     private LinkedHashMap historyQueue = new LinkedHashMap<Long, Long>()
     {
         @Override
@@ -77,6 +79,7 @@ public class GoogleFitStepCounter implements StepCounter,
                 .addOnConnectionFailedListener(this)
                 .build();
         mApiClient.connect();
+        countingbeganTsMillis = DateUtil.getServerTimeInMillis();
     }
 
     @Override
@@ -110,6 +113,7 @@ public class GoogleFitStepCounter implements StepCounter,
         synchronized (historyQueue){
             historyQueue.clear();
         }
+        countingbeganTsMillis = DateUtil.getServerTimeInMillis();
     }
 
     @Override
@@ -186,8 +190,8 @@ public class GoogleFitStepCounter implements StepCounter,
             public void onResult(DataSourcesResult dataSourcesResult) {
                 Log.i(TAG, "onResult of dataSourcesResultCallback, Status: " + dataSourcesResult.getStatus().toString());
                 for( DataSource dataSource : dataSourcesResult.getDataSources() ) {
-                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: " + dataSource.toDebugString());
-                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource type: " + dataSource.getDataType().getName());
+                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: "
+                            + dataSource.toDebugString() + ", type: " + dataSource.getDataType().getName());
                     if( DataType.TYPE_STEP_COUNT_DELTA.equals(dataSource.getDataType()) ) {
                         Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
                         registerFitnessDataListener(dataSource, dataSource.getDataType());
@@ -249,13 +253,22 @@ public class GoogleFitStepCounter implements StepCounter,
         if (!isPaused){
             for( Field field : dataPoint.getDataType().getFields() ) {
                 Value value = dataPoint.getValue( field );
-                String message = "Field: " + field.getName() + " Value: " + value;
-                Logger.d(TAG, message);
-                Long deltaSteps = Long.parseLong(value.toString());
-                synchronized (historyQueue){
-                    historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
+                long startTime = dataPoint.getStartTime(TimeUnit.MILLISECONDS);
+                if (startTime < countingbeganTsMillis){
+                    // This stepcount reading's interval started before the beginning of step counting, will ignore
+                    Logger.d(TAG, "Older step count reading, will ignore");
+                } else {
+                    String message = "Field: " + field.getName() + " Value: " + value;
+                    Logger.d(TAG, message);
+                    if (Field.FIELD_STEPS.getName().equals(field.getName())){
+                        // Step count data
+                        Long deltaSteps = Long.parseLong(value.toString());
+                        synchronized (historyQueue){
+                            historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
+                        }
+                        listener.onStepCount(deltaSteps.intValue());
+                    }
                 }
-                listener.onStepCount(deltaSteps.intValue());
             }
         }
     }
