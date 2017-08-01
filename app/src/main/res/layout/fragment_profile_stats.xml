@@ -13,10 +13,10 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_weight="95">
+            android:layout_weight="100">
 
             <com.sharesmile.share.views.CircularImageView
                 android:id="@+id/img_profile_stats"
@@ -35,7 +35,7 @@
                     android:id="@+id/tv_profile_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="17.5sp"
                     android:maxLines="2"
                     android:textColor="@color/black_54"
                     android:text="Ankit Maheshwari"/>
@@ -43,7 +43,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp">
+                    android:layout_marginTop="6dp">
 
                     <com.sharesmile.share.views.LBTextView
                         android:id="@+id/tv_level_min"

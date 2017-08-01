@@ -342,8 +342,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-//            replaceFragment(ShareFragment.newInstance(null, null), true);
-            performOperation(SHOW_FAQ_FRAGMENT,false);
+//            performOperation(SHOW_FAQ_FRAGMENT,false);
+            openMusicPlayer();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
@@ -359,6 +359,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mDrawerLayout.closeDrawers();
 
         return false;
+    }
+
+    private void openMusicPlayer(){
+        if(android.os.Build.VERSION.SDK_INT>=15){
+            Intent intent=Intent.makeMainSelectorActivity(Intent.ACTION_MAIN,
+                    Intent.CATEGORY_APP_MUSIC);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//Min SDK 15
+            startActivity(intent);
+        }else{
+            Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");//Min SDK 8
+            startActivity(intent);
+        }
     }
 
     private void showLeaderBoard() {

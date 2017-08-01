@@ -310,10 +310,10 @@ public class RealRunFragment extends RunFragment {
                 break;
 
             case R.id.btn_stop:
-                showStopDialog();
                 AnalyticsEvent.create(Event.ON_CLICK_STOP_RUN)
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
+                showStopDialog();
                 break;
         }
     }

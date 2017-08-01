@@ -84,7 +84,7 @@ public class Config {
 
     public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
     public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs
-    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 120000;// in millisecs
+    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 108000;// in millisecs
     public static final long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 43200000;// in millisecs, i.e. 12 hours
 
     public static final float GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD = 0.305f; // in m/s, i.e. 1.1 km/hr
