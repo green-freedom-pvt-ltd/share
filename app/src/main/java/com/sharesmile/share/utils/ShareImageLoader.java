@@ -80,7 +80,7 @@ public class ShareImageLoader {
         Picasso.Builder builder =  new Picasso.Builder(MainApplication.getContext());
         builder.downloader(new OkHttpDownloader(httpClient));
         Picasso built = builder.build();
-//        built.setIndicatorsEnabled(true);
+        built.setIndicatorsEnabled(true);
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
         return built;

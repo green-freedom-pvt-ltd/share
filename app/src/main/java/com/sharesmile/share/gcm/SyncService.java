@@ -97,11 +97,12 @@ public class SyncService extends GcmTaskService {
 
     @Override
     public void onInitializeTasks() {
+        Logger.d(TAG, "onInitializeTasks");
         super.onInitializeTasks();
         MainApplication.getInstance().startSyncTasks();
     }
 
-    private int syncData(){
+    public static int syncData(){
 
         syncServerTime();
         uploadUserData();
@@ -123,10 +124,10 @@ public class SyncService extends GcmTaskService {
         Logger.d(TAG, "syncLeaderBoardData");
 
         if (!MainApplication.isLogin()){
-            return GcmNetworkManager.RESULT_FAILURE;
+            return ExpoBackoffTask.RESULT_FAILURE;
         }
 
-        int result = GcmNetworkManager.RESULT_SUCCESS;
+        int result = ExpoBackoffTask.RESULT_SUCCESS;
 
         try {
             Logger.d(TAG, "Will sync GlobalLeaderBoard");
@@ -138,11 +139,10 @@ public class SyncService extends GcmTaskService {
         } catch (NetworkException e) {
             Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data from network: " + e);
             e.printStackTrace();
-            result = GcmNetworkManager.RESULT_FAILURE;
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
-        if (LeaderBoardDataStore.getInstance().getLeagueBoard() != null
-                && LeaderBoardDataStore.getInstance().toShowLeague()){
+        if (LeaderBoardDataStore.getInstance().toSyncLeaugeData()){
             // Go for sync only when an active league is present and is still visible to team members
             try {
                 Logger.d(TAG, "Will sync LeagueBoard");
@@ -151,10 +151,16 @@ public class SyncService extends GcmTaskService {
                 LeaderBoardDataStore.getInstance().setLeagueBoardData(leagueBoard);
                 // Notify LeaderBoardFragment about it
                 EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
-            } catch (NetworkException e) {
-                Logger.e(TAG, "Exception occurred while syncing LeagueBoard data from network: " + e);
-                e.printStackTrace();
-                result = GcmNetworkManager.RESULT_FAILURE;
+            } catch (NetworkException ne) {
+                String log= "NetworkException while fetching my (user_id = "
+                        +MainApplication.getInstance().getUserDetails().getUserId()
+                        +", and team_id = "+LeaderBoardDataStore.getInstance().getMyTeamId()
+                        +") LeaugeBoardData: " + ne;
+                Logger.e(TAG, log);
+                ne.printStackTrace();
+                Crashlytics.log(log);
+                Crashlytics.logException(ne);
+                return ExpoBackoffTask.RESULT_RESCHEDULE;
             }
 
             try {
@@ -170,10 +176,16 @@ public class SyncService extends GcmTaskService {
                     // Notify LeaderBoardFragment about it
                     EventBus.getDefault().post(new TeamLeaderBoardDataFetched(leagueTeamId, true, myTeamLeaderBoard));
                 }
-            } catch (NetworkException e) {
-                Logger.e(TAG, "Exception occurred while syncing MyTeamLeaderBoardData from network: " + e);
-                e.printStackTrace();
-                result = GcmNetworkManager.RESULT_FAILURE;
+            } catch (NetworkException ne) {
+                String log= "NetworkException while fetching my (user_id = "
+                        +MainApplication.getInstance().getUserDetails().getUserId()
+                        +", and team_id = "+LeaderBoardDataStore.getInstance().getMyTeamId()
+                        +") TeamLeaderBoardData: " + ne;
+                Logger.e(TAG, log);
+                ne.printStackTrace();
+                Crashlytics.log(log);
+                Crashlytics.logException(ne);
+                return ExpoBackoffTask.RESULT_RESCHEDULE;
             }
 
         }
@@ -197,7 +209,7 @@ public class SyncService extends GcmTaskService {
     }
 
 
-    private int syncWorkoutData(){
+    private static int syncWorkoutData(){
         synchronized (SyncService.class){
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             long clientVersion = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
@@ -217,9 +229,9 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private long syncWorkoutTimeStamp;
+    private static long syncWorkoutTimeStamp;
 
-    private int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao){
+    private static int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao){
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(syncUrl);
             if (syncWorkoutTimeStamp == 0){
@@ -346,7 +358,7 @@ public class SyncService extends GcmTaskService {
     }
 
 
-    private int uploadUserData() {
+    private static int uploadUserData() {
         int user_id = MainApplication.getInstance().getUserID();
         Logger.d(TAG, "uploadUserData for userId: " + user_id );
         try {
@@ -413,9 +425,9 @@ public class SyncService extends GcmTaskService {
                 for (Workout workout : mWorkoutList) {
                     isSuccess = isSuccess && uploadWorkoutData(workout);
                 }
-                return isSuccess ? GcmNetworkManager.RESULT_SUCCESS : GcmNetworkManager.RESULT_RESCHEDULE;
+                return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
             } else {
-                return GcmNetworkManager.RESULT_SUCCESS;
+                return ExpoBackoffTask.RESULT_SUCCESS;
             }
         }
 
@@ -581,7 +593,7 @@ public class SyncService extends GcmTaskService {
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, true);
                 Utils.updateTrackRecordFromDb();
                 EventBus.getDefault().post(new DBEvent.RunDataUpdated());
-                return GcmNetworkManager.RESULT_SUCCESS;
+                return ExpoBackoffTask.RESULT_SUCCESS;
             }
         } catch (NetworkException e) {
             Logger.d(TAG, "NetworkException in forceRefreshAllWorkoutData: " + e);
@@ -596,7 +608,7 @@ public class SyncService extends GcmTaskService {
                     .put("failure_type", e.getFailureType())
                     .buildAndDispatch();
 
-            return GcmNetworkManager.RESULT_RESCHEDULE;
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
         } catch (Exception e) {
             Logger.d(TAG, "Exception in forceRefreshAllWorkoutData: " + e.getMessage());
             e.printStackTrace();
@@ -607,7 +619,7 @@ public class SyncService extends GcmTaskService {
                     .put("exception_message", e.getMessage())
                     .buildAndDispatch();
 
-            return GcmNetworkManager.RESULT_RESCHEDULE;
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
     }

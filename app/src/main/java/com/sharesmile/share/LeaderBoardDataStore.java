@@ -7,6 +7,7 @@ import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
@@ -153,19 +154,42 @@ public class LeaderBoardDataStore {
 
     public boolean toShowLeague(){
         if (leagueBoard != null){
+            Logger.d(TAG, "LeagueBoard is not null");
             if (isLeagueActive()){
+                Logger.d(TAG, "League is active");
                 return true;
             } else {
-                long leagueStartDateEpoch = leagueBoard.getLeagueStartDateEpoch();
-                long leagueDurationInSecs = ((long)leagueBoard.getDurationInDays())*86400;
-                long oneWeekBufferInSecs = 604800;
-                return (DateUtil.getServerTimeInMillis() / 1000) < leagueStartDateEpoch + leagueDurationInSecs + oneWeekBufferInSecs;
+                return isLeagueInWithdrawlPeriod();
+            }
+        }else {
+            Logger.d(TAG, "LeagueBoard is null");
+        }
+        return false;
+    }
+
+    public boolean toSyncLeaugeData(){
+        if (leagueTeamId > 0){
+            if (leagueBoard == null || isLeagueActive()){
+                return true;
+            } else {
+                return isLeagueInWithdrawlPeriod();
             }
         }
         return false;
     }
 
+    private boolean isLeagueInWithdrawlPeriod(){
+        long leagueStartDateEpoch = leagueBoard.getLeagueStartDateEpoch();
+        long leagueDurationInSecs = ((long)leagueBoard.getDurationInDays())*86400;
+        Logger.d(TAG, "League not active, leagueStartDateEpoch = " + leagueStartDateEpoch
+                + ", leagueDurationInSecs = " + leagueDurationInSecs);
+        long oneWeekWithdrawlPeriodInSecs = 604800;
+        return (DateUtil.getServerTimeInMillis() / 1000) < leagueStartDateEpoch
+                + leagueDurationInSecs + oneWeekWithdrawlPeriodInSecs;
+    }
+
     public void clearLeagueData(){
+        Logger.d(TAG, "clearLeagueData");
         this.leagueBoard = null;
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_LEAGUEBOARD_CACHED_DATA);
         this.myTeamLeaderBoard = null;
@@ -173,18 +197,20 @@ public class LeaderBoardDataStore {
     }
 
     public void setLeagueTeamId(int teamId){
+        Logger.d(TAG, "setLeagueTeamId with " + teamId);
         // LeagueTeamId is set only when it is changed
         leagueTeamId = teamId;
         SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamId);
         // LeagueTeamId has changed, clear existing League data and immediately start the sync process
         clearLeagueData();
-        Thread syncThread = new Thread(new Runnable() {
+        ExpoBackoffTask task = new ExpoBackoffTask() {
             @Override
-            public void run() {
-                SyncService.syncLeaderBoardData();
+            public int performtask() {
+                return SyncService.syncLeaderBoardData();
             }
-        });
-        syncThread.start();
+        };
+        task.run();
+
     }
 
     public void setLeagueBoardData(TeamBoard leagueBoard){

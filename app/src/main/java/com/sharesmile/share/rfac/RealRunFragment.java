@@ -208,6 +208,8 @@ public class RealRunFragment extends RunFragment {
                     }
                     tvCalorieMets.setText(caloriesString);
                 }
+            }else {
+                tvCalorieMets.setText("0");
             }
         }
     }

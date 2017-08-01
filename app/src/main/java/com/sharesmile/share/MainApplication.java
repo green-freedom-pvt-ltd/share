@@ -494,7 +494,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
 
         prefsManager.setBoolean(Constants.PREF_IS_SIGN_UP_USER, details.isSignUp());
-
+        Logger.d(TAG, "setUserDetails: myTeamId stored = " + LeaderBoardDataStore.getInstance().getMyTeamId()
+                + ", and myTeamId in user details = " + details.getTeamId());
         if (LeaderBoardDataStore.getInstance().getMyTeamId() != details.getTeamId()){
             LeaderBoardDataStore.getInstance().setLeagueTeamId(details.getTeamId());
             Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamId());
