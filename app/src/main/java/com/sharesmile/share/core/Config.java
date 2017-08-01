@@ -92,6 +92,6 @@ public class Config {
 
     public static final float MIN_DISTANCE_FOR_FEEDBACK_POPUP = 5.0f;// in Kms
 
-    public static final float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 10000f;// in meters
+    public static final float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 5000f;// in meters
 
 }
