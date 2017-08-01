@@ -12,6 +12,8 @@ public class Urls {
     private static final String CAUSE_LIST_URL = "/api/causesv2.json";
     private static final String RUN_URL = "/api/runs/";
 
+    private static final String UPDATE_RUN_URL = "/api/updaterun/";
+
     private static final String LOGIN_URL = "/api/users/";
     private static final String FEEDBACK_URL = "/api/userFeedback/";
     private static final String FAQ_URL = "/api/faq/";
@@ -41,6 +43,11 @@ public class Urls {
 
     public static String getRunUrl() {
         String url = getBaseUrl() + RUN_URL;
+        return url;
+    }
+
+    public static String getUpdateRunUrl() {
+        String url = getBaseUrl() + UPDATE_RUN_URL;
         return url;
     }
 

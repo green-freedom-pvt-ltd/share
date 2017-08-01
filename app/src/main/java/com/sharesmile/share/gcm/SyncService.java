@@ -441,9 +441,11 @@ public class SyncService extends GcmTaskService {
         JSONObject jsonObject = new JSONObject();
         try {
 
+            boolean isUpdateRequest = false;
             if (workout.getId() != null && workout.getId() > 0){
                 // TODO: Need to make a PUT request in this update scenario
                 jsonObject.put("run_id", workout.getId());
+                isUpdateRequest  = true;
             }
 
             jsonObject.put("user_id", user_id);
@@ -486,7 +488,16 @@ public class SyncService extends GcmTaskService {
 
             Logger.d(TAG, "Will upload run: "+jsonObject.toString());
 
-            Run response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
+
+            Run response;
+            if (isUpdateRequest){
+                // Need to make PUT request at update endpoint
+                String updateUrl = Urls.getUpdateRunUrl() + workout.getId() + "/";
+                response = NetworkDataProvider.doPutCall(updateUrl, jsonObject, Run.class);
+            }else {
+                // Need to make POST request to create a new Run
+                response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
+            }
 
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             // Commenting delete command as it is not required after adding unique constraint to WORKOUT_ID
