@@ -190,6 +190,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
         SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
         isWalkEngagementNotificationOnDisplay = false;
+        AnalyticsEvent.create(Event.DISMISS_WALK_ENGAGEMENT_NOTIF)
+                .buildAndDispatch();
     }
 
     private void startWalkEngagementDetectionCounter(){

@@ -442,11 +442,15 @@ public class SyncService extends GcmTaskService {
         try {
 
             boolean isUpdateRequest = false;
-            if (workout.getId() != null && workout.getId() > 0){
-                // TODO: Need to make a PUT request in this update scenario
+            if (workout.getVersion() != null && workout.getVersion() > 0){
+                // Need to make a PUT request to update this already existing run on server
                 jsonObject.put("run_id", workout.getId());
                 isUpdateRequest  = true;
+            }else {
+                // Version is not set, means this is a newly created run on client and needs to be POSTed on server
+                isUpdateRequest = false;
             }
+
 
             jsonObject.put("user_id", user_id);
             jsonObject.put("cause_run_title", workout.getCauseBrief());

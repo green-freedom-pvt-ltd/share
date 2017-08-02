@@ -95,14 +95,18 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs){
         Logger.d(TAG, "showUpdate: distanceCovered = " + distanceCovered
                 + ", elapsedTimeInSecs " + elapsedTimeInSecs);
-        if (!isTimerRunning){
+        if (!isTimerRunning && isRunning()){
             startTimer(elapsedTimeInSecs);
+        }else {
+            updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs));
         }
     }
 
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs ){
-        if (!isTimerRunning){
+        if (!isTimerRunning && isRunning()){
             startTimer(elapsedTimeInSecs);
+        }else {
+            updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs));
         }
     }
 
@@ -294,12 +298,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         }
     }
 
-    public void refreshWorkoutData(){
-        if (isAttachedToActivity()){
-            showUpdate(myActivity.getCurrentSpeed(), myActivity.getTotalDistanceInMeters(),
-                    (int) myActivity.getElapsedTimeInSecs());
-        }
-    }
+    public abstract void refreshWorkoutData();
 
     public Properties getWorkoutBundle(){
         return WorkoutSingleton.getInstance().getWorkoutBundle();
@@ -308,11 +307,13 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     protected void continuedRun(){
         Logger.d(TAG, "continuedRun");
         int elapsedTImeInSecs = (int) WorkoutSingleton.getInstance().getDataStore().getElapsedTime();
+        Logger.d(TAG, "elapsedTimeInSecs = " + elapsedTImeInSecs);
         myActivity.continuedRun();
         if (!isRunning()){
             // If the run is in paused state then don't start timer
             updateTimeView(Utils.secondsToHHMMSS(elapsedTImeInSecs));
         }else {
+            // Workout is in running state
             startTimer(elapsedTImeInSecs);
         }
         onContinuedRun(!isRunning());
@@ -351,4 +352,5 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     };
 
     public abstract void showStopDialog();
+
 }

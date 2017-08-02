@@ -66,7 +66,9 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
+import static com.sharesmile.share.core.Config.MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT;
 import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
+import static com.sharesmile.share.core.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
@@ -199,12 +201,7 @@ public class WorkoutService extends Service implements
         workout.setBeginTimeStamp(data.getBeginTimeStamp());
         workout.setEndTimeStamp(DateUtil.getServerTimeInMillis());
         workout.setCalories(data.getCalories().getCalories());
-
-        // TODO: sending team_id in all the runs, filtering of runs for league will happen on Backend. Confirm with Nagle
         workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
-//        if (LeaderBoardDataStore.getInstance().isLeagueActive()){
-//            workout.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
-//        }
         workout.setNumSpikes(data.getNumGpsSpikes());
         workout.setNumUpdates(data.getNumUpdateEvents());
         workout.setAppVersion(Utils.getAppVersion());
@@ -421,7 +418,7 @@ public class WorkoutService extends Service implements
                 if (acceptedLocationFix == null){
                     if (beginningLocationsRotatingQueue == null){
                         Logger.d(TAG, "Hunt for first accepted location begins");
-                        beginningLocationsRotatingQueue = new CircularQueue<>(3);
+                        beginningLocationsRotatingQueue = new CircularQueue<>(WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE);
                         beginningLocationsRotatingQueue.add(location);
                         // Will not send to tracker as it is the very first location fix received
                         // Will first fill the beginningLocationsRotatingQueue, which will help us in identifying the first accepted point
@@ -603,8 +600,8 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
         updateStickyNotification();
         float totalDistanceKmsTwoDecimal = Float.parseFloat(Utils.formatToKmsWithTwoDecimal(totalDistance));
-        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= 0.1){
-            // Send event only when the distance counter increment by one unit
+        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT){
+            // Send event only when the distance counter increment by 100 meters
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(getWorkoutBundle())
                     .put("delta_distance", deltaDistance) // in meters

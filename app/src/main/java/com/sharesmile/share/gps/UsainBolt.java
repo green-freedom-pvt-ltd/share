@@ -7,6 +7,8 @@ import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
+import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT;
+import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT;
 import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 
 /**
@@ -112,11 +114,11 @@ public class UsainBolt {
             float averageStrideLength = (Utils.getAverageStrideLength() == 0)
                     ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
             // Normalising averageStrideLength obtained
-            if (averageStrideLength < 0.3f){
-                averageStrideLength = 0.3f;
+            if (averageStrideLength < GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT){
+                averageStrideLength = GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT;
             }
-            if (averageStrideLength > 1f){
-                averageStrideLength = 1f;
+            if (averageStrideLength > GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT){
+                averageStrideLength = GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT;
             }
             // Calculate expected num of steps in the recorded session based on speed and avgStrideLength
             int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);

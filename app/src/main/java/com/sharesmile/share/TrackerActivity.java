@@ -278,12 +278,7 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public long getElapsedTimeInSecs(){
-        if (isBoundToLocationService()) {
-            long elapsedTime = locationService.getWorkoutElapsedTimeInSecs();
-            Logger.d(TAG, "getElapsedTimeInSecs = " + elapsedTime);
-            return elapsedTime;
-        }
-        return 0;
+        return (long) WorkoutSingleton.getInstance().getElapsedTimeInSecs();
     }
 
     public Properties getWorkoutBundle(){
@@ -291,10 +286,7 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public float getTotalDistanceInMeters(){
-        if (isBoundToLocationService()){
-            return locationService.getTotalDistanceCoveredInMeters();
-        }
-        return 0;
+        return WorkoutSingleton.getInstance().getTotalDistanceInMeters();
     }
 
     public float getCurrentSpeed(){
@@ -305,17 +297,11 @@ public class TrackerActivity extends BaseActivity {
     }
 
     public float getAvgSpeed(){
-        if (isBoundToLocationService()){
-            return locationService.getAvgSpeed();
-        }
-        return 0;
+        return WorkoutSingleton.getInstance().getAvgSpeed();
     }
 
     public int getTotalSteps(){
-        if (isBoundToLocationService()){
-            return locationService.getTotalStepsInWorkout();
-        }
-        return 0;
+        return WorkoutSingleton.getInstance().getTotalSteps();
     }
 
     private void unbindLocationService() {

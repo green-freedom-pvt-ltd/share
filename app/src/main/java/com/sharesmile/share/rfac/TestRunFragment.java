@@ -174,6 +174,11 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
+    public void refreshWorkoutData() {
+
+    }
+
+    @Override
     public void showStopDialog() {
 
     }

@@ -167,6 +167,34 @@ public class WorkoutSingleton {
         return this.dataStore;
     }
 
+    public float getElapsedTimeInSecs(){
+        if (dataStore != null){
+            return dataStore.getElapsedTime();
+        }
+        return 0;
+    }
+
+    public float getTotalDistanceInMeters(){
+        if (dataStore != null){
+            return dataStore.getTotalDistance();
+        }
+        return 0;
+    }
+
+    public float getAvgSpeed(){
+        if (dataStore != null){
+            return dataStore.getAvgSpeed();
+        }
+        return 0;
+    }
+
+    public int getTotalSteps(){
+        if (dataStore != null){
+            return dataStore.getTotalSteps();
+        }
+        return 0;
+    }
+
     public Properties getWorkoutBundle() {
         if (dataStore != null){
             Properties p = new Properties();

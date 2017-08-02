@@ -115,6 +115,7 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Logger.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         // Will begin workout if not already active
         if (!myActivity.isWorkoutActive()) {
@@ -133,6 +134,7 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void updateTimeView(String newTime) {
+        Logger.d(TAG, "updateTimeView with " + newTime );
         time.setText(newTime);
         if (newTime.length() > 5) {
             mTimerIndicator.setText("HR:MIN:SEC");
@@ -214,6 +216,32 @@ public class RealRunFragment extends RunFragment {
         }
     }
 
+    @Override
+    public void refreshWorkoutData(){
+        Logger.d(TAG, "refreshWorkoutData");
+        if (isAttachedToActivity()){
+            updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs()));
+            String distanceString = Utils.formatToKmsWithTwoDecimal(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
+            distanceTextView.setText(distanceString);
+            int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
+            impact.setText(String.valueOf(rupees));
+            if (WorkoutSingleton.getInstance().getDataStore() != null){
+                Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
+                if (calorie != null){
+                    String caloriesString = "";
+                    if (calorie.getCalories() > 100){
+                        caloriesString = String.valueOf(Math.round(calorie.getCalories()));
+                    }else {
+                        caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
+                    }
+                    tvCalorieMets.setText(caloriesString);
+                }
+            }else {
+                tvCalorieMets.setText("0");
+            }
+        }
+    }
+
 
     private String getImpactInRupees(float distanceCovered){
         String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
@@ -253,6 +281,7 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     protected void onContinuedRun(boolean isPaused) {
+        Logger.d(TAG, "onContinuedRun , isPaused = " + isPaused);
         if (!isRunning()) {
             pauseButton.setText(R.string.resume);
             runProgressBar.setVisibility(View.INVISIBLE);

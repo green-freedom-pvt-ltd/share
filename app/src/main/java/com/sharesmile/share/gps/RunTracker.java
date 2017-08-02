@@ -22,6 +22,7 @@ import com.sharesmile.share.utils.Utils;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.core.Config.DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT;
+import static com.sharesmile.share.core.Config.TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 
 /**
@@ -40,7 +41,7 @@ public class RunTracker implements Tracker {
         synchronized (RunTracker.class){
             this.executorService = executorService;
             this.listener = listener;
-            recordHistoryQueue = new CircularQueue<>(8);
+            recordHistoryQueue = new CircularQueue<>(TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE);
             if (isActive()){
                 dataStore = WorkoutSingleton.getInstance().getDataStore();
                 String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
