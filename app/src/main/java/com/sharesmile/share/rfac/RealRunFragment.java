@@ -134,7 +134,6 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void updateTimeView(String newTime) {
-        Logger.d(TAG, "updateTimeView with " + newTime );
         time.setText(newTime);
         if (newTime.length() > 5) {
             mTimerIndicator.setText("HR:MIN:SEC");

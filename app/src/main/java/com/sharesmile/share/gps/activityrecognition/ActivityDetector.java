@@ -28,6 +28,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.MainApplication.showRunNotification;
+import static com.sharesmile.share.core.Config.ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
@@ -78,7 +79,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private ActivityDetector(Context appContext){
         this.appContext = appContext;
         this.handler = new Handler();
-        this.historyQueue = new CircularQueue<>(5);
+        this.historyQueue = new CircularQueue<>(ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE);
         this.isWorkoutActive = WorkoutSingleton.getInstance().isWorkoutActive();
         connectGoogleApiClient();
     }

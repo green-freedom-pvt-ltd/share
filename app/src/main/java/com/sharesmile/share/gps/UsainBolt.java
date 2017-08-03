@@ -61,7 +61,6 @@ public class UsainBolt {
                         .put("detected_by", "gps_speed")
                         .put("gps_speed", recentGpsSpeed*3.6)
                         .put("recent_speed", recentSpeed*3.6)
-                        .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                         .buildAndDispatch();
                 return true;
             }
@@ -73,8 +72,6 @@ public class UsainBolt {
                         .addBundle(workoutService.getWorkoutBundle())
                         .put("detected_by", "activity_recognition")
                         .put("recent_speed", recentSpeed*3.6)
-                        .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
-                        .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                         .buildAndDispatch();
                 return true;
             }
@@ -154,9 +151,8 @@ public class UsainBolt {
                         AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
                                 .addBundle(workoutService.getWorkoutBundle())
                                 .put("detected_by", "speed_logic")
-                                .put("speed_in_session", speedInSession*3.6)
                                 .put("recent_speed", recentSpeed*3.6)
-                                .put("steps_ratio", stepsRatio)
+                                .put("cadence_ratio", stepsRatio)
                                 .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                                 .buildAndDispatch();
                         return true;

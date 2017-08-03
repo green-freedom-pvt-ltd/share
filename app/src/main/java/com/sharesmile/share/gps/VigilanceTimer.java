@@ -10,6 +10,7 @@ import com.sharesmile.share.utils.Logger;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.sharesmile.share.core.Config.BAD_GPS_NOTIF_THRESHOLD_INTERVAL;
 import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT;
 import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
 import static com.sharesmile.share.core.Config.MIN_NUM_SPIKES_RATE_FOR_BAD_GPS;
@@ -160,7 +161,7 @@ public class VigilanceTimer implements Runnable {
 			workoutService.cancelBadGpsNotification();
 		}
 
-		if (timeWithContinuousBadGpsBehaviour > 60000){
+		if (timeWithContinuousBadGpsBehaviour > BAD_GPS_NOTIF_THRESHOLD_INTERVAL){
 			// Time to show GPS signal Weak popup
 			workoutService.notifyUserAboutBadGps();
 		}

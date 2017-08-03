@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import static com.sharesmile.share.core.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
+import static com.sharesmile.share.core.Config.GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 
@@ -81,7 +82,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         this.handler = new Handler();
         this.listeners = new HashSet<>();
         this.silentListeners = new HashSet<>();
-        this.locationQueue = new CircularQueue<>(8);
+        this.locationQueue = new CircularQueue<>(GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE);
         if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available

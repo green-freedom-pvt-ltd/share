@@ -47,10 +47,48 @@ public class Config {
     // Minimum ON_FOOT confidence required for walk engagement notif
     public static final int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 60;
 
+    // Used maintain history of activityRecognitionResult recent history
+    public static final int ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE = 5;
+
+    // ActivityRecognition updates request interval
+    public static final long DETECTED_INTERVAL_IDLE = 10000; // in millisecs
+    public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
+
+    // If user remains continuously still for this much time then Still notification is shown
+    public static final long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
+
+    // Walk engagement counter is invoked periodically after this interval
+    public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
+
+    // Show walk engaagement notif if user has been on foot continuously for this much amount of time
+    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 105000;// in millisecs
+
+    public static final long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 43200000;// in millisecs, i.e. 12 hours
+
+    // During tracking If GPS behaves bad continuously for this much amount of time, then BAD_GPS_NOTIF is shown
+    public static final long BAD_GPS_NOTIF_THRESHOLD_INTERVAL = 60000;
+
+    // In a single DistRecord update delta_distance cannot be more than this value
+    public static final float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 5000f;// in meters
+
+    // ON_WORKOUT_UPDATE analytics event occurrs after this much distance
+    public static final float MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT = 0.1f;// in Kms
+
+
+    // Sync Config
+    // All the client data is synced periodically after this interval
+    public static final long DATA_SYNC_INTERVAL = 10800L;// in secs, i.e. every 3 hours
+    public static final long DATA_SYNC_INTERVAL_FLEX = 5400L;// in secs, i.e. every 1.5 hours
+
+    /*******************************/
+
+
     public static final int TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE = 8;
 
     public static final int WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE = 3;
 
+    // Used to calculate recent GPS speed
+    public static final int GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE = 8;
 
 
     public static final long LOCATION_UPDATE_INTERVAL = 1000; // in millisecs
@@ -84,8 +122,6 @@ public class Config {
     public static boolean USAIN_BOLT_CHECK = true;
 
 
-
-
     // All recent avg confidence values are reset to 0 after this interval
     public static final long ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL = 30000; // in millisecs
     public static final long ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE = 40000; // in millisecs
@@ -94,32 +130,18 @@ public class Config {
     public static final long ACTIVITY_VALID_INTERVAL_ACTIVE = 15000; // in millisecs
     public static final long ACTIVITY_VALID_INTERVAL_IDLE = 35000; // in millisecs
 
-    // ActivityRecognition updates request interval
-    public static final long DETECTED_INTERVAL_IDLE = 10000; // in millisecs
-    public static final long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
-
-    public static final long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
 
     public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
     public static final long CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
 
-    public static final long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
-    public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 30000; // in millisecs
-    public static final long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 108000;// in millisecs
-    public static final long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 43200000;// in millisecs, i.e. 12 hours
+
+    public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 60000; // in millisecs
+
 
     public static final float GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD = 0.305f; // in m/s, i.e. 1.1 km/hr
     public static final float MIN_NUM_SPIKES_RATE_FOR_BAD_GPS = 0.083f; // in spikes/sec, i.e. 5 spikes per min
 
     public static final float MIN_DISTANCE_FOR_FEEDBACK_POPUP = 5.0f;// in Kms
 
-    public static final float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 5000f;// in meters
-
-    public static final float MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT = 0.1f;// in Kms
-
-    // Sync Config
-
-    public static final long DATA_SYNC_INTERVAL = 10800L;// in secs, i.e. every 3 hours
-    public static final long DATA_SYNC_INTERVAL_FLEX = 5400L;// in secs, i.e. every 1.5 hours
 
 }

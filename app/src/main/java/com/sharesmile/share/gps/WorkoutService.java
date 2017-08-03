@@ -252,7 +252,6 @@ public class WorkoutService extends Service implements
                     .addBundle(getWorkoutBundle())
                     .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                     .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
-                    .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                     .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                     .buildAndDispatch();
 
@@ -529,7 +528,6 @@ public class WorkoutService extends Service implements
             AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
                     .put("spikey_distance", deltaDistance)
                     .put("time_interval", deltaTime)
-                    .put("delta_speed", deltaSpeed*3.6)
                     .put("threshold_applied", thresholdApplied)
                     .put("is_secondary_check", false)
                     .addBundle(getWorkoutBundle())
@@ -605,6 +603,7 @@ public class WorkoutService extends Service implements
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(getWorkoutBundle())
                     .put("delta_distance", deltaDistance) // in meters
+                    .put("delta_time", deltaTime) // in secs
                     .put("delta_speed", deltaSpeed) // in km/hrs
                     .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                     .put("recent_speed", getCurrentSpeed())
