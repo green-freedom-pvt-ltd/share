@@ -1,6 +1,8 @@
 package com.dao;
 
 import de.greenrobot.daogenerator.Entity;
+import de.greenrobot.daogenerator.Index;
+import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
 
 /**
@@ -37,7 +39,7 @@ public class Version11 extends SchemaVersion{
         workout.addDateProperty("date");
         workout.addFloatProperty("runAmount");
         workout.addBooleanProperty("is_sync");
-        workout.addStringProperty("workoutId").index();
+        Property workoutId = workout.addStringProperty("workoutId").getProperty();
         workout.addDoubleProperty("startPointLatitude");
         workout.addDoubleProperty("startPointLongitude");
         workout.addDoubleProperty("endPointLatitude");
@@ -54,6 +56,11 @@ public class Version11 extends SchemaVersion{
         workout.addIntProperty("osVersion");
         workout.addStringProperty("deviceId");
         workout.addStringProperty("deviceName");
+
+        Index workoutIdUniqueIndex = new Index();
+        workoutIdUniqueIndex.addProperty(workoutId);
+        workoutIdUniqueIndex.makeUnique();
+        workout.addIndex(workoutIdUniqueIndex);
     }
 
     private static void addUserData(Schema schema) {

@@ -93,7 +93,7 @@ public class WorkoutDao extends AbstractDao<Workout, Long> {
                 "\"DEVICE_ID\" TEXT," + // 25: deviceId
                 "\"DEVICE_NAME\" TEXT);"); // 26: deviceName
         // Add Indexes
-        db.execSQL("CREATE INDEX " + constraint + "IDX_WORKOUT_WORKOUT_ID ON WORKOUT" +
+        db.execSQL("CREATE UNIQUE INDEX " + constraint + "IDX_WORKOUT_WORKOUT_ID ON WORKOUT" +
                 " (\"WORKOUT_ID\");");
     }
 
