@@ -59,7 +59,7 @@ class TeamBoard : UnObfuscable, Serializable {
             var board = LeaderBoard();
             board.id = id;
             board.first_name = teamName;
-            board.last_week_distance = total_distance?.totalDistance;
+            board.distance = total_distance?.totalDistance;
             return board;
         }
 

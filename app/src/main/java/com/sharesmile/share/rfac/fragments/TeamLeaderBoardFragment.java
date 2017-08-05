@@ -1,9 +1,19 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 
+import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.LeaderBoardDataStore;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import Models.TeamLeaderBoard;
 
 /**
  * Created by ankitmaheshwari on 8/5/17.
@@ -17,7 +27,7 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
 
     public static TeamLeaderBoardFragment getInstance(int teamId) {
         TeamLeaderBoardFragment fragment = new TeamLeaderBoardFragment();
-        Bundle bundle = fragment.getArguments();
+        Bundle bundle = new Bundle();
         bundle.putInt(BUNDLE_TEAM_ID, teamId);
         fragment.setArguments(bundle);
         return fragment;
@@ -33,8 +43,21 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
     }
 
     @Override
-    protected void refreshItems() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        EventBus.getDefault().register(this);
+    }
 
+    @Override
+    public void onDetach() {
+        EventBus.getDefault().unregister(this);
+        super.onDetach();
+    }
+
+    @Override
+    protected void refreshItems() {
+        super.refreshItems();
+        LeaderBoardDataStore.getInstance().updateTeamLeaderBoardData(mTeamId);
     }
 
     @Override
@@ -48,13 +71,46 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
         showProgressDialog();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(TeamLeaderBoardDataFetched event){
+        if (mTeamId == event.getTeamId() && isAttachedToActivity()){
+            // Check if we received TeamLeaderBoard data for the correct teamId
+            // &&
+            // Check if fragment is still on display
+            TeamLeaderBoard board = null;
+            if (event.isSuccess()){
+                board = event.getTeamLeaderBoard();
+            }else if (mTeamId == LeaderBoardDataStore.getInstance().getMyTeamId()){
+                board = LeaderBoardDataStore.getInstance().getMyTeamLeaderBoard();
+            }
+            mleaderBoardList.clear();
+            hideProgressDialog();
+            if (board != null){
+                // We have something to display
+                String teamName = "";
+                for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
+                    Float distance = 0f;
+                    if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
+                        distance = team.getLeagueTotalDistance().getTotalDistance();
+                    }
+                    if (TextUtils.isEmpty(teamName)){
+                        teamName = team.getTeamName();
+                    }
+                    mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
+                }
+                if (!TextUtils.isEmpty(teamName)){
+                    setToolbarTitle(teamName);
+                }
+                mLeaderBoardAdapter.setData(mleaderBoardList);
+            }else {
+                MainApplication.showToast("Network Error, Please try again");
+            }
+        }
+    }
+
     @Override
     public BOARD_TYPE getBoardType() {
         return BOARD_TYPE.TEAM_LEADERBAORD;
     }
 
-    @Override
-    public void onItemClick(long id) {
-
-    }
 }

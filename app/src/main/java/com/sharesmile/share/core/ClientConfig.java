@@ -148,8 +148,16 @@ public class ClientConfig implements UnObfuscable{
         }catch (NetworkException ne){
             Logger.d(TAG, "NetworkException in ClientConfig sync: " + ne);
             ne.printStackTrace();
-            Crashlytics.log("ClientConfig sync failed due to networkException for user_id ("
-                    + MainApplication.getInstance().getUserDetails().getUserId() +"), messageFromServer: " + ne);
+            String message = "";
+            int userId = 0;
+            if (MainApplication.getInstance().isLogin() && MainApplication.getInstance().getUserDetails() != null){
+                userId = MainApplication.getInstance().getUserDetails().getUserId();
+                message = "ClientConfig sync failed due to networkException for user_id ("
+                        + userId +"), messageFromServer: " + ne;
+            }else {
+                message = "ClientConfig sync failed due to networkException, messageFromServer: " + ne;
+            }
+            Crashlytics.log(message);
             Crashlytics.logException(ne);
             if (ne.getFailureType() == FailureType.REQUEST_FAILURE){
                 return ExpoBackoffTask.RESULT_RESCHEDULE;

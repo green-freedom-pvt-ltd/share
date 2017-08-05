@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,6 +16,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -41,7 +41,6 @@ public class RealRunFragment extends RunFragment {
     TextView time;
     TextView distanceTextView;
     TextView impact;
-    ProgressBar runProgressBar;
     Button pauseButton;
     Button stopButton;
 
@@ -59,6 +58,9 @@ public class RealRunFragment extends RunFragment {
 
     @BindView(R.id.live_distance_container)
     RelativeLayout distanceContainer;
+
+    @BindView(R.id.btn_music_hook)
+    View musicHookButton;
 
     @BindView(R.id.live_timer_container)
     View timerContainer;
@@ -87,11 +89,11 @@ public class RealRunFragment extends RunFragment {
         time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
         distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
         impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
-        runProgressBar = (ProgressBar) baseView.findViewById(R.id.run_progress_bar);
         pauseButton = (Button) baseView.findViewById(R.id.btn_pause);
         stopButton = (Button) baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
+        musicHookButton.setOnClickListener(this);
 
         if (MainApplication.getInstance().getBodyWeight() <= 0){
             // Need to hide caloriesContainer and reset distanceContainer LayoutParams
@@ -197,7 +199,7 @@ public class RealRunFragment extends RunFragment {
             String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
             distanceTextView.setText(distanceString);
             int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
-            impact.setText(String.valueOf(rupees));
+            impact.setText("\u20B9" + String.valueOf(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
                 if (calorie != null){
@@ -223,7 +225,7 @@ public class RealRunFragment extends RunFragment {
             String distanceString = Utils.formatToKmsWithTwoDecimal(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
             distanceTextView.setText(distanceString);
             int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
-            impact.setText(String.valueOf(rupees));
+            impact.setText("\u20B9"+String.valueOf(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
                 if (calorie != null){
@@ -262,18 +264,16 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void onPauseRun() {
         pauseButton.setText(R.string.resume);
-        runProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
     protected void onResumeRun() {
         pauseButton.setText(R.string.pause);
-        runProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onBeginRun() {
-        impact.setText("0");
+        impact.setText("\u20B9 0");
         distanceTextView.setText("0.00");
         tvCalorieMets.setText("0.0");
     }
@@ -283,10 +283,8 @@ public class RealRunFragment extends RunFragment {
         Logger.d(TAG, "onContinuedRun , isPaused = " + isPaused);
         if (!isRunning()) {
             pauseButton.setText(R.string.resume);
-            runProgressBar.setVisibility(View.INVISIBLE);
         } else {
             pauseButton.setText(R.string.pause);
-            runProgressBar.setVisibility(View.VISIBLE);
         }
 
         float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
@@ -342,6 +340,9 @@ public class RealRunFragment extends RunFragment {
                         .addBundle(getWorkoutBundle())
                         .buildAndDispatch();
                 showStopDialog();
+                break;
+            case R.id.btn_music_hook:
+                getFragmentController().performOperation(IFragmentController.OPEN_MUSIC_PLAYER, null);
                 break;
         }
     }

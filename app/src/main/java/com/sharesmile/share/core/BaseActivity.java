@@ -198,7 +198,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                 }else {
                     throw new IllegalArgumentException("Input should be a Run object for SHOW_FEEDBACK_FRAGMENT");
                 }
-
+                break;
+            case OPEN_MUSIC_PLAYER:
+                openMusicPlayer();
                 break;
         }
     }
@@ -206,6 +208,19 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     @Override
     public void goBack() {
         onBackPressed();
+    }
+
+    private void openMusicPlayer(){
+        Logger.d(TAG, "openMusicPlayer");
+        if(android.os.Build.VERSION.SDK_INT>=15){
+            Intent intent=Intent.makeMainSelectorActivity(Intent.ACTION_MAIN,
+                    Intent.CATEGORY_APP_MUSIC);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//Min SDK 15
+            startActivity(intent);
+        }else{
+            Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");//Min SDK 8
+            startActivity(intent);
+        }
     }
 
     private void showFeedbackFragment(Run concernedRun) {

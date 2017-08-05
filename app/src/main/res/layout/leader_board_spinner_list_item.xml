@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.sharesmile.share.views.MRTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_leader_board_spinner"
+    style="?android:attr/spinnerItemStyle"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:maxLines="1"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@color/white"
+    android:ellipsize="marquee"
+    android:textAlignment="inherit"
+    android:textSize="14sp"
+    android:textColor="@color/greyish_brown_two"
+    />

@@ -46,7 +46,8 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.FeedbackFragment;
-import com.sharesmile.share.rfac.fragments.LeaderBoardFragment;
+import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
+import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
@@ -230,8 +231,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void showLeagueBoard(){
-        LeaderBoardFragment leageBoardFragment
-                = LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD);
+        LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
         replaceFragment(leageBoardFragment , true);
     }
 
@@ -342,8 +342,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-//            performOperation(SHOW_FAQ_FRAGMENT,false);
-            openMusicPlayer();
+            performOperation(SHOW_FAQ_FRAGMENT,false);
+//            openMusicPlayer();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
@@ -361,20 +361,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return false;
     }
 
-    private void openMusicPlayer(){
-        if(android.os.Build.VERSION.SDK_INT>=15){
-            Intent intent=Intent.makeMainSelectorActivity(Intent.ACTION_MAIN,
-                    Intent.CATEGORY_APP_MUSIC);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//Min SDK 15
-            startActivity(intent);
-        }else{
-            Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");//Min SDK 8
-            startActivity(intent);
-        }
-    }
-
     private void showLeaderBoard() {
-        replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.GLOBAL_LEADERBOARD), true);
+        replaceFragment(GlobalLeaderBoardFragment.getInstance(), true);
     }
 
     private void showLoginActivity() {
@@ -402,7 +390,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             updateNavigationMenu();
         } else if (requestCode == REQUEST_LEAGUE_REGISTRATION) {
             if (resultCode == RESULT_OK) {
-                replaceFragment(LeaderBoardFragment.getInstance(LeaderBoardFragment.BOARD_TYPE.LEAGUEBOARD), true);
+                replaceFragment(LeagueBoardFragment.getInstance(), true);
             }
         }
     }

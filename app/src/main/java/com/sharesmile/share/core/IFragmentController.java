@@ -28,6 +28,8 @@ public interface IFragmentController {
 
     int HIDE_TOOLBAR = 109;
 
+    int OPEN_MUSIC_PLAYER = 110;
+
 
     /*
         Common methods which can be implemented either by abstract BaseActivity or by solid child activities

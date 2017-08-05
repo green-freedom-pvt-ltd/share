@@ -33,10 +33,13 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
     private List<LeaderBoard> mData;
     private Context mContext;
 
-    public LeaderBoardAdapter(Context context, boolean isLeagueBoard, ItemClickListener lis) {
+    public LeaderBoardAdapter(Context context, boolean isLeagueBoard) {
         this.mContext = context;
         this.isLeagueBoard = isLeagueBoard;
-        mListener = lis;
+    }
+
+    public void setItemClickListener(ItemClickListener listener){
+        this.mListener = listener;
     }
 
     @Override
@@ -75,7 +78,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         @BindView(R.id.tv_profile_name)
         TextView mProfileName;
 
-        @BindView(R.id.last_week_distance)
+        @BindView(R.id.tv_distance)
         TextView mlastWeekDistance;
 
         @BindView(R.id.containerView)
@@ -112,7 +115,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
             mProfileName.setText(Utils.dedupName(firstName, lastName));
             String last_Week_Distance;
-            Float lastWeekDist = leaderboard.getLast_week_distance();
+            Float lastWeekDist = leaderboard.getDistance();
             if (lastWeekDist > 10f){
                 last_Week_Distance = String.valueOf(Math.round(lastWeekDist));
             }else {

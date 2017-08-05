@@ -1,6 +1,7 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.io.Serializable;
@@ -22,8 +23,8 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
     @SerializedName("social_thumb")
     private String imageUrl;
 
-    @SerializedName("last_week_distance")
-    private LastWeekDistance lastWeekDistance;
+    @SerializedName("distance")
+    private float distance;
 
     @SerializedName("ranking")
     private int rank;
@@ -40,8 +41,8 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
         return imageUrl;
     }
 
-    public float getLastWeekDistance() {
-        return lastWeekDistance.getLastWeekDistance();
+    public float getDistance() {
+        return distance;
     }
 
     public long getUserid() {
@@ -52,9 +53,10 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
         return rank;
     }
 
-    public com.sharesmile.share.LeaderBoard getLeaderBoardDbObject()
+    public LeaderBoard getLeaderBoardDbObject()
     {
-        com.sharesmile.share.LeaderBoard lb = new com.sharesmile.share.LeaderBoard((long) getUserid(), getFirstName(), getLastName(), getImageUrl(), getLastWeekDistance(), getRank());
+        LeaderBoard lb = new LeaderBoard((long) getUserid(), getFirstName(), getLastName(),
+                getImageUrl(), getDistance(), getRank());
         return lb;
     }
 

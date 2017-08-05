@@ -3,6 +3,7 @@ package com.sharesmile.share;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
@@ -53,11 +54,23 @@ public class LeaderBoardDataStore {
     private LeaderBoardDataStore(Context appContext){
         this.context = appContext;
         this.leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
-        this.globalLeaderBoardMap = new HashMap<>();
-        this.globalLeaderBoardMap.put(LAST_WEEK_INTERVAL, SharedPrefsManager.getInstance()
-                .getObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
-        this.globalLeaderBoardMap.put(ALL_TIME_INTERVAL, SharedPrefsManager.getInstance()
-                .getObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
+
+        this.globalLeaderBoardMap = SharedPrefsManager.getInstance().getCollection(
+                Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA,
+                new TypeToken<Map<String, LeaderBoardList>>(){}.getType());
+
+        if (globalLeaderBoardMap == null){
+            globalLeaderBoardMap = new HashMap<>();
+        }
+
+//        this.globalLeaderBoardMap = new HashMap<>();
+//        this.globalLeaderBoardMap.put(LAST_WEEK_INTERVAL, SharedPrefsManager.getInstance()
+//                .getObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
+//        this.globalLeaderBoardMap.put(ALL_TIME_INTERVAL, SharedPrefsManager.getInstance()
+//                .getObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
+//        this.globalLeaderBoardMap.put(LAST_MONTH_INTERVAL, SharedPrefsManager.getInstance()
+//                .getObject(Constants.PREF_GLOBAL_LAST_MONTH_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
+
         this.leagueBoard = SharedPrefsManager.getInstance()
                 .getObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, TeamBoard.class);
         this.myTeamLeaderBoard = SharedPrefsManager.getInstance()
@@ -101,12 +114,8 @@ public class LeaderBoardDataStore {
         return leagueBoard;
     }
 
-    public LeaderBoardList getGlobalLastWeekLeaderBoard() {
-        return globalLeaderBoardMap.get(LAST_WEEK_INTERVAL);
-    }
-
-    public LeaderBoardList getGlobalAllTimeLeaderBoard() {
-        return globalLeaderBoardMap.get(ALL_TIME_INTERVAL);
+    public LeaderBoardList getGlobalLeaderBoard(String interval){
+        return globalLeaderBoardMap.get(interval);
     }
 
     public TeamLeaderBoard getMyTeamLeaderBoard() {
@@ -237,11 +246,16 @@ public class LeaderBoardDataStore {
             }
         });
         this.globalLeaderBoardMap.put(interval, leaderBoardList);
-        if (LAST_WEEK_INTERVAL.equals(interval)){
-            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, leaderBoardList);
-        }else if (ALL_TIME_INTERVAL.equals(interval)){
-            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, leaderBoardList);
-        }
+        SharedPrefsManager.getInstance().setCollection(Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA,
+                globalLeaderBoardMap);
+
+//        if (LAST_WEEK_INTERVAL.equals(interval)){
+//            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, leaderBoardList);
+//        }else if (ALL_TIME_INTERVAL.equals(interval)){
+//            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, leaderBoardList);
+//        }else if (LAST_MONTH_INTERVAL.equals(interval)){
+//            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LAST_MONTH_LEADERBOARD_CACHED_DATA, leaderBoardList);
+//        }
     }
 
     public void setMyTeamLeaderBoardData(TeamLeaderBoard board){

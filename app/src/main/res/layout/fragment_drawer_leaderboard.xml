@@ -21,18 +21,15 @@
             android:visibility="gone"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"/>
 
-        <com.sharesmile.share.views.MLTextView
-            android:id="@+id/tv_leaderboard_data"
+        <Spinner
+            android:id="@+id/interval_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:paddingLeft="96dp"
-            android:gravity="left"
+            android:prompt="@string/most_kms_last_7_days"
             android:background="@color/white"
-            android:text="@string/leader_board_week"
-            android:textSize="14sp"
             android:visibility="gone"/>
+
+
 
     </android.support.design.widget.AppBarLayout>
 
@@ -72,6 +69,7 @@
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -13,7 +13,7 @@ public class LeaderBoard {
     private String first_name;
     private String last_name;
     private String social_thumb;
-    private Float last_week_distance;
+    private Float distance;
     private Integer rank;
 
     // KEEP FIELDS - put your custom fields here
@@ -26,12 +26,12 @@ public class LeaderBoard {
         this.id = id;
     }
 
-    public LeaderBoard(Long id, String first_name, String last_name, String social_thumb, Float last_week_distance, Integer rank) {
+    public LeaderBoard(Long id, String first_name, String last_name, String social_thumb, Float distance, Integer rank) {
         this.id = id;
         this.first_name = first_name;
         this.last_name = last_name;
         this.social_thumb = social_thumb;
-        this.last_week_distance = last_week_distance;
+        this.distance = distance;
         this.rank = rank;
     }
 
@@ -67,12 +67,12 @@ public class LeaderBoard {
         this.social_thumb = social_thumb;
     }
 
-    public Float getLast_week_distance() {
-        return last_week_distance;
+    public Float getDistance() {
+        return distance;
     }
 
-    public void setLast_week_distance(Float last_week_distance) {
-        this.last_week_distance = last_week_distance;
+    public void setDistance(Float distance) {
+        this.distance = distance;
     }
 
     public Integer getRank() {
