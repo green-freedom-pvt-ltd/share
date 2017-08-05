@@ -48,6 +48,7 @@ public class LeaderBoardDataStore {
 
     public static final String ALL_TIME_INTERVAL = "all_time";
     public static final String LAST_WEEK_INTERVAL = "last_7";
+    public static final String LAST_MONTH_INTERVAL = "last_30";
 
     private LeaderBoardDataStore(Context appContext){
         this.context = appContext;
