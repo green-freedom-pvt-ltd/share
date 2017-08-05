@@ -38,6 +38,7 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.NotificationActionReceiver;
@@ -65,9 +66,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
-import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
-import static com.sharesmile.share.core.Config.MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT;
-import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 import static com.sharesmile.share.core.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
@@ -224,7 +222,7 @@ public class WorkoutService extends Service implements
             WorkoutServiceRetainerAlarm.setRepeatingAlarm(this);
             GoogleLocationTracker.getInstance().registerForWorkout(this);
             handler.removeCallbacks(handleGpsInactivityRunnable);
-            handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
+            handler.postDelayed(handleGpsInactivityRunnable, ClientConfig.getInstance().GPS_INACTIVITY_NOTIFICATION_DELAY);
 
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
@@ -268,7 +266,7 @@ public class WorkoutService extends Service implements
             cancelAllWorkoutNotifications();
             // Do not show walk engagement notification until the next 12 hours
             long currentTs = DateUtil.getServerTimeInMillis();
-            long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
+            long scheduleWalkEngagementAfter = currentTs + ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
             SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
             ActivityDetector.getInstance().workoutIdle();
         }
@@ -410,7 +408,7 @@ public class WorkoutService extends Service implements
         Logger.i(TAG, "onLocationChanged with \n" + location.toString());
         cancelGpsInactiveNotification();
         handler.removeCallbacks(handleGpsInactivityRunnable);
-        handler.postDelayed(handleGpsInactivityRunnable, Config.GPS_INACTIVITY_NOTIFICATION_DELAY);
+        handler.postDelayed(handleGpsInactivityRunnable, ClientConfig.getInstance().GPS_INACTIVITY_NOTIFICATION_DELAY);
         if(tracker != null && tracker.isRunning()) {
             if (!ActivityDetector.getInstance().isStill()){
                 // Process GPS fix only when the device is not Still
@@ -503,17 +501,17 @@ public class WorkoutService extends Service implements
         float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
 
         // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
-        if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > USAIN_BOLT_GPS_SPEED_LIMIT){
-            spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+        if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
+            spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {
             if ( ActivityDetector.getInstance().isOnFoot() ||
-                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= MIN_CADENCE_FOR_WALK)){
+                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
                 // Can make a safe assumption that the person is on foot
-                spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
+                spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
             } else {
-                spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
+                spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
                 thresholdApplied = "default";
             }
         }
@@ -598,7 +596,7 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
         updateStickyNotification();
         float totalDistanceKmsTwoDecimal = Float.parseFloat(Utils.formatToKmsWithTwoDecimal(totalDistance));
-        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT){
+        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= ClientConfig.getInstance().MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT){
             // Send event only when the distance counter increment by 100 meters
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(getWorkoutBundle())
@@ -976,7 +974,7 @@ public class WorkoutService extends Service implements
             // But will do it only when user is on the move on foot
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
             if ( ActivityDetector.getInstance().isOnFoot()
-                    || stepCounter.getMovingAverageOfStepsPerSec() > MIN_CADENCE_FOR_WALK){
+                    || stepCounter.getMovingAverageOfStepsPerSec() > ClientConfig.getInstance().MIN_CADENCE_FOR_WALK){
                 notifyUserAboutGpsInactivity();
             }
         }

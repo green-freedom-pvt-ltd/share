@@ -24,6 +24,7 @@ import com.onesignal.OneSignal;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.core.NotificationActionReceiver;
@@ -411,6 +412,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     public void startSyncTasks() {
         Logger.d(TAG, "startSyncTasks");
         SyncHelper.syncUserFromDB();
+        ClientConfig.sync();
         SyncHelper.scheduleDataSync(this);
         SyncHelper.syncMessageCenterData(this);
         boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);

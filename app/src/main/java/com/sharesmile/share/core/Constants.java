@@ -133,7 +133,8 @@ public class Constants {
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
     public static final String PREF_LEAGUE_TEAM_ID="pref_league_team_id";
     public static final String PREF_USER_DETAILS="pref_user_details";
-    public static final String PREF_GLOBAL_LEADERBOARD_CACHED_DATA="pref_global_leaderboard_cached_data";
+    public static final String PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA ="pref_global_leaderboard_cached_data";
+    public static final String PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA="pref_global_all_time_leaderboard_cached_data";
     public static final String PREF_LEAGUEBOARD_CACHED_DATA="pref_leagueboard_cached_data";
     public static final String PREF_MY_TEAM_LEADERBOARD_CACHED_DATA="pref_my_team_leaderboard_cached_data";
     public static final String PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB="pref_is_workout_data_up_to_date_in_db";
@@ -164,6 +165,8 @@ public class Constants {
     public static final String FEEDBACK_TAG_POST_RUN_SAD = "sad";
 
     public static final String PREF_APP_VERSION = "pref_app_version";
+
+    public static final String PREF_CLIENT_CONFIG = "pref_client_config";
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));

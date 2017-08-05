@@ -12,13 +12,15 @@ public class Urls {
     private static final String CAUSE_LIST_URL = "/api/causesv2.json";
     private static final String RUN_URL = "/api/runs/";
 
+    private static final String CLIENT_CONFIG_URL = "/api/runconfig/";
+
     private static final String UPDATE_RUN_URL = "/api/updaterun/";
 
     private static final String LOGIN_URL = "/api/users/";
     private static final String FEEDBACK_URL = "/api/userFeedback/";
     private static final String FAQ_URL = "/api/faq/";
     private static final String MESSAGE_URL = "/api/messageCenter/";
-    private static final String LEADERBOARD_URL = "/api/leaderBoard/";
+    private static final String LEADERBOARD_URL = "/api/leaderboardv2/";
     private static final String FRAUDSTERS_URL = "/api/fraudsters/";
 
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
@@ -65,6 +67,11 @@ public class Urls {
         return url;
     }
 
+    public static String getClientConfigUrl() {
+        String url = getBaseUrl() + CLIENT_CONFIG_URL;
+        return url;
+    }
+
     public static String getLoginUrl(String email) {
         String url = getBaseUrl() + LOGIN_URL;
         if (!TextUtils.isEmpty(email)){
@@ -102,8 +109,8 @@ public class Urls {
         return url;
     }
 
-    public static String getLeaderboardUrl() {
-        String url = getBaseUrl() + LEADERBOARD_URL;
+    public static String getLeaderboardUrl(String interval) {
+        String url = getBaseUrl() + LEADERBOARD_URL + "?interval=" + interval;
         return url;
     }
 

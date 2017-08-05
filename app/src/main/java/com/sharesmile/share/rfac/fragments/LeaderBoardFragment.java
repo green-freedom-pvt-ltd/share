@@ -51,6 +51,8 @@ import Models.TeamLeaderBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.sharesmile.share.LeaderBoardDataStore.LAST_WEEK_INTERVAL;
+
 /**
  * Created by piyush on 8/30/16.
  */
@@ -195,11 +197,11 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     private void fetchData() {
         if (mBoard == BOARD_TYPE.GLOBAL_LEADERBOARD) {
             // GlobalLeaderBoard
-            if (LeaderBoardDataStore.getInstance().getGlobalLeaderBoard() != null){
+            if (LeaderBoardDataStore.getInstance().getGlobalLastWeekLeaderBoard() != null){
                 showGlobalLeaderBoardData(LeaderBoardDataStore.getInstance()
-                        .getGlobalLeaderBoard());
+                        .getGlobalLastWeekLeaderBoard());
             }else {
-                LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData();
+                LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData(LAST_WEEK_INTERVAL);
                 showProgressDialog();
             }
         } else {
@@ -276,7 +278,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
         } else if (mBoard == BOARD_TYPE.TEAM_LEADERBAORD) {
             LeaderBoardDataStore.getInstance().updateTeamLeaderBoardData(mTeamId);
         } else {
-            LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData();
+            LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData(LAST_WEEK_INTERVAL);
         }
     }
 
@@ -349,7 +351,7 @@ public class LeaderBoardFragment extends BaseFragment implements LeaderBoardAdap
     public void onEvent(GlobalLeaderBoardDataUpdated event){
         if (isAttachedToActivity() && BOARD_TYPE.GLOBAL_LEADERBOARD.equals(mBoard)){
             hideProgressDialog();
-            LeaderBoardList globalLeaderBoardData = LeaderBoardDataStore.getInstance().getGlobalLeaderBoard();
+            LeaderBoardList globalLeaderBoardData = LeaderBoardDataStore.getInstance().getGlobalLastWeekLeaderBoard();
             if (event.isSuccess()){
                 showGlobalLeaderBoardData(globalLeaderBoardData);
             }else {

@@ -1,6 +1,7 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
@@ -10,9 +11,6 @@ import com.sharesmile.share.utils.Logger;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.sharesmile.share.core.Config.BAD_GPS_NOTIF_THRESHOLD_INTERVAL;
-import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT;
-import static com.sharesmile.share.core.Config.MIN_CADENCE_FOR_WALK;
 import static com.sharesmile.share.core.Config.MIN_NUM_SPIKES_RATE_FOR_BAD_GPS;
 
 /**
@@ -39,8 +37,8 @@ public class VigilanceTimer implements Runnable {
 						  ScheduledExecutorService executorService){
 		this.scheduledExecutor = executorService;
 		this.workoutService = workoutService;
-		scheduledExecutor.scheduleAtFixedRate(this, Config.VIGILANCE_TIMER_INTERVAL,
-				Config.VIGILANCE_TIMER_INTERVAL, TimeUnit.MILLISECONDS);
+		scheduledExecutor.scheduleAtFixedRate(this, ClientConfig.getInstance().VIGILANCE_TIMER_INTERVAL,
+				ClientConfig.getInstance().VIGILANCE_TIMER_INTERVAL, TimeUnit.MILLISECONDS);
 		usainBolt = new UsainBolt(workoutService);
 //		recentPerformanceQueue = new CircularQueue<>(RECENT_PERF_QUEUE_SIZE);
 		numSpikesAtLastVigilance = WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes();
@@ -111,7 +109,7 @@ public class VigilanceTimer implements Runnable {
 
 		//Reaching here means everything is alright, vigilance approved
 		long currentTime = DateUtil.getServerTimeInMillis();
-		workoutService.workoutVigilanceSessionApproved(currentTime - Config.VIGILANCE_TIMER_INTERVAL,
+		workoutService.workoutVigilanceSessionApproved(currentTime - ClientConfig.getInstance().VIGILANCE_TIMER_INTERVAL,
 									currentTime);
 
 	}
@@ -151,7 +149,8 @@ public class VigilanceTimer implements Runnable {
 
 		if (recentSpeed < Config.GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD
 				&& spikesPerSec > MIN_NUM_SPIKES_RATE_FOR_BAD_GPS
-				&& ( onFootConfidence > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT || recentCadence > MIN_CADENCE_FOR_WALK))
+				&& ( onFootConfidence > ClientConfig.getInstance().CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT
+					|| recentCadence > ClientConfig.getInstance().MIN_CADENCE_FOR_WALK))
 		{
 			// GPS misbehaved for this session
 			timeWithContinuousBadGpsBehaviour += deltaMillis;
@@ -161,7 +160,7 @@ public class VigilanceTimer implements Runnable {
 			workoutService.cancelBadGpsNotification();
 		}
 
-		if (timeWithContinuousBadGpsBehaviour > BAD_GPS_NOTIF_THRESHOLD_INTERVAL){
+		if (timeWithContinuousBadGpsBehaviour > ClientConfig.getInstance().BAD_GPS_NOTIF_THRESHOLD_INTERVAL){
 			// Time to show GPS signal Weak popup
 			workoutService.notifyUserAboutBadGps();
 		}
@@ -194,7 +193,7 @@ public class VigilanceTimer implements Runnable {
 		}else{
 			int totalSteps = workoutService.getTracker().getTotalSteps();
 			int stepsThisSession = totalSteps - stepsTillNow;
-			if (stepsThisSession < (Config.VIGILANCE_TIMER_INTERVAL / 1000)*Config.MIN_STEPS_PER_SECOND_FACTOR){
+			if (stepsThisSession < (ClientConfig.getInstance().VIGILANCE_TIMER_INTERVAL / 1000)*Config.MIN_STEPS_PER_SECOND_FACTOR){
 				//time to pause workout
 				// Not enough steps since the beginning
 				Logger.d(TAG, "Only " + stepsThisSession + " this session. Not enough! Will pause workout");

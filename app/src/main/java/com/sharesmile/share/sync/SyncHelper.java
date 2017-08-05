@@ -15,6 +15,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
@@ -34,8 +35,6 @@ import java.util.List;
 import Models.CampaignList;
 import Models.MessageList;
 
-import static com.sharesmile.share.core.Config.DATA_SYNC_INTERVAL;
-import static com.sharesmile.share.core.Config.DATA_SYNC_INTERVAL_FLEX;
 import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
@@ -52,10 +51,10 @@ public class SyncHelper {
         PeriodicTask task = new PeriodicTask.Builder()
                 .setService(SyncService.class)
                 .setTag(SYNC_DATA)
-                .setPeriod(DATA_SYNC_INTERVAL) // in secs , i.e. every 3 hours
+                .setPeriod(ClientConfig.getInstance().DATA_SYNC_INTERVAL) // in secs , i.e. every 3 hours
                 .setPersisted(true)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setFlex(DATA_SYNC_INTERVAL_FLEX) // 1.5 hours
+                .setFlex(ClientConfig.getInstance().DATA_SYNC_INTERVAL_FLEX) // 1.5 hours
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(context);

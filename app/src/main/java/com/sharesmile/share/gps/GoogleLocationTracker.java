@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.CircularQueue;
@@ -50,7 +51,6 @@ import java.util.Set;
 
 import static com.sharesmile.share.core.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
 import static com.sharesmile.share.core.Config.GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE;
-import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 
 
@@ -523,7 +523,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     }
 
     public boolean isInVehicleAsPerGpsSpeed(){
-        return getRecentGpsSpeed() > USAIN_BOLT_GPS_SPEED_LIMIT;
+        return getRecentGpsSpeed() > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT;
     }
 
 

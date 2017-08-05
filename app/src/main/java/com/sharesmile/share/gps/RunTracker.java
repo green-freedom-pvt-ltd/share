@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton.State;
@@ -21,9 +22,7 @@ import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.sharesmile.share.core.Config.DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT;
 import static com.sharesmile.share.core.Config.TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE;
-import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
@@ -314,7 +313,7 @@ public class RunTracker implements Tracker {
             if (dataStore.coldStartAfterResume()){
                 // This is a potential source location
                 Logger.i(TAG, "Checking for source, accuracy = " + point.getAccuracy());
-                if (point.getAccuracy() < Config.SOURCE_ACCEPTABLE_ACCURACY){
+                if (point.getAccuracy() < ClientConfig.getInstance().SOURCE_ACCEPTABLE_ACCURACY){
                     // Set has source only when it has acceptable accuracy
                     Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
                     DistRecord startRecord = new DistRecord(point);
@@ -348,17 +347,17 @@ public class RunTracker implements Tracker {
                     float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
 
                     // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
-                    if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > USAIN_BOLT_GPS_SPEED_LIMIT){
-                        spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+                    if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
+                        spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
                         thresholdApplied = "in_vehicle";
                     }else {
                         if ( ActivityDetector.getInstance().isOnFoot() ||
-                                (listener.isCountingSteps() && listener.getMovingAverageOfStepsPerSec() >= Config.MIN_CADENCE_FOR_WALK)){
+                                (listener.isCountingSteps() && listener.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
                             // Can make a safe assumption that the person is on foot
-                            spikeFilterSpeedThreshold = Config.SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
+                            spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                             thresholdApplied = "on_foot";
                         }else {
-                            spikeFilterSpeedThreshold = Config.SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
+                            spikeFilterSpeedThreshold = ClientConfig.getInstance().SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
                             thresholdApplied = "default";
                         }
                     }
@@ -383,7 +382,7 @@ public class RunTracker implements Tracker {
                                  Apply formula to check whether to record the point or not
                           */
                         float accuracy = point.getAccuracy();
-                        if (accuracy < Config.THRESHOLD_ACCURACY){
+                        if (accuracy < ClientConfig.getInstance().THRESHOLD_ACCURACY){
                             Logger.d(TAG, "Accuracy Wins");
                             toRecord = true;
                         }else{
@@ -393,7 +392,7 @@ public class RunTracker implements Tracker {
 
                     // Step 4: Record if needed, else wait for next location
                     if (toRecord){
-                        if (dist > DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT){
+                        if (dist > ClientConfig.getInstance().DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT){
                             // If it is making too big a jump in distance then we will not allow, even if the speed is in limit
                             dist = 0;
                         }
@@ -423,10 +422,10 @@ public class RunTracker implements Tracker {
     }
 
     private boolean checkUsingFormula(float dist, float accuracy){
-        float deltaAccuracy = accuracy - (Config.THRESHOLD_ACCURACY - Config.THRESHOLD_ACCURACY_OFFSET);
+        float deltaAccuracy = accuracy - (ClientConfig.getInstance().THRESHOLD_ACCURACY - Config.THRESHOLD_ACCURACY_OFFSET);
         float value = (dist / deltaAccuracy);
         Logger.d(TAG, "Applying formula, dist = " + dist + " accuracy = " + accuracy + " value = " + value);
-        if ( value > Config.THRESHOLD_FACTOR){
+        if ( value > ClientConfig.getInstance().THRESHOLD_FACTOR){
             return true;
         }
         return false;

@@ -19,7 +19,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.Config;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
@@ -28,21 +28,11 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.MainApplication.showRunNotification;
-import static com.sharesmile.share.core.Config.ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
 import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
-import static com.sharesmile.share.core.Config.CONFIDENCE_LOWER_THRESHOLD_STILL;
-import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_ON_FOOT;
-import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_VEHICLE;
-import static com.sharesmile.share.core.Config.CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT;
-import static com.sharesmile.share.core.Config.CONFIDENCE_UPPER_THRESHOLD_STILL;
-import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_ACTIVE;
-import static com.sharesmile.share.core.Config.DETECTED_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
-import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_COUNTER_INTERVAL;
-import static com.sharesmile.share.core.Config.WALK_ENGAGEMENT_NOTIFICATION_INTERVAL;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
@@ -79,7 +69,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private ActivityDetector(Context appContext){
         this.appContext = appContext;
         this.handler = new Handler();
-        this.historyQueue = new CircularQueue<>(ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE);
+        this.historyQueue = new CircularQueue<>(ClientConfig.getInstance().ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE);
         this.isWorkoutActive = WorkoutSingleton.getInstance().isWorkoutActive();
         connectGoogleApiClient();
     }
@@ -140,7 +130,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private void registerForActivityUpdates(){
         Intent intent = new Intent(appContext, ActivityRecognizedService.class);
         PendingIntent pendingIntent = PendingIntent.getService( appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        long detectionIntervalMillis = isWorkoutActive() ? DETECTED_INTERVAL_ACTIVE : DETECTED_INTERVAL_IDLE;
+        long detectionIntervalMillis = isWorkoutActive() ? ClientConfig.getInstance().DETECTED_INTERVAL_ACTIVE : ClientConfig.getInstance().DETECTED_INTERVAL_IDLE;
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, detectionIntervalMillis, pendingIntent );
         if (!isWorkoutActive()){
             startWalkEngagementDetectionCounter();
@@ -188,7 +178,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     public void userDismissedWalkEngagementNotif(){
         // Do not show walk engagement notification until the next 12 hours
         long currentTs = DateUtil.getServerTimeInMillis();
-        long scheduleWalkEngagementAfter = currentTs + Config.WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
+        long scheduleWalkEngagementAfter = currentTs + ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
         SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
         isWalkEngagementNotificationOnDisplay = false;
         AnalyticsEvent.create(Event.DISMISS_WALK_ENGAGEMENT_NOTIF)
@@ -198,7 +188,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private void startWalkEngagementDetectionCounter(){
         handler.removeCallbacks(handleEngagementNotificationRunnable);
         timeOnFootContinuously = 0;
-        handler.postDelayed(handleEngagementNotificationRunnable, WALK_ENGAGEMENT_COUNTER_INTERVAL);
+        handler.postDelayed(handleEngagementNotificationRunnable, ClientConfig.getInstance().WALK_ENGAGEMENT_COUNTER_INTERVAL);
     }
 
     public boolean isWorkoutActive(){
@@ -251,9 +241,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void run() {
             Logger.d(TAG, "handleEngagementNotificationRunnable: run called");
-            if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT){
+            if (onFootConfidenceRecentAvg > ClientConfig.getInstance().CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT){
                 // If on foot currently increase timeOnFootContinuously
-                timeOnFootContinuously += WALK_ENGAGEMENT_COUNTER_INTERVAL;
+                timeOnFootContinuously += ClientConfig.getInstance().WALK_ENGAGEMENT_COUNTER_INTERVAL;
             }else {
                 // If not on foot then reset timeOnFootContinuously to 0
                 timeOnFootContinuously = 0;
@@ -266,7 +256,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     }, REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL);
                 }
             }
-            if (timeOnFootContinuously >= WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
+            if (timeOnFootContinuously >= ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
                 // User has been walking continuously for the past 2 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
                 if (!isWalkEngagementNotificationOnDisplay){
@@ -289,7 +279,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 }
                 timeOnFootContinuously = 0;
             }
-            handler.postDelayed(handleEngagementNotificationRunnable, WALK_ENGAGEMENT_COUNTER_INTERVAL);
+            handler.postDelayed(handleEngagementNotificationRunnable, ClientConfig.getInstance().WALK_ENGAGEMENT_COUNTER_INTERVAL);
         }
     };
 
@@ -320,7 +310,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         if (isWorkoutActive()){
             if (isStill){
                 if (stillNotificationOccurredCounter == 0){
-                    handler.postDelayed(handleStillNotificationRunnable, Config.STILL_NOTIFICATION_DISPLAY_INTERVAL);
+                    handler.postDelayed(handleStillNotificationRunnable, ClientConfig.getInstance().STILL_NOTIFICATION_DISPLAY_INTERVAL);
                     Logger.d(TAG, "Scheduling Still notification.");
                 }
             }else {
@@ -375,14 +365,14 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
                     + avgVehilceConfidence + ", Foot: " + onFootConfidenceRecentAvg + ", Still: " + avgStillConfidence);
 
-            if (avgStillConfidence > CONFIDENCE_UPPER_THRESHOLD_STILL){
+            if (avgStillConfidence > ClientConfig.getInstance().CONFIDENCE_UPPER_THRESHOLD_STILL){
                 isStill = true;
-            }else if (avgStillConfidence < CONFIDENCE_LOWER_THRESHOLD_STILL){
+            }else if (avgStillConfidence < ClientConfig.getInstance().CONFIDENCE_LOWER_THRESHOLD_STILL){
                 isStill = false;
                 stillNotificationOccurredCounter = 0;
             }
 
-            if (avgVehilceConfidence > CONFIDENCE_THRESHOLD_VEHICLE){
+            if (avgVehilceConfidence > ClientConfig.getInstance().CONFIDENCE_THRESHOLD_VEHICLE){
                 isInVehicle = true;
                 isStill = false; // isStill is forced set as false if the user is supposedly in vehicle
                 stillNotificationOccurredCounter = 0;
@@ -390,7 +380,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                 isInVehicle = false;
             }
 
-            if (onFootConfidenceRecentAvg > CONFIDENCE_THRESHOLD_ON_FOOT){
+            if (onFootConfidenceRecentAvg > ClientConfig.getInstance().CONFIDENCE_THRESHOLD_ON_FOOT){
                 isOnFoot = true;
                 isStill = false; // isStill is forced set as false if the user is supposedly on foot
                 stillNotificationOccurredCounter = 0;

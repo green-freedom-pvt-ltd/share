@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.RunPathFragment;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -222,7 +223,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
                 break;
 
             case R.id.bt_edit_config:
-                getFragmentController().replaceFragment(ConfigFragment.newInstance(), true);
+//                getFragmentController().replaceFragment(ConfigFragment.newInstance(), true);
                 break;
 
             case R.id.iv_static_google_map:
@@ -244,11 +245,11 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
             nnfe.printStackTrace();
         }
         sb.append("\nTHRESHOLD_INTERVAL : " + Config.THRESHOLD_INTEVAL + " secs");
-        sb.append("\nTHRESHOLD_ACCURACY : " + Config.THRESHOLD_ACCURACY);
-        sb.append("\nTHRESHOLD_FACTOR : " + Config.THRESHOLD_FACTOR);
-        sb.append("\nVIGILANCE_TIMER_INTERVAL : " + Config.VIGILANCE_TIMER_INTERVAL + " milli secs");
+        sb.append("\nTHRESHOLD_ACCURACY : " + ClientConfig.getInstance().THRESHOLD_ACCURACY);
+        sb.append("\nTHRESHOLD_FACTOR : " + ClientConfig.getInstance().THRESHOLD_FACTOR);
+        sb.append("\nVIGILANCE_TIMER_INTERVAL : " + ClientConfig.getInstance().VIGILANCE_TIMER_INTERVAL + " milli secs");
         sb.append("\nVIGILANCE_START_THRESHOLD : " + (Config.VIGILANCE_START_THRESHOLD / 1000) + " secs");
-        sb.append("\nUSAIN_BOLT_UPPER_SPEED_LIMIT : " + Config.USAIN_BOLT_UPPER_SPEED_LIMIT * 3.6 + " km/hr");
+        sb.append("\nUSAIN_BOLT_UPPER_SPEED_LIMIT : " + ClientConfig.getInstance().USAIN_BOLT_UPPER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nLOWER_SPEED_LIMIT : " + Config.LOWER_SPEED_LIMIT * 3.6 + " km/hr");
         sb.append("\nMIN_STEPS_PER_SECOND_FACTOR : " + Config.MIN_STEPS_PER_SECOND_FACTOR);
         if (workoutData != null) {

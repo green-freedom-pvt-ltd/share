@@ -2,6 +2,7 @@ package com.sharesmile.share.gps;
 
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.Logger;
@@ -9,7 +10,6 @@ import com.sharesmile.share.utils.Utils;
 
 import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT;
 import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT;
-import static com.sharesmile.share.core.Config.USAIN_BOLT_GPS_SPEED_LIMIT;
 
 /**
  * Created by ankitmaheshwari on 6/24/17.
@@ -48,13 +48,13 @@ public class UsainBolt {
         // recentSpeed is avg speed from recent few samples of accepted GPS points in the past 24 secs
         float recentSpeed = workoutService.getCurrentSpeed();
         // If recentSpeed is above USAIN_BOLT_RECENT_SPEED_LOWER_BOUND (14.8 km/hr) then only enter the check for USAIN_BOLT
-        if (recentSpeed > Config.USAIN_BOLT_RECENT_SPEED_LOWER_BOUND){
+        if (recentSpeed > ClientConfig.getInstance().USAIN_BOLT_RECENT_SPEED_LOWER_BOUND){
 
             // recent is avg GPS speed from recent few samples of accepted GPS points in the past 24 secs
             // GPS speed is obtained directly from location object and is calculated using doppler shift
             float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
             // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
-            if (recentGpsSpeed > USAIN_BOLT_GPS_SPEED_LIMIT){
+            if (recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
                 Logger.d(TAG, "Recent GPS speed is greater than threshold, must be Usain Bolt");
                 AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
                         .addBundle(workoutService.getWorkoutBundle())
@@ -130,9 +130,9 @@ public class UsainBolt {
                 // speed limit is greater for ON_FOOT cases to reduces Usain Bolt false positive occurrences
                 float upperSpeedLimit;
                 if (ActivityDetector.getInstance().isOnFoot()){
-                    upperSpeedLimit = Config.USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT; // 45 km/hr
+                    upperSpeedLimit = ClientConfig.getInstance().USAIN_BOLT_UPPER_SPEED_LIMIT_ON_FOOT; // 45 km/hr
                 }else {
-                    upperSpeedLimit = Config.USAIN_BOLT_UPPER_SPEED_LIMIT; // 25.2 km/hr
+                    upperSpeedLimit = ClientConfig.getInstance().USAIN_BOLT_UPPER_SPEED_LIMIT; // 25.2 km/hr
                 }
 
                 // Check if the speed is greater than allowed limit
@@ -145,7 +145,7 @@ public class UsainBolt {
 						 This is done to avoid false USAIN_BOLT cases where the user is actually walking
 						 and speed goes above limit because of GPS spikes
 					 */
-                    if (stepsRatio < Config.USAIN_BOLT_WAIVER_STEPS_RATIO){
+                    if (stepsRatio < ClientConfig.getInstance().USAIN_BOLT_WAIVER_STEPS_RATIO){
                         // Speed more than limit, and insufficient num of steps,
                         // user definitely must be inside a vehicle
                         AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
@@ -162,7 +162,7 @@ public class UsainBolt {
                 lastValidatedDistance = currentDistanceCovered;
                 lastValidatedNumSteps = currentNumSteps;
             }
-            if (speedInSession > Config.USAIN_BOLT_UPPER_SPEED_LIMIT){
+            if (speedInSession > ClientConfig.getInstance().USAIN_BOLT_UPPER_SPEED_LIMIT){
                 // Potential Usain Bolt Which was missed
                 AnalyticsEvent.create(Event.ON_POTENTIAL_USAIN_BOLT_MISSED)
                         .addBundle(workoutService.getWorkoutBundle())

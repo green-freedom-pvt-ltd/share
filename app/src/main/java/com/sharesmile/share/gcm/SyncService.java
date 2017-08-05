@@ -18,6 +18,7 @@ import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.network.NetworkDataProvider;
@@ -52,6 +53,9 @@ import java.util.UUID;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
+
+import static com.sharesmile.share.LeaderBoardDataStore.ALL_TIME_INTERVAL;
+import static com.sharesmile.share.LeaderBoardDataStore.LAST_WEEK_INTERVAL;
 
 /**
  * Created by Shine on 15/05/16.
@@ -104,6 +108,7 @@ public class SyncService extends GcmTaskService {
 
     public static int syncData(){
 
+        ClientConfig.sync();
         syncServerTime();
         uploadUserData();
         syncLeaderBoardData();
@@ -130,14 +135,29 @@ public class SyncService extends GcmTaskService {
         int result = ExpoBackoffTask.RESULT_SUCCESS;
 
         try {
-            Logger.d(TAG, "Will sync GlobalLeaderBoard");
-            LeaderBoardList leaderBoardList = NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(), LeaderBoardList.class);
+            Logger.d(TAG, "Will sync GlobalLeaderBoard Last week data");
+            LeaderBoardList lastWeekList =
+                    NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(LAST_WEEK_INTERVAL), LeaderBoardList.class);
             // Store this in LeaderBoardDataStore
-            LeaderBoardDataStore.getInstance().setGlobalLeaderBoardData(leaderBoardList);
+            LeaderBoardDataStore.getInstance().setGlobalLeaderBoard(LAST_WEEK_INTERVAL, lastWeekList);
             // Notify LeaderBoardFragment about it
-            EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true));
+            EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, LAST_WEEK_INTERVAL));
         } catch (NetworkException e) {
-            Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data from network: " + e);
+            Logger.e(TAG, "Exception occurred while syncing last week's GlobalLeaderBoardData data from network: " + e);
+            e.printStackTrace();
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
+        }
+
+        try {
+            Logger.d(TAG, "Will sync GlobalLeaderBoard all time data");
+            LeaderBoardList lastWeekList =
+                    NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(ALL_TIME_INTERVAL), LeaderBoardList.class);
+            // Store this in LeaderBoardDataStore
+            LeaderBoardDataStore.getInstance().setGlobalLeaderBoard(ALL_TIME_INTERVAL, lastWeekList);
+            // Notify LeaderBoardFragment about it
+            EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, ALL_TIME_INTERVAL));
+        } catch (NetworkException e) {
+            Logger.e(TAG, "Exception occurred while syncing all time's GlobalLeaderBoardData data from network: " + e);
             e.printStackTrace();
             result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }

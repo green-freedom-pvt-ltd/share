@@ -41,16 +41,22 @@ public class LeaderBoardDataStore {
     private static LeaderBoardDataStore uniqueInstance;
 
     private TeamBoard leagueBoard;
-    private LeaderBoardList globalLeaderBoard;
+    private Map<String, LeaderBoardList> globalLeaderBoardMap;
     private TeamLeaderBoard myTeamLeaderBoard;
     private int leagueTeamId;
     private Context context;
 
+    public static final String ALL_TIME_INTERVAL = "all_time";
+    public static final String LAST_WEEK_INTERVAL = "last_7";
+
     private LeaderBoardDataStore(Context appContext){
         this.context = appContext;
         this.leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
-        this.globalLeaderBoard = SharedPrefsManager.getInstance()
-                .getObject(Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA, LeaderBoardList.class);
+        this.globalLeaderBoardMap = new HashMap<>();
+        this.globalLeaderBoardMap.put(LAST_WEEK_INTERVAL, SharedPrefsManager.getInstance()
+                .getObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
+        this.globalLeaderBoardMap.put(ALL_TIME_INTERVAL, SharedPrefsManager.getInstance()
+                .getObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
         this.leagueBoard = SharedPrefsManager.getInstance()
                 .getObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, TeamBoard.class);
         this.myTeamLeaderBoard = SharedPrefsManager.getInstance()
@@ -94,8 +100,12 @@ public class LeaderBoardDataStore {
         return leagueBoard;
     }
 
-    public LeaderBoardList getGlobalLeaderBoard() {
-        return globalLeaderBoard;
+    public LeaderBoardList getGlobalLastWeekLeaderBoard() {
+        return globalLeaderBoardMap.get(LAST_WEEK_INTERVAL);
+    }
+
+    public LeaderBoardList getGlobalAllTimeLeaderBoard() {
+        return globalLeaderBoardMap.get(ALL_TIME_INTERVAL);
     }
 
     public TeamLeaderBoard getMyTeamLeaderBoard() {
@@ -218,15 +228,19 @@ public class LeaderBoardDataStore {
         SharedPrefsManager.getInstance().setObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, leagueBoard);
     }
 
-    public void setGlobalLeaderBoardData(LeaderBoardList globalLeaderBoard){
-        Collections.sort(globalLeaderBoard.getLeaderBoardList(), new Comparator<LeaderBoardData>() {
+    public void setGlobalLeaderBoard(String interval, LeaderBoardList leaderBoardList){
+        Collections.sort(leaderBoardList.getLeaderBoardList(), new Comparator<LeaderBoardData>() {
             @Override
             public int compare(LeaderBoardData o1, LeaderBoardData o2) {
                 return o1.getRank() - o2.getRank();
             }
         });
-        this.globalLeaderBoard = globalLeaderBoard;
-        SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA, globalLeaderBoard);
+        this.globalLeaderBoardMap.put(interval, leaderBoardList);
+        if (LAST_WEEK_INTERVAL.equals(interval)){
+            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, leaderBoardList);
+        }else if (ALL_TIME_INTERVAL.equals(interval)){
+            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, leaderBoardList);
+        }
     }
 
     public void setMyTeamLeaderBoardData(TeamLeaderBoard board){
@@ -252,20 +266,20 @@ public class LeaderBoardDataStore {
         });
     }
 
-    public void updateGlobalLeaderBoardData() {
-        NetworkDataProvider.doGetCallAsync(Urls.getLeaderboardUrl(), new NetworkAsyncCallback<LeaderBoardList>() {
+    public void updateGlobalLeaderBoardData(final String interval) {
+        NetworkDataProvider.doGetCallAsync(Urls.getLeaderboardUrl(interval), new NetworkAsyncCallback<LeaderBoardList>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 Logger.e(TAG, "Couldn't fetch GlobalLeaderBoard data: " + ne);
                 ne.printStackTrace();
-                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(false));
+                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(false, interval));
             }
 
             @Override
             public void onNetworkSuccess(LeaderBoardList list) {
-                Logger.d(TAG, "Successfully fetched LeagueBoardData");
-                setGlobalLeaderBoardData(list);
-                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true));
+                Logger.d(TAG, "Successfully fetched LeaderBoard data for " + interval);
+                setGlobalLeaderBoard(interval, list);
+                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, interval));
             }
         });
     }

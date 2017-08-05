@@ -7,13 +7,18 @@ package com.sharesmile.share.Events;
 public class GlobalLeaderBoardDataUpdated {
 
     private boolean success;
+    private String interval;
 
-    public GlobalLeaderBoardDataUpdated(boolean success){
+    public GlobalLeaderBoardDataUpdated(boolean success, String interval){
         this.success = success;
+        this.interval = interval;
     }
 
     public boolean isSuccess() {
         return success;
     }
 
+    public String getInterval() {
+        return interval;
+    }
 }
