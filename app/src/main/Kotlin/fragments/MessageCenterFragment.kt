@@ -78,7 +78,6 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
     }
 
     override fun onShareMessageClick(message: Message) {
-        progress_bar.visibility = View.VISIBLE
         Utils.shareImageWithMessage(context, message.message_image, message.shareTemplate)
     }
 
