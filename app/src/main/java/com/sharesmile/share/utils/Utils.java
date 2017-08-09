@@ -44,6 +44,9 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.Run;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -314,18 +317,53 @@ public class Utils {
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
         shareIntent.setType("text/plain");
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_via)));
+    }
+
+    public static void share(Context context, Uri bitmapUri, String shareTemplate) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
+        shareIntent.setType("image/*");
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, "send"));
     }
 
-    public static void share(Context context, Uri uri, String shareTemplate) {
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.setType("image/*");
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, "send"));
+    public static void shareImageWithMessage(final Context context, final String imageUrl, final String message){
+        ShareImageLoader.getInstance().getImageLoader().load(imageUrl)
+                .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), message);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Logger.d(TAG, "shareImageWithMessage: Image could not be loaded from disk or memory, will try from network");
+                Picasso.with(context).load(imageUrl).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), message);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        Utils.share(context, null, message);
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
     }
 
 
@@ -847,5 +885,7 @@ public class Utils {
             return Character.toUpperCase(first) + s.substring(1);
         }
     }
+
+
 
 }

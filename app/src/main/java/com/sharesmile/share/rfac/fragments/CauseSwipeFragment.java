@@ -51,6 +51,12 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     @BindView(R.id.card_view)
     CardView mCardView;
 
+    @BindView(R.id.iv_cause_completed)
+    ImageView causeCompletedImage;
+
+    @BindView(R.id.card_container)
+    View cardContainer;
+
     @BindView(R.id.amount_raised_rupees)
     TextView amountRaisedRupees;
 
@@ -86,7 +92,12 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         View view = inflater.inflate(
                 R.layout.swipe_layout, container, false);
         ButterKnife.bind(this, view);
-        init();
+        if (cause.isCompleted()){
+            renderCauseCompletedImage();
+        }else {
+            renderCardContainer();
+        }
+        renderCardContainer();
         return view;
     }
 
@@ -96,8 +107,15 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onStart");
     }
 
-    private void init() {
-        Logger.d(TAG, "init with cause: " + cause.getTitle() +", and amount raised: " + cause.getAmountRaised());
+    private void renderCauseCompletedImage(){
+        cardContainer.setVisibility(View.GONE);
+        ShareImageLoader.getInstance().loadImage(cause.getCauseCompletedImage(), causeCompletedImage,
+                ContextCompat.getDrawable(getContext(), R.drawable.placeholder_thankyou_image));
+        causeCompletedImage.setVisibility(View.VISIBLE);
+    }
+
+    private void renderCardContainer() {
+        causeCompletedImage.setVisibility(View.GONE);
         mDescription.setText(cause.getDetailText());
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());
@@ -129,6 +147,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         //load image
         ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,
                 ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
+        cardContainer.setVisibility(View.VISIBLE);
     }
 
     @Override

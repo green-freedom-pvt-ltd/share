@@ -40,6 +40,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_AMOUNT;
+import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_DISTANCE;
+import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_FIRST_NAME;
+import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_PARTNER;
+import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_SPONSOR;
+
 /**
  * Created by Shine on 8/5/2016.
  */
@@ -153,7 +159,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
 
-//        mCauseData = MainApplication.getInstance().getActiveCauses().get(2);
+//        mCauseData = MainApplication.getInstance().getCausesToShow().get(2);
 //        mWorkoutData = WorkoutDataImpl.getDummyWorkoutData();
 
         mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
@@ -392,79 +398,6 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         alertDialog.show();
     }
-
-
-    /*
-
-    private void shareOnGooglePlus() {
-        Intent shareIntent = new PlusShare.Builder(getActivity())
-                .setType("text/plain")
-                .setText(getShareMsg())
-                .getIntent();
-        startActivityForResult(shareIntent, REQUEST_SHARE);
-    }
-
-    private void shareOnWhatsApp() {
-
-        try {
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, getShareMsg());
-            sendIntent.setType("text/plain");
-            sendIntent.setPackage("com.whatsapp");
-            startActivityForResult(sendIntent, REQUEST_SHARE);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(getContext(), "Whats app not installed ", Toast.LENGTH_LONG).show();
-        }
-
-    }
-
-    private void shareOnTwitter() {
-
-        TweetComposer.Builder builder = new TweetComposer.Builder(getActivity())
-                .text(getShareMsg());
-        startActivityForResult(builder.createIntent(), REQUEST_SHARE);
-        //  builder.show();
-    }
-
-    private void shareOnFb() {
-
-        FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
-        ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentUrl(Uri.parse(getString(R.string.url_play_store_with_utm)))
-                .setContentTitle(getString(R.string.app_name))
-                .setContentDescription(getShareMsg())
-                .setImageUrl(Uri.parse(mCauseData.getCauseThankYouImage()))
-                .build();
-
-
-        ShareDialog shareDialog = new ShareDialog(this);
-        shareDialog.registerCallback(new CallbackManagerImpl(), new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-                //Toast.makeText(getActivity(),"Success",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel() {
-                //  Toast.makeText(getActivity(),"Failed",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-
-            }
-        }, REQUEST_SHARE);
-        shareDialog.show(content);
-    }
-
-    */
-
-    private String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
-    private String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
-    private String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
-    private String SHARE_PLACEHOLDER_SPONSOR = "<sponsor_company>";
-    private String SHARE_PLACEHOLDER_PARTNER = "<partner_ngo>";
 
     /*
     *

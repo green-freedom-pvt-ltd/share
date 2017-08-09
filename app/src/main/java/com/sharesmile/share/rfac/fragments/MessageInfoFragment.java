@@ -1,7 +1,5 @@
 package com.sharesmile.share.rfac.fragments;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -19,8 +17,6 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -99,23 +95,7 @@ public class MessageInfoFragment extends BaseFragment implements View.OnClickLis
     }
 
     private void onShareMessageClick(final Message message) {
-        Picasso.with(getContext()).load(message.getMessage_image()).into(new Target() {
-
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()), message.getShareTemplate());
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Utils.share(getContext(), null, message.getShareTemplate());
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-
-        });
+        Utils.shareImageWithMessage(getContext(), message.getMessage_image(), message.getShareTemplate());
     }
 
 }

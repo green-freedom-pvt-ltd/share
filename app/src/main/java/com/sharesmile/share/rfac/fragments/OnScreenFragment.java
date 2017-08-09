@@ -34,6 +34,7 @@ import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLButton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,7 +48,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class OnScreenFragment extends BaseFragment implements View.OnClickListener {
+public class OnScreenFragment extends BaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private static final String TAG = OnScreenFragment.class.getSimpleName();
     @BindView(R.id.viewpager)
@@ -81,6 +82,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         mRunButton.setOnClickListener(this);
         getFragmentController().updateToolBar(getString(R.string.impactrun), false);
         viewPager.setClipToPadding(false);
+        viewPager.addOnPageChangeListener(this);
         viewPager.setPageTransformer(false, new ViewPagerTransformer());
         viewPager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.view_pager_page_margin));
         viewPager.setPadding(getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_left), 0, getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_right), 0);
@@ -125,11 +127,11 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
     private void fetchPageData() {
         Logger.d(TAG, "fetchPageData");
-        if (MainApplication.getInstance().getActiveCauses().isEmpty()){
+        if (MainApplication.getInstance().getCausesToShow().isEmpty()){
             showProgressDialog();
             EventBus.getDefault().post(new TriggerCauseDataSync());
         }else {
-            setCausedata(MainApplication.getInstance().getActiveCauses());
+            setCausedata(MainApplication.getInstance().getCausesToShow());
         }
     }
 
@@ -158,11 +160,17 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.btn_lets_run:
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
-                getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
-                AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
-                        .addBundle(causeData.getCauseBundle())
-                        .put("cause_index", viewPager.getCurrentItem())
-                        .buildAndDispatch();
+                if (causeData.isCompleted()){
+                    Utils.shareImageWithMessage(getContext(), causeData.getCauseCompletedImage(),
+                            causeData.getCauseShareMessageTemplate());
+                }else {
+                    // If it is not completed then it must be an active on going cause
+                    getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
+                    AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
+                            .addBundle(causeData.getCauseBundle())
+                            .put("cause_index", viewPager.getCurrentItem())
+                            .buildAndDispatch();
+                }
                 break;
 
             case R.id.badge_layout:
@@ -177,7 +185,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
         Logger.d(TAG, "onEvent: CauseDataUpdated");
         if (isAdded()){
-            setCausedata(MainApplication.getInstance().getActiveCauses());
+            setCausedata(MainApplication.getInstance().getCausesToShow());
         }
     }
 
@@ -185,6 +193,26 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
     public void onEvent(TriggerCauseDataSync triggerSync) {
         Logger.d(TAG, "onEvent: triggerSync");
         SyncService.updateCauseData();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        CauseData causeData = mAdapter.getItemAtPosition(position);
+        if (causeData.isCompleted()){
+            mRunButton.setText(getString(R.string.tell_your_friends));
+        }else {
+            mRunButton.setText(getString(R.string.let_go));
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 
     private static class TriggerCauseDataSync {

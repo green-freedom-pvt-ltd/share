@@ -171,6 +171,12 @@ public class Constants {
 
     public static final String PREF_CLIENT_CONFIG = "pref_client_config";
 
+    public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
+    public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
+    public static String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
+    public static String SHARE_PLACEHOLDER_SPONSOR = "<sponsor_company>";
+    public static String SHARE_PLACEHOLDER_PARTNER = "<partner_ngo>";
+
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));
         add(new LatLng(19.118485, 72.913496));

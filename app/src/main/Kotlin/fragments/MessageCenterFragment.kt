@@ -3,8 +3,6 @@ package fragments
 import activities.MessageVideoActivity
 import adapters.MessageCenterAdapter
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
@@ -23,8 +21,6 @@ import com.sharesmile.share.rfac.fragments.MessageInfoFragment
 import com.sharesmile.share.sync.SyncHelper
 import com.sharesmile.share.utils.SharedPrefsManager
 import com.sharesmile.share.utils.Utils
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_message_center.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -83,20 +79,7 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
 
     override fun onShareMessageClick(message: Message) {
         progress_bar.visibility = View.VISIBLE
-        Picasso.with(context).load(message.message_image).into(object : Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                progress_bar.visibility = View.GONE
-
-                Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), message.shareTemplate);
-            }
-
-            override fun onBitmapFailed(errorDrawable: Drawable?) {
-                Utils.share(context, null, message.shareTemplate);
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-            }
-        })
+        Utils.shareImageWithMessage(context, message.message_image, message.shareTemplate)
     }
 
     override fun onMessageCardClick(message: Message) {

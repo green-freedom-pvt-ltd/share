@@ -372,11 +372,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void share() {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_msg));
-        startActivity(Intent.createChooser(intent, "Share via"));
+        Utils.share(this, getString(R.string.share_msg));
     }
 
     public void showHome() {

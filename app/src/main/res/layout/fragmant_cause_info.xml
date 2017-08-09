@@ -10,7 +10,7 @@
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:background="@color/pale_magenta"
-        android:text="Begin Run"
+        android:text="@string/rfac_begin_run"
         android:textAllCaps="true"
         android:textColor="@color/white" />
 

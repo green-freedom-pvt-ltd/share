@@ -367,11 +367,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return causeList;
     }
 
-    public List<CauseData> getActiveCauses(){
+    public List<CauseData> getCausesToShow(){
         List<CauseData> activeCauses = new ArrayList<CauseData>();
         if (causeList != null){
             for (CauseData causeData : causeList.getCauses()) {
                 if (causeData.isActive()) {
+                    activeCauses.add(causeData);
+                }else if (causeData.isCompleted()){
                     activeCauses.add(causeData);
                 }
             }

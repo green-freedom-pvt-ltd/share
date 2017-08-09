@@ -41,7 +41,7 @@ public class ShareImageLoader {
     private static ShareImageLoader instance;
 
     private ShareImageLoader() {
-        picasso = getImageLoader();
+        picasso = constructImageLoader();
     }
 
     public static synchronized ShareImageLoader getInstance() {
@@ -60,7 +60,7 @@ public class ShareImageLoader {
         return cache;
     }
 
-    private Picasso getImageLoader() {
+    private Picasso constructImageLoader() {
 
         OkHttpClient httpClient = HttpClientManager.getDefaultHttpClient();
 
@@ -268,6 +268,10 @@ public class ShareImageLoader {
         // handle low memory
         Logger.d(TAG,"HANDLING LOW MEMORY");
         System.gc();
+    }
+
+    public Picasso getImageLoader(){
+        return picasso;
     }
 
 }

@@ -22,6 +22,7 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
 import com.sharesmile.share.views.MRTextView;
 
@@ -98,21 +99,13 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
 
     private void init() {
 
-
         mRunButton.setOnClickListener(this);
+        String description = cause.isCompleted() ? cause.getCauseCompletedReport() : cause.getCauseDescription();
+        mDescription.setText(description);
 
-//        mRunButton.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                Logger.d(TAG, "onClick of Begin Run, will start Tracker Activity flow");
-//                getFragmentController().performOperation(IFragmentController.START_RUN_TEST, cause);
-//                return true;
-//            }
-//        });
-
-        mDescription.setText(cause.getCauseDescription());
         mTitle.setText(cause.getTitle());
         mCategory.setText(cause.getCategory());
+
         if (cause.getExecutor() != null) {
             if (cause.getExecutor().getType().equalsIgnoreCase("ngo")) {
                 mSponsor.setText("with " + cause.getExecutor().getPartnerNgo());
@@ -121,14 +114,22 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
             }
         }
 
-        ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,
+        String imageUrl = cause.isCompleted() ? cause.getCauseCompletedDescriptionImage() : cause.getImageUrl();
+        ShareImageLoader.getInstance().loadImage(imageUrl, mCauseImage,
                 ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
+
+        if (cause.isCompleted()){
+            mRunButton.setText(getString(R.string.tell_your_friends));
+        }else {
+            mRunButton.setText(getString(R.string.rfac_begin_run));
+        }
 
         updateActionbar();
     }
 
     private void updateActionbar() {
-        getFragmentController().updateToolBar(getString(R.string.overview), true);
+        String toolbarTitle = cause.isCompleted() ? getString(R.string.thank_you) : getString(R.string.overview);
+        getFragmentController().updateToolBar(toolbarTitle, true);
     }
 
 
@@ -136,10 +137,15 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.begin_run:
-                getFragmentController().performOperation(IFragmentController.START_RUN, cause);
-                AnalyticsEvent.create(Event.ON_CLICK_BEGIN_RUN)
-                        .addBundle(cause.getCauseBundle())
-                        .buildAndDispatch();
+                if (cause.isCompleted()){
+                    Utils.shareImageWithMessage(getContext(), cause.getCauseCompletedImage(),
+                            cause.getCauseShareMessageTemplate());
+                }else {
+                    getFragmentController().performOperation(IFragmentController.START_RUN, cause);
+                    AnalyticsEvent.create(Event.ON_CLICK_BEGIN_RUN)
+                            .addBundle(cause.getCauseBundle())
+                            .buildAndDispatch();
+                }
                 break;
             case R.id.badge_layout:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
@@ -147,6 +153,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
             default:
         }
     }
+
 
 
 }

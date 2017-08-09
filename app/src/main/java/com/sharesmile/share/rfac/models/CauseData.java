@@ -64,6 +64,21 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("total_runs")
     private int totalRuns;
 
+    @SerializedName("is_completed")
+    private boolean isCompleted;
+
+    @SerializedName("cause_completed_image")
+    private String causeCompletedImage;
+
+    @SerializedName("cause_completed_description_image")
+    private String causeCompletedDescriptionImage;
+
+    @SerializedName("cause_completed_share_message_template")
+    private String causeCompletedShareMessageTemplate;
+
+    @SerializedName("cause_completed_report")
+    private String causeCompletedReport;
+
     @SerializedName("cause_thank_you_image_v2")
     private List<CauseImageData> causeImageDataList;
 
@@ -203,6 +218,46 @@ public class CauseData implements UnObfuscable, Serializable {
 
     public void setTotalRuns(int totalRuns) {
         this.totalRuns = totalRuns;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
+    }
+
+    public String getCauseCompletedImage() {
+        return causeCompletedImage;
+    }
+
+    public void setCauseCompletedImage(String causeCompletedImage) {
+        this.causeCompletedImage = causeCompletedImage;
+    }
+
+    public String getCauseCompletedDescriptionImage() {
+        return causeCompletedDescriptionImage;
+    }
+
+    public void setCauseCompletedDescriptionImage(String causeCompletedDescriptionImage) {
+        this.causeCompletedDescriptionImage = causeCompletedDescriptionImage;
+    }
+
+    public String getCauseCompletedShareMessageTemplate() {
+        return causeCompletedShareMessageTemplate;
+    }
+
+    public void setCauseCompletedShareMessageTemplate(String causeCompletedShareMessageTemplate) {
+        this.causeCompletedShareMessageTemplate = causeCompletedShareMessageTemplate;
+    }
+
+    public String getCauseCompletedReport() {
+        return causeCompletedReport;
+    }
+
+    public void setCauseCompletedReport(String causeCompletedReport) {
+        this.causeCompletedReport = causeCompletedReport;
     }
 
     public List<CauseImageData> getCauseImageDataList() {
