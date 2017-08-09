@@ -162,7 +162,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
                 if (causeData.isCompleted()){
                     Utils.shareImageWithMessage(getContext(), causeData.getCauseCompletedImage(),
-                            causeData.getCauseShareMessageTemplate());
+                            causeData.getCauseCompletedShareMessageTemplate());
                 }else {
                     // If it is not completed then it must be an active on going cause
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);

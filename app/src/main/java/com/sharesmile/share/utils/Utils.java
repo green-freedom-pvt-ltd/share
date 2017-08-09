@@ -330,12 +330,12 @@ public class Utils {
         context.startActivity(Intent.createChooser(shareIntent, "send"));
     }
 
-    public static void shareImageWithMessage(final Context context, final String imageUrl, final String message){
+    public static void shareImageWithMessage(final Context context, final String imageUrl, final String shareMessage){
         ShareImageLoader.getInstance().getImageLoader().load(imageUrl)
                 .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), message);
+                Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), shareMessage);
             }
 
             @Override
@@ -344,12 +344,12 @@ public class Utils {
                 Picasso.with(context).load(imageUrl).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), message);
+                        Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), shareMessage);
                     }
 
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
-                        Utils.share(context, null, message);
+                        Utils.share(context, null, shareMessage);
                     }
 
                     @Override

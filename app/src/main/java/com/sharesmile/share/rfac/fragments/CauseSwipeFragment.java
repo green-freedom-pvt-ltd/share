@@ -97,7 +97,6 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         }else {
             renderCardContainer();
         }
-        renderCardContainer();
         return view;
     }
 
@@ -111,6 +110,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         cardContainer.setVisibility(View.GONE);
         ShareImageLoader.getInstance().loadImage(cause.getCauseCompletedImage(), causeCompletedImage,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_thankyou_image));
+        causeCompletedImage.setOnClickListener(this);
         causeCompletedImage.setVisibility(View.VISIBLE);
     }
 
@@ -154,6 +154,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.card_view:
+            case R.id.iv_cause_completed:
                 showCauseInfoFragment();
                 AnalyticsEvent.create(Event.ON_CLICK_CAUSE_CARD)
                         .put("cause_title", cause.getTitle())

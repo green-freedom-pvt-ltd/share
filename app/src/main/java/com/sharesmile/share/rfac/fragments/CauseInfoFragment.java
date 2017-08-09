@@ -139,7 +139,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
             case R.id.begin_run:
                 if (cause.isCompleted()){
                     Utils.shareImageWithMessage(getContext(), cause.getCauseCompletedImage(),
-                            cause.getCauseShareMessageTemplate());
+                            cause.getCauseCompletedShareMessageTemplate());
                 }else {
                     getFragmentController().performOperation(IFragmentController.START_RUN, cause);
                     AnalyticsEvent.create(Event.ON_CLICK_BEGIN_RUN)

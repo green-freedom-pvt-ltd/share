@@ -248,8 +248,7 @@ public class RealRunFragment extends RunFragment {
 
 
     private String getImpactInRupees(float distanceCovered){
-        String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCovered);
-        int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
+        int rupees = (int) Math.floor(getConversionFactor() * (distanceCovered / 1000));
         return String.valueOf(rupees);
     }
 

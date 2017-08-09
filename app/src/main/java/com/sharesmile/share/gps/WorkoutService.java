@@ -903,9 +903,7 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
-        String distDecimal = Utils.formatToKmsWithTwoDecimal(getTotalDistanceCoveredInMeters());
-        float fDistance = Float.parseFloat(distDecimal);
-        int rupees = (int) Math.floor(mCauseData.getConversionRate() * fDistance);
+        int rupees = (int) Math.floor(mCauseData.getConversionRate() * (getTotalDistanceCoveredInMeters() / 1000));
 
         String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeDrawable;
