@@ -162,6 +162,14 @@ public class WorkoutService extends Service implements
             Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
+                    .addBundle(result.getWorkoutBundle())
+                    .put("cause_id", mCauseData.getId())
+                    .put("cause_title", mCauseData.getTitle())
+                    .put("num_spikes", result.getNumGpsSpikes())
+                    .put("bolt_count", result.getUsainBoltCount())
+                    .put("num_update_events", result.getNumUpdateEvents())
+                    .buildAndDispatch();
         }
         stopTimer();
     }
@@ -246,12 +254,15 @@ public class WorkoutService extends Service implements
         if (currentlyTracking) {
             handler.removeCallbacks(handleGpsInactivityRunnable);
 
-            AnalyticsEvent.create(Event.ON_WORKOUT_END)
-                    .addBundle(getWorkoutBundle())
-                    .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
-                    .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
-                    .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
-                    .buildAndDispatch();
+            if (WorkoutSingleton.getInstance().getDataStore() != null){
+                AnalyticsEvent.create(Event.ON_WORKOUT_END)
+                        .addBundle(getWorkoutBundle())
+                        .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                        .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
+                        .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                        .buildAndDispatch();
+            }
+
 
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);

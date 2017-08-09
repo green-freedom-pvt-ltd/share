@@ -100,6 +100,8 @@ public class RealRunFragment extends RunFragment {
             caloriesContainer.setVisibility(View.GONE);
             distanceContainer.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) distanceContainer.getLayoutParams();
+            LinearLayout.LayoutParams timerParams = (LinearLayout.LayoutParams) timerContainer.getLayoutParams();
+            params.topMargin = timerParams.topMargin;
             params.weight = 4;
             distanceContainer.setLayoutParams(params);
         }else {
@@ -107,7 +109,8 @@ public class RealRunFragment extends RunFragment {
             caloriesContainer.setVisibility(View.VISIBLE);
             distanceContainer.setGravity(Gravity.LEFT);
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) distanceContainer.getLayoutParams();
-            params.weight = 3;
+            params.topMargin = 0;
+            params.weight = 3.2f;
             distanceContainer.setLayoutParams(params);
         }
 

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -475,7 +476,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     private String replacePlaceHolders(String msg){
         if (msg.contains(SHARE_PLACEHOLDER_FIRST_NAME)){
-            if (MainApplication.isLogin()){
+            if (MainApplication.isLogin() && !TextUtils.isEmpty(MainApplication.getInstance().getUserDetails().getFirstName())){
                 msg = msg.replaceAll(SHARE_PLACEHOLDER_FIRST_NAME,
                         MainApplication.getInstance().getUserDetails().getFirstName());
             }else {

@@ -24,8 +24,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.gson.Gson;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
@@ -385,15 +383,9 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
-                        runFragment.onWorkoutResult(result);
-                        AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
-                                .addBundle(result.getWorkoutBundle())
-                                .put("cause_id", mCauseData.getId())
-                                .put("cause_title", mCauseData.getTitle())
-                                .put("num_spikes", result.getNumGpsSpikes())
-                                .put("bolt_count", result.getUsainBoltCount())
-                                .put("num_update_events", result.getNumUpdateEvents())
-                                .buildAndDispatch();
+                        if (runFragment != null) {
+                            runFragment.onWorkoutResult(result);
+                        }
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:

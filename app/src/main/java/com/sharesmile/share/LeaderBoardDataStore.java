@@ -22,14 +22,22 @@ import com.sharesmile.share.utils.Urls;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * Created by ankitmaheshwari on 5/12/17.
@@ -50,6 +58,12 @@ public class LeaderBoardDataStore {
     public static final String ALL_TIME_INTERVAL = "all_time";
     public static final String LAST_WEEK_INTERVAL = "last_7";
     public static final String LAST_MONTH_INTERVAL = "last_30";
+
+    public static final List<String> ALL_INTERVALS = new ArrayList<String>(){{
+        add(LAST_WEEK_INTERVAL);
+        add(LAST_MONTH_INTERVAL);
+        add(ALL_TIME_INTERVAL);
+    }};
 
     private LeaderBoardDataStore(Context appContext){
         this.context = appContext;
@@ -239,7 +253,21 @@ public class LeaderBoardDataStore {
     }
 
     public void setGlobalLeaderBoard(String interval, LeaderBoardList leaderBoardList){
-        Collections.sort(leaderBoardList.getLeaderBoardList(), new Comparator<LeaderBoardData>() {
+        List<LeaderBoardData> list = leaderBoardList.getLeaderBoardList();
+
+        Set<Integer> rankSet = new HashSet<>();
+        Iterator<LeaderBoardData> iterator = list.iterator();
+        while (iterator.hasNext()){
+            LeaderBoardData data = iterator.next();
+            Integer rank = data.getRank();
+            if (rankSet.contains(rank)){
+                iterator.remove();
+            }else {
+                rankSet.add(rank);
+            }
+        }
+
+        Collections.sort(list, new Comparator<LeaderBoardData>() {
             @Override
             public int compare(LeaderBoardData o1, LeaderBoardData o2) {
                 return o1.getRank() - o2.getRank();
@@ -249,13 +277,6 @@ public class LeaderBoardDataStore {
         SharedPrefsManager.getInstance().setCollection(Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA,
                 globalLeaderBoardMap);
 
-//        if (LAST_WEEK_INTERVAL.equals(interval)){
-//            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, leaderBoardList);
-//        }else if (ALL_TIME_INTERVAL.equals(interval)){
-//            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, leaderBoardList);
-//        }else if (LAST_MONTH_INTERVAL.equals(interval)){
-//            SharedPrefsManager.getInstance().setObject(Constants.PREF_GLOBAL_LAST_MONTH_LEADERBOARD_CACHED_DATA, leaderBoardList);
-//        }
     }
 
     public void setMyTeamLeaderBoardData(TeamLeaderBoard board){

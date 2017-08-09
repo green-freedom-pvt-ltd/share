@@ -54,8 +54,7 @@ import java.util.UUID;
 import Models.TeamBoard;
 import Models.TeamLeaderBoard;
 
-import static com.sharesmile.share.LeaderBoardDataStore.ALL_TIME_INTERVAL;
-import static com.sharesmile.share.LeaderBoardDataStore.LAST_WEEK_INTERVAL;
+import static com.sharesmile.share.LeaderBoardDataStore.ALL_INTERVALS;
 
 /**
  * Created by Shine on 15/05/16.
@@ -134,32 +133,21 @@ public class SyncService extends GcmTaskService {
 
         int result = ExpoBackoffTask.RESULT_SUCCESS;
 
-        try {
-            Logger.d(TAG, "Will sync GlobalLeaderBoard Last week data");
-            LeaderBoardList lastWeekList =
-                    NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(LAST_WEEK_INTERVAL), LeaderBoardList.class);
-            // Store this in LeaderBoardDataStore
-            LeaderBoardDataStore.getInstance().setGlobalLeaderBoard(LAST_WEEK_INTERVAL, lastWeekList);
-            // Notify LeaderBoardFragment about it
-            EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, LAST_WEEK_INTERVAL));
-        } catch (NetworkException e) {
-            Logger.e(TAG, "Exception occurred while syncing last week's GlobalLeaderBoardData data from network: " + e);
-            e.printStackTrace();
-            result = ExpoBackoffTask.RESULT_RESCHEDULE;
-        }
-
-        try {
-            Logger.d(TAG, "Will sync GlobalLeaderBoard all time data");
-            LeaderBoardList lastWeekList =
-                    NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(ALL_TIME_INTERVAL), LeaderBoardList.class);
-            // Store this in LeaderBoardDataStore
-            LeaderBoardDataStore.getInstance().setGlobalLeaderBoard(ALL_TIME_INTERVAL, lastWeekList);
-            // Notify LeaderBoardFragment about it
-            EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, ALL_TIME_INTERVAL));
-        } catch (NetworkException e) {
-            Logger.e(TAG, "Exception occurred while syncing all time's GlobalLeaderBoardData data from network: " + e);
-            e.printStackTrace();
-            result = ExpoBackoffTask.RESULT_RESCHEDULE;
+        for (String interval : ALL_INTERVALS){
+            try {
+                Logger.d(TAG, "Will sync GlobalLeaderBoard, interval: " + interval);
+                LeaderBoardList list =
+                        NetworkDataProvider.doGetCall(Urls.getLeaderboardUrl(interval), LeaderBoardList.class);
+                // Store this in LeaderBoardDataStore
+                LeaderBoardDataStore.getInstance().setGlobalLeaderBoard(interval, list);
+                // Notify LeaderBoardFragment about it
+                EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, interval));
+            } catch (NetworkException e) {
+                Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data ("
+                        +interval+") from network: " + e);
+                e.printStackTrace();
+                result = ExpoBackoffTask.RESULT_RESCHEDULE;
+            }
         }
 
         if (LeaderBoardDataStore.getInstance().toSyncLeaugeData()){
@@ -272,8 +260,8 @@ public class SyncService extends GcmTaskService {
                     // Generating new client_run_id and scheduling the run for sync
                     workout.setWorkoutId(UUID.randomUUID().toString());
                     workout.setIs_sync(false);
-                    mWorkoutDao.insertOrReplace(workout);
                 }
+                mWorkoutDao.insertOrReplace(workout);
             }
 
             // Update User's track record
@@ -471,55 +459,53 @@ public class SyncService extends GcmTaskService {
                 isUpdateRequest = false;
             }
 
-
-            jsonObject.put("user_id", user_id);
-            jsonObject.put("cause_run_title", workout.getCauseBrief());
-            jsonObject.put("distance", workout.getDistance());
-
-            if (workout.getBeginTimeStamp() != null){
-                jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
-                jsonObject.put("start_time_epoch", workout.getBeginTimeStamp());
-            }else if (workout.getDate() != null){
-                jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
-                jsonObject.put("start_time_epoch", workout.getDate().getTime());
-            }
-
-            if (workout.getEndTimeStamp() != null){
-                jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
-                jsonObject.put("end_time_epoch", workout.getEndTimeStamp());
-            }
-            jsonObject.put("run_amount", workout.getRunAmount());
-            jsonObject.put("run_duration", workout.getElapsedTime());
-            jsonObject.put("run_duration_epoch", Utils.hhmmssToSecs(workout.getElapsedTime()));
-            jsonObject.put("no_of_steps", workout.getSteps());
-            jsonObject.put("avg_speed", workout.getAvgSpeed());
-            jsonObject.put("client_run_id", workout.getWorkoutId());
-            jsonObject.put("start_location_lat", workout.getStartPointLatitude());
-            jsonObject.put("start_location_long", workout.getStartPointLongitude());
-            jsonObject.put("end_location_lat", workout.getEndPointLatitude());
-            jsonObject.put("end_location_long", workout.getEndPointLongitude());
-            jsonObject.put("version", workout.getVersion());
-            jsonObject.put("calories_burnt", workout.getCalories() == null ? 0 : workout.getCalories());
-            if (workout.getTeamId() != null && workout.getTeamId() > 0){
-                jsonObject.put("team_id", workout.getTeamId());
-            }
-            jsonObject.put("num_spikes", workout.getNumSpikes());
-            jsonObject.put("num_updates", workout.getNumUpdates());
-            jsonObject.put("app_version", workout.getAppVersion());
-            jsonObject.put("os_version", workout.getOsVersion());
-            jsonObject.put("device_id", workout.getDeviceId());
-            jsonObject.put("device_name", workout.getDeviceName());
-
-            Logger.d(TAG, "Will upload run: "+jsonObject.toString());
-
-
             Run response;
             if (isUpdateRequest){
-                // Need to make PUT request at update endpoint
+                // Need to make PUT request with just client_run_id in post data
+                jsonObject.put("client_run_id", workout.getWorkoutId());
                 String updateUrl = Urls.getUpdateRunUrl() + workout.getId() + "/";
                 response = NetworkDataProvider.doPutCall(updateUrl, jsonObject, Run.class);
             }else {
                 // Need to make POST request to create a new Run
+                jsonObject.put("user_id", user_id);
+                jsonObject.put("cause_run_title", workout.getCauseBrief());
+                jsonObject.put("distance", workout.getDistance());
+
+                if (workout.getBeginTimeStamp() != null){
+                    jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+                    jsonObject.put("start_time_epoch", workout.getBeginTimeStamp());
+                }else if (workout.getDate() != null){
+                    jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
+                    jsonObject.put("start_time_epoch", workout.getDate().getTime());
+                }
+
+                if (workout.getEndTimeStamp() != null){
+                    jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
+                    jsonObject.put("end_time_epoch", workout.getEndTimeStamp());
+                }
+                jsonObject.put("run_amount", workout.getRunAmount());
+                jsonObject.put("run_duration", workout.getElapsedTime());
+                jsonObject.put("run_duration_epoch", Utils.hhmmssToSecs(workout.getElapsedTime()));
+                jsonObject.put("no_of_steps", workout.getSteps());
+                jsonObject.put("avg_speed", workout.getAvgSpeed());
+                jsonObject.put("client_run_id", workout.getWorkoutId());
+                jsonObject.put("start_location_lat", workout.getStartPointLatitude());
+                jsonObject.put("start_location_long", workout.getStartPointLongitude());
+                jsonObject.put("end_location_lat", workout.getEndPointLatitude());
+                jsonObject.put("end_location_long", workout.getEndPointLongitude());
+                jsonObject.put("version", workout.getVersion());
+                jsonObject.put("calories_burnt", workout.getCalories() == null ? 0 : workout.getCalories());
+                if (workout.getTeamId() != null && workout.getTeamId() > 0){
+                    jsonObject.put("team_id", workout.getTeamId());
+                }
+                jsonObject.put("num_spikes", workout.getNumSpikes());
+                jsonObject.put("num_updates", workout.getNumUpdates());
+                jsonObject.put("app_version", workout.getAppVersion());
+                jsonObject.put("os_version", workout.getOsVersion());
+                jsonObject.put("device_id", workout.getDeviceId());
+                jsonObject.put("device_name", workout.getDeviceName());
+
+                Logger.d(TAG, "Will upload run: "+jsonObject.toString());
                 response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
             }
 
@@ -617,7 +603,23 @@ public class SyncService extends GcmTaskService {
             Gson gson = new Gson();
             Logger.d(TAG, "Updating these runs in DB " + gson.toJson(runList));
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            mWorkoutDao.insertOrReplaceInTx(runList);
+
+            Iterator<Workout> iterator = runList.iterator();
+            while (iterator.hasNext()){
+                Workout workout = iterator.next();
+                if (TextUtils.isEmpty(workout.getWorkoutId())){
+                    // Generating new client_run_id and scheduling the run for sync
+                    workout.setWorkoutId(UUID.randomUUID().toString());
+                    workout.setIs_sync(false);
+                    if (workout.getVersion() == 0){
+                        // Setting dummy version just make sure that this record is updated using PUT request
+                        workout.setVersion(1L);
+                    }
+                }
+//                Logger.d(TAG, "Will insert: " + gson.toJson(workout));
+                mWorkoutDao.insertOrReplace(workout);
+            }
+
             if (!TextUtils.isEmpty(runList.getNextUrl())) {
                 // Recursive call to fetch the runs of next page
                 return forceRefreshAllWorkoutData(runList.getNextUrl());
@@ -634,7 +636,7 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "NetworkException in forceRefreshAllWorkoutData: " + e);
             e.printStackTrace();
             Crashlytics.log("forceRefreshAllWorkoutData networkException for user_id ("
-                    +MainApplication.getInstance().getUserDetails().getUserId() +"), messageFromServer: " + e);
+                    +MainApplication.getInstance().getUserID() +"), messageFromServer: " + e);
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_FORCE_REFRESH_FAILURE)
                     .put("exception_message", e.getMessage())
@@ -648,7 +650,7 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "Exception in forceRefreshAllWorkoutData: " + e.getMessage());
             e.printStackTrace();
             Crashlytics.log("forceRefreshAllWorkoutData Exception for user_id ("
-                    +MainApplication.getInstance().getUserDetails().getUserId() +")");
+                    +MainApplication.getInstance().getUserID() +")");
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_FORCE_REFRESH_FAILURE)
                     .put("exception_message", e.getMessage())

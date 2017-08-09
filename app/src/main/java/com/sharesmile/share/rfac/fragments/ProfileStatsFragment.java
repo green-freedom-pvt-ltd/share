@@ -144,6 +144,7 @@ public class ProfileStatsFragment extends BaseFragment {
         // Setting Profile Picture
         boolean isWorkoutDataUpToDate =
                 SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
+        Logger.d(TAG, "initUi: isWorkoutDataUpToDate = " + isWorkoutDataUpToDate);
 
         if (isWorkoutDataUpToDate){
             hideProgressDialog();

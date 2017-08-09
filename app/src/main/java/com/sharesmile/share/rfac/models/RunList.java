@@ -7,6 +7,7 @@ import com.sharesmile.share.Workout;
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -130,6 +131,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setDistance(run.getDistance());
         workout.setRunAmount(run.getRunAmount());
         workout.setElapsedTime(run.getRunDuration()); // Set proper ElapsedTime
+        workout.setRecordedTime((float) Utils.hhmmssToSecs(run.getRunDuration()));
         workout.setIsValidRun(!run.isFlag());
         workout.setStartPointLatitude(run.getStartLocationLat());
         workout.setStartPointLongitude(run.getStartLocationLong());
