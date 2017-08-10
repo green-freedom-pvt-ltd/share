@@ -141,8 +141,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        if (mLoginHandler != null){
+            mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 
+    @Override
+    protected void onDestroy() {
+        mLoginHandler.disconnect();
+        super.onDestroy();
     }
 
     private void startMainActivity() {
@@ -163,7 +170,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void showHideProgress(boolean show, String title) {
-
         if (show) {
             mLoginContainer.setVisibility(View.GONE);
             mProgressContainer.setVisibility(View.VISIBLE);

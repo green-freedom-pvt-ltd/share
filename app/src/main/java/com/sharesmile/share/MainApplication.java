@@ -323,7 +323,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     }
 
-    private void updateAppVersionInPrefs(){
+    public void updateAppVersionInPrefs(){
         try {
             String currentVersion = "";
             PackageInfo pInfo = getContext().getPackageManager()

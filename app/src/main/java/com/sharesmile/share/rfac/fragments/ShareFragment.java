@@ -288,6 +288,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         if (weightInputDialog != null && weightInputDialog.isShowing()){
             weightInputDialog.dismiss();
         }
+        if (mLoginHandler != null){
+            mLoginHandler.disconnect();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -437,25 +440,34 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     @Override
     public void onLoginSuccess() {
-        getFragmentController().replaceFragment(ShareFragment.newInstance(mWorkoutData, mCauseData), false);
-    }
-
-    @Override
-    public void showHideProgress(boolean show, String title) {
-        if (show) {
-            mLoginContainer.setVisibility(View.GONE);
-            mProgressContainer.setVisibility(View.VISIBLE);
-        } else {
-            mLoginContainer.setVisibility(View.VISIBLE);
-            mProgressContainer.setVisibility(View.GONE);
+        if (isAttachedToActivity()){
+            getFragmentController().replaceFragment(ShareFragment.newInstance(mWorkoutData, mCauseData), false);
         }
     }
 
     @Override
+    public void showHideProgress(boolean show, String title) {
+        if (isAttachedToActivity()){
+            if (show) {
+                mLoginContainer.setVisibility(View.GONE);
+                mProgressContainer.setVisibility(View.VISIBLE);
+            } else {
+                mLoginContainer.setVisibility(View.VISIBLE);
+                mProgressContainer.setVisibility(View.GONE);
+            }
+        }
+
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        if (mLoginHandler != null){
+            mLoginHandler.onActivityResult(requestCode, resultCode, data);
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
 }
 
 

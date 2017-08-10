@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -89,14 +90,15 @@ public class LoginImpl {
 
     private void initializeGoogleLogin() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail().requestIdToken(getContext().getString(R.string.server_client_id))
-                .requestServerAuthCode(getContext().getString(R.string.server_client_id), false)
+                .requestEmail().requestIdToken(MainApplication.getContext().getString(R.string.server_client_id))
+                .requestServerAuthCode(MainApplication.getContext().getString(R.string.server_client_id), false)
                 .build();
 
         Context context = getContext();
         if (context != null) {
             mGoogleApiClient = new GoogleApiClient.Builder(context)
-                    .enableAutoManage(activityWeakReference != null ? activityWeakReference.get() : fragmentWeakReference.get().getActivity(), mConnectionFailedListener)
+                    .enableAutoManage(activityWeakReference != null ? activityWeakReference.get()
+                            : fragmentWeakReference.get().getActivity(), mConnectionFailedListener)
                     .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                     .build();
         }
@@ -158,7 +160,7 @@ public class LoginImpl {
 
     private void verifyUserDetails(String userEmail, String token, final boolean isFbLogin) {
 
-        mListener.showHideProgress(true, getContext().getString(R.string.login));
+        mListener.showHideProgress(true, MainApplication.getContext().getString(R.string.login));
         Map<String, String> header = new HashMap<>();
         if (isFbLogin) {
             header.put("Authorization", "Bearer facebook " + token);
@@ -254,6 +256,22 @@ public class LoginImpl {
         }
     };
 
+    /**
+     * To be call when lifecycle of caller activity/fragment ends
+     */
+    public void disconnect(){
+        if (mGoogleApiClient != null){
+            FragmentActivity activity =  activityWeakReference != null ? activityWeakReference.get()
+                    : fragmentWeakReference.get().getActivity();
+            if (activity != null){
+                mGoogleApiClient.stopAutoManage(activity);
+            }
+            if (mGoogleApiClient.isConnected()){
+                mGoogleApiClient.disconnect();
+            }
+        }
+    }
+
     private Context getContext() {
 
         if (activityWeakReference != null && !activityWeakReference.get().isFinishing()) {
@@ -312,8 +330,8 @@ public class LoginImpl {
 
         List<NameValuePair> data = new ArrayList<>();
         data.add(new BasicNameValuePair("code", token));
-        data.add(new BasicNameValuePair("client_id", getContext().getString(R.string.server_client_id)));
-        data.add(new BasicNameValuePair("client_secret", getContext().getString(R.string.server_secret_id)));
+        data.add(new BasicNameValuePair("client_id", MainApplication.getContext().getString(R.string.server_client_id)));
+        data.add(new BasicNameValuePair("client_secret", MainApplication.getContext().getString(R.string.server_secret_id)));
         data.add(new BasicNameValuePair("access_type", "offline"));
         data.add(new BasicNameValuePair("grant_type", "authorization_code"));
 

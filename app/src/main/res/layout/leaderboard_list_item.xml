@@ -20,7 +20,7 @@
 
         <com.sharesmile.share.views.MLTextView
             android:id="@+id/id_leaderboard"
-            android:layout_width="30dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="1"
@@ -37,7 +37,7 @@
 
         <com.sharesmile.share.views.MRTextView
             android:id="@+id/tv_profile_name"
-            android:layout_width="70dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:maxLines="2"
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_gravity="end"
-            android:layout_marginRight="12dp"
+            android:layout_marginRight="4dp"
             android:gravity="center"
             android:textColor="@color/black"
             tools:text="5 KM" />

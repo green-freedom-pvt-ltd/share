@@ -265,7 +265,14 @@ public class Utils {
         String[] parts = hhmmss.split(":");
         switch (parts.length){
             case 3:
-                secs += 3600*Long.parseLong(parts[0]);
+                String left = parts[0];
+                if (left.contains(" ")){
+                    String[] leftParts = left.split("\\s+");
+                    secs += 86400*Long.parseLong(leftParts[0]);
+                    secs += 3600*Long.parseLong(leftParts[1]);
+                }else{
+                    secs += 3600*Long.parseLong(left);
+                }
                 secs += 60*Long.parseLong(parts[1]);
                 secs += Long.parseLong(parts[2]);
                 break;
@@ -705,7 +712,11 @@ public class Utils {
     }
 
     public static String getAppVersion(){
-        return SharedPrefsManager.getInstance().getString(Constants.PREF_APP_VERSION);
+        String appVersion = SharedPrefsManager.getInstance().getString(Constants.PREF_APP_VERSION);
+        if (TextUtils.isEmpty(appVersion)){
+            MainApplication.getInstance().updateAppVersionInPrefs();
+        }
+        return appVersion;
     }
 
 
