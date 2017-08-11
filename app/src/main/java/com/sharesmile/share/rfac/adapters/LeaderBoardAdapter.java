@@ -139,9 +139,9 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
                 mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.white));
             } else {
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
-                mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.black));
-                mProfileName.setTextColor(mContext.getResources().getColor(R.color.black));
-                mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.black));
+                mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
+                mProfileName.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
+                mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 if(isLeagueBoard) container.setCardElevation(3f);
                 else container.setCardElevation(.5f);
                 container.setOnClickListener(null);

@@ -196,6 +196,8 @@ public class SyncService extends GcmTaskService {
                 return ExpoBackoffTask.RESULT_RESCHEDULE;
             }
 
+        }else {
+            Logger.d(TAG, "Will NOT sync LeagueBoard");
         }
 
         return result;
