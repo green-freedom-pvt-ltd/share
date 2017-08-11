@@ -148,7 +148,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onDestroy() {
-        mLoginHandler.disconnect();
+        if (mLoginHandler != null){
+            mLoginHandler.disconnect();
+        }
         super.onDestroy();
     }
 

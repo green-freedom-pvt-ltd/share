@@ -59,6 +59,7 @@
     <color name="grey_disable">#C5C5BE</color>
     <color name="white_three">#d8d8d8</color>
     <color name="warm_grey">#979797</color>
+    <color name="warm_grey_50">#7f979797</color>
     <color name="warm_grey_two">#777777</color>
     <color name="warm_grey_three">#8a8a8a</color>
     <color name="light_gold">#ffcd4d</color>

@@ -389,16 +389,20 @@ public class TrackerActivity extends BaseActivity {
                         break;
 
                     case Constants.BROADCAST_WORKOUT_UPDATE_CODE:
-                        float currentSpeed = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_SPEED);
-                        float currentDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
-                        int elapsedTimeInSecs = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
-                        runFragment.showUpdate(currentSpeed, currentDistanceCovered, elapsedTimeInSecs);
+                        if (runFragment != null){
+                            float currentSpeed = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_SPEED);
+                            float currentDistanceCovered = bundle.getFloat(Constants.KEY_WORKOUT_UPDATE_TOTAL_DISTANCE);
+                            int elapsedTimeInSecs = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
+                            runFragment.showUpdate(currentSpeed, currentDistanceCovered, elapsedTimeInSecs);
+                        }
                         break;
 
                     case Constants.BROADCAST_STEPS_UPDATE_CODE:
-                        int currentTotalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
-                        int elapsedTime = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
-                        runFragment.showSteps(currentTotalSteps, elapsedTime);
+                        if (runFragment != null){
+                            int currentTotalSteps = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_STEPS);
+                            int elapsedTime = bundle.getInt(Constants.KEY_WORKOUT_UPDATE_ELAPSED_TIME_IN_SECS);
+                            runFragment.showSteps(currentTotalSteps, elapsedTime);
+                        }
                         break;
 
                     case Constants.BROADCAST_UNBIND_SERVICE_CODE:
@@ -459,7 +463,7 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (WorkoutSingleton.getInstance().isWorkoutActive()) {
+        if (WorkoutSingleton.getInstance().isWorkoutActive() && runFragment != null) {
             runFragment.showStopDialog();
             return;
         }

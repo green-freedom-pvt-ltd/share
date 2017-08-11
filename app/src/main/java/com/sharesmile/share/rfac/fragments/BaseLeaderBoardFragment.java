@@ -2,7 +2,9 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -44,6 +46,8 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     @BindView(R.id.list_container)
     View listContainer;
 
+    LinearLayoutManager mLayoutManager;
+
     protected List<LeaderBoard> mleaderBoardList = new ArrayList<>();
     protected LeaderBoardAdapter mLeaderBoardAdapter;
 
@@ -60,8 +64,15 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     protected void init() {
         mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), isLeagueBoard());
         fetchData();
+        mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                mLayoutManager.getOrientation());
+        mDividerItemDecoration.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.leaderboard_list_item_divider));
+        mRecyclerView.addItemDecoration(mDividerItemDecoration);
+
         setupToolbar();
         mswipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
