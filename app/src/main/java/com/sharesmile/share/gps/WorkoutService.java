@@ -184,10 +184,7 @@ public class WorkoutService extends Service implements
         workout.setDistance(data.getDistance() / 1000); // in Kms
         workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
 
-        //data.getDistance()
-        String distDecimal = Utils.formatToKmsWithTwoDecimal(data.getDistance());
-
-        int rupees = (int) Math.floor(mCauseData.getConversionRate() * Float.valueOf(distDecimal));
+        int rupees = (int) Math.floor(mCauseData.getConversionRate() * (data.getDistance() / 1000));
 
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
@@ -769,7 +766,8 @@ public class WorkoutService extends Service implements
         if (tracker != null && tracker.isActive()) {
             distanceReduction = tracker.discardApprovalQueue();
             distReductionString =
-                    (distanceReduction == 0) ? null : Utils.formatToKmsWithTwoDecimal(Math.abs(distanceReduction));
+                    (distanceReduction == 0) ? null :
+                            Utils.formatToKmsWithTwoDecimal(Math.abs(distanceReduction));
         }
 
         WorkoutSingleton.getInstance().incrementUsainBoltsCounter();

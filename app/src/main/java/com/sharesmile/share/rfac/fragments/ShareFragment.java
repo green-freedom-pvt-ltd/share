@@ -224,10 +224,10 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
 
-        String distanceCovered = Utils.formatWithOneDecimal(distanceInMeters / 1000);
-        int rupees = (int) Math.floor(mCauseData.getConversionRate() * Float.valueOf(distanceCovered));
+        int rupees = (int) Math.floor(mCauseData.getConversionRate() * (distanceInMeters / 1000));
         impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
+        String distanceCovered = Utils.formatWithOneDecimal(distanceInMeters / 1000);
         distance.setText(distanceCovered);
         distanceLabel.setText(getString(R.string.distance));
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
@@ -424,9 +424,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
                     Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance()));
         }
         if (msg.contains(SHARE_PLACEHOLDER_AMOUNT)) {
-            String rDistance = Utils.formatToKmsWithTwoDecimal(mWorkoutData.getDistance());
-            Float fDistance = Float.parseFloat(rDistance);
-            int rs = (int) Math.floor(fDistance * mCauseData.getConversionRate());
+            int rs = (int) Math.floor((mWorkoutData.getDistance() / 1000) * mCauseData.getConversionRate());
             msg = msg.replaceAll(SHARE_PLACEHOLDER_AMOUNT, String.valueOf(rs));
         }
         if (msg.contains(SHARE_PLACEHOLDER_SPONSOR)) {

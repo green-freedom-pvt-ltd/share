@@ -174,9 +174,7 @@ public class RealRunFragment extends RunFragment {
 
     protected void exitRun(WorkoutData data){
         Logger.d(TAG, "exit");
-        String distanceString = Utils.formatToKmsWithTwoDecimal(data.getDistance());
-        Float fDistance = Float.parseFloat(distanceString);
-        if (mCauseData.getMinDistance() > (fDistance * 1000)
+        if (mCauseData.getMinDistance() > (data.getDistance())
                 && !data.isMockLocationDetected()) {
             myActivity.exit();
             stopTimer();
@@ -201,8 +199,8 @@ public class RealRunFragment extends RunFragment {
             // Only when the delta is greater than 0.04 km we show the update
             String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
             distanceTextView.setText(distanceString);
-            int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
-            impact.setText("\u20B9" + String.valueOf(rupees));
+            int rupees = (int) Math.floor(getConversionFactor() * (distanceCoveredMeters / 1000));
+            impact.setText("\u20B9 " + String.valueOf(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
                 if (calorie != null){
@@ -225,10 +223,11 @@ public class RealRunFragment extends RunFragment {
         Logger.d(TAG, "refreshWorkoutData");
         if (isAttachedToActivity()){
             updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs()));
-            String distanceString = Utils.formatToKmsWithTwoDecimal(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
+            float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
+            String distanceString = Utils.formatToKmsWithTwoDecimal(totalDistance);
             distanceTextView.setText(distanceString);
-            int rupees = (int) Math.floor(getConversionFactor() * Float.parseFloat(distanceString));
-            impact.setText("\u20B9"+String.valueOf(rupees));
+            int rupees = (int) Math.floor(getConversionFactor() * (totalDistance / 1000));
+            impact.setText("\u20B9 "+String.valueOf(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
                 if (calorie != null){
@@ -290,7 +289,7 @@ public class RealRunFragment extends RunFragment {
         }
 
         float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
-        impact.setText(getImpactInRupees(distanceCovered));
+        impact.setText("\u20B9 " + getImpactInRupees(distanceCovered));
         distanceTextView.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
         if (WorkoutSingleton.getInstance().getDataStore() != null){
             Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
@@ -351,9 +350,8 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
-        String rDistance = distanceTextView.getText().toString();
-        Float fDistance = Float.parseFloat(rDistance);
-        if (mCauseData.getMinDistance() > (fDistance * 1000)) {
+        float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
+        if (mCauseData.getMinDistance() > (totalDistance)) {
             showMinDistanceDialog();
         } else {
             showRunEndDialog();

@@ -55,6 +55,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -102,14 +103,29 @@ public class Utils {
         return true;
     }
 
+    /**
+     * Format distance in meters to a two decimal KM value, RoundingMode is FLOOR
+     * @param distanceInMeters
+     * @return
+     */
     public static String formatToKmsWithTwoDecimal(float distanceInMeters){
         return getDecimalFormat("0.00").format(distanceInMeters / 1000);
     }
 
+    /**
+     * Format the input float to a one decimal String, RoundingMode is FLOOR
+     * @param distance
+     * @return
+     */
     public static String formatWithOneDecimal(float distance){
         return getDecimalFormat("0.0").format(distance);
     }
 
+    /**
+     * Format the input double to a one decimal String, RoundingMode is FLOOR
+     * @param distance
+     * @return
+     */
     public static String formatWithOneDecimal(double distance){
         return getDecimalFormat("0.0").format(distance);
     }
@@ -134,6 +150,7 @@ public class Utils {
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat(pattern, dfs);
         df.setGroupingUsed(false);
+        df.setRoundingMode(RoundingMode.FLOOR);
         return df;
     }
 
