@@ -2,7 +2,7 @@
 <com.sharesmile.share.views.MRTextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tv_leader_board_spinner"
     style="?android:attr/spinnerItemStyle"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="40dp"
     android:maxLines="1"
     android:paddingBottom="10dp"
@@ -12,4 +12,5 @@
     android:textSize="14sp"
     android:textColor="@color/greyish_brown_two"
     android:drawablePadding="10dp"
-    android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp" />
+    android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
+    android:drawableTint="@color/black_57"/>

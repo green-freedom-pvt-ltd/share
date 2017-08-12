@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:prompt="@string/most_kms_last_7_days"
             android:background="@color/white"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:gravity="center" />
 
 
 
