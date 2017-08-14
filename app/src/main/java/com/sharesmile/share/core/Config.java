@@ -82,6 +82,7 @@ public class Config {
 
     /*******************************/
 
+    public static final long CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL = 1200000; // in millis
 
     public static final int TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE = 8;
 

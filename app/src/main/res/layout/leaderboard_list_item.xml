@@ -34,7 +34,7 @@
             android:scaleType="fitCenter"
             android:visibility="visible" />
 
-        <com.sharesmile.share.views.MSBTextView
+        <com.sharesmile.share.views.MRTextView
             android:id="@+id/tv_profile_name"
             android:layout_width="0dp"
             android:layout_height="match_parent"

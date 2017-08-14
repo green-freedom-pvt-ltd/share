@@ -15,6 +15,7 @@ import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.Events.UsainBoltForceExit;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -176,7 +177,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateUiOnMockLocation updateUiOnMockLocation) {
         Logger.d(TAG, "onEvent: UpdateUiOnMockLocation");
-        showForceExitDialogAfterStopRun("Mock location detected!", "Please disable mock location to proceed");
+        showForceExitDialogAfterStopRun(MainApplication.getContext().getString(R.string.mock_location_detected),
+                MainApplication.getContext().getString(R.string.mock_location_detected_content));
         AnalyticsEvent.create(Event.ON_LOAD_DISBALE_MOCK_LOCATION)
                 .buildAndDispatch();
     }
@@ -184,7 +186,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UsainBoltForceExit usainBoltForceExit) {
         Logger.d(TAG, "onEvent: UsainBoltForceExit");
-        showForceExitDialogAfterStopRun("You are in a vehicle", "Stopping your run. Please start tracking while running/walking");
+        showForceExitDialogAfterStopRun(MainApplication.getContext().getString(R.string.you_are_in_vehicle),
+                MainApplication.getContext().getString(R.string.usain_bolt_force_exit_popup_content));
         AnalyticsEvent.create(Event.ON_LOAD_USAIN_BOLT_FORCE_EXIT)
                 .buildAndDispatch();
     }
@@ -281,12 +284,13 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         alertDialog.setTitle(title);
         alertDialog.setMessage(content);
         alertDialog.setCancelable(false);
-        alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                if (isAttachedToActivity()) {
-                    myActivity.exit();
-                }
+        alertDialog.setNegativeButton(MainApplication.getContext().getString(R.string.ok_caps),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if (isAttachedToActivity()) {
+                            myActivity.exit();
+                        }
             }
         });
         alertDialog.show();

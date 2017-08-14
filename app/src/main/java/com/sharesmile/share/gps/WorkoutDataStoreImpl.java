@@ -25,6 +25,8 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static com.sharesmile.share.core.Config.CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL;
+
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
  */
@@ -294,7 +296,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             }
             long latestTimeStamp = usainBoltOcurredTimeStamps.get(count - 1);
             long firstTimeStamp = usainBoltOcurredTimeStamps.get(count - 3);
-            if (latestTimeStamp - firstTimeStamp <  1200000){
+            if (latestTimeStamp - firstTimeStamp <  CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL){
                 // If three consecutive usain bolts have ocurred within 20 mins then user must be in a vehicle
                 return true;
             }

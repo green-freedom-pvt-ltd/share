@@ -360,8 +360,8 @@ public class RealRunFragment extends RunFragment {
 
     private void showRunEndDialog() {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("Finish Run");
-        alertDialog.setMessage("Are you sure you want to end the run?");
+        alertDialog.setTitle(getString(R.string.finish_workout));
+        alertDialog.setMessage(getString(R.string.finish_workout_message));
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (isAttachedToActivity()){

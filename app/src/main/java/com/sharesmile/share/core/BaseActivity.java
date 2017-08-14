@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -17,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 
@@ -25,7 +23,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.MainActivity;
@@ -34,7 +31,6 @@ import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Utils;
 
 import activities.ImpactLeagueActivity;
 import fragments.FaqFragment;
@@ -384,27 +380,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     public void showMessageCenter() {
         replaceFragment(new MessageCenterFragment(), true);
-    }
-
-    /**
-     * Not being used anymore
-     */
-    public void showFeedBackDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.post_fun_feedback_title)).setMessage(getString(R.string.post_fun_feedback_msg));
-        builder.setPositiveButton("Great", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Utils.redirectToPlayStore(BaseActivity.this);
-            }
-        });
-        builder.setNegativeButton("Okay", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                replaceFragment(new FeedbackFragment(), true);
-            }
-        });
-        builder.show();
     }
 
     @Override

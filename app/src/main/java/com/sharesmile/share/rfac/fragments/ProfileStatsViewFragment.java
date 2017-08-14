@@ -145,9 +145,11 @@ public class ProfileStatsViewFragment extends BaseFragment {
         BarDataSet dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
         dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+
         IValueFormatter intValueFormatter = new IValueFormatter() {
             @Override
-            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex,
+                                            ViewPortHandler viewPortHandler) {
                 int val = Math.round(value);
                 if (val > 0){
                     return "\u20B9 " + String.valueOf(val);
@@ -156,8 +158,8 @@ public class ProfileStatsViewFragment extends BaseFragment {
                 }
             }
         };
-        dataSet.setValueFormatter(intValueFormatter);
 
+        dataSet.setValueFormatter(intValueFormatter);
         BarData data = new BarData(dataSet);
         barChart.setData(data);
         barChart.setDrawGridBackground(false);
@@ -176,9 +178,9 @@ public class ProfileStatsViewFragment extends BaseFragment {
         yAxis.setLabelCount(3, true);
 
         yAxis.setCenterAxisLabels(true);
-        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
+        yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.black_5));
         yAxis.setDrawAxisLine(false);
-        yAxis.setGridLineWidth(0.5f);
+        yAxis.setGridLineWidth(1f);
 
         yAxis.setValueFormatter(new IAxisValueFormatter() {
             @Override
@@ -199,7 +201,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
         XAxis xAxis = barChart.getXAxis();
 
         xAxis.setDrawGridLines(false);
-        xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.warm_grey));
+        xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.black_5));
         xAxis.setAxisLineWidth(1.0f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
