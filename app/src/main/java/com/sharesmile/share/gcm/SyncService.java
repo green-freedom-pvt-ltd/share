@@ -120,7 +120,10 @@ public class SyncService extends GcmTaskService {
 
 
     public static int syncServerTime(){
-        ServerTimeKeeper.getInstance().forceSyncTimerWithServerTime();
+        // Force sync servertime but do not retry on failure
+        if (NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+            ServerTimeKeeper.getInstance().forceSyncTimerWithServerTime(false);
+        }
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 

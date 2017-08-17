@@ -541,9 +541,11 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     @Override
     public void onStart() {
         Logger.i(TAG, "onStart");
-        if (!ServerTimeKeeper.getInstance().isInSyncWithServer()){
-            ServerTimeKeeper.getInstance().syncTimerWithServerTime();
-        }
+        //TODO: Need to remove this after testing, sync should not initiate on application's onStart
+//        if (!ServerTimeKeeper.getInstance().isInSyncWithServer()){
+//            Logger.i(TAG, "MainApplication onStart, will call syncTimerWithServerTime of ServerTimeKeeper");
+//            ServerTimeKeeper.getInstance().syncTimerWithServerTime();
+//        }
         GoogleLocationTracker.getInstance().startLocationTracking(false);
         AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
 

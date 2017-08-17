@@ -48,7 +48,7 @@ public class ServerTimeKeeper {
         systemTimeAtSync = 0L;
         realTimeAtSync = 0L;
         // Sync with Server
-        syncTimerWithServerTime();
+        initiateExpoBackoffSyncRetries();
     }
 
     public static void init() {
@@ -83,9 +83,10 @@ public class ServerTimeKeeper {
      */
     public static long getServerTimeStampInMillis() {
         long timeStampToReturn;
-        if (!getInstance().isInSyncWithServer()) {
+        if (!getInstance().isInSyncWithServer()
+                && NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             //Start sync process
-            getInstance().syncTimerWithServerTime();
+            getInstance().initiateExpoBackoffSyncRetries();
         }
         //return currentServerTimeStamp in millis
         long millitimeDiff = System.currentTimeMillis() - getInstance().systemTimeAtSync;
@@ -94,9 +95,10 @@ public class ServerTimeKeeper {
     }
 
     public void checkIfTimerIsOutOfSync(){
+        Logger.d(TAG, "checkIfTimerIsOutOfSync");
         if (!isInSyncWithServer()){
             // If timer is not in sync yet then simply go for sync
-            syncTimerWithServerTime();
+            initiateExpoBackoffSyncRetries();
         }else {
             synchronized (ServerTimeKeeper.class){
                 // calculate delta between realTime and systemTime at last sync
@@ -116,10 +118,10 @@ public class ServerTimeKeeper {
     private void setTimerOutOfSync() {
         Logger.i(TAG, "setTimerOutOfSync");
         isInSyncWithServer.set(false);
-        syncTimerWithServerTime();
+        initiateExpoBackoffSyncRetries();
     }
 
-    public synchronized void syncTimerWithServerTime() {
+    private synchronized void syncTimerWithServerTime() {
         Logger.d(TAG, "syncTimerWithServerTime");
         if (isInSyncWithServer()){
             Logger.d(TAG, "Already in sync with server, won't do anything");
@@ -127,33 +129,42 @@ public class ServerTimeKeeper {
         }
         // Start Server time fetching logic if network is connected
         if (NetworkUtils.isNetworkConnected(MainApplication.getContext())){
-            forceSyncTimerWithServerTime();
+            forceSyncTimerWithServerTime(true);
         }else {
             // Network not present shall retry after some time, expBackoff
             expBackoffRetry();
         }
     }
 
-    public synchronized void forceSyncTimerWithServerTime(){
+    public synchronized void forceSyncTimerWithServerTime(boolean toRetry){
         // Start asynchronous fetching if it is not being fetched already
         if (!isFetchingServerTime.get()) {
-            executeSyncCallAsynchronously();
+            executeSyncCallAsynchronously(toRetry);
         }
     }
 
     long expBackoffDelay = INITIAL_DELAY;
 
-    private void expBackoffRetry(){
-        expBackoffDelay *= 2;
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                syncTimerWithServerTime();
-            }
-        }, expBackoffDelay);
+    private void initiateExpoBackoffSyncRetries(){
+        handler.removeCallbacks(retryRunnable);
+        expBackoffDelay = INITIAL_DELAY;
+        expBackoffRetry();
     }
 
-    private void executeSyncCallAsynchronously(){
+    private void expBackoffRetry(){
+        expBackoffDelay *= 2;
+        Logger.d(TAG, "expBackoffRetry with delay: " + expBackoffDelay);
+        handler.postDelayed(retryRunnable, expBackoffDelay);
+    }
+
+    private Runnable retryRunnable = new Runnable() {
+        @Override
+        public void run() {
+            syncTimerWithServerTime();
+        }
+    };
+
+    private void executeSyncCallAsynchronously(final boolean toRetry){
         isFetchingServerTime.set(true);
         Logger.d(TAG, "Will invoke servertime GET call");
         AsyncTask.execute(new Runnable() {
@@ -177,7 +188,10 @@ public class ServerTimeKeeper {
                     isFetchingServerTime.set(false);
                     if (!isInSyncWithServer()){
                         // Still not synced, will retry
-                        expBackoffRetry();
+                        Logger.d(TAG, "executeSyncCallAsynchronously, call for time sync failed, will retry");
+                        if (toRetry){
+                            expBackoffRetry();
+                        }
                     }
                 }
             }
