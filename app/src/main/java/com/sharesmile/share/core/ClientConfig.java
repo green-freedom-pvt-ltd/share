@@ -29,7 +29,7 @@ public class ClientConfig implements UnObfuscable{
 
     public  float SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 32f; // in m/s, i.e. 115.2 km/hr
 
-    public  float SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 16.67f; // in m/s, i.e. 60 km/hr
+    public  float SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 20.83f; // in m/s, i.e. 75 km/hr
 
     public  float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 9.03f; // in m/s, i.e. 32.5 km/hr
 
@@ -55,7 +55,7 @@ public class ClientConfig implements UnObfuscable{
 
     // Activity Detector Config
     public  int CONFIDENCE_THRESHOLD_VEHICLE = 74;
-    public  int CONFIDENCE_THRESHOLD_ON_FOOT = 73;
+    public  int CONFIDENCE_THRESHOLD_ON_FOOT = 75;
     public  int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
     public  int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
     // Minimum ON_FOOT confidence required for walk engagement notif

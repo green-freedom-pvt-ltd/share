@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
+import io.smooch.core.Smooch;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
@@ -320,6 +321,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         updateAppVersionInPrefs();
         AnalyticsEvent.create(Event.ON_APPLICATION_CREATE)
                 .buildAndDispatch();
+        Smooch.init(this, "c6596ame55nb4hotaciy1j91v");
 
     }
 

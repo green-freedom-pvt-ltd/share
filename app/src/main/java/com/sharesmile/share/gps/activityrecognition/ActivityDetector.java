@@ -286,10 +286,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     final Runnable resetConfidenceValuesRunnable = new Runnable() {
         @Override
         public void run() {
-            runningConfidenceRecentAvg = 0;
-            walkingConfidenceRecentAvg = 0;
-            onFootConfidenceRecentAvg = 0;
-            timeCoveredByHistoryQueue = 0;
+            reset();
             handler.removeCallbacks(resetConfidenceValuesRunnable);
         }
     };
@@ -439,9 +436,17 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private void reset(){
+        runningConfidenceRecentAvg = 0;
+        walkingConfidenceRecentAvg = 0;
+        onFootConfidenceRecentAvg = 0;
+        timeCoveredByHistoryQueue = 0;
         isInVehicle = false;
         isOnFoot = false;
+        isStill = false;
         historyQueue.clear();
+        AnalyticsEvent.create(Event.ACTIVITY_DETECTOR_RESET)
+                .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
+                .buildAndDispatch();
     }
 
 

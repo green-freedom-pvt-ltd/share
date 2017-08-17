@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 132
-        versionName "2.3.3.1"
+        versionCode 133
+        versionName "2.3.3.2"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -142,6 +142,8 @@ dependencies {
         exclude group: 'com.google.firebase'
     }
     compile 'com.android.support:multidex:1.0.1'
+    compile 'io.smooch:core:latest.release'
+    compile 'io.smooch:ui:latest.release'
 }
 
 apply plugin: 'com.google.gms.google-services'

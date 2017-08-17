@@ -308,6 +308,8 @@ public class RunTracker implements Tracker {
 
 
     private synchronized void processLocation(Location point){
+        point.getAltitude();
+        point.getBearing();
         if (isRunning()){
             //Check if the start point has been detected since the workout started/resumed
             if (dataStore.coldStartAfterResume()){

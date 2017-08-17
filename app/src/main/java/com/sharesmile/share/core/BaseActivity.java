@@ -19,10 +19,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.MainActivity;
@@ -208,14 +210,23 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     private void openMusicPlayer(){
         Logger.d(TAG, "openMusicPlayer");
-        if(android.os.Build.VERSION.SDK_INT>=15){
-            Intent intent=Intent.makeMainSelectorActivity(Intent.ACTION_MAIN,
-                    Intent.CATEGORY_APP_MUSIC);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//Min SDK 15
-            startActivity(intent);
-        }else{
-            Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");//Min SDK 8
-            startActivity(intent);
+        try{
+            if(android.os.Build.VERSION.SDK_INT>=15){
+                Intent intent=Intent.makeMainSelectorActivity(Intent.ACTION_MAIN,
+                        Intent.CATEGORY_APP_MUSIC);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//Min SDK 15
+                startActivity(intent);
+            }else{
+                Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");//Min SDK 8
+                startActivity(intent);
+            }
+        }catch (Exception e){
+            String message = "Can't find application for playing music: " + e.getMessage();
+            Logger.e(TAG, message);
+            e.printStackTrace();
+            Crashlytics.log(message);
+            Crashlytics.logException(e);
+            MainApplication.showToast(R.string.cant_find_music_application);
         }
     }
 

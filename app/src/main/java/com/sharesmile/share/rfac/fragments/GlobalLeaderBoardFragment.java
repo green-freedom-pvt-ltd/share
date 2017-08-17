@@ -175,10 +175,10 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         int userId = MainApplication.getInstance().getUserID();
         boolean isShowingMyRank = false;
         for (LeaderBoardData data : list.getLeaderBoardList()){
-            if (data.getRank() > 50 && userId == data.getUserid()){
+            if (data.getRank() > list.getLeaderBoardList().size() && userId == data.getUserid()){
                 myLeaderBoard = data.getLeaderBoardDbObject();
                 isShowingMyRank = true;
-            }else if (data.getRank() > 0 && data.getRank() <= 50){
+            }else if (data.getRank() > 0 && data.getRank() <= list.getLeaderBoardList().size()){
                 mleaderBoardList.add(data.getLeaderBoardDbObject());
             }
         }

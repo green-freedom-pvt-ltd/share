@@ -1,5 +1,7 @@
 package com.sharesmile.share.analytics.events;
 
+import com.sharesmile.share.analytics.Analytics;
+
 /**
  * Created by ankitm on 11/04/16.
  */
@@ -21,6 +23,7 @@ public enum Event {
     ON_CLICK_CAUSE_CARD(AnalyticsEvent.CATEGORY_CAUSE),
     ON_LOAD_CAUSE_DETAILS(AnalyticsEvent.CATEGORY_CAUSE),
 
+    ACTIVITY_DETECTOR_RESET(AnalyticsEvent.CATEGORY_VIGILANCE),
     ACTIVITY_RCOGNIZED_IN_VEHICLE(AnalyticsEvent.CATEGORY_VIGILANCE),
     ON_USAIN_BOLT_ALERT(AnalyticsEvent.CATEGORY_VIGILANCE),
     ON_POTENTIAL_USAIN_BOLT_MISSED(AnalyticsEvent.CATEGORY_VIGILANCE),
@@ -53,6 +56,7 @@ public enum Event {
 
     ON_LOAD_GPS_INACTIVE_POPUP(AnalyticsEvent.CATEGORY_WORKOUT),
     ON_LOAD_GPS_WEAK_POPUP(AnalyticsEvent.CATEGORY_WORKOUT),
+
 
     ON_LOAD_HAPPY_SAD_POPUP(AnalyticsEvent.CATEGORY_GENERAL),
     ON_LOAD_TAKE_FEEDBACK_POPUP(AnalyticsEvent.CATEGORY_GENERAL),

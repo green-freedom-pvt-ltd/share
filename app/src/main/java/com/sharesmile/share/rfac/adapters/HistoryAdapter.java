@@ -8,9 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.rfac.models.Run;
@@ -163,8 +161,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             Logger.d(TAG, "Run clicked, id = " +workout.getId() + ", client_run_id = "
                                     + workout.getWorkoutId() + ", version = " + workout.getVersion()
                                     + ", start_time = " + DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
-                            MainApplication.showToast("RunId = " + workout.getId() + ", clientRunId = "
-                                    + workout.getWorkoutId(), Toast.LENGTH_LONG);
+//                            MainApplication.showToast("RunId = " + workout.getId() + ", clientRunId = "
+//                                    + workout.getWorkoutId(), Toast.LENGTH_LONG);
                         }
                     });
                 }
