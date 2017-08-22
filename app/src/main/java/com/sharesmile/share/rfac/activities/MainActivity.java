@@ -69,7 +69,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import Models.CampaignList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.smooch.ui.ConversationActivity;
 
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -343,8 +342,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_faq) {
-            ConversationActivity.show(this);
-//            performOperation(SHOW_FAQ_FRAGMENT,false);
+//            ConversationActivity.show(this);
+            performOperation(SHOW_FAQ_FRAGMENT,false);
 //            openMusicPlayer();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
