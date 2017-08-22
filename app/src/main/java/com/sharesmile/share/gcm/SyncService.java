@@ -245,6 +245,11 @@ public class SyncService extends GcmTaskService {
     private static long syncWorkoutTimeStamp;
 
     private static int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao){
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+            // If internet not available then silently exit
+            Logger.d(TAG, "Internet not available while syncing runs with URL: " + syncUrl);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        }
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(syncUrl);
             if (syncWorkoutTimeStamp == 0){
@@ -449,6 +454,10 @@ public class SyncService extends GcmTaskService {
 
     private static boolean uploadWorkoutData(Workout workout) {
 
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+            // If internet not available then silently exit
+            return false;
+        }
         Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId()
                 + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
         int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
