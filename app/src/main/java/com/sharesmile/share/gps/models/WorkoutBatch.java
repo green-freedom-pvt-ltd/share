@@ -3,7 +3,6 @@ package com.sharesmile.share.gps.models;
 import android.location.Location;
 import android.os.Parcelable;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.core.UnObfuscable;
 
 import java.util.List;
@@ -54,7 +53,7 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	/**
 	 * @return list of all points of this batch
 	 */
-	List<LatLng> getPoints();
+	List<WorkoutPoint> getPoints();
 
 	/**
 	 *completes this batch and returns this after whatever post processing is required

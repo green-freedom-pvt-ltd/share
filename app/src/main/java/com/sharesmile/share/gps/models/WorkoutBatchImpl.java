@@ -4,7 +4,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.DateUtil;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	private float distance; // in m
 	private long startTimeStamp;// in millis
-	private List<LatLng> points;
+	private List<WorkoutPoint> points;
 	private boolean isRunning;
 	private float elapsedTime; // in secs
 	private long lastRecordAddedTs; // in millis
@@ -39,8 +39,8 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		points = new ArrayList<>();
 		if (source.points != null){
 			for (int i = 0; i < source.points.size(); i++){
-				LatLng latLng = source.points.get(i);
-				points.add(i, new LatLng(latLng.latitude, latLng.longitude));
+				WorkoutPoint point = source.points.get(i);
+				points.add(i, new WorkoutPoint(point));
 			}
 		}
 		lastRecordAddedTs = source.lastRecordAddedTs;
@@ -49,7 +49,35 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	@Override
 	public void addRecord(DistRecord record) {
 		addDistance(record.getDist());
-		points.add(new LatLng(record.getLocation().getLatitude(), record.getLocation().getLongitude()));
+		Location loc = record.getLocation();
+		WorkoutPoint point = new WorkoutPoint();
+		if (loc.hasAccuracy()){
+			point.setAccuracy(loc.getAccuracy());
+		}else {
+			point.setAccuracy(-1);
+		}
+		if (loc.hasAltitude()){
+			point.setAltitude(loc.getAltitude());
+		}else {
+			point.setAltitude(-1);
+		}
+		if (loc.hasBearing()){
+			point.setBearing(loc.getBearing());
+		}else {
+			point.setBearing(-1);
+		}
+		if (loc.hasSpeed()){
+			point.setGpsSpeed(loc.getSpeed());
+		}else {
+			point.setGpsSpeed(-1);
+		}
+		point.setLatitude(loc.getLatitude());
+		point.setLongitude(loc.getLongitude());
+		point.setTimeStamp(loc.getTime());
+		point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
+		point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
+		point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
+		points.add(point);
 		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 
@@ -65,8 +93,35 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	}
 
 	@Override
-	public void setStartPoint(Location location) {
-		points.add(0, new LatLng(location.getLatitude(), location.getLongitude()));
+	public void setStartPoint(Location loc) {
+		WorkoutPoint point = new WorkoutPoint();
+		if (loc.hasAccuracy()){
+			point.setAccuracy(loc.getAccuracy());
+		}else {
+			point.setAccuracy(-1);
+		}
+		if (loc.hasAltitude()){
+			point.setAltitude(loc.getAltitude());
+		}else {
+			point.setAltitude(-1);
+		}
+		if (loc.hasBearing()){
+			point.setBearing(loc.getBearing());
+		}else {
+			point.setBearing(-1);
+		}
+		if (loc.hasSpeed()){
+			point.setGpsSpeed(loc.getSpeed());
+		}else {
+			point.setGpsSpeed(-1);
+		}
+		point.setLatitude(loc.getLatitude());
+		point.setLongitude(loc.getLongitude());
+		point.setTimeStamp(loc.getTime());
+		point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
+		point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
+		point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
+		points.add(0, point);
 	}
 
 	@Override
@@ -92,7 +147,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	}
 
 	@Override
-	public List<LatLng> getPoints() {
+	public List<WorkoutPoint> getPoints() {
 		return points;
 	}
 
@@ -124,8 +179,8 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		distance = in.readFloat();
 		startTimeStamp = in.readLong();
 		if (in.readByte() == 0x01) {
-			points = new ArrayList<LatLng>();
-			in.readList(points, LatLng.class.getClassLoader());
+			points = new ArrayList<WorkoutPoint>();
+			in.readList(points, WorkoutPoint.class.getClassLoader());
 		} else {
 			points = null;
 		}

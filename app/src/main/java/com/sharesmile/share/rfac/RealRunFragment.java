@@ -288,7 +288,7 @@ public class RealRunFragment extends RunFragment {
             pauseButton.setText(R.string.pause);
         }
 
-        float distanceCovered = WorkoutSingleton.getInstance().getDataStore().getDistanceCoveredSinceLastResume(); // in meters
+        float distanceCovered = WorkoutSingleton.getInstance().getTotalDistanceInMeters(); // in meters
         impact.setText("\u20B9 " + getImpactInRupees(distanceCovered));
         distanceTextView.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
         if (WorkoutSingleton.getInstance().getDataStore() != null){

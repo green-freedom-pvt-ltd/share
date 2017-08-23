@@ -263,7 +263,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	public List<LatLng> getPoints() {
 		List<LatLng> points = new ArrayList<>();
 		for (WorkoutBatch batch : getBatches()){
-			points.addAll(batch.getPoints());
+			List<LatLng> batchPoints = new ArrayList<>();
+			for (WorkoutPoint workoutPoint : batch.getPoints()){
+				batchPoints.add(new LatLng(workoutPoint.getLatitude(), workoutPoint.getLongitude()));
+			}
+			points.addAll(batchPoints);
 		}
 		return points;
 	}
@@ -279,8 +283,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			getCurrentBatch().setStartPoint(record.getLocation());
 		}else{
 			// Add record over here
-			getCurrentBatch().addRecord(record);
 			this.distance += record.getDist();
+			getCurrentBatch().addRecord(record);
 			if (MainApplication.getInstance().getBodyWeight() > 0){
 				this.calories.incrementCaloriesMets(Utils.getDeltaCaloriesMets(record.getInterval(), record.getSpeed()));
 				this.calories.incrementCaloriesKarkanen(Utils.getDeltaCaloriesKarkanen(record.getInterval(), record.getSpeed()));
@@ -335,8 +339,6 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		p.put("num_steps", getTotalSteps());
 		p.put("client_run_id", getWorkoutId());
 		p.put("calories", getCalories().getCalories());
-//		p.put("num_spikes", getNumGpsSpikes());
-//		p.put("num_update_events", getNumUpdateEvents());
 		return p;
 	}
 

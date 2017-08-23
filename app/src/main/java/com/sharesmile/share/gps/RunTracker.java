@@ -400,7 +400,6 @@ public class RunTracker implements Tracker {
                         }
                         DistRecord record = new DistRecord(point, prevLocation, prevTimeStamp,  dist);
                         Logger.d(TAG, "Distance Recording: " + record.toString());
-                        Logger.d(TAG, "GPS Speed obtained from chosen point is " + point.getSpeed() + ", provider is " + point.getProvider());
                         double prevCalories = dataStore.getCalories().getCalories();
                         dataStore.addRecord(record);
                         synchronized (recordHistoryQueue){
