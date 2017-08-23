@@ -55,7 +55,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/tv_impact"
         android:textSize="12sp"
-        android:text="Impact"
+        android:text="@string/raised"
         android:textColor="@color/black_38" />
 
     <LinearLayout

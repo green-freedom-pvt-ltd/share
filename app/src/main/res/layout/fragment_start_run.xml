@@ -22,7 +22,7 @@
         android:layout_below="@+id/img_sponsor_logo"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"
-        android:text="is proud to sponsor your run"
+        android:text="@string/is_proud_to_sponsor_your_workout"
         android:textSize="15dp" />
 
     <FrameLayout
