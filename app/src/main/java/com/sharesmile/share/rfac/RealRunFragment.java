@@ -359,50 +359,54 @@ public class RealRunFragment extends RunFragment {
     }
 
     private void showRunEndDialog() {
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(getString(R.string.finish_workout));
-        alertDialog.setMessage(getString(R.string.finish_workout_message));
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (isAttachedToActivity()){
-                    endRun(true);
+        if (isAttachedToActivity() && !getActivity().isFinishing()){
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setTitle(getString(R.string.finish_workout));
+            alertDialog.setMessage(getString(R.string.finish_workout_message));
+            alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (isAttachedToActivity()){
+                        endRun(true);
+                    }
                 }
-            }
-        });
+            });
 
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialog.show();
-        AnalyticsEvent.create(Event.ON_LOAD_FINISH_RUN_POPUP)
-                .addBundle(getWorkoutBundle())
-                .buildAndDispatch();
+            alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog.show();
+            AnalyticsEvent.create(Event.ON_LOAD_FINISH_RUN_POPUP)
+                    .addBundle(getWorkoutBundle())
+                    .buildAndDispatch();
+        }
     }
 
     private void showMinDistanceDialog() {
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(getString(R.string.dialog_title_min_distance));
-        alertDialog.setMessage(getString(R.string.dialog_msg_min_distance, mCauseData.getMinDistance()));
-        alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+        if (isAttachedToActivity() && !getActivity().isFinishing()){
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setTitle(getString(R.string.dialog_title_min_distance));
+            alertDialog.setMessage(getString(R.string.dialog_msg_min_distance, mCauseData.getMinDistance()));
+            alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
 
-            }
-        });
-
-        alertDialog.setNegativeButton(getString(R.string.dialog_negative_button_min_distance), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (isAttachedToActivity()) {
-                    endRun(true);
                 }
-            }
-        });
-        alertDialog.show();
-        AnalyticsEvent.create(Event.ON_LOAD_TOO_SHORT_POPUP)
-                .addBundle(getWorkoutBundle())
-                .buildAndDispatch();
+            });
+
+            alertDialog.setNegativeButton(getString(R.string.dialog_negative_button_min_distance), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (isAttachedToActivity()) {
+                        endRun(true);
+                    }
+                }
+            });
+            alertDialog.show();
+            AnalyticsEvent.create(Event.ON_LOAD_TOO_SHORT_POPUP)
+                    .addBundle(getWorkoutBundle())
+                    .buildAndDispatch();
+        }
     }
 
     /*  Rs per km*/
@@ -411,30 +415,32 @@ public class RealRunFragment extends RunFragment {
     }
 
     private void showErrorDialog(String msg) {
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        View view = getLayoutInflater(null).inflate(R.layout.alert_dialog_title, null);
-        view.setBackgroundColor(getResources().getColor(R.color.neon_red));
-        TextView titleView = (TextView) view.findViewById(R.id.title);
-        titleView.setText(getString(R.string.error));
-        alertDialog.setCustomTitle(view);
-        alertDialog.setMessage(msg);
-        alertDialog.setPositiveButton(getString(R.string.resume), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (isAttachedToActivity()){
-                    resumeRun();
-                }
+        if (isAttachedToActivity() && !getActivity().isFinishing()){
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            View view = getLayoutInflater(null).inflate(R.layout.alert_dialog_title, null);
+            view.setBackgroundColor(getResources().getColor(R.color.neon_red));
+            TextView titleView = (TextView) view.findViewById(R.id.title);
+            titleView.setText(getString(R.string.error));
+            alertDialog.setCustomTitle(view);
+            alertDialog.setMessage(msg);
+            alertDialog.setPositiveButton(getString(R.string.resume), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (isAttachedToActivity()){
+                        resumeRun();
+                    }
 
-            }
-        });
-        alertDialog.setNegativeButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (isAttachedToActivity()){
-                    endRun(true);
                 }
-            }
-        });
+            });
+            alertDialog.setNegativeButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (isAttachedToActivity()){
+                        endRun(true);
+                    }
+                }
+            });
 
-        alertDialog.show();
+            alertDialog.show();
+        }
     }
 
 }
