@@ -60,7 +60,7 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
             board.id = id;
             board.first_name = firstName;
             board.last_name = lastName
-            board.distance = distance;
+            board.last_week_distance = distance;
             board.social_thumb = imageUrl;
             return board;
         }

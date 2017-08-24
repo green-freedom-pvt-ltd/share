@@ -170,6 +170,7 @@ public class Constants {
     public static final String PREF_APP_VERSION = "pref_app_version";
 
     public static final String PREF_CLIENT_CONFIG = "pref_client_config";
+    public static final String PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX = "pending_workout_location_data_queue_";
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";

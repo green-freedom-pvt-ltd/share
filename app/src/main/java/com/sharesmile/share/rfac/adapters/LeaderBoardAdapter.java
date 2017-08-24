@@ -115,7 +115,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
             mProfileName.setText(Utils.dedupName(firstName, lastName));
             String last_Week_Distance;
-            Float lastWeekDist = leaderboard.getDistance();
+            Float lastWeekDist = leaderboard.getLast_week_distance();
             if (lastWeekDist > 10f){
                 last_Week_Distance = String.valueOf(Math.round(lastWeekDist));
             }else {

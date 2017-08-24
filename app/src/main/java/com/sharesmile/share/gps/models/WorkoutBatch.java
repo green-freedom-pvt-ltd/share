@@ -40,6 +40,11 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	long getStartTimeStamp();
 
 	/**
+	 * @return the epoch (in millis) at which the last point of this batch was recorded
+	 */
+	long getLastRecordedTimeStamp();
+
+	/**
 	 * @return elapsed time, till the batch is running, since the beginning of this batch in secs;
 	 * once the batch completes it returns the total time for which the batch was running
 	 */

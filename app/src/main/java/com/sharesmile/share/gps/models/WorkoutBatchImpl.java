@@ -50,7 +50,12 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	public void addRecord(DistRecord record) {
 		addDistance(record.getDist());
 		Location loc = record.getLocation();
+		Location prevLocation = record.getPrevLocation();
 		WorkoutPoint point = new WorkoutPoint();
+		if (record.getDist() == 0 && prevLocation != null && prevLocation.distanceTo(loc) > 0){
+			// The points were separated but dist was forcefully set as Zero
+			point.setFlagged(true);
+		}
 		if (loc.hasAccuracy()){
 			point.setAccuracy(loc.getAccuracy());
 		}else {
@@ -127,6 +132,11 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	@Override
 	public long getStartTimeStamp() {
 		return startTimeStamp;
+	}
+
+	@Override
+	public long getLastRecordedTimeStamp() {
+		return lastRecordAddedTs;
 	}
 
 	@Override

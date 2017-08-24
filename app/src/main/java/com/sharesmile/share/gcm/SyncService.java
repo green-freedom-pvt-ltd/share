@@ -21,6 +21,10 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ExpoBackoffTask;
+import com.sharesmile.share.gps.models.WorkoutBatch;
+import com.sharesmile.share.gps.models.WorkoutBatchLocationData;
+import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.network.NetworkUtils;
@@ -55,6 +59,7 @@ import Models.TeamBoard;
 import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.LeaderBoardDataStore.ALL_INTERVALS;
+import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 
 /**
  * Created by Shine on 15/05/16.
@@ -113,6 +118,7 @@ public class SyncService extends GcmTaskService {
         syncLeaderBoardData();
         updateCauseData();
         syncWorkoutData();
+        uploadPendingWorkoutsData();
 
         // Returning success as result does not matter
         return GcmNetworkManager.RESULT_SUCCESS;
@@ -222,6 +228,11 @@ public class SyncService extends GcmTaskService {
     }
 
 
+    /**
+     * Constructs the sync URL using clientVersion and then fetches all runs with version above clientVersion
+     * and then insert or update all of those runs in DB
+     * @return
+     */
     private static int syncWorkoutData(){
         synchronized (SyncService.class){
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
@@ -419,46 +430,152 @@ public class SyncService extends GcmTaskService {
 
 
     public static void pushWorkoutDataWithBackoff(){
-        ExpoBackoffTask task = new ExpoBackoffTask() {
+        ExpoBackoffTask task = new ExpoBackoffTask(2000) {
             @Override
             public int performtask() {
-                return uploadWorkoutData();
+                return uploadPendingWorkoutsData();
             }
         };
         task.run();
     }
 
 
-    private static int uploadWorkoutData() {
+    private static int uploadPendingWorkoutsData() {
         synchronized (SyncService.class){
-            Logger.d(TAG, "uploadWorkoutData");
 
+            // Step: Upload all the Pending Workouts
+            Logger.d(TAG, "uploadPendingWorkoutData");
+            boolean isSuccess = true;
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties
                     .Is_sync.eq(false)).list();
 
             if (mWorkoutList != null && mWorkoutList.size() > 0) {
-
-                boolean isSuccess = true;
                 for (Workout workout : mWorkoutList) {
                     boolean result = uploadWorkoutData(workout);
                     isSuccess = isSuccess && result;
                 }
-                return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
-            } else {
-                return ExpoBackoffTask.RESULT_SUCCESS;
             }
+
+            // Step: Upload all pending WorkoutLocationData
+            Logger.d(TAG, "uploadPendingWorkoutData, Will upload locationData");
+            List<Workout> pendingLocationWorkoutsList = mWorkoutDao.queryBuilder()
+                    .where(
+                            WorkoutDao.Properties.Is_sync.eq(true),
+                            WorkoutDao.Properties.ShouldSyncLocationData.eq(true)
+                    ).list();
+
+            if (pendingLocationWorkoutsList != null && pendingLocationWorkoutsList.size() > 0) {
+                for (Workout workout : pendingLocationWorkoutsList) {
+                    boolean result = uploadWorkoutLocationData(workout);
+                    if (result){
+                        // If all batches of this workout are uploaded successfully, we update the boolean flag in DB
+                        workout.setShouldSyncLocationData(false);
+                        mWorkoutDao.insertOrReplace(workout);
+                    }
+                    isSuccess = isSuccess && result;
+                }
+            }
+            return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
+
         }
 
     }
 
+    private static boolean uploadWorkoutLocationData(Workout workout){
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+            // If internet not available then silently exit
+            return false;
+        }
+
+        Logger.d(TAG, "uploadWorkoutLocationData called for client_run_id: " + workout.getWorkoutId()
+                + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
+        long runId = workout.getId();
+        String workoutId = workout.getWorkoutId();
+        String prefKey = PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX + workoutId;
+        WorkoutData workoutData = SharedPrefsManager.getInstance().getObject(prefKey, WorkoutDataImpl.class);
+
+        Gson gson = new Gson();
+        Logger.d(TAG, "uploadWorkoutLocationData will upload locationData from: " + gson.toJson(workoutData));
+
+        for (int i=0; i< workoutData.getBatches().size(); i++){
+            WorkoutBatch batch = workoutData.getBatches().get(i);
+
+            // Step: Construct WorkoutBatchLocationData object for this batch
+            WorkoutBatchLocationData locationData = new WorkoutBatchLocationData();
+            locationData.setBatchNum(i);
+            locationData.setClientRunId(workoutId);
+            locationData.setRunId(runId);
+            locationData.setStartTimeEpoch(batch.getStartTimeStamp());
+            locationData.setEndTimeEpoch(batch.getLastRecordedTimeStamp());
+            locationData.setLocationArray(batch.getPoints());
+
+            // Step: POST WorkoutBatchLocationData on server
+            String locationDataString = gson.toJson(locationData);
+            try {
+                Logger.d(TAG, "Will POST data: " + locationDataString);
+                WorkoutBatchLocationData response = NetworkDataProvider.doPostCall(Urls.getRunLocationsUrl(),
+                        locationDataString, WorkoutBatchLocationData.class);
+                AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
+                        .put("upload_result", "success")
+                        .put("run_id", runId)
+                        .put("batch_num", i)
+                        .put("client_run_id", workoutId)
+                        .buildAndDispatch();
+            }catch (NetworkException e){
+                e.printStackTrace();
+                String message = "NetworkException while uploading WorkoutLocationData: " + e.getMessage()
+                        + "\n WorkoutLocationData: " + locationDataString;
+                Logger.d(TAG, message);
+                Crashlytics.log(message);
+                Crashlytics.logException(e);
+                AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
+                        .put("upload_result", "failure")
+                        .put("run_id", runId)
+                        .put("batch_num", i)
+                        .put("client_run_id", workoutId)
+                        .put("exception_message", e.getMessage())
+                        .put("message_from_server", e.getMessageFromServer())
+                        .put("http_status", e.getHttpStatusCode())
+                        .put("failure_type", e.getFailureType())
+                        .buildAndDispatch();
+                return false;
+            }catch (Exception ex){
+                String message = "Exception while uploading WorkoutLocationData: " + ex.getMessage()
+                        + "\n WorkoutLocationData: " + locationDataString;
+                Logger.e(TAG, message);
+                ex.printStackTrace();
+                Crashlytics.log(message);
+                Crashlytics.logException(ex);
+                AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
+                        .put("upload_result", "failure")
+                        .put("run_id", runId)
+                        .put("client_run_id", workoutId)
+                        .put("batch_num", i)
+                        .put("exception_message", ex.getMessage())
+                        .buildAndDispatch();
+                return false;
+            }
+        }
+
+        // Reaching here means all batches were uploaded successfully,
+        // will remove the pref key on which locationData was stored
+        SharedPrefsManager.getInstance().removeKey(prefKey);
+        return true;
+    }
+
+    /**
+     * Uploads WorkoutData and stores the run_id received in workoutDao object
+     * @param workout
+     * @return true on success and false on failure
+     */
     private static boolean uploadWorkoutData(Workout workout) {
 
         if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
             // If internet not available then silently exit
             return false;
         }
-        Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId()
+        Logger.d(TAG, "uploadPendingWorkoutData called for client_run_id: " + workout.getWorkoutId()
                 + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
         int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
         JSONObject jsonObject = new JSONObject();

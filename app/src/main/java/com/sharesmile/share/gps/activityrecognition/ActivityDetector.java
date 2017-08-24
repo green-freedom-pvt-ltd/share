@@ -444,9 +444,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         isOnFoot = false;
         isStill = false;
         historyQueue.clear();
-        AnalyticsEvent.create(Event.ACTIVITY_DETECTOR_RESET)
-                .put("time_considered_ad", getTimeCoveredByHistoryQueueInSecs())
-                .buildAndDispatch();
     }
 
 

@@ -165,6 +165,11 @@ public class NetworkDataProvider {
         return doPostCall(url, convertJSONdataToBody(jsonData), responseClass);
     }
 
+    public static <T> T doPostCall(String url, String jsonString,
+                                   Class<T> responseClass) throws NetworkException {
+        return doPostCall(url, convertJSONStringToBody(jsonString), responseClass);
+    }
+
     public static <T> T doPostCall(String url, List<NameValuePair> formData,
                                    Type typeOfT) throws NetworkException {
         return doPostCall(url, convertFormDataToBody(formData), typeOfT);
@@ -212,6 +217,16 @@ public class NetworkDataProvider {
         RequestBody body;
         if (jsonData != null) {
             body = RequestBody.create(JSON, jsonData.toString());
+        } else {
+            body = RequestBody.create(JSON, "");
+        }
+        return body;
+    }
+
+    private static RequestBody convertJSONStringToBody(String jsonString) {
+        RequestBody body;
+        if (!TextUtils.isEmpty(jsonString)) {
+            body = RequestBody.create(JSON, jsonString);
         } else {
             body = RequestBody.create(JSON, "");
         }

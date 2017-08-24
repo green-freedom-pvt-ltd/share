@@ -3,6 +3,7 @@ package com.sharesmile.share.gps.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.UnObfuscable;
 
 /**
@@ -11,16 +12,38 @@ import com.sharesmile.share.core.UnObfuscable;
 
 public class WorkoutPoint implements UnObfuscable, Parcelable {
 
+    @SerializedName("acc")
     private float accuracy; // in meters
+
+    @SerializedName("lat")
     private double latitude;
+
+    @SerializedName("lon")
     private double longitude;
+
+    @SerializedName("ts")
     private long timeStamp; // in millis
+
+    @SerializedName("ber")
     private float bearing; // in degrees
+
+    @SerializedName("alt")
     private double altitude; // in meters
+
+    @SerializedName("spd")
     private float gpsSpeed; // in m/s
+
+    @SerializedName("stc")
     private int cumulativeStepCount; // cumulative step count
+
+    @SerializedName("dis")
     private float cumulativeDistance;
+
+    @SerializedName("nspk")
     private int cumulativeNumSpikes;
+
+    @SerializedName("flag")
+    private Boolean flagged;
 
     public WorkoutPoint(){
     }
@@ -36,6 +59,9 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         cumulativeStepCount = source.cumulativeStepCount;
         cumulativeDistance = source.cumulativeDistance;
         cumulativeNumSpikes = source.cumulativeNumSpikes;
+        if (source.flagged != null){
+            flagged = source.flagged;
+        }
     }
 
     public float getAccuracy() {
@@ -118,6 +144,14 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         this.cumulativeNumSpikes = cumulativeNumSpikes;
     }
 
+    public Boolean getFlagged() {
+        return flagged;
+    }
+
+    public void setFlagged(Boolean flagged) {
+        this.flagged = flagged;
+    }
+
     protected WorkoutPoint(Parcel in) {
         accuracy = in.readFloat();
         latitude = in.readDouble();
@@ -129,6 +163,8 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         cumulativeStepCount = in.readInt();
         cumulativeDistance = in.readFloat();
         cumulativeNumSpikes = in.readInt();
+        byte flaggedVal = in.readByte();
+        flagged = flaggedVal == 0x02 ? null : flaggedVal != 0x00;
     }
 
     @Override
@@ -148,6 +184,11 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         dest.writeInt(cumulativeStepCount);
         dest.writeFloat(cumulativeDistance);
         dest.writeInt(cumulativeNumSpikes);
+        if (flagged == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (flagged ? 0x01 : 0x00));
+        }
     }
 
     @SuppressWarnings("unused")
