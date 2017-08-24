@@ -4,18 +4,16 @@ import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.utils.ShareImageLoader;
-import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 
 import java.util.List;
@@ -30,7 +28,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
     private ItemClickListener mListener;
     private boolean isLeagueBoard = false;
-    private List<LeaderBoard> mData;
+    private List<BaseLeaderBoardItem> mData;
     private Context mContext;
 
     public LeaderBoardAdapter(Context context, boolean isLeagueBoard) {
@@ -54,7 +52,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         return mData != null ? mData.size() : 0;
     }
 
-    public void setData(List<LeaderBoard> data) {
+    public void setData(List<BaseLeaderBoardItem> data) {
         this.mData = data;
         notifyDataSetChanged();
     }
@@ -93,36 +91,36 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             }
         }
 
-        public void bindData(final LeaderBoard leaderboard, int rank) {
+        public void bindData(final BaseLeaderBoardItem leaderboard, int rank) {
             mleaderBoard.setText(String.valueOf(rank));
 
-            ShareImageLoader.getInstance().loadImage(leaderboard.getSocial_thumb(), mProfileImage,
+            ShareImageLoader.getInstance().loadImage(leaderboard.getImage(), mProfileImage,
                     ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
-            String firstName = leaderboard.getFirst_name();
-            if (!TextUtils.isEmpty(firstName)){
-                if (firstName.length() > 1){
-                    firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1);
-                }
-            }
+//            String firstName = leaderboard.getFirst_name();
+//            if (!TextUtils.isEmpty(firstName)){
+//                if (firstName.length() > 1){
+//                    firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1);
+//                }
+//            }
+//
+//            String lastName = leaderboard.getLast_name();
+//            if (!TextUtils.isEmpty(lastName)){
+//                if (lastName.length() > 1){
+//                    lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1);
+//                }
+//            }
 
-            String lastName = leaderboard.getLast_name();
-            if (!TextUtils.isEmpty(lastName)){
-                if (lastName.length() > 1){
-                    lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1);
-                }
-            }
-
-            mProfileName.setText(Utils.dedupName(firstName, lastName));
-            String last_Week_Distance;
-            Float lastWeekDist = leaderboard.getLast_week_distance();
+            mProfileName.setText(leaderboard.getName());
+            String distanceString;
+            Float lastWeekDist = leaderboard.getDistance();
             if (lastWeekDist > 10f){
-                last_Week_Distance = String.valueOf(Math.round(lastWeekDist));
+                distanceString = String.valueOf(Math.round(lastWeekDist));
             }else {
-                last_Week_Distance = String.format("%.1f", lastWeekDist);
+                distanceString = String.format("%.1f", lastWeekDist);
             }
 
-            mlastWeekDistance.setText(last_Week_Distance + " Km");
+            mlastWeekDistance.setText(distanceString + " Km");
 
             final int id;
             if (isLeagueBoard) {

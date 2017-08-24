@@ -15,13 +15,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
-import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.utils.Utils;
@@ -59,7 +59,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
 
     private String interval = LAST_WEEK_INTERVAL;
 
-    private LeaderBoard myLeaderBoard;
+    private BaseLeaderBoardItem myLeaderBoard;
 
     HighLightArrayAdapter spinnerAdapter;
 
@@ -194,7 +194,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         hideProgressDialog();
     }
 
-    private void showMyRank(LeaderBoard myLeaderBoard){
+    private void showMyRank(BaseLeaderBoardItem myLeaderBoard){
         // Need to show rank at the bottom
         myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
         myListItem.setCardElevation(3f);
@@ -207,7 +207,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
         myListItem.setVisibility(View.VISIBLE);
-        mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRank());
+        mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());
     }
 
     @Override

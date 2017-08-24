@@ -12,12 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
+import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.utils.Logger;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     LinearLayoutManager mLayoutManager;
 
-    protected List<LeaderBoard> mleaderBoardList = new ArrayList<>();
+    protected List<BaseLeaderBoardItem> mleaderBoardList = new ArrayList<>();
     protected LeaderBoardAdapter mLeaderBoardAdapter;
 
     @Nullable

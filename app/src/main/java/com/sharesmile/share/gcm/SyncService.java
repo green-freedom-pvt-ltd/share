@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import Models.TeamBoard;
+import Models.LeagueBoard;
 import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.LeaderBoardDataStore.ALL_INTERVALS;
@@ -163,7 +163,7 @@ public class SyncService extends GcmTaskService {
             // Go for sync only when an active league is present and is still visible to team members
             try {
                 Logger.d(TAG, "Will sync LeagueBoard");
-                TeamBoard leagueBoard = NetworkDataProvider.doGetCall(Urls.getTeamBoardUrl(), TeamBoard.class);
+                LeagueBoard leagueBoard = NetworkDataProvider.doGetCall(Urls.getLeagueBoardUrl(), LeagueBoard.class);
                 // Store this in LeaderBoardDataStore
                 LeaderBoardDataStore.getInstance().setLeagueBoardData(leagueBoard);
                 // Notify LeaderBoardFragment about it

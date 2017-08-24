@@ -1,8 +1,8 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
-import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.utils.Utils;
 
 import java.io.Serializable;
 
@@ -53,10 +53,11 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
         return rank;
     }
 
-    public LeaderBoard getLeaderBoardDbObject()
+    public BaseLeaderBoardItem getLeaderBoardDbObject()
     {
-        LeaderBoard lb = new LeaderBoard((long) getUserid(), getFirstName(), getLastName(),
-                getImageUrl(), getDistance(), getRank());
+        BaseLeaderBoardItem lb = new BaseLeaderBoardItem(
+                getUserid(), Utils.dedupName(getFirstName(), getLastName()) , getImageUrl(),
+                getDistance(), getRank());
         return lb;
     }
 

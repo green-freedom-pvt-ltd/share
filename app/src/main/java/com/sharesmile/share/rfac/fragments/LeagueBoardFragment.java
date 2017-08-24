@@ -19,7 +19,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import Models.TeamBoard;
+import Models.LeagueBoard;
 import butterknife.BindView;
 
 /**
@@ -81,7 +81,7 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     public void onEvent(LeagueBoardDataUpdated event){
         if (isAttachedToActivity()){
             hideProgressDialog();
-            TeamBoard board = LeaderBoardDataStore.getInstance().getLeagueBoard();
+            LeagueBoard board = LeaderBoardDataStore.getInstance().getLeagueBoard();
             if (event.isSuccess()){
                 showLeagueBoardData(board);
             }else {
@@ -95,18 +95,12 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
         }
     }
 
-    private void showLeagueBoardData(TeamBoard board){
+    private void showLeagueBoardData(LeagueBoard board){
         mleaderBoardList.clear();
-        mBannerUrl = null;
-        String leagueName = "";
-        for (TeamBoard.Team team : board.getTeamList()) {
-            if (!TextUtils.isEmpty(team.getLeagueName())){
-                leagueName = team.getLeagueName();
-            }
+        mBannerUrl = board.getLeagueBanner();
+        String leagueName = board.getLeagueName();
+        for (LeagueBoard.Team team : board.getTeamList()) {
             mleaderBoardList.add(team.convertToLeaderBoard());
-            if (!TextUtils.isEmpty(team.getBanner())){
-                mBannerUrl = team.getBanner();
-            }
         }
         setBannerImage();
         hideProgressDialog();

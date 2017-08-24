@@ -1,8 +1,9 @@
 package Models
 
 import com.google.gson.annotations.SerializedName
-import com.sharesmile.share.LeaderBoard
 import com.sharesmile.share.core.UnObfuscable
+import com.sharesmile.share.rfac.models.BaseLeaderBoardItem
+import com.sharesmile.share.utils.Utils
 import java.io.Serializable
 import java.util.*
 
@@ -54,14 +55,13 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
         private val imageUrl: String? = null
 
 
-        public fun convertToLeaderBoard(distance: Float): LeaderBoard {
+        public fun convertToLeaderBoard(distance: Float): BaseLeaderBoardItem {
 
-            var board = LeaderBoard();
-            board.id = id;
-            board.first_name = firstName;
-            board.last_name = lastName
-            board.last_week_distance = distance;
-            board.social_thumb = imageUrl;
+            var board = BaseLeaderBoardItem()
+            board.id = id as Long
+            board.name = Utils.dedupName(firstName, lastName)
+            board.distance = distance
+            board.image = imageUrl
             return board;
         }
     }

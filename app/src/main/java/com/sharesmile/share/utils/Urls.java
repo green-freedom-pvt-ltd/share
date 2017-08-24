@@ -32,7 +32,7 @@ public class Urls {
     private static final String CAMPAIGN_URL = "/api/campaign/";
 
     private static final String LEAGUE_URL = "/api/employeetoteam/";
-    private static final String TEAMBOARD_URL = "/api/teamboard/";
+    private static final String LEAGUEBOARD_URL = "/api/teamboard/";
     private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboard/";
     private static final String SERVER_TIME_URL = "/api/servertime/";
 
@@ -136,8 +136,8 @@ public class Urls {
         return url;
     }
 
-    public static String getTeamBoardUrl() {
-        return getBaseUrl() + TEAMBOARD_URL;
+    public static String getLeagueBoardUrl() {
+        return getBaseUrl() + LEAGUEBOARD_URL;
     }
 
     public static String getTeamLeaderBoardUrl() {

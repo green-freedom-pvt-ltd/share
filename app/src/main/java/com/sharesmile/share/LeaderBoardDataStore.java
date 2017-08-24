@@ -31,13 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
-import Models.TeamBoard;
+import Models.LeagueBoard;
 import Models.TeamLeaderBoard;
-
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 /**
  * Created by ankitmaheshwari on 5/12/17.
@@ -49,7 +45,7 @@ public class LeaderBoardDataStore {
 
     private static LeaderBoardDataStore uniqueInstance;
 
-    private TeamBoard leagueBoard;
+    private LeagueBoard leagueBoard;
     private Map<String, LeaderBoardList> globalLeaderBoardMap;
     private TeamLeaderBoard myTeamLeaderBoard;
     private int leagueTeamId;
@@ -77,16 +73,8 @@ public class LeaderBoardDataStore {
             globalLeaderBoardMap = new HashMap<>();
         }
 
-//        this.globalLeaderBoardMap = new HashMap<>();
-//        this.globalLeaderBoardMap.put(LAST_WEEK_INTERVAL, SharedPrefsManager.getInstance()
-//                .getObject(Constants.PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
-//        this.globalLeaderBoardMap.put(ALL_TIME_INTERVAL, SharedPrefsManager.getInstance()
-//                .getObject(Constants.PREF_GLOBAL_ALL_TIME_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
-//        this.globalLeaderBoardMap.put(LAST_MONTH_INTERVAL, SharedPrefsManager.getInstance()
-//                .getObject(Constants.PREF_GLOBAL_LAST_MONTH_LEADERBOARD_CACHED_DATA, LeaderBoardList.class));
-
         this.leagueBoard = SharedPrefsManager.getInstance()
-                .getObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, TeamBoard.class);
+                .getObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, LeagueBoard.class);
         this.myTeamLeaderBoard = SharedPrefsManager.getInstance()
                 .getObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, TeamLeaderBoard.class);
     }
@@ -124,7 +112,7 @@ public class LeaderBoardDataStore {
         }
     }
 
-    public TeamBoard getLeagueBoard() {
+    public LeagueBoard getLeagueBoard() {
         return leagueBoard;
     }
 
@@ -142,13 +130,7 @@ public class LeaderBoardDataStore {
 
     public String getLeagueName(){
         if (leagueBoard != null ){
-            Iterator<TeamBoard.Team> iter = leagueBoard.getTeamList().iterator();
-            while (iter.hasNext()){
-                TeamBoard.Team team = iter.next();
-                if (!TextUtils.isEmpty(team.getLeagueName())){
-                    return team.getLeagueName();
-                }
-            }
+            return leagueBoard.getLeagueName();
         }
         return null;
     }
@@ -168,9 +150,9 @@ public class LeaderBoardDataStore {
 
     public String getTeamName(int teamId){
         if (leagueBoard != null){
-            Iterator<TeamBoard.Team> iter = leagueBoard.getTeamList().iterator();
+            Iterator<LeagueBoard.Team> iter = leagueBoard.getTeamList().iterator();
             while (iter.hasNext()){
-                TeamBoard.Team team = iter.next();
+                LeagueBoard.Team team = iter.next();
                 if (team.getId() == teamId){
                     return team.getTeamName();
                 }
@@ -247,7 +229,7 @@ public class LeaderBoardDataStore {
 
     }
 
-    public void setLeagueBoardData(TeamBoard leagueBoard){
+    public void setLeagueBoardData(LeagueBoard leagueBoard){
         this.leagueBoard = leagueBoard;
         SharedPrefsManager.getInstance().setObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, leagueBoard);
     }
@@ -285,7 +267,7 @@ public class LeaderBoardDataStore {
     }
 
     public void updateLeagueBoardData() {
-        NetworkDataProvider.doGetCallAsync(Urls.getTeamBoardUrl(), new NetworkAsyncCallback<TeamBoard>() {
+        NetworkDataProvider.doGetCallAsync(Urls.getLeagueBoardUrl(), new NetworkAsyncCallback<LeagueBoard>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 Logger.e(TAG, "Couldn't fetch LeagueBoard data: " + ne);
@@ -294,7 +276,7 @@ public class LeaderBoardDataStore {
             }
 
             @Override
-            public void onNetworkSuccess(TeamBoard board) {
+            public void onNetworkSuccess(LeagueBoard board) {
                 Logger.d(TAG, "Successfully fetched LeagueBoardData");
                 setLeagueBoardData(board);
                 EventBus.getDefault().post(new LeagueBoardDataUpdated(true));

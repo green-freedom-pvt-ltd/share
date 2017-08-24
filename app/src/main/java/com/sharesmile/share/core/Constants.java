@@ -164,8 +164,11 @@ public class Constants {
 
     public static final String FEEDBACK_TAG_FLAGGED_RUN = "flag";
     public static final String FEEDBACK_TAG_DRAWER = "drawer";
-    public static final String FEEDBACK_TAG_POST_RUN_HAPPY = "happy";
     public static final String FEEDBACK_TAG_POST_RUN_SAD = "sad";
+    public static final String FEEDBACK_TAG_PAST_WORKOUT = "past_workout";
+    public static final String FEEDBACK_TAG_QUESTION = "question";
+    public static final String FEEDBACK_TAG_SOMETHING_ELSE = "other";
+
 
     public static final String PREF_APP_VERSION = "pref_app_version";
 
