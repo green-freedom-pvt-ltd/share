@@ -38,6 +38,9 @@ class LeagueBoard : UnObfuscable, Serializable {
     @SerializedName("impactleague_bannner")
     var leagueBanner: String = ""
 
+    @SerializedName("impactleague_logo")
+    var leagueLogo: String = ""
+
     @SerializedName("total_members")
     var totalMembers: Int = 0
 
@@ -46,6 +49,9 @@ class LeagueBoard : UnObfuscable, Serializable {
 
     @SerializedName("total_distance")
     var totalDistance: Float = 0f
+
+    @SerializedName("total_impact")
+    var totalImpact: Float = 0f
 
     @SerializedName("results")
     var teamList: ArrayList<Team>? = null;

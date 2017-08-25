@@ -132,7 +132,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         float targetAmount = cause.getTargetAmount();
         float amountRaised = cause.getAmountRaised();
         amountRaisedRupees.setText(getString(R.string.amount_raised_rupees,
-                Utils.formatIndianCommaSeparated(amountRaised)));
+                Utils.formatEnglishCommaSeparated(amountRaised)));
 
         float percent = (targetAmount > 0f) ? (amountRaised / targetAmount) : 0;
         amountRaisedPercent.setText((int) (percent*100) + "%");

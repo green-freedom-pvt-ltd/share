@@ -10,7 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -45,6 +47,19 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     @BindView(R.id.list_container)
     View listContainer;
+
+    @BindView(R.id.iv_banner_logo)
+    ImageView bannerLogo;
+
+    @BindView(R.id.tv_banner_total_impact)
+    TextView bannerTotalImpact;
+
+    @BindView(R.id.tv_banner_num_runs)
+    TextView bannerNumRuns;
+
+    @BindView(R.id.tv_banner_num_members)
+    TextView bannerNumMembers;
+
 
     LinearLayoutManager mLayoutManager;
 

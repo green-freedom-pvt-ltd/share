@@ -1,10 +1,8 @@
 package com.sharesmile.share.rfac.fragments;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
@@ -14,6 +12,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -28,10 +27,8 @@ import butterknife.BindView;
 
 public class LeagueBoardFragment extends BaseLeaderBoardFragment implements LeaderBoardAdapter.ItemClickListener {
 
-    @BindView(R.id.banner)
-    ImageView mBanner;
-
-    private String mBannerUrl;
+    @BindView(R.id.banner_container)
+    View bannerContainer;
 
     public static LeagueBoardFragment getInstance() {
         LeagueBoardFragment fragment = new LeagueBoardFragment();
@@ -97,12 +94,11 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     private void showLeagueBoardData(LeagueBoard board){
         mleaderBoardList.clear();
-        mBannerUrl = board.getLeagueBanner();
         String leagueName = board.getLeagueName();
         for (LeagueBoard.Team team : board.getTeamList()) {
             mleaderBoardList.add(team.convertToLeaderBoard());
         }
-        setBannerImage();
+        setBannerContainer(board);
         hideProgressDialog();
         if (!TextUtils.isEmpty(leagueName)){
             setToolbarTitle(leagueName);
@@ -110,12 +106,15 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
         mLeaderBoardAdapter.setData(mleaderBoardList);
     }
 
-    private void setBannerImage() {
-        if (!TextUtils.isEmpty(mBannerUrl)) {
-            ShareImageLoader.getInstance().loadImage(mBannerUrl, mBanner,
-                    ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
-            mBanner.setVisibility(View.VISIBLE);
+    private void setBannerContainer(LeagueBoard board) {
+        if (!TextUtils.isEmpty(board.getLeagueLogo())) {
+            ShareImageLoader.getInstance().loadImage(board.getLeagueLogo(), bannerLogo);
+            bannerLogo.setVisibility(View.VISIBLE);
         }
+        bannerTotalImpact.setText("\u20B9 " + Utils.formatEnglishCommaSeparated(board.getTotalImpact()));
+        bannerNumRuns.setText(Utils.formatEnglishCommaSeparated(board.getTotalRuns()));
+        bannerNumMembers.setText(String.valueOf(board.getTotalMembers()));
+        bannerContainer.setVisibility(View.VISIBLE);
     }
 
     @Override

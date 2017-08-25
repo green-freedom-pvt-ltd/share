@@ -154,7 +154,7 @@ public class Utils {
         return df;
     }
 
-    public static String formatIndianCommaSeparated(float value){
+    public static String formatEnglishCommaSeparated(float value){
         return NumberFormat.getNumberInstance(Locale.ENGLISH).format((int) value);
     }
 
