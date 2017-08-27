@@ -2,7 +2,6 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.content.DialogInterface;
 
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -98,13 +97,15 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.setListener(new BaseDialog.Listener() {
             @Override
             public void onPrimaryClick(BaseDialog dialog) {
-                Utils.share(MainApplication.getContext(), getString(R.string.share_msg));
-                dialog.dismiss();
-                AnalyticsEvent.create(Event.ON_CLICK_TELL_YOUR_FRIENDS)
-                        .addBundle(workoutData.getWorkoutBundle())
-                        .put("num_spikes", workoutData.getNumGpsSpikes())
-                        .put("bolt_count", workoutData.getUsainBoltCount())
-                        .buildAndDispatch();
+                if (isAttachedToActivity()){
+                    Utils.share(getActivity(), getString(R.string.share_msg));
+                    dialog.dismiss();
+                    AnalyticsEvent.create(Event.ON_CLICK_TELL_YOUR_FRIENDS)
+                            .addBundle(workoutData.getWorkoutBundle())
+                            .put("num_spikes", workoutData.getNumGpsSpikes())
+                            .put("bolt_count", workoutData.getUsainBoltCount())
+                            .buildAndDispatch();
+                }
             }
 
             @Override
