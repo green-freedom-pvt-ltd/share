@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container_feedback_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:orientation="horizontal"
+        android:background="@null"
+        android:padding="5dp">
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_category_label"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/greyish_brown_two"
+            android:textSize="14sp"
+            tools:text="Have a Query" />
+
+        <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="23dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/greyish_brown_two"
+            tools:text=">" />
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

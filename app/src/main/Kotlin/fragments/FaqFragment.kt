@@ -2,7 +2,6 @@ package fragments
 
 import Models.FaqList
 import adapters.FaqAdapter
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -33,9 +32,9 @@ class FaqFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mAdapter = FaqAdapter(fragmentController);
-        view.recycler_view.layoutManager = LinearLayoutManager(context);
-        view.recycler_view.adapter = mAdapter;
-        view.recycler_view.setHasFixedSize(true);
+        view.faq_recycler_view.layoutManager = LinearLayoutManager(context);
+        view.faq_recycler_view.adapter = mAdapter;
+        view.faq_recycler_view.setHasFixedSize(true);
         getFaqList();
         fragmentController.updateToolBar(getString(R.string.title_faq), true);
 

@@ -97,20 +97,6 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             ShareImageLoader.getInstance().loadImage(leaderboard.getImage(), mProfileImage,
                     ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
-//            String firstName = leaderboard.getFirst_name();
-//            if (!TextUtils.isEmpty(firstName)){
-//                if (firstName.length() > 1){
-//                    firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1);
-//                }
-//            }
-//
-//            String lastName = leaderboard.getLast_name();
-//            if (!TextUtils.isEmpty(lastName)){
-//                if (lastName.length() > 1){
-//                    lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1);
-//                }
-//            }
-
             mProfileName.setText(leaderboard.getName());
             String distanceString;
             Float lastWeekDist = leaderboard.getDistance();

@@ -99,7 +99,6 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
     inner class FaqUserFeedbackHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
-
         fun bindData() {
 
             itemView.submit.setOnClickListener(View.OnClickListener {

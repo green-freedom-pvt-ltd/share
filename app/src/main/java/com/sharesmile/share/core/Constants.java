@@ -1,6 +1,7 @@
 package com.sharesmile.share.core;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.rfac.models.FeedbackCategory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -180,6 +181,32 @@ public class Constants {
     public static String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
     public static String SHARE_PLACEHOLDER_SPONSOR = "<sponsor_company>";
     public static String SHARE_PLACEHOLDER_PARTNER = "<partner_ngo>";
+
+    public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{
+        add(FeedbackCategory.PAST_WORKOUT);
+        add(FeedbackCategory.QUESTIONS);
+        add(FeedbackCategory.FEEDBACK);
+        add(FeedbackCategory.SOMETHING_ELSE);
+    }};
+
+    public static final List<FeedbackCategory>  PAST_WORKOUT_CATEGORIES = new ArrayList<FeedbackCategory>(){{
+        add(FeedbackCategory.LESS_DISTANCE);
+        add(FeedbackCategory.MORE_DISTANCE);
+        add(FeedbackCategory.FLAGGED_RUN);
+        add(FeedbackCategory.NOT_IN_VEHICLE);
+        add(FeedbackCategory.IMPACT_MISSING_LEADERBOARD);
+        add(FeedbackCategory.STILL_SOMETHING_ELSE);
+    }};
+
+    public static final List<FeedbackCategory>  OTHER_LEVEL_2_CATEGORIES = new ArrayList<FeedbackCategory>(){{
+        add(FeedbackCategory.DISTANCE_NOT_ACCURATE);
+        add(FeedbackCategory.WORKOUT_MISSING_HISTORY);
+        add(FeedbackCategory.IMPACT_MISSING_LEADERBOARD);
+        add(FeedbackCategory.NOT_IN_VEHICLE);
+        add(FeedbackCategory.GPS_ISSUE);
+        add(FeedbackCategory.ZERO_DISTANCE);
+        add(FeedbackCategory.STILL_SOMETHING_ELSE);
+    }};
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));
