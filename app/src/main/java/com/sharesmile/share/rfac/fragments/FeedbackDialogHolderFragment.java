@@ -2,6 +2,7 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.content.DialogInterface;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -9,7 +10,7 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
 import com.sharesmile.share.rfac.TakeFeedbackDialog;
-import com.sharesmile.share.rfac.models.RateUsDialog;
+import com.sharesmile.share.rfac.models.TellYourFriendsDialog;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
@@ -43,7 +44,7 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                         .put("bolt_count", workoutData.getUsainBoltCount())
                         .put("num_update_events", workoutData.getNumUpdateEvents())
                         .buildAndDispatch();
-                showRateUsDialog(workoutData);
+                showTellYourFriendsDialog(workoutData);
             }
 
             @Override
@@ -76,8 +77,8 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 .buildAndDispatch();
     }
 
-    protected void showRateUsDialog(final WorkoutData workoutData){
-        feedbackDialog = new RateUsDialog(getActivity(), R.style.BackgroundDimDialog);
+    protected void showTellYourFriendsDialog(final WorkoutData workoutData){
+        feedbackDialog = new TellYourFriendsDialog(getActivity(), R.style.BackgroundDimDialog);
         feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -97,9 +98,9 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.setListener(new BaseDialog.Listener() {
             @Override
             public void onPrimaryClick(BaseDialog dialog) {
-                Utils.redirectToPlayStore(getContext());
+                Utils.share(MainApplication.getContext(), getString(R.string.share_msg));
                 dialog.dismiss();
-                AnalyticsEvent.create(Event.ON_CLICK_RATE_US)
+                AnalyticsEvent.create(Event.ON_CLICK_TELL_YOUR_FRIENDS)
                         .addBundle(workoutData.getWorkoutBundle())
                         .put("num_spikes", workoutData.getNumGpsSpikes())
                         .put("bolt_count", workoutData.getUsainBoltCount())

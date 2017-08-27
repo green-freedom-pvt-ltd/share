@@ -17,30 +17,30 @@ import butterknife.OnClick;
  * Created by ankitmaheshwari on 6/27/17.
  */
 
-public class RateUsDialog extends BaseDialog {
+public class TellYourFriendsDialog extends BaseDialog {
 
-    private static final String TAG = "RateUsDialog";
+    private static final String TAG = "TellYourFriendsDialog";
 
-    @BindView(R.id.btn_rate_us)
+    @BindView(R.id.btn_tell_friends)
     View rateUsButton;
 
-    public RateUsDialog(Context context, int theme){
+    public TellYourFriendsDialog(Context context, int theme){
         super(context, theme);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_rate_us);
+        setContentView(R.layout.tell_your_friends);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ButterKnife.bind(this);
         setCanceledOnTouchOutside(true);
         setCancelable(true);
     }
 
-    @OnClick(R.id.btn_rate_us)
-    public void onRateUsClick(){
-        Logger.d(TAG, "onRateUsClick");
+    @OnClick(R.id.btn_tell_friends)
+    public void onTellFriendsClick(){
+        Logger.d(TAG, "onTellFriendsClick");
         if (listener != null){
             listener.onPrimaryClick(this);
         }
