@@ -60,6 +60,10 @@ import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.LeaderBoardDataStore.ALL_INTERVALS;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
+import static com.sharesmile.share.gcm.TaskConstants.PUSH_FRAUD_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.PUSH_USER_FEEDBACK;
+import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
+import static com.sharesmile.share.gcm.TaskConstants.UPLOAD_USER_DATA;
 
 /**
  * Created by Shine on 15/05/16.
@@ -71,23 +75,22 @@ public class SyncService extends GcmTaskService {
     public int onRunTask(TaskParams taskParams) {
         Logger.d(TAG, "runtask started: " + taskParams.getTag());
         try {
-            if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false)) {
-                return GcmNetworkManager.RESULT_FAILURE;
-            }else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.UPLOAD_USER_DATA)) {
-                return uploadUserData();
-            } else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.SYNC_DATA)){
-                return syncData();
+            switch (taskParams.getTag()){
+                case UPLOAD_USER_DATA:
+                    return uploadUserData();
+                case SYNC_DATA:
+                    return syncData();
+                case PUSH_FRAUD_DATA:
+                    Bundle fraudExtras = taskParams.getExtras();
+                    String fraudDataString = fraudExtras.getString(TaskConstants.FRAUD_DATA_JSON);
+                    return pushFraudData(fraudDataString);
+                case PUSH_USER_FEEDBACK:
+                    Bundle feedbackExtras = taskParams.getExtras();
+                    String feedbackString = feedbackExtras.getString(TaskConstants.FEEDBACK_DATA_JSON);
+                    return pushUserFeedback(feedbackString);
+                default:
+                    return GcmNetworkManager.RESULT_SUCCESS;
             }
-            else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_FRAUD_DATA)) {
-                Bundle extras = taskParams.getExtras();
-                String fraudDataString = extras.getString(TaskConstants.FRAUD_DATA_JSON);
-                pushFraudData(fraudDataString);
-            }else if (taskParams.getTag().equalsIgnoreCase(TaskConstants.PUSH_USER_FEEDBACK)) {
-                Bundle extras = taskParams.getExtras();
-                String feedbackString = extras.getString(TaskConstants.FEEDBACK_DATA_JSON);
-                pushUserFeedback(feedbackString);
-            }
-            return GcmNetworkManager.RESULT_SUCCESS;
         } catch (Throwable th){
             String message = "Exception while performing sync task: " + taskParams.getTag()
                     + ", exception message: " + th.getMessage();
@@ -344,6 +347,9 @@ public class SyncService extends GcmTaskService {
     }
 
     private int pushFraudData(String fraudDataString){
+        if (!MainApplication.isLogin()){
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
         if (TextUtils.isEmpty(fraudDataString)){
             Logger.d(TAG, "Can't push FraudDtaString in TaskParams is empty");
             return GcmNetworkManager.RESULT_FAILURE;
@@ -388,6 +394,10 @@ public class SyncService extends GcmTaskService {
 
 
     private static int uploadUserData() {
+        if (!MainApplication.isLogin()){
+            // Can't sync a non logged in User
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
         int user_id = MainApplication.getInstance().getUserID();
         Logger.d(TAG, "uploadUserData for userId: " + user_id );
         try {
