@@ -521,13 +521,13 @@ public class Utils {
             run.setEndLocationLong(workout.getEndPointLongitude());
         }
         run.setIsFlag(!workout.getIsValidRun());
-        run.setTeamId(workout.getTeamId());
-        run.setNumSpikes(workout.getNumSpikes());
-        run.setNumUpdates(workout.getNumUpdates());
-        run.setAppVersion(workout.getAppVersion());
-        run.setOsVersion(workout.getOsVersion());
-        run.setDeviceId(workout.getDeviceId());
-        run.setDeviceName(workout.getDeviceName());
+        run.setTeamId(workout.getTeamId() != null ? workout.getTeamId() : 0);
+        run.setNumSpikes(workout.getNumSpikes() != null ? workout.getNumSpikes() : 0);
+        run.setNumUpdates(workout.getNumUpdates() != null ? workout.getNumUpdates() : 0);
+        run.setAppVersion(workout.getAppVersion() != null ? workout.getAppVersion() : "");
+        run.setOsVersion(workout.getOsVersion() != null ? workout.getOsVersion() : 0);
+        run.setDeviceId(workout.getDeviceId() != null ? workout.getDeviceId() : "");
+        run.setDeviceName(workout.getDeviceName() != null ? workout.getDeviceName() : "");
 
         return run;
     }

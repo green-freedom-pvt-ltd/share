@@ -53,7 +53,7 @@ public class FeedbackResolutionFragment extends FeedbackLevelThreeFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         feedbackResolution = (FeedbackResolution) getArguments().getSerializable(FEEDBACK_RESOLUTION_ARGS);
-        concernedRun = (Run) getArguments().getSerializable(FEEDBACK_RESOLUTION_ARGS);
+        concernedRun = (Run) getArguments().getSerializable(CONCERNED_RUN_ARGS);
     }
 
     @Override

@@ -44,8 +44,6 @@ import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -278,12 +276,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }, timeInMillis);
     }
 
-    public static RefWatcher getRefWatcher(Context context) {
-        MainApplication application = (MainApplication) context.getApplicationContext();
-        return application.refWatcher;
-    }
-
-    private RefWatcher refWatcher;
+//    public static RefWatcher getRefWatcher(Context context) {
+//        MainApplication application = (MainApplication) context.getApplicationContext();
+//        return application.refWatcher;
+//    }
+//
+//    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
@@ -292,6 +290,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         ActivityLifecycleCallback.register(this);
 
         super.onCreate();
+        /*
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
@@ -299,6 +298,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
         refWatcher = LeakCanary.install(this);
         // Normal app init code...
+        */
 
         //Initialization code
         SharedPrefsManager.initialize(getApplicationContext());

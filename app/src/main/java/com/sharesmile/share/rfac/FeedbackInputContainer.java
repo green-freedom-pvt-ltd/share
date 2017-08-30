@@ -54,7 +54,7 @@ public class FeedbackInputContainer {
 
     @OnClick(R.id.bt_feedback_submit)
     public void onFeedbackSubmit(){
-        if (TextUtils.isEmpty(getUserInput())){
+        if (TextUtils.isEmpty(getUserInput()) || getUserInput().trim().length() == 0){
             MainApplication.showToast(R.string.please_enter_feedback);
         }else {
             listener.onFeedbackSubmit(getUserInput());

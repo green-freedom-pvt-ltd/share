@@ -50,7 +50,7 @@ class LeagueBoard : UnObfuscable, Serializable {
     @SerializedName("total_distance")
     var totalDistance: Float = 0f
 
-    @SerializedName("total_impact")
+    @SerializedName("total_amount")
     var totalImpact: Float = 0f
 
     @SerializedName("results")
@@ -80,7 +80,7 @@ class LeagueBoard : UnObfuscable, Serializable {
             var board = BaseLeaderBoardItem()
             board.id = id as Long
             board.name = teamName
-            board.distance = distance as Float
+            board.distance = distance.toFloat()
             board.ranking = ranking
             return board
         }

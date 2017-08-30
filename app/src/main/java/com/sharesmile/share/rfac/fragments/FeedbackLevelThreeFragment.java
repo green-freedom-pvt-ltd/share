@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -11,8 +12,10 @@ import android.widget.ProgressBar;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.FeedbackChatContainer;
 import com.sharesmile.share.rfac.FeedbackInputContainer;
+import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.FeedbackNode;
 import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.sync.SyncHelper;
@@ -21,6 +24,7 @@ import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.smooch.ui.ConversationActivity;
 
 /**
  * Created by ankitmaheshwari on 8/29/17.
@@ -115,6 +119,8 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
         Logger.d(TAG, "onFeedbackSubmit with: " + feedbackText);
         if (validateUserInput(feedbackText)){
             SyncHelper.pushUserFeedback(constructFeedbackObject(feedbackText));
+            MainApplication.showToast(R.string.feedback_submitted_successfully);
+            openHomeActivityAndFinish();
         }
     }
 
@@ -123,6 +129,17 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
         Logger.d(TAG, "onChatClicked");
         // TODO: Fire Feedback Api to get ticketId and then start ChatActivity
         SyncHelper.pushUserFeedback(constructFeedbackObject(null));
+        ConversationActivity.show(getContext());
+    }
+
+    private void openHomeActivityAndFinish(){
+        if (getActivity() != null){
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra(Constants.BUNDLE_SHOW_RUN_STATS, true);
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
 }

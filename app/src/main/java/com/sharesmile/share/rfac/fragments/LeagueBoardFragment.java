@@ -61,7 +61,7 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     @Override
     protected void setupToolbar() {
-        setToolbarTitle(getResources().getString(R.string.impact_league));
+        setToolbarTitle(LeaderBoardDataStore.getInstance().getLeagueName());
     }
 
     @Override

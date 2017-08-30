@@ -109,7 +109,7 @@ public class SyncHelper {
                     You specify the earliest point in time in the future from which your task might start executing,
                     as well as the latest point in time in the future at which your task must have executed.
                  */
-                .setExecutionWindow(0L, 60L)
+                .setExecutionWindow(0L, 5L)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .build();
 
