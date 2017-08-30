@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 143
-        versionName "2.3.6.2"
+        versionCode 144
+        versionName "2.3.6.3"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -114,9 +114,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-fitness:10.2.6'
     compile 'com.google.android.gms:play-services-auth:10.2.6'
     compile 'com.google.android.gms:play-services-plus:10.2.6'
-    compile 'com.google.android.gms:play-services-gcm:10.2.6'
-    compile 'com.google.firebase:firebase-core:10.2.6'
     compile 'com.google.firebase:firebase-messaging:10.2.6'
+    compile 'com.google.firebase:firebase-core:10.2.6'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
