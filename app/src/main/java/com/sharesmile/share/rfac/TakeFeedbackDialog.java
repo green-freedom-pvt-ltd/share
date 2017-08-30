@@ -28,6 +28,7 @@ import static com.sharesmile.share.core.Constants.FEEDBACK_TAG_POST_RUN_SAD;
  * Created by ankitmaheshwari on 6/26/17.
  */
 
+@Deprecated
 public class TakeFeedbackDialog extends BaseDialog {
 
     private static final String TAG = "TakeFeedbackDialog";

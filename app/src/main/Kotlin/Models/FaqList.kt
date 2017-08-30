@@ -2,6 +2,7 @@ package Models
 
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.core.UnObfuscable
+import com.sharesmile.share.rfac.models.Qna
 import java.io.Serializable
 import java.util.*
 
@@ -11,13 +12,6 @@ import java.util.*
 class FaqList :UnObfuscable, Serializable {
 
     @SerializedName("results")
-    var faqList: ArrayList<Faq>? = null;
+    var faqList: ArrayList<Qna>? = null;
 
-    class Faq : Serializable {
-        @SerializedName("question")
-        var question: String? = "";
-
-        @SerializedName("answer")
-        var answer: String? = "";
-    }
 }

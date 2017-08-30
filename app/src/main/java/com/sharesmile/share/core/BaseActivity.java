@@ -27,15 +27,19 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.rfac.FeedbackResolutionFactory;
 import com.sharesmile.share.rfac.activities.MainActivity;
-import com.sharesmile.share.rfac.fragments.FeedbackFragment;
+import com.sharesmile.share.rfac.fragments.FeedbackResolutionFragment;
+import com.sharesmile.share.rfac.fragments.HelpCenterFragment;
+import com.sharesmile.share.rfac.fragments.PastWorkoutIssueFragment;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.rfac.models.FeedbackCategory;
+import com.sharesmile.share.rfac.models.FeedbackResolution;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
 import activities.ImpactLeagueActivity;
-import fragments.FaqFragment;
 import fragments.MessageCenterFragment;
 
 import static com.sharesmile.share.core.Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION;
@@ -187,18 +191,25 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case SHOW_LEAGUE_ACTIVITY:
                 startActivityForResult(new Intent(this, ImpactLeagueActivity.class), REQUEST_LEAGUE_REGISTRATION);
                 break;
-            case SHOW_FAQ_FRAGMENT:
-                showFaq();
+            case OPEN_HELP_CENTER:
+                openHelpCenter();
                 break;
-            case SHOW_FEEDBACK_FRAGMENT:
+            case TAKE_FLAGGED_RUN_FEEDBACK:
                 if (input instanceof Run){
-                    showFeedbackFragment((Run)input);
+                    takeFlaggedRunFeedback((Run)input);
                 }else {
-                    throw new IllegalArgumentException("Input should be a Run object for SHOW_FEEDBACK_FRAGMENT");
+                    throw new IllegalArgumentException("Input should be a Run object for TAKE_FLAGGED_RUN_FEEDBACK");
                 }
                 break;
             case OPEN_MUSIC_PLAYER:
                 openMusicPlayer();
+                break;
+            case TAKE_POST_RUN_SAD_FEEDBACK:
+                if (input instanceof Run){
+                    takePostRunSadFeedback((Run)input);
+                }else {
+                    throw new IllegalArgumentException("Input should be a Run object for TAKE_POST_RUN_SAD_FEEDBACK");
+                }
                 break;
         }
     }
@@ -230,12 +241,19 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
-    private void showFeedbackFragment(Run concernedRun) {
-        replaceFragment(FeedbackFragment.newInstance(concernedRun), true);
+    private void takePostRunSadFeedback(Run concernedRun){
+        replaceFragment(PastWorkoutIssueFragment.newInstance(FeedbackCategory.POST_RUN_SAD.copy(),
+                concernedRun), true);
     }
 
-    private void showFaq() {
-        replaceFragment(new FaqFragment(), true);
+    private void takeFlaggedRunFeedback(Run concernedRun) {
+        FeedbackResolution resolution =
+                FeedbackResolutionFactory.getResolutionForCategory(FeedbackCategory.FLAGGED_RUN_HISTORY);
+        replaceFragment(FeedbackResolutionFragment.newInstance(resolution, concernedRun), true);
+    }
+
+    private void openHelpCenter(){
+        replaceFragment(HelpCenterFragment.newInstance(), true);
     }
 
     @Override

@@ -4,10 +4,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:id="@+id/container_select_workout"
+        android:layout_width="match_parent"
+        android:layout_height="63dp"
+        android:gravity="center"
+        android:background="@color/white"
+        android:elevation="3dp"
+        android:visibility="gone">
+
+        <com.sharesmile.share.views.MRTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/black_65"
+            android:gravity="center"
+            android:text="@string/select_workout_with_issue"/>
+
+    </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/lv_profile_history"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/container_select_workout"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

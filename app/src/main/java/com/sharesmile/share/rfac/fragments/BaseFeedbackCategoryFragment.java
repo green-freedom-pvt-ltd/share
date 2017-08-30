@@ -29,7 +29,7 @@ public abstract class BaseFeedbackCategoryFragment extends BaseFeedbackFragment 
     private static final String TAG = "BaseFeedbackCategoryFragment";
 
     @BindView(R.id.rv_feedback_category)
-    private RecyclerView recyclerView;
+    public RecyclerView recyclerView;
 
     LinearLayoutManager mLayoutManager;
     FeedbackCategoryAdapter adapter;

@@ -37,6 +37,7 @@ import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
+import com.sharesmile.share.rfac.models.Qna;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
@@ -49,7 +50,9 @@ import com.squareup.leakcanary.RefWatcher;
 import java.util.ArrayList;
 import java.util.List;
 
+import Models.FaqList;
 import io.fabric.sdk.android.Fabric;
+import io.smooch.core.Smooch;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
@@ -79,6 +82,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     private AppLifecycleHelper lifecycleHelper;
 
     private CauseList causeList;
+    private FaqList faqList;
 
     //generally for singleton class constructor is made private but since this class is registered
     //in manifest and extends Application constructor is public so OS can instantiate it
@@ -316,12 +320,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         checkForFirstLaunchAfterInstall();
 
         causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
+        faqList = SharedPrefsManager.getInstance().getObject(Constants.KEY_FAQ_LIST, FaqList.class);
 
         updateAppVersionInPrefs();
         AnalyticsEvent.create(Event.ON_APPLICATION_CREATE)
                 .buildAndDispatch();
 
-//        Smooch.init(this, "c6596ame55nb4hotaciy1j91v");
+        Smooch.init(this, "c6596ame55nb4hotaciy1j91v");
 
     }
 
@@ -347,6 +352,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
     }
 
+    public CauseList getCauseList(){
+        return causeList;
+    }
+
     public void updateCauseList(CauseList updated){
         this.causeList = updated;
         SharedPrefsManager.getInstance().setObject(Constants.KEY_CAUSE_LIST, updated);
@@ -365,12 +374,17 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
     }
 
-    public CauseList getCauseList(){
-        return causeList;
+    public FaqList getFaqList(){
+        return faqList;
+    }
+
+    public void updateFaqList(FaqList updated){
+        this.faqList = updated;
+        SharedPrefsManager.getInstance().setObject(Constants.KEY_FAQ_LIST, updated);
     }
 
     public List<CauseData> getCausesToShow(){
-        List<CauseData> activeCauses = new ArrayList<CauseData>();
+        List<CauseData> activeCauses = new ArrayList<>();
         if (causeList != null){
             for (CauseData causeData : causeList.getCauses()) {
                 if (causeData.isActive()) {
@@ -381,6 +395,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             }
         }
         return activeCauses;
+    }
+
+    public List<Qna> getFaqsToShow(){
+        if (faqList != null){
+            return faqList.getFaqList();
+        }
+        return new ArrayList<>();
     }
 
     public PendingIntent createAppIntent(){

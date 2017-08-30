@@ -6,7 +6,7 @@ package com.sharesmile.share.rfac.models;
 
 public class FeedbackResolution extends FeedbackNode {
 
-    private String descriptionText;
+    private String explanationText;
 
     private String promptText;
 
@@ -14,13 +14,13 @@ public class FeedbackResolution extends FeedbackNode {
 
     public FeedbackResolution(String descriptionText, String promptText, String hintText) {
         super(LEVEL_3, "resolution", Type.RESOLUTION);
-        this.descriptionText = descriptionText;
+        this.explanationText = descriptionText;
         this.promptText = promptText;
         this.hintText = hintText;
     }
 
-    public String getDescriptionText() {
-        return descriptionText;
+    public String getExplanationText() {
+        return explanationText;
     }
 
     public String getPromptText() {

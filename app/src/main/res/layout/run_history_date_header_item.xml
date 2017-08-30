@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:padding="8dp"
     android:background="@drawable/rounded_rectangle_blue_vertical_gradient">
+    <!--android:background="@drawable/rounded_rectangle_blue_vertical_gradient"-->
 
     <com.sharesmile.share.views.MLTextView
         android:id="@+id/tv_run_history_date_header"

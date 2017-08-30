@@ -1,6 +1,5 @@
 package adapters
 
-import Models.FaqList
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -15,9 +14,10 @@ import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
 import com.sharesmile.share.rfac.fragments.OnScreenFragment
+import com.sharesmile.share.rfac.models.Qna
 import com.sharesmile.share.utils.Urls
 import kotlinx.android.synthetic.main.faq_item_user_input.view.*
-import kotlinx.android.synthetic.main.faq_list_item.view.*
+import kotlinx.android.synthetic.main.feedback_qna_item.view.*
 import org.json.JSONObject
 import java.util.*
 
@@ -26,7 +26,7 @@ import java.util.*
  */
 class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    public var dataList: ArrayList<FaqList.Faq>? = null
+    public var dataList: ArrayList<Qna>? = null
     /* set(value) {
          dataList = value
          notifyDataSetChanged()
@@ -55,7 +55,7 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
         when (viewType) {
             ITEM_FAQ_QUESTION -> {
-                return FaqHolder(LayoutInflater.from(parent?.context).inflate(R.layout.faq_list_item, parent, false));
+                return FaqHolder(LayoutInflater.from(parent?.context).inflate(R.layout.feedback_qna_item, parent, false));
             }
             ITEM_FAQ_FEEDBACK -> {
                 return FaqUserFeedbackHolder(LayoutInflater.from(parent?.context).inflate(R.layout.faq_item_user_input, parent, false))
@@ -68,7 +68,7 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
     }
 
-    public fun setData(data: ArrayList<FaqList.Faq>?) {
+    public fun setData(data: ArrayList<Qna>?) {
         dataList = data
         notifyDataSetChanged()
     }
@@ -90,10 +90,10 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
     inner class FaqHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
-        public fun bindData(data: FaqList.Faq) {
+        public fun bindData(data: Qna) {
 
-            itemView.qa.text = data.question;
-            itemView.answer.text = data.answer;
+            itemView.tv_feedback_question.text = data.question;
+            itemView.tv_feedback_answer.text = data.answer;
         }
     }
 

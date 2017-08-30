@@ -96,6 +96,8 @@ public class Constants {
 
     public static final String KEY_CAUSE_LIST = "key_cause_list_new";
 
+    public static final String KEY_FAQ_LIST = "key_faq_list";
+
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";
 
     public static final String PREF_PREV_DIST_RECORD = "pref_prev_dist_record";
@@ -176,6 +178,10 @@ public class Constants {
     public static final String PREF_CLIENT_CONFIG = "pref_client_config";
     public static final String PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX = "pending_workout_location_data_queue_";
 
+
+    public static final String PREFS_CHAT_TOOLTIP_DISPLAY_COUNT = "chat_tooltip_diplay_count";
+
+
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
     public static String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
@@ -189,24 +195,28 @@ public class Constants {
         add(FeedbackCategory.SOMETHING_ELSE);
     }};
 
-    public static final List<FeedbackCategory>  PAST_WORKOUT_CATEGORIES = new ArrayList<FeedbackCategory>(){{
-        add(FeedbackCategory.LESS_DISTANCE);
-        add(FeedbackCategory.MORE_DISTANCE);
-        add(FeedbackCategory.FLAGGED_RUN);
-        add(FeedbackCategory.NOT_IN_VEHICLE);
-        add(FeedbackCategory.IMPACT_MISSING_LEADERBOARD);
-        add(FeedbackCategory.STILL_SOMETHING_ELSE);
-    }};
+    public static final List<FeedbackCategory> getPastWorkoutCategories(){
+        return new ArrayList<FeedbackCategory>(){{
+            add(FeedbackCategory.LESS_DISTANCE.copy());
+            add(FeedbackCategory.MORE_DISTANCE.copy());
+            add(FeedbackCategory.FLAGGED_RUN.copy());
+            add(FeedbackCategory.NOT_IN_VEHICLE.copy());
+            add(FeedbackCategory.IMPACT_MISSING_LEADERBOARD.copy());
+            add(FeedbackCategory.STILL_SOMETHING_ELSE.copy());
+        }};
+    }
 
-    public static final List<FeedbackCategory>  OTHER_LEVEL_2_CATEGORIES = new ArrayList<FeedbackCategory>(){{
-        add(FeedbackCategory.DISTANCE_NOT_ACCURATE);
-        add(FeedbackCategory.WORKOUT_MISSING_HISTORY);
-        add(FeedbackCategory.IMPACT_MISSING_LEADERBOARD);
-        add(FeedbackCategory.NOT_IN_VEHICLE);
-        add(FeedbackCategory.GPS_ISSUE);
-        add(FeedbackCategory.ZERO_DISTANCE);
-        add(FeedbackCategory.STILL_SOMETHING_ELSE);
-    }};
+    public static final List<FeedbackCategory>  getOtherLevelTwoCategories() {
+        return new ArrayList<FeedbackCategory>() {{
+            add(FeedbackCategory.DISTANCE_NOT_ACCURATE.copy());
+            add(FeedbackCategory.WORKOUT_MISSING_HISTORY.copy());
+            add(FeedbackCategory.IMPACT_MISSING_LEADERBOARD.copy());
+            add(FeedbackCategory.NOT_IN_VEHICLE.copy());
+            add(FeedbackCategory.GPS_ISSUE.copy());
+            add(FeedbackCategory.ZERO_DISTANCE.copy());
+            add(FeedbackCategory.STILL_SOMETHING_ELSE.copy());
+        }};
+    }
 
     public static final List<LatLng> SAMPLE_POINTS_LIST = new ArrayList<LatLng>() {{
         add(new LatLng(19.118394, 72.914196));

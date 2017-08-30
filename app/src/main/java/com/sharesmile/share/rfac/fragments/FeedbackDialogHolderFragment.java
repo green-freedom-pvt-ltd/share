@@ -6,9 +6,9 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
-import com.sharesmile.share.rfac.TakeFeedbackDialog;
 import com.sharesmile.share.rfac.models.TellYourFriendsDialog;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -56,7 +56,8 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                         .put("bolt_count", workoutData.getUsainBoltCount())
                         .put("num_update_events", workoutData.getNumUpdateEvents())
                         .buildAndDispatch();
-                showTakeFeedbackDialog(workoutData);
+                getFragmentController().performOperation(IFragmentController.TAKE_POST_RUN_SAD_FEEDBACK,
+                        Utils.convertWorkoutDataToRun(workoutData));
             }
         });
         feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -121,32 +122,32 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 .buildAndDispatch();
     }
 
-    protected void showTakeFeedbackDialog(final WorkoutData workoutData){
-        feedbackDialog = new TakeFeedbackDialog(getActivity(), R.style.BackgroundDimDialog, workoutData);
-        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                Logger.d(TAG, "TakeFeedbackDialog: onCancel");
-                // User cancelled the dialog without acting on it, lets just trigger exit
-                exitFeedback(workoutData);
-            }
-        });
-        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                Logger.d(TAG, "TakeFeedbackDialog: onDismiss");
-                // Dialog dismissed explicitly
-                exitFeedback(workoutData);
-            }
-        });
-        feedbackDialog.show();
-        AnalyticsEvent.create(Event.ON_LOAD_TAKE_FEEDBACK_POPUP)
-                .addBundle(workoutData.getWorkoutBundle())
-                .put("num_spikes", workoutData.getNumGpsSpikes())
-                .put("bolt_count", workoutData.getUsainBoltCount())
-                .put("num_update_events", workoutData.getNumUpdateEvents())
-                .buildAndDispatch();
-    }
+//    protected void showTakeFeedbackDialog(final WorkoutData workoutData){
+//        feedbackDialog = new TakeFeedbackDialog(getActivity(), R.style.BackgroundDimDialog, workoutData);
+//        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                Logger.d(TAG, "TakeFeedbackDialog: onCancel");
+//                // User cancelled the dialog without acting on it, lets just trigger exit
+//                exitFeedback(workoutData);
+//            }
+//        });
+//        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialog) {
+//                Logger.d(TAG, "TakeFeedbackDialog: onDismiss");
+//                // Dialog dismissed explicitly
+//                exitFeedback(workoutData);
+//            }
+//        });
+//        feedbackDialog.show();
+//        AnalyticsEvent.create(Event.ON_LOAD_TAKE_FEEDBACK_POPUP)
+//                .addBundle(workoutData.getWorkoutBundle())
+//                .put("num_spikes", workoutData.getNumGpsSpikes())
+//                .put("bolt_count", workoutData.getUsainBoltCount())
+//                .put("num_update_events", workoutData.getNumUpdateEvents())
+//                .buildAndDispatch();
+//    }
 
     @Override
     public void onDestroyView() {

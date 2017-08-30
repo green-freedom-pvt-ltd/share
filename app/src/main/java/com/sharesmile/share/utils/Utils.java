@@ -42,6 +42,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.Run;
 import com.squareup.picasso.NetworkPolicy;
@@ -490,6 +491,7 @@ public class Utils {
 
     public static Run convertWorkoutToRun(Workout workout){
         Logger.d(TAG, "convertWorkoutToRun");
+
         Run run = new Run();
         run.setId(workout.getId());
         run.setCauseName(workout.getCauseBrief());
@@ -519,6 +521,51 @@ public class Utils {
             run.setEndLocationLong(workout.getEndPointLongitude());
         }
         run.setIsFlag(!workout.getIsValidRun());
+        run.setTeamId(workout.getTeamId());
+        run.setNumSpikes(workout.getNumSpikes());
+        run.setNumUpdates(workout.getNumUpdates());
+        run.setAppVersion(workout.getAppVersion());
+        run.setOsVersion(workout.getOsVersion());
+        run.setDeviceId(workout.getDeviceId());
+        run.setDeviceName(workout.getDeviceName());
+
+        return run;
+    }
+
+    public static Run convertWorkoutDataToRun(WorkoutData workout){
+        Logger.d(TAG, "convertWorkoutDataToRun");
+
+        Run run = new Run();
+        run.setDistance(workout.getDistance());
+        if (workout.getBeginTimeStamp() > 0){
+            Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
+            run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+        }
+        run.setRunDuration(Utils.secondsToHHMMSS((int) workout.getElapsedTime()));
+        run.setNumSteps(workout.getTotalSteps());
+        run.setAvgSpeed(workout.getAvgSpeed());
+        run.setClientRunId(workout.getWorkoutId());
+        if (workout.getStartPoint() != null){
+            run.setStartLocationLat(workout.getStartPoint().latitude);
+        }
+        if (workout.getStartPoint() != null){
+            run.setStartLocationLong(workout.getStartPoint().longitude);
+        }
+        if (workout.getLatestPoint()!= null){
+            run.setEndLocationLat(workout.getLatestPoint().latitude);
+        }
+        if (workout.getLatestPoint() != null){
+            run.setEndLocationLong(workout.getLatestPoint().longitude);
+        }
+        if (MainApplication.getInstance().getUserDetails() != null){
+            run.setTeamId(MainApplication.getInstance().getUserDetails().getTeamId());
+        }
+        run.setNumSpikes(workout.getNumGpsSpikes());
+        run.setNumUpdates(workout.getNumUpdateEvents());
+        run.setAppVersion(Utils.getAppVersion());
+        run.setOsVersion(Build.VERSION.SDK_INT);
+        run.setDeviceId(Utils.getUniqueId(MainApplication.getContext()));
+        run.setDeviceName(Utils.getDeviceName());
 
         return run;
     }

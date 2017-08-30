@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import Models.FaqList;
 import Models.LeagueBoard;
 import Models.TeamLeaderBoard;
 
@@ -120,6 +121,7 @@ public class SyncService extends GcmTaskService {
         uploadUserData();
         syncLeaderBoardData();
         updateCauseData();
+        updateFaqs();
         syncWorkoutData();
         uploadPendingWorkoutsData();
 
@@ -230,6 +232,26 @@ public class SyncService extends GcmTaskService {
         }
     }
 
+    public static int updateFaqs() {
+        Logger.d(TAG, "updateFaqs");
+        try {
+            FaqList faqList = NetworkDataProvider.doGetCall(Urls.getFaqUrl(), FaqList.class);
+            MainApplication.getInstance().updateFaqList(faqList);
+            EventBus.getDefault().post(new DBEvent.FaqsUpdated(true));
+            return GcmNetworkManager.RESULT_SUCCESS;
+        } catch (NetworkException e) {
+            Logger.e(TAG, "Exception occurred while fetching updated Faqs list from network: " + e.getMessage());
+            e.printStackTrace();
+            EventBus.getDefault().post(new DBEvent.FaqsUpdated(false));
+            return GcmNetworkManager.RESULT_FAILURE;
+        } catch (Exception ex){
+            Logger.e(TAG, "Exception occurred while fetching updated Faqs list: " + ex.getMessage());
+            ex.printStackTrace();
+            EventBus.getDefault().post(new DBEvent.FaqsUpdated(false));
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+    }
+
 
     /**
      * Constructs the sync URL using clientVersion and then fetches all runs with version above clientVersion
@@ -314,35 +336,40 @@ public class SyncService extends GcmTaskService {
         }
         Logger.d(TAG, "Will pushUserFeedback: " + feedbackString);
         try {
-            Gson gson = new Gson();
-            UserFeedback feedback = gson.fromJson(feedbackString, UserFeedback.class);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("user_id", feedback.getUserId());
-            jsonObject.put("email", feedback.getEmail());
-            jsonObject.put("phone_number", feedback.getPhoneNumber());
-            jsonObject.put("tag", feedback.getTag());
-            jsonObject.put("run_id", feedback.getRunId());
-            jsonObject.put("client_run_id", feedback.getClientRunId());
-            jsonObject.put("feedback", feedback.getMessage());
+//            Gson gson = new Gson();
+//            UserFeedback feedback = gson.fromJson(feedbackString, UserFeedback.class);
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("user_id", feedback.getUserId());
+//            jsonObject.put("email", feedback.getEmail());
+//            jsonObject.put("phone_number", feedback.getPhoneNumber());
+//            jsonObject.put("tag", feedback.getTag());
+//            jsonObject.put("run_id", feedback.getRunId());
+//            jsonObject.put("client_run_id", feedback.getClientRunId());
+//            jsonObject.put("feedback", feedback.getMessage());
 
-            NetworkDataProvider.doPostCall(Urls.getFeedBackUrl(), jsonObject, UserFeedback.class);
+            NetworkDataProvider.doPostCall(Urls.getFeedBackUrl(), feedbackString, UserFeedback.class);
             return GcmNetworkManager.RESULT_SUCCESS;
 
-        }catch (JSONException e){
-            e.printStackTrace();
-            Logger.d(TAG, "JSONException: " + e.getMessage());
-            Crashlytics.logException(e);
-            return GcmNetworkManager.RESULT_RESCHEDULE;
         }catch (NetworkException ne){
             ne.printStackTrace();
             Logger.d(TAG, "NetworkException: " + ne);
-            String log= "Couldn't post user feedback to URL: " + Urls.getFraudstersUrl() + ", Feedback: " + feedbackString;
+            String log= "Couldn't post user feedback to URL: " + Urls.getFeedBackUrl()
+                    + ", Feedback: " + feedbackString;
             Logger.e(TAG, log);
             Crashlytics.log(log);
             Crashlytics.log("Push user feedback (id="+MainApplication.getInstance().getUserDetails().getUserId()
                     +") networkException, messageFromServer: " + ne);
             Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
+        }catch (Exception e){
+            e.printStackTrace();
+            String log= "Couldn't post user feedback to URL: " + Urls.getFeedBackUrl()
+                    + ", Feedback: " + feedbackString;
+            Logger.e(TAG, log);
+            Logger.e(TAG, "Exception: " + e.getMessage());
+            Crashlytics.log(log);
+            Crashlytics.logException(e);
+            return GcmNetworkManager.RESULT_FAILURE;
         }
     }
 

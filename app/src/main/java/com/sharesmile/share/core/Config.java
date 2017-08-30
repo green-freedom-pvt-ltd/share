@@ -144,5 +144,7 @@ public class Config {
 
     public static final float MIN_DISTANCE_FOR_FEEDBACK_POPUP = 5.0f;// in Kms
 
+    public static final int CHAT_TOOL_TIP_DISPLAY_MAX_COUNT = 3;
+
 
 }

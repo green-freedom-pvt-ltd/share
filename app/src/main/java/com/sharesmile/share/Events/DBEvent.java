@@ -22,6 +22,19 @@ public class DBEvent {
         }
     }
 
+    public static class FaqsUpdated{
+
+        private boolean success;
+
+        public FaqsUpdated(boolean success){
+            this.success = success;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+    }
+
     public static class RunDataUpdated {
         public RunDataUpdated() {
         }

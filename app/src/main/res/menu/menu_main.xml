@@ -33,14 +33,9 @@
         android:title="About Us" />
 
     <item
-        android:id="@+id/nav_item_faq"
+        android:id="@+id/nav_item_help"
         android:icon="@drawable/svg_ic_help_black"
         android:title="Help" />
-    <item
-        android:id="@+id/nav_item_feedback"
-        android:icon="@drawable/svg_ic_feedback_black"
-        android:title="Feedback" />
-
 
     <item
         android:id="@+id/nav_item_share"

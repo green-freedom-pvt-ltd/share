@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:clipToPadding="false">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/bt_chat"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:fabSize="normal"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        app:backgroundTint="@color/bright_sky_blue"
+        app:srcCompat="@drawable/ic_chat_white_24px"/>
+
+    <com.sharesmile.share.views.MRTextView
+        android:id="@+id/tooltip_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chat_with_us"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="@color/greyish_brown_two"
+        android:background="@drawable/rounded_rectangle_hollow_grey"
+        android:paddingTop="11dp"
+        android:paddingBottom="11dp"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:layout_above="@id/bt_chat"
+        android:layout_toLeftOf="@id/bt_chat"/>
+
+</RelativeLayout>

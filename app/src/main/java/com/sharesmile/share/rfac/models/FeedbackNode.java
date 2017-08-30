@@ -1,10 +1,14 @@
 package com.sharesmile.share.rfac.models;
 
+import com.sharesmile.share.core.UnObfuscable;
+
+import java.io.Serializable;
+
 /**
  * Created by ankitmaheshwari on 8/26/17.
  */
 
-public class FeedbackNode {
+public class FeedbackNode implements UnObfuscable, Serializable {
 
     public static final int LEVEL_1 = 1;
     public static final int LEVEL_2 = 2;
@@ -14,10 +18,21 @@ public class FeedbackNode {
     private String value;
     private Type type;
 
+    private FeedbackNode parent;
+
     public FeedbackNode(int level, String value, Type type) {
         this.level = level;
         this.value = value;
         this.type = type;
+    }
+
+
+    public FeedbackNode getParent() {
+        return parent;
+    }
+
+    public void setParent(FeedbackNode parent) {
+        this.parent = parent;
     }
 
     public int getLevel() {

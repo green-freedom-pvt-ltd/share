@@ -29,6 +29,7 @@ import static com.sharesmile.share.core.Constants.FEEDBACK_TAG_FLAGGED_RUN;
 /**
  * Created by apurvgandhwani on 3/26/2016.
  */
+@Deprecated
 public class FeedbackFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String BUNDLE_CONCERNED_RUN = "bundle_concerned_run";
@@ -41,10 +42,6 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
     private InputMethodManager inputMethodManager;
 
     Run concernedRun;
-
-    public FeedbackFragment(){
-
-    }
 
     public static FeedbackFragment newInstance(Run concernedRun) {
         FeedbackFragment fragment = new FeedbackFragment();
@@ -81,7 +78,11 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         }
         hideKeyboard(mFeedbackText);
         MainApplication.showToast(R.string.feedback_thanks);
+        SyncHelper.pushUserFeedback(constructFeedbackObject());
+        getFragmentController().replaceFragment(new OnScreenFragment(), true);
+    }
 
+    private UserFeedback constructFeedbackObject(){
         UserFeedback feedback = new UserFeedback();
         if (MainApplication.isLogin()){
             feedback.setUserId(MainApplication.getInstance().getUserID());
@@ -91,10 +92,10 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         String feedbackText = mFeedbackText.getText().toString();
         StringBuilder stringBuilder = new StringBuilder();
         if (concernedRun != null){
-            String concernedRunDetails = concernedRun.toString();
+            String concernedRunDetails = concernedRun.extractRelevantInfoAsString();
             stringBuilder.append( "Feedback Message: " + feedbackText
                     +"\nTime: " + DateUtil.getCurrentDate()
-                    +"\nConcerned Run:\n" + concernedRunDetails) ;
+                    +"\nConcerned " + concernedRunDetails) ;
             feedback.setTag(FEEDBACK_TAG_FLAGGED_RUN);
             if (concernedRun.getId() > 0){
                 feedback.setRunId((int)concernedRun.getId());
@@ -105,8 +106,7 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
             feedback.setTag(FEEDBACK_TAG_DRAWER);
         }
         feedback.setMessage(stringBuilder.toString());
-        SyncHelper.pushUserFeedback(feedback);
-        getFragmentController().replaceFragment(new OnScreenFragment(), true);
+        return feedback;
     }
 
     protected void hideKeyboard(View view) {

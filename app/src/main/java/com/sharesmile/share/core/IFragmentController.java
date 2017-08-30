@@ -23,12 +23,12 @@ public interface IFragmentController {
 
     int SHOW_MESSAGE_CENTER = 105;
     int SHOW_LEAGUE_ACTIVITY = 106;
-    int SHOW_FAQ_FRAGMENT = 107;
-    int SHOW_FEEDBACK_FRAGMENT = 108;
-
+    int OPEN_HELP_CENTER = 107;
+    int TAKE_FLAGGED_RUN_FEEDBACK = 108;
     int HIDE_TOOLBAR = 109;
 
     int OPEN_MUSIC_PLAYER = 110;
+    int TAKE_POST_RUN_SAD_FEEDBACK =111;
 
 
     /*

@@ -170,7 +170,7 @@ public class ProfileStatsFragment extends BaseFragment {
                 runHistoryButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        getFragmentController().replaceFragment(new ProfileHistoryFragment(), true);
+                        getFragmentController().replaceFragment(ProfileHistoryFragment.newInstance(false), true);
                     }
                 });
             }else {

@@ -1,10 +1,15 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.rfac.FeedbackResolutionFactory;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
+import com.sharesmile.share.rfac.models.FeedbackQna;
+import com.sharesmile.share.rfac.models.FeedbackResolution;
 
 import java.util.List;
 
@@ -15,6 +20,15 @@ import java.util.List;
 public class HelpCenterFragment extends BaseFeedbackCategoryFragment {
 
     private static final String TAG = "HelpCenterFragment";
+
+    public static HelpCenterFragment newInstance() {
+
+        Bundle args = new Bundle();
+
+        HelpCenterFragment fragment = new HelpCenterFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public int getFeedbackLevel() {
@@ -34,7 +48,20 @@ public class HelpCenterFragment extends BaseFeedbackCategoryFragment {
 
     @Override
     public void onItemClick(FeedbackCategory category) {
-        // TODO: Load Level_2 or Level_3 FeedbackFragment depending on the category clicked
-        getFragmentController().replaceFragment();
+        if (FeedbackCategory.PAST_WORKOUT.equals(category)){
+            getFragmentController().replaceFragment(ProfileHistoryFragment.newInstance(true), true);
+        }
+        else if (FeedbackCategory.QUESTIONS.equals(category)){
+            FeedbackQna feedbackQna =  FeedbackResolutionFactory
+                    .getQna(MainApplication.getInstance().getFaqsToShow());
+            getFragmentController().replaceFragment(FeedbackQnaFragment.newInstance(feedbackQna), true);
+        }
+        else if (FeedbackCategory.FEEDBACK.equals(category)){
+            FeedbackResolution resolution = FeedbackResolutionFactory.getResolutionForCategory(category);
+            getFragmentController().replaceFragment(FeedbackResolutionFragment.newInstance(resolution), true);
+        }
+        else if (FeedbackCategory.SOMETHING_ELSE.equals(category)){
+            getFragmentController().replaceFragment(OtherIssueFragment.newInstance(category), true);
+        }
     }
 }

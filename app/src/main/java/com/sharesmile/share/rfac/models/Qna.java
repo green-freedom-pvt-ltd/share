@@ -1,12 +1,15 @@
 package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharesmile.share.core.UnObfuscable;
+
+import java.io.Serializable;
 
 /**
  * Created by ankitmaheshwari on 8/26/17.
  */
 
-public class Faq {
+public class Qna implements UnObfuscable, Serializable{
 
     @SerializedName("question")
     private String question;

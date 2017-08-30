@@ -20,6 +20,7 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
+import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunHistoryDateHeaderItem;
 import com.sharesmile.share.rfac.models.RunHistoryDetailsItem;
@@ -43,6 +44,9 @@ import java.util.TreeMap;
  * Created by apurvgandhwani on 3/29/2016.
  */
 public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapter.AdapterInterface {
+
+
+    View selectIssueContainer;
     RecyclerView mRecyclerView;
     ProgressBar mProgress;
     private List<Workout> mWorkoutList;
@@ -52,10 +56,24 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     private static String TAG = "ProfileHistoryFragment";
 
+    private static final String ARG_IS_RUN_SELECTION = "arg_is_run_selection";
+
+    private boolean isRunSelection;
+
+    public static ProfileHistoryFragment newInstance(boolean isRunSelection) {
+
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_IS_RUN_SELECTION, isRunSelection);
+        ProfileHistoryFragment fragment = new ProfileHistoryFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isRunSelection = getArguments().getBoolean(ARG_IS_RUN_SELECTION);
     }
 
     @Nullable
@@ -64,6 +82,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         View v = inflater.inflate(R.layout.fragment_profile_history, null);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.lv_profile_history);
         mProgress = (ProgressBar) v.findViewById(R.id.progress_bar);
+        selectIssueContainer = v.findViewById(R.id.container_select_workout);
         init();
         EventBus.getDefault().register(this);
         return v;
@@ -71,10 +90,29 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     private void init() {
         Logger.d(TAG, "init");
-        mHistoryAdapter = new HistoryAdapter(this);
+        mHistoryAdapter = new HistoryAdapter(this, isRunSelection);
         mRecyclerView.setAdapter(mHistoryAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        if (isRunSelection){
+            selectIssueContainer.setVisibility(View.VISIBLE);
+        }else {
+            selectIssueContainer.setVisibility(View.GONE);
+        }
         fetchRunDataFromDb();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        setupToolbar();
+    }
+
+    protected void setupToolbar(){
+        if (isRunSelection){
+            setToolbarTitle(getString(R.string.select_workout));
+        }else {
+            setToolbarTitle(getString(R.string.workout_history_title));
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -189,14 +227,14 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
 
     @Override
-    public void showInvalidRunDialog(final Run invalidRun) {
+    public void showFlaggedRunDialog(final Run flaggedRun) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         invalidRunDialog = builder.setTitle(getString(R.string.invalid_run_title))
-                .setMessage(getString(R.string.invalid_run_message))
-                .setPositiveButton(getString(R.string.feedback), new DialogInterface.OnClickListener() {
+                .setMessage(getString(R.string.flagged_run_message))
+                .setPositiveButton(getString(R.string.why_it_is_flagged), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        getFragmentController().performOperation(IFragmentController.SHOW_FEEDBACK_FRAGMENT, invalidRun);
+                        getFragmentController().performOperation(IFragmentController.TAKE_FLAGGED_RUN_FEEDBACK, flaggedRun);
                     }
                 }).setNegativeButton(getString(R.string.ok), null)
                 .show();
@@ -219,6 +257,12 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
                     })
                     .show();
         }
+    }
+
+    @Override
+    public void onSelectWorkoutWithIssue(Run selectedWorkout) {
+        getFragmentController().replaceFragment(PastWorkoutIssueFragment
+                .newInstance(FeedbackCategory.PAST_WORKOUT.copy(), selectedWorkout), true);
     }
 }
 

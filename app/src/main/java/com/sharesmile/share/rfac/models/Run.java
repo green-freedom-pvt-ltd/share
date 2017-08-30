@@ -3,6 +3,7 @@ package com.sharesmile.share.rfac.models;
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Utils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -311,6 +312,11 @@ public class Run implements UnObfuscable, Serializable {
 
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
+    }
+
+    public String extractRelevantInfoAsString(){
+        return "Workout: " + Utils.formatToKmsWithTwoDecimal(distance) + " km" + ", "
+                + numSteps + " steps";
     }
 
     @Override

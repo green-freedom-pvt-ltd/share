@@ -45,7 +45,6 @@ import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.pushNotification.NotificationConsts;
-import com.sharesmile.share.rfac.fragments.FeedbackFragment;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
@@ -329,11 +328,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             replaceFragment(WebViewFragment.getInstance(WebViewFragment.DISPLAY_ABOUT_US), true);
         }
 
-        if (menuItem.getItemId() == R.id.nav_item_feedback) {
-            Logger.d(TAG, "feedback clicked");
-            replaceFragment(new FeedbackFragment(), true);
-        }
-
         if (menuItem.getItemId() == R.id.nav_item_settings) {
             Logger.d(TAG, "settings clicked");
             replaceFragment(new SettingsFragment(), true);
@@ -341,9 +335,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             showHome();
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
-        } else if (menuItem.getItemId() == R.id.nav_item_faq) {
+        } else if (menuItem.getItemId() == R.id.nav_item_help) {
 //            ConversationActivity.show(this);
-            performOperation(SHOW_FAQ_FRAGMENT,false);
+            performOperation(OPEN_HELP_CENTER,false);
 //            openMusicPlayer();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
