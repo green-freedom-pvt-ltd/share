@@ -19,6 +19,9 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("cause_run_title")
     String causeName;
 
+    @SerializedName("cause_id")
+    int causeId;
+
     @SerializedName("start_time")
     String startTime;
 
@@ -108,6 +111,14 @@ public class Run implements UnObfuscable, Serializable {
 
     public void setCauseName(String causeName) {
         this.causeName = causeName;
+    }
+
+    public int getCauseId() {
+        return causeId;
+    }
+
+    public void setCauseId(int causeId) {
+        this.causeId = causeId;
     }
 
     public String getStartTime() {
@@ -315,7 +326,7 @@ public class Run implements UnObfuscable, Serializable {
     }
 
     public String extractRelevantInfoAsString(){
-        return "Workout: " + Utils.formatToKmsWithTwoDecimal(distance) + " km" + ", "
+        return "Workout: " + Utils.formatWithOneDecimal(distance) + " km" + ", "
                 + numSteps + " steps";
     }
 

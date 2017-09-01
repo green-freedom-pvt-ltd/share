@@ -495,6 +495,7 @@ public class Utils {
         Run run = new Run();
         run.setId(workout.getId());
         run.setCauseName(workout.getCauseBrief());
+        run.setCauseId(workout.getCauseId() != null ? workout.getCauseId() : 0);
         run.setDistance(workout.getDistance());
         if (workout.getBeginTimeStamp() != null){
             Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");

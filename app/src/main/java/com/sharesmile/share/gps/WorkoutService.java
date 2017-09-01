@@ -189,6 +189,7 @@ public class WorkoutService extends Service implements
         workout.setRecordedTime(data.getRecordedTime());
         workout.setSteps(data.getTotalSteps());
         workout.setCauseBrief(mCauseData.getTitle());
+        workout.setCauseId(Integer.parseInt(String.valueOf(mCauseData.getId())));
         workout.setDate(new Date(data.getBeginTimeStamp()));
         workout.setIs_sync(false);
         workout.setWorkoutId(data.getWorkoutId());

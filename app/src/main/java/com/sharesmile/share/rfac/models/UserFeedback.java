@@ -21,7 +21,7 @@ public class UserFeedback {
     private String clientRunId;
     @SerializedName("tag")
     private String tag;
-    @SerializedName("message")
+    @SerializedName("feedback")
     private String message;
     @SerializedName("feedback_app_version")
     private String appVersion;

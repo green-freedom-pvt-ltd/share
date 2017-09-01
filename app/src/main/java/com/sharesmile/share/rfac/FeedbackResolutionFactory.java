@@ -58,7 +58,7 @@ public class FeedbackResolutionFactory {
                     "\n" +
                     "Our automated algorithm detects when our app is used in a vehicle. Your workout is one of the 1.3 % of incorrectly detected cases. We are sorry for that. \n",
 
-                    "Issu still not resolved? Send feedback or chat with us.",
+                    "Issue still not resolved? Send feedback or chat with us.",
 
                     "Enter feedback here");
         }else if (FeedbackCategory.IMPACT_MISSING_LEADERBOARD.equals(parent)){

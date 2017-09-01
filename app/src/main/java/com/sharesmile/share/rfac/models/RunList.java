@@ -127,6 +127,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setIs_sync(true); //
         workout.setDate(run.getDate());
         workout.setCauseBrief(run.getCauseName());
+        workout.setCauseId(run.getCauseId());
         workout.setAvgSpeed(run.getAvgSpeed());
         workout.setDistance(run.getDistance());
         workout.setRunAmount(run.getRunAmount());

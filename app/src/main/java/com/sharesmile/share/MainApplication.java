@@ -50,6 +50,7 @@ import java.util.List;
 
 import Models.FaqList;
 import io.fabric.sdk.android.Fabric;
+import io.smooch.core.Settings;
 import io.smooch.core.Smooch;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
@@ -326,7 +327,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         AnalyticsEvent.create(Event.ON_APPLICATION_CREATE)
                 .buildAndDispatch();
 
-        Smooch.init(this, "c6596ame55nb4hotaciy1j91v");
+        Settings settings = new Settings("c6596ame55nb4hotaciy1j91v");
+        settings.setFirebaseCloudMessagingAutoRegistrationEnabled(false);
+        Smooch.init(this, settings);
 
     }
 

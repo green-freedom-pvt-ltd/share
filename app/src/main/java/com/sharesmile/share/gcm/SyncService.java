@@ -330,24 +330,14 @@ public class SyncService extends GcmTaskService {
     }
 
     private int pushUserFeedback(String feedbackString){
+        Logger.d(TAG, "pushUserFeedback with: " + feedbackString );
         if (TextUtils.isEmpty(feedbackString)){
             Logger.d(TAG, "Can't push FeedbackString in TaskParams is empty");
             return GcmNetworkManager.RESULT_FAILURE;
         }
-        Logger.d(TAG, "Will pushUserFeedback: " + feedbackString);
         try {
-//            Gson gson = new Gson();
-//            UserFeedback feedback = gson.fromJson(feedbackString, UserFeedback.class);
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("user_id", feedback.getUserId());
-//            jsonObject.put("email", feedback.getEmail());
-//            jsonObject.put("phone_number", feedback.getPhoneNumber());
-//            jsonObject.put("tag", feedback.getTag());
-//            jsonObject.put("run_id", feedback.getRunId());
-//            jsonObject.put("client_run_id", feedback.getClientRunId());
-//            jsonObject.put("feedback", feedback.getMessage());
-
             NetworkDataProvider.doPostCall(Urls.getFeedBackUrl(), feedbackString, UserFeedback.class);
+            Logger.d(TAG, "Successfully pushed feedback");
             return GcmNetworkManager.RESULT_SUCCESS;
 
         }catch (NetworkException ne){
@@ -638,6 +628,9 @@ public class SyncService extends GcmTaskService {
                 // Need to make POST request to create a new Run
                 jsonObject.put("user_id", user_id);
                 jsonObject.put("cause_run_title", workout.getCauseBrief());
+                if (workout.getCauseId() > 0){
+                    jsonObject.put("cause_id", workout.getCauseId());
+                }
                 jsonObject.put("distance", workout.getDistance());
 
                 if (workout.getBeginTimeStamp() != null){

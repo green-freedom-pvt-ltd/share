@@ -128,7 +128,7 @@
         </service>
 
         <service
-            android:name="com.clevertap.android.sdk.FcmMessageListenerService">
+            android:name="com.sharesmile.share.core.CustomFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
