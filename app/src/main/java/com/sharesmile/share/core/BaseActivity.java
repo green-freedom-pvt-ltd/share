@@ -27,14 +27,10 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.GoogleLocationTracker;
-import com.sharesmile.share.rfac.FeedbackResolutionFactory;
+import com.sharesmile.share.rfac.activities.FeedbackActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
-import com.sharesmile.share.rfac.fragments.FeedbackResolutionFragment;
-import com.sharesmile.share.rfac.fragments.HelpCenterFragment;
-import com.sharesmile.share.rfac.fragments.PastWorkoutIssueFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.FeedbackResolution;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -242,18 +238,27 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
     private void takePostRunSadFeedback(Run concernedRun){
-        replaceFragment(PastWorkoutIssueFragment.newInstance(FeedbackCategory.POST_RUN_SAD.copy(),
-                concernedRun), true);
+        // Start FeedbackActivty with concernedRun
+        Logger.d(TAG, "takePostRunSadFeedback: Will start FeedbackActivity");
+        Intent intent = new Intent(this, FeedbackActivity.class);
+        intent.putExtra(FeedbackActivity.FEEDBACK_CATEGORY_ARG, FeedbackCategory.POST_RUN_SAD.copy());
+        intent.putExtra(FeedbackActivity.FEEDBACK_CONCERNED_RUN_ARG, concernedRun);
+        startActivity(intent);
     }
 
     private void takeFlaggedRunFeedback(Run concernedRun) {
-        FeedbackResolution resolution =
-                FeedbackResolutionFactory.getResolutionForCategory(FeedbackCategory.FLAGGED_RUN_HISTORY);
-        replaceFragment(FeedbackResolutionFragment.newInstance(resolution, concernedRun), true);
+        // Start FeedbackActivty with concernedRun
+        Logger.d(TAG, "takeFlaggedRunFeedback: Will start FeedbackActivity");
+        Intent intent = new Intent(this, FeedbackActivity.class);
+        intent.putExtra(FeedbackActivity.FEEDBACK_CATEGORY_ARG, FeedbackCategory.FLAGGED_RUN_HISTORY.copy());
+        intent.putExtra(FeedbackActivity.FEEDBACK_CONCERNED_RUN_ARG, concernedRun);
+        startActivity(intent);
     }
 
     private void openHelpCenter(){
-        replaceFragment(HelpCenterFragment.newInstance(), true);
+        Logger.d(TAG, "openHelpCenter: Will start FeedbackActivity");
+        Intent intent = new Intent(this, FeedbackActivity.class);
+        startActivity(intent);
     }
 
     @Override

@@ -106,11 +106,6 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
-    public void loadInitialFragment() {
-
-    }
-
-    @Override
     public int getFrameLayoutId() {
         return 0;
     }
@@ -133,6 +128,11 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     @Override
     public void unregisterForPermissionRequest(int requestCode) {
 
+    }
+
+    @Override
+    public void setToolbarTitle(String toolbarTitle) {
+        // Do Nothing
     }
 
     @Override

@@ -70,7 +70,7 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
 
         fun convertToLeaderBoard(): BaseLeaderBoardItem {
             var board = BaseLeaderBoardItem()
-            board.id = id as Long
+            board.id = id.toLong()
             board.name = Utils.dedupName(firstName, lastName)
             board.image = imageUrl
             board.distance = distance

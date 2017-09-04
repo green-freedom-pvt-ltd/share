@@ -91,10 +91,6 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         list.add(getString(R.string.most_kms_last_month));
         list.add(getString(R.string.most_kms_all_time));
 
-//        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this.getContext(),
-//                R.layout.spinner_item, list);
-//        dataAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-
         spinnerAdapter = new HighLightArrayAdapter(this.getContext(),
                 R.layout.leader_board_spinner, list);
         spinnerAdapter.setDropDownViewResource(R.layout.leader_board_spinner_list_item);

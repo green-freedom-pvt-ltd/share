@@ -224,7 +224,6 @@ public class LeaderBoardDataStore {
             }
         };
         task.run();
-
     }
 
     public void setLeagueBoardData(LeagueBoard leagueBoard){
@@ -302,6 +301,7 @@ public class LeaderBoardDataStore {
     }
 
     public void updateTeamLeaderBoardData(final int teamId) {
+        Logger.d(TAG, "updateTeamLeaderBoardData");
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("team_id", String.valueOf(teamId));
         NetworkDataProvider.doGetCallAsync(Urls.getTeamLeaderBoardUrl(), queryParams, null,

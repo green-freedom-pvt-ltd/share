@@ -7,63 +7,69 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+        android:orientation="vertical">
 
-        <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/list_container"
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/interval_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/most_kms_last_7_days"
+            android:background="@color/white"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:visibility="gone"/>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.design.widget.AppBarLayout
-                android:id="@+id/leaderboard_app_bar"
+            <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white">
+                android:layout_height="match_parent">
 
-                <RelativeLayout
-                    android:id="@+id/container_banner"
+                <LinearLayout
+                    android:id="@+id/list_container"
                     android:layout_width="match_parent"
-                    android:layout_height="240dp"
-                    android:visibility="gone">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:focusableInTouchMode="true">
 
-                    <android.support.v4.view.ViewPager
-                        android:id="@+id/banner_view_pager"
+                    <RelativeLayout
+                        android:id="@+id/container_banner"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"/>
+                        android:layout_height="240dp"
+                        android:visibility="gone">
 
-                    <LinearLayout
-                        android:id="@+id/banner_carousel_indicator_holder"
-                        android:layout_alignParentBottom="true"
+                        <android.support.v4.view.ViewPager
+                            android:id="@+id/banner_view_pager"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"/>
+
+                        <LinearLayout
+                            android:id="@+id/banner_carousel_indicator_holder"
+                            android:layout_alignParentBottom="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="6dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recycler_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="6dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-                    </LinearLayout>
+                        android:layout_height="wrap_content" />
 
-                </RelativeLayout>
+                </LinearLayout>
 
-                <android.support.v7.widget.AppCompatSpinner
-                    android:id="@+id/interval_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:prompt="@string/most_kms_last_7_days"
-                    android:background="@color/white"
-
-                    android:gravity="center" />
-
-            </android.support.design.widget.AppBarLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            </android.support.v4.widget.NestedScrollView>
 
             <include
                 android:id="@+id/containerView"
@@ -73,8 +79,9 @@
                 android:layout_gravity="bottom"
                 android:visibility="gone"/>
 
-        </android.support.design.widget.CoordinatorLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progress_bar"

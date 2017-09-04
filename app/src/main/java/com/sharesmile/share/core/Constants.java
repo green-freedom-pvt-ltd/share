@@ -206,6 +206,15 @@ public class Constants {
         }};
     }
 
+    public static final List<FeedbackCategory> getPostRunSadCategories(){
+        return new ArrayList<FeedbackCategory>(){{
+            add(FeedbackCategory.LESS_DISTANCE.copy());
+            add(FeedbackCategory.MORE_DISTANCE.copy());
+            add(FeedbackCategory.NOT_IN_VEHICLE.copy());
+            add(FeedbackCategory.STILL_SOMETHING_ELSE.copy());
+        }};
+    }
+
     public static final List<FeedbackCategory>  getOtherLevelTwoCategories() {
         return new ArrayList<FeedbackCategory>() {{
             add(FeedbackCategory.DISTANCE_NOT_ACCURATE.copy());

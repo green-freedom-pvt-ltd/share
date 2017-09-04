@@ -57,7 +57,11 @@ public class PastWorkoutIssueFragment extends BaseFeedbackCategoryFragment {
     @NonNull
     @Override
     public List<FeedbackCategory> getCategories() {
-        return Constants.getPastWorkoutCategories();
+        if (FeedbackCategory.PAST_WORKOUT.equals(levelOneParent)){
+            return Constants.getPastWorkoutCategories();
+        }else {
+            return Constants.getPostRunSadCategories();
+        }
     }
 
     @Override

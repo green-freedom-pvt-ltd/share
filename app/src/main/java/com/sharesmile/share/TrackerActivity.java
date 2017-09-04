@@ -108,8 +108,7 @@ public class TrackerActivity extends BaseActivity {
         return WorkoutSingleton.getInstance().isWorkoutActive();
     }
 
-    @Override
-    public void loadInitialFragment() {
+    private void loadInitialFragment() {
         if (isWorkoutActive()) {
             runFragment = createRunFragment();
             addFragment(runFragment, false);
@@ -165,6 +164,11 @@ public class TrackerActivity extends BaseActivity {
     @Override
     public void unregisterForPermissionRequest(int requestCode) {
 
+    }
+
+    @Override
+    public void setToolbarTitle(String toolbarTitle) {
+        // Do Nothing
     }
 
     @Override

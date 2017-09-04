@@ -39,8 +39,6 @@ public interface IFragmentController {
 
     void replaceFragment(BaseFragment fragment, boolean addToBackStack);
 
-    void loadInitialFragment();
-
     int getFrameLayoutId();
 
     String getName();
@@ -54,6 +52,8 @@ public interface IFragmentController {
     void requestPermission(int requestCode, PermissionCallback permissionsCallback);
 
     void unregisterForPermissionRequest(int requestCode);
+
+    void setToolbarTitle(String toolbarTitle);
 
     void updateToolBar(String title,boolean showAsUpEnable);
 

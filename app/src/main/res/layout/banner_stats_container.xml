@@ -7,30 +7,45 @@
     android:background="@drawable/leagueboard_banner_bg"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="22dp">
+    android:padding="21dp">
 
     <ImageView
         android:id="@+id/iv_banner_logo"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="60"
+        android:layout_height="45dp"
         android:scaleType="fitCenter"
         android:visibility="gone"/>
 
-    <com.sharesmile.share.views.LBKTextView
-        android:id="@+id/tv_banner_total_impact"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="68"
+        android:layout_weight="1"
         android:gravity="center"
-        android:text="\u20B9 57,438"
-        android:textColor="@color/orange"
-        android:textSize="48sp" />
+        android:orientation="vertical">
+
+        <com.sharesmile.share.views.MRTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:textColor="@color/black_64"
+            android:text="@string/total_raised"/>
+
+        <com.sharesmile.share.views.LBKTextView
+            android:id="@+id/tv_banner_total_impact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="\u20B9 57,438"
+            android:textColor="@color/orange"
+            android:textSize="48sp" />
+
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="60">
+        android:layout_height="60dp"
+        android:paddingBottom="6dp">
 
         <com.sharesmile.share.views.MRTextView
             android:id="@+id/banner_num_runs_label"

@@ -17,7 +17,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -35,15 +34,16 @@ import android.widget.Toast;
 
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
+import com.sharesmile.share.core.ToolbarActivity;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
@@ -66,21 +66,17 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import Models.CampaignList;
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
+public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CODE_LOGIN = 1001;
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
-    Toolbar toolbar;
 
-    @BindView(R.id.toolbar_title)
-    TextView mToolbarTitle;
     private ActionBarDrawerToggle mDrawerToggle;
 
     private InputMethodManager inputMethodManager;
@@ -100,12 +96,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             loadInitialFragment();
         }
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle("");
-        toolbar.setSubtitle("");
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, getToolbar(), R.string.app_name,
                 R.string.app_name);
 
         mDrawerToggle.syncState();
@@ -221,8 +212,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mi.setTitle(mNewTitle);
     }
 
-    @Override
-    public void loadInitialFragment() {
+    private void loadInitialFragment() {
         addFragment(new OnScreenFragment(), false);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
@@ -246,19 +236,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     @Override
-    public void performOperation(int operationId, Object input) {
-        switch (operationId) {
-            case HIDE_TOOLBAR:
-                if (toolbar != null){
-                    toolbar.setVisibility(View.GONE);
-                }
-                break;
-            default:
-                super.performOperation(operationId, input);
-        }
-    }
-
-    @Override
     public void exit() {
         finish();
     }
@@ -275,7 +252,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public void updateToolBar(String title, boolean showAsUpEnable) {
-        mToolbarTitle.setText(title);
+        setToolbarTitle(title);
         showHomeAsUpEnable(showAsUpEnable);
     }
 
@@ -337,9 +314,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_help) {
-//            ConversationActivity.show(this);
             performOperation(OPEN_HELP_CENTER,false);
-//            openMusicPlayer();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
@@ -411,6 +386,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(DBEvent.CampaignDataUpdated campaignDataUpdated) {
         showPromoModal(campaignDataUpdated.getCampaign());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(LeagueBoardDataUpdated dataUpdated) {
+        if (dataUpdated.isSuccess()){
+            updateNavigationMenu();
+        }
     }
 
     public void showPromoModal(final CampaignList.Campaign campaign) {

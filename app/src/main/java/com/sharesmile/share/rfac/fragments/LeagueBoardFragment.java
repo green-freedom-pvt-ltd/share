@@ -1,7 +1,6 @@
 package com.sharesmile.share.rfac.fragments;
 
 import android.content.Context;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.rfac.AppBarStateChangedListener;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.adapters.LeagueBoardBannerPagerAdapter;
 import com.sharesmile.share.utils.Logger;
@@ -47,9 +45,6 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     @BindView(R.id.container_banner)
     View bannerContainer;
 
-    @BindView(R.id.leaderboard_app_bar)
-    AppBarLayout appBarLayout;
-
     @BindView(R.id.banner_carousel_indicator_holder)
     LinearLayout carouselIndicatorsHolder;
 
@@ -73,18 +68,18 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     @Override
     protected void init() {
         initBanner();
-        appBarLayout.addOnOffsetChangedListener(new AppBarStateChangedListener() {
-            @Override
-            public void onStateChanged(AppBarLayout appBarLayout, State state) {
-                Logger.d(TAG, "onStateChanged: " + state.toString());
-                if (state == State.EXPANDED){
-                    enableDisableSwipeRefresh(true);
-                }else {
-                    enableDisableSwipeRefresh(false);
-                }
-
-            }
-        });
+//        appBarLayout.addOnOffsetChangedListener(new AppBarStateChangedListener() {
+//            @Override
+//            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+//                Logger.d(TAG, "onStateChanged: " + state.toString());
+//                if (state == State.EXPANDED){
+//                    enableDisableSwipeRefresh(true);
+//                }else {
+//                    enableDisableSwipeRefresh(false);
+//                }
+//
+//            }
+//        });
         super.init();
         mLeaderBoardAdapter.setItemClickListener(this);
     }

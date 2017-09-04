@@ -4,7 +4,17 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
-    app:layout_scrollFlags="scroll|enterAlways"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    android:background="@color/sky_blue"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:navigationIcon="?homeAsUpIndicator">
+
+    <com.sharesmile.share.views.MRTextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|left"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:text="Toolbar Title" />
+
 </android.support.v7.widget.Toolbar>

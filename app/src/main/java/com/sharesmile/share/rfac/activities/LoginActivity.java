@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)
                 && (isFromMainActivity || !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false))) {
-            setContentView(R.layout.welcome_screen);
+            setContentView(R.layout.activity_login);
             mLoginHandler = new LoginImpl(this, this);
             ButterKnife.bind(this);
             initUi();
