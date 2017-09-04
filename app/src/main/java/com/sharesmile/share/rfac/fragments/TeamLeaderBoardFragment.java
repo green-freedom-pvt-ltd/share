@@ -87,19 +87,12 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
             hideProgressDialog();
             if (board != null){
                 // We have something to display
-                String teamName = "";
-                for (TeamLeaderBoard.UserDetails team : board.getTeamList()) {
-                    Float distance = 0f;
-                    if (team.getLeagueTotalDistance() != null && team.getLeagueTotalDistance().getTotalDistance() != null) {
-                        distance = team.getLeagueTotalDistance().getTotalDistance();
-                    }
-                    if (TextUtils.isEmpty(teamName)){
-                        teamName = team.getTeamName();
-                    }
-                    mleaderBoardList.add(team.getUser().convertToLeaderBoard(distance));
-                }
+                String teamName = board.getTeamName();
                 if (!TextUtils.isEmpty(teamName)){
                     setToolbarTitle(teamName);
+                }
+                for (TeamLeaderBoard.MemberDetails memberDetails : board.getMembersList()) {
+                    mleaderBoardList.add(memberDetails.convertToLeaderBoard());
                 }
                 mLeaderBoardAdapter.setData(mleaderBoardList);
             }else {

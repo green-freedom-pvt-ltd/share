@@ -465,7 +465,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     /**
-     * @return UserDetails object if user is logged in, NULL otherwise
+     * @return MemberDetails object if user is logged in, NULL otherwise
      */
     public UserDetails getUserDetails(){
         return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);

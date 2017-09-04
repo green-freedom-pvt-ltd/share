@@ -1,8 +1,13 @@
 package com.sharesmile.share.rfac.fragments;
 
 import android.content.Context;
+import android.support.design.widget.AppBarLayout;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
@@ -10,13 +15,18 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.rfac.AppBarStateChangedListener;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.rfac.adapters.LeagueBoardBannerPagerAdapter;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Models.LeagueBoard;
 import butterknife.BindView;
@@ -27,8 +37,21 @@ import butterknife.BindView;
 
 public class LeagueBoardFragment extends BaseLeaderBoardFragment implements LeaderBoardAdapter.ItemClickListener {
 
-    @BindView(R.id.banner_container)
+    private static final String TAG = "LeagueBoardFragment";
+
+    LeagueBoardBannerPagerAdapter bannerPagerAdapter;
+
+    @BindView(R.id.banner_view_pager)
+    ViewPager bannerViewPager;
+
+    @BindView(R.id.container_banner)
     View bannerContainer;
+
+    @BindView(R.id.leaderboard_app_bar)
+    AppBarLayout appBarLayout;
+
+    @BindView(R.id.banner_carousel_indicator_holder)
+    LinearLayout carouselIndicatorsHolder;
 
     public static LeagueBoardFragment getInstance() {
         LeagueBoardFragment fragment = new LeagueBoardFragment();
@@ -49,6 +72,19 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     @Override
     protected void init() {
+        initBanner();
+        appBarLayout.addOnOffsetChangedListener(new AppBarStateChangedListener() {
+            @Override
+            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                Logger.d(TAG, "onStateChanged: " + state.toString());
+                if (state == State.EXPANDED){
+                    enableDisableSwipeRefresh(true);
+                }else {
+                    enableDisableSwipeRefresh(false);
+                }
+
+            }
+        });
         super.init();
         mLeaderBoardAdapter.setItemClickListener(this);
     }
@@ -56,12 +92,70 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     @Override
     protected void refreshItems() {
         super.refreshItems();
+        bannerContainer.setVisibility(View.GONE);
         LeaderBoardDataStore.getInstance().updateLeagueBoardData();
     }
 
     @Override
     protected void setupToolbar() {
         setToolbarTitle(LeaderBoardDataStore.getInstance().getLeagueName());
+    }
+
+    private int currentPage;
+    private List<ImageView> indicators = new ArrayList<>();
+
+    private void initBanner(){
+        bannerPagerAdapter = new LeagueBoardBannerPagerAdapter();
+        bannerViewPager.setAdapter(bannerPagerAdapter);
+        currentPage = 0;
+        bannerViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                // Setting newImage as current image
+                setSelectedPage(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                enableDisableSwipeRefresh( state == ViewPager.SCROLL_STATE_IDLE );
+            }
+        });
+        addIndicators(2, currentPage);
+    }
+
+    private void addIndicators(int numPages, int displayImageIndex){
+        Logger.d(TAG, "addIndicators, displayImageIndex = " + displayImageIndex);
+        if (Utils.isCollectionFilled(indicators) && indicators.size() == numPages) {
+            // Indicators already added, no need to add again.
+            return;
+        }else{
+            carouselIndicatorsHolder.removeAllViews();
+            indicators = new ArrayList<>();
+            for(int i=0; i < numPages; i++){
+                View indicatorContainer = LayoutInflater.from(getContext()).inflate(R.layout.carousel_indicator,
+                        carouselIndicatorsHolder, false);
+                indicators.add((ImageView) indicatorContainer.findViewById(R.id.iv_indicator_circle));
+                if (i == displayImageIndex){
+                    indicators.get(i).setSelected(true);
+                }
+                carouselIndicatorsHolder.addView(indicatorContainer);
+            }
+        }
+    }
+
+    private void setSelectedPage(int newPosition){
+        int prevIndex = currentPage;
+        // Setting newPosition as current page
+        currentPage = newPosition;
+        if (indicators != null){
+            indicators.get(prevIndex).setSelected(false);
+            indicators.get(currentPage).setSelected(true);
+        }
     }
 
     @Override
@@ -93,12 +187,13 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     }
 
     private void showLeagueBoardData(LeagueBoard board){
+        Logger.d(TAG, "showLeagueBoardData");
         mleaderBoardList.clear();
         String leagueName = board.getLeagueName();
         for (LeagueBoard.Team team : board.getTeamList()) {
             mleaderBoardList.add(team.convertToLeaderBoard());
         }
-        setBannerContainer(board);
+        setBanner(board);
         hideProgressDialog();
         if (!TextUtils.isEmpty(leagueName)){
             setToolbarTitle(leagueName);
@@ -106,15 +201,10 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
         mLeaderBoardAdapter.setData(mleaderBoardList);
     }
 
-    private void setBannerContainer(LeagueBoard board) {
-        if (!TextUtils.isEmpty(board.getLeagueLogo())) {
-            ShareImageLoader.getInstance().loadImage(board.getLeagueLogo(), bannerLogo);
-            bannerLogo.setVisibility(View.VISIBLE);
-        }
-        bannerTotalImpact.setText("\u20B9 " + Utils.formatEnglishCommaSeparated(board.getTotalImpact()));
-        bannerNumRuns.setText(Utils.formatEnglishCommaSeparated(board.getTotalRuns()));
-        bannerNumMembers.setText(String.valueOf(board.getTotalMembers()));
+    private void setBanner(LeagueBoard board) {
+        bannerPagerAdapter.setData(board);
         bannerContainer.setVisibility(View.VISIBLE);
+        enableDisableSwipeRefresh(true);
     }
 
     @Override

@@ -5,117 +5,59 @@
     android:id="@+id/profile_tab_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:orientation="vertical">
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white">
-
-        <LinearLayout
-            android:id="@+id/banner_container"
-            android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:background="@drawable/leagueboard_banner_bg"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="22dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/iv_banner_logo"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="60"
-                android:scaleType="fitCenter"
-                android:visibility="gone"/>
-
-            <com.sharesmile.share.views.LBKTextView
-                android:id="@+id/tv_banner_total_impact"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="68"
-                android:gravity="center"
-                android:text="\u20B9 57,438"
-                android:textColor="@color/orange"
-                android:textSize="48sp" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="60">
-
-                <com.sharesmile.share.views.MRTextView
-                    android:id="@+id/banner_num_runs_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@color/black_38"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:text="@string/impact_runs"/>
-
-                <com.sharesmile.share.views.LBTextView
-                    android:id="@+id/tv_banner_num_runs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textColor="@color/black_57"
-                    android:text="7,944"
-                    android:layout_alignParentLeft="true"
-                    android:layout_above="@id/banner_num_runs_label"/>
-
-                <com.sharesmile.share.views.MRTextView
-                    android:id="@+id/banner_num_members_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@color/black_38"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:text="@string/members"/>
-
-                <com.sharesmile.share.views.LBTextView
-                    android:id="@+id/tv_banner_num_members"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textColor="@color/black_57"
-                    android:text="435"
-                    android:layout_alignParentRight="true"
-                    android:layout_above="@id/banner_num_members_label"/>
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <android.support.v7.widget.AppCompatSpinner
-            android:id="@+id/interval_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:prompt="@string/most_kms_last_7_days"
-            android:background="@color/white"
-            android:visibility="gone"
-            android:gravity="center" />
-
-    </android.support.design.widget.AppBarLayout>
+    android:background="@color/white">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
         <android.support.design.widget.CoordinatorLayout
             android:id="@+id/list_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingBottom="1.5dp"
-            android:paddingLeft="1dp"
-            android:paddingRight="1dp">
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/leaderboard_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+
+                <RelativeLayout
+                    android:id="@+id/container_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:visibility="gone">
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/banner_view_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"/>
+
+                    <LinearLayout
+                        android:id="@+id/banner_carousel_indicator_holder"
+                        android:layout_alignParentBottom="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/interval_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:prompt="@string/most_kms_last_7_days"
+                    android:background="@color/white"
+
+                    android:gravity="center" />
+
+            </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"

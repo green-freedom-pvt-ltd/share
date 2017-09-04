@@ -85,7 +85,7 @@ public class ProfileGeneralFragment extends BaseFragment implements
         super.onCreate(savedInstanceState);
         userDetails = MainApplication.getInstance().getUserDetails();
         Gson gson = new Gson();
-        Logger.d(TAG, "onCreate, UserDetails: " + gson.toJson(userDetails));
+        Logger.d(TAG, "onCreate, MemberDetails: " + gson.toJson(userDetails));
     }
 
     @Nullable

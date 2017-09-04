@@ -8,6 +8,11 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import io.smooch.core.User;
+
 /**
  * Created by ankitm on 11/04/16.
  */
@@ -66,6 +71,7 @@ public class Analytics {
     public void setUserProperties(){
         UserDetails details = MainApplication.getInstance().getUserDetails();
         if (details != null){
+            Logger.d(TAG, "setUserProperties");
             setUserName(details.getFullName());
             setUserId(details.getUserId());
             setUserEmail(details.getEmail());
@@ -73,6 +79,17 @@ public class Analytics {
             setUserGender(details.getGenderUser());
             setUserPhoto(details.getSocialThumb());
             setUserImpactLeagueTeamCode(details.getTeamId());
+
+            User.getCurrentUser().setFirstName(details.getFirstName());
+            User.getCurrentUser().setLastName(details.getLastName());
+            User.getCurrentUser().setEmail(details.getEmail());
+
+            final Map<String, Object> customProperties = new HashMap<>();
+            customProperties.put("userId", details.getUserId());
+            customProperties.put("phoneNumber", details.getPhoneNumber());
+            customProperties.put("gender", details.getGenderUser());
+            customProperties.put("teamId", details.getTeamId());
+            User.getCurrentUser().addProperties(customProperties);
         }
     }
 

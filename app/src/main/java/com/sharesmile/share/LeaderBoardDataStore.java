@@ -1,8 +1,8 @@
 package com.sharesmile.share;
 
 import android.content.Context;
-import android.text.TextUtils;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
@@ -121,6 +121,10 @@ public class LeaderBoardDataStore {
     }
 
     public TeamLeaderBoard getMyTeamLeaderBoard() {
+        if (myTeamLeaderBoard == null){
+            myTeamLeaderBoard = SharedPrefsManager.getInstance()
+                    .getObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, TeamLeaderBoard.class);
+        }
         return myTeamLeaderBoard;
     }
 
@@ -136,14 +140,8 @@ public class LeaderBoardDataStore {
     }
 
     public String getMyTeamName(){
-        if (myTeamLeaderBoard != null && myTeamLeaderBoard.getTeamList().get(0) != null){
-            Iterator<TeamLeaderBoard.UserDetails> iter = myTeamLeaderBoard.getTeamList().iterator();
-            while (iter.hasNext()){
-                TeamLeaderBoard.UserDetails team = iter.next();
-                if (!TextUtils.isEmpty(team.getTeamName())){
-                    return team.getTeamName();
-                }
-            }
+        if (myTeamLeaderBoard != null){
+            return myTeamLeaderBoard.getTeamName();
         }
         return null;
     }
@@ -277,7 +275,8 @@ public class LeaderBoardDataStore {
 
             @Override
             public void onNetworkSuccess(LeagueBoard board) {
-                Logger.d(TAG, "Successfully fetched LeagueBoardData");
+                Gson gson = new Gson();
+                Logger.d(TAG, "Successfully fetched LeagueBoardData: " + gson.toJson(board));
                 setLeagueBoardData(board);
                 EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
             }

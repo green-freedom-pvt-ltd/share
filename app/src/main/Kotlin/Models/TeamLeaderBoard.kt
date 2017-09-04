@@ -21,59 +21,66 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
     @SerializedName("previous")
     var previousUrl: String = ""
 
+    @SerializedName("team_name")
+    var teamName: String = ""
+
+    @SerializedName("team_id")
+    var teamId: Int? = 0
+
+    @SerializedName("total_distance")
+    var totalDistance: Float? = 0f
+
+    @SerializedName("total_amount")
+    var totalAmount: Float? = 0f
+
+    @SerializedName("total_members")
+    var totalMembers: Int? = 0
+
+    @SerializedName("total_runs")
+    var totalRuns: Int? = 0
+
     @SerializedName("results")
-    var teamList: ArrayList<UserDetails>? = null;
+    var membersList: ArrayList<MemberDetails>? = null;
 
-    public class UserDetails : Serializable {
-        @SerializedName("user")
-        var user: User? = null;
-
-        @SerializedName("league_total_distance")
-        public val leagueTotalDistance: TotalDistance? = null
-
-        @SerializedName("league_total_amount")
-        public val totalLeagueAmount: TotalLeagueAmount? = null
-
-        @SerializedName("team")
-        public var teamName: String? = null
-
-    }
-
-
-    public class User : Serializable {
+    class MemberDetails : Serializable {
 
         @SerializedName("user_id")
-        var id: Long? = 0;
+        var id: Int = 0
+
+        @SerializedName("ranking")
+        var ranking: Int = 0
 
         @SerializedName("first_name")
-        private var firstName: String? = null
+        var firstName: String? = null
 
         @SerializedName("last_name")
-        private val lastName: String? = null
+        var lastName: String? = null
 
         @SerializedName("social_thumb")
-        private val imageUrl: String? = null
+        var imageUrl: String? = null
 
+        @SerializedName("gender_user")
+        var gender: String? = null
 
-        public fun convertToLeaderBoard(distance: Float): BaseLeaderBoardItem {
+        @SerializedName("distance")
+        var distance: Float = 0f
 
+        @SerializedName("amount")
+        var amount: Float = 0f
+
+        fun convertToLeaderBoard(): BaseLeaderBoardItem {
             var board = BaseLeaderBoardItem()
             board.id = id as Long
             board.name = Utils.dedupName(firstName, lastName)
-            board.distance = distance
             board.image = imageUrl
-            return board;
+            board.distance = distance
+            board.ranking = ranking
+            board.amount = amount
+            return board
         }
+
     }
 
-    class TotalDistance : Serializable {
-        @SerializedName("total_distance")
-        public val totalDistance: Float? = 0f;
-    }
 
-    class TotalLeagueAmount : Serializable {
-        @SerializedName("total_amount")
-        public val totalAmount: Float? = 0f;
-    }
 
 }

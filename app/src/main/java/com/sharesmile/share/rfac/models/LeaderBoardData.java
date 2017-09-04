@@ -29,6 +29,9 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
     @SerializedName("ranking")
     private int rank;
 
+    @SerializedName("amount")
+    private float amount;
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -53,11 +56,19 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
         return rank;
     }
 
+    public float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
     public BaseLeaderBoardItem getLeaderBoardDbObject()
     {
         BaseLeaderBoardItem lb = new BaseLeaderBoardItem(
                 getUserid(), Utils.dedupName(getFirstName(), getLastName()) , getImageUrl(),
-                getDistance(), getRank());
+                getDistance(), getRank(), getAmount());
         return lb;
     }
 

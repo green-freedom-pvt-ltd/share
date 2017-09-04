@@ -33,7 +33,7 @@ public class Urls {
 
     private static final String LEAGUE_URL = "/api/employeetoteam/";
     private static final String LEAGUEBOARD_URL = "/api/teamboardv2/";
-    private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboard/";
+    private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboardv2/";
     private static final String SERVER_TIME_URL = "/api/servertime/";
 
     public static String getBaseUrl() {

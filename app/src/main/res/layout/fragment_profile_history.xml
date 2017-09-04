@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/black_65"
+            android:textColor="@color/black_64"
             android:gravity="center"
             android:text="@string/select_workout_with_issue"/>
 

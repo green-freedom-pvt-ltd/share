@@ -10,9 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -48,19 +46,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     @BindView(R.id.list_container)
     View listContainer;
 
-    @BindView(R.id.iv_banner_logo)
-    ImageView bannerLogo;
-
-    @BindView(R.id.tv_banner_total_impact)
-    TextView bannerTotalImpact;
-
-    @BindView(R.id.tv_banner_num_runs)
-    TextView bannerNumRuns;
-
-    @BindView(R.id.tv_banner_num_members)
-    TextView bannerNumMembers;
-
-
     LinearLayoutManager mLayoutManager;
 
     protected List<BaseLeaderBoardItem> mleaderBoardList = new ArrayList<>();
@@ -69,7 +54,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View l = inflater.inflate(R.layout.fragment_drawer_leaderboard, null);
         ButterKnife.bind(this, l);
         init();
@@ -97,14 +81,20 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
                 }else {
                     MainApplication.showToast("Please connect to Internet");
                 }
-
             }
         });
         mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
 
     }
 
+    protected void enableDisableSwipeRefresh(boolean enable) {
+        if (mswipeRefresh != null) {
+            mswipeRefresh.setEnabled(enable);
+        }
+    }
+
     protected void refreshItems(){
+        Logger.d(TAG, "refreshItems");
         if (mleaderBoardList != null) {
             mleaderBoardList.clear();
             Logger.i(TAG, "LeaderBoard list cleared");

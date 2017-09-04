@@ -485,7 +485,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 Logger.i(TAG, "Mock Location detected: " + location.toString());
                 EventBus.getDefault().post(new MockLocationDetected());
             }
-        }else {
+        } else {
             if (isMockLocationEnabled()){
                 Logger.i(TAG, "Mock location is enabled");
                 EventBus.getDefault().post(new MockLocationDetected());

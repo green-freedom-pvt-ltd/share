@@ -8,9 +8,9 @@ public class FeedbackCategory extends FeedbackNode {
 
     // Level_1
     public static final FeedbackCategory PAST_WORKOUT = new FeedbackCategory(LEVEL_1, "pastworkout", "Issue with past workout");
-    public static final FeedbackCategory QUESTIONS = new FeedbackCategory(LEVEL_1, "question", "Questions");
-    public static final FeedbackCategory FEEDBACK = new FeedbackCategory(LEVEL_1, "feedback", "Feedback/Suggestions");
-    public static final FeedbackCategory SOMETHING_ELSE = new FeedbackCategory(LEVEL_1, "else", "Something else");
+    public static final FeedbackCategory QUESTIONS = new FeedbackCategory(LEVEL_1, "question", "I have a query");
+    public static final FeedbackCategory FEEDBACK = new FeedbackCategory(LEVEL_1, "feedback", "I have a suggestion");
+    public static final FeedbackCategory SOMETHING_ELSE = new FeedbackCategory(LEVEL_1, "else", "Issue not listed");
     public static final FeedbackCategory FLAGGED_RUN_HISTORY = new FeedbackCategory(LEVEL_1, "flag", "Workout flagged in history");
     public static final FeedbackCategory POST_RUN_SAD = new FeedbackCategory(LEVEL_1, "sad", "Not good");
     public static final FeedbackCategory POST_RUN_HAPPY = new FeedbackCategory(LEVEL_1, "happy", "I loved it");

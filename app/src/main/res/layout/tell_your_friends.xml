@@ -29,7 +29,7 @@
             android:text="@string/tell_friends"
             android:textAllCaps="true"
             android:gravity="center"
-            android:textColor="@color/black_65"/>
+            android:textColor="@color/black_64"/>
 
         <com.sharesmile.share.views.MRTextView
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
             android:textAlignment="center"
             android:gravity="center"
             android:textSize="13sp"
-            android:textColor="@color/black_65" />
+            android:textColor="@color/black_64" />
 
         <com.sharesmile.share.views.MRButton
             android:id="@+id/btn_tell_friends"

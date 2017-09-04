@@ -88,6 +88,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         setContentView(R.layout.activity_main);

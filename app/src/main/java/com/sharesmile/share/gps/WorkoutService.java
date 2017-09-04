@@ -806,7 +806,7 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "pushFraudDataOnServer");
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if (userDetails == null){
-            Logger.e(TAG, "Can't push fraud data as UserDetails are not present");
+            Logger.e(TAG, "Can't push fraud data as MemberDetails are not present");
             return;
         }
         FraudData data = new FraudData();

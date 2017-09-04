@@ -11,17 +11,19 @@ public class BaseLeaderBoardItem {
     private String image;
     private float distance;
     private int ranking;
+    private float amount;
 
     public BaseLeaderBoardItem(){
 
     }
 
-    public BaseLeaderBoardItem(long id, String name, String image, float distance, int ranking) {
+    public BaseLeaderBoardItem(long id, String name, String image, float distance, int ranking, float amount) {
         this.id = id;
         this.name = name;
         this.image = image;
         this.distance = distance;
         this.ranking = ranking;
+        this.amount = amount;
     }
 
     public long getId() {
@@ -62,5 +64,13 @@ public class BaseLeaderBoardItem {
 
     public void setRanking(int ranking) {
         this.ranking = ranking;
+    }
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
     }
 }

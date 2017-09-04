@@ -35,7 +35,7 @@ class LeagueBoard : UnObfuscable, Serializable {
     @SerializedName("duration")
     var durationInDays: Int = 0
 
-    @SerializedName("impactleague_bannner")
+    @SerializedName("impactleague_banner")
     var leagueBanner: String = ""
 
     @SerializedName("impactleague_logo")
@@ -71,17 +71,21 @@ class LeagueBoard : UnObfuscable, Serializable {
         var teamCaptainEmailId: String? = ""
 
         @SerializedName("distance")
-        private var distance: Int = 0
+        private var distance: Float = 0f
+
+        @SerializedName("amount")
+        private var amount: Float = 0f
 
         @SerializedName("ranking")
         private var ranking: Int = 0
 
-        public fun convertToLeaderBoard(): BaseLeaderBoardItem {
+        fun convertToLeaderBoard(): BaseLeaderBoardItem {
             var board = BaseLeaderBoardItem()
             board.id = id as Long
             board.name = teamName
-            board.distance = distance.toFloat()
+            board.distance = distance
             board.ranking = ranking
+            board.amount = amount
             return board
         }
     }

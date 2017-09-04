@@ -421,7 +421,7 @@ public class SyncService extends GcmTaskService {
 
             UserDetails prev = MainApplication.getInstance().getUserDetails();
             if (prev == null){
-                Logger.d(TAG, "Can't UPLOAD, UserDetails not present");
+                Logger.d(TAG, "Can't UPLOAD, MemberDetails not present");
                 return GcmNetworkManager.RESULT_FAILURE;
             }
 

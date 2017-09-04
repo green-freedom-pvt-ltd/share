@@ -46,9 +46,10 @@
     <color name="seafoam_blue">#50d2c2</color>
     <color name="ice_blue">#e6f8ff</color>
     <color name="black_5">#0c000000</color>
+    <color name="black_18">#2e000000</color>
     <color name="black_50">#7f000000</color>
     <color name="black_57">#91000000</color>
-    <color name="black_65">#a5000000</color>
+    <color name="black_64">#a4000000</color>
     <color name="black_four">#141414</color>
     <color name="dark_blue">#55acee</color>
     <color name="denim_blue">#3c55a2</color>
@@ -65,4 +66,28 @@
     <color name="light_gold">#ffcd4d</color>
     <color name="purplish_brown">#453640</color>
     <color name="pale_grey">#f6f7f9</color>
+
+    <color name="Smooch_accent">#9200aa</color>
+    <color name="Smooch_accentDark">#76008a</color>
+    <color name="Smooch_accentLight">#be7cca</color>
+
+    <color name="Smooch_backgroundInput">#ffffff</color>
+
+    <color name="Smooch_btnSendHollow">#c0c0c0</color>
+    <color name="Smooch_btnSendHollowBorder">#303030</color>
+
+    <color name="Smooch_header">#989898</color>
+
+    <color name="Smooch_messageDate">@color/Smooch_header</color>
+    <color name="Smooch_messageShadow">#7f999999</color>
+
+    <color name="Smooch_remoteMessageAuthor">@color/Smooch_header</color>
+    <color name="Smooch_remoteMessageBackground">#ffffff</color>
+    <color name="Smooch_remoteMessageBorder">#d9d9d9</color>
+    <color name="Smooch_remoteMessageText">#000000</color>
+
+    <color name="Smooch_userMessageBackground">@color/Smooch_accent</color>
+    <color name="Smooch_userMessageBorder">@color/Smooch_accentDark</color>
+    <color name="Smooch_userMessageFailedBackground">@color/Smooch_accentLight</color>
+    <color name="Smooch_userMessageText">#ffffff</color>
 </resources>

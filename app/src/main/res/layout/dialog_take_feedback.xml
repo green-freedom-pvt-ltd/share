@@ -28,7 +28,7 @@
             android:textSize="20sp"
             android:text="@string/tell_us_about_it"
             android:gravity="center"
-            android:textColor="@color/black_65"/>
+            android:textColor="@color/black_64"/>
 
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/et_take_feedback"
@@ -40,7 +40,7 @@
             android:background="@color/grey"
             android:padding="16dp"
             android:textSize="12sp"
-            android:textColor="@color/black_65"
+            android:textColor="@color/black_64"
             android:inputType="text"/>
 
         <com.sharesmile.share.views.MRButton
