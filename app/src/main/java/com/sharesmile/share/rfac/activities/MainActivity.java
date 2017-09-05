@@ -224,7 +224,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             builder.setCancelable(false);
         } else {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, false);
-            builder.setNegativeButton(getString(R.string.later), null);
+            builder.setNegativeButton(getString(R.string.later), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
         }
         builder.show();
     }

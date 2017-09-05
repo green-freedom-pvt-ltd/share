@@ -363,7 +363,7 @@ public class RealRunFragment extends RunFragment {
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
             alertDialog.setTitle(getString(R.string.finish_workout));
             alertDialog.setMessage(getString(R.string.finish_workout_message));
-            alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (isAttachedToActivity()){
                         endRun(true);
@@ -371,7 +371,7 @@ public class RealRunFragment extends RunFragment {
                 }
             });
 
-            alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
@@ -420,7 +420,7 @@ public class RealRunFragment extends RunFragment {
             View view = getLayoutInflater(null).inflate(R.layout.alert_dialog_title, null);
             view.setBackgroundColor(getResources().getColor(R.color.neon_red));
             TextView titleView = (TextView) view.findViewById(R.id.title);
-            titleView.setText(getString(R.string.error));
+            titleView.setText(getString(R.string.something_not_right));
             alertDialog.setCustomTitle(view);
             alertDialog.setMessage(msg);
             alertDialog.setPositiveButton(getString(R.string.resume), new DialogInterface.OnClickListener() {

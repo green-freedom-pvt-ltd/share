@@ -228,7 +228,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     private void showGpsWeakDialog(){
         if (gpsWeakDialog == null){
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-            alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                     WorkoutSingleton.getInstance().setGpsState(GPS_STATE_OK);

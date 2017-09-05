@@ -231,7 +231,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         invalidRunDialog = builder.setTitle(getString(R.string.invalid_run_title))
                 .setMessage(getString(R.string.flagged_run_message))
-                .setPositiveButton(getString(R.string.why_it_is_flagged), new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.flagged_run_feedback), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         getFragmentController().performOperation(IFragmentController.TAKE_FLAGGED_RUN_FEEDBACK, flaggedRun);
