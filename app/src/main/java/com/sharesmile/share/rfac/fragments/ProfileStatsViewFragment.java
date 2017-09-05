@@ -68,7 +68,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
     @BindView(R.id.tv_total_runs)
     TextView totalRuns;
 
-    @BindView(R.id.tv_distance)
+    @BindView(R.id.tv_km_distance)
     TextView distance;
 
     int position;

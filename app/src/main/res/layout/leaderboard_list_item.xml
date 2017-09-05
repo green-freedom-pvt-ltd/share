@@ -47,7 +47,7 @@
             tools:text="Name" />
 
         <com.sharesmile.share.views.MRTextView
-            android:id="@+id/tv_distance"
+            android:id="@+id/tv_list_item_impact"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"

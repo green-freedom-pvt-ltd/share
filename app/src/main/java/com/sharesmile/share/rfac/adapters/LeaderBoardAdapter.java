@@ -76,8 +76,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         @BindView(R.id.tv_profile_name)
         TextView mProfileName;
 
-        @BindView(R.id.tv_distance)
-        TextView mlastWeekDistance;
+        @BindView(R.id.tv_list_item_impact)
+        TextView mImpact;
 
         @BindView(R.id.containerView)
         CardView container;
@@ -98,15 +98,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
                     ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
             mProfileName.setText(leaderboard.getName());
-            String distanceString;
-            Float lastWeekDist = leaderboard.getDistance();
-            if (lastWeekDist > 10f){
-                distanceString = String.valueOf(Math.round(lastWeekDist));
-            }else {
-                distanceString = String.format("%.1f", lastWeekDist);
-            }
-
-            mlastWeekDistance.setText(distanceString + " Km");
+            String impactString = String.valueOf(Math.round(leaderboard.getAmount()));
+            mImpact.setText("\u20B9 " + impactString);
 
             final int id;
             if (isLeagueBoard) {
@@ -120,12 +113,12 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
                 container.setCardElevation(3f);
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.white));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.white));
-                mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.white));
+                mImpact.setTextColor(mContext.getResources().getColor(R.color.white));
             } else {
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
-                mlastWeekDistance.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
+                mImpact.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 if(isLeagueBoard) container.setCardElevation(3f);
                 else container.setCardElevation(.5f);
                 container.setOnClickListener(null);

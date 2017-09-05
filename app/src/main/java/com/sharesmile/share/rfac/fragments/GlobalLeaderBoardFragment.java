@@ -55,7 +55,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
 
     TextView myProfileName;
 
-    TextView mylastWeekDistance;
+    TextView myImpact;
 
     private String interval = LAST_WEEK_INTERVAL;
 
@@ -195,12 +195,12 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
         myListItem.setCardElevation(3f);
         myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
-        mylastWeekDistance = (TextView) myListItem.findViewById(R.id.tv_distance);
+        myImpact = (TextView) myListItem.findViewById(R.id.tv_list_item_impact);
         myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
 
         myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        mylastWeekDistance.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        myImpact.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
         myListItem.setVisibility(View.VISIBLE);
         mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());
