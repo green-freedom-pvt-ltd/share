@@ -3,6 +3,7 @@ package com.sharesmile.share.core;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.utils.Logger;
@@ -18,9 +19,9 @@ public abstract class ExpoBackoffTask implements Runnable {
     private static final String TAG = "ExpoBackoffTask";
     public static final int DEFAULT_DELAY = 250; // in millisecs
 
-    public static final int RESULT_SUCCESS = 0;
-    public static final int RESULT_RESCHEDULE = 1;
-    public static final int RESULT_FAILURE = 2;
+    public static final int RESULT_SUCCESS = GcmNetworkManager.RESULT_SUCCESS;
+    public static final int RESULT_RESCHEDULE = GcmNetworkManager.RESULT_RESCHEDULE;
+    public static final int RESULT_FAILURE = GcmNetworkManager.RESULT_FAILURE;
 
     private int delayMs;
 

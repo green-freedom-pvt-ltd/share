@@ -38,12 +38,14 @@ import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.ToolbarActivity;
+import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
@@ -68,11 +70,13 @@ import org.greenrobot.eventbus.ThreadMode;
 import Models.CampaignList;
 import butterknife.ButterKnife;
 
+import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
+
 
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
 
     private static final String TAG = "MainActivity";
-    private static final int REQUEST_CODE_LOGIN = 1001;
+    public static final String INTENT_STOP_RUN = "intent_stop_run";
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
@@ -86,26 +90,76 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-        setContentView(R.layout.activity_main);
 
-        ButterKnife.bind(this);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
-        if (savedInstanceState == null) {
-            loadInitialFragment();
+        boolean isFirstTimeUser = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_TIME_USER, true);
+
+        if (isFirstTimeUser){
+            // Very first launch of app, show onboarding
+            startOnboardingActivity();
+            finish();
+        }else {
+            Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
+            Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
+            Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip);
+            if (!userLogin && !isLoginSkip) {
+                startLoginActivity();
+            } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
+                boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
+                if (intentStopRun){
+                    WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
+                }
+                startTrackingActivity();
+            } else {
+                Logger.d(TAG, "render MainActivity UI");
+                // Normal launch of MainActivity, render its layout
+                EventBus.getDefault().register(this);
+                ButterKnife.bind(this);
+                mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+                mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
+                if (savedInstanceState == null) {
+                    loadInitialFragment();
+                }
+
+                mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, getToolbar(), R.string.app_name,
+                        R.string.app_name);
+
+                mDrawerToggle.syncState();
+                Logger.d(TAG, "Will setNavigationItemSelectedListener on mNavigationView");
+                mNavigationView.setNavigationItemSelectedListener(this);
+                updateNavigationMenu();
+                checkAppVersion();
+                SyncHelper.syncCampaignData(getApplicationContext());
+                handleNotificationIntent();
+                Analytics.getInstance().setUserProperties();
+            }
         }
+    }
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, getToolbar(), R.string.app_name,
-                R.string.app_name);
+    private void startTrackingActivity(){
+        Intent intent = new Intent(this, TrackerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
-        mDrawerToggle.syncState();
-        mNavigationView.setNavigationItemSelectedListener(this);
-        updateNavigationMenu();
-        checkAppVersion();
-        SyncHelper.syncCampaignData(getApplicationContext());
-        handleNotificationIntent();
-        Analytics.getInstance().setUserProperties();
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
+        startActivity(intent);
+        finish();
+    }
+
+    private void startOnboardingActivity() {
+        Intent intent = new Intent(this, OnBoardingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
     }
 
     @Override
@@ -197,10 +251,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             impactLeagueMenu.setVisible(false);
         }
 
-        Menu m = mNavigationView.getMenu();
-        for (int i = 0; i < m.size(); i++) {
-            MenuItem mi = m.getItem(i);
-            //the method we have create in activity
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem mi = menu.getItem(i);
             applyFontToMenuItem(mi);
         }
     }
@@ -338,7 +390,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     private void showLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra(LoginActivity.BUNDLE_FROM_MAINACTIVITY, true);
         startActivityForResult(intent, REQUEST_CODE_LOGIN);
     }
 
@@ -354,6 +405,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOGIN) {
+            Logger.d(TAG, "onActivityResult with REQUEST_CODE_LOGIN");
             updateNavigationMenu();
         } else if (requestCode == REQUEST_LEAGUE_REGISTRATION) {
             if (resultCode == RESULT_OK) {

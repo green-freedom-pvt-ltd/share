@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,11 +11,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.ExpoBackoffTask;
+import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.rfac.FeedbackChatContainer;
 import com.sharesmile.share.rfac.FeedbackInputContainer;
+import com.sharesmile.share.rfac.activities.ChatActivity;
+import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.FeedbackNode;
 import com.sharesmile.share.rfac.models.UserFeedback;
@@ -24,7 +30,8 @@ import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.smooch.ui.ConversationActivity;
+
+import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 
 /**
  * Created by ankitmaheshwari on 8/29/17.
@@ -118,18 +125,82 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
     public void onFeedbackSubmit(String feedbackText) {
         Logger.d(TAG, "onFeedbackSubmit with: " + feedbackText);
         if (validateUserInput(feedbackText)){
-            SyncHelper.pushUserFeedback(constructFeedbackObject(feedbackText));
-            MainApplication.showToast(R.string.feedback_submitted_successfully);
-            openHomeActivityAndFinish();
+            pendingFeedback = constructFeedbackObject(feedbackText);
+            if (MainApplication.isLogin()){
+                pushFeedbackAndExit(pendingFeedback);
+                pendingFeedback = null;
+            }else {
+                startLoginActivityForResult();
+            }
         }
+    }
+
+    private void startLoginActivityForResult() {
+        Intent intent = new Intent(getContext(), LoginActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_LOGIN);
     }
 
     @Override
     public void onChatClicked(){
         Logger.d(TAG, "onChatClicked");
         // TODO: Fire Feedback Api to get ticketId and then start ChatActivity
-        SyncHelper.pushUserFeedback(constructFeedbackObject(null));
-        ConversationActivity.show(getContext());
+        pendingFeedback = constructFeedbackObject(null);
+        if (MainApplication.isLogin()){
+            pushChatFeedbackNow(pendingFeedback);
+            startChat();
+            pendingFeedback = null;
+        }else {
+            startLoginActivityForResult();
+        }
+    }
+
+    private void pushChatFeedbackNow(final UserFeedback chatFeedback){
+        ExpoBackoffTask backoffTask = new ExpoBackoffTask() {
+            @Override
+            public int performtask() {
+                Gson gson = new Gson();
+                String feedbackJson = gson.toJson(chatFeedback);
+                return SyncService.pushUserFeedback(feedbackJson);
+            }
+        };
+        backoffTask.run();
+    }
+
+    UserFeedback pendingFeedback;
+
+    private void pushFeedbackAndExit(UserFeedback feedbackObject){
+        SyncHelper.pushUserFeedback(feedbackObject);
+        MainApplication.showToast(R.string.feedback_submitted_successfully);
+        openHomeActivityAndFinish();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.d(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + resultCode);
+        if (requestCode == REQUEST_CODE_LOGIN && resultCode == Activity.RESULT_OK){
+            if (isAttachedToActivity() && pendingFeedback != null){
+                if (pendingFeedback.isChat()){
+                    pushChatFeedbackNow(pendingFeedback);
+                    startChat();
+                }else {
+                    pushFeedbackAndExit(pendingFeedback);
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void startChat(){
+//        Conversation conversation = Smooch.getConversation();
+//        if (conversation != null){
+//            Logger.d(TAG, "onChatClicked, will send Hello World");
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("name", "Ankit");
+//            map.put("age", 29);
+//            Message message = new Message("Hello World","My payload",map);
+//            conversation.sendMessage(message);
+//        }
+        ChatActivity.show(getContext());
     }
 
     private void openHomeActivityAndFinish(){

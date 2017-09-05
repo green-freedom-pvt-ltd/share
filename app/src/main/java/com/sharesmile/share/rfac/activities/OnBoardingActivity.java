@@ -7,11 +7,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.rfac.adapters.OnBoardingAdapter;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -20,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class OnBoardingActivity extends BaseActivity implements View.OnClickListener {
+
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
 
@@ -29,25 +28,7 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        boolean isFirstTimeUser = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_TIME_USER, true);
-
-        if (isFirstTimeUser) {
-            initView();
-        } else {
-            Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
-            Boolean isLoginSkip = !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
-            if (!userLogin && !isLoginSkip) {
-                startLoginActivity();
-            } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
-                Intent intent = new Intent(this, TrackerActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } else {
-                startMainActivity();
-            }
-        }
-
+        initView();
     }
 
     private void initView() {
@@ -86,16 +67,6 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
             }
         });
         done.setOnClickListener(this);
-    }
-
-    private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        Bundle extraBundle = getIntent().getExtras();
-        if (extraBundle != null) {
-            intent.putExtras(extraBundle);
-        }
-        startActivity(intent);
     }
 
     private void startLoginActivity() {
@@ -143,11 +114,9 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-
             case R.id.done:
                 startLoginActivity();
                 break;
-
         }
     }
 }

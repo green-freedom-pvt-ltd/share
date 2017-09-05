@@ -34,7 +34,7 @@ import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
-import com.sharesmile.share.rfac.activities.LoginActivity;
+import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.Qna;
@@ -408,7 +408,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public PendingIntent createAppIntent(){
-        Intent resultIntent = new Intent(getInstance().getApplicationContext(), LoginActivity.class);
+        Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
@@ -417,8 +417,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public PendingIntent createStopRunIntent(){
-        Intent resultIntent = new Intent(getInstance().getApplicationContext(), LoginActivity.class);
-        resultIntent.putExtra(LoginActivity.INTENT_STOP_RUN, true);
+        Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
+        resultIntent.putExtra(MainActivity.INTENT_STOP_RUN, true);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =

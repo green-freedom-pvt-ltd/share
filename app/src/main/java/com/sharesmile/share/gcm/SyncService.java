@@ -329,7 +329,7 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private int pushUserFeedback(String feedbackString){
+    public static int pushUserFeedback(String feedbackString){
         Logger.d(TAG, "pushUserFeedback with: " + feedbackString );
         if (TextUtils.isEmpty(feedbackString)){
             Logger.d(TAG, "Can't push FeedbackString in TaskParams is empty");
@@ -339,7 +339,6 @@ public class SyncService extends GcmTaskService {
             NetworkDataProvider.doPostCall(Urls.getFeedBackUrl(), feedbackString, UserFeedback.class);
             Logger.d(TAG, "Successfully pushed feedback");
             return GcmNetworkManager.RESULT_SUCCESS;
-
         }catch (NetworkException ne){
             ne.printStackTrace();
             Logger.d(TAG, "NetworkException: " + ne);

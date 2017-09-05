@@ -30,6 +30,8 @@ public interface IFragmentController {
     int OPEN_MUSIC_PLAYER = 110;
     int TAKE_POST_RUN_SAD_FEEDBACK =111;
 
+    int LOGIN_FOR_RESULT = 112;
+
 
     /*
         Common methods which can be implemented either by abstract BaseActivity or by solid child activities

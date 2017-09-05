@@ -99,7 +99,9 @@ public class SyncHelper {
     public static void pushUserFeedback(UserFeedback feedback) {
         Gson gson = new Gson();
         Bundle bundle = new Bundle();
-        bundle.putString(TaskConstants.FEEDBACK_DATA_JSON, gson.toJson(feedback));
+        String feedbackJson = gson.toJson(feedback);
+        bundle.putString(TaskConstants.FEEDBACK_DATA_JSON, feedbackJson);
+        Logger.d(TAG, "Will push UserFeedback: " + feedbackJson);
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.PUSH_USER_FEEDBACK)

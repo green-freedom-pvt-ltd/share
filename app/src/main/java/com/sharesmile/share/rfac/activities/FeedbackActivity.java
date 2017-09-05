@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.activities    ;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -14,6 +15,8 @@ import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.FeedbackResolution;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.utils.Logger;
+
+import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 
 /**
  * Created by ankitmaheshwari on 9/4/17.
@@ -31,10 +34,30 @@ public class FeedbackActivity extends ToolbarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activty_feedback);
         if (savedInstanceState == null) {
             loadInitialFragment();
         }
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activty_feedback;
+    }
+
+//    @Override
+//    public void performOperation(int operationId, Object input) {
+//        switch (operationId) {
+//            case LOGIN_FOR_RESULT:
+//                showLoginActivity();
+//                break;
+//            default:
+//                super.performOperation(operationId, input);
+//        }
+//    }
+
+    private void showLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_LOGIN);
     }
 
     public void loadInitialFragment() {

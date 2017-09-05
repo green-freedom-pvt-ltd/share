@@ -23,6 +23,7 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage message){
         try {
+            Logger.d(TAG, "onMessageReceived: Received message: " + message.getMessageId());
             Map data = message.getData();
 
             if (data.size() > 0) {
@@ -39,7 +40,7 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                     CleverTapAPI.createNotification(getApplicationContext(), extras);
                 }
             }
-
+            Logger.d(TAG, "onMessageReceived: Will pass received message to Smooch");
             // Handle for Smooch
             FcmService.triggerSmoochNotification(data, this);
 

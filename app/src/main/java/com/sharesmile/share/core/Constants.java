@@ -181,6 +181,8 @@ public class Constants {
 
     public static final String PREFS_CHAT_TOOLTIP_DISPLAY_COUNT = "chat_tooltip_diplay_count";
 
+    public static final int REQUEST_CODE_LOGIN = 1001;
+
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";

@@ -10,18 +10,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.LoginImpl;
-import com.sharesmile.share.gps.WorkoutSingleton;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.views.MRTextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 
 
 /**
@@ -31,8 +29,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_GOOGLE_SIGN_IN = 1001;
-    public static final String BUNDLE_FROM_MAINACTIVITY = "is_from_mainactivity";
-    public static final String INTENT_STOP_RUN = "intent_stop_run";
+
     @BindView(R.id.btn_login_fb)
     LinearLayout mFbLoginButton;
 
@@ -47,7 +44,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @BindView(R.id.progress_container)
     LinearLayout mProgressContainer;
-    private boolean isFromMainActivity;
     private LoginImpl mLoginHandler;
 
     static
@@ -59,27 +55,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        isFromMainActivity = getIntent().getBooleanExtra(BUNDLE_FROM_MAINACTIVITY, false);
-        boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
-
-        if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN)
-                && (isFromMainActivity || !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false))) {
-            setContentView(R.layout.activity_login);
-            mLoginHandler = new LoginImpl(this, this);
-            ButterKnife.bind(this);
-            initUi();
-        } else if(WorkoutSingleton.getInstance().isWorkoutActive()) {
-            Intent intent = new Intent(this, TrackerActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-            if (intentStopRun){
-                WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
-            }
-            startActivity(intent);
-        } else {
-            startMainActivity();
-        }
+        setContentView(R.layout.activity_login);
+        mLoginHandler = new LoginImpl(this, this);
+        ButterKnife.bind(this);
+        initUi();
     }
 
     private void initUi() {
@@ -124,7 +103,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tv_welcome_skip:
                 SharedPrefsManager prefsManager = SharedPrefsManager.getInstance();
                 prefsManager.setBoolean(Constants.PREF_LOGIN_SKIP, true);
-                startMainActivity();
+                exitWithResult(false);
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_SKIP)
                         .buildAndDispatch();
                 break;
@@ -135,6 +114,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         .buildAndDispatch();
                 break;
 
+        }
+    }
+
+    private void exitWithResult(boolean loginSuccess){
+        if (getCallingActivity() != null){
+            Logger.d(TAG, "Will return result loginSuccess = " + loginSuccess);
+            // LoginActivity was started for result
+            if (loginSuccess){
+                setResult(RESULT_OK, null);
+            }else {
+                setResult(RESULT_CANCELED, null);
+            }
+            finish();
+        }else {
+            startMainActivity();
         }
     }
 
@@ -155,19 +149,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void startMainActivity() {
-        if (!isFromMainActivity) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        } else {
-            finish();
-        }
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
 
     @Override
     public void onLoginSuccess() {
-        startMainActivity();
+        exitWithResult(true);
     }
 
     @Override
