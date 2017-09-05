@@ -962,6 +962,10 @@ public class Utils {
         }
     }
 
+    public static int convertDistanceToRupees(float conversionRate, float distanceInMeters){
+        return  Math.round(conversionRate * (distanceInMeters / 1000));
+    }
+
 
 
 }

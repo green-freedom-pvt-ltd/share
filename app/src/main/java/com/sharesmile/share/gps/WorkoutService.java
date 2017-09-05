@@ -55,7 +55,6 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
-//import com.squareup.leakcanary.RefWatcher;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -80,6 +79,8 @@ import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_BAD;
 import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_INACTIVE;
 import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_OK;
 import static com.sharesmile.share.rfac.RunFragment.NOTIFICATION_TIMER_TICK;
+
+//import com.squareup.leakcanary.RefWatcher;
 
 
 /**
@@ -184,7 +185,7 @@ public class WorkoutService extends Service implements
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
         workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
-        int rupees = (int) Math.floor(mCauseData.getConversionRate() * (data.getDistance() / 1000));
+        int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), data.getDistance());
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
         workout.setSteps(data.getTotalSteps());
@@ -906,8 +907,7 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
-        int rupees = (int) Math.floor(mCauseData.getConversionRate() * (getTotalDistanceCoveredInMeters() / 1000));
-
+        int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), getTotalDistanceCoveredInMeters());
         String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeDrawable;
         if (tracker.isRunning()){
