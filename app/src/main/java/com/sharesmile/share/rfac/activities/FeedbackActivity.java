@@ -107,6 +107,6 @@ public class FeedbackActivity extends ToolbarActivity {
 
     @Override
     public void updateToolBar(String title, boolean showAsUpEnable) {
-
+        setToolbarTitle(title);
     }
 }

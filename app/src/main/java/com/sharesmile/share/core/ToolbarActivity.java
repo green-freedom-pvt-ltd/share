@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 
-import butterknife.BindView;
-
 /**
  * Created by ankitmaheshwari on 9/4/17.
  */
@@ -21,7 +19,6 @@ public abstract class ToolbarActivity extends BaseActivity {
 
     Toolbar toolbar;
 
-    @BindView(R.id.toolbar_title)
     TextView mToolbarTitle;
 
     @Override
@@ -29,6 +26,7 @@ public abstract class ToolbarActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbarTitle = (TextView) findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
