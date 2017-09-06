@@ -143,7 +143,7 @@
         <!-- Facebook login END -->
 
         <service
-            android:name="com.clevertap.android.sdk.FcmTokenListenerService">
+            android:name="com.sharesmile.share.core.CustomFirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>

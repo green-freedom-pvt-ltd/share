@@ -180,6 +180,7 @@ public class Constants {
 
 
     public static final String PREFS_CHAT_TOOLTIP_DISPLAY_COUNT = "chat_tooltip_diplay_count";
+    public static final String PREFS_LAST_SAVED_FCM_TOKEN = "prefs_last_saved_fcm_token";
 
     public static final int REQUEST_CODE_LOGIN = 1001;
 
