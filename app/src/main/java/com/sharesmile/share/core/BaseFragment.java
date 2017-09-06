@@ -28,6 +28,7 @@ public class BaseFragment extends Fragment {
 
     public void setToolbarTitle(String title){
         Logger.d(TAG, "setToolbarTitle: " + title);
+//        getFragmentController().setToolbarTitle(title);
         getFragmentController().updateToolBar(title, true);
     }
 

@@ -284,7 +284,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     @Override
     public int getFrameLayoutId() {
-        return R.id.containerView;
+        return R.id.main_frame_layout;
     }
 
     @Override
@@ -309,7 +309,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     @Override
     public void updateToolBar(String title, boolean showAsUpEnable) {
-        setToolbarTitle(title);
+        super.updateToolBar(title, showAsUpEnable);
         showHomeAsUpEnable(showAsUpEnable);
     }
 

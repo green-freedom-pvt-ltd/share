@@ -55,6 +55,11 @@ public abstract class ToolbarActivity extends BaseActivity {
         mToolbarTitle.setText(title);
     }
 
+    @Override
+    public void updateToolBar(String title, boolean showAsUpEnable) {
+        setToolbarTitle(title);
+    }
+
     public Toolbar getToolbar(){
         return toolbar;
     }

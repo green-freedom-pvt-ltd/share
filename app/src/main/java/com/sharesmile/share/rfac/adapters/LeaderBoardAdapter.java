@@ -79,7 +79,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         @BindView(R.id.tv_list_item_impact)
         TextView mImpact;
 
-        @BindView(R.id.containerView)
+        @BindView(R.id.container_list_item)
         CardView container;
 
 

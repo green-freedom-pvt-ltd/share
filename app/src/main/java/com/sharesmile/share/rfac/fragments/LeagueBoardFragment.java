@@ -100,6 +100,7 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     private List<ImageView> indicators = new ArrayList<>();
 
     private void initBanner(){
+        Logger.d(TAG, "initBanner");
         bannerPagerAdapter = new LeagueBoardBannerPagerAdapter();
         bannerViewPager.setAdapter(bannerPagerAdapter);
         currentPage = 0;
@@ -124,9 +125,10 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     }
 
     private void addIndicators(int numPages, int displayImageIndex){
-        Logger.d(TAG, "addIndicators, displayImageIndex = " + displayImageIndex);
+        Logger.d(TAG, "addIndicators, numpages = "+ numPages+", displayImageIndex = " + displayImageIndex);
         if (Utils.isCollectionFilled(indicators) && indicators.size() == numPages) {
             // Indicators already added, no need to add again.
+            Logger.d(TAG, "no need to add indicators again");
             return;
         }else{
             carouselIndicatorsHolder.removeAllViews();
@@ -219,6 +221,12 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
                     .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
                     .buildAndDispatch();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        indicators = null;
     }
 
     @Override

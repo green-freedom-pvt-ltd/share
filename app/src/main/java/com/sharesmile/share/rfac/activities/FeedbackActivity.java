@@ -82,7 +82,7 @@ public class FeedbackActivity extends ToolbarActivity {
 
     @Override
     public int getFrameLayoutId() {
-        return R.id.containerView;
+        return R.id.feedback_main_frame_layout;
     }
 
     @Override

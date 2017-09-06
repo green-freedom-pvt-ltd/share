@@ -48,8 +48,8 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     @BindView(R.id.interval_spinner)
     Spinner intervalSpinner;
 
-    @BindView(R.id.containerView)
-    CardView myListItem;
+    @BindView(R.id.container_list_item)
+    CardView selfRankItem;
 
     TextView myRank;
 
@@ -182,7 +182,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         if (isShowingMyRank){
             showMyRank(myLeaderBoard);
         }else {
-            myListItem.setVisibility(View.GONE);
+            selfRankItem.setVisibility(View.GONE);
             mRecyclerView.setPadding(0,0,0,0);
         }
 
@@ -192,18 +192,18 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
 
     private void showMyRank(BaseLeaderBoardItem myLeaderBoard){
         // Need to show rank at the bottom
-        myListItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
-        myListItem.setCardElevation(3f);
-        myProfileName = (TextView) myListItem.findViewById(R.id.tv_profile_name);
-        myImpact = (TextView) myListItem.findViewById(R.id.tv_list_item_impact);
-        myRank = (TextView) myListItem.findViewById(R.id.id_leaderboard);
+        selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
+        selfRankItem.setCardElevation(3f);
+        myProfileName = (TextView) selfRankItem.findViewById(R.id.tv_profile_name);
+        myImpact = (TextView) selfRankItem.findViewById(R.id.tv_list_item_impact);
+        myRank = (TextView) selfRankItem.findViewById(R.id.id_leaderboard);
 
         myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         myImpact.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
-        myListItem.setVisibility(View.VISIBLE);
-        mLeaderBoardAdapter.createMyViewHolder(myListItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());
+        selfRankItem.setVisibility(View.VISIBLE);
+        mLeaderBoardAdapter.createMyViewHolder(selfRankItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());
     }
 
     @Override
