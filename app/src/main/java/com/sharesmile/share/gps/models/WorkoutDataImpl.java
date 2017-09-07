@@ -273,11 +273,12 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	@Override
-	public synchronized void addRecord(DistRecord record){
+	public synchronized void addRecord(DistRecord record, boolean persistPoints){
 		if (!isRunning()){
 			Logger.i(TAG, "Won't add add record as user is not running");
 			return;
 		}
+		//TODO: Persist location data in file only when persistPoints boolean is true, i.e. it is approved WorkoutData
 		if (record.isFirstRecordAfterResume()){
 			//Just set the start point if it is "first cold started" record after start/resume of workout
 			getCurrentBatch().setStartPoint(record.getLocation());

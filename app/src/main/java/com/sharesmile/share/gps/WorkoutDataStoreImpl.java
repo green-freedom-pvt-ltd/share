@@ -122,8 +122,9 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             dirtyWorkoutData.addDistance(extraPolatedDistance);
             extraPolatedDistanceToBeApproved = extraPolatedDistance;
             Location startLocation = record.getLocation();
-            dirtyWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
-            approvedWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
+            if (dirtyWorkoutData.getStartPoint() == null){
+                dirtyWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
+            }
             Logger.d(TAG, "addRecord: Source record after begin/resume, extraPolatedDistanceToBeApproved = "
                     + extraPolatedDistance);
             AnalyticsEvent.create(Event.ON_START_LOCATION_AFTER_RESUME)
@@ -135,7 +136,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         }
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
-        dirtyWorkoutData.addRecord(record);
+        dirtyWorkoutData.addRecord(record, false);
         waitingForApprovalQueue.add(record);
     }
 
@@ -227,10 +228,14 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
             extraPolatedDistanceToBeApproved = 0;
         }
+        if (approvedWorkoutData.getStartPoint() == null){
+            LatLng dirtyStartPoint = dirtyWorkoutData.getStartPoint();
+            approvedWorkoutData.setStartPoint(new LatLng(dirtyStartPoint.latitude, dirtyStartPoint.longitude));
+        }
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
             Logger.d(TAG, "Approving record: " + record.toString());
-            approvedWorkoutData.addRecord(record);
+            approvedWorkoutData.addRecord(record, true);
         }
         approvePendingSteps();
         persistBothWorkoutData();
@@ -273,7 +278,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
             Logger.d(TAG, "Approving record: " + record.toString());
-            approvedWorkoutData.addRecord(record);
+            approvedWorkoutData.addRecord(record, true);
         }
         approvePendingSteps();
         clearPersistentStorage();

@@ -77,7 +77,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 * adds given distance record
 	 * @param recordToAdd
 	 */
-	void addRecord(DistRecord recordToAdd);
+	void addRecord(DistRecord recordToAdd, boolean persistPoints);
 
 	/**
 	 * @return epoch (millis) at which workout began

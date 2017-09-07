@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -19,7 +20,6 @@ import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.rfac.FeedbackChatContainer;
 import com.sharesmile.share.rfac.FeedbackInputContainer;
-import com.sharesmile.share.rfac.activities.ChatActivity;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.FeedbackNode;
@@ -30,6 +30,8 @@ import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.smooch.core.Smooch;
+import io.smooch.ui.ConversationActivity;
 
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 
@@ -200,7 +202,12 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
 //            Message message = new Message("Hello World","My payload",map);
 //            conversation.sendMessage(message);
 //        }
-        ChatActivity.show(getContext());
+        String fcmToken = FirebaseInstanceId.getInstance().getToken();
+        Logger.d(TAG, "Will send FCM Token to Smooch: " + fcmToken);
+        if (!TextUtils.isEmpty(fcmToken)){
+            Smooch.setFirebaseCloudMessagingToken(FirebaseInstanceId.getInstance().getToken());
+        }
+        ConversationActivity.show(getContext());
     }
 
     private void openHomeActivityAndFinish(){

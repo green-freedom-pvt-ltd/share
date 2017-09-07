@@ -48,6 +48,14 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	@Override
 	public void addRecord(DistRecord record) {
+		/*
+			TODO: Instead of keeping an array of WorkoutPoints in memory convert WorkoutPoint into JSON string and write it off in a file
+			This file will keep on increasing in size as and when points are added into it
+			Every batch will have a separate file
+			When the time comes to upload the location data all the batch files for given client_run_id will be
+			 posted on server as WorkoutBatchLocationData
+
+		 */
 		addDistance(record.getDist());
 		Location loc = record.getLocation();
 		Location prevLocation = record.getPrevLocation();
