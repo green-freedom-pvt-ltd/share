@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -19,6 +21,7 @@ import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,15 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     @BindView(R.id.list_container)
     View listContainer;
+
+    @BindView(R.id.container_list_item)
+    private CardView selfRankItem;
+
+    TextView myRank;
+
+    TextView myProfileName;
+
+    TextView myImpact;
 
     LinearLayoutManager mLayoutManager;
 
@@ -109,6 +121,26 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     protected abstract void fetchData();
 
+    protected void showSelfRank(BaseLeaderBoardItem myLeaderBoard){
+        // Need to show rank at the bottom
+        selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
+        selfRankItem.setCardElevation(3f);
+        myProfileName = (TextView) selfRankItem.findViewById(R.id.tv_profile_name);
+        myImpact = (TextView) selfRankItem.findViewById(R.id.tv_list_item_impact);
+        myRank = (TextView) selfRankItem.findViewById(R.id.id_leaderboard);
+
+        myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        myImpact.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
+        selfRankItem.setVisibility(View.VISIBLE);
+        mLeaderBoardAdapter.createMyViewHolder(selfRankItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());
+    }
+
+    protected void hideSelfRank(){
+        selfRankItem.setVisibility(View.GONE);
+        mRecyclerView.setPadding(0,0,0,0);
+    }
 
     protected void showProgressDialog() {
         mProgressBar.setVisibility(View.VISIBLE);

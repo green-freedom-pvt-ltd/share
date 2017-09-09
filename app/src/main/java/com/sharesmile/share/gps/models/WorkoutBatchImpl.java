@@ -19,6 +19,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	private float distance; // in m
 	private long startTimeStamp;// in millis
+	private long endTimeStamp; // in millis
 	private List<WorkoutPoint> points;
 	private boolean isRunning;
 	private float elapsedTime; // in secs
@@ -34,6 +35,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	private WorkoutBatchImpl(WorkoutBatchImpl source){
 		distance = source.distance;
 		startTimeStamp = source.startTimeStamp;
+		endTimeStamp = source.endTimeStamp;
 		isRunning = source.isRunning;
 		elapsedTime = source.getElapsedTime();
 		points = new ArrayList<>();
@@ -143,6 +145,11 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	}
 
 	@Override
+	public long getEndTimeStamp() {
+		return endTimeStamp;
+	}
+
+	@Override
 	public long getLastRecordedTimeStamp() {
 		return lastRecordAddedTs;
 	}
@@ -171,6 +178,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	@Override
 	public synchronized WorkoutBatch end() {
+		endTimeStamp = DateUtil.getServerTimeInMillis();
 		setElapsedTime();
 		isRunning = false;
 		return this;
@@ -196,6 +204,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	protected WorkoutBatchImpl(Parcel in) {
 		distance = in.readFloat();
 		startTimeStamp = in.readLong();
+		endTimeStamp = in.readLong();
 		if (in.readByte() == 0x01) {
 			points = new ArrayList<WorkoutPoint>();
 			in.readList(points, WorkoutPoint.class.getClassLoader());
@@ -216,6 +225,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeFloat(distance);
 		dest.writeLong(startTimeStamp);
+		dest.writeLong(endTimeStamp);
 		if (points == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

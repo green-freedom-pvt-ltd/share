@@ -117,7 +117,7 @@ public class Urls {
     }
 
     public static String getLeaderboardUrl(String interval) {
-        String url = getBaseUrl() + LEADERBOARD_URL + "?interval=" + interval;
+        String url = getBaseUrl() + LEADERBOARD_URL + "?interval=" + interval + "&orderby=amount";
         return url;
     }
 

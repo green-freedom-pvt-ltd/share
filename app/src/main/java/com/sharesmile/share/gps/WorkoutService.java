@@ -796,11 +796,11 @@ public class WorkoutService extends Service implements
             );
         }else {
             // Force stop workout, show notif, And blocking exit popup on UI
-            stopWorkout();
             MainApplication.showRunNotification(getString(R.string.notification_usain_bolt_force_exit_title),
                     WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID,
                     getString(R.string.notification_usain_bolt_force_exit));
             EventBus.getDefault().post(new UsainBoltForceExit());
+            stopWorkout();
         }
     }
 
