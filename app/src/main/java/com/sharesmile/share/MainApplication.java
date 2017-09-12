@@ -136,6 +136,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
      * @return true if the notification was actually shown, false otherwise
      */
     public static boolean showRunNotification(String notifTitle, int notificationId, String notifText, String... args){
+        Logger.d(TAG, "showRunNotification: " + notifTitle);
 
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT || notificationId == WORKOUT_NOTIFICATION_STILL_ID){
             if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS)){
@@ -200,6 +201,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
         builder.setDeleteIntent(getDeleteIntent(notificationId));
         builder.setContentIntent(getInstance().createAppIntent());
+        Logger.d(TAG, "showRunNotification: Will notify now, notificationId: " + notificationId);
         NotificationManagerCompat.from(getContext()).notify(notificationId, builder.build());
         return true;
     }

@@ -16,7 +16,7 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	 * attribute given record to this batch
 	 * @param record which is to be attributed to this batch
 	 */
-	void addRecord(DistRecord record);
+	void addRecord(DistRecord record, boolean persistPoints);
 
 	/**
 	 * @return distance covered in this batch
@@ -43,6 +43,11 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	 * @return the epoch (in millis) at which this batch ended, or 0 if the batch has not ended yet
 	 */
 	long getEndTimeStamp();
+
+	/**
+	 * @return Name of the file (internal storage) in which this batche's location data is stored
+	 */
+	String getLocationDataFileName();
 
 	/**
 	 * @return the epoch (in millis) at which the last point of this batch was recorded

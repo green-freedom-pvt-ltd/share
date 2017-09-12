@@ -894,6 +894,10 @@ public class Utils {
         return dialog;
     }
 
+    public static String getLocationDataFileName(String workoutId, int batchNum){
+        return "location_data_" + workoutId + "_" + batchNum;
+    }
+
     public static String UNIQUE_ID;
 
     /**

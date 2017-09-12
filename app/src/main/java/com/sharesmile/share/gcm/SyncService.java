@@ -533,7 +533,7 @@ public class SyncService extends GcmTaskService {
             locationData.setClientRunId(workoutId);
             locationData.setRunId(runId);
             locationData.setStartTimeEpoch(batch.getStartTimeStamp());
-            locationData.setEndTimeEpoch(batch.getLastRecordedTimeStamp());
+            locationData.setEndTimeEpoch(batch.getEndTimeStamp());
             locationData.setLocationArray(batch.getPoints());
 
             // Step: POST WorkoutBatchLocationData on server
@@ -542,12 +542,18 @@ public class SyncService extends GcmTaskService {
                 Logger.d(TAG, "Will POST data: " + locationDataString);
                 WorkoutBatchLocationData response = NetworkDataProvider.doPostCall(Urls.getRunLocationsUrl(),
                         locationDataString, WorkoutBatchLocationData.class);
+                // Successfully uploaded location data
                 AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
                         .put("upload_result", "success")
                         .put("run_id", runId)
                         .put("batch_num", i)
                         .put("client_run_id", workoutId)
                         .buildAndDispatch();
+                // Delete the file in which location data of this batch was stored
+                if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+                    Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
+                }
+
             }catch (NetworkException e){
                 e.printStackTrace();
                 String message = "NetworkException while uploading WorkoutLocationData: " + e.getMessage()

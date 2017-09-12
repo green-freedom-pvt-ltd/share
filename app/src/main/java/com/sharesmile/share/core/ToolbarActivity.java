@@ -25,8 +25,8 @@ public abstract class ToolbarActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolbarTitle = (TextView) findViewById(R.id.toolbar_title);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        mToolbarTitle = (TextView) findViewById(R.id.toolbar_main_title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

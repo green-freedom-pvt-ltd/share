@@ -1,12 +1,22 @@
 package com.sharesmile.share.gps.models;
 
+import android.content.Context;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Logger;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,47 +30,42 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	private float distance; // in m
 	private long startTimeStamp;// in millis
 	private long endTimeStamp; // in millis
-	private List<WorkoutPoint> points;
+	private String locationDataFileName; // Name of the file in app's storage where all the location data of this batch is stored
 	private boolean isRunning;
 	private float elapsedTime; // in secs
 	private long lastRecordAddedTs; // in millis
 
-	public WorkoutBatchImpl(long startTimeStamp){
+	public WorkoutBatchImpl(long startTimeStamp, String locationDataFileName){
 		isRunning = true;
 		this.startTimeStamp = startTimeStamp;
-		points = new ArrayList<>();
 		lastRecordAddedTs = startTimeStamp;
+		this.locationDataFileName = locationDataFileName;
 	}
 
 	private WorkoutBatchImpl(WorkoutBatchImpl source){
 		distance = source.distance;
 		startTimeStamp = source.startTimeStamp;
 		endTimeStamp = source.endTimeStamp;
+		locationDataFileName = source.locationDataFileName;
 		isRunning = source.isRunning;
 		elapsedTime = source.getElapsedTime();
-		points = new ArrayList<>();
-		if (source.points != null){
-			for (int i = 0; i < source.points.size(); i++){
-				WorkoutPoint point = source.points.get(i);
-				points.add(i, new WorkoutPoint(point));
-			}
-		}
 		lastRecordAddedTs = source.lastRecordAddedTs;
 	}
 
 	@Override
-	public void addRecord(DistRecord record) {
+	public void addRecord(DistRecord record, boolean persistPoints) {
 		/*
-			TODO: Instead of keeping an array of WorkoutPoints in memory convert WorkoutPoint into JSON string and write it off in a file
+			TODO: If persistPoints is true instead of keeping an array of WorkoutPoints in memory convert WorkoutPoint into JSON string and write it off in a file
 			This file will keep on increasing in size as and when points are added into it
 			Every batch will have a separate file
 			When the time comes to upload the location data all the batch files for given client_run_id will be
-			 posted on server as WorkoutBatchLocationData
+			posted on server as WorkoutBatchLocationData
 
 		 */
 		addDistance(record.getDist());
 		Location loc = record.getLocation();
 		Location prevLocation = record.getPrevLocation();
+
 		WorkoutPoint point = new WorkoutPoint();
 		if (record.getDist() == 0 && prevLocation != null && prevLocation.distanceTo(loc) > 0){
 			// The points were separated but dist was forcefully set as Zero
@@ -92,8 +97,73 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
 		point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
 		point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
-		points.add(point);
+
+		writePointToFile(point);
+
 		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
+	}
+
+	private void writePointToFile(WorkoutPoint point){
+		Gson gson = new Gson();
+		try {
+			OutputStreamWriter outputStreamWriter =
+					new OutputStreamWriter(MainApplication.getContext()
+							.openFileOutput(locationDataFileName, Context.MODE_APPEND));
+			String text = gson.toJson(point);
+			Logger.d(TAG, "Appending to file: " + text);
+			outputStreamWriter.append(text);
+			outputStreamWriter.append("\n");
+			outputStreamWriter.close();
+		}
+		catch (IOException e) {
+			String message = "Exception occurred while writing WorkoutPoint to file: " + locationDataFileName
+					+ ", exception: " + e.getMessage();
+			Logger.e(TAG, message);
+			e.printStackTrace();
+			Logger.e(TAG, "Cant write WorkoutPoint: " + gson.toJson(point));
+			Crashlytics.log(message);
+			Crashlytics.logException(e);
+		}
+	}
+
+	private List<WorkoutPoint> getPointsInFile(){
+		List<WorkoutPoint> points = new ArrayList<>();
+		Gson gson = new Gson();
+
+		try {
+			// open the file for reading
+			InputStream inputStream = MainApplication.getContext().openFileInput(locationDataFileName);
+
+			// if file the available for reading
+			if (inputStream != null) {
+				// prepare the file for reading
+				InputStreamReader inputreader = new InputStreamReader(inputStream);
+				BufferedReader buffreader = new BufferedReader(inputreader);
+
+				String line;
+
+				// Read every line of the file into the line-variable, one line at a time
+				while ( (line = buffreader.readLine()) != null ) {
+					// Parse the line as a WorkoutPoint and add it to the list
+					//TODO: Remove this log statement after debugging
+					Logger.d(TAG, "Read line from file: " + line);
+					WorkoutPoint point = gson.fromJson(line, WorkoutPoint.class);
+					points.add(point);
+				}
+				inputStream.close();
+			}else {
+				throw new IllegalStateException("InputStream null for file: " + locationDataFileName);
+			}
+		} catch (Exception ex) {
+			String message = "Exception occurred while reading WorkoutPoint from file: " + locationDataFileName
+					+ ", exception: " + ex.getMessage();
+			Logger.e(TAG, message);
+			ex.printStackTrace();
+			Crashlytics.log(message);
+			Crashlytics.logException(ex);
+		} finally {
+			return points;
+		}
 	}
 
 	@Override
@@ -104,7 +174,6 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	@Override
 	public void addDistance(float distanceToAdd) {
 		distance += distanceToAdd;
-		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 
 	@Override
@@ -136,7 +205,8 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
 		point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
 		point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
-		points.add(0, point);
+		writePointToFile(point);
+		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 
 	@Override
@@ -147,6 +217,11 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	@Override
 	public long getEndTimeStamp() {
 		return endTimeStamp;
+	}
+
+	@Override
+	public String getLocationDataFileName() {
+		return locationDataFileName;
 	}
 
 	@Override
@@ -173,7 +248,12 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	@Override
 	public List<WorkoutPoint> getPoints() {
-		return points;
+		if (startTimeStamp == lastRecordAddedTs){
+			// No record have been added yet, return empty list
+			return new ArrayList<>();
+		}else {
+			return getPointsInFile();
+		}
 	}
 
 	@Override
@@ -194,7 +274,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		return "WorkoutBatchImpl{" +
 				"distance=" + distance +
 				", startTimeStamp=" + startTimeStamp +
-				", points=" + points +
+				", workoutId=" + locationDataFileName +
 				", isRunning=" + isRunning +
 				", elapsedTime=" + elapsedTime +
 				", lastRecordAddedTs=" + lastRecordAddedTs +
@@ -205,12 +285,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		distance = in.readFloat();
 		startTimeStamp = in.readLong();
 		endTimeStamp = in.readLong();
-		if (in.readByte() == 0x01) {
-			points = new ArrayList<WorkoutPoint>();
-			in.readList(points, WorkoutPoint.class.getClassLoader());
-		} else {
-			points = null;
-		}
+		locationDataFileName = in.readString();
 		isRunning = in.readByte() != 0x00;
 		elapsedTime = in.readFloat();
 		lastRecordAddedTs = in.readLong();
@@ -226,12 +301,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		dest.writeFloat(distance);
 		dest.writeLong(startTimeStamp);
 		dest.writeLong(endTimeStamp);
-		if (points == null) {
-			dest.writeByte((byte) (0x00));
-		} else {
-			dest.writeByte((byte) (0x01));
-			dest.writeList(points);
-		}
+		dest.writeString(locationDataFileName);
 		dest.writeByte((byte) (isRunning ? 0x01 : 0x00));
 		dest.writeFloat(elapsedTime);
 		dest.writeLong(lastRecordAddedTs);

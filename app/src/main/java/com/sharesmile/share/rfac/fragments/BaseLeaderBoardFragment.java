@@ -50,7 +50,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     View listContainer;
 
     @BindView(R.id.container_list_item)
-    private CardView selfRankItem;
+    CardView selfRankItem;
 
     TextView myRank;
 

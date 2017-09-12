@@ -47,7 +47,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		paused = false;
 		batches = new ArrayList<>();
 		this.beginTimeStamp = beginTimeStamp;
-		invokeNewBatch(beginTimeStamp);
+		invokeNewBatch(beginTimeStamp, workoutId);
 		this.workoutId = workoutId;
 		this.calories = new Calorie(0,0);
 		this.usainBoltCount = 0;
@@ -79,8 +79,10 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		numUpdateEvents = source.numUpdateEvents;
 	}
 
-	private void invokeNewBatch(long startTimeStamp){
-		WorkoutBatchImpl newbatch = new WorkoutBatchImpl(startTimeStamp);
+	private void invokeNewBatch(long startTimeStamp, String workoutId){
+		int index = batches.size();
+		WorkoutBatchImpl newbatch =
+				new WorkoutBatchImpl(startTimeStamp, Utils.getLocationDataFileName(workoutId, index));
 		batches.add(newbatch);
 	}
 
@@ -246,14 +248,17 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public synchronized void workoutResume() {
 		if (isPaused()){
-			invokeNewBatch(DateUtil.getServerTimeInMillis());
+			invokeNewBatch(DateUtil.getServerTimeInMillis(), workoutId);
 			paused = false;
 		}
 	}
 
 	@Override
 	public boolean coldStartAfterResume() {
-		if (!isPaused() && getCurrentBatch().getPoints().size() == 0){
+		// TODO: Change this logic of coldStartAfterResume, as now only approved points are stored in a file
+		// Size of points will be zero if none of the records is approved
+		if (!isPaused()
+				&& getCurrentBatch().getLastRecordedTimeStamp() == getCurrentBatch().getStartTimeStamp() ){
 			return true;
 		}
 		return false;
@@ -285,7 +290,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		}else{
 			// Add record over here
 			this.distance += record.getDist();
-			getCurrentBatch().addRecord(record);
+			getCurrentBatch().addRecord(record, persistPoints);
 			if (MainApplication.getInstance().getBodyWeight() > 0){
 				this.calories.incrementCaloriesMets(Utils.getDeltaCaloriesMets(record.getInterval(), record.getSpeed()));
 				this.calories.incrementCaloriesKarkanen(Utils.getDeltaCaloriesKarkanen(record.getInterval(), record.getSpeed()));

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toolbar"
+    android:id="@+id/toolbar_main"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="@color/sky_blue"
@@ -9,7 +9,7 @@
     app:navigationIcon="?homeAsUpIndicator">
 
     <com.sharesmile.share.views.MRTextView
-        android:id="@+id/toolbar_title"
+        android:id="@+id/toolbar_main_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|left"

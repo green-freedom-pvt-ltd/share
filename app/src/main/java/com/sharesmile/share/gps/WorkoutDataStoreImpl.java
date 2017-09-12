@@ -228,7 +228,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
             extraPolatedDistanceToBeApproved = 0;
         }
-        if (approvedWorkoutData.getStartPoint() == null){
+        if (approvedWorkoutData.getStartPoint() == null && dirtyWorkoutData.getStartPoint() != null){
             LatLng dirtyStartPoint = dirtyWorkoutData.getStartPoint();
             approvedWorkoutData.setStartPoint(new LatLng(dirtyStartPoint.latitude, dirtyStartPoint.longitude));
         }
