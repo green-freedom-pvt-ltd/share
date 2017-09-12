@@ -54,51 +54,58 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 
 	@Override
 	public void addRecord(DistRecord record, boolean persistPoints) {
+
+		addDistance(record.getDist());
+
 		/*
-			TODO: If persistPoints is true instead of keeping an array of WorkoutPoints in memory convert WorkoutPoint into JSON string and write it off in a file
+			If persistPoints is true instead of keeping an array of WorkoutPoints in memory
+			convert WorkoutPoint into JSON string and write it off in a file
+
 			This file will keep on increasing in size as and when points are added into it
 			Every batch will have a separate file
 			When the time comes to upload the location data all the batch files for given client_run_id will be
 			posted on server as WorkoutBatchLocationData
 
 		 */
-		addDistance(record.getDist());
-		Location loc = record.getLocation();
-		Location prevLocation = record.getPrevLocation();
 
-		WorkoutPoint point = new WorkoutPoint();
-		if (record.getDist() == 0 && prevLocation != null && prevLocation.distanceTo(loc) > 0){
-			// The points were separated but dist was forcefully set as Zero
-			point.setFlagged(true);
-		}
-		if (loc.hasAccuracy()){
-			point.setAccuracy(loc.getAccuracy());
-		}else {
-			point.setAccuracy(-1);
-		}
-		if (loc.hasAltitude()){
-			point.setAltitude(loc.getAltitude());
-		}else {
-			point.setAltitude(-1);
-		}
-		if (loc.hasBearing()){
-			point.setBearing(loc.getBearing());
-		}else {
-			point.setBearing(-1);
-		}
-		if (loc.hasSpeed()){
-			point.setGpsSpeed(loc.getSpeed());
-		}else {
-			point.setGpsSpeed(-1);
-		}
-		point.setLatitude(loc.getLatitude());
-		point.setLongitude(loc.getLongitude());
-		point.setTimeStamp(loc.getTime());
-		point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
-		point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
-		point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
+		if (persistPoints){
+			Location loc = record.getLocation();
+			Location prevLocation = record.getPrevLocation();
 
-		writePointToFile(point);
+			WorkoutPoint point = new WorkoutPoint();
+			if (record.getDist() == 0 && prevLocation != null && prevLocation.distanceTo(loc) > 0){
+				// The points were separated but dist was forcefully set as Zero
+				point.setFlagged(true);
+			}
+			if (loc.hasAccuracy()){
+				point.setAccuracy(loc.getAccuracy());
+			}else {
+				point.setAccuracy(-1);
+			}
+			if (loc.hasAltitude()){
+				point.setAltitude(loc.getAltitude());
+			}else {
+				point.setAltitude(-1);
+			}
+			if (loc.hasBearing()){
+				point.setBearing(loc.getBearing());
+			}else {
+				point.setBearing(-1);
+			}
+			if (loc.hasSpeed()){
+				point.setGpsSpeed(loc.getSpeed());
+			}else {
+				point.setGpsSpeed(-1);
+			}
+			point.setLatitude(loc.getLatitude());
+			point.setLongitude(loc.getLongitude());
+			point.setTimeStamp(loc.getTime());
+			point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
+			point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
+			point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
+
+			writePointToFile(point);
+		}
 
 		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
@@ -145,8 +152,6 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 				// Read every line of the file into the line-variable, one line at a time
 				while ( (line = buffreader.readLine()) != null ) {
 					// Parse the line as a WorkoutPoint and add it to the list
-					//TODO: Remove this log statement after debugging
-					Logger.d(TAG, "Read line from file: " + line);
 					WorkoutPoint point = gson.fromJson(line, WorkoutPoint.class);
 					points.add(point);
 				}
@@ -177,35 +182,37 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	}
 
 	@Override
-	public void setStartPoint(Location loc) {
-		WorkoutPoint point = new WorkoutPoint();
-		if (loc.hasAccuracy()){
-			point.setAccuracy(loc.getAccuracy());
-		}else {
-			point.setAccuracy(-1);
+	public void setStartPoint(Location loc, boolean persistPoints) {
+		if (persistPoints){
+			WorkoutPoint point = new WorkoutPoint();
+			if (loc.hasAccuracy()){
+				point.setAccuracy(loc.getAccuracy());
+			}else {
+				point.setAccuracy(-1);
+			}
+			if (loc.hasAltitude()){
+				point.setAltitude(loc.getAltitude());
+			}else {
+				point.setAltitude(-1);
+			}
+			if (loc.hasBearing()){
+				point.setBearing(loc.getBearing());
+			}else {
+				point.setBearing(-1);
+			}
+			if (loc.hasSpeed()){
+				point.setGpsSpeed(loc.getSpeed());
+			}else {
+				point.setGpsSpeed(-1);
+			}
+			point.setLatitude(loc.getLatitude());
+			point.setLongitude(loc.getLongitude());
+			point.setTimeStamp(loc.getTime());
+			point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
+			point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
+			point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
+			writePointToFile(point);
 		}
-		if (loc.hasAltitude()){
-			point.setAltitude(loc.getAltitude());
-		}else {
-			point.setAltitude(-1);
-		}
-		if (loc.hasBearing()){
-			point.setBearing(loc.getBearing());
-		}else {
-			point.setBearing(-1);
-		}
-		if (loc.hasSpeed()){
-			point.setGpsSpeed(loc.getSpeed());
-		}else {
-			point.setGpsSpeed(-1);
-		}
-		point.setLatitude(loc.getLatitude());
-		point.setLongitude(loc.getLongitude());
-		point.setTimeStamp(loc.getTime());
-		point.setCumulativeDistance(WorkoutSingleton.getInstance().getTotalDistanceInMeters());
-		point.setCumulativeStepCount(WorkoutSingleton.getInstance().getTotalSteps());
-		point.setCumulativeNumSpikes(WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes());
-		writePointToFile(point);
 		lastRecordAddedTs = DateUtil.getServerTimeInMillis();
 	}
 

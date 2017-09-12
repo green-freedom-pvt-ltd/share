@@ -66,7 +66,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
-import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
@@ -217,7 +216,7 @@ public class WorkoutService extends Service implements
         workoutDao.insertOrReplace(workout);
         Utils.updateTrackRecordFromDb();
 
-        String key = PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX + workout.getWorkoutId();
+        String key = Utils.getWorkoutLocationDataPendingQueuePrefKey(workout.getWorkoutId());
         SharedPrefsManager.getInstance().setObject(key, data);
 
         SyncService.pushWorkoutDataWithBackoff();

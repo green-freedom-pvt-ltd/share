@@ -71,6 +71,8 @@ import java.util.Map;
 
 import Models.Level;
 
+import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
+
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
  */
@@ -968,6 +970,10 @@ public class Utils {
 
     public static int convertDistanceToRupees(float conversionRate, float distanceInMeters){
         return  Math.round(conversionRate * (distanceInMeters / 1000));
+    }
+
+    public static String getWorkoutLocationDataPendingQueuePrefKey(String workoutId){
+        return PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX + workoutId;
     }
 
 

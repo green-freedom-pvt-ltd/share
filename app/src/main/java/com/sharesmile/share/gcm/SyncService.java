@@ -60,7 +60,6 @@ import Models.LeagueBoard;
 import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.LeaderBoardDataStore.ALL_INTERVALS;
-import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.gcm.TaskConstants.PUSH_FRAUD_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.PUSH_USER_FEEDBACK;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
@@ -518,7 +517,7 @@ public class SyncService extends GcmTaskService {
                 + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
         long runId = workout.getId();
         String workoutId = workout.getWorkoutId();
-        String prefKey = PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX + workoutId;
+        String prefKey = Utils.getWorkoutLocationDataPendingQueuePrefKey(workoutId);
         WorkoutData workoutData = SharedPrefsManager.getInstance().getObject(prefKey, WorkoutDataImpl.class);
 
         Gson gson = new Gson();
@@ -549,11 +548,6 @@ public class SyncService extends GcmTaskService {
                         .put("batch_num", i)
                         .put("client_run_id", workoutId)
                         .buildAndDispatch();
-                // Delete the file in which location data of this batch was stored
-                if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
-                    Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
-                }
-
             }catch (NetworkException e){
                 e.printStackTrace();
                 String message = "NetworkException while uploading WorkoutLocationData: " + e.getMessage()
@@ -587,6 +581,14 @@ public class SyncService extends GcmTaskService {
                         .put("exception_message", ex.getMessage())
                         .buildAndDispatch();
                 return false;
+            }
+        }
+
+        // Delete the file in which location data of this batch was stored
+        for (int i=0; i< workoutData.getBatches().size(); i++) {
+            WorkoutBatch batch = workoutData.getBatches().get(i);
+            if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+                Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
             }
         }
 
@@ -633,7 +635,7 @@ public class SyncService extends GcmTaskService {
                 // Need to make POST request to create a new Run
                 jsonObject.put("user_id", user_id);
                 jsonObject.put("cause_run_title", workout.getCauseBrief());
-                if (workout.getCauseId() > 0){
+                if (workout.getCauseId() != null && workout.getCauseId() > 0){
                     jsonObject.put("cause_id", workout.getCauseId());
                 }
                 jsonObject.put("distance", workout.getDistance());

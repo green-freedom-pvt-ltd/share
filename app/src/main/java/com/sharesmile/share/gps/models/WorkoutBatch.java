@@ -32,7 +32,7 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	 * sets the start point for this batch
 	 * @param location
 	 */
-	void setStartPoint(Location location);
+	void setStartPoint(Location location, boolean persistPoints);
 
 	/**
 	 * @return the epoch (in millis) at which this batch began
