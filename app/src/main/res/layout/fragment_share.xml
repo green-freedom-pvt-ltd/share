@@ -197,8 +197,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
-                android:visibility="visible"
-                android:src="@drawable/placeholder_thankyou_image">
+                android:visibility="visible">
             </ImageView>
 
             <LinearLayout

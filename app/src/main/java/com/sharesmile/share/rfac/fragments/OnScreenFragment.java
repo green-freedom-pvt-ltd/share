@@ -80,7 +80,6 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         View view = inflater.inflate(R.layout.fragment_cause, container, false);
         ButterKnife.bind(this, view);
         mRunButton.setOnClickListener(this);
-        getFragmentController().updateToolBar(getString(R.string.impactrun), false);
         viewPager.setClipToPadding(false);
         viewPager.addOnPageChangeListener(this);
         viewPager.setPageTransformer(false, new ViewPagerTransformer());

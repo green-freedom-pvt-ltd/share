@@ -1,9 +1,11 @@
 package com.sharesmile.share.rfac;
 
+import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
@@ -44,7 +46,22 @@ public class FeedbackInputContainer {
     }
 
     private void init(){
+        String somethingElsePrompt = "Let us know about your issue. Send feedback or chat with us.";
+        //TODO: This is a short term hack which needs to be removed
+        if (somethingElsePrompt.equals(promptText)){
+            // Remove top margin on container
+            final LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) containerView.getLayoutParams();
+            lp.topMargin = 0;
+            containerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    containerView.setLayoutParams(lp);
+                }
+            });
+        }
         promptTextView.setText(promptText);
+        Typeface font = Typeface.createFromAsset(containerView.getContext().getAssets(), "fonts/Montserrat-Light.otf");
+        inputEditText.setTypeface(font);
         inputEditText.setHint(hintText);
     }
 

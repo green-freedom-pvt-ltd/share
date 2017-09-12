@@ -19,8 +19,8 @@ public class FeedbackResolutionFactory {
             resolution =  new FeedbackResolution("Got it. \n" +
                     "\n" +
                     "Our tracking algorithm uses a combination of GPS and motion sensors in the device to calculate distance.\n" +
-                    "Sometimes because of unreliability and low accuracy of these sensor readings it ends up recording wrong distance. \n" +
-                    "We are working hard everyday to make our tracking algorithm more accurate and robust and it would help enormously if you could tell us a bit more about the discrepancy you observed.\n",
+                    "Sometimes because of unreliability and low accuracy of these sensors it ends up recording wrong distance. \n" +
+                    "We are working hard everyday to make our tracking algorithm more robust. It would help a lot if you could tell us a bit more about the discrepancy you observed.\n",
 
                     "Tell us more about the issue",
 
@@ -28,19 +28,19 @@ public class FeedbackResolutionFactory {
         }else if (FeedbackCategory.LESS_DISTANCE.equals(parent)){
             resolution =  new FeedbackResolution("Got it. We regret that your distance counted was lesser than actual. \n" +
                     "\n" +
-                    "GPS gets tricky at times. But no worries, just enter below the correct distance in Kms, and submit. Or chat with us. \n" +
+                    "This might be due to poor GPS signals received during your workout. \n" +
                     "\n" +
-                    "We will look into the case and change accordingly. Thanks for letting us know.\n",
+                    "But no worries, tell us more. We would love to help.\n",
 
                     "",
 
                     "Enter correct distance in Kms");
         }else if (FeedbackCategory.MORE_DISTANCE.equals(parent)){
-            resolution =  new FeedbackResolution("Got it. So awesome of you for letting us know !\n" +
+            resolution =  new FeedbackResolution("Got it. Awesome of you for letting us know !\n" +
                     "\n" +
-                    "GPS gets tricky at times. Please enter below the correct distance in Kms and submit. Or chat with us.\n" +
+                    "This might be due to poor GPS signals received during your workout.\n" +
                     "\n" +
-                    "Thanks for letting us know.\n",
+                    "But no worries, tell us more. We would love to help.\n",
 
                     "",
 
@@ -64,7 +64,7 @@ public class FeedbackResolutionFactory {
         }else if (FeedbackCategory.IMPACT_MISSING_LEADERBOARD.equals(parent)){
             resolution =  new FeedbackResolution("Got it. Thanks for informing.\n" +
                     "\n" +
-                    "Data in leaderboard is fetched from server, but sometimes your workouts take a few hours to sync on server. Please wait for some time and make sure that you are connected to internet.\n",
+                    "Sometimes your workouts take a few hours to sync on our database. Please wait for some time, and make sure that you are connected to internet.\n",
 
                     "Issue still not resolved? Send feedback or chat with us.",
 

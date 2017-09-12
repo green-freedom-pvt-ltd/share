@@ -717,13 +717,13 @@ public class Utils {
         return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
     }
 
-    public static final Level getLevel(float kmsCovered){
+    public static final Level getLevel(int impactInRupees){
         Iterator<Map.Entry<Integer, Level>> iter = Constants.LEVELS_MAP.entrySet().iterator();
         Level result = null;
         while (iter.hasNext()){
             Map.Entry<Integer, Level> entry = iter.next();
             Level level = entry.getValue();
-            if (kmsCovered >= level.getMinKm() && kmsCovered < level.getMaxKm()){
+            if (impactInRupees >= level.getMinImpact() && impactInRupees < level.getMaxImpact()){
                 result = level;
                 break;
             }

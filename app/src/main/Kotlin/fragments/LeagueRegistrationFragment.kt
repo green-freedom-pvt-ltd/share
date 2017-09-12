@@ -4,6 +4,7 @@ import Models.LeagueTeam
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -113,7 +114,8 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
         view!!.findViewById(R.id.submit).setOnClickListener(this);
 
-        ShareImageLoader.getInstance().loadImage(mBanner, view!!.league_image)
+        ShareImageLoader.getInstance().loadImage(mBanner, view!!.league_image,
+                ContextCompat.getDrawable(context, R.drawable.cause_image_placeholder))
     }
 
     private fun onSubmit() {

@@ -79,7 +79,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.fragment_run;
+        return R.layout.fragment_test_run;
     }
 
     @Override

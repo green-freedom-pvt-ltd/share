@@ -35,7 +35,7 @@ import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.rfac.TestRunFragment;
-import com.sharesmile.share.rfac.fragments.StartRunFragment;
+import com.sharesmile.share.rfac.fragments.RunCountdownFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -113,7 +113,7 @@ public class TrackerActivity extends BaseActivity {
             runFragment = createRunFragment();
             addFragment(runFragment, false);
         } else {
-            addFragment(StartRunFragment.newInstance(mCauseData), false);
+            addFragment(RunCountdownFragment.newInstance(mCauseData), false);
         }
     }
 

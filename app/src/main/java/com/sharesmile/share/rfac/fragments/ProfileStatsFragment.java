@@ -39,7 +39,7 @@ import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
+import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 
 /**
  * Created by ankitmaheshwari on 4/28/17.
@@ -69,6 +69,9 @@ public class ProfileStatsFragment extends BaseFragment {
 
     @BindView(R.id.stats_view_pager)
     ViewPager viewPager;
+
+    @BindView(R.id.stats_sharable_container)
+    View sharableContainer;
 
     @BindView(R.id.bt_see_runs)
     View runHistoryButton;
@@ -111,14 +114,14 @@ public class ProfileStatsFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_share_profile:
-                Bitmap toShare = Utils.getBitmapFromLiveView(viewPager);
+                Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
                 Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                         getString(R.string.share_stats));
                 AnalyticsEvent.create(Event.ON_CLICK_PROFILE_SHARE)
                         .buildAndDispatch();
                 return true;
             case R.id.item_edit_profile:
-                getFragmentController().replaceFragment(new ProfileGeneralFragment(), true);
+                getFragmentController().replaceFragment(new EditProfileFragment(), true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -155,12 +158,13 @@ public class ProfileStatsFragment extends BaseFragment {
             name.setText(MainApplication.getInstance().getUserDetails().getFullName());
 
             // Level and Level's progress
-            long lifetimeDistance = SharedPrefsManager.getInstance().getLong(PREF_WORKOUT_LIFETIME_DISTANCE);
-            Level level = Utils.getLevel(Float.parseFloat(lifetimeDistance+""));
-            levelMinDist.setText(level.getMinKm() + "km");
-            levelMaxDist.setText(level.getMaxKm() + "km");
+            int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
+            Level level = Utils.getLevel(lifeTimeImpact);
+            levelMinDist.setText("\u20B9 " + level.getMinImpact());
+            levelMaxDist.setText("\u20B9 " + level.getMaxImpact());
             levelNum.setText("Level " + level.getLevel());
-            float progressPercent = ((float)(lifetimeDistance - level.getMinKm())) / (level.getMaxKm() - level.getMinKm());
+            float progressPercent =
+                    ((float)(lifeTimeImpact - level.getMinImpact())) / (level.getMaxImpact() - level.getMinImpact());
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) levelProgressBar.getLayoutParams();
             params.weight = progressPercent;
             levelProgressBar.setLayoutParams(params);

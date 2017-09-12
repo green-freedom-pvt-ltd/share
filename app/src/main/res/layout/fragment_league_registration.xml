@@ -16,8 +16,7 @@
             android:id="@+id/league_image"
             android:layout_width="match_parent"
             android:layout_height="240dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/cause_image_placeholder" />
+            android:scaleType="centerCrop"/>
 
         <LinearLayout
             android:layout_width="match_parent"

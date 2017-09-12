@@ -1,6 +1,5 @@
 package com.sharesmile.share.rfac.adapters;
 
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +52,7 @@ public class FeedbackCategoryAdapter extends RecyclerView.Adapter<FeedbackCatego
         TextView categoryLabel;
 
         @BindView(R.id.container_feedback_list_item)
-        CardView container;
+        View container;
 
         public CategoryViewHolder(View itemView) {
             super(itemView);

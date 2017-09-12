@@ -22,8 +22,7 @@
             android:layout_height="240dp"
             android:background="@color/light_grey"
             android:clickable="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/cause_image_placeholder" />
+            android:scaleType="centerCrop"/>
 
         <RelativeLayout
             android:layout_width="match_parent"

@@ -51,7 +51,7 @@ public class PastWorkoutIssueFragment extends BaseFeedbackCategoryFragment {
 
     @Override
     protected void setupToolbar() {
-        setToolbarTitle(getString(R.string.select_issue));
+        setToolbarTitle(getString(R.string.help_center));
     }
 
     @NonNull

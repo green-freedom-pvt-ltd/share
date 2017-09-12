@@ -47,7 +47,6 @@
             android:layout_marginTop="10dp"
             android:textSize="48sp"
             android:textStyle="bold"
-
             android:text="\u20B9 0"
             android:textColor="@color/orange" />
 
@@ -130,7 +129,6 @@
                 android:layout_below="@+id/img_timer_icon"
                 android:layout_centerHorizontal="true"
                 android:textColor="@color/black_57"
-
                 android:text="00:00"
                 android:textSize="30sp" />
 
@@ -144,7 +142,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/tv_run_progress_timer"
                 android:maxLines="1"
-
                 android:textAllCaps="true"
                 android:text="MIN:SEC"/>
 

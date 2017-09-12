@@ -35,8 +35,7 @@
                     android:layout_height="240dp"
                     android:background="@color/light_grey"
                     android:clickable="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/cause_sample" />
+                    android:scaleType="centerCrop" />
 
                 <com.sharesmile.share.views.MLTextView
                     android:id="@+id/category"

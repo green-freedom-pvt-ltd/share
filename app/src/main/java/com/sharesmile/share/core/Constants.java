@@ -249,13 +249,18 @@ public class Constants {
     }};
 
     public static final Map<Integer, Level> LEVELS_MAP = new HashMap<Integer, Level>(){{
-        put(1, new Level(1, 0, 50));
-        put(2, new Level(2, 50, 250));
-        put(3, new Level(3, 250, 1000));
-        put(4, new Level(4, 1000, 2500));
-        put(5, new Level(5, 2500, 5000));
-        put(6, new Level(6, 5000, 10000));
-        put(7, new Level(7, 10000, Integer.MAX_VALUE));
+        put(0, new Level(0, 0, 10));
+        put(1, new Level(1, 10, 50));
+        put(2, new Level(2, 50, 100));
+        put(3, new Level(3, 100, 500));
+        put(4, new Level(4, 500, 1000));
+        put(5, new Level(5, 1000, 2000));
+        put(6, new Level(6, 2000, 5000));
+        put(7, new Level(7, 5000, 10000));
+        put(8, new Level(8, 10000, 20000));
+        put(9, new Level(9, 20000, 50000));
+        put(10, new Level(10, 50000, 100000));
+        put(11, new Level(11, 100000, Integer.MAX_VALUE));
     }};
 
 }

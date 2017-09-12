@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.FeedbackNode;
 import com.sharesmile.share.rfac.models.FeedbackResolution;
 import com.sharesmile.share.rfac.models.Run;
@@ -69,6 +70,14 @@ public class FeedbackResolutionFragment extends FeedbackLevelThreeFragment {
 
     @Override
     protected void setupToolbar() {
+        FeedbackNode parent = feedbackResolution.getParent();
+        if (parent != null){
+            if (FeedbackCategory.FEEDBACK.equals(parent)){
+                // Change title to "Suggestion"
+                setToolbarTitle(getString(R.string.suggestion));
+                return;
+            }
+        }
         setToolbarTitle(getString(R.string.help_center));
     }
 

@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 3/31/2016.
  */
-public class StartRunFragment extends BaseFragment {
+public class RunCountdownFragment extends BaseFragment {
 
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
@@ -37,8 +37,8 @@ public class StartRunFragment extends BaseFragment {
     ImageView mSponsorImage;
     private CauseData mCauseData;
 
-    public static StartRunFragment newInstance(CauseData causeData) {
-        StartRunFragment fragment = new StartRunFragment();
+    public static RunCountdownFragment newInstance(CauseData causeData) {
+        RunCountdownFragment fragment = new RunCountdownFragment();
         Bundle args = new Bundle();
         args.putSerializable(BUNDLE_CAUSE_DATA, causeData);
         fragment.setArguments(args);
@@ -63,7 +63,7 @@ public class StartRunFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_start_run, null);
+        View v = inflater.inflate(R.layout.fragment_run_count_down, null);
         ButterKnife.bind(this,v);
         countdown = (TextView) v.findViewById(R.id.tv_countdown);
         RelativeLayout layout_countdown = (RelativeLayout) v.findViewById(R.id.start_countdown_layout);

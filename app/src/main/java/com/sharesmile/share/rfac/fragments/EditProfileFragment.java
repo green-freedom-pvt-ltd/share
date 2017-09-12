@@ -45,11 +45,11 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 3/29/2016.
  */
-public class ProfileGeneralFragment extends BaseFragment implements
+public class EditProfileFragment extends BaseFragment implements
         RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener,
         View.OnClickListener, TextWatcher {
 
-    private static final String TAG = "ProfileGeneralFragment";
+    private static final String TAG = "EditProfileFragment";
 
     @BindView(R.id.et_profile_general_birthday)
     TextView mBirthday;
@@ -92,7 +92,7 @@ public class ProfileGeneralFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_profile_general, null);
+        View v = inflater.inflate(R.layout.fragment_edit_profile, null);
         getActivity().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         ButterKnife.bind(this, v);
@@ -271,7 +271,7 @@ public class ProfileGeneralFragment extends BaseFragment implements
                         .put("body_weight", bodyWeightEntered)
                         .buildAndDispatch();
             }catch (Exception e){
-                Logger.e("ProfileGeneralFragment", "Exception while parsing body weight: " + e.getMessage() );
+                Logger.e("EditProfileFragment", "Exception while parsing body weight: " + e.getMessage() );
                 e.printStackTrace();
             }
         }

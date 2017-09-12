@@ -7,24 +7,24 @@ package Models;
 public class Level {
 
     private int level;
-    private int minKm; // inclusive
-    private int maxKm; // exclusive
+    private int minImpact; // inclusive
+    private int maxImpact; // exclusive
 
-    public Level(int level, int minKm, int maxKm) {
+    public Level(int level, int minImpact, int maxImpact) {
         this.level = level;
-        this.minKm = minKm;
-        this.maxKm = maxKm;
+        this.minImpact = minImpact;
+        this.maxImpact = maxImpact;
     }
 
     public int getLevel() {
         return level;
     }
 
-    public int getMinKm() {
-        return minKm;
+    public int getMinImpact() {
+        return minImpact;
     }
 
-    public int getMaxKm() {
-        return maxKm;
+    public int getMaxImpact() {
+        return maxImpact;
     }
 }
