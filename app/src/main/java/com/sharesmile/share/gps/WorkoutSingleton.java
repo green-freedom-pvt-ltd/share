@@ -88,9 +88,9 @@ public class WorkoutSingleton {
         dataStore = null;
     }
 
-    public void pauseWorkout(){
+    public void pauseWorkout(String reason){
         setState(State.PAUSED);
-        dataStore.workoutPause();
+        dataStore.workoutPause(reason);
     }
 
     public void resumeWorkout(){

@@ -45,6 +45,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED;
+
 public class TrackerActivity extends BaseActivity {
 
 
@@ -268,7 +270,7 @@ public class TrackerActivity extends BaseActivity {
 
     public void pauseWorkout() {
         if (isBoundToLocationService()) {
-            locationService.pause("user_clicked");
+            locationService.pause(PAUSE_REASON_USER_CLICKED);
         }
     }
 

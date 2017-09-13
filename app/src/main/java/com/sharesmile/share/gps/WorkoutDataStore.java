@@ -56,7 +56,7 @@ public interface WorkoutDataStore {
 
 	boolean coldStartAfterResume();
 
-	void workoutPause();
+	void workoutPause(String reason);
 
 	void workoutResume();
 

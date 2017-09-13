@@ -34,6 +34,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	private boolean isRunning;
 	private float elapsedTime; // in secs
 	private long lastRecordAddedTs; // in millis
+	private boolean wasInVehicle;
 
 	public WorkoutBatchImpl(long startTimeStamp, String locationDataFileName){
 		isRunning = true;
@@ -50,6 +51,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		isRunning = source.isRunning;
 		elapsedTime = source.getElapsedTime();
 		lastRecordAddedTs = source.lastRecordAddedTs;
+		wasInVehicle = source.wasInVehicle;
 	}
 
 	@Override
@@ -247,6 +249,11 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		return (lastRecordAddedTs - startTimeStamp) / 1000;
 	}
 
+	@Override
+	public boolean wasInVehicle() {
+		return wasInVehicle;
+	}
+
 	private void setElapsedTime(){
 		if (isRunning){
 			elapsedTime = (DateUtil.getServerTimeInMillis() - startTimeStamp) / 1000;
@@ -264,7 +271,8 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	}
 
 	@Override
-	public synchronized WorkoutBatch end() {
+	public synchronized WorkoutBatch end(boolean wasInVehicle) {
+		this.wasInVehicle = wasInVehicle;
 		endTimeStamp = DateUtil.getServerTimeInMillis();
 		setElapsedTime();
 		isRunning = false;
@@ -296,6 +304,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		isRunning = in.readByte() != 0x00;
 		elapsedTime = in.readFloat();
 		lastRecordAddedTs = in.readLong();
+		wasInVehicle = in.readByte() != 0x00;
 	}
 
 	@Override
@@ -312,6 +321,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 		dest.writeByte((byte) (isRunning ? 0x01 : 0x00));
 		dest.writeFloat(elapsedTime);
 		dest.writeLong(lastRecordAddedTs);
+		dest.writeByte((byte) (wasInVehicle ? 0x01 : 0x00));
 	}
 
 	@SuppressWarnings("unused")

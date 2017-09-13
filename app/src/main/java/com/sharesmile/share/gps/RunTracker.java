@@ -86,9 +86,9 @@ public class RunTracker implements Tracker {
     }
 
     @Override
-    public synchronized void pauseRun() {
+    public synchronized void pauseRun(String reason) {
         Logger.d(TAG, "pauseRun");
-        WorkoutSingleton.getInstance().pauseWorkout();
+        WorkoutSingleton.getInstance().pauseWorkout(reason);
     }
 
     /**

@@ -66,6 +66,9 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
+import static com.sharesmile.share.core.Constants.PAUSE_REASON_GPS_DISABLED;
+import static com.sharesmile.share.core.Constants.PAUSE_REASON_USAIN_BOLT;
+import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED_NOTIFICATION;
 import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
@@ -377,7 +380,7 @@ public class WorkoutService extends Service implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(PauseWorkoutEvent pauseWorkoutEvent) {
-        pause("user_clicked_notification");
+        pause(PAUSE_REASON_USER_CLICKED_NOTIFICATION);
         EventBus.getDefault().post(new UpdateUiOnWorkoutPauseEvent());
     }
 
@@ -482,6 +485,13 @@ public class WorkoutService extends Service implements
      */
     public boolean checkForSpike(Location loc1, Location loc2){
 
+        float deltaDistance = loc1.distanceTo(loc2);
+
+        // If distance is less than 35 meters then we will not perform spike filter check
+        if (deltaDistance < Config.PRIMARY_SPIKE_FILTER_CHECK_WAIVER_DISTANCE){
+            return false;
+        }
+
         long firstLocationTime = loc1.getTime();
         if (LocationManager.NETWORK_PROVIDER.equals(loc1.getProvider())){
             // Location returned by NETWORK_PROVIDER
@@ -500,7 +510,6 @@ public class WorkoutService extends Service implements
         long deltaTimeInMillis = Math.abs(secondLocationTime - firstLocationTime);
         long deltaTime = deltaTimeInMillis / 1000;
 
-        float deltaDistance = loc1.distanceTo(loc2);
         float deltaSpeed = (deltaDistance * 1000) / deltaTimeInMillis;
 
         // Determine speed threshold based on User's current context
@@ -586,7 +595,7 @@ public class WorkoutService extends Service implements
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_PAUSE_WORKOUT_CODE);
             sendBroadcast(bundle);
-            pause("gps_disabled");
+            pause(PAUSE_REASON_GPS_DISABLED);
             // Popup to enable location again
             GoogleLocationTracker.getInstance().startLocationTracking(true);
         }
@@ -684,7 +693,7 @@ public class WorkoutService extends Service implements
             vigilanceTimer.pauseTimer();
         }
         if (tracker != null && tracker.isRunning()) {
-            tracker.pauseRun();
+            tracker.pauseRun(reason);
             //Test: Put stopping locationServices code over here
             Logger.d(TAG, "PauseWorkout");
             AnalyticsEvent.create(Event.ON_WORKOUT_PAUSE)
@@ -778,7 +787,7 @@ public class WorkoutService extends Service implements
         pushFraudDataOnServer();
 
         if (!WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()){
-            pause("usain_bolt");
+            pause(PAUSE_REASON_USAIN_BOLT);
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,

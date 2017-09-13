@@ -136,7 +136,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         }
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
-        dirtyWorkoutData.addRecord(record, false);
+        dirtyWorkoutData.addRecord(record, true);
         waitingForApprovalQueue.add(record);
     }
 
@@ -189,10 +189,10 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     @Override
-    public void workoutPause() {
+    public void workoutPause(String reason) {
         Logger.d(TAG, "workoutPause");
-        dirtyWorkoutData.workoutPause();
-        approvedWorkoutData.workoutPause();
+        dirtyWorkoutData.workoutPause(reason);
+        approvedWorkoutData.workoutPause(reason);
         // If it was a defaulter scenario then the queue has already been discarded
         approveWorkoutData();
         persistBothWorkoutData();
@@ -235,7 +235,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
             Logger.d(TAG, "Approving record: " + record.toString());
-            approvedWorkoutData.addRecord(record, true);
+            approvedWorkoutData.addRecord(record, false);
         }
         approvePendingSteps();
         persistBothWorkoutData();
@@ -278,7 +278,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
             Logger.d(TAG, "Approving record: " + record.toString());
-            approvedWorkoutData.addRecord(record, true);
+            approvedWorkoutData.addRecord(record, false);
         }
         approvePendingSteps();
         clearPersistentStorage();

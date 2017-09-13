@@ -66,6 +66,11 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	float getRecordedTime();
 
 	/**
+	 * @return true if user was caught inside a vehicle for this batch, false otherwise
+	 */
+	boolean wasInVehicle();
+
+	/**
 	 * @return list of all points of this batch
 	 */
 	List<WorkoutPoint> getPoints();
@@ -73,7 +78,7 @@ public interface WorkoutBatch extends UnObfuscable, Parcelable{
 	/**
 	 *completes this batch and returns this after whatever post processing is required
 	 */
-	WorkoutBatch end();
+	WorkoutBatch end(boolean wasInVehicle);
 
 	/**
 	 * Creates a Deep copy of this batch

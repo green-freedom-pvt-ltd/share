@@ -532,6 +532,7 @@ public class SyncService extends GcmTaskService {
             locationData.setClientRunId(workoutId);
             locationData.setRunId(runId);
             locationData.setStartTimeEpoch(batch.getStartTimeStamp());
+            locationData.setWasInVehicle(batch.wasInVehicle());
             locationData.setEndTimeEpoch(batch.getEndTimeStamp());
             locationData.setLocationArray(batch.getPoints());
 
@@ -679,8 +680,6 @@ public class SyncService extends GcmTaskService {
             }
 
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            // Commenting delete command as it is not required after adding unique constraint to WORKOUT_ID
-//            mWorkoutDao.delete(workout);
             workout.setId(response.getId());
             workout.setIs_sync(true);
             workout.setIsValidRun(!response.isFlag());

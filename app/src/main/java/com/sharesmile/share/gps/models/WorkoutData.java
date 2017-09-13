@@ -76,6 +76,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	/**
 	 * adds given distance record
 	 * @param recordToAdd
+	 * @param persistPoints If true location from this record is persisted in file belonging to the current batch
 	 */
 	void addRecord(DistRecord recordToAdd, boolean persistPoints);
 
@@ -109,7 +110,7 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	/**
 	 * completes the currently runnning batch
 	 */
-	void workoutPause();
+	void workoutPause(String reason);
 
 	/**
 	 * invokes new batch and adds it to the list of batches

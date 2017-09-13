@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -238,9 +239,14 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	}
 
 	@Override
-	public synchronized void workoutPause() {
+	public synchronized void workoutPause(String reason) {
 		if (!isPaused()){
-			getCurrentBatch().end();
+			if (Constants.PAUSE_REASON_USAIN_BOLT.equals(reason)){
+				// User was caught in a vehicle
+				getCurrentBatch().end(true);
+			}else {
+				getCurrentBatch().end(false);
+			}
 			paused = true;
 		}
 	}
@@ -323,7 +329,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public synchronized WorkoutData close(){
 		if (!isPaused()){
-			workoutPause();
+			workoutPause(null);
 		}
 		setElapsedTime();
 		setRecordedTime();

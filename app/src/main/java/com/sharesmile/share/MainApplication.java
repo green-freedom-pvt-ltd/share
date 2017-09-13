@@ -326,8 +326,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         faqList = SharedPrefsManager.getInstance().getObject(Constants.KEY_FAQ_LIST, FaqList.class);
 
         updateAppVersionInPrefs();
-        AnalyticsEvent.create(Event.ON_APPLICATION_CREATE)
-                .buildAndDispatch();
 
         Settings settings = new Settings("c6596ame55nb4hotaciy1j91v");
         settings.setFirebaseCloudMessagingAutoRegistrationEnabled(false);

@@ -27,6 +27,17 @@ public class WorkoutBatchLocationData implements UnObfuscable, Serializable {
     @SerializedName("end_time_epoch")
     private long endTimeEpoch;
 
+    @SerializedName("was_in_vehicle")
+    private boolean wasInVehicle;
+
+    public boolean isWasInVehicle() {
+        return wasInVehicle;
+    }
+
+    public void setWasInVehicle(boolean wasInVehicle) {
+        this.wasInVehicle = wasInVehicle;
+    }
+
     @SerializedName("location_array")
     private List<WorkoutPoint> locationArray;
 

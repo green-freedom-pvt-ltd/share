@@ -12,7 +12,7 @@ import com.sharesmile.share.gps.models.WorkoutData;
 public interface Tracker {
 
 	WorkoutData endRun();
-	void pauseRun();
+	void pauseRun(String reason);
 	void resumeRun();
 	boolean isActive();
 	boolean isPaused();
