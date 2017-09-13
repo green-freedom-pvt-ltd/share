@@ -30,7 +30,7 @@
             <ImageView
                 android:id="@+id/image_run"
                 android:layout_width="match_parent"
-                android:layout_height="240dp"
+                android:layout_height="263dp"
                 android:background="@color/light_grey"
                 android:clickable="true"
                 android:scaleType="centerCrop"
