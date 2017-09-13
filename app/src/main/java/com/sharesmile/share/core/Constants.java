@@ -163,7 +163,6 @@ public class Constants {
 
     public static final String PREF_DISABLE_ALERTS = "pref_disable_alerts";
     public static final String PREF_DISABLE_GPS_UPDATES = "pref_disable_gps_updates";
-    public static final String PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER = "pref_schedule_walk_engagement_notif_after";
 
     public static final String FEEDBACK_TAG_FLAGGED_RUN = "flag";
     public static final String FEEDBACK_TAG_DRAWER = "drawer";

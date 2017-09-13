@@ -535,36 +535,36 @@ public class Utils {
         return run;
     }
 
-    public static Run convertWorkoutDataToRun(WorkoutData workout){
+    public static Run convertWorkoutDataToRun(WorkoutData data){
         Logger.d(TAG, "convertWorkoutDataToRun");
 
         Run run = new Run();
-        run.setDistance(workout.getDistance());
-        if (workout.getBeginTimeStamp() > 0){
+        run.setDistance(data.getDistance() / 1000);
+        if (data.getBeginTimeStamp() > 0){
             Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
-            run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
+            run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(data.getBeginTimeStamp())));
         }
-        run.setRunDuration(Utils.secondsToHHMMSS((int) workout.getElapsedTime()));
-        run.setNumSteps(workout.getTotalSteps());
-        run.setAvgSpeed(workout.getAvgSpeed());
-        run.setClientRunId(workout.getWorkoutId());
-        if (workout.getStartPoint() != null){
-            run.setStartLocationLat(workout.getStartPoint().latitude);
+        run.setRunDuration(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        run.setNumSteps(data.getTotalSteps());
+        run.setAvgSpeed(data.getAvgSpeed());
+        run.setClientRunId(data.getWorkoutId());
+        if (data.getStartPoint() != null){
+            run.setStartLocationLat(data.getStartPoint().latitude);
         }
-        if (workout.getStartPoint() != null){
-            run.setStartLocationLong(workout.getStartPoint().longitude);
+        if (data.getStartPoint() != null){
+            run.setStartLocationLong(data.getStartPoint().longitude);
         }
-        if (workout.getLatestPoint()!= null){
-            run.setEndLocationLat(workout.getLatestPoint().latitude);
+        if (data.getLatestPoint()!= null){
+            run.setEndLocationLat(data.getLatestPoint().latitude);
         }
-        if (workout.getLatestPoint() != null){
-            run.setEndLocationLong(workout.getLatestPoint().longitude);
+        if (data.getLatestPoint() != null){
+            run.setEndLocationLong(data.getLatestPoint().longitude);
         }
         if (MainApplication.getInstance().getUserDetails() != null){
             run.setTeamId(MainApplication.getInstance().getUserDetails().getTeamId());
         }
-        run.setNumSpikes(workout.getNumGpsSpikes());
-        run.setNumUpdates(workout.getNumUpdateEvents());
+        run.setNumSpikes(data.getNumGpsSpikes());
+        run.setNumUpdates(data.getNumUpdateEvents());
         run.setAppVersion(Utils.getAppVersion());
         run.setOsVersion(Build.VERSION.SDK_INT);
         run.setDeviceId(Utils.getUniqueId(MainApplication.getContext()));

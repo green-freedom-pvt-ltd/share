@@ -82,7 +82,13 @@ public class Config {
 
     /*******************************/
 
+    // Need to be added in Run Configuration params
+
+    public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 180000; // in millisecs
+
     public static final float PRIMARY_SPIKE_FILTER_CHECK_WAIVER_DISTANCE = 35;// in meters
+
+
 
     public static final long CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL = 1200000; // in millis
 
@@ -136,9 +142,6 @@ public class Config {
 
     public static final long CURRENT_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
     public static final long CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL = 24000; // in millisecs
-
-
-    public static final long REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL = 60000; // in millisecs
 
 
     public static final float GOOD_GPS_RECENT_SPEED_LOWER_THRESHOLD = 0.305f; // in m/s, i.e. 1.1 km/hr

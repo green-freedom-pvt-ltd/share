@@ -40,7 +40,6 @@ import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.Qna;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -55,7 +54,6 @@ import io.smooch.core.Smooch;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
-import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
@@ -142,15 +140,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS)){
                 Logger.i(TAG, "Won't show notification with id:" + notificationId + ", as alerts are disabled");
                 return false;
-            }
-            if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
-                long currentTsMillis = DateUtil.getServerTimeInMillis();
-                long scheduleWalkEngagementAfter = SharedPrefsManager.getInstance().getLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER);
-                if (currentTsMillis < scheduleWalkEngagementAfter){
-                    // Won't show walk engagement notif, can only show it after "scheduleWalkEngagementAfter" time
-                    Logger.i(TAG, "Won't show walk engagement notif, can only show it after " + scheduleWalkEngagementAfter + " time");
-                    return false;
-                }
             }
             if (notificationId == WORKOUT_NOTIFICATION_STILL_ID){
                 if (!WorkoutSingleton.getInstance().isRunning()){

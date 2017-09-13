@@ -44,6 +44,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.models.WorkoutBatch;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.FraudData;
@@ -69,7 +70,6 @@ import static com.sharesmile.share.core.Config.WORKOUT_BEGINNING_LOCATION_CIRCUL
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_GPS_DISABLED;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USAIN_BOLT;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED_NOTIFICATION;
-import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
@@ -144,6 +144,10 @@ public class WorkoutService extends Service implements
             vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         }
         makeForegroundAndSticky();
+
+        ActivityDetector.getInstance().startActivityDetection();
+        AnalyticsEvent.create(Event.ON_WORKOUT_START)
+                .buildAndDispatch();
     }
 
 
@@ -157,6 +161,14 @@ public class WorkoutService extends Service implements
             if (result.getDistance() >= mCauseData.getMinDistance()
                     && !result.isMockLocationDetected()) {
                 persistWorkoutInDb(result);
+            }else {
+                // Delete the files in which location data of all the batches of this workout was stored
+                for (int i=0; i< result.getBatches().size(); i++) {
+                    WorkoutBatch batch = result.getBatches().get(i);
+                    if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+                        Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
+                    }
+                }
             }
             tracker = null;
             Bundle bundle = new Bundle();
@@ -166,6 +178,10 @@ public class WorkoutService extends Service implements
             Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
             intent.putExtras(bundle);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+            // Do not perform activity detection until the next 24 hours, unless user starts workout
+            ActivityDetector.getInstance().stopActivityDetection();
+
             AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
                     .addBundle(result.getWorkoutBundle())
                     .put("cause_id", mCauseData.getId())
@@ -245,9 +261,6 @@ public class WorkoutService extends Service implements
                     stepCounter = new GoogleFitStepCounter(this, this);
                 }
             }
-            ActivityDetector.getInstance().workoutActive();
-            AnalyticsEvent.create(Event.ON_WORKOUT_START)
-                    .buildAndDispatch();
         }
 
     }
@@ -267,7 +280,6 @@ public class WorkoutService extends Service implements
                         .buildAndDispatch();
             }
 
-
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
@@ -279,11 +291,6 @@ public class WorkoutService extends Service implements
             unBindFromActivityAndStop();
             distanceInKmsOnLastUpdateEvent = 0f;
             cancelAllWorkoutNotifications();
-            // Do not show walk engagement notification until the next 12 hours
-            long currentTs = DateUtil.getServerTimeInMillis();
-            long scheduleWalkEngagementAfter = currentTs + ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
-            SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
-            ActivityDetector.getInstance().workoutIdle();
         }
     }
 

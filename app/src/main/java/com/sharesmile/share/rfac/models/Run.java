@@ -35,10 +35,10 @@ public class Run implements UnObfuscable, Serializable {
     Long endTimeEpoch;
 
     @SerializedName("distance")
-    float distance;
+    float distance; // In Kms
 
     @SerializedName("run_amount")
-    float runAmount;
+    float runAmount; // In Rupees
 
     @SerializedName("run_duration")
     String runDuration;

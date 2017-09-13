@@ -65,7 +65,7 @@ public class ClientConfig implements UnObfuscable{
     public  int ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE = 5;
 
     // ActivityRecognition updates request interval
-    public  long DETECTED_INTERVAL_IDLE = 10000; // in millisecs
+    public  long DETECTED_INTERVAL_IDLE = 15000; // in millisecs
     public  long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 
     // If user remains continuously still for this much time then Still notification is shown
@@ -74,10 +74,10 @@ public class ClientConfig implements UnObfuscable{
     // Walk engagement counter is invoked periodically after this interval
     public  long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
 
-    // Show walk engaagement notif if user has been on foot continuously for this much amount of time
-    public  long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 105000;// in millisecs
+    // Show walk engagement notif if user has been on foot continuously for this much amount of time
+    public  long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 90000;// in millisecs
 
-    public  long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 43200000;// in millisecs, i.e. 12 hours
+    public  long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 86400000;// in millisecs, i.e. 24 hours
 
     // During tracking If GPS behaves bad continuously for this much amount of time, then BAD_GPS_NOTIF is shown
     public  long BAD_GPS_NOTIF_THRESHOLD_INTERVAL = 60000;

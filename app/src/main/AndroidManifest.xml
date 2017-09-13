@@ -192,6 +192,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".gps.activityrecognition.InvokeActivityDetectionAlarm" android:exported="true">
+            <intent-filter>
+                <action android:name="com.sharesmile.share.gps.activityrecognition.START_ACTIVITY_DETECTION_ALARM" >
+                </action>
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".core.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" >

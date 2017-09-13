@@ -22,9 +22,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.CircularQueue;
-import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.MainApplication.showRunNotification;
@@ -33,7 +31,6 @@ import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
 import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
 import static com.sharesmile.share.core.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
-import static com.sharesmile.share.core.Constants.PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
@@ -56,8 +53,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private float onFootConfidenceRecentAvg;
     private long timeCoveredByHistoryQueue;
 
-    private boolean isWorkoutActive;
-
     private CircularQueue<ActivityRecognitionResult> historyQueue;
 
     private static ActivityDetector uniqueInstance;
@@ -70,8 +65,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         this.appContext = appContext;
         this.handler = new Handler();
         this.historyQueue = new CircularQueue<>(ClientConfig.getInstance().ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE);
-        this.isWorkoutActive = WorkoutSingleton.getInstance().isWorkoutActive();
-        connectGoogleApiClient();
+//        connectGoogleApiClient();
     }
 
     /**
@@ -130,35 +124,83 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private void registerForActivityUpdates(){
         Intent intent = new Intent(appContext, ActivityRecognizedService.class);
         PendingIntent pendingIntent = PendingIntent.getService( appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        long detectionIntervalMillis = isWorkoutActive() ? ClientConfig.getInstance().DETECTED_INTERVAL_ACTIVE : ClientConfig.getInstance().DETECTED_INTERVAL_IDLE;
+        long detectionIntervalMillis = isWorkoutActive() ? ClientConfig.getInstance().DETECTED_INTERVAL_ACTIVE
+                : ClientConfig.getInstance().DETECTED_INTERVAL_IDLE;
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, detectionIntervalMillis, pendingIntent );
-        if (!isWorkoutActive()){
+        if (isWorkoutActive()){
+            stopWalkEngagementDetectionCounter();
+        }else {
             startWalkEngagementDetectionCounter();
         }
     }
 
-    public void workoutActive(){
-        isWorkoutActive = true;
+    public void startActivityDetection(){
+        Logger.d(TAG, "startActivityDetection");
         if (googleApiClient != null && googleApiClient.isConnected()){
             registerForActivityUpdates();
         }else {
             connectGoogleApiClient();
         }
+        InvokeActivityDetectionAlarm.cancelAlarm(appContext);
+
+        //TODO: Check do we really need to removeCallbacks on handleStillNotificationRunnable
+//        handler.removeCallbacks(handleStillNotificationRunnable);
+
+    }
+
+//    public void workoutActive(){
+//        isWorkoutActive = true;
+//        if (googleApiClient != null && googleApiClient.isConnected()){
+//            registerForActivityUpdates();
+//        }else {
+//            connectGoogleApiClient();
+//        }
+//        handler.removeCallbacks(handleStillNotificationRunnable);
+//        stopWalkEngagementDetectionCounter();
+//    }
+
+    public void stopActivityDetection(){
+        Logger.d(TAG, "stopActivityDetection");
+
         handler.removeCallbacks(handleStillNotificationRunnable);
         stopWalkEngagementDetectionCounter();
-    }
+        reset();
 
-    public void workoutIdle(){
-        isWorkoutActive = false;
+        unregisterForActivityUpdates();
+
         if (googleApiClient != null && googleApiClient.isConnected()){
-            registerForActivityUpdates();
-        }else {
-            connectGoogleApiClient();
+            googleApiClient.disconnect();
         }
-        handler.removeCallbacks(handleStillNotificationRunnable);
-        startWalkEngagementDetectionCounter();
+        googleApiClient = null;
+
+        InvokeActivityDetectionAlarm.setAlarm(appContext,
+                ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD);
     }
 
+    private void unregisterForActivityUpdates(){
+        Intent intent = new Intent(appContext, ActivityRecognizedService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+        }
+    }
+
+//    public void workoutIdle(){
+//        isWorkoutActive = false;
+//        if (googleApiClient != null && googleApiClient.isConnected()){
+//            registerForActivityUpdates();
+//        }else {
+//            connectGoogleApiClient();
+//        }
+//        handler.removeCallbacks(handleStillNotificationRunnable);
+//        startWalkEngagementDetectionCounter();
+//    }
+
+    /**
+     * Hides WALK_ENGAGEMENT notification if it is already on display
+     * Stops periodic checking of activity for WALK_ENGAGEMENT notification
+     * resets timeOnFootContinuosly
+     */
     private void stopWalkEngagementDetectionCounter(){
         cancelWalkEngagementNotif();
         handler.removeCallbacks(handleEngagementNotificationRunnable);
@@ -173,18 +215,23 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
 
     /**
      * Called when user explicitly dismissed walk engagement notification, either by swiping OR by clicking on cancel
-     * Need to make sure that we do not show walk engagement in near future
+     * Need to make sure that we do not perform activity detection for the next 12 hours unless user starts workout again
      */
     public void userDismissedWalkEngagementNotif(){
-        // Do not show walk engagement notification until the next 12 hours
-        long currentTs = DateUtil.getServerTimeInMillis();
-        long scheduleWalkEngagementAfter = currentTs + ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD;
-        SharedPrefsManager.getInstance().setLong(PREF_SCHEDULE_WALK_ENGAGEMENT_NOTIF_AFTER, scheduleWalkEngagementAfter);
+
+        // Do not perform activity detection until the next 24 hours, unless user starts workout
+        stopActivityDetection();
+
         isWalkEngagementNotificationOnDisplay = false;
         AnalyticsEvent.create(Event.DISMISS_WALK_ENGAGEMENT_NOTIF)
                 .buildAndDispatch();
+
     }
 
+    /**
+     * resets timeOnFootContinuously
+     * Starts periodic checking of activity for WALK_ENGAGEMENT notification
+     */
     private void startWalkEngagementDetectionCounter(){
         handler.removeCallbacks(handleEngagementNotificationRunnable);
         timeOnFootContinuously = 0;
@@ -192,25 +239,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public boolean isWorkoutActive(){
-        return isWorkoutActive;
-    }
-
-    public void stopActivityDetection(){
-        Logger.d(TAG, "stopActivityDetection");
-        unregisterForActivityUpdates();
-        if (googleApiClient != null && googleApiClient.isConnected()){
-            googleApiClient.disconnect();
-        }
-        googleApiClient = null;
-    }
-
-    private void unregisterForActivityUpdates(){
-        reset();
-        Intent intent = new Intent(appContext, ActivityRecognizedService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
-        }
+        return WorkoutSingleton.getInstance().isWorkoutActive();
     }
 
     final Runnable handleStillNotificationRunnable = new Runnable() {
@@ -237,6 +266,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private long timeOnFootContinuously = 0;
     private boolean isWalkEngagementNotificationOnDisplay = false;
 
+    /**
+     * Triggers after every WALK_ENGAGEMENT_COUNTER_INTERVAL and notifies user if he has been walking since past 2 minutes without switching on ImpactRun
+     */
     final Runnable handleEngagementNotificationRunnable = new Runnable() {
         @Override
         public void run() {
