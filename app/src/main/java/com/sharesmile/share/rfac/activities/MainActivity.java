@@ -44,6 +44,7 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.ToolbarActivity;
 import com.sharesmile.share.gps.WorkoutSingleton;
@@ -246,11 +247,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             loginMenu.setVisible(false);
             profileMenu.setVisible(true);
             leaderboardMenu.setVisible(true);
-            if (LeaderBoardDataStore.getInstance().toShowLeague()){
-                impactLeagueMenu.setVisible(true);
-            }else {
-                impactLeagueMenu.setVisible(false);
-            }
+            impactLeagueMenu.setVisible(true);
+//            if (LeaderBoardDataStore.getInstance().toShowLeague()){
+//                impactLeagueMenu.setVisible(true);
+//            }else {
+//                impactLeagueMenu.setVisible(false);
+//            }
         } else {
             loginMenu.setVisible(true);
             profileMenu.setVisible(false);
@@ -379,7 +381,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
             showLeaderBoard();
         } else if (menuItem.getItemId() == R.id.nav_item_impact_league) {
-            showLeagueBoard();
+            if (LeaderBoardDataStore.getInstance().toShowLeague()){
+                showLeagueBoard();
+            }else {
+                performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
+            }
             AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_NAVIGATION_MENU)
                     .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
                     .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())

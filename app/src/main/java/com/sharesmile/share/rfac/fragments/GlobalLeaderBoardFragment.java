@@ -107,10 +107,10 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_league:
-                int teamId = LeaderBoardDataStore.getInstance().getMyTeamId();
-                if (teamId > 0) {
+//                int teamId = LeaderBoardDataStore.getInstance().getMyTeamId();
+                if (LeaderBoardDataStore.getInstance().toShowLeague()){
                     getFragmentController().replaceFragment(LeagueBoardFragment.getInstance(), true);
-                } else {
+                }else {
                     getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
                 }
                 AnalyticsEvent.create(Event.ON_CLICK_CUP_ICON)

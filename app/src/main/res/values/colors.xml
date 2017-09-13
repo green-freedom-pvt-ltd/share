@@ -67,9 +67,9 @@
     <color name="purplish_brown">#453640</color>
     <color name="pale_grey">#f6f7f9</color>
 
-    <color name="Smooch_accent">#9200aa</color>
-    <color name="Smooch_accentDark">#76008a</color>
-    <color name="Smooch_accentLight">#be7cca</color>
+    <color name="Smooch_accent">#00B9FF</color>
+    <color name="Smooch_accentDark">#008DC3</color>
+    <color name="Smooch_accentLight">#B3D9E6</color>
 
     <color name="Smooch_backgroundInput">#ffffff</color>
 
@@ -80,6 +80,7 @@
 
     <color name="Smooch_messageDate">@color/Smooch_header</color>
     <color name="Smooch_messageShadow">#7f999999</color>
+
 
     <color name="Smooch_remoteMessageAuthor">@color/Smooch_header</color>
     <color name="Smooch_remoteMessageBackground">#ffffff</color>

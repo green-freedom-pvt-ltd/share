@@ -74,6 +74,7 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
         startActivity(intent);
+        finish();
     }
 
     @Override
