@@ -273,8 +273,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     }, REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL);
                 }
             }
-            MainApplication.showToast("Confidence: " + Math.round(onFootConfidenceRecentAvg)
-                    + ", time: " + timeOnFootContinuously / 1000);
+//            MainApplication.showToast("Confidence: " + Math.round(onFootConfidenceRecentAvg)
+//                    + ", time: " + timeOnFootContinuously / 1000);
             if (timeOnFootContinuously >= ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
                 // User has been walking continuously for the past 2 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
