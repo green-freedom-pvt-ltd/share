@@ -12,11 +12,13 @@ import com.sharesmile.share.LeaderBoardDataStore
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
 import com.sharesmile.share.analytics.Analytics
-import com.sharesmile.share.core.Constants
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
-import com.sharesmile.share.utils.*
+import com.sharesmile.share.utils.BasicNameValuePair
+import com.sharesmile.share.utils.NameValuePair
+import com.sharesmile.share.utils.Urls
+import com.sharesmile.share.utils.Utils
 import kotlinx.android.synthetic.main.fragment_secret_code.view.*
 import java.util.*
 
@@ -58,7 +60,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         var code = view!!.secret_code.text.toString();
         if (TextUtils.isEmpty(code)) {
             view!!.code_layout.error = "Enter Secret team code"
-            return;
+            return
         }
         verifySecretCode(code);
 
@@ -114,7 +116,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
     }
 
     override fun screenTitle(): String {
-        return getString(R.string.secret_code);
+        return getString(R.string.impact_league)
     }
 }
 
