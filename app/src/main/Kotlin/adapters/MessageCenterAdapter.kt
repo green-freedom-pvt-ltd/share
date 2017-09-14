@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import com.sharesmile.share.MainApplication.getContext
 import com.sharesmile.share.Message
 import com.sharesmile.share.R
+import com.sharesmile.share.analytics.events.AnalyticsEvent
+import com.sharesmile.share.analytics.events.Event
 import com.sharesmile.share.utils.DateUtil
 import com.sharesmile.share.utils.ShareImageLoader
 import kotlinx.android.synthetic.main.item_message_center.view.*
@@ -61,6 +63,9 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
             itemView.setOnClickListener(object : View.OnClickListener {
                 override fun onClick(v: View?) {
                     mListerner.onMessageCardClick(data);
+                    AnalyticsEvent.create(Event.ON_CLICK_FEED_CARD)
+                            .put("feed_card_id", data.id)
+                            .buildAndDispatch()
                 }
 
             })
@@ -68,6 +73,9 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
 
                 override fun onClick(v: View?) {
                     mListerner.onShareMessageClick(data)
+                    AnalyticsEvent.create(Event.ON_CLICK_FEED_CARD_SHARE)
+                            .put("feed_card_id", data.id)
+                            .buildAndDispatch()
                 }
             })
         }

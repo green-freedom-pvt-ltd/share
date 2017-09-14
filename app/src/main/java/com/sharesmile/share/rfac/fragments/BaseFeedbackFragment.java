@@ -1,5 +1,11 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.View;
+
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.FeedbackNode;
 
@@ -14,6 +20,15 @@ public abstract class BaseFeedbackFragment extends BaseFragment {
     public abstract FeedbackNode.Type getFeedbackNodeType();
     public abstract int getFeedbackLevel();
     protected abstract void setupToolbar();
+    public abstract String getScreenName();
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        AnalyticsEvent.create(Event.ON_LOAD_FEEDBACK_SCREEN)
+                .put("screen", getScreenName())
+                .buildAndDispatch();
+    }
 
     @Override
     public void onStart() {

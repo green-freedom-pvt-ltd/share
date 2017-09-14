@@ -153,6 +153,10 @@ public class FeedbackQnaFragment extends FeedbackLevelThreeFragment {
         setToolbarTitle(getString(R.string.questions));
     }
 
+    @Override
+    public String getScreenName() {
+        return "Questions";
+    }
 
 
 }

@@ -154,9 +154,15 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.card_view:
-            case R.id.iv_cause_completed:
                 showCauseInfoFragment();
                 AnalyticsEvent.create(Event.ON_CLICK_CAUSE_CARD)
+                        .put("cause_title", cause.getTitle())
+                        .put("cause_id", cause.getId())
+                        .buildAndDispatch();
+                break;
+            case R.id.iv_cause_completed:
+                showCauseInfoFragment();
+                AnalyticsEvent.create(Event.ON_CLICK_CAUSE_COMPLETED_CARD)
                         .put("cause_title", cause.getTitle())
                         .put("cause_id", cause.getId())
                         .buildAndDispatch();

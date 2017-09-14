@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/badge_layout"
     android:layout_width="48dp"
     android:layout_height="48dp"
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:padding="12dp"
-        android:src="@drawable/ic_message_white_24dp" />
+        app:srcCompat="@drawable/ic_public_white_24px" />
 
     <!-- Menu Item Image -->
     <ImageView

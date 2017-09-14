@@ -163,13 +163,11 @@ public class Constants {
 
     public static final String PREF_DISABLE_ALERTS = "pref_disable_alerts";
     public static final String PREF_DISABLE_GPS_UPDATES = "pref_disable_gps_updates";
+    public static final String PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP = "pref_last_activity_detection_stopped_time_stamp";
 
     public static final String FEEDBACK_TAG_FLAGGED_RUN = "flag";
     public static final String FEEDBACK_TAG_DRAWER = "drawer";
     public static final String FEEDBACK_TAG_POST_RUN_SAD = "sad";
-    public static final String FEEDBACK_TAG_PAST_WORKOUT = "past_workout";
-    public static final String FEEDBACK_TAG_QUESTION = "question";
-    public static final String FEEDBACK_TAG_SOMETHING_ELSE = "other";
 
 
     public static final String PREF_APP_VERSION = "pref_app_version";
@@ -179,7 +177,6 @@ public class Constants {
 
 
     public static final String PREFS_CHAT_TOOLTIP_DISPLAY_COUNT = "chat_tooltip_diplay_count";
-    public static final String PREFS_LAST_SAVED_FCM_TOKEN = "prefs_last_saved_fcm_token";
 
     public static final int REQUEST_CODE_LOGIN = 1001;
 

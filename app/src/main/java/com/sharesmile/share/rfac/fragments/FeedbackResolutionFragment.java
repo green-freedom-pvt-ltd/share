@@ -82,6 +82,11 @@ public class FeedbackResolutionFragment extends FeedbackLevelThreeFragment {
     }
 
     @Override
+    public String getScreenName() {
+        return "Resolution";
+    }
+
+    @Override
     protected int getLayoutId() {
         return R.layout.frag_feedback_resolution;
     }

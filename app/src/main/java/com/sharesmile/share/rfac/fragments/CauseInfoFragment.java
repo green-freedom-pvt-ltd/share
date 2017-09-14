@@ -149,6 +149,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
                 break;
             case R.id.badge_layout:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
+                AnalyticsEvent.create(Event.ON_CLICK_FEED).buildAndDispatch();
                 break;
             default:
         }

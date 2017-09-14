@@ -16,6 +16,8 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
@@ -86,6 +88,16 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         init();
         EventBus.getDefault().register(this);
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (isRunSelection){
+            AnalyticsEvent.create(Event.ON_LOAD_FEEDBACK_PAST_WORKOUTS).buildAndDispatch();
+        }else {
+            AnalyticsEvent.create(Event.ON_LOAD_WORKOUT_HISTORY).buildAndDispatch();
+        }
     }
 
     private void init() {

@@ -96,22 +96,34 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
         setToolbarTitle(LeaderBoardDataStore.getInstance().getLeagueName());
     }
 
-    private int currentPage;
+    private int currentPageIndex;
     private List<ImageView> indicators = new ArrayList<>();
 
     private void initBanner(){
         Logger.d(TAG, "initBanner");
         bannerPagerAdapter = new LeagueBoardBannerPagerAdapter();
         bannerViewPager.setAdapter(bannerPagerAdapter);
-        currentPage = 0;
+        currentPageIndex = 0;
         bannerViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
             public void onPageSelected(int position) {
+                //Position is the index of the newPage on screen
+                if (position < currentPageIndex){
+                    // User moved to left
+                    AnalyticsEvent.create(Event.ON_SWIPE_LEAGEBOARD_BANNER)
+                            .put("direction", "left")
+                            .buildAndDispatch();
+
+                }else if (position > currentPageIndex) {
+                    // User moved to right
+                    AnalyticsEvent.create(Event.ON_SWIPE_LEAGEBOARD_BANNER)
+                            .put("direction", "right")
+                            .buildAndDispatch();
+                }
                 // Setting newImage as current image
                 setSelectedPage(position);
             }
@@ -121,7 +133,7 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
                 enableDisableSwipeRefresh( state == ViewPager.SCROLL_STATE_IDLE );
             }
         });
-        addIndicators(2, currentPage);
+        addIndicators(2, currentPageIndex);
     }
 
     private void addIndicators(int numPages, int displayImageIndex){
@@ -146,12 +158,12 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     }
 
     private void setSelectedPage(int newPosition){
-        int prevIndex = currentPage;
+        int prevIndex = currentPageIndex;
         // Setting newPosition as current page
-        currentPage = newPosition;
+        currentPageIndex = newPosition;
         if (indicators != null){
             indicators.get(prevIndex).setSelected(false);
-            indicators.get(currentPage).setSelected(true);
+            indicators.get(currentPageIndex).setSelected(true);
         }
     }
 

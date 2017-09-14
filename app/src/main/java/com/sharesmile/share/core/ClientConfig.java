@@ -59,7 +59,7 @@ public class ClientConfig implements UnObfuscable{
     public  int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
     public  int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
     // Minimum ON_FOOT confidence required for walk engagement notif
-    public  int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 60;
+    public  int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 52;
 
     // Used maintain history of activityRecognitionResult recent history
     public  int ACTIVITY_RECOGNITION_RESULT_HISTORY_QUEUE_MAX_SIZE = 5;

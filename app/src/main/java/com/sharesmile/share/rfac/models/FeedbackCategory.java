@@ -22,7 +22,7 @@ public class FeedbackCategory extends FeedbackNode {
     public static FeedbackCategory FLAGGED_RUN = new FeedbackCategory(LEVEL_2, "scratched", "Why is it scratched off");
     public static FeedbackCategory NOT_IN_VEHICLE = new FeedbackCategory(LEVEL_2, "notvehicle", "I wasn't in a vehicle");
     public static FeedbackCategory IMPACT_MISSING_LEADERBOARD = new FeedbackCategory(LEVEL_2, "leaderboardadd", "Impact missing in Leaderboard");
-    public static FeedbackCategory STILL_SOMETHING_ELSE = new FeedbackCategory(LEVEL_2, "else", "Something else");
+    public static FeedbackCategory STILL_SOMETHING_ELSE = new FeedbackCategory(LEVEL_2, "stillelse", "Something else");
 
     public static FeedbackCategory DISTANCE_NOT_ACCURATE = new FeedbackCategory(LEVEL_2, "notaccurate", "Distance not accurate");
     public static FeedbackCategory WORKOUT_MISSING_HISTORY = new FeedbackCategory(LEVEL_2, "workoutmissing", "Workout missing from history");

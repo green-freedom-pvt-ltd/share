@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.FeedbackResolutionFactory;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
@@ -40,6 +42,11 @@ public class HelpCenterFragment extends BaseFeedbackCategoryFragment {
         setToolbarTitle(getString(R.string.help_center));
     }
 
+    @Override
+    public String getScreenName() {
+        return "Level1";
+    }
+
     @NonNull
     @Override
     public List<FeedbackCategory> getCategories() {
@@ -63,5 +70,8 @@ public class HelpCenterFragment extends BaseFeedbackCategoryFragment {
         else if (FeedbackCategory.SOMETHING_ELSE.equals(category)){
             getFragmentController().replaceFragment(OtherIssueFragment.newInstance(category), true);
         }
+        AnalyticsEvent.create(Event.ON_CLICK_FEEDBACK_CATEGORY)
+                .put("feedback_category", category.getValue())
+                .buildAndDispatch();
     }
 }

@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.sharesmile.share.Message;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
@@ -90,6 +92,9 @@ public class MessageInfoFragment extends BaseFragment implements View.OnClickLis
         switch (v.getId()) {
             case R.id.share:
                 onShareMessageClick(message);
+                AnalyticsEvent.create(Event.ON_CLICK_FEED_CARD_SHARE)
+                        .put("feed_card_id", message.getId())
+                        .buildAndDispatch();
                 break;
         }
     }

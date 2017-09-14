@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.rfac.ImageBannerContainer;
 import com.sharesmile.share.rfac.StatsBannerContainer;
 
@@ -35,17 +37,33 @@ public class LeagueBoardBannerPagerAdapter extends BannerPagerAdapter{
     }
 
     @Override
-    protected View getItemView(int position, ViewGroup container) {
+    protected View getItemView(final int position, ViewGroup container) {
         switch (position){
             case 0:
                 View imageBanner = LayoutInflater.from(container.getContext())
                         .inflate(R.layout.banner_image_container, container, false);
                 imageBannerContainer = new ImageBannerContainer(imageBanner, leagueBoard.getLeagueBanner());
+                imageBanner.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AnalyticsEvent.create(Event.ON_CLICK_LEAGUE_BOARD_BANNER)
+                                .put("type", "image")
+                                .buildAndDispatch();
+                    }
+                });
                 return imageBanner;
             case 1:
                 View statsBanner = LayoutInflater.from(container.getContext())
                         .inflate(R.layout.banner_stats_container, container, false);
                 statsBannerContainer = new StatsBannerContainer(statsBanner, leagueBoard);
+                statsBanner.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AnalyticsEvent.create(Event.ON_CLICK_LEAGUE_BOARD_BANNER)
+                                .put("type", "stats")
+                                .buildAndDispatch();
+                    }
+                });
                 return statsBanner;
             default:
                 throw new IndexOutOfBoundsException("Invalid index "+position+" for LeagueBoardBannerPagerAdapter");

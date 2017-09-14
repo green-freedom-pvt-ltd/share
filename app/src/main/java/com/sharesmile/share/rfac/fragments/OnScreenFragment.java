@@ -162,6 +162,10 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
                 if (causeData.isCompleted()){
                     Utils.shareImageWithMessage(getContext(), causeData.getCauseCompletedImage(),
                             causeData.getCauseCompletedShareMessageTemplate());
+                    AnalyticsEvent.create(Event.ON_CLICK_CAUSE_COMPLETED_SHARE)
+                            .addBundle(causeData.getCauseBundle())
+                            .put("cause_index", viewPager.getCurrentItem())
+                            .buildAndDispatch();
                 }else {
                     // If it is not completed then it must be an active on going cause
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
@@ -174,6 +178,7 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
 
             case R.id.badge_layout:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
+                AnalyticsEvent.create(Event.ON_CLICK_FEED).buildAndDispatch();
                 break;
             default:
 

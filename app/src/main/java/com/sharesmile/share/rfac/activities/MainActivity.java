@@ -130,7 +130,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 Logger.d(TAG, "Will setNavigationItemSelectedListener on mNavigationView");
                 mNavigationView.setNavigationItemSelectedListener(this);
                 updateNavigationMenu();
-                checkAppVersion();
+                checkAppVersionAndShowUpdatePopupIfRequired();
                 SyncHelper.syncCampaignData(getApplicationContext());
                 handleNotificationIntent();
                 Analytics.getInstance().setUserProperties();
@@ -195,10 +195,10 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
     }
 
-    private void checkAppVersion() {
+    private void checkAppVersionAndShowUpdatePopupIfRequired() {
 
         int latestAppVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
-        boolean forceUpdate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FORCE_UPDATE, false);
+        final boolean forceUpdate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FORCE_UPDATE, false);
 
         boolean showAppUpdateDialog = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, false);
         String message = SharedPrefsManager.getInstance().getString(Constants.PREF_APP_UPDATE_MESSAGE);
@@ -214,16 +214,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Utils.redirectToPlayStore(MainActivity.this);
+                                AnalyticsEvent.create(Event.ON_CLICK_APP_UPDATE_NOW).buildAndDispatch();
                             }
                         });
 
         if (forceUpdate) {
-            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    finish();
-                }
-            });
             builder.setCancelable(false);
         } else {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, false);
@@ -234,7 +229,18 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 }
             });
         }
+
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                AnalyticsEvent.create(Event.ON_DISMISS_APP_UPDATE_POPUP).buildAndDispatch();
+                if (forceUpdate){
+                    finish();
+                }
+            }
+        });
         builder.show();
+        AnalyticsEvent.create(Event.ON_LOAD_APP_UPDATE_POPUP).buildAndDispatch();
     }
 
     public void updateNavigationMenu() {
@@ -361,6 +367,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
         if (menuItem.getItemId() == R.id.nav_item_profile) {
             replaceFragment(new ProfileStatsFragment(), true);
+            AnalyticsEvent.create(Event.ON_SELECT_PROFILE_MENU)
+                    .buildAndDispatch();
         }
 
         if (menuItem.getItemId() == R.id.nav_item_aboutUs) {
@@ -372,14 +380,22 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             replaceFragment(new SettingsFragment(), true);
         } else if (menuItem.getItemId() == R.id.nav_item_home) {
             showHome();
+            AnalyticsEvent.create(Event.ON_SELECT_HOME_MENU)
+                    .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
         } else if (menuItem.getItemId() == R.id.nav_item_help) {
             performOperation(OPEN_HELP_CENTER,false);
+            AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
+                    .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
             share();
+            AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
+                    .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
             showLeaderBoard();
+            AnalyticsEvent.create(Event.ON_SELECT_LEADERBOARD_MENU)
+                    .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_impact_league) {
             if (LeaderBoardDataStore.getInstance().toShowLeague()){
                 showLeagueBoard();

@@ -50,6 +50,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     private BaseLeaderBoardItem myLeaderBoard;
 
     HighLightArrayAdapter spinnerAdapter;
+    private boolean isFirstSpinnerItemSelected = false;
 
     public static GlobalLeaderBoardFragment getInstance() {
         GlobalLeaderBoardFragment fragment = new GlobalLeaderBoardFragment();
@@ -175,8 +176,6 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         hideProgressDialog();
     }
 
-
-
     @Override
     public BOARD_TYPE getBoardType() {
         return BOARD_TYPE.GLOBAL_LEADERBOARD;
@@ -194,6 +193,12 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         }
         spinnerAdapter.setSelection(position);
         fetchData();
+        if (!isFirstSpinnerItemSelected){
+            isFirstSpinnerItemSelected = true;
+        }else {
+            AnalyticsEvent.create(Event.ON_CHANGE_GLOBAL_LEADERBOARD_RANGE).put("selected_range", interval).buildAndDispatch();
+        }
+
     }
 
     @Override

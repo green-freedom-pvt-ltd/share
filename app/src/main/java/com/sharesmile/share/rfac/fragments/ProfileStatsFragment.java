@@ -122,6 +122,7 @@ public class ProfileStatsFragment extends BaseFragment {
                 return true;
             case R.id.item_edit_profile:
                 getFragmentController().replaceFragment(new EditProfileFragment(), true);
+                AnalyticsEvent.create(Event.ON_CLICK_EDIT_PROFILE).buildAndDispatch();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -175,6 +176,7 @@ public class ProfileStatsFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         getFragmentController().replaceFragment(ProfileHistoryFragment.newInstance(false), true);
+                        AnalyticsEvent.create(Event.ON_CLICK_SEE_WORKOUTS).buildAndDispatch();
                     }
                 });
             }else {

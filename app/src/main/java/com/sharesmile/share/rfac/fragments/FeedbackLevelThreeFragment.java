@@ -15,6 +15,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gcm.SyncService;
@@ -135,6 +137,8 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
                 startLoginActivityForResult();
             }
         }
+        AnalyticsEvent.create(Event.ON_CLICK_FEEDBACK_SUBMIT)
+                .buildAndDispatch();
     }
 
     private void startLoginActivityForResult() {
@@ -154,6 +158,8 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
         }else {
             startLoginActivityForResult();
         }
+        AnalyticsEvent.create(Event.ON_CLICK_FEEDBACK_CHAT)
+                .buildAndDispatch();
     }
 
     private void pushChatFeedbackNow(final UserFeedback chatFeedback){
@@ -193,15 +199,6 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
     }
 
     private void startChat(){
-//        Conversation conversation = Smooch.getConversation();
-//        if (conversation != null){
-//            Logger.d(TAG, "onChatClicked, will send Hello World");
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("name", "Ankit");
-//            map.put("age", 29);
-//            Message message = new Message("Hello World","My payload",map);
-//            conversation.sendMessage(message);
-//        }
         String fcmToken = FirebaseInstanceId.getInstance().getToken();
         Logger.d(TAG, "Will send FCM Token to Smooch: " + fcmToken);
         if (!TextUtils.isEmpty(fcmToken)){

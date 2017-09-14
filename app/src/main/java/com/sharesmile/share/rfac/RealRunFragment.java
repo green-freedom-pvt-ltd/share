@@ -344,6 +344,8 @@ public class RealRunFragment extends RunFragment {
                 break;
             case R.id.btn_music_hook:
                 getFragmentController().performOperation(IFragmentController.OPEN_MUSIC_PLAYER, null);
+                AnalyticsEvent.create(Event.ON_CLICK_MUSIC_BUTTON)
+                        .buildAndDispatch();
                 break;
         }
     }
@@ -443,4 +445,10 @@ public class RealRunFragment extends RunFragment {
         }
     }
 
+    @Override
+    protected boolean handleBackPress() {
+        Logger.d(TAG, "handleBackPress");
+        AnalyticsEvent.create(Event.ON_CLICK_BACK_ON_TRACKER_SCREEN).buildAndDispatch();
+        return super.handleBackPress();
+    }
 }

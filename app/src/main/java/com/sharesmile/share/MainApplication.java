@@ -54,6 +54,7 @@ import io.smooch.core.Smooch;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
+import static com.sharesmile.share.core.Constants.PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
@@ -319,6 +320,17 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         Settings settings = new Settings("c6596ame55nb4hotaciy1j91v");
         settings.setFirebaseCloudMessagingAutoRegistrationEnabled(false);
         Smooch.init(this, settings);
+
+        long lastActivtyDetectionStoppedTs =
+                SharedPrefsManager.getInstance().getLong(PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP);
+        long currentTs = System.currentTimeMillis();
+
+        if (currentTs - lastActivtyDetectionStoppedTs
+                > ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD){
+            // Will start background activity detection only
+            // if sufficient time elapsed since last time activity detection stopped
+            ActivityDetector.getInstance().startActivityDetection();
+        }
 
     }
 
