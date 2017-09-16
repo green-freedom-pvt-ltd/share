@@ -456,6 +456,7 @@ public class SyncService extends GcmTaskService {
 
 
     public static void pushWorkoutDataWithBackoff(){
+        Logger.d(TAG, "pushWorkoutDataWithBackoff");
         ExpoBackoffTask task = new ExpoBackoffTask(2000) {
             @Override
             public int performtask() {
@@ -492,7 +493,9 @@ public class SyncService extends GcmTaskService {
                             WorkoutDao.Properties.ShouldSyncLocationData.eq(true)
                     ).list();
 
-            if (pendingLocationWorkoutsList != null && pendingLocationWorkoutsList.size() > 0) {
+            if (pendingLocationWorkoutsList == null || pendingLocationWorkoutsList.isEmpty()){
+                Logger.d(TAG, "uploadPendingWorkoutsData: Didn't find any pending WorkoutLocationData to be uploaded");
+            }else {
                 for (Workout workout : pendingLocationWorkoutsList) {
                     boolean resultL = uploadWorkoutLocationData(workout);
                     if (resultL){
@@ -503,6 +506,7 @@ public class SyncService extends GcmTaskService {
                     isSuccess = isSuccess && resultL;
                 }
             }
+
             return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
@@ -521,6 +525,19 @@ public class SyncService extends GcmTaskService {
         String prefKey = Utils.getWorkoutLocationDataPendingQueuePrefKey(workoutId);
         WorkoutData workoutData = SharedPrefsManager.getInstance().getObject(prefKey, WorkoutDataImpl.class);
 
+        if (workoutData == null){
+            String failureMessage = "Can't find WorkoutData for " + workoutId;
+            Logger.d(TAG, "uploadWorkoutLocationData, " + failureMessage);
+            AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
+                    .put("upload_result", "failure")
+                    .put("run_id", runId)
+                    .put("client_run_id", workoutId)
+                    .put("batch_num", -1)
+                    .put("exception_message", failureMessage)
+                    .buildAndDispatch();
+            return false;
+        }
+
         Gson gson = new Gson();
         Logger.d(TAG, "uploadWorkoutLocationData will upload locationData from: " + gson.toJson(workoutData));
 
@@ -537,9 +554,10 @@ public class SyncService extends GcmTaskService {
             locationData.setEndTimeEpoch(batch.getEndTimeStamp());
             locationData.setLocationArray(batch.getPoints());
 
-            // Step: POST WorkoutBatchLocationData on server
-            String locationDataString = gson.toJson(locationData);
+            String locationDataString = "";
             try {
+                // Step: POST WorkoutBatchLocationData on server
+                locationDataString = gson.toJson(locationData);
                 Logger.d(TAG, "Will POST data: " + locationDataString);
                 WorkoutBatchLocationDataResponse response = NetworkDataProvider.doPostCall(Urls.getRunLocationsUrl(),
                         locationDataString, WorkoutBatchLocationDataResponse.class);
