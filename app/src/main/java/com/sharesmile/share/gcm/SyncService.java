@@ -23,6 +23,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gps.models.WorkoutBatch;
 import com.sharesmile.share.gps.models.WorkoutBatchLocationData;
+import com.sharesmile.share.gps.models.WorkoutBatchLocationDataResponse;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.network.NetworkDataProvider;
@@ -472,13 +473,14 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "uploadPendingWorkoutData");
             boolean isSuccess = true;
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties
-                    .Is_sync.eq(false)).list();
+            List<Workout> mWorkoutList = mWorkoutDao.queryBuilder()
+                    .where(WorkoutDao.Properties.Is_sync.eq(false))
+                    .list();
 
             if (mWorkoutList != null && mWorkoutList.size() > 0) {
                 for (Workout workout : mWorkoutList) {
-                    boolean result = uploadWorkoutData(workout);
-                    isSuccess = isSuccess && result;
+                    boolean resultW = uploadWorkoutData(workout);
+                    isSuccess = isSuccess && resultW;
                 }
             }
 
@@ -492,17 +494,16 @@ public class SyncService extends GcmTaskService {
 
             if (pendingLocationWorkoutsList != null && pendingLocationWorkoutsList.size() > 0) {
                 for (Workout workout : pendingLocationWorkoutsList) {
-                    boolean result = uploadWorkoutLocationData(workout);
-                    if (result){
+                    boolean resultL = uploadWorkoutLocationData(workout);
+                    if (resultL){
                         // If all batches of this workout are uploaded successfully, we update the boolean flag in DB
                         workout.setShouldSyncLocationData(false);
                         mWorkoutDao.insertOrReplace(workout);
                     }
-                    isSuccess = isSuccess && result;
+                    isSuccess = isSuccess && resultL;
                 }
             }
             return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
-
         }
 
     }
@@ -540,8 +541,8 @@ public class SyncService extends GcmTaskService {
             String locationDataString = gson.toJson(locationData);
             try {
                 Logger.d(TAG, "Will POST data: " + locationDataString);
-                WorkoutBatchLocationData response = NetworkDataProvider.doPostCall(Urls.getRunLocationsUrl(),
-                        locationDataString, WorkoutBatchLocationData.class);
+                WorkoutBatchLocationDataResponse response = NetworkDataProvider.doPostCall(Urls.getRunLocationsUrl(),
+                        locationDataString, WorkoutBatchLocationDataResponse.class);
                 // Successfully uploaded location data
                 AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
                         .put("upload_result", "success")
@@ -549,6 +550,7 @@ public class SyncService extends GcmTaskService {
                         .put("batch_num", i)
                         .put("client_run_id", workoutId)
                         .buildAndDispatch();
+
             }catch (NetworkException e){
                 e.printStackTrace();
                 String message = "NetworkException while uploading WorkoutLocationData: " + e.getMessage()
@@ -567,7 +569,7 @@ public class SyncService extends GcmTaskService {
                         .put("failure_type", e.getFailureType())
                         .buildAndDispatch();
                 return false;
-            }catch (Exception ex){
+            }catch (Throwable ex){
                 String message = "Exception while uploading WorkoutLocationData: " + ex.getMessage()
                         + "\n WorkoutLocationData: " + locationDataString;
                 Logger.e(TAG, message);

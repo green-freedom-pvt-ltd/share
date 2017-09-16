@@ -68,18 +68,6 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     @Override
     protected void init() {
         initBanner();
-//        appBarLayout.addOnOffsetChangedListener(new AppBarStateChangedListener() {
-//            @Override
-//            public void onStateChanged(AppBarLayout appBarLayout, State state) {
-//                Logger.d(TAG, "onStateChanged: " + state.toString());
-//                if (state == State.EXPANDED){
-//                    enableDisableSwipeRefresh(true);
-//                }else {
-//                    enableDisableSwipeRefresh(false);
-//                }
-//
-//            }
-//        });
         super.init();
         mLeaderBoardAdapter.setItemClickListener(this);
     }
