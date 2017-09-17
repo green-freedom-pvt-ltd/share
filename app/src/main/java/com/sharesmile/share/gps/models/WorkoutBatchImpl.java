@@ -119,7 +119,6 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 					new OutputStreamWriter(MainApplication.getContext()
 							.openFileOutput(locationDataFileName, Context.MODE_APPEND));
 			String text = gson.toJson(point);
-			Logger.d(TAG, "Appending to file: " + text);
 			outputStreamWriter.append(text);
 			outputStreamWriter.append("\n");
 			outputStreamWriter.close();

@@ -34,7 +34,7 @@ public class FeedbackResolutionFactory {
 
                     "",
 
-                    "Enter correct distance in Kms");
+                    "Enter feedback here");
         }else if (FeedbackCategory.MORE_DISTANCE.equals(parent)){
             resolution =  new FeedbackResolution("Got it. Awesome of you for letting us know !\n" +
                     "\n" +
@@ -44,7 +44,7 @@ public class FeedbackResolutionFactory {
 
                     "",
 
-                    "Enter correct distance in Kms");
+                    "Enter feedback here");
         }else if (FeedbackCategory.FLAGGED_RUN.equals(parent)){
             resolution =  new FeedbackResolution("Got it.  \n" +
                     "\n" +

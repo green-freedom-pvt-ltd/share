@@ -234,7 +234,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         }
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
-            Logger.d(TAG, "Approving record: " + record.toString());
             approvedWorkoutData.addRecord(record, false);
         }
         approvePendingSteps();

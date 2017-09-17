@@ -470,7 +470,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     public void onConnected(@Nullable Bundle bundle) {
         Logger.d(TAG, "onConnected");
         reset();
-        registerForActivityUpdates();
+        if (googleApiClient != null){
+            registerForActivityUpdates();
+        }
     }
 
     @Override
