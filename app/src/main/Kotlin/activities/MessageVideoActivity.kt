@@ -39,7 +39,7 @@ class MessageVideoActivity : YouTubeBaseActivity() ,View.OnClickListener{
 
         setContentView(R.layout.activity_message_video)
         ButterKnife.bind(this@MessageVideoActivity);
-        mPlayer = findViewById(R.id.video_player) as YouTubePlayerView;
+        mPlayer = findViewById<YouTubePlayerView>(R.id.video_player)
 
         val video = message.getVideoId()
 
@@ -56,7 +56,7 @@ class MessageVideoActivity : YouTubeBaseActivity() ,View.OnClickListener{
             })
         }
 
-        mClose =findViewById(R.id.close) as ImageView
+        mClose = findViewById<ImageView>(R.id.close)
         mClose?.setOnClickListener(this)
     }
 

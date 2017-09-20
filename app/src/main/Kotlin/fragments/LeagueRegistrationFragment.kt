@@ -9,11 +9,8 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
+import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
-import android.widget.TextView
-import android.widget.Toast
 import base.BaseFragment2
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
@@ -112,7 +109,7 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
             }
         }
 
-        view!!.findViewById(R.id.submit).setOnClickListener(this);
+        view!!.findViewById<Button>(R.id.submit).setOnClickListener(this);
 
         ShareImageLoader.getInstance().loadImage(mBanner, view!!.league_image,
                 ContextCompat.getDrawable(context, R.drawable.cause_image_placeholder))
@@ -162,9 +159,9 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val v = super.getView(position, convertView, parent)
             if (position === 0) {
-                (v.findViewById(R.id.text1) as TextView).setTextColor(resources.getColor(R.color.bluey_grey))
+                (v.findViewById<TextView>(R.id.text1)).setTextColor(resources.getColor(R.color.bluey_grey))
             } else {
-                (v.findViewById(R.id.text1) as TextView).setTextColor(resources.getColor(R.color.greyish_brown_two))
+                (v.findViewById<TextView>(R.id.text1)).setTextColor(resources.getColor(R.color.greyish_brown_two))
 
             }
             return v;

@@ -51,6 +51,7 @@ import Models.FaqList;
 import io.fabric.sdk.android.Fabric;
 import io.smooch.core.Settings;
 import io.smooch.core.Smooch;
+import io.smooch.core.SmoochCallback;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
@@ -319,7 +320,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         Settings settings = new Settings("c6596ame55nb4hotaciy1j91v");
         settings.setFirebaseCloudMessagingAutoRegistrationEnabled(false);
-        Smooch.init(this, settings);
+        Smooch.init(this, settings, new SmoochCallback() {
+            @Override
+            public void run(Response response) {
+                // Smooch Initialised
+            }
+        });
 
         long lastActivtyDetectionStoppedTs =
                 SharedPrefsManager.getInstance().getLong(PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP);

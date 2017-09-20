@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import base.BaseFragment2
 import com.sharesmile.share.LeaderBoardDataStore
 import com.sharesmile.share.MainApplication
@@ -43,7 +44,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view?.findViewById(R.id.submit_btn)?.setOnClickListener(this);
+        view?.findViewById<Button>(R.id.submit_btn)?.setOnClickListener(this);
     }
 
     override fun onClick(v: View?) {
