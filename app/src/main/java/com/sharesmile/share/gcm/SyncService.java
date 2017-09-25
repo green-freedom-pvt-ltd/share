@@ -115,11 +115,12 @@ public class SyncService extends GcmTaskService {
     }
 
     public static int syncData(){
-
+        Logger.d(TAG, "syncData");
         ClientConfig.sync();
         syncServerTime();
         uploadUserData();
-        syncLeaderBoardData();
+        syncGlobalLeaderBoardData();
+        syncLeagueBoardData();
         updateCauseData();
         updateFaqs();
         syncWorkoutData();
@@ -138,9 +139,9 @@ public class SyncService extends GcmTaskService {
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
-    public static int syncLeaderBoardData(){
-        Logger.d(TAG, "syncLeaderBoardData");
+    public static int syncGlobalLeaderBoardData(){
 
+        Logger.d(TAG, "syncGlobalLeaderBoardData");
         if (!MainApplication.isLogin()){
             return ExpoBackoffTask.RESULT_FAILURE;
         }
@@ -163,6 +164,16 @@ public class SyncService extends GcmTaskService {
                 result = ExpoBackoffTask.RESULT_RESCHEDULE;
             }
         }
+        return result;
+    }
+
+    public static int syncLeagueBoardData(){
+        Logger.d(TAG, "syncLeagueBoardData");
+        if (!MainApplication.isLogin()){
+            return ExpoBackoffTask.RESULT_FAILURE;
+        }
+
+        int result = ExpoBackoffTask.RESULT_SUCCESS;
 
         if (LeaderBoardDataStore.getInstance().toSyncLeaugeData()){
             // Go for sync only when an active league is present and is still visible to team members
@@ -420,6 +431,7 @@ public class SyncService extends GcmTaskService {
 
             UserDetails prev = MainApplication.getInstance().getUserDetails();
             if (prev == null){
+                // Ideally this condition should never happen
                 Logger.d(TAG, "Can't UPLOAD, MemberDetails not present");
                 return GcmNetworkManager.RESULT_FAILURE;
             }

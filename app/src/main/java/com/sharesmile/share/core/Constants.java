@@ -134,7 +134,6 @@ public class Constants {
     public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
     public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
-    public static final String PREF_LEAGUE_TEAM_ID="pref_league_team_id";
     public static final String PREF_USER_DETAILS="pref_user_details";
 
     public static final String PREF_GLOBAL_LEADERBOARD_CACHED_DATA ="pref_global_leader_board_cached_data_new";

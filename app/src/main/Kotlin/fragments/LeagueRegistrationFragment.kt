@@ -30,7 +30,6 @@ import java.util.*
  */
 class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
-
     companion object {
         const private val BUNDLE_DEPARTMENT_ARRAY: String = "bundle_department_array";
         const private val BUNDLE_LOCATION_ARRAY: String = "bundle_location_array";
@@ -60,13 +59,13 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mLocationArray = arguments.getStringArrayList(BUNDLE_LOCATION_ARRAY);
-        mDepartmentArray = arguments.getStringArrayList(BUNDLE_DEPARTMENT_ARRAY);
-        mDepartmentArray.add(0, "Choose your department");
-        mLocationArray.add(0, "Choose your location");
+        mLocationArray = arguments.getStringArrayList(BUNDLE_LOCATION_ARRAY)
+        mDepartmentArray = arguments.getStringArrayList(BUNDLE_DEPARTMENT_ARRAY)
+        mDepartmentArray.add(0, getString(R.string.choose_your_department))
+        mLocationArray.add(0, getString(R.string.choose_your_location))
 
-        mCode = arguments.getString(BUNDLE_LEAGUE_CODE);
-        mBanner = arguments.getString(BUNDLE_LEAGUE_BANNER);
+        mCode = arguments.getString(BUNDLE_LEAGUE_CODE)
+        mBanner = arguments.getString(BUNDLE_LEAGUE_BANNER)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -132,26 +131,26 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
         data.add(BasicNameValuePair("city", mSelectedLocation))
         data.add(BasicNameValuePair("department", mSelectedDepartment))
 
-        NetworkDataProvider.doPutCallAsyncWithForData(Urls.getLeagueUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
+        NetworkDataProvider.doPutCallAsyncWithFormData(Urls.getLeagueUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
-                fragmentListener.showActivityContent();
-                Toast.makeText(context, "Network error", Toast.LENGTH_SHORT).show();
+                fragmentListener.showActivityContent()
+                Toast.makeText(context, "Network error", Toast.LENGTH_SHORT).show()
             }
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
-                fragmentListener.showActivityContent();
-                activity.setResult(Activity.RESULT_OK);
-                activity.finish();
+                fragmentListener.showActivityContent()
+                activity.setResult(Activity.RESULT_OK)
+                activity.finish()
             }
         })
     }
 
     override fun onClick(v: View?) {
-        onSubmit();
+        onSubmit()
     }
 
     override fun screenTitle(): String {
-        return getString(R.string.impact_league);
+        return getString(R.string.impact_league)
     }
 
     inner class ArrayItemAdapter(context: Context, layout: Int, res: Int, itemarray: ArrayList<String>) : ArrayAdapter<String>(context,layout, res,itemarray) {

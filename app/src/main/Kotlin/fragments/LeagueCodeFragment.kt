@@ -12,10 +12,10 @@ import base.BaseFragment2
 import com.sharesmile.share.LeaderBoardDataStore
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
-import com.sharesmile.share.analytics.Analytics
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
+import com.sharesmile.share.rfac.models.UserDetails
 import com.sharesmile.share.utils.BasicNameValuePair
 import com.sharesmile.share.utils.NameValuePair
 import com.sharesmile.share.utils.Urls
@@ -92,18 +92,32 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
 
         val forEach = leagueData?.companyDetails?.forEach {
             if (it.city != null) {
-                location.add(it.city!!)
+                if (!location.contains(it.city!!)){
+                    location.add(it.city!!)
+                }
             }
 
             if (it.department != null) {
-                department.add(it.department!!)
+                if (!department.contains(it.department!!)){
+                    department.add(it.department!!)
+                }
             }
         }
-        LeaderBoardDataStore.getInstance().setLeagueTeamId(leagueData.teamCode!!);
-        // Setting team code for Analytics
-        Analytics.getInstance().setUserImpactLeagueTeamCode(leagueData.teamCode!!);
-        activity.setResult(Activity.RESULT_OK);
-        fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null);
+        val userDetails: UserDetails = MainApplication.getInstance().getUserDetails()
+        if (userDetails.teamId != leagueData.teamCode!!){
+            userDetails.teamId = leagueData.teamCode!!
+            LeaderBoardDataStore.getInstance().updateMyTeamId(leagueData.teamCode!!)
+            MainApplication.getInstance().userDetails = userDetails
+        }
+
+        if (leagueData.metaDataRequired != null && leagueData.metaDataRequired!!){
+            // Show City Department screen
+            fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null)
+        }else {
+            // Pass success result to MainActivity and exit
+            activity.setResult(Activity.RESULT_OK)
+            activity.finish()
+        }
     }
 
     private fun invalidCode(error: NetworkException?) {

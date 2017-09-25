@@ -16,10 +16,10 @@ public class CauseList implements UnObfuscable {
     private int count;
 
     @SerializedName("next")
-    private int next;
+    private String next;
 
     @SerializedName("previous")
-    private int previous;
+    private String previous;
 
     @SerializedName("results")
     List<CauseData> causes;

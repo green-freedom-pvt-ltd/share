@@ -335,7 +335,7 @@ public class LoginImpl {
         data.add(new BasicNameValuePair("access_type", "offline"));
         data.add(new BasicNameValuePair("grant_type", "authorization_code"));
 
-        NetworkDataProvider.doPostCallAsync(Urls.getGoogleConvertTokenUrl(), data, new NetworkAsyncCallback<GoogleOauthResponse>() {
+        NetworkDataProvider.doPostCallAsyncWithFormData(Urls.getGoogleConvertTokenUrl(), data, new NetworkAsyncCallback<GoogleOauthResponse>() {
                     @Override
                     public void onNetworkSuccess(final GoogleOauthResponse googleOauthResponse) {
                         MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {

@@ -13,6 +13,7 @@ import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.views.CircularImageView;
 
@@ -25,6 +26,8 @@ import butterknife.ButterKnife;
  * Created by piyush on 9/1/16.
  */
 public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.LeaderBoardViewHolder> {
+
+    private static final String TAG = "LeaderBoardAdapter";
 
     private ItemClickListener mListener;
     private boolean isLeagueBoard = false;
@@ -109,12 +112,14 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             }
 
             if (id == leaderboard.getId()) {
+                Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " matches");
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.light_gold));
                 container.setCardElevation(3f);
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.white));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.white));
                 mImpact.setTextColor(mContext.getResources().getColor(R.color.white));
             } else {
+                Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " doesn't match");
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));

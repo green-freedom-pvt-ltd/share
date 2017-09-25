@@ -831,7 +831,7 @@ public class WorkoutService extends Service implements
         data.setCauseId((int) mCauseData.getId());
         data.setClientRunId(WorkoutSingleton.getInstance().getDataStore().getWorkoutId());
         data.setMockLocationUsed(WorkoutSingleton.getInstance().isMockLocationEnabled());
-        data.setTeamId(userDetails.getTeamId());
+        data.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
         data.setTimeStamp(DateUtil.getServerTimeInMillis() / 1000); // epoch in secs
         data.setUsainBoltCount(WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount());
 

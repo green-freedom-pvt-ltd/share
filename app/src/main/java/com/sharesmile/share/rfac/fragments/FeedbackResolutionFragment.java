@@ -5,7 +5,10 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.TextView;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.FeedbackNode;
 import com.sharesmile.share.rfac.models.FeedbackResolution;
@@ -119,8 +122,17 @@ public class FeedbackResolutionFragment extends FeedbackLevelThreeFragment {
                         +"\nConcerned " + concernedDetails;
                 builder.message(enhancedMessage);
             }
-            builder.runId((int) concernedRun.getId());
-            builder.clientRunId(concernedRun.getClientRunId());
+            int runId = (int) concernedRun.getId();
+            String clientRunId = concernedRun.getClientRunId();
+            if (runId == 0){
+                WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+                Workout workout = mWorkoutDao.queryBuilder()
+                        .where(WorkoutDao.Properties.WorkoutId.eq(clientRunId))
+                        .unique();
+                runId = (workout != null && workout.getId() != null) ? workout.getId().intValue() : 0;
+            }
+            builder.runId(runId);
+            builder.clientRunId(clientRunId);
         }
 
         FeedbackNode parent = feedbackResolution.getParent();

@@ -32,7 +32,10 @@ class LeagueTeam : UnObfuscable, Serializable {
     var banner: String? = null;
 
     @SerializedName("team_code")
-    var teamCode: Int? = null;
+    var teamCode: Int? = null
+
+    @SerializedName("meta_data_required")
+    var metaDataRequired: Boolean? = null
 
     @SerializedName("company_attribute")
     var companyDetails: ArrayList<Company>? = null;

@@ -82,7 +82,7 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                Logger.d(TAG, "TakeFeedbackDialog: onCancel");
+                Logger.d(TAG, "TakeEmailDialog: onCancel");
                 // User cancelled the dialog without acting on it, lets just trigger exit
                 exitFeedback(workoutData);
             }
@@ -90,7 +90,7 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
         feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                Logger.d(TAG, "TakeFeedbackDialog: onDismiss");
+                Logger.d(TAG, "TakeEmailDialog: onDismiss");
                 // Dialog dismissed explicitly
                 exitFeedback(workoutData);
             }
@@ -123,11 +123,11 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
     }
 
 //    protected void showTakeFeedbackDialog(final WorkoutData workoutData){
-//        feedbackDialog = new TakeFeedbackDialog(getActivity(), R.style.BackgroundDimDialog, workoutData);
+//        feedbackDialog = new TakeEmailDialog(getActivity(), R.style.BackgroundDimDialog, workoutData);
 //        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 //            @Override
 //            public void onCancel(DialogInterface dialog) {
-//                Logger.d(TAG, "TakeFeedbackDialog: onCancel");
+//                Logger.d(TAG, "TakeEmailDialog: onCancel");
 //                // User cancelled the dialog without acting on it, lets just trigger exit
 //                exitFeedback(workoutData);
 //            }
@@ -135,7 +135,7 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
 //        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 //            @Override
 //            public void onDismiss(DialogInterface dialog) {
-//                Logger.d(TAG, "TakeFeedbackDialog: onDismiss");
+//                Logger.d(TAG, "TakeEmailDialog: onDismiss");
 //                // Dialog dismissed explicitly
 //                exitFeedback(workoutData);
 //            }

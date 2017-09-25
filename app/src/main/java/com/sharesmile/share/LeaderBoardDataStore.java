@@ -2,8 +2,10 @@ package com.sharesmile.share;
 
 import android.content.Context;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sharesmile.share.Events.ExitLeague;
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
@@ -15,12 +17,15 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import Models.LeagueBoard;
+import Models.LeagueTeam;
 import Models.TeamLeaderBoard;
 
 /**
@@ -48,7 +54,7 @@ public class LeaderBoardDataStore {
     private LeagueBoard leagueBoard;
     private Map<String, LeaderBoardList> globalLeaderBoardMap;
     private TeamLeaderBoard myTeamLeaderBoard;
-    private int leagueTeamId;
+
     private Context context;
 
     public static final String ALL_TIME_INTERVAL = "all_time";
@@ -63,8 +69,6 @@ public class LeaderBoardDataStore {
 
     private LeaderBoardDataStore(Context appContext){
         this.context = appContext;
-        this.leagueTeamId = SharedPrefsManager.getInstance().getInt(Constants.PREF_LEAGUE_TEAM_ID);
-
         this.globalLeaderBoardMap = SharedPrefsManager.getInstance().getCollection(
                 Constants.PREF_GLOBAL_LEADERBOARD_CACHED_DATA,
                 new TypeToken<Map<String, LeaderBoardList>>(){}.getType());
@@ -129,7 +133,12 @@ public class LeaderBoardDataStore {
     }
 
     public int getMyTeamId() {
-        return leagueTeamId;
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        if (userDetails != null){
+            Logger.d(TAG, "Returning myTeamId: " + userDetails.getTeamId());
+            return userDetails.getTeamId();
+        }
+        return 0;
     }
 
     public String getLeagueName(){
@@ -182,7 +191,7 @@ public class LeaderBoardDataStore {
     }
 
     public boolean toSyncLeaugeData(){
-        if (leagueTeamId > 0){
+        if (getMyTeamId() > 0){
             if (leagueBoard == null || isLeagueActive()){
                 return true;
             } else {
@@ -210,20 +219,24 @@ public class LeaderBoardDataStore {
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA);
     }
 
-    public void setLeagueTeamId(int teamId){
-        Logger.d(TAG, "setLeagueTeamId with " + teamId);
-        // LeagueTeamId is set only when it is changed
-        leagueTeamId = teamId;
-        SharedPrefsManager.getInstance().setInt(Constants.PREF_LEAGUE_TEAM_ID, teamId);
+    /**
+     * Updates and persists new teamId
+     * triggers updates due to the change in teamId
+     * @param teamId
+     */
+    public void updateMyTeamId(int teamId){
+        Logger.d(TAG, "updateMyTeamId with " + teamId);
         // LeagueTeamId has changed, clear existing League data and immediately start the sync process
         clearLeagueData();
-        ExpoBackoffTask task = new ExpoBackoffTask() {
-            @Override
-            public int performtask() {
-                return SyncService.syncLeaderBoardData();
-            }
-        };
-        task.run();
+        if (teamId > 0){
+            ExpoBackoffTask task = new ExpoBackoffTask() {
+                @Override
+                public int performtask() {
+                    return SyncService.syncLeagueBoardData();
+                }
+            };
+            task.run();
+        }
     }
 
     public void setLeagueBoardData(LeagueBoard leagueBoard){
@@ -324,5 +337,45 @@ public class LeaderBoardDataStore {
                 EventBus.getDefault().post(new TeamLeaderBoardDataFetched(teamId, true, board));
             }
         });
+    }
+
+    public void exitLeague() {
+        Logger.d(TAG, "exitLeague");
+        JSONObject requestJson = new JSONObject();
+        final int userId = MainApplication.getInstance().getUserID();
+        final int teamId = getMyTeamId();
+        try {
+            requestJson.put("user", userId);
+            requestJson.put("team", teamId);
+            requestJson.put("is_logout", true);
+        }catch (JSONException jse){
+            jse.printStackTrace();
+        }
+        if (requestJson == null){
+            MainApplication.showToast(R.string.some_error_occurred);
+            return;
+        }
+        NetworkDataProvider.doPutCallAsync(Urls.getLeagueUrl(), requestJson,
+                new NetworkAsyncCallback<LeagueTeam>() {
+                    @Override
+                    public void onNetworkFailure(NetworkException ne) {
+                        MainApplication.showToast(R.string.network_error_please_retry);
+                        String message = "Put request for Exit failed for teamId: "+teamId+", and userId: "
+                                + userId+", because: " + ne;
+                        Logger.e(TAG, message);
+                        ne.printStackTrace();
+                        Crashlytics.log(message);
+                        Crashlytics.logException(ne);
+                    }
+
+                    @Override
+                    public void onNetworkSuccess(LeagueTeam leagueTeam) {
+                        Logger.d(TAG, "Successfully logged out from teamId: " + teamId);
+                        // Remove all cached data
+                        updateMyTeamId(0);
+                        // Notify the UI about it
+                        EventBus.getDefault().post(new ExitLeague());
+                    }
+                });
     }
 }

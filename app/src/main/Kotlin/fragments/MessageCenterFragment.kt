@@ -72,8 +72,7 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
         mAdapter.setData(messageList)
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, false)
         if (messageList.size > 0) {
-            progress_bar.visibility = View.GONE;
-
+            progress_bar.visibility = View.GONE
         }
     }
 

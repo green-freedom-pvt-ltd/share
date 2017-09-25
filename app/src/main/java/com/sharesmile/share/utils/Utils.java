@@ -33,6 +33,7 @@ import com.google.gson.JsonSyntaxException;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.BodyWeightChangedEvent;
+import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
@@ -560,9 +561,7 @@ public class Utils {
         if (data.getLatestPoint() != null){
             run.setEndLocationLong(data.getLatestPoint().longitude);
         }
-        if (MainApplication.getInstance().getUserDetails() != null){
-            run.setTeamId(MainApplication.getInstance().getUserDetails().getTeamId());
-        }
+        run.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
         run.setNumSpikes(data.getNumGpsSpikes());
         run.setNumUpdates(data.getNumUpdateEvents());
         run.setAppVersion(Utils.getAppVersion());
@@ -844,6 +843,64 @@ public class Utils {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(activity.getString(R.string.enter_weight));
+
+        // Set up the input
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        final View container = inflater.inflate(R.layout.dialog_weight_input_container, null);
+        final EditText editText = (EditText) container.findViewById(R.id.et_body_weight_kg);
+        builder.setView(container);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // This method is overridden below
+            }
+        });
+        builder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        AnalyticsEvent.create(Event.ON_LOAD_WEIGHT_INPUT_DIALOG)
+                .buildAndDispatch();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String inputWeight = editText.getText().toString();
+                if (TextUtils.isEmpty(inputWeight)){
+                    MainApplication.showToast(R.string.enter_actual_weight);
+                }else {
+                    float weight = Float.parseFloat(inputWeight);
+                    if (weight < 10 || weight > 200){
+                        MainApplication.showToast(R.string.enter_actual_weight);
+                    }else {
+                        MainApplication.getInstance().setBodyWeight(weight);
+                        EventBus.getDefault().post(new BodyWeightChangedEvent());
+                        dialog.dismiss();
+                        MainApplication.showToast("Will count calories for future walks/runs.");
+                    }
+                }
+            }
+        });
+
+        return dialog;
+    }
+
+    public static AlertDialog showEnterEmailDialog(final Activity activity){
+        if (activity == null || activity.isFinishing()){
+            return null;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(activity.getString(R.string.please_enter_email));
 
         // Set up the input
         LayoutInflater inflater = LayoutInflater.from(activity);

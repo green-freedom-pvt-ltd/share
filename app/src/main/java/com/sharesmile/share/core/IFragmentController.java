@@ -32,7 +32,6 @@ public interface IFragmentController {
 
     int LOGIN_FOR_RESULT = 112;
 
-
     /*
         Common methods which can be implemented either by abstract BaseActivity or by solid child activities
      */

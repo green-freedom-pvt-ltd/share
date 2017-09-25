@@ -27,7 +27,9 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
+import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.core.NotificationActionReceiver;
+import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
@@ -456,6 +458,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             // Need to forcefully refresh workout data now
             SyncHelper.forceRefreshEntireWorkoutHistory();
         }
+        new ExpoBackoffTask() {
+            @Override
+            public int performtask() {
+                return SyncService.syncData();
+            }
+        }.run();
     }
 
 
@@ -498,6 +506,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public void setUserDetails(UserDetails details){
+
+        UserDetails oldDetails = getUserDetails();
         Gson gson = new Gson();
         Logger.d(TAG, "setUserDetails as: " + gson.toJson(details));
         SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
@@ -532,10 +542,14 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
 
         prefsManager.setBoolean(Constants.PREF_IS_SIGN_UP_USER, details.isSignUp());
-        Logger.d(TAG, "setUserDetails: myTeamId stored = " + LeaderBoardDataStore.getInstance().getMyTeamId()
+
+        int oldTeamId = (oldDetails == null) ? -1 : oldDetails.getTeamId();
+        Logger.d(TAG, "setUserDetails: myTeamId stored = " + oldTeamId
                 + ", and myTeamId in user details = " + details.getTeamId());
-        if (LeaderBoardDataStore.getInstance().getMyTeamId() != details.getTeamId()){
-            LeaderBoardDataStore.getInstance().setLeagueTeamId(details.getTeamId());
+        if (oldTeamId != details.getTeamId()){
+            // Notify LeaderBoardDataStore only if their is a change in teamId
+            LeaderBoardDataStore.getInstance().updateMyTeamId(details.getTeamId());
+            // Setting team code for Analytics
             Analytics.getInstance().setUserImpactLeagueTeamCode(details.getTeamId());
         }
     }

@@ -10,7 +10,6 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.gson.Gson;
 import com.sharesmile.share.Events.DBEvent;
-import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.User;
@@ -130,34 +129,30 @@ public class SyncHelper {
         return fetchMessages(url, messageCount);
     }
 
-    private static boolean fetchMessages(String url, long messageCount) {
+    private static boolean fetchMessages(String url, long prevMessagesCount) {
 
         try {
             MessageList messageList = NetworkDataProvider.doGetCall(url, MessageList.class);
             if (messageList == null){
                 return false;
             }
-            if (messageCount >= messageList.getTotalMessageCount()) {
-                Logger.d(TAG, "update success" + messageList + " : " + messageList.getTotalMessageCount());
+            MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
+            messageDao.insertOrReplaceInTx(messageList);
+            if (prevMessagesCount < messageList.getTotalMessageCount()){
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, true);
+            }
+            Logger.d(TAG, "Feed Messages fetched successfully");
+            if (!TextUtils.isEmpty(messageList.getNextUrl())) {
+                return fetchMessages(messageList.getNextUrl(), prevMessagesCount);
+            }else {
                 EventBus.getDefault().post(new DBEvent.MessageDataUpdated());
                 return true;
-            } else {
-                MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
-                messageDao.insertOrReplaceInTx(messageList);
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, true);
-                Logger.d(TAG, "Message fetch success" + messageList.toString());
-                if (!TextUtils.isEmpty(messageList.getNextUrl())) {
-                    return fetchMessages(messageList.getNextUrl(), messageCount);
-                }
             }
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
             return false;
         }
-        EventBus.getDefault().post(new DBEvent.MessageDataUpdated());
-
-        return true;
     }
 
     public static void syncUserFromDB(){
@@ -178,7 +173,8 @@ public class SyncHelper {
                     details.setAuthToken(prefsManager.getString(PREF_AUTH_TOKEN));
                     details.setGenderUser(user.getGender());
                     details.setSignUp(prefsManager.getBoolean(Constants.PREF_IS_SIGN_UP_USER));
-                    details.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
+                    String prefTeamIdKey = "pref_league_team_id";
+                    details.setTeamId(SharedPrefsManager.getInstance().getInt(prefTeamIdKey));
                     details.setSocialThumb(user.getProfileImageUrl());
 
                     MainApplication.getInstance().setUserDetails(details);

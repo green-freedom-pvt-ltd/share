@@ -40,9 +40,9 @@ public class NetworkDataProvider {
     public static final String HTTP_HEADER_JSON = "application/json";
     public static final String HTTP_HEADER_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String ENCODING = "charset=utf-8";
-    public static final long CONNECTION_TIMEOUT_POST_VALUE = 30;
-    public static final long READ_TIMEOUT_POST_VALUE = 30;
-    public static final long WRITE_TIMEOUT_POST_VALUE = 30;
+    public static final long CONNECTION_TIMEOUT_POST_VALUE = 35;
+    public static final long READ_TIMEOUT_POST_VALUE = 35;
+    public static final long WRITE_TIMEOUT_POST_VALUE = 35;
     private static final MediaType JSON = MediaType.parse(HTTP_HEADER_JSON + "; " +
             ENCODING);
     private static final MediaType URLENCODED = MediaType.parse(HTTP_HEADER_FORM_URLENCODED + "; " +
@@ -203,7 +203,6 @@ public class NetworkDataProvider {
             for (NameValuePair pair : formData) {
                 bodyData.addFormDataPart(pair.getName(), pair.getValue());
             }
-
             body = bodyData.build();
         } else {
             MultipartBuilder bodyData = new MultipartBuilder().type(MultipartBuilder.FORM);
@@ -325,12 +324,12 @@ public class NetworkDataProvider {
         call.enqueue(cb);
     }
 
-    public static <R extends UnObfuscable> void doPostCallAsync(String url, List<NameValuePair> data,
-                                                                NetworkAsyncCallback<R> cb) {
-        RequestBody body = RequestBody.create(URLENCODED, convertToData(data));
+    public static <R extends UnObfuscable> void doPutCallAsync(String url, JSONObject requestJSON,
+                                                               NetworkAsyncCallback<R> cb) {
+        RequestBody body = RequestBody.create(JSON, requestJSON.toString());
         Request.Builder requestBuilder = new Request.Builder().url(url)
-                .post(body);
-
+                .header(CONTENT_TYPE_TAG, HTTP_HEADER_JSON)
+                .put(body);
         if (MainApplication.isLogin()) {
             requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
         }
@@ -353,8 +352,8 @@ public class NetworkDataProvider {
         call.enqueue(cb);
     }
 
-    public static <R extends UnObfuscable> void doPutCallAsyncWithForData(String url, List<NameValuePair> data,
-                                                                          NetworkAsyncCallback<R> cb) {
+    public static <R extends UnObfuscable> void doPutCallAsyncWithFormData(String url, List<NameValuePair> data,
+                                                                           NetworkAsyncCallback<R> cb) {
         RequestBody body = convertFormDataToBody(data);
         Request.Builder requestBuilder = new Request.Builder().url(url)
                 .put(body);

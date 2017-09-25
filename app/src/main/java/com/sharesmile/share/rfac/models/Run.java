@@ -327,7 +327,7 @@ public class Run implements UnObfuscable, Serializable {
 
     public String extractRelevantInfoAsString(){
         return "Workout: " + Utils.formatWithOneDecimal(distance) + " km" + ", "
-                + numSteps + " steps";
+                + numSteps + " steps" + ", duration: " + runDuration;
     }
 
     @Override

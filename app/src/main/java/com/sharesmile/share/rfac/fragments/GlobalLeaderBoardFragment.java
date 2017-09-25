@@ -108,7 +108,6 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_league:
-//                int teamId = LeaderBoardDataStore.getInstance().getMyTeamId();
                 if (LeaderBoardDataStore.getInstance().toShowLeague()){
                     getFragmentController().replaceFragment(LeagueBoardFragment.getInstance(), true);
                 }else {
