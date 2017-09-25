@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 165
-        versionName "2.4.0"
+        versionCode 169
+        versionName "2.4.1"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -129,8 +129,8 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile 'com.onesignal:OneSignal:3.+@aar'
-    compile 'com.facebook.android:facebook-android-sdk:4.+'
+    compile 'com.onesignal:OneSignal:3.6.1@aar'
+    compile 'com.facebook.android:facebook-android-sdk:4.25.0'
     compile 'com.jakewharton:butterknife:8.0.1'
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
     compile 'de.greenrobot:greendao:2.1.0'
@@ -144,8 +144,8 @@ dependencies {
         exclude group: 'com.google.firebase'
     }
     compile 'com.android.support:multidex:1.0.1'
-    compile 'io.smooch:core:latest.release'
-    compile 'io.smooch:ui:latest.release'
+    compile 'io.smooch:core:4.8.1'
+    compile 'io.smooch:ui:4.8.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -9,7 +9,7 @@ import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.rfac.activities.OnBoardingActivity;
+import com.sharesmile.share.rfac.activities.MainActivity;
 
 import org.json.JSONObject;
 
@@ -35,7 +35,7 @@ public class NotificationHandler implements OneSignal.NotificationOpenedHandler 
             }
         }
 
-        Intent intent = new Intent(MainApplication.getContext(), OnBoardingActivity.class);
+        Intent intent = new Intent(MainApplication.getContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtras(bundle);
         MainApplication.getContext().startActivity(intent);

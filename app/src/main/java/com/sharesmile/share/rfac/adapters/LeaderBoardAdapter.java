@@ -13,6 +13,7 @@ import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.views.CircularImageView;
 
@@ -25,6 +26,8 @@ import butterknife.ButterKnife;
  * Created by piyush on 9/1/16.
  */
 public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.LeaderBoardViewHolder> {
+
+    private static final String TAG = "LeaderBoardAdapter";
 
     private ItemClickListener mListener;
     private boolean isLeagueBoard = false;
@@ -53,6 +56,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
     }
 
     public void setData(List<BaseLeaderBoardItem> data) {
+        Logger.d(TAG, "setData");
         this.mData = data;
         notifyDataSetChanged();
     }
