@@ -19,7 +19,6 @@ import butterknife.OnClick;
  * Created by ankitmaheshwari on 6/26/17.
  */
 
-@Deprecated
 public class TakeEmailDialog extends BaseDialog {
 
     private static final String TAG = "TakeEmailDialog";
