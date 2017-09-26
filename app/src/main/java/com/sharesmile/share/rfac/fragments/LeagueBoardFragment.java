@@ -18,8 +18,8 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.adapters.LeagueBoardBannerPagerAdapter;
+import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
@@ -40,7 +40,7 @@ import static com.sharesmile.share.core.IFragmentController.START_MAIN_ACTIVITY;
  * Created by ankitmaheshwari on 8/5/17.
  */
 
-public class LeagueBoardFragment extends BaseLeaderBoardFragment implements LeaderBoardAdapter.ItemClickListener {
+public class LeagueBoardFragment extends BaseLeaderBoardFragment {
 
     private static final String TAG = "LeagueBoardFragment";
 
@@ -54,6 +54,8 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     @BindView(R.id.banner_carousel_indicator_holder)
     LinearLayout carouselIndicatorsHolder;
+
+    LeagueBoard origData;
 
     public static LeagueBoardFragment getInstance() {
         LeagueBoardFragment fragment = new LeagueBoardFragment();
@@ -76,7 +78,6 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
     protected void init() {
         initBanner();
         super.init();
-        mLeaderBoardAdapter.setItemClickListener(this);
     }
 
     @Override
@@ -166,8 +167,9 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     @Override
     protected void fetchData() {
-        if (LeaderBoardDataStore.getInstance().getLeagueBoard() != null){
-            showLeagueBoardData(LeaderBoardDataStore.getInstance().getLeagueBoard());
+        origData = LeaderBoardDataStore.getInstance().getLeagueBoard();
+        if (origData != null){
+            prepareDataSetAndRender();
         }else {
             LeaderBoardDataStore.getInstance().updateLeagueBoardData();
             showProgressDialog();
@@ -179,12 +181,12 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
         Logger.d(TAG, "onEvent: LeagueBoardDataUpdated");
         if (isAttachedToActivity()){
             hideProgressDialog();
-            LeagueBoard board = LeaderBoardDataStore.getInstance().getLeagueBoard();
+            origData = LeaderBoardDataStore.getInstance().getLeagueBoard();
             if (event.isSuccess()){
-                showLeagueBoardData(board);
+                prepareDataSetAndRender();
             }else {
-                if (board != null){
-                    showLeagueBoardData(board);
+                if (origData != null){
+                    prepareDataSetAndRender();
                     MainApplication.showToast("Network Error, Couldn't refresh");
                 }else {
                     MainApplication.showToast("Network Error, Please try again");
@@ -193,19 +195,26 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
         }
     }
 
-    private void showLeagueBoardData(LeagueBoard board){
-        Logger.d(TAG, "showLeagueBoardData");
-        mleaderBoardList.clear();
-        String leagueName = board.getLeagueName();
-        for (LeagueBoard.Team team : board.getTeamList()) {
-            mleaderBoardList.add(team.convertToLeaderBoard());
+    private void prepareDataSetAndRender(){
+        Logger.d(TAG, "prepareDataSetAndRender");
+        List<BaseLeaderBoardItem> itemList = new ArrayList<>();
+
+        int myTeamId = LeaderBoardDataStore.getInstance().getMyTeamId();
+        int myPos = -1;
+        List<LeagueBoard.Team> origList = origData.getTeamList();
+        for (int i=0; i < origList.size(); i++) {
+            LeagueBoard.Team data = origList.get(i);
+            if (myTeamId == data.getId()){
+                myPos = i;
+            }
+            itemList.add(data.convertToLeaderBoard());
         }
-        setBanner(board);
-        hideProgressDialog();
+        String leagueName = origData.getLeagueName();
         if (!TextUtils.isEmpty(leagueName)){
             setToolbarTitle(leagueName);
         }
-        mLeaderBoardAdapter.setData(mleaderBoardList);
+        setBanner(origData);
+        render(itemList, myPos);
     }
 
     private void setBanner(LeagueBoard board) {
@@ -231,6 +240,16 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
                     .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
                     .buildAndDispatch();
         }
+    }
+
+    @Override
+    public int getMyId() {
+        return LeaderBoardDataStore.getInstance().getMyTeamId();
+    }
+
+    @Override
+    public boolean toShowLogo() {
+        return origData != null && origData.getShowTeamLogos();
     }
 
     @Override

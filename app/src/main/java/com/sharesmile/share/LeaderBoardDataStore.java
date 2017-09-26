@@ -135,7 +135,7 @@ public class LeaderBoardDataStore {
     public int getMyTeamId() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if (userDetails != null){
-            Logger.d(TAG, "Returning myTeamId: " + userDetails.getTeamId());
+//            Logger.d(TAG, "Returning myTeamId: " + userDetails.getTeamId());
             return userDetails.getTeamId();
         }
         return 0;

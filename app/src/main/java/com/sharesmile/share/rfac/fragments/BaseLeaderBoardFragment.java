@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
  * Created by ankitmaheshwari on 8/5/17.
  */
 
-public abstract class BaseLeaderBoardFragment extends BaseFragment {
+public abstract class BaseLeaderBoardFragment extends BaseFragment implements LeaderBoardAdapter.Parent {
 
     private static final String TAG = "BaseLeaderBoardFragment";
 
@@ -50,16 +50,12 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     @BindView(R.id.container_list_item)
     CardView selfRankItem;
-//
-//    TextView myRank;
-//
-//    TextView myProfileName;
-//
-//    TextView myImpact;
+
+    private int myLeaderBoardItemPosition;
 
     LinearLayoutManager mLayoutManager;
 
-    protected List<BaseLeaderBoardItem> mleaderBoardList = new ArrayList<>();
+    private List<BaseLeaderBoardItem> mleaderBoardList = new ArrayList<>();
     protected LeaderBoardAdapter mLeaderBoardAdapter;
 
     @Nullable
@@ -72,13 +68,30 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     }
 
     protected void init() {
-        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), isLeagueBoard());
-        fetchData();
+        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this);
         mLayoutManager = new LinearLayoutManager(getContext());
+        fetchData();
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setNestedScrollingEnabled(false);
-        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setNestedScrollingEnabled(false);
+//        mRecyclerView.setHasFixedSize(true);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                Logger.d(TAG, "onScrollStateChanged, newState = " + newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Logger.d(TAG, "onScrolled");
+                if (mleaderBoardList != null && !mleaderBoardList.isEmpty()){
+                    renderSelfRank();
+                }
+            }
+        });
 
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
                 mLayoutManager.getOrientation());
@@ -120,23 +133,54 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     protected abstract void fetchData();
 
-    protected void showSelfRank(BaseLeaderBoardItem myLeaderBoard){
-        // Need to show rank at the bottom
-        selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
-        selfRankItem.setCardElevation(3f);
-//        myProfileName = (TextView) selfRankItem.findViewById(R.id.tv_profile_name);
-//        myImpact = (TextView) selfRankItem.findViewById(R.id.tv_list_item_impact);
-//        myRank = (TextView) selfRankItem.findViewById(R.id.id_leaderboard);
+    public void render(List<BaseLeaderBoardItem> list, final int myPosition){
+        Logger.d(TAG, "render");
+        if (list == null || list.isEmpty()){
+            MainApplication.showToast(R.string.nothing_to_display);
+            return;
+        }
 
-//        myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-//        myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-//        myImpact.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
-        selfRankItem.setVisibility(View.VISIBLE);
-        mLeaderBoardAdapter.createMyViewHolder(selfRankItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());
+        // Step: Set the list obtained from child
+        this.mleaderBoardList = list;
+        this.myLeaderBoardItemPosition = myPosition;
+
+        mLeaderBoardAdapter.setData(list);
+
+        mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                renderSelfRank();
+            }
+        });
+        hideProgressDialog();
     }
 
-    protected void hideSelfRank(){
+    private void renderSelfRank(){
+        int lastItemPos = mLayoutManager.findLastVisibleItemPosition();
+        Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
+                + myLeaderBoardItemPosition);
+        if (lastItemPos < myLeaderBoardItemPosition){
+            showSelfRankAtBottom();
+        }else {
+            hideSelfRankFromBottom();
+        }
+    }
+
+    protected void showSelfRankAtBottom(){
+        Logger.d(TAG, "showSelfRankAtBottom");
+        if (myLeaderBoardItemPosition >= 0){
+            // Need to show rank at the bottom
+            selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
+            selfRankItem.setCardElevation(3f);
+            mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
+            selfRankItem.setVisibility(View.VISIBLE);
+            BaseLeaderBoardItem myLeaderBoardItem = mleaderBoardList.get(myLeaderBoardItemPosition);
+            mLeaderBoardAdapter.createMyViewHolder(selfRankItem).bindData(myLeaderBoardItem, myLeaderBoardItem.getRanking());
+        }
+    }
+
+    protected void hideSelfRankFromBottom(){
+        Logger.d(TAG, "hideSelfRankFromBottom");
         selfRankItem.setVisibility(View.GONE);
         mRecyclerView.setPadding(0,0,0,0);
     }
@@ -157,7 +201,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
     }
 
     public abstract BOARD_TYPE getBoardType();
-
 
     public enum BOARD_TYPE {
         GLOBAL_LEADERBOARD,

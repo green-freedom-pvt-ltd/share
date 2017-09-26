@@ -12,10 +12,14 @@ import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Models.TeamLeaderBoard;
 
@@ -31,6 +35,8 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
     private static final String BUNDLE_TEAM_ID = "bundle_team_id";
 
     private int mTeamId;
+
+    private TeamLeaderBoard origData;
 
     public static TeamLeaderBoardFragment getInstance(int teamId) {
         TeamLeaderBoardFragment fragment = new TeamLeaderBoardFragment();
@@ -85,28 +91,37 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
             // Check if we received TeamLeaderBoard data for the correct teamId
             // &&
             // Check if fragment is still on display
-            TeamLeaderBoard board = null;
             if (event.isSuccess()){
-                board = event.getTeamLeaderBoard();
+                origData = event.getTeamLeaderBoard();
             }else if (mTeamId == LeaderBoardDataStore.getInstance().getMyTeamId()){
-                board = LeaderBoardDataStore.getInstance().getMyTeamLeaderBoard();
+                origData = LeaderBoardDataStore.getInstance().getMyTeamLeaderBoard();
             }
-            mleaderBoardList.clear();
-            hideProgressDialog();
-            if (board != null){
+            if (origData != null){
                 // We have something to display
-                String teamName = board.getTeamName();
+                String teamName = origData.getTeamName();
                 if (!TextUtils.isEmpty(teamName)){
                     setToolbarTitle(teamName);
                 }
-                for (TeamLeaderBoard.MemberDetails memberDetails : board.getMembersList()) {
-                    mleaderBoardList.add(memberDetails.convertToLeaderBoard());
-                }
-                mLeaderBoardAdapter.setData(mleaderBoardList);
+                prepareDatasetAndRender();
             }else {
                 MainApplication.showToast("Network Error, Please try again");
             }
         }
+    }
+
+    public void prepareDatasetAndRender() {
+        List<BaseLeaderBoardItem> itemList = new ArrayList<>();
+        int myUserId = MainApplication.getInstance().getUserID();
+        int myPos = -1;
+        List<TeamLeaderBoard.MemberDetails> origList = origData.getMembersList();
+        for (int i=0; i < origList.size(); i++) {
+            TeamLeaderBoard.MemberDetails data = origList.get(i);
+            if (myUserId == data.getId()){
+                myPos = i;
+            }
+            itemList.add(data.convertToLeaderBoard());
+        }
+        render(itemList, myPos);
     }
 
     @Override
@@ -143,4 +158,18 @@ public class TeamLeaderBoardFragment extends BaseLeaderBoardFragment {
         }
     }
 
+    @Override
+    public void onItemClick(long id) {
+        // Nothing to do here
+    }
+
+    @Override
+    public int getMyId() {
+        return MainApplication.getInstance().getUserID();
+    }
+
+    @Override
+    public boolean toShowLogo() {
+        return true;
+    }
 }

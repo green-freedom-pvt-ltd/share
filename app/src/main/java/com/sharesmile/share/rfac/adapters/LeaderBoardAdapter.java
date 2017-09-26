@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.sharesmile.share.LeaderBoardDataStore;
-import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.utils.Logger;
@@ -29,18 +27,13 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
 
     private static final String TAG = "LeaderBoardAdapter";
 
-    private ItemClickListener mListener;
-    private boolean isLeagueBoard = false;
+    private Parent mParent;
     private List<BaseLeaderBoardItem> mData;
     private Context mContext;
 
-    public LeaderBoardAdapter(Context context, boolean isLeagueBoard) {
+    public LeaderBoardAdapter(Context context, Parent parent) {
         this.mContext = context;
-        this.isLeagueBoard = isLeagueBoard;
-    }
-
-    public void setItemClickListener(ItemClickListener listener){
-        this.mListener = listener;
+        this.mParent = parent;
     }
 
     @Override
@@ -90,7 +83,9 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
         public LeaderBoardViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            if (isLeagueBoard) {
+            if (mParent.toShowLogo()) {
+                mProfileImage.setVisibility(View.VISIBLE);
+            }else {
                 mProfileImage.setVisibility(View.GONE);
             }
         }
@@ -105,12 +100,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
             String impactString = String.valueOf(Math.round(leaderboard.getAmount()));
             mImpact.setText("\u20B9 " + impactString);
 
-            final int id;
-            if (isLeagueBoard) {
-                id = LeaderBoardDataStore.getInstance().getMyTeamId();
-            } else {
-                id = MainApplication.getInstance().getUserID();
-            }
+            final int id = mParent.getMyId();
 
             if (id == leaderboard.getId()) {
                 Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " matches");
@@ -120,28 +110,28 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.white));
                 mImpact.setTextColor(mContext.getResources().getColor(R.color.white));
             } else {
-                Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " doesn't match");
+//                Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " doesn't match");
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mImpact.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
-                if(isLeagueBoard) container.setCardElevation(3f);
+                if(mParent.toShowLogo()) container.setCardElevation(3f);
                 else container.setCardElevation(.5f);
                 container.setOnClickListener(null);
             }
 
-            if (isLeagueBoard) {
-                container.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mListener.onItemClick(leaderboard.getId());
-                    }
-                });
-            }
+            container.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mParent.onItemClick(leaderboard.getId());
+                }
+            });
         }
     }
 
-    public interface ItemClickListener {
-        public void onItemClick(long id);
+    public interface Parent {
+        void onItemClick(long id);
+        int getMyId();
+        boolean toShowLogo();
     }
 }

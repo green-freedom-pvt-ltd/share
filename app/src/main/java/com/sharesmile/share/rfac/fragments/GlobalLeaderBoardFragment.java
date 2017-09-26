@@ -47,10 +47,10 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
 
     private String interval = LAST_WEEK_INTERVAL;
 
-    private BaseLeaderBoardItem myLeaderBoard;
-
     HighLightArrayAdapter spinnerAdapter;
     private boolean isFirstSpinnerItemSelected = false;
+
+    private LeaderBoardList origData;
 
     public static GlobalLeaderBoardFragment getInstance() {
         GlobalLeaderBoardFragment fragment = new GlobalLeaderBoardFragment();
@@ -126,9 +126,9 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     @Override
     protected void fetchData() {
         // GlobalLeaderBoard
-
-        if (LeaderBoardDataStore.getInstance().getGlobalLeaderBoard(interval) != null){
-            showGlobalLeaderBoardData(LeaderBoardDataStore.getInstance().getGlobalLeaderBoard(interval));
+        origData = LeaderBoardDataStore.getInstance().getGlobalLeaderBoard(interval);
+        if (origData != null){
+            prepareDatasetAndRender();
         }else {
             LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData(interval);
             showProgressDialog();
@@ -139,13 +139,12 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     public void onEvent(GlobalLeaderBoardDataUpdated event){
         if (isAttachedToActivity()){
             hideProgressDialog();
-            LeaderBoardList globalLeaderBoardData
-                    = LeaderBoardDataStore.getInstance().getGlobalLeaderBoard(interval);
+            origData = LeaderBoardDataStore.getInstance().getGlobalLeaderBoard(interval);
             if (event.isSuccess()){
-                showGlobalLeaderBoardData(globalLeaderBoardData);
+                prepareDatasetAndRender();
             }else {
-                if (globalLeaderBoardData != null){
-                    showGlobalLeaderBoardData(globalLeaderBoardData);
+                if (origData != null){
+                    prepareDatasetAndRender();
                     MainApplication.showToast("Network Error, Couldn't refresh");
                 }else {
                     MainApplication.showToast("Network Error, Please try again");
@@ -154,25 +153,19 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         }
     }
 
-    public void showGlobalLeaderBoardData(LeaderBoardList list) {
-        mleaderBoardList.clear();
-        int userId = MainApplication.getInstance().getUserID();
-        boolean isShowingMyRank = false;
-        for (LeaderBoardData data : list.getLeaderBoardList()){
-            if (data.getRank() > list.getLeaderBoardList().size() && userId == data.getUserid()){
-                myLeaderBoard = data.getLeaderBoardDbObject();
-                isShowingMyRank = true;
-            }else if (data.getRank() > 0 && data.getRank() <= list.getLeaderBoardList().size()){
-                mleaderBoardList.add(data.getLeaderBoardDbObject());
+    public void prepareDatasetAndRender() {
+        List<BaseLeaderBoardItem> itemList = new ArrayList<>();
+        int myUserId = MainApplication.getInstance().getUserID();
+        int myPos = -1;
+        List<LeaderBoardData> origList = origData.getLeaderBoardList();
+        for (int i=0; i < origList.size(); i++) {
+            LeaderBoardData data = origList.get(i);
+            if (myUserId == data.getUserid()){
+                myPos = i;
             }
+            itemList.add(data.getLeaderBoardDbObject());
         }
-        mLeaderBoardAdapter.setData(mleaderBoardList);
-        if (isShowingMyRank){
-            showSelfRank(myLeaderBoard);
-        }else {
-            hideSelfRank();
-        }
-        hideProgressDialog();
+        render(itemList, myPos);
     }
 
     @Override
@@ -203,6 +196,21 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onItemClick(long id) {
+        // No action on click
+    }
+
+    @Override
+    public int getMyId() {
+        return MainApplication.getInstance().getUserID();
+    }
+
+    @Override
+    public boolean toShowLogo() {
+        return true;
     }
 
     class HighLightArrayAdapter extends ArrayAdapter<String> {
