@@ -214,4 +214,16 @@ public class SyncHelper {
         }
     }
 
+    public static void oneTimeUploadUserData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_USER_DATA)
+                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
 }

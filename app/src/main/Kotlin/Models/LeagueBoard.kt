@@ -53,10 +53,13 @@ class LeagueBoard : UnObfuscable, Serializable {
     @SerializedName("total_amount")
     var totalImpact: Float = 0f
 
-    @SerializedName("results")
-    var teamList: ArrayList<Team>? = null;
+    @SerializedName("show_team_logos")
+    var showTeamLogos: Boolean = false
 
-    public class Team : Serializable {
+    @SerializedName("results")
+    var teamList: ArrayList<Team>? = null
+
+    class Team : Serializable {
 
         @SerializedName("team_id")
         var id: Long? = 0
@@ -69,6 +72,9 @@ class LeagueBoard : UnObfuscable, Serializable {
 
         @SerializedName("team_captain_email_id")
         var teamCaptainEmailId: String? = ""
+
+        @SerializedName("team_logo")
+        var teamLogo: String? = ""
 
         @SerializedName("distance")
         private var distance: Float = 0f
@@ -83,6 +89,7 @@ class LeagueBoard : UnObfuscable, Serializable {
             var board = BaseLeaderBoardItem()
             board.id = id as Long
             board.name = teamName
+            board.image = teamLogo
             board.distance = distance
             board.ranking = ranking
             board.amount = amount

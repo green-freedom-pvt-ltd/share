@@ -81,6 +81,7 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     @Override
     protected void refreshItems() {
+        Logger.d(TAG, "refreshItems");
         super.refreshItems();
         bannerContainer.setVisibility(View.GONE);
         LeaderBoardDataStore.getInstance().updateLeagueBoardData();
@@ -175,6 +176,7 @@ public class LeagueBoardFragment extends BaseLeaderBoardFragment implements Lead
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(LeagueBoardDataUpdated event){
+        Logger.d(TAG, "onEvent: LeagueBoardDataUpdated");
         if (isAttachedToActivity()){
             hideProgressDialog();
             LeagueBoard board = LeaderBoardDataStore.getInstance().getLeagueBoard();

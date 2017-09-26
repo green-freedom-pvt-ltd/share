@@ -8,6 +8,8 @@ import android.widget.EditText;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 
 import base.BaseDialog;
@@ -51,6 +53,10 @@ public class TakeEmailDialog extends BaseDialog {
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(inputMessage).matches()){
             MainApplication.showToast(R.string.please_enter_valid_email_address);
         }else {
+            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+            userDetails.setEmail(inputMessage);
+            MainApplication.getInstance().setUserDetails(userDetails);
+            SyncHelper.oneTimeUploadUserData();
             if (listener != null){
                 listener.onPrimaryClick(this);
             }

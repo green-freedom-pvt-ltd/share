@@ -21,9 +21,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.Task;
 import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -31,9 +28,8 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.gcm.SyncService;
-import com.sharesmile.share.gcm.TaskConstants;
 import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
@@ -286,7 +282,7 @@ public class EditProfileFragment extends BaseFragment implements
             }
         }
         MainApplication.getInstance().setUserDetails(userDetails);
-        oneTimeUploadUserData();
+        SyncHelper.oneTimeUploadUserData();
         MainApplication.showToast("Saved!");
     }
 
@@ -320,18 +316,6 @@ public class EditProfileFragment extends BaseFragment implements
             case R.id.et_profile_general_birthday:
                 showDatePicker();
         }
-    }
-
-    private void oneTimeUploadUserData() {
-        OneoffTask task = new OneoffTask.Builder()
-                .setService(SyncService.class)
-                .setTag(TaskConstants.UPLOAD_USER_DATA)
-                .setExecutionWindow(0L, 300) // Within 5 mins
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
-                .build();
-
-        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(getContext().getApplicationContext());
-        mGcmNetworkManager.schedule(task);
     }
 
     @Override

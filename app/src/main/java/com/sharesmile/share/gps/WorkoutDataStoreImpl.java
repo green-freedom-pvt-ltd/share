@@ -224,6 +224,19 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public synchronized void approveWorkoutData() {
         Logger.d(TAG, "approveWorkoutData");
+        approveTheProgressSoFar();
+        persistBothWorkoutData();
+    }
+
+    @Override
+    public WorkoutData clear(){
+        Logger.d(TAG, "clear: approving workoutData one last time because this is the end");
+        approveTheProgressSoFar();
+        clearPersistentStorage();
+        return approvedWorkoutData.close();
+    }
+
+    private void approveTheProgressSoFar(){
         if (extraPolatedDistanceToBeApproved > 0){
             approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
             extraPolatedDistanceToBeApproved = 0;
@@ -234,10 +247,10 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         }
         while (!waitingForApprovalQueue.isEmpty()){
             DistRecord record = waitingForApprovalQueue.remove();
+            Logger.d(TAG, "Approving record: " + record.toString());
             approvedWorkoutData.addRecord(record, false);
         }
         approvePendingSteps();
-        persistBothWorkoutData();
     }
 
     private synchronized void approvePendingSteps(){
@@ -265,23 +278,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public String getWorkoutId() {
         return dirtyWorkoutData.getWorkoutId();
-    }
-
-    @Override
-    public WorkoutData clear(){
-        Logger.d(TAG, "clear: approving workoutData one last time because this is the end");
-        if (extraPolatedDistanceToBeApproved > 0){
-            approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
-            extraPolatedDistanceToBeApproved = 0;
-        }
-        while (!waitingForApprovalQueue.isEmpty()){
-            DistRecord record = waitingForApprovalQueue.remove();
-            Logger.d(TAG, "Approving record: " + record.toString());
-            approvedWorkoutData.addRecord(record, false);
-        }
-        approvePendingSteps();
-        clearPersistentStorage();
-        return approvedWorkoutData.close();
     }
 
     @Override

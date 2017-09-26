@@ -56,6 +56,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<LeaderBoardAdapter.
     }
 
     public void setData(List<BaseLeaderBoardItem> data) {
+        Logger.d(TAG, "setData");
         this.mData = data;
         notifyDataSetChanged();
     }

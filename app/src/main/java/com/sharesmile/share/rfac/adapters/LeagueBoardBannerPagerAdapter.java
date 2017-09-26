@@ -9,6 +9,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.rfac.ImageBannerContainer;
 import com.sharesmile.share.rfac.StatsBannerContainer;
+import com.sharesmile.share.utils.Logger;
 
 import Models.LeagueBoard;
 
@@ -17,6 +18,8 @@ import Models.LeagueBoard;
  */
 
 public class LeagueBoardBannerPagerAdapter extends BannerPagerAdapter{
+
+    private static final String TAG = "LeagueBoardBannerPagerAdapter";
 
     private LeagueBoard leagueBoard;
 
@@ -27,6 +30,7 @@ public class LeagueBoardBannerPagerAdapter extends BannerPagerAdapter{
     }
 
     public void setData(LeagueBoard leagueBoard){
+        Logger.d(TAG, "setData");
         this.leagueBoard = leagueBoard;
         notifyDataSetChanged();
     }
@@ -38,6 +42,7 @@ public class LeagueBoardBannerPagerAdapter extends BannerPagerAdapter{
 
     @Override
     protected View getItemView(final int position, ViewGroup container) {
+        Logger.d(TAG, "getItemView: " + position);
         switch (position){
             case 0:
                 View imageBanner = LayoutInflater.from(container.getContext())
@@ -55,6 +60,7 @@ public class LeagueBoardBannerPagerAdapter extends BannerPagerAdapter{
             case 1:
                 View statsBanner = LayoutInflater.from(container.getContext())
                         .inflate(R.layout.banner_stats_container, container, false);
+                Logger.d(TAG, "getItemView, stats banner, total raised = " + leagueBoard.getTotalImpact());
                 statsBannerContainer = new StatsBannerContainer(statsBanner, leagueBoard);
                 statsBanner.setOnClickListener(new View.OnClickListener() {
                     @Override

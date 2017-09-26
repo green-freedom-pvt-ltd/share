@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -51,12 +50,12 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
 
     @BindView(R.id.container_list_item)
     CardView selfRankItem;
-
-    TextView myRank;
-
-    TextView myProfileName;
-
-    TextView myImpact;
+//
+//    TextView myRank;
+//
+//    TextView myProfileName;
+//
+//    TextView myImpact;
 
     LinearLayoutManager mLayoutManager;
 
@@ -125,13 +124,13 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment {
         // Need to show rank at the bottom
         selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
         selfRankItem.setCardElevation(3f);
-        myProfileName = (TextView) selfRankItem.findViewById(R.id.tv_profile_name);
-        myImpact = (TextView) selfRankItem.findViewById(R.id.tv_list_item_impact);
-        myRank = (TextView) selfRankItem.findViewById(R.id.id_leaderboard);
+//        myProfileName = (TextView) selfRankItem.findViewById(R.id.tv_profile_name);
+//        myImpact = (TextView) selfRankItem.findViewById(R.id.tv_list_item_impact);
+//        myRank = (TextView) selfRankItem.findViewById(R.id.id_leaderboard);
 
-        myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        myImpact.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+//        myRank.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+//        myProfileName.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+//        myImpact.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
         mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
         selfRankItem.setVisibility(View.VISIBLE);
         mLeaderBoardAdapter.createMyViewHolder(selfRankItem).bindData(myLeaderBoard, myLeaderBoard.getRanking());

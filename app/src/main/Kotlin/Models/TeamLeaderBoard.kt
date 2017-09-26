@@ -39,6 +39,9 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
     @SerializedName("total_runs")
     var totalRuns: Int? = 0
 
+    @SerializedName("team_logo")
+    var teamLogo: String? = ""
+
     @SerializedName("results")
     var membersList: ArrayList<MemberDetails>? = null;
 

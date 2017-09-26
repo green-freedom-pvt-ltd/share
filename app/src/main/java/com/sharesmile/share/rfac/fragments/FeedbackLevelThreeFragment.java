@@ -22,14 +22,17 @@ import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.rfac.FeedbackChatContainer;
 import com.sharesmile.share.rfac.FeedbackInputContainer;
+import com.sharesmile.share.rfac.TakeEmailDialog;
 import com.sharesmile.share.rfac.activities.LoginActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.FeedbackNode;
+import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
+import base.BaseDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.smooch.core.Smooch;
@@ -129,16 +132,40 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
     public void onFeedbackSubmit(String feedbackText) {
         Logger.d(TAG, "onFeedbackSubmit with: " + feedbackText);
         if (validateUserInput(feedbackText)){
-            pendingFeedback = constructFeedbackObject(feedbackText);
             if (MainApplication.isLogin()){
-                pushFeedbackAndExit(pendingFeedback);
-                pendingFeedback = null;
+                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+                if (TextUtils.isEmpty(userDetails.getEmail())){
+                    // Need to ask the user for her email
+                    showTakeEmailDialog(feedbackText);
+                }else {
+                    UserFeedback feedback = constructFeedbackObject(feedbackText);
+                    pushFeedbackAndExit(feedback);
+                }
             }else {
+                pendingFeedback = constructFeedbackObject(feedbackText);
                 startLoginActivityForResult();
             }
         }
         AnalyticsEvent.create(Event.ON_CLICK_FEEDBACK_SUBMIT)
                 .buildAndDispatch();
+    }
+
+    private void showTakeEmailDialog(final String feedbackText){
+        BaseDialog emailDialog = new TakeEmailDialog(getActivity(), R.style.BackgroundDimDialog);
+        emailDialog.setListener(new BaseDialog.Listener() {
+            @Override
+            public void onPrimaryClick(BaseDialog dialog) {
+                // Submit clicked
+                UserFeedback feedback = constructFeedbackObject(feedbackText);
+                pushFeedbackAndExit(feedback);
+            }
+
+            @Override
+            public void onSecondaryClick(BaseDialog dialog) {
+                // Will not be clicked
+            }
+        });
+        emailDialog.show();
     }
 
     private void startLoginActivityForResult() {
@@ -149,7 +176,6 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
     @Override
     public void onChatClicked(){
         Logger.d(TAG, "onChatClicked");
-        // TODO: Fire Feedback Api to get ticketId and then start ChatActivity
         pendingFeedback = constructFeedbackObject(null);
         if (MainApplication.isLogin()){
             pushChatFeedbackNow(pendingFeedback);
@@ -193,6 +219,7 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
                 }else {
                     pushFeedbackAndExit(pendingFeedback);
                 }
+                pendingFeedback = null;
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

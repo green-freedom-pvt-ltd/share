@@ -34,8 +34,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 166
-        versionName "2.4.1"
+        versionCode 170
+        versionName "2.4.2"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -129,8 +129,8 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile 'com.onesignal:OneSignal:3.+@aar'
-    compile 'com.facebook.android:facebook-android-sdk:4.+'
+    compile 'com.onesignal:OneSignal:3.6.1@aar'
+    compile 'com.facebook.android:facebook-android-sdk:4.25.0'
     compile 'com.jakewharton:butterknife:8.0.1'
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
     compile 'de.greenrobot:greendao:2.1.0'
