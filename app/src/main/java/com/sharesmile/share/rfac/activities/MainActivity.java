@@ -390,10 +390,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             performOperation(OPEN_HELP_CENTER,false);
             AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
                     .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_share) {
-            //TODO: Remove this hack
-            showTakeEmailDialog();
-//            share();
+        } else if (menuItem.getItemId() == R.id.nav_item_share) {;
+            share();
             AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
