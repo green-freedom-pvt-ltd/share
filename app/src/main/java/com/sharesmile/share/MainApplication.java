@@ -320,11 +320,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         updateAppVersionInPrefs();
 
-        Settings settings = new Settings("c6596ame55nb4hotaciy1j91v");
+        Settings settings = new Settings("5993e8883fba2e2d0023b2de");
         settings.setFirebaseCloudMessagingAutoRegistrationEnabled(false);
         Smooch.init(this, settings, new SmoochCallback() {
             @Override
             public void run(Response response) {
+                Logger.d(TAG, "Smooch initialised: " + response.getError());
                 // Smooch Initialised
             }
         });

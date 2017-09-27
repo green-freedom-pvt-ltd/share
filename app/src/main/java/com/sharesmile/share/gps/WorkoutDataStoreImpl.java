@@ -195,7 +195,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         approvedWorkoutData.workoutPause(reason);
         // If it was a defaulter scenario then the queue has already been discarded
         approveWorkoutData();
-        persistBothWorkoutData();
     }
 
     @Override

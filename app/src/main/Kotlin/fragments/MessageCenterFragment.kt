@@ -77,7 +77,13 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
     }
 
     override fun onShareMessageClick(message: Message) {
-        Utils.shareImageWithMessage(context, message.message_image, message.shareTemplate)
+        if (!TextUtils.isEmpty(message.videoId!!)){
+            // To share a video
+            Utils.share(context, message.shareTemplate)
+        }else{
+            // To share an image
+            Utils.shareImageWithMessage(context, message.message_image, message.shareTemplate)
+        }
     }
 
     override fun onMessageCardClick(message: Message) {

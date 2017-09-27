@@ -9,6 +9,7 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
+import com.sharesmile.share.rfac.RateAndShareDialog;
 import com.sharesmile.share.rfac.models.TellYourFriendsDialog;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -43,7 +44,7 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                         .put("bolt_count", workoutData.getUsainBoltCount())
                         .put("num_update_events", workoutData.getNumUpdateEvents())
                         .buildAndDispatch();
-                showTellYourFriendsDialog(workoutData);
+                showRateAndShareDialog(workoutData);
             }
 
             @Override
@@ -115,39 +116,56 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
             }
         });
         feedbackDialog.show();
+    }
+
+    protected void showRateAndShareDialog(final WorkoutData workoutData){
+        feedbackDialog = new RateAndShareDialog(getActivity(), R.style.BackgroundDimDialog);
+        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Logger.d(TAG, "RateAndShareDialog: onCancel");
+                exitFeedback(workoutData);
+            }
+        });
+        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Logger.d(TAG, "TakeEmailDialog: onDismiss");
+                exitFeedback(workoutData);
+            }
+        });
+        feedbackDialog.setListener(new BaseDialog.Listener() {
+            @Override
+            public void onPrimaryClick(BaseDialog dialog) {
+                // User chose to Rate
+                if (isAttachedToActivity()){
+                    Utils.redirectToPlayStore(getContext());
+                    dialog.dismiss();
+                    AnalyticsEvent.create(Event.ON_CLICK_RATE_US_AFTER_FEEDBACK)
+                            .addBundle(workoutData.getWorkoutBundle())
+                            .buildAndDispatch();
+                }
+            }
+
+            @Override
+            public void onSecondaryClick(BaseDialog dialog) {
+                // User chose to share
+                if (isAttachedToActivity()){
+                    Utils.share(getActivity(), getString(R.string.share_msg));
+                    dialog.dismiss();
+                    AnalyticsEvent.create(Event.ON_CLICK_SHARE_AFTER_FEEDBACK)
+                            .addBundle(workoutData.getWorkoutBundle())
+                            .buildAndDispatch();
+                }
+            }
+        });
+        feedbackDialog.show();
         AnalyticsEvent.create(Event.ON_LOAD_RATE_US_POPUP)
                 .addBundle(workoutData.getWorkoutBundle())
                 .put("num_spikes", workoutData.getNumGpsSpikes())
                 .put("bolt_count", workoutData.getUsainBoltCount())
                 .buildAndDispatch();
     }
-
-//    protected void showTakeFeedbackDialog(final WorkoutData workoutData){
-//        feedbackDialog = new TakeEmailDialog(getActivity(), R.style.BackgroundDimDialog, workoutData);
-//        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//            @Override
-//            public void onCancel(DialogInterface dialog) {
-//                Logger.d(TAG, "TakeEmailDialog: onCancel");
-//                // User cancelled the dialog without acting on it, lets just trigger exit
-//                exitFeedback(workoutData);
-//            }
-//        });
-//        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//            @Override
-//            public void onDismiss(DialogInterface dialog) {
-//                Logger.d(TAG, "TakeEmailDialog: onDismiss");
-//                // Dialog dismissed explicitly
-//                exitFeedback(workoutData);
-//            }
-//        });
-//        feedbackDialog.show();
-//        AnalyticsEvent.create(Event.ON_LOAD_TAKE_FEEDBACK_POPUP)
-//                .addBundle(workoutData.getWorkoutBundle())
-//                .put("num_spikes", workoutData.getNumGpsSpikes())
-//                .put("bolt_count", workoutData.getUsainBoltCount())
-//                .put("num_update_events", workoutData.getNumUpdateEvents())
-//                .buildAndDispatch();
-//    }
 
     @Override
     public void onDestroyView() {

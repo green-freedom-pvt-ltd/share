@@ -25,6 +25,7 @@ import com.sharesmile.share.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import Models.LeagueBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -58,6 +59,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     private List<BaseLeaderBoardItem> mleaderBoardList = new ArrayList<>();
     protected LeaderBoardAdapter mLeaderBoardAdapter;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,18 +79,28 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
 //        mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            int oldScrollY;
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                Logger.d(TAG, "onScrollStateChanged, newState = " + newState);
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Logger.d(TAG, "onScrolled");
+
+                boolean scrollUp = false;
+                if (dy > 0){
+                    // Scroll Up (finger move up), Move down
+                    scrollUp = true;
+                }else {
+                    // Scroll down (finger move down), Move up
+                    scrollUp = false;
+                }
+
                 if (mleaderBoardList != null && !mleaderBoardList.isEmpty()){
-                    renderSelfRank();
+                    renderSelfRank(scrollUp);
                 }
             }
         });
@@ -113,7 +125,8 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
 
     }
 
-    protected void enableDisableSwipeRefresh(boolean enable) {
+    @Override
+    public void enableDisableSwipeRefresh(boolean enable) {
         if (mswipeRefresh != null) {
             mswipeRefresh.setEnabled(enable);
         }
@@ -127,6 +140,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
         }
         mLeaderBoardAdapter.notifyDataSetChanged();
         listContainer.setVisibility(View.GONE);
+        selfRankItem.setVisibility(View.GONE);
     }
 
     protected abstract void setupToolbar();
@@ -149,17 +163,19 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
         mRecyclerView.post(new Runnable() {
             @Override
             public void run() {
-                renderSelfRank();
+                renderSelfRank(true);
             }
         });
         hideProgressDialog();
     }
 
-    private void renderSelfRank(){
+    private void renderSelfRank(boolean scrollUp){
         int lastItemPos = mLayoutManager.findLastVisibleItemPosition();
-        Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
-                + myLeaderBoardItemPosition);
-        if (lastItemPos < myLeaderBoardItemPosition){
+//        Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
+//                + myLeaderBoardItemPosition);
+        int limit = scrollUp ? myLeaderBoardItemPosition : myLeaderBoardItemPosition + 1;
+        limit = limit + mLeaderBoardAdapter.getHeaderOffSet();
+        if (lastItemPos < limit){
             showSelfRankAtBottom();
         }else {
             hideSelfRankFromBottom();
@@ -167,7 +183,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     protected void showSelfRankAtBottom(){
-        Logger.d(TAG, "showSelfRankAtBottom");
         if (myLeaderBoardItemPosition >= 0){
             // Need to show rank at the bottom
             selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
@@ -180,7 +195,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     protected void hideSelfRankFromBottom(){
-        Logger.d(TAG, "hideSelfRankFromBottom");
         selfRankItem.setVisibility(View.GONE);
         mRecyclerView.setPadding(0,0,0,0);
     }
@@ -194,6 +208,16 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
         mProgressBar.setVisibility(View.GONE);
         listContainer.setVisibility(View.VISIBLE);
         mswipeRefresh.setRefreshing(false);
+    }
+
+    @Override
+    public boolean toShowBanner() {
+        return false;
+    }
+
+    @Override
+    public LeagueBoard getBannerData() {
+        return null;
     }
 
     public boolean isLeagueBoard(){

@@ -3,6 +3,7 @@ package com.sharesmile.share.rfac.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,8 +101,13 @@ public class MessageInfoFragment extends BaseFragment implements View.OnClickLis
     }
 
     private void onShareMessageClick(final Message message) {
-        Utils.shareImageWithMessage(getContext(), message.getMessage_image(), message.getShareTemplate());
+        if (!TextUtils.isEmpty(message.getVideoId())){
+            // To share a video
+            Utils.share(getContext(), message.getShareTemplate());
+        }else{
+            // To share an image
+            Utils.shareImageWithMessage(getContext(), message.getMessage_image(), message.getShareTemplate());
+        }
     }
-
 }
 

@@ -206,6 +206,10 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
         SyncHelper.pushUserFeedback(feedbackObject);
         MainApplication.showToast(R.string.feedback_submitted_successfully);
         openHomeActivityAndFinish();
+        AnalyticsEvent.create(Event.ON_SUBMIT_FEEDBACK)
+                .put("tag", feedbackObject.getTag())
+                .put("sub_tag", feedbackObject.getSubTag())
+                .buildAndDispatch();
     }
 
     @Override
@@ -227,8 +231,8 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
 
     private void startChat(){
         String fcmToken = FirebaseInstanceId.getInstance().getToken();
-        Logger.d(TAG, "Will send FCM Token to Smooch: " + fcmToken);
         if (!TextUtils.isEmpty(fcmToken)){
+            Logger.d(TAG, "Will send FCM Token to Smooch: " + fcmToken);
             Smooch.setFirebaseCloudMessagingToken(FirebaseInstanceId.getInstance().getToken());
         }
         ConversationActivity.show(getContext());

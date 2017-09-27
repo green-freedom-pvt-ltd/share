@@ -59,6 +59,7 @@ public class UsainBolt {
                 AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
                         .addBundle(workoutService.getWorkoutBundle())
                         .put("detected_by", "gps_speed")
+                        .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                         .put("gps_speed", recentGpsSpeed*3.6)
                         .put("recent_speed", recentSpeed*3.6)
                         .buildAndDispatch();
@@ -71,6 +72,7 @@ public class UsainBolt {
                 AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
                         .addBundle(workoutService.getWorkoutBundle())
                         .put("detected_by", "activity_recognition")
+                        .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                         .put("recent_speed", recentSpeed*3.6)
                         .buildAndDispatch();
                 return true;

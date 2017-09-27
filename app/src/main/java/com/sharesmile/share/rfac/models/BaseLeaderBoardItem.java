@@ -4,7 +4,7 @@ package com.sharesmile.share.rfac.models;
  * Created by ankitmaheshwari on 8/24/17.
  */
 
-public class BaseLeaderBoardItem {
+public class BaseLeaderBoardItem implements LeaderBoardItem{
 
     private long id;
     private String name;
@@ -72,5 +72,10 @@ public class BaseLeaderBoardItem {
 
     public void setAmount(float amount) {
         this.amount = amount;
+    }
+
+    @Override
+    public int getType() {
+        return ROW_ITEM;
     }
 }

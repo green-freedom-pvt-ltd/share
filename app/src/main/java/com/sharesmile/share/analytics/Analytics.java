@@ -80,6 +80,9 @@ public class Analytics {
             setUserPhoto(details.getSocialThumb());
             setUserImpactLeagueTeamCode(details.getTeamId());
 
+
+            // Setting properties for smooch
+
             User.getCurrentUser().setFirstName(details.getFirstName());
             User.getCurrentUser().setLastName(details.getLastName());
             User.getCurrentUser().setEmail(details.getEmail());
