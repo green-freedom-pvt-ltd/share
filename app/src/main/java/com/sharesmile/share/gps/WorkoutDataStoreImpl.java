@@ -21,9 +21,7 @@ import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.sharesmile.share.core.Config.CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL;
 
@@ -38,9 +36,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     private WorkoutData approvedWorkoutData;
     private int numStepsWhenBatchBegan;
 
-    Queue<DistRecord> waitingForApprovalQueue = new ConcurrentLinkedQueue<>();
-    volatile float extraPolatedDistanceToBeApproved = 0f;
-    volatile int numStepsToBeApproved = 0;
     private List<Long> usainBoltOcurredTimeStamps;
 
     WorkoutDataStoreImpl(){
@@ -120,13 +115,10 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             float extraPolatedDistance = stepsRanWhileSearchingForSource * averageStrideLength;
 
             dirtyWorkoutData.addDistance(extraPolatedDistance);
-            extraPolatedDistanceToBeApproved = extraPolatedDistance;
             Location startLocation = record.getLocation();
             if (dirtyWorkoutData.getStartPoint() == null){
                 dirtyWorkoutData.setStartPoint(new LatLng(startLocation.getLatitude(), startLocation.getLongitude()));
             }
-            Logger.d(TAG, "addRecord: Source record after begin/resume, extraPolatedDistanceToBeApproved = "
-                    + extraPolatedDistance);
             AnalyticsEvent.create(Event.ON_START_LOCATION_AFTER_RESUME)
                     .addBundle(getWorkoutBundle())
                     .put("start_location_latitude", startLocation.getLatitude())
@@ -137,7 +129,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
         dirtyWorkoutData.addRecord(record, true);
-        waitingForApprovalQueue.add(record);
     }
 
     @Override
@@ -154,7 +145,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     public void addSteps(int numSteps){
         if (isWorkoutRunning()){
             dirtyWorkoutData.addSteps(numSteps);
-            numStepsToBeApproved += numSteps;
         }
     }
 
@@ -236,34 +226,11 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     private void approveTheProgressSoFar(){
-        if (extraPolatedDistanceToBeApproved > 0){
-            approvedWorkoutData.addDistance(extraPolatedDistanceToBeApproved);
-            extraPolatedDistanceToBeApproved = 0;
-        }
-        if (approvedWorkoutData.getStartPoint() == null && dirtyWorkoutData.getStartPoint() != null){
-            LatLng dirtyStartPoint = dirtyWorkoutData.getStartPoint();
-            approvedWorkoutData.setStartPoint(new LatLng(dirtyStartPoint.latitude, dirtyStartPoint.longitude));
-        }
-        while (!waitingForApprovalQueue.isEmpty()){
-            DistRecord record = waitingForApprovalQueue.remove();
-            Logger.d(TAG, "Approving record: " + record.toString());
-            approvedWorkoutData.addRecord(record, false);
-        }
-        approvePendingSteps();
-    }
-
-    private synchronized void approvePendingSteps(){
-        if (numStepsToBeApproved > 0){
-            approvedWorkoutData.addSteps(numStepsToBeApproved);
-            numStepsToBeApproved = 0;
-        }
+        approvedWorkoutData = dirtyWorkoutData.copy();
     }
 
     @Override
     public synchronized void discardApprovalQueue() {
-        extraPolatedDistanceToBeApproved = 0;
-        waitingForApprovalQueue.clear();
-        numStepsToBeApproved = 0;
         // Cleansing DirtyWorkoutData as user defaulted
         dirtyWorkoutData = approvedWorkoutData.copy();
         persistDirtyWorkoutData();
