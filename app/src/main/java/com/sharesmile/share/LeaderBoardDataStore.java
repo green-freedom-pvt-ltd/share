@@ -18,14 +18,14 @@ import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.utils.BasicNameValuePair;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.NameValuePair;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -341,21 +341,15 @@ public class LeaderBoardDataStore {
 
     public void exitLeague() {
         Logger.d(TAG, "exitLeague");
-        JSONObject requestJson = new JSONObject();
+
+        List<NameValuePair> data = new ArrayList<>();
         final int userId = MainApplication.getInstance().getUserID();
         final int teamId = getMyTeamId();
-        try {
-            requestJson.put("user", userId);
-            requestJson.put("team", teamId);
-            requestJson.put("is_logout", true);
-        }catch (JSONException jse){
-            jse.printStackTrace();
-        }
-        if (requestJson == null){
-            MainApplication.showToast(R.string.some_error_occurred);
-            return;
-        }
-        NetworkDataProvider.doPutCallAsync(Urls.getLeagueUrl(), requestJson,
+        data.add(new BasicNameValuePair("user", String.valueOf(userId)));
+        data.add(new BasicNameValuePair("team_code", String.valueOf(teamId)));
+        data.add(new BasicNameValuePair("is_logout", "true"));
+
+        NetworkDataProvider.doPutCallAsyncWithFormData(Urls.getLeagueRegistrationUrl(), data,
                 new NetworkAsyncCallback<LeagueTeam>() {
                     @Override
                     public void onNetworkFailure(NetworkException ne) {

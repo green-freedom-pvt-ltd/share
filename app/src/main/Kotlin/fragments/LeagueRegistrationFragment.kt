@@ -116,12 +116,12 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
     private fun onSubmit() {
         if (TextUtils.isEmpty(mSelectedDepartment)) {
-            Toast.makeText(context, "Select Department", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(context, "Select Department", Toast.LENGTH_SHORT).show()
+            return
         }
         if (TextUtils.isEmpty(mSelectedLocation)) {
-            Toast.makeText(context, "Select Location", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(context, "Select Location", Toast.LENGTH_SHORT).show()
+            return
         }
 
         fragmentListener.showProgressBar()
@@ -131,7 +131,7 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
         data.add(BasicNameValuePair("city", mSelectedLocation))
         data.add(BasicNameValuePair("department", mSelectedDepartment))
 
-        NetworkDataProvider.doPutCallAsyncWithFormData(Urls.getLeagueUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
+        NetworkDataProvider.doPutCallAsyncWithFormData(Urls.getLeagueRegistrationUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
                 fragmentListener.showActivityContent()
                 Toast.makeText(context, "Network error", Toast.LENGTH_SHORT).show()

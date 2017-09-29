@@ -23,4 +23,11 @@ public class BasicNameValuePair implements NameValuePair {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return "BasicNameValuePair{" +
+                "name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

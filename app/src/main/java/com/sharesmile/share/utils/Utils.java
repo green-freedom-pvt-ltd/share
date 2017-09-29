@@ -154,7 +154,7 @@ public class Utils {
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat(pattern, dfs);
         df.setGroupingUsed(false);
-        df.setRoundingMode(RoundingMode.FLOOR);
+        df.setRoundingMode(RoundingMode.HALF_EVEN);
         return df;
     }
 

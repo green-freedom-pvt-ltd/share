@@ -31,7 +31,7 @@ public class Urls {
     private static final String GOOGLE_CONVERT_TOKEN_URL = "/oauth2/v4/token";
     private static final String CAMPAIGN_URL = "/api/campaign/";
 
-    private static final String LEAGUE_URL = "/api/employeetoteam/";
+    private static final String LEAGUE_REGISTRATION_URL = "/api/employeetoteam/";
     private static final String LEAGUEBOARD_URL = "/api/teamboardv2/";
     private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboardv2/";
     private static final String SERVER_TIME_URL = "/api/servertime/";
@@ -126,8 +126,8 @@ public class Urls {
         return url;
     }
 
-    public static String getLeagueUrl() {
-        String url = getBaseUrl() + LEAGUE_URL;
+    public static String getLeagueRegistrationUrl() {
+        String url = getBaseUrl() + LEAGUE_REGISTRATION_URL;
         return url;
     }
 

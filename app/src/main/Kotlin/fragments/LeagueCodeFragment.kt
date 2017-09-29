@@ -73,15 +73,16 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         data.add(BasicNameValuePair("user", MainApplication.getInstance().userID.toString()))
         data.add(BasicNameValuePair("team", code))
 
-        NetworkDataProvider.doPostCallAsyncWithFormData(Urls.getLeagueUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
+        NetworkDataProvider.doPostCallAsyncWithFormData(Urls.getLeagueRegistrationUrl(), data,
+                object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
-                fragmentListener.showActivityContent();
-                invalidCode(ne);
+                fragmentListener.showActivityContent()
+                invalidCode(ne)
             }
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
-                fragmentListener.showActivityContent();
-                getTeamDetails(leagueTeam!!, code);
+                fragmentListener.showActivityContent()
+                getTeamDetails(leagueTeam!!, code)
             }
         })
     }
