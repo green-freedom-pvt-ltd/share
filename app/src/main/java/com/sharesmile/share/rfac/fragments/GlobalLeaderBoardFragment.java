@@ -89,7 +89,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     @Override
     protected void refreshItems() {
         super.refreshItems();
-        LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData(LAST_WEEK_INTERVAL);
+        LeaderBoardDataStore.getInstance().updateGlobalLeaderBoardData(interval);
     }
 
     @Override
