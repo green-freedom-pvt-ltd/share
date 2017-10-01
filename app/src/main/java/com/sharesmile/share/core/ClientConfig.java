@@ -86,7 +86,7 @@ public class ClientConfig implements UnObfuscable{
     public  float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 5000f;// in meters
 
     // ON_WORKOUT_UPDATE analytics event occurrs after this much distance
-    public  float MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT = 0.1f;// in Kms
+    public  float MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT = 0.5f;// in Kms
 
     // Sync Config
     // All the client data is synced periodically after this interval

@@ -98,16 +98,12 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
                 + ", elapsedTimeInSecs " + elapsedTimeInSecs);
         if (!isTimerRunning && isRunning()){
             startTimer(elapsedTimeInSecs);
-        }else {
-            updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs));
         }
     }
 
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs ){
         if (!isTimerRunning && isRunning()){
             startTimer(elapsedTimeInSecs);
-        }else {
-            updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs));
         }
     }
 
