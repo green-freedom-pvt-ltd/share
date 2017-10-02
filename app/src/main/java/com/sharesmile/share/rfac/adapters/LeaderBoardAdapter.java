@@ -176,6 +176,22 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
             });
         }
+
+        public void show(){
+            Logger.d(TAG, "show");
+            container.setVisibility(View.VISIBLE);
+            container.requestLayout();
+        }
+
+        public void hide(){
+            Logger.d(TAG, "hide");
+            container.setVisibility(View.GONE);
+        }
+
+        public boolean isVisible(){
+            return container.getVisibility() == View.VISIBLE && container.getHeight() > 0;
+        }
+
     }
 
     public class BannerHeaderViewHolder extends RecyclerView.ViewHolder{
@@ -267,8 +283,10 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         public void bindData(LeagueBoard leagueBoard){
             // Sets data for banner
-            bannerPagerAdapter.setData(leagueBoard);
-            mParent.enableDisableSwipeRefresh(true);
+            if (leagueBoard != null){
+                bannerPagerAdapter.setData(leagueBoard);
+                mParent.enableDisableSwipeRefresh(true);
+            }
         }
     }
 

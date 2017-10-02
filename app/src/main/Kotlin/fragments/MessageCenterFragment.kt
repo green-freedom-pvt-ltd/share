@@ -52,7 +52,6 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
         fragmentController.updateToolBar(getString(R.string.title_messages), true);
         SyncHelper.syncMessageCenterData(context)
         fetchMessageDataFromDb()
-        progress_bar.visibility = View.VISIBLE;
     }
 
     override fun onDestroyView() {

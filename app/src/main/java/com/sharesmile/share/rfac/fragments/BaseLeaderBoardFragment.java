@@ -52,6 +52,8 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     @BindView(R.id.container_list_item)
     CardView selfRankItem;
 
+    LeaderBoardAdapter.LeaderBoardViewHolder selfRankHolder;
+
     private int myLeaderBoardItemPosition;
 
     LinearLayoutManager mLayoutManager;
@@ -75,8 +77,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
         fetchData();
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
-//        mRecyclerView.setNestedScrollingEnabled(false);
-//        mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -122,6 +122,8 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
             }
         });
         mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
+
+        selfRankHolder =  mLeaderBoardAdapter.createMyViewHolder(selfRankItem);
 
     }
 
@@ -170,33 +172,37 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     private void renderSelfRank(boolean scrollUp){
-        int lastItemPos = mLayoutManager.findLastVisibleItemPosition();
-//        Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
-//                + myLeaderBoardItemPosition);
-        int limit = scrollUp ? myLeaderBoardItemPosition : myLeaderBoardItemPosition + 1;
-        limit = limit + mLeaderBoardAdapter.getHeaderOffSet();
-        if (lastItemPos < limit){
-            showSelfRankAtBottom();
-        }else {
-            hideSelfRankFromBottom();
+        if (myLeaderBoardItemPosition >= 0){
+            int lastItemPos = mLayoutManager.findLastVisibleItemPosition();
+            Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
+                    + myLeaderBoardItemPosition + ", scrollUp = " + scrollUp);
+            int limit = scrollUp ? myLeaderBoardItemPosition : myLeaderBoardItemPosition + 1;
+            limit = limit + mLeaderBoardAdapter.getHeaderOffSet();
+            if (lastItemPos < limit){
+                showSelfRankAtBottom();
+            }else {
+                hideSelfRankFromBottom();
+            }
         }
     }
 
     protected void showSelfRankAtBottom(){
-        if (myLeaderBoardItemPosition >= 0){
+        Logger.d(TAG, "showSelfRankAtBottom");
+        if (!selfRankHolder.isVisible()){
             // Need to show rank at the bottom
-            selfRankItem.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.light_gold));
-            selfRankItem.setCardElevation(3f);
-            mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
-            selfRankItem.setVisibility(View.VISIBLE);
             BaseLeaderBoardItem myLeaderBoardItem = mleaderBoardList.get(myLeaderBoardItemPosition);
-            mLeaderBoardAdapter.createMyViewHolder(selfRankItem).bindData(myLeaderBoardItem, myLeaderBoardItem.getRanking());
+            selfRankHolder.bindData(myLeaderBoardItem, myLeaderBoardItem.getRanking());
+            selfRankHolder.show();
+            mRecyclerView.setPadding(0,0,0, (int) Utils.convertDpToPixel(getContext(), 68));
         }
     }
 
     protected void hideSelfRankFromBottom(){
-        selfRankItem.setVisibility(View.GONE);
-        mRecyclerView.setPadding(0,0,0,0);
+        Logger.d(TAG, "hideSelfRankFromBottom");
+        if (selfRankHolder.isVisible()){
+            selfRankHolder.hide();
+            mRecyclerView.setPadding(0,0,0,0);
+        }
     }
 
     protected void showProgressDialog() {

@@ -31,7 +31,7 @@ public class ClientConfig implements UnObfuscable{
 
     public  float SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT = 20.83f; // in m/s, i.e. 75 km/hr
 
-    public  float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 9.03f; // in m/s, i.e. 32.5 km/hr
+    public  float SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT = 12.5f; // in m/s, i.e. 32.5 km/hr
 
     public  float USAIN_BOLT_UPPER_SPEED_LIMIT = 7f; // in m/s, i.e. 25.2 km/hr
 
