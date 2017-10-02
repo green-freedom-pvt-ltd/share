@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -402,7 +403,8 @@ public class Utils {
             FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
             out.close();
-            bmpUri = Uri.fromFile(file);
+            bmpUri = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".core.my.provider", file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

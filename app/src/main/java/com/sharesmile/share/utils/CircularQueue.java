@@ -10,7 +10,6 @@ public class CircularQueue<E> {
     private static final String TAG = "CircularQueue";
 
     private E[] circularQueueAr;
-    private int maxSize;   //Maximum Size of Circular Queue
     private int rear;//elements will be added/queued at rear.
     private int front;   //elements will be removed/dequeued from front
     private int number; //number of elements currently in Priority Queue
@@ -19,8 +18,7 @@ public class CircularQueue<E> {
      * Constructor
      */
     public CircularQueue(int maxSize){
-        this.maxSize = maxSize;
-        circularQueueAr = (E[])new Object[this.maxSize];
+        circularQueueAr = (E[])new Object[maxSize];
         number=0; //Initially number of elements in Circular Queue are 0.
         front=0;
         rear=0;
@@ -54,7 +52,7 @@ public class CircularQueue<E> {
     }
 
     public int getMaxSize(){
-        return maxSize;
+        return circularQueueAr.length;
     }
 
     public int getCurrentSize(){

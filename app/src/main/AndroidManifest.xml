@@ -223,6 +223,16 @@
         <activity android:name="activities.ImpactLeagueActivity"
             android:screenOrientation="portrait"/>
 
+        <provider
+            android:name=".core.ShareFileProvider"
+            android:authorities="${applicationId}.core.my.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
         <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
     </application>
 

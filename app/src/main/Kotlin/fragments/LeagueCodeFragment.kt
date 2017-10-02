@@ -76,13 +76,17 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         NetworkDataProvider.doPostCallAsyncWithFormData(Urls.getLeagueRegistrationUrl(), data,
                 object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
-                fragmentListener.showActivityContent()
-                invalidCode(ne)
+                if (fragmentListener != null){
+                    fragmentListener.showActivityContent()
+                    invalidCode(ne)
+                }
             }
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
-                fragmentListener.showActivityContent()
-                getTeamDetails(leagueTeam!!, code)
+                if (fragmentListener != null){
+                    fragmentListener.showActivityContent()
+                    getTeamDetails(leagueTeam!!, code)
+                }
             }
         })
     }

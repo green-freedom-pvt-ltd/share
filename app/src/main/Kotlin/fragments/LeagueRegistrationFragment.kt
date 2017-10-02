@@ -133,14 +133,18 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
         NetworkDataProvider.doPutCallAsyncWithFormData(Urls.getLeagueRegistrationUrl(), data, object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
-                fragmentListener.showActivityContent()
+                if (fragmentListener != null){
+                    fragmentListener.showActivityContent()
+                }
                 Toast.makeText(context, "Network error", Toast.LENGTH_SHORT).show()
             }
 
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
-                fragmentListener.showActivityContent()
-                activity.setResult(Activity.RESULT_OK)
-                activity.finish()
+                if (fragmentListener != null){
+                    fragmentListener.showActivityContent()
+                    activity.setResult(Activity.RESULT_OK)
+                    activity.finish()
+                }
             }
         })
     }

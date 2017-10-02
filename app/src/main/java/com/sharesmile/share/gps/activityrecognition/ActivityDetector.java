@@ -353,6 +353,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             synchronized (historyQueue){
                 while (i >= 0){
                     ActivityRecognitionResult elem = historyQueue.getElemAtPosition(i);
+                    if (elem == null){
+                        break;
+                    }
                     long timeDiff = currentTime - elem.getTime();
                     if (timeDiff > validInterval){
                         // This is elem is way too old to be considered

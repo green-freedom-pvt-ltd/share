@@ -174,7 +174,7 @@ public class ServerTimeKeeper {
                     List<ServerTimeResponse> list =
                             NetworkDataProvider.doGetCall(Urls.getServerTimeUrl(),
                                     new TypeToken<List<ServerTimeResponse>>(){}.getType());
-                    if (list.size() > 0){
+                    if (list != null && list.size() > 0){
                         long currentServerTimeMillis = list.get(0).getTimeEpoch();
                         Logger.d(TAG, "Successfully fetched serverTime: " + currentServerTimeMillis);
                         syncServerAndSystemMilliTime(currentServerTimeMillis);

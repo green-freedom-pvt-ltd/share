@@ -46,7 +46,6 @@ import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -123,17 +122,7 @@ public class LoginImpl {
                                 public void onCompleted(
                                         JSONObject object,
                                         GraphResponse response) {
-                                    // Application code
-                                    String userEmail = "";
-                                    Logger.d(TAG, "Facebook graphrequest response is: " + response.toString());
-                                    Logger.d(TAG, "Facebook graphrequest JSONObject is: " + object.toString());
-                                    try {
-                                        userEmail = object.getString("email");
-                                    } catch (JSONException e) {
-                                        Logger.e(TAG, "Can't extract email from Facebook response: \n" + object.toString());
-                                        e.printStackTrace();
-                                    }
-                                    verifyUserDetails(userEmail, token, true);
+                                    verifyUserDetails(token, true);
                                 }
                             });
                     Bundle parameters = new Bundle();
@@ -158,7 +147,7 @@ public class LoginImpl {
         }
     }
 
-    private void verifyUserDetails(String userEmail, String token, final boolean isFbLogin) {
+    private void verifyUserDetails(String token, final boolean isFbLogin) {
 
         mListener.showHideProgress(true, MainApplication.getContext().getString(R.string.login));
         Map<String, String> header = new HashMap<>();
@@ -168,7 +157,7 @@ public class LoginImpl {
             header.put("Authorization", "Bearer google-oauth2 " + token);
         }
 
-        NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(userEmail), header, new Callback() {
+        NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(), header, new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
                 Log.i("TAG", "Login error ");
@@ -317,7 +306,7 @@ public class LoginImpl {
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             Logger.d(TAG, "email: " + acct.getEmail() + " Name : " + acct.getDisplayName() + " token " + acct.getIdToken() + "auth :  " + acct.getServerAuthCode());
-            get_google_access_token(acct.getEmail(), acct.getServerAuthCode());
+            get_google_access_token(acct.getServerAuthCode());
         } else {
             Logger.d(TAG, "failed");
             MainApplication.getInstance().showToast(R.string.login_error);
@@ -326,7 +315,7 @@ public class LoginImpl {
         }
     }
 
-    private String get_google_access_token(final String email, String token) {
+    private String get_google_access_token(String token) {
 
         List<NameValuePair> data = new ArrayList<>();
         data.add(new BasicNameValuePair("code", token));
@@ -341,7 +330,7 @@ public class LoginImpl {
                         MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                verifyUserDetails(email, googleOauthResponse.access_token, false);
+                                verifyUserDetails(googleOauthResponse.access_token, false);
                             }
                         });
 

@@ -1,7 +1,5 @@
 package com.sharesmile.share.utils;
 
-import android.text.TextUtils;
-
 /**
  * Created by Shine on 01/05/16.
  */
@@ -79,11 +77,8 @@ public class Urls {
         return url;
     }
 
-    public static String getLoginUrl(String email) {
+    public static String getLoginUrl() {
         String url = getBaseUrl() + LOGIN_URL;
-        if (!TextUtils.isEmpty(email)){
-            url = url + "?" + email;
-        }
         return url;
     }
 

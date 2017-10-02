@@ -245,6 +245,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     }
 
     private void requestLocationUpdates(){
+
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         state = State.FETCHING_LOCATION;
         synchronized (GoogleLocationTracker.class){
@@ -356,8 +357,10 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             switch (requestCode){
                 case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
                     // Can startWorkout with location requests
-                    state = State.LOCATION_ENABLED;
-                    requestLocationUpdates();
+                    if (googleApiClient != null && googleApiClient.isConnected()){
+                        state = State.LOCATION_ENABLED;
+                        requestLocationUpdates();
+                    }
                     break;
                 case Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION:
                     // GooglePlayServices resolved can connect GoogleApiClient

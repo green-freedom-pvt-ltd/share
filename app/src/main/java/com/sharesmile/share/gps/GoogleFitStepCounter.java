@@ -85,17 +85,19 @@ public class GoogleFitStepCounter implements StepCounter,
     @Override
     public void stopCounting() {
         Logger.d(TAG, "stopCounting");
-        Fitness.SensorsApi.remove( mApiClient, this )
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        if (status.isSuccess() && mApiClient.isConnected()) {
-                            mApiClient.disconnect();
+        if (mApiClient.isConnected()){
+            Fitness.SensorsApi.remove( mApiClient, this )
+                    .setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+                            if (status.isSuccess() && mApiClient.isConnected()) {
+                                mApiClient.disconnect();
+                            }
                         }
-                    }
-                });
-        synchronized (historyQueue){
-            historyQueue.clear();
+                    });
+            synchronized (historyQueue){
+                historyQueue.clear();
+            }
         }
     }
 

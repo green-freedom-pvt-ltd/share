@@ -620,7 +620,8 @@ public class SyncService extends GcmTaskService {
         // Delete the files in which location data of all the batches of this workout was stored
         for (int i=0; i< workoutData.getBatches().size(); i++) {
             WorkoutBatch batch = workoutData.getBatches().get(i);
-            if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+            String fileName = batch.getLocationDataFileName();
+            if (!TextUtils.isEmpty(fileName) && MainApplication.getContext().deleteFile(fileName)){
                 Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
             }
         }
