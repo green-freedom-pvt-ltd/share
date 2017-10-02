@@ -149,9 +149,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             if (toAdd){
                 Logger.d(TAG, "Will register this listener for location updates");
                 WeakReference<Listener> reference = new WeakReference<>(listener);
-                synchronized (GoogleLocationTracker.class){
-                    listeners.add(reference);
-                }
+                listeners.add(reference);
                 if (state == State.FETCHING_LOCATION){
                     listener.onLocationTrackerReady();
                 }
@@ -172,9 +170,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             }
             if (toAdd){
                 WeakReference<SilentListener> reference = new WeakReference<>(silentListener);
-                synchronized (GoogleLocationTracker.class){
-                    this.silentListeners.add(reference);
-                }
+                this.silentListeners.add(reference);
             }
         }
     }
@@ -187,17 +183,15 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     public void unregister(Listener listener){
         Logger.i(TAG, "unregister");
         if (listener != null){
-            synchronized (GoogleLocationTracker.class){
-                Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-                while (iterator.hasNext()){
-                    WeakReference<Listener> reference = iterator.next();
-                    if (reference.get() != null){
-                        if (listener.equals(reference.get())){
-                            iterator.remove();
-                        }
-                    }else {
+            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+            while (iterator.hasNext()){
+                WeakReference<Listener> reference = iterator.next();
+                if (reference.get() != null){
+                    if (listener.equals(reference.get())){
                         iterator.remove();
                     }
+                }else {
+                    iterator.remove();
                 }
             }
         }
@@ -247,18 +241,16 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     private void requestLocationUpdates(){
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         state = State.FETCHING_LOCATION;
-        synchronized (GoogleLocationTracker.class){
-            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-            while (iterator.hasNext()){
-                final WeakReference<Listener> reference = iterator.next();
-                if (reference.get() != null){
-                    MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            reference.get().onLocationTrackerReady();
-                        }
-                    }, 50);
-                }
+        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+        while (iterator.hasNext()){
+            final WeakReference<Listener> reference = iterator.next();
+            if (reference.get() != null){
+                MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        reference.get().onLocationTrackerReady();
+                    }
+                }, 50);
             }
         }
 
@@ -280,13 +272,11 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         // Permission was denied or request was cancelled
         Logger.i(TAG, "Location Permission denied");
         Toast.makeText(appContext, "We need location permission to track Runs", Toast.LENGTH_LONG).show();
-        synchronized (GoogleLocationTracker.class){
-            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-            while (iterator.hasNext()){
-                WeakReference<Listener> reference = iterator.next();
-                if (reference.get() != null){
-                    reference.get().onPermissionDenied();
-                }
+        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+        while (iterator.hasNext()){
+            WeakReference<Listener> reference = iterator.next();
+            if (reference.get() != null){
+                reference.get().onPermissionDenied();
             }
         }
     }
@@ -461,13 +451,11 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             retryAttempt++;
         }
         else {
-            synchronized (GoogleLocationTracker.class){
-                Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-                while (iterator.hasNext()){
-                    WeakReference<Listener> reference = iterator.next();
-                    if (reference.get() != null){
-                        reference.get().onConnectionFailure();
-                    }
+            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+            while (iterator.hasNext()){
+                WeakReference<Listener> reference = iterator.next();
+                if (reference.get() != null){
+                    reference.get().onConnectionFailure();
                 }
             }
         }
@@ -493,20 +481,18 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         }
 
         currentLocation = location;
-        synchronized (GoogleLocationTracker.class){
-            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-            while (iterator.hasNext()){
-                WeakReference<Listener> reference = iterator.next();
-                if (reference.get() != null){
-                    reference.get().onLocationChanged(location);
-                }
+        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+        while (iterator.hasNext()){
+            WeakReference<Listener> reference = iterator.next();
+            if (reference.get() != null){
+                reference.get().onLocationChanged(location);
             }
-            Iterator<WeakReference<SilentListener>> sIterator = silentListeners.iterator();
-            while (sIterator.hasNext()){
-                WeakReference<SilentListener> reference = sIterator.next();
-                if (reference.get() != null){
-                    reference.get().onLocationChanged(location);
-                }
+        }
+        Iterator<WeakReference<SilentListener>> sIterator = silentListeners.iterator();
+        while (sIterator.hasNext()){
+            WeakReference<SilentListener> reference = sIterator.next();
+            if (reference.get() != null){
+                reference.get().onLocationChanged(location);
             }
         }
         // Recent GPS speed calculation :
@@ -609,13 +595,11 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     if (state != State.FETCHING_LOCATION && state != State.LOCATION_ENABLED){
                         Logger.i(TAG, "GPS ENABLED");
                         startLocationTracking(false);
-                        synchronized (GoogleLocationTracker.class){
-                            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-                            while (iterator.hasNext()){
-                                WeakReference<Listener> reference = iterator.next();
-                                if (reference.get() != null){
-                                    reference.get().onGpsEnabled();
-                                }
+                        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+                        while (iterator.hasNext()){
+                            WeakReference<Listener> reference = iterator.next();
+                            if (reference.get() != null){
+                                reference.get().onGpsEnabled();
                             }
                         }
                     }
@@ -623,13 +607,11 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                     Logger.i(TAG, "GPS DISABLED");
                     if (state == State.FETCHING_LOCATION || state == State.LOCATION_ENABLED){
                         state = State.API_CLIENT_CONNECTED;
-                        synchronized (GoogleLocationTracker.class){
-                            Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-                            while (iterator.hasNext()){
-                                WeakReference<Listener> reference = iterator.next();
-                                if (reference.get() != null){
-                                    reference.get().onGpsDisabled();
-                                }
+                        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+                        while (iterator.hasNext()){
+                            WeakReference<Listener> reference = iterator.next();
+                            if (reference.get() != null){
+                                reference.get().onGpsDisabled();
                             }
                         }
                     }
