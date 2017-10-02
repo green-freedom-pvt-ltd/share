@@ -17,7 +17,7 @@
             android:layout_marginLeft="16dp"
             android:gravity="center_vertical"
             android:minHeight="100dp"
-            android:text="Share ImpactRun"
+            android:text="Share Impact"
             android:textColor="@color/MontserratRegular"
             android:visibility="gone"
             android:textSize="16sp" />
