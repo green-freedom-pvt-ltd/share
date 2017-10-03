@@ -283,7 +283,8 @@
         android:layout_height="0dp"
         android:layout_weight="12"
         android:layout_below="@id/sharable_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clipChildren="false">
 
         <View
             android:layout_width="match_parent"
@@ -320,7 +321,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:clipChildren="false">
 
             <RelativeLayout
                 android:layout_width="0dp"
