@@ -174,8 +174,8 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     private void renderSelfRank(boolean scrollUp){
         if (myLeaderBoardItemPosition >= 0){
             int lastItemPos = mLayoutManager.findLastVisibleItemPosition();
-            Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
-                    + myLeaderBoardItemPosition + ", scrollUp = " + scrollUp);
+//            Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
+//                    + myLeaderBoardItemPosition + ", scrollUp = " + scrollUp);
             int limit = scrollUp ? myLeaderBoardItemPosition : myLeaderBoardItemPosition + 1;
             limit = limit + mLeaderBoardAdapter.getHeaderOffSet();
             if (lastItemPos < limit){
@@ -198,7 +198,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     protected void hideSelfRankFromBottom(){
-        Logger.d(TAG, "hideSelfRankFromBottom");
+//        Logger.d(TAG, "hideSelfRankFromBottom");
         if (selfRankHolder.isVisible()){
             selfRankHolder.hide();
             mRecyclerView.setPadding(0,0,0,0);

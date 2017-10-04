@@ -53,7 +53,7 @@ class LeagueBoard : UnObfuscable, Serializable {
     @SerializedName("total_amount")
     var totalImpact: Float = 0f
 
-    @SerializedName("show_team_logos")
+    @SerializedName("show_team_logo")
     var showTeamLogos: Boolean = false
 
     @SerializedName("results")
