@@ -390,7 +390,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             performOperation(OPEN_HELP_CENTER,false);
             AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
                     .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_share) {;
+        } else if (menuItem.getItemId() == R.id.nav_item_share) {
+//            replaceFragment(ShareFragment.newInstance(WorkoutDataImpl.getDummyWorkoutData(), MainApplication.getInstance().getCauseList().getCauses().get(0)), true);
             share();
             AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                     .buildAndDispatch();

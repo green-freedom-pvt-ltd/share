@@ -16,7 +16,7 @@ import com.sharesmile.share.R;
 /**
  Use this class in the xml for using round images
  */
-public class CircularImageView extends ImageView {
+public class CircularImageView extends android.support.v7.widget.AppCompatImageView {
 
     private int borderWidth = 4;
     private int viewWidth;

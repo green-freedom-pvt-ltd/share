@@ -227,7 +227,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), distanceInMeters);
         impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
         initCaloriesContainer();
-        String distanceCovered = Utils.formatWithOneDecimal(distanceInMeters / 1000);
+        String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
         distance.setText(distanceCovered);
         distanceLabel.setText(getString(R.string.distance));
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
