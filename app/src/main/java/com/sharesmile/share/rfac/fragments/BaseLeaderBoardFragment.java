@@ -187,7 +187,6 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     protected void showSelfRankAtBottom(){
-        Logger.d(TAG, "showSelfRankAtBottom");
         if (!selfRankHolder.isVisible()){
             // Need to show rank at the bottom
             BaseLeaderBoardItem myLeaderBoardItem = mleaderBoardList.get(myLeaderBoardItemPosition);

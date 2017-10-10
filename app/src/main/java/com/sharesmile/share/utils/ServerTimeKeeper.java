@@ -36,7 +36,7 @@ public class ServerTimeKeeper {
     private Long realTimeAtSync;// in millisecs
     private Handler handler;
 
-    public static final long INITIAL_DELAY = 250; // in millisecs
+    public static final long INITIAL_DELAY = 2000; // in millisecs
     public static final long THRESHOLD_DELTA = 150; // in millisecs
 
     private ServerTimeKeeper() {
@@ -48,7 +48,7 @@ public class ServerTimeKeeper {
         systemTimeAtSync = 0L;
         realTimeAtSync = 0L;
         // Sync with Server
-        initiateExpoBackoffSyncRetries();
+        initiateExpoBackoffSyncRetries(100);
     }
 
     public static void init() {
@@ -83,11 +83,6 @@ public class ServerTimeKeeper {
      */
     public static long getServerTimeStampInMillis() {
         long timeStampToReturn;
-        if (!getInstance().isInSyncWithServer()
-                && NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
-            //Start sync process
-            getInstance().initiateExpoBackoffSyncRetries();
-        }
         //return currentServerTimeStamp in millis
         long millitimeDiff = System.currentTimeMillis() - getInstance().systemTimeAtSync;
         timeStampToReturn = (getInstance().serverTimeAtSync + millitimeDiff);
@@ -98,7 +93,7 @@ public class ServerTimeKeeper {
         Logger.d(TAG, "checkIfTimerIsOutOfSync");
         if (!isInSyncWithServer()){
             // If timer is not in sync yet then simply go for sync
-            initiateExpoBackoffSyncRetries();
+            initiateExpoBackoffSyncRetries(INITIAL_DELAY);
         }else {
             synchronized (ServerTimeKeeper.class){
                 // calculate delta between realTime and systemTime at last sync
@@ -109,16 +104,11 @@ public class ServerTimeKeeper {
                 if (Math.abs(deltaAtSync - deltaNow) > THRESHOLD_DELTA){
                     // Time difference is substantial, this is most likely a manual update in System clock
                     // setTimerOutOfSync and Go for a sync
-                    setTimerOutOfSync();
+                    isInSyncWithServer.set(false);
+                    initiateExpoBackoffSyncRetries(INITIAL_DELAY);
                 }
             }
         }
-    }
-
-    private void setTimerOutOfSync() {
-        Logger.i(TAG, "setTimerOutOfSync");
-        isInSyncWithServer.set(false);
-        initiateExpoBackoffSyncRetries();
     }
 
     private synchronized void syncTimerWithServerTime() {
@@ -145,9 +135,9 @@ public class ServerTimeKeeper {
 
     long expBackoffDelay = INITIAL_DELAY;
 
-    private void initiateExpoBackoffSyncRetries(){
+    private void initiateExpoBackoffSyncRetries(long initialDelay){
         handler.removeCallbacks(retryRunnable);
-        expBackoffDelay = INITIAL_DELAY;
+        expBackoffDelay = initialDelay;
         expBackoffRetry();
     }
 

@@ -145,10 +145,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             connectGoogleApiClient();
         }
         InvokeActivityDetectionAlarm.cancelAlarm(appContext);
-
-        //TODO: Check do we really need to removeCallbacks on handleStillNotificationRunnable
-//        handler.removeCallbacks(handleStillNotificationRunnable);
-
     }
 
     public void stopActivityDetection(){

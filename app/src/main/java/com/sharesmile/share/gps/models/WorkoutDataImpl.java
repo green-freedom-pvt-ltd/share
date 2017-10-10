@@ -261,8 +261,6 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public boolean coldStartAfterResume() {
-		// TODO: Change this logic of coldStartAfterResume, as now only approved points are stored in a file
-		// Size of points will be zero if none of the records is approved
 		if (!isPaused()
 				&& getCurrentBatch().getLastRecordedTimeStamp() == getCurrentBatch().getStartTimeStamp() ){
 			return true;

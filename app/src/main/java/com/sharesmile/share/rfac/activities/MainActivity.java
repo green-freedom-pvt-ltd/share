@@ -49,7 +49,6 @@ import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.ToolbarActivity;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.pushNotification.NotificationConsts;
-import com.sharesmile.share.rfac.TakeEmailDialog;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.OnScreenFragment;
@@ -71,7 +70,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import Models.CampaignList;
-import base.BaseDialog;
 import butterknife.ButterKnife;
 
 import static com.sharesmile.share.MainApplication.getContext;
@@ -414,23 +412,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         mDrawerLayout.closeDrawers();
 
         return false;
-    }
-
-    private void showTakeEmailDialog(){
-        BaseDialog emailDialog = new TakeEmailDialog(this, R.style.BackgroundDimDialog);
-        emailDialog.setListener(new BaseDialog.Listener() {
-            @Override
-            public void onPrimaryClick(BaseDialog dialog) {
-                // Submit clicked
-                //TODO: Set email and push to server
-            }
-
-            @Override
-            public void onSecondaryClick(BaseDialog dialog) {
-
-            }
-        });
-        emailDialog.show();
     }
 
     private void showLeaderBoard() {

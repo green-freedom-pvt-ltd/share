@@ -152,15 +152,17 @@ public class LoginImpl {
         mListener.showHideProgress(true, MainApplication.getContext().getString(R.string.login));
         Map<String, String> header = new HashMap<>();
         if (isFbLogin) {
+//            Logger.d(TAG, "Putting Facebook accessToken: " + token);
             header.put("Authorization", "Bearer facebook " + token);
         } else {
+//            Logger.d(TAG, "Putting google accessToken: " + token);
             header.put("Authorization", "Bearer google-oauth2 " + token);
         }
 
         NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(), header, new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                Log.i("TAG", "Login error ");
+                Log.i(TAG, "Login error, Api failed");
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                     @Override
                     public void run() {

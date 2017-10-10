@@ -6,7 +6,7 @@ import Models.TeamLeaderBoard;
  * Created by ankitmaheshwari on 5/12/17.
  */
 
-public class TeamLeaderBoardDataFetched {
+public class TeamLeaderBoardDataFetched implements LeagueDataEvent{
 
     private boolean success;
     private int teamId;

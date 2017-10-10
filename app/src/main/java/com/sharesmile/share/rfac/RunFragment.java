@@ -283,8 +283,8 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         alertDialog.setNegativeButton(MainApplication.getContext().getString(R.string.ok_caps),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
                         if (isAttachedToActivity()) {
+                            dialog.dismiss();
                             myActivity.exit();
                         }
             }

@@ -353,7 +353,8 @@ public class LeaderBoardDataStore {
                 new NetworkAsyncCallback<LeagueTeam>() {
                     @Override
                     public void onNetworkFailure(NetworkException ne) {
-                        MainApplication.showToast(R.string.network_error_please_retry);
+                        MainApplication.showToast(R.string.network_error_cant_exit);
+                        EventBus.getDefault().post(new ExitLeague(false));
                         String message = "Put request for Exit failed for teamId: "+teamId+", and userId: "
                                 + userId+", because: " + ne;
                         Logger.e(TAG, message);
@@ -368,7 +369,7 @@ public class LeaderBoardDataStore {
                         // Remove all cached data
                         updateMyTeamId(0);
                         // Notify the UI about it
-                        EventBus.getDefault().post(new ExitLeague());
+                        EventBus.getDefault().post(new ExitLeague(true));
                     }
                 });
     }

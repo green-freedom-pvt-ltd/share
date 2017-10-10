@@ -27,9 +27,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
-import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.core.NotificationActionReceiver;
-import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
@@ -459,12 +457,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             // Need to forcefully refresh workout data now
             SyncHelper.forceRefreshEntireWorkoutHistory();
         }
-        new ExpoBackoffTask() {
-            @Override
-            public int performtask() {
-                return SyncService.syncData();
-            }
-        }.run();
     }
 
 
@@ -587,11 +579,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     @Override
     public void onStart() {
         Logger.i(TAG, "onStart");
-        //TODO: Need to remove this after testing, sync should not initiate on application's onStart
-//        if (!ServerTimeKeeper.getInstance().isInSyncWithServer()){
-//            Logger.i(TAG, "MainApplication onStart, will call syncTimerWithServerTime of ServerTimeKeeper");
-//            ServerTimeKeeper.getInstance().syncTimerWithServerTime();
-//        }
         GoogleLocationTracker.getInstance().startLocationTracking(false);
         AnalyticsEvent.create(Event.LAUNCH_APP).buildAndDispatch();
 
