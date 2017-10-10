@@ -19,7 +19,6 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
-import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +40,6 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     @BindView(R.id.category)
     TextView mCategory;
 
-
     @BindView(R.id.run_screen_description)
     TextView mDescription;
 
@@ -57,17 +55,17 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     @BindView(R.id.card_container)
     View cardContainer;
 
-    @BindView(R.id.amount_raised_rupees)
-    TextView amountRaisedRupees;
-
-    @BindView(R.id.amount_raised_percent)
-    TextView amountRaisedPercent;
+    @BindView(R.id.amount_remaining_percent)
+    TextView amountRemainingPercent;
 
     @BindView(R.id.amount_raised_progress_bar)
     View amountRaisedProgress;
 
     @BindView(R.id.num_impact_runs)
     TextView numImpactRuns;
+
+    @BindView(R.id.tv_goal_amount)
+    TextView goalAmount;
 
 
     public static Fragment getInstance(CauseData causeData) {
@@ -90,7 +88,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(
-                R.layout.swipe_layout, container, false);
+                R.layout.cause_card, container, false);
         ButterKnife.bind(this, view);
         if (cause.isCompleted()){
             renderCauseCompletedImage();
@@ -131,18 +129,21 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
 
         float targetAmount = cause.getTargetAmount();
         float amountRaised = cause.getAmountRaised();
-        amountRaisedRupees.setText(getString(R.string.amount_raised_rupees,
-                Utils.formatEnglishCommaSeparated(amountRaised)));
+        goalAmount.setText("\u20B9 " + (int)(targetAmount));
 
         float percent = (targetAmount > 0f) ? (amountRaised / targetAmount) : 0;
-        amountRaisedPercent.setText((int) (percent*100) + "%");
+        if (percent > 1){
+            percent = 1;
+        }
+        int remainingPercent = Math.round((1-percent)*100);
+        amountRemainingPercent.setText(remainingPercent + getString(R.string.amount_remaining_percent));
 
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) amountRaisedProgress.getLayoutParams();
         params.weight = percent;
         amountRaisedProgress.setLayoutParams(params);
 
         int numRuns = cause.getTotalRuns();
-        numImpactRuns.setText(getString(R.string.num_impact_runs, numRuns));
+        numImpactRuns.setText(String.valueOf(numRuns));
 
         //load image
         ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,

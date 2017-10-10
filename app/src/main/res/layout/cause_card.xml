@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:gravity="center">
-
-    <com.sharesmile.share.views.MLTextView
-        android:id="@+id/tv_tag"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_alignParentTop="true"
-        android:gravity="start|center_vertical"
-        android:text="Education">
-    </com.sharesmile.share.views.MLTextView>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tv_tag"
-        style="@style/baseCardStyle">
+        app:cardUseCompatPadding="true"
+        app:cardElevation="4dp">
 
         <LinearLayout
             android:id="@+id/card_container"
@@ -25,51 +19,193 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/iv_cause_card"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
-                android:scaleType="centerCrop"/>
+                android:layout_weight="0.49">
+
+                <ImageView
+                    android:id="@+id/img_run"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/white"
+                    android:alpha="0.74">
+
+                    <com.sharesmile.share.views.MLTextView
+                        android:id="@+id/category"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cause_type"
+                        android:textColor="@color/greyish_brown_two"
+                        android:textSize="12sp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="6"
-                android:paddingTop="12dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="18dp"
-                android:paddingBottom="10dp"
+                android:layout_weight="0.51"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@color/white"
                 android:orientation="vertical">
 
+                <com.sharesmile.share.views.MSBTextView
+                    android:id="@+id/run_screen_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="33"
+                    android:paddingTop="10dp"
+                    android:text="Sponsor a Child, Foster a Future!"
+                    android:textColor="@color/greyish_brown_two"
+                    android:textSize="17sp" />
+
                 <com.sharesmile.share.views.MRTextView
+                    android:id="@+id/run_screen_sponsor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="18"
+                    android:paddingTop="2dp"
+                    tools:text="by Shwas Foundation"
+                    android:textColor="@color/warm_grey_three"
+                    android:textSize="11sp" />
+
+                <com.sharesmile.share.views.MRTextView
+                    android:id="@+id/run_screen_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="30"
+                    android:paddingTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    android:text="@string/mini_description"
+                    android:textColor="@color/greyish_brown_two"
+                    android:textSize="11sp" />
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:textSize="18sp"
-                    android:gravity="top"
-                    android:text="Sponsor a child, Foster a future"/>
+                    android:layout_weight="10"
+                    android:paddingTop="3dp">
 
-                <com.sharesmile.share.views.MLTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:textSize="12sp"
-                    android:gravity="top"
-                    android:text="by Shwas Foundation"/>
+                    <com.sharesmile.share.views.LBTextView
+                        android:id="@+id/amount_remaining_percent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="54% Remaining"
+                        android:textColor="@color/greyish_brown_two"
+                        android:layout_alignParentRight="true"
+                        android:textSize="9sp" />
 
-                <com.sharesmile.share.views.MLTextView
+                </RelativeLayout>
+
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="7"
-                    android:textSize="14sp"
-                    android:gravity="center_vertical|start"
-                    android:text="@string/cause_brief"/>
+                    android:paddingTop="2dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/rounded_rectangle_grey">
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:weightSum="1">
+
+                        <View
+                            android:id="@+id/amount_raised_progress_bar"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/rounded_rectangle_blue_green_gradient"
+                            android:layout_weight="0.3">
+                        </View>
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="24"
+                    android:paddingTop="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_alignParentLeft="true">
+
+                        <com.sharesmile.share.views.MSBTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/impact_runs"
+                            android:textSize="7sp"
+                            android:textColor="@color/greyish_brown_two"/>
+
+                        <com.sharesmile.share.views.MRTextView
+                            android:id="@+id/num_impact_runs"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="15,492"
+                            android:textColor="@color/greyish_brown_two"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right">
+
+                        <com.sharesmile.share.views.MSBTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/cause_goal"
+                            android:textSize="7sp"
+                            android:textColor="@color/greyish_brown_two"/>
+
+                        <com.sharesmile.share.views.MRTextView
+                            android:id="@+id/tv_goal_amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4,00,000"
+                            android:textColor="@color/greyish_brown_two"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/iv_cause_completed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
+
     </android.support.v7.widget.CardView>
 
-</RelativeLayout>
+</LinearLayout>

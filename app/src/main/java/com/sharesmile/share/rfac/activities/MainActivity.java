@@ -51,7 +51,7 @@ import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
-import com.sharesmile.share.rfac.fragments.OnScreenFragment;
+import com.sharesmile.share.rfac.fragments.HomeScreenFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.rfac.fragments.WebViewFragment;
@@ -280,7 +280,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void loadInitialFragment() {
-        addFragment(new OnScreenFragment(), false);
+        addFragment(new HomeScreenFragment(), false);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
             replaceFragment(new ProfileStatsFragment(), true);
@@ -428,7 +428,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     public void showHome() {
-        replaceFragment(new OnScreenFragment(), true);
+        replaceFragment(new HomeScreenFragment(), true);
     }
 
     @Override

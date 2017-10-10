@@ -10,6 +10,8 @@
 
     <color name="dark_sky_blue">#0099ff</color>
 
+    <color name="light_blue">#04cbfd</color>
+    <color name="light_green">#33f373</color>
     <color name="bright_blue">#0077ff</color>
     <color name="medium_bright_blue">#53a0fe</color>
     <color name="pale_bright_blue">#009aff</color>

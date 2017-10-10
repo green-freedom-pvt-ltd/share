@@ -13,7 +13,7 @@ import com.sharesmile.share.core.IFragmentController
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
-import com.sharesmile.share.rfac.fragments.OnScreenFragment
+import com.sharesmile.share.rfac.fragments.HomeScreenFragment
 import com.sharesmile.share.rfac.models.Qna
 import com.sharesmile.share.utils.Urls
 import kotlinx.android.synthetic.main.faq_item_user_input.view.*
@@ -109,7 +109,7 @@ class FaqAdapter(controller: IFragmentController) : RecyclerView.Adapter<Recycle
 
                 var requestObject: JSONObject = JSONObject();
                 requestObject.put("question", itemView.user_response.text);
-                fragmentController.replaceFragment(OnScreenFragment(), true)
+                fragmentController.replaceFragment(HomeScreenFragment(), true)
 
                 if (MainApplication.isLogin()) {
                     requestObject.put("user_id", MainApplication.getInstance().userID)

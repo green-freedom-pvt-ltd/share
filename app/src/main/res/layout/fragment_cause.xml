@@ -1,11 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
+    <LinearLayout
         android:id="@+id/content_view"
-        layout="@layout/tab_layout" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2">
+
+            <RelativeLayout
+                android:id="@+id/bt_home_drawer"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="6dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="16dp"
+                    android:layout_centerInParent="true"
+                    app:srcCompat="@drawable/ic_sort_black_24px"/>
+
+            </RelativeLayout>
+
+            <include
+                android:id="@+id/bt_home_feed"
+                layout="@layout/menu_badge"
+                android:layout_height="48dp"
+                android:layout_width="48dp"
+                android:layout_marginRight="6dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:orientation="vertical">
+
+            <com.sharesmile.share.views.LBTextView
+                android:id="@+id/tv_impact_so_far"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="36sp"
+                android:text="476213"
+                android:textColor="@color/light_blue"
+                android:gravity="center"/>
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@string/impact_so_far"
+                android:textColor="@color/warm_grey_three"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3">
+
+            <com.sharesmile.share.views.MLButton
+                android:id="@+id/btn_lets_run"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="46dp"
+                android:layout_marginRight="46dp"
+                android:background="@drawable/rounded_corner"
+                android:layout_centerInParent="true"
+                android:text="@string/let_go"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progress_bar"

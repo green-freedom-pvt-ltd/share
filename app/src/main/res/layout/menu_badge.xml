@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:padding="12dp"
+        android:layout_alignParentRight="true"
         app:srcCompat="@drawable/ic_public_white_24px" />
 
     <!-- Menu Item Image -->

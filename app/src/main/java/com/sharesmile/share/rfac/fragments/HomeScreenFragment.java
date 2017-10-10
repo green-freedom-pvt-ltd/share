@@ -48,9 +48,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class OnScreenFragment extends BaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
+public class HomeScreenFragment extends BaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
-    private static final String TAG = OnScreenFragment.class.getSimpleName();
+    private static final String TAG = "HomeScreenFragment";
     @BindView(R.id.viewpager)
     ViewPager viewPager;
 
@@ -115,13 +115,9 @@ public class OnScreenFragment extends BaseFragment implements View.OnClickListen
         } else {
             hideProgressDialog();
         }
-        updateActionbar();
+        getFragmentController().performOperation(IFragmentController.HIDE_TOOLBAR, null);
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SELECTION)
                 .buildAndDispatch();
-    }
-
-    private void updateActionbar() {
-        getFragmentController().updateToolBar(getString(R.string.title_cause), false);
     }
 
     private void fetchPageData() {

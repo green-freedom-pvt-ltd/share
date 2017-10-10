@@ -79,7 +79,7 @@ public class FeedbackFragment extends BaseFragment implements View.OnClickListen
         hideKeyboard(mFeedbackText);
         MainApplication.showToast(R.string.feedback_thanks);
         SyncHelper.pushUserFeedback(constructFeedbackObject());
-        getFragmentController().replaceFragment(new OnScreenFragment(), true);
+        getFragmentController().replaceFragment(new HomeScreenFragment(), true);
     }
 
     private UserFeedback constructFeedbackObject(){
