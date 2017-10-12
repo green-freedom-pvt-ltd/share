@@ -123,6 +123,11 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
+    public void setToolbarElevation(float dpValue) {
+
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.done:

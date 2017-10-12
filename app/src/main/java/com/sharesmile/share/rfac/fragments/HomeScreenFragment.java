@@ -30,6 +30,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -281,7 +282,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     }
 
     private void setOverallImpactTextView(int overallImpact){
-        overallImpactTextView.setText(getString(R.string.rupee_symbol) +" " + Utils.formatIndianCommaSeparated(overallImpact));
+        overallImpactTextView.setText(UnitsManager.formatRupeeToMyCurrency(overallImpact));
     }
 
     private void startCountAnimation(int from, int to) {

@@ -96,6 +96,19 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     protected void setupToolbar() {
         setHasOptionsMenu(true);
         setToolbarTitle(getResources().getString(R.string.leaderboard));
+        getFragmentController().setToolbarElevation(0);
+    }
+
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        getFragmentController().setToolbarElevation(2);
+//    }
+
+    @Override
+    public void onDestroyView() {
+        getFragmentController().setToolbarElevation(2);
+        super.onDestroyView();
     }
 
     @Override

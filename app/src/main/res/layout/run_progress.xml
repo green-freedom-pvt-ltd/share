@@ -47,7 +47,7 @@
             android:layout_marginTop="10dp"
             android:textSize="48sp"
             android:textStyle="bold"
-            android:text="\u20B9 0"
+            android:text="0"
             android:textColor="@color/orange" />
 
         <com.sharesmile.share.views.LBTextView

@@ -44,6 +44,7 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.pushNotification.NotificationConsts;
@@ -160,20 +161,21 @@ public class Utils {
         return df;
     }
 
-    public static String formatEnglishCommaSeparated(long value){
-        return NumberFormat.getNumberInstance(Locale.ENGLISH).format(value);
+    public static String formatCommaSeparated(long value){
+        String countryCode = UnitsManager.getCountryCode() != null ? UnitsManager.getCountryCode() : "IN";
+        if ("IN".equalsIgnoreCase(countryCode)){
+            return formatIndianCommaSeparated(value);
+        }else {
+            Locale locale = new Locale("EN", countryCode);
+            NumberFormat format =  NumberFormat.getInstance(locale);
+            return format.format(value);
+        }
     }
 
-    public static final long THOUSAND = 1000;
-    public static final long LAKH = 100000;
-    public static final long CRORE = 10000000;
-    public static final long ARAB = 1000000000;
-    public static final long KHARAB = 100000000000L;
-
-    public static String formatIndianCommaSeparated(long rupee){
+    public static String formatIndianCommaSeparated(long value){
 
         // remove sign if present
-        String raw = String.valueOf(Math.abs(rupee));
+        String raw = String.valueOf(Math.abs(value));
         int numDigits = raw.length();
         StringBuilder sb = new StringBuilder(raw);
         // Reverse the string to start from right most digits
@@ -188,19 +190,8 @@ public class Utils {
             }
         }
         // Reverse the string back to get original number
-        String sign = (rupee < 0) ? "-" : "";
+        String sign = (value < 0) ? "-" : "";
         return sign + sb.reverse().toString();
-    }
-
-    private static final String padWithZeroes(long num, int expectedNumDigits){
-        int actualNumDigits = String.valueOf(num).length();
-        String ret = String.valueOf(num);
-        if (expectedNumDigits > actualNumDigits){
-            for (int i=0; i < expectedNumDigits - actualNumDigits; i++){
-                ret = "0" + ret;
-            }
-        }
-        return ret;
     }
 
     /**
@@ -1080,6 +1071,36 @@ public class Utils {
         return px;
     }
 
+
+    /**
+     * Get ISO 3166-1 alpha-2 country code for this device (or null if not available)
+     * @param context Context reference to get the TelephonyManager instance from
+     * @return country code or null
+     */
+    public static String getUserCountry(Context context) {
+        //TODO: remove this hack
+        if (true){
+            return "US";
+        }
+
+        try {
+            final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            final String simCountry = tm.getSimCountryIso();
+            if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
+                return simCountry.toLowerCase(Locale.US);
+            }
+            else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+                String networkCountry = tm.getNetworkCountryIso();
+                if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
+                    return networkCountry.toLowerCase(Locale.US);
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
 }

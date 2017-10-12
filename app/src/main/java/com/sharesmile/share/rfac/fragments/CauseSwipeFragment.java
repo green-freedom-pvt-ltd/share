@@ -16,6 +16,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
@@ -134,7 +135,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
 
         float targetAmount = cause.getTargetAmount();
         float amountRaised = cause.getAmountRaised();
-        goalAmount.setText("\u20B9 " + Utils.formatIndianCommaSeparated(Math.round(targetAmount)));
+        goalAmount.setText(UnitsManager.formatRupeeToMyCurrency(targetAmount));
 
         float percent = (targetAmount > 0f) ? (amountRaised / targetAmount) : 0;
         if (percent > 1){
@@ -148,7 +149,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         amountRaisedProgress.setLayoutParams(params);
 
         int numRuns = cause.getTotalRuns();
-        numImpactRuns.setText(Utils.formatIndianCommaSeparated(numRuns));
+        numImpactRuns.setText(Utils.formatCommaSeparated(numRuns));
 
         //load image
         ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,

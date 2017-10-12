@@ -42,6 +42,7 @@ import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.NotificationActionReceiver;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutBatch;
@@ -944,7 +945,7 @@ public class WorkoutService extends Service implements
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle(contentTitle)
-                        .setContentText(getString(R.string.rs_symbol) + rupees
+                        .setContentText(UnitsManager.formatRupeeToMyCurrency(rupees)
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
                                         ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
                                         : "")

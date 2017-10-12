@@ -94,9 +94,9 @@ public class Constants {
 
     public static final String KEY_STOP_WORKOUT_PROBLEM = "key_workout_stop_reason";
 
-    public static final String KEY_CAUSE_LIST = "key_cause_list_new";
+    public static final String KEY_CAUSE_LIST = "key_cause_list_v2";
 
-    public static final String KEY_LAST_VISIBLE_CAUSE_LIST = "key_last_visible_cause_list";
+    public static final String KEY_LAST_VISIBLE_CAUSE_LIST = "key_last_visible_cause_list_v2";
 
     public static final String KEY_FAQ_LIST = "key_faq_list";
 
@@ -178,6 +178,12 @@ public class Constants {
 
 
     public static final String PREFS_CHAT_TOOLTIP_DISPLAY_COUNT = "chat_tooltip_diplay_count";
+
+    public static final String PREFS_MY_COUNTRY_CODE = "my_country_code";
+    public static final String PREFS_MY_CURRENCY = "my_currency";
+    public static final String PREFS_MY_DISTANCE_UNIT = "my_distance_unit";
+    public static final String PREFS_DEFAULT_UNITS_SET = "default_units_set";
+    public static final String PREFS_MY_EXCHANGE_RATE = "my_exchange_rate";
 
     public static final int REQUEST_CODE_LOGIN = 1001;
 
@@ -265,5 +271,88 @@ public class Constants {
         put(10, new Level(10, 50000, 100000));
         put(11, new Level(11, 100000, Integer.MAX_VALUE));
     }};
+
+    public static final String DEFAULT_EXCHANGE_RATE_JSON = "[\n" +
+            "                {\n" +
+            "                    \"currency\": \"USD\",\n" +
+            "                    \"rate\": 65.08\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"CAD\",\n" +
+            "                    \"rate\": 52.26\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"INR\",\n" +
+            "                    \"rate\": 1.0\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"GBP\",\n" +
+            "                    \"rate\": 86.11\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"EUR\",\n" +
+            "                    \"rate\": 77.21\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"JPY\",\n" +
+            "                    \"rate\": 0.58\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"AUD\",\n" +
+            "                    \"rate\": 50.94\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"CHF\",\n" +
+            "                    \"rate\": 66.83\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"CNY\",\n" +
+            "                    \"rate\": 9.88\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"SEK\",\n" +
+            "                    \"rate\": 8.04\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"NZD\",\n" +
+            "                    \"rate\": 74.21\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"MXN\",\n" +
+            "                    \"rate\": 3.48\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"SGD\",\n" +
+            "                    \"rate\": 48.08\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"HKD\",\n" +
+            "                    \"rate\": 8.34\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"NOK\",\n" +
+            "                    \"rate\": 8.23\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"KRW\",\n" +
+            "                    \"rate\": 0.06\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"TRY\",\n" +
+            "                    \"rate\": 17.9\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"RUB\",\n" +
+            "                    \"rate\": 1.13\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"BRL\",\n" +
+            "                    \"rate\": 20.52\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \"currency\": \"ZAR\",\n" +
+            "                    \"rate\": 4.83\n" +
+            "                }\n" +
+            "            ]";
 
 }

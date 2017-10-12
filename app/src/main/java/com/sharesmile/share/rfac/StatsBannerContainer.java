@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 
@@ -47,10 +48,8 @@ public class StatsBannerContainer {
             ShareImageLoader.getInstance().loadImage(board.getLeagueLogo(), bannerLogo);
             bannerLogo.setVisibility(View.VISIBLE);
         }
-        bannerTotalImpact.setText("\u20B9 "
-                + Utils.formatIndianCommaSeparated((long) Math.round(board.getTotalImpact()))
-        );
-        bannerNumRuns.setText(Utils.formatIndianCommaSeparated((long) board.getTotalRuns()));
+        bannerTotalImpact.setText(UnitsManager.formatRupeeToMyCurrency(board.getTotalImpact()));
+        bannerNumRuns.setText(Utils.formatCommaSeparated((long) board.getTotalRuns()));
         bannerNumMembers.setText(String.valueOf(board.getTotalMembers()));
     }
 

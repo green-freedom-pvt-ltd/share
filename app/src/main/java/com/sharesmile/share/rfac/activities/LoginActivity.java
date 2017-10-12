@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.btn_login_fb:
+            case R.id.bt_fb_login:
                 mLoginHandler.performFbLogin();
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
                         .put("medium", "fb")
@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_SKIP)
                         .buildAndDispatch();
                 break;
-            case R.id.btn_login_google:
+            case R.id.bt_google_login:
                 mLoginHandler.performGoogleLogin();
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
                         .put("medium", "gplus")

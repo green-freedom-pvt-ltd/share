@@ -22,6 +22,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
 import com.sharesmile.share.sync.SyncHelper;
@@ -161,8 +162,8 @@ public class ProfileStatsFragment extends BaseFragment {
             // Level and Level's progress
             int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
             Level level = Utils.getLevel(lifeTimeImpact);
-            levelMinDist.setText("\u20B9 " + level.getMinImpact());
-            levelMaxDist.setText("\u20B9 " + level.getMaxImpact());
+            levelMinDist.setText(UnitsManager.formatRupeeToMyCurrency(level.getMinImpact()));
+            levelMaxDist.setText(UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
             levelNum.setText("Level " + level.getLevel());
             float progressPercent =
                     ((float)(lifeTimeImpact - level.getMinImpact())) / (level.getMaxImpact() - level.getMinImpact());

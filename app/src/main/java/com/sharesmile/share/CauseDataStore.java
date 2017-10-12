@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
@@ -24,7 +25,7 @@ import java.util.List;
 
 public class CauseDataStore {
 
-    private static final String TAG = "LeaderBoardDataStore";
+    private static final String TAG = "CauseDataStore";
 
     private static CauseDataStore uniqueInstance;
 
@@ -76,6 +77,7 @@ public class CauseDataStore {
     public void updateCauseList(CauseList updated){
         this.causeList = updated;
         SharedPrefsManager.getInstance().setObject(Constants.KEY_CAUSE_LIST, updated);
+        UnitsManager.setExchangeRates(updated.getExchangeRates());
         if (causeList != null){
             for (CauseData causeData : causeList.getCauses()) {
                 if (causeData.getApplicationUpdate() != null) {

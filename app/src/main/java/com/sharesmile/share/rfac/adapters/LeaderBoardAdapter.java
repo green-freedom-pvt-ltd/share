@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.rfac.models.LeaderBoardItem;
 import com.sharesmile.share.utils.Logger;
@@ -146,8 +147,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
             mProfileName.setText(leaderboard.getName());
-            String impactString = String.valueOf(Math.round(leaderboard.getAmount()));
-            mImpact.setText("\u20B9 " + impactString);
+            mImpact.setText(UnitsManager.formatRupeeToMyCurrency(leaderboard.getAmount()));
 
             final int id = mParent.getMyId();
 

@@ -28,6 +28,7 @@ import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.core.NotificationActionReceiver;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
@@ -41,7 +42,6 @@ import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -339,6 +339,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             ActivityDetector.getInstance().startActivityDetection();
         }
 
+        if (!UnitsManager.defaultUnitsSet()){
+            UnitsManager.setDefaultUnits();
+        }
+
     }
 
     public void updateAppVersionInPrefs(){
@@ -552,18 +556,31 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
 
-        Logger.d(TAG, "Testing indiancommaseparated"
-                + "   " + Utils.formatIndianCommaSeparated(0)
-                + "   " + Utils.formatIndianCommaSeparated(23)
-                + "   " + Utils.formatIndianCommaSeparated(9001)
-                + "   " + Utils.formatIndianCommaSeparated(12001)
-                + "   " + Utils.formatIndianCommaSeparated(10000)
-                + "   " + Utils.formatIndianCommaSeparated(103000)
-                + "   " + Utils.formatIndianCommaSeparated(702007)
-                + "   " + Utils.formatIndianCommaSeparated(98000008)
-                + "   " + Utils.formatIndianCommaSeparated(900020000)
-                + "   " + Utils.formatIndianCommaSeparated(97181662908L)
-        );
+//        Logger.d(TAG, "Testing indiancommaseparated"
+//                + "   " + Utils.formatIndianCommaSeparated(0)
+//                + "   " + Utils.formatIndianCommaSeparated(23)
+//                + "   " + Utils.formatIndianCommaSeparated(9001)
+//                + "   " + Utils.formatIndianCommaSeparated(12001)
+//                + "   " + Utils.formatIndianCommaSeparated(10000)
+//                + "   " + Utils.formatIndianCommaSeparated(103000)
+//                + "   " + Utils.formatIndianCommaSeparated(702007)
+//                + "   " + Utils.formatIndianCommaSeparated(98000008)
+//                + "   " + Utils.formatIndianCommaSeparated(900020000)
+//                + "   " + Utils.formatIndianCommaSeparated(97181662908L)
+//        );
+
+//        String [] countries = { "US", "CA", "MX", "GB", "DE", "RU", "JP", "CN", "IN", "AU",
+//                "CH", "SE", "NZ", "SG", "HK", "NO", "KR", "TR", "RU", "BR", "ZA" };
+//
+//        for (String countryCode : countries){
+//            countryCode = countryCode.toUpperCase();
+//            Locale locale = new Locale("EN",countryCode);
+//            CurrencyCode currency = CurrencyCode.getInstance(locale);
+//            String symbol = UnitsManager.CURRENCY_CODE_TO_SYMBOL_MAP.get(currency.getCurrencyCode());
+//            System.out.println("For country " + countryCode + ", currency symbol is " + symbol
+//                    + " and code is " + currency.getCurrencyCode());
+//        }
+
     }
 
     @Override

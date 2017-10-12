@@ -25,11 +25,10 @@
                 android:layout_marginLeft="7dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentBottom="true"
-                    app:srcCompat="@drawable/ic_sort_black_24px"/>
+                    android:layout_width="15dp"
+                    android:layout_height="12dp"
+                    android:layout_centerInParent="true"
+                    app:srcCompat="@drawable/ic_sort_black_24pxff"/>
 
             </RelativeLayout>
 
@@ -86,7 +85,7 @@
             android:layout_height="0dp"
             android:layout_weight="110">
 
-            <com.sharesmile.share.views.MLButton
+            <com.sharesmile.share.views.MSBButton
                 android:id="@+id/btn_lets_run"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"

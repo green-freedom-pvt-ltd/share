@@ -17,6 +17,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -200,7 +201,7 @@ public class RealRunFragment extends RunFragment {
             String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
-            impact.setText("\u20B9 " + String.valueOf(rupees));
+            impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
                 if (calorie != null){
@@ -227,7 +228,7 @@ public class RealRunFragment extends RunFragment {
             String distanceString = Utils.formatToKmsWithTwoDecimal(totalDistance);
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), totalDistance);
-            impact.setText("\u20B9 "+String.valueOf(rupees));
+            impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
             if (WorkoutSingleton.getInstance().getDataStore() != null){
                 Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
                 if (calorie != null){
@@ -243,12 +244,6 @@ public class RealRunFragment extends RunFragment {
                 tvCalorieMets.setText("0");
             }
         }
-    }
-
-
-    private String getImpactInRupees(float distanceCovered){
-        int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCovered);
-        return String.valueOf(rupees);
     }
 
     @Override
@@ -274,7 +269,7 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     protected void onBeginRun() {
-        impact.setText("\u20B9 0");
+        impact.setText(UnitsManager.formatRupeeToMyCurrency(0));
         distanceTextView.setText("0.00");
         tvCalorieMets.setText("0.0");
     }
@@ -289,7 +284,8 @@ public class RealRunFragment extends RunFragment {
         }
 
         float distanceCovered = WorkoutSingleton.getInstance().getTotalDistanceInMeters(); // in meters
-        impact.setText("\u20B9 " + getImpactInRupees(distanceCovered));
+        int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCovered);
+        impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
         distanceTextView.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
         if (WorkoutSingleton.getInstance().getDataStore() != null){
             Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();

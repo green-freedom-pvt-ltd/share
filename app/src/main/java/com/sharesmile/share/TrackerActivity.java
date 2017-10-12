@@ -187,6 +187,11 @@ public class TrackerActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void setToolbarElevation(float dpValue) {
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

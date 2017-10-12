@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cardUseCompatPadding="true"
-        app:cardElevation="4dp">
+        app:cardElevation="3dp">
 
         <LinearLayout
             android:id="@+id/card_container"
@@ -167,6 +167,7 @@
                             android:layout_height="wrap_content"
                             android:text="15,492"
                             android:textColor="@color/greyish_brown_two"
+                            android:textStyle="bold"
                             android:textSize="16sp" />
 
                     </LinearLayout>
@@ -191,6 +192,7 @@
                             android:layout_height="wrap_content"
                             android:text="4,00,000"
                             android:textColor="@color/greyish_brown_two"
+                            android:textStyle="bold"
                             android:textSize="16sp" />
 
                     </LinearLayout>

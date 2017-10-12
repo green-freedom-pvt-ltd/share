@@ -21,14 +21,12 @@ import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.rfac.CustomBarChartRenderer;
 import com.sharesmile.share.rfac.models.BarChartDataSet;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
-
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -126,7 +124,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
     }
 
     private void displayStats(){
-        impactInRupees.setText("\u20B9 " + Utils.formatIndianCommaSeparated(totalAmountRaised));
+        impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(totalAmountRaised));
         totalRuns.setText(numRuns + "");
         String totalDistanceString;
         if (totalDistance > 100){
@@ -143,7 +141,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
         barChartDataSet = new BarChartDataSet(TYPE_WEEKLY);
 
         BarDataSet dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
-        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
         dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
 
         IValueFormatter intValueFormatter = new IValueFormatter() {
@@ -152,7 +150,8 @@ public class ProfileStatsViewFragment extends BaseFragment {
                                             ViewPortHandler viewPortHandler) {
                 int val = Math.round(value);
                 if (val > 0){
-                    return "\u20B9 " + String.valueOf(val);
+                    return UnitsManager.formatRupeeToMyCurrency(val);
+//                            "\u20B9 " + String.valueOf(val);
                 }else {
                     return "";
                 }
@@ -186,12 +185,12 @@ public class ProfileStatsViewFragment extends BaseFragment {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 if (value > 10){
-                    return "\u20B9 " + Math.round(value);
+                    return UnitsManager.formatRupeeToMyCurrency(value);
+//                            "\u20B9 " + Math.round(value);
                 }
                 else if (value > 0){
-                    DecimalFormat df = new DecimalFormat("#.#");
-                    df.setRoundingMode(RoundingMode.CEILING);
-                    return "\u20B9 " + df.format(value);
+                    // Earlier only one decimal was being shown
+                    return UnitsManager.formatRupeeToMyCurrency(value);
                 }else {
                     return "";
                 }

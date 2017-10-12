@@ -5,7 +5,7 @@
 
     <!-- view background color -->
     <solid
-        android:color="@color/pale_bright_blue" >
+        android:color="@color/bright_sky_blue" >
     </solid>
 
     <!-- Here is the corner radius -->

@@ -22,6 +22,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.LoginImpl;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.MainActivity;
@@ -207,7 +208,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
 
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), distanceInMeters);
-        impactInRupees.setText(getString(R.string.rs_symbol) + String.valueOf(rupees));
+        impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
         initCaloriesContainer();
         String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
         distance.setText(distanceCovered);

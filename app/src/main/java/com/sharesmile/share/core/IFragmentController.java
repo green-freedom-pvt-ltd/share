@@ -64,5 +64,7 @@ public interface IFragmentController {
 
     void hideToolbar();
 
+    void setToolbarElevation(float dpValue);
+
 
 }

@@ -1,5 +1,6 @@
 package com.sharesmile.share.core;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.utils.Utils;
 
 /**
  * Created by ankitmaheshwari on 9/4/17.
@@ -76,4 +78,16 @@ public abstract class ToolbarActivity extends BaseActivity {
             toolbar.setVisibility(View.GONE);
         }
     }
+
+
+    @Override
+    public void setToolbarElevation(float dpValue) {
+        if (toolbar != null){
+            if (Build.VERSION.SDK_INT >= 21 ){
+                toolbar.setElevation(Utils.convertDpToPixel(getApplicationContext(), dpValue));
+            }
+        }
+    }
+
+
 }

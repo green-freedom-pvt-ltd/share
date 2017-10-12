@@ -21,6 +21,9 @@ public class CauseList implements UnObfuscable {
     @SerializedName("previous")
     private String previous;
 
+    @SerializedName("exchange_rates")
+    private List<ExchangeRate> exchangeRates;
+
     @SerializedName("results")
     List<CauseData> causes;
 
@@ -36,4 +39,11 @@ public class CauseList implements UnObfuscable {
         this.causes = causes;
     }
 
+    public List<ExchangeRate> getExchangeRates() {
+        return exchangeRates;
+    }
+
+    public void setExchangeRates(List<ExchangeRate> exchangeRates) {
+        this.exchangeRates = exchangeRates;
+    }
 }
