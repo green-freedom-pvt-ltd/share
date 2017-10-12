@@ -8,6 +8,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
+import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
@@ -233,8 +234,7 @@ public class SyncService extends GcmTaskService {
         Logger.d(TAG, "updateCauseData");
         try {
             CauseList causeList = NetworkDataProvider.doGetCall(Urls.getCauseListUrl(), CauseList.class);
-            MainApplication.getInstance().updateCauseList(causeList);
-            EventBus.getDefault().post(new DBEvent.CauseDataUpdated(causeList));
+            CauseDataStore.getInstance().updateCauseList(causeList);
             return GcmNetworkManager.RESULT_SUCCESS;
         } catch (NetworkException e) {
             Logger.e(TAG, "Exception occurred while fetching updated cause list from network");

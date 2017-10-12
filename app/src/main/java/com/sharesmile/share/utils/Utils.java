@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -159,8 +160,47 @@ public class Utils {
         return df;
     }
 
-    public static String formatEnglishCommaSeparated(float value){
-        return NumberFormat.getNumberInstance(Locale.ENGLISH).format((int) value);
+    public static String formatEnglishCommaSeparated(long value){
+        return NumberFormat.getNumberInstance(Locale.ENGLISH).format(value);
+    }
+
+    public static final long THOUSAND = 1000;
+    public static final long LAKH = 100000;
+    public static final long CRORE = 10000000;
+    public static final long ARAB = 1000000000;
+    public static final long KHARAB = 100000000000L;
+
+    public static String formatIndianCommaSeparated(long rupee){
+
+        // remove sign if present
+        String raw = String.valueOf(Math.abs(rupee));
+        int numDigits = raw.length();
+        StringBuilder sb = new StringBuilder(raw);
+        // Reverse the string to start from right most digits
+        sb = sb.reverse();
+        // Counter to keep track of number of commas placed
+        int commas = 0;
+        for (int i=0; i<numDigits; i++){
+            // Insert a comma if i is in the range [3, 5, 7, 9, ...)
+            if (i % 2 == 1 && i != 1 ){
+                sb.insert(i+commas, ",");
+                commas++;
+            }
+        }
+        // Reverse the string back to get original number
+        String sign = (rupee < 0) ? "-" : "";
+        return sign + sb.reverse().toString();
+    }
+
+    private static final String padWithZeroes(long num, int expectedNumDigits){
+        int actualNumDigits = String.valueOf(num).length();
+        String ret = String.valueOf(num);
+        if (expectedNumDigits > actualNumDigits){
+            for (int i=0; i < expectedNumDigits - actualNumDigits; i++){
+                ret = "0" + ret;
+            }
+        }
+        return ret;
     }
 
     /**
@@ -1033,6 +1073,11 @@ public class Utils {
 
     public static String getWorkoutLocationDataPendingQueuePrefKey(String workoutId){
         return PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX + workoutId;
+    }
+
+    public static int convertSpToPixels(float sp, Context context) {
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+        return px;
     }
 
 

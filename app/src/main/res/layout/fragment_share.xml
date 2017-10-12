@@ -218,18 +218,72 @@
                     android:textColor="@color/greyish_brown_two"
                     android:textSize="18sp" />
 
-                <include
-                    android:id="@+id/btn_login_fb"
-                    layout="@layout/login_button"
-                    android:layout_width="250dp"
-                    android:layout_height="53dp" />
+                <android.support.v7.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_95"
+                    app:cardElevation="3dp"
+                    app:cardUseCompatPadding="true">
 
-                <include
-                    android:id="@+id/btn_login_google"
-                    layout="@layout/login_button"
-                    android:layout_width="250dp"
-                    android:layout_height="53dp"
-                    android:layout_marginTop="15dp" />
+                    <LinearLayout
+                        android:id="@+id/btn_login_fb"
+                        android:layout_width="232dp"
+                        android:layout_height="53dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <com.sharesmile.share.views.MRTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:textAllCaps="true"
+                            android:textSize="12.5sp"
+                            android:textColor="@color/denim_blue"
+                            android:text="@string/logn_with_fb"/>
+
+                        <ImageView
+                            android:layout_width="47dp"
+                            android:layout_height="47dp"
+                            android:src="@drawable/logo_fb"/>
+                    </LinearLayout>
+
+                </android.support.v7.widget.CardView>
+
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_95"
+                    app:cardElevation="3dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:id="@+id/btn_login_google"
+                        android:layout_width="232dp"
+                        android:layout_height="53dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <com.sharesmile.share.views.MLTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:textAllCaps="true"
+                            android:textSize="13.4sp"
+                            android:textColor="@color/pale_red"
+                            android:text="@string/logn_with_google"/>
+
+                        <ImageView
+                            android:layout_width="47dp"
+                            android:layout_height="47dp"
+                            android:src="@drawable/login_google"/>
+                    </LinearLayout>
+
+                </android.support.v7.widget.CardView>
 
                 <LinearLayout
                     android:id="@+id/tv_welcome_skip"

@@ -113,6 +113,16 @@ public class OnBoardingActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
+    public void showToolbar() {
+
+    }
+
+    @Override
+    public void hideToolbar() {
+
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.done:

@@ -126,7 +126,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
     }
 
     private void displayStats(){
-        impactInRupees.setText("\u20B9 " + totalAmountRaised);
+        impactInRupees.setText("\u20B9 " + Utils.formatIndianCommaSeparated(totalAmountRaised));
         totalRuns.setText(numRuns + "");
         String totalDistanceString;
         if (totalDistance > 100){

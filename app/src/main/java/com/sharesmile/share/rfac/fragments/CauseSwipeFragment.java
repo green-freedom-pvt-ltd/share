@@ -19,6 +19,7 @@ import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,6 +105,10 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onStart");
     }
 
+    public boolean isCompleted(){
+        return cause.isCompleted();
+    }
+
     private void renderCauseCompletedImage(){
         cardContainer.setVisibility(View.GONE);
         ShareImageLoader.getInstance().loadImage(cause.getCauseCompletedImage(), causeCompletedImage,
@@ -129,7 +134,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
 
         float targetAmount = cause.getTargetAmount();
         float amountRaised = cause.getAmountRaised();
-        goalAmount.setText("\u20B9 " + (int)(targetAmount));
+        goalAmount.setText("\u20B9 " + Utils.formatIndianCommaSeparated(Math.round(targetAmount)));
 
         float percent = (targetAmount > 0f) ? (amountRaised / targetAmount) : 0;
         if (percent > 1){
@@ -143,7 +148,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         amountRaisedProgress.setLayoutParams(params);
 
         int numRuns = cause.getTotalRuns();
-        numImpactRuns.setText(String.valueOf(numRuns));
+        numImpactRuns.setText(Utils.formatIndianCommaSeparated(numRuns));
 
         //load image
         ShareImageLoader.getInstance().loadImage(cause.getImageUrl(), mCauseImage,

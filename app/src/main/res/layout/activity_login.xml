@@ -2,22 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_splash_screen"
+    android:background="@drawable/login_screen_background"
     android:orientation="vertical">
 
-    <com.sharesmile.share.views.MSBTextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="150dp"
-        android:shadowColor="@color/black_50"
-        android:shadowDy="2"
-        android:shadowDx="2"
-        android:shadowRadius="2"
-        android:text="@string/impact_run"
-        android:textAllCaps="true"
-        android:textColor="@color/white"
-        android:textSize="36sp" />
+        android:layout_marginTop="60dp"
+        android:src="@drawable/impact_text_logo"
+        android:layout_gravity="center_horizontal"/>
+
 
     <LinearLayout
         android:id="@+id/login_container"
@@ -28,25 +22,62 @@
         android:orientation="vertical"
         android:visibility="visible">
 
-        <include
-            android:id="@+id/btn_login_google"
-            layout="@layout/login_button"
-            android:layout_width="250dp"
-            android:layout_height="53dp" />
-
-        <include
-            android:id="@+id/btn_login_fb"
-            layout="@layout/login_button"
-            android:layout_width="250dp"
+        <LinearLayout
+            android:id="@+id/bt_fb_login"
+            android:layout_width="232dp"
             android:layout_height="53dp"
-            android:layout_marginTop="15dp" />
+            android:gravity="center_vertical"
+            android:background="@drawable/login_button_background"
+            android:orientation="horizontal">
+
+            <com.sharesmile.share.views.MRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textSize="12.5sp"
+                android:textColor="@color/denim_blue"
+                android:text="@string/logn_with_fb"/>
+
+            <ImageView
+                android:layout_width="47dp"
+                android:layout_height="47dp"
+                android:src="@drawable/logo_fb"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bt_google_login"
+            android:layout_width="232dp"
+            android:layout_height="53dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="13dp"
+            android:background="@drawable/login_button_background"
+            android:orientation="horizontal">
+
+            <com.sharesmile.share.views.MLTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textSize="13.4sp"
+                android:textColor="@color/pale_red"
+                android:text="@string/logn_with_google"/>
+
+            <ImageView
+                android:layout_width="47dp"
+                android:layout_height="47dp"
+                android:src="@drawable/login_google"/>
+        </LinearLayout>
 
 
         <LinearLayout
+            android:id="@+id/container_login_skip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginBottom="56dp"
+            android:layout_marginTop="39dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -62,7 +93,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="SKIP"
+                android:text="@string/skip"
+                android:textAllCaps="true"
                 android:textColor="@color/white_dark"
                 android:textSize="12.5sp" />
         </LinearLayout>

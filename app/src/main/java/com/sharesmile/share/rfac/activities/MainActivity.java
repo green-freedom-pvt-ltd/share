@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
@@ -48,12 +49,14 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.ToolbarActivity;
 import com.sharesmile.share.gps.WorkoutSingleton;
+import com.sharesmile.share.gps.models.WorkoutDataImpl;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
-import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.HomeScreenFragment;
+import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
+import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.fragments.WebViewFragment;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
@@ -389,8 +392,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {
-//            replaceFragment(ShareFragment.newInstance(WorkoutDataImpl.getDummyWorkoutData(), MainApplication.getInstance().getCauseList().getCauses().get(0)), true);
-            share();
+            replaceFragment(ShareFragment.newInstance(WorkoutDataImpl.getDummyWorkoutData(), CauseDataStore.getInstance().getCausesToShow().get(0)), true);
+//            share();
             AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
@@ -429,6 +432,17 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     public void showHome() {
         replaceFragment(new HomeScreenFragment(), true);
+    }
+
+    @Override
+    public void performOperation(int operationId, Object input) {
+        switch (operationId) {
+            case OPEN_DRAWER:
+                mDrawerLayout.openDrawer(Gravity.LEFT);
+                break;
+            default:
+                super.performOperation(operationId, input);
+        }
     }
 
     @Override

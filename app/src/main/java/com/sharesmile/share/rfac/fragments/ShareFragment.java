@@ -21,7 +21,6 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.LoginImpl;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -196,23 +195,6 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         tv_skip.setOnClickListener(this);
         mFbLoginButton.setOnClickListener(this);
         mGoogleLoginButton.setOnClickListener(this);
-
-        //init fb login
-        TextView mFbText = (TextView) mFbLoginButton.findViewById(R.id.title);
-        mFbText.setText(getString(R.string.logn_with_fb));
-        mFbText.setTextColor(getResources().getColor(R.color.denim_blue));
-
-        ImageView mFbImage = (ImageView) mFbLoginButton.findViewById(R.id.login_image);
-        mFbImage.setImageResource(R.drawable.logo_fb);
-
-
-        //init Google login
-        TextView mGText = (TextView) mGoogleLoginButton.findViewById(R.id.title);
-        mGText.setText(getString(R.string.logn_with_google));
-        mGText.setTextColor(getResources().getColor(R.color.pale_red));
-
-        ImageView mGImage = (ImageView) mGoogleLoginButton.findViewById(R.id.login_image);
-        mGImage.setImageResource(R.drawable.login_google);
     }
 
     @Override
@@ -234,7 +216,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         durationLabel.setText(getString(R.string.duration));
         initImageData();
 
-        getFragmentController().performOperation(IFragmentController.HIDE_TOOLBAR, null);
+        getFragmentController().hideToolbar();
 
         AnalyticsEvent.create(Event.ON_LOAD_SHARE_SCREEN)
                 .addBundle(mWorkoutData.getWorkoutBundle())

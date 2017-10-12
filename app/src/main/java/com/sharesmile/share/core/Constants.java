@@ -96,6 +96,8 @@ public class Constants {
 
     public static final String KEY_CAUSE_LIST = "key_cause_list_new";
 
+    public static final String KEY_LAST_VISIBLE_CAUSE_LIST = "key_last_visible_cause_list";
+
     public static final String KEY_FAQ_LIST = "key_faq_list";
 
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";

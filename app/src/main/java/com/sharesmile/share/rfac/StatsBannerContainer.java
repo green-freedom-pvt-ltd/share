@@ -47,8 +47,10 @@ public class StatsBannerContainer {
             ShareImageLoader.getInstance().loadImage(board.getLeagueLogo(), bannerLogo);
             bannerLogo.setVisibility(View.VISIBLE);
         }
-        bannerTotalImpact.setText("\u20B9 " + Utils.formatEnglishCommaSeparated(board.getTotalImpact()));
-        bannerNumRuns.setText(Utils.formatEnglishCommaSeparated(board.getTotalRuns()));
+        bannerTotalImpact.setText("\u20B9 "
+                + Utils.formatIndianCommaSeparated((long) Math.round(board.getTotalImpact()))
+        );
+        bannerNumRuns.setText(Utils.formatIndianCommaSeparated((long) board.getTotalRuns()));
         bannerNumMembers.setText(String.valueOf(board.getTotalMembers()));
     }
 

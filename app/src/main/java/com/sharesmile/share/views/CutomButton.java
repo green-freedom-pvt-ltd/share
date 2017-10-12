@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.Button;
 
 
-abstract class CustomButton extends Button {
+abstract class CustomButton extends android.support.v7.widget.AppCompatButton {
 
     public static final boolean IS_CUSTOM_FONT_ALLOWED = true;
 

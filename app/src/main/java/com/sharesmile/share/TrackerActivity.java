@@ -49,7 +49,6 @@ import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED;
 
 public class TrackerActivity extends BaseActivity {
 
-
     private static final String TAG = "TrackerActivity";
     private DrawerLayout drawerLayout;
     private WorkoutService locationService;
@@ -175,6 +174,16 @@ public class TrackerActivity extends BaseActivity {
 
     @Override
     public void updateToolBar(String title, boolean showAsUpEnable) {
+
+    }
+
+    @Override
+    public void showToolbar() {
+
+    }
+
+    @Override
+    public void hideToolbar() {
 
     }
 

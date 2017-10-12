@@ -35,14 +35,13 @@ import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.MainActivity;
-import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.Qna;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +79,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     private AppLifecycleHelper lifecycleHelper;
 
-    private CauseList causeList;
+
     private FaqList faqList;
 
     //generally for singleton class constructor is made private but since this class is registered
@@ -313,7 +312,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
 
-        causeList = SharedPrefsManager.getInstance().getObject(Constants.KEY_CAUSE_LIST, CauseList.class);
+        //TODO: Check whether this is the right place for CauseDataStore init call
+        CauseDataStore.initialize(getContext());
         faqList = SharedPrefsManager.getInstance().getObject(Constants.KEY_FAQ_LIST, FaqList.class);
 
         updateAppVersionInPrefs();
@@ -363,28 +363,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         }
     }
 
-    public CauseList getCauseList(){
-        return causeList;
-    }
-
-    public void updateCauseList(CauseList updated){
-        this.causeList = updated;
-        SharedPrefsManager.getInstance().setObject(Constants.KEY_CAUSE_LIST, updated);
-        if (causeList != null){
-            for (CauseData causeData : causeList.getCauses()) {
-                if (causeData.getApplicationUpdate() != null) {
-                    int latestVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
-                    if (latestVersion < causeData.getApplicationUpdate().app_version && causeData.getApplicationUpdate().app_version > BuildConfig.VERSION_CODE) {
-                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, true);
-                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, causeData.getApplicationUpdate().force_update);
-                        SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, causeData.getApplicationUpdate().app_version);
-                        SharedPrefsManager.getInstance().setString(Constants.PREF_APP_UPDATE_MESSAGE, causeData.getApplicationUpdate().message);
-                    }
-                }
-            }
-        }
-    }
-
     public FaqList getFaqList(){
         return faqList;
     }
@@ -392,20 +370,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     public void updateFaqList(FaqList updated){
         this.faqList = updated;
         SharedPrefsManager.getInstance().setObject(Constants.KEY_FAQ_LIST, updated);
-    }
-
-    public List<CauseData> getCausesToShow(){
-        List<CauseData> activeCauses = new ArrayList<>();
-        if (causeList != null){
-            for (CauseData causeData : causeList.getCauses()) {
-                if (causeData.isActive()) {
-                    activeCauses.add(causeData);
-                }else if (causeData.isCompleted()){
-                    activeCauses.add(causeData);
-                }
-            }
-        }
-        return activeCauses;
     }
 
     public List<Qna> getFaqsToShow(){
@@ -587,6 +551,19 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
+
+        Logger.d(TAG, "Testing indiancommaseparated"
+                + "   " + Utils.formatIndianCommaSeparated(0)
+                + "   " + Utils.formatIndianCommaSeparated(23)
+                + "   " + Utils.formatIndianCommaSeparated(9001)
+                + "   " + Utils.formatIndianCommaSeparated(12001)
+                + "   " + Utils.formatIndianCommaSeparated(10000)
+                + "   " + Utils.formatIndianCommaSeparated(103000)
+                + "   " + Utils.formatIndianCommaSeparated(702007)
+                + "   " + Utils.formatIndianCommaSeparated(98000008)
+                + "   " + Utils.formatIndianCommaSeparated(900020000)
+                + "   " + Utils.formatIndianCommaSeparated(97181662908L)
+        );
     }
 
     @Override

@@ -34,9 +34,8 @@ public class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//        RefWatcher refWatcher = MainApplication.getRefWatcher(getActivity());
-//        refWatcher.watch(this);
     }
+
 
     public boolean isAttachedToActivity(){
         return controller != null;

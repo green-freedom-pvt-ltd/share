@@ -42,9 +42,10 @@
 
     <!--Screen-Fragment-->
 
-    <dimen name="view_pager_page_margin">20dp</dimen>
-    <dimen name="view_pager_margin_left">40dp</dimen>
-    <dimen name="view_pager_margin_right">40dp</dimen>
+    <dimen name="view_pager_page_margin">25dp</dimen>
+    <dimen name="view_pager_margin_left">50dp</dimen>
+    <dimen name="view_pager_margin_right">50dp</dimen>
     <dimen name="view_pager_margin_top">40dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="super_large_text">36sp</dimen>
 </resources>

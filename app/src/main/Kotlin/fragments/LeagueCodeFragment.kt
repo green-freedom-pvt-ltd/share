@@ -91,8 +91,8 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
     }
 
     private fun getTeamDetails(leagueData: LeagueTeam, code: String) {
-        var location: ArrayList<String> = ArrayList<String>();
-        var department: ArrayList<String> = ArrayList<String>();
+        var location: ArrayList<String> = ArrayList<String>()
+        var department: ArrayList<String> = ArrayList<String>()
 
         val forEach = leagueData?.companyDetails?.forEach {
             if (it.city != null) {
@@ -115,13 +115,15 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         }
 
         if (leagueData.metaDataRequired == null || leagueData.metaDataRequired!!){
-            // Show City Department screen
-            fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null)
-        }else{
-            // Pass success result to MainActivity and exit
-            activity.setResult(Activity.RESULT_OK)
-            activity.finish()
+            if (!location.isEmpty() && !department.isEmpty()){
+                // Show City Department screen
+                fragmentListener.replaceFragment(LeagueRegistrationFragment.getInstance(location, department = department, code = code, banner = leagueData?.banner), false, null)
+                return
+            }
         }
+        // Pass success result to MainActivity and exit
+        activity.setResult(Activity.RESULT_OK)
+        activity.finish()
 
     }
 

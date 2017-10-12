@@ -3,12 +3,12 @@
     android:shape="rectangle">
 
     <!-- view background color -->
-    <solid android:color="@color/white"></solid>
+    <solid android:color="@color/white_95"></solid>
 
     <!-- view border color and width -->
     <stroke
-        android:width="3dp"
-        android:color="@color/white"></stroke>
+        android:width="1dp"
+        android:color="@color/white_95"></stroke>
 
     <!-- If you want to add some padding -->
     <padding

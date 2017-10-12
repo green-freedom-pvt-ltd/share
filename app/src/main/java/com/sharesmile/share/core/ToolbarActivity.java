@@ -56,6 +56,7 @@ public abstract class ToolbarActivity extends BaseActivity {
     @Override
     public void updateToolBar(String title, boolean showAsUpEnable) {
         setToolbarTitle(title);
+        showToolbar();
     }
 
     public Toolbar getToolbar(){
@@ -63,16 +64,16 @@ public abstract class ToolbarActivity extends BaseActivity {
     }
 
     @Override
-    public void performOperation(int operationId, Object input) {
-        switch (operationId) {
-            case HIDE_TOOLBAR:
-                if (toolbar != null){
-                    toolbar.setVisibility(View.GONE);
-                }
-                break;
-            default:
-                super.performOperation(operationId, input);
+    public void showToolbar() {
+        if (toolbar != null){
+            toolbar.setVisibility(View.VISIBLE);
         }
     }
 
+    @Override
+    public void hideToolbar() {
+        if (toolbar != null){
+            toolbar.setVisibility(View.GONE);
+        }
+    }
 }

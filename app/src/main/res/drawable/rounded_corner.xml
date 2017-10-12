@@ -5,13 +5,13 @@
 
     <!-- view background color -->
     <solid
-        android:color="@color/light_blue" >
+        android:color="@color/bright_sky_blue" >
     </solid>
 
     <!-- view border color and width -->
     <stroke
         android:width="3dp"
-        android:color="@color/light_blue" >
+        android:color="@color/bright_sky_blue" >
     </stroke>
 
     <!-- If you want to add some padding -->

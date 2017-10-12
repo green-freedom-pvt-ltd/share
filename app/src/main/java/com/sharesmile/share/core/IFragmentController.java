@@ -25,12 +25,14 @@ public interface IFragmentController {
     int SHOW_LEAGUE_ACTIVITY = 106;
     int OPEN_HELP_CENTER = 107;
     int TAKE_FLAGGED_RUN_FEEDBACK = 108;
-    int HIDE_TOOLBAR = 109;
 
     int OPEN_MUSIC_PLAYER = 110;
     int TAKE_POST_RUN_SAD_FEEDBACK =111;
 
     int LOGIN_FOR_RESULT = 112;
+
+    int OPEN_DRAWER = 113;
+    int CLOSE_DRAWER = 114;
 
     /*
         Common methods which can be implemented either by abstract BaseActivity or by solid child activities
@@ -57,6 +59,10 @@ public interface IFragmentController {
     void setToolbarTitle(String toolbarTitle);
 
     void updateToolBar(String title,boolean showAsUpEnable);
+
+    void showToolbar();
+
+    void hideToolbar();
 
 
 }

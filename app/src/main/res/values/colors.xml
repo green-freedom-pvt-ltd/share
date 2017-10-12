@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/bright_sky_blue</color>
-    <color name="colorPrimaryDark">@color/dark_sky_blue</color>
+    <color name="colorPrimary">@color/white</color>
+    <color name="colorPrimaryDark">@color/bright_sky_blue</color>
     <color name="colorAccent">#FF4081</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="windowBackground">#FFFFFF</color>
@@ -16,7 +16,7 @@
     <color name="medium_bright_blue">#53a0fe</color>
     <color name="pale_bright_blue">#009aff</color>
 
-    <color name="bright_sky_blue">#00b9ff</color>
+    <color name="bright_sky_blue">#00c1f2</color>
     <color name="white">#ffffff</color>
     <color name="greyish_brown">#454545</color>
     <color name="pale_magenta">#d667cd</color>
@@ -36,6 +36,7 @@
     <color name="MontserratRegular">#4a4a4a</color>
 
     <color name="white_50">#7fffffff</color>
+    <color name="white_95">#f2ffffff</color>
     <color name="black_very_light">#0f000000</color>
     <color name="very_light_grey">#f0f0f0</color>
     <color name="white_dark">#eeeeee</color>
