@@ -41,6 +41,7 @@ public class RealRunFragment extends RunFragment {
 
     TextView time;
     TextView distanceTextView;
+    TextView distanceUnitTextView;
     TextView impact;
     Button pauseButton;
     Button stopButton;
@@ -89,6 +90,7 @@ public class RealRunFragment extends RunFragment {
         ButterKnife.bind(this, baseView);
         time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
         distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
+        distanceUnitTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance_unit);
         impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
         pauseButton = (Button) baseView.findViewById(R.id.btn_pause);
         stopButton = (Button) baseView.findViewById(R.id.btn_stop);
@@ -114,6 +116,9 @@ public class RealRunFragment extends RunFragment {
             params.weight = 3.2f;
             distanceContainer.setLayoutParams(params);
         }
+
+        String distanceLabel = getString(R.string.distance_km, UnitsManager.getDistanceLabel().toUpperCase());
+        distanceUnitTextView.setText(distanceLabel);
 
         ShareImageLoader.getInstance().loadImage(mCauseData.getSponsor().getLogoUrl(), mSponsorLogo);
 
@@ -187,18 +192,20 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCoveredMeters, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCoveredMeters, elapsedTimeInSecs);
-        float distanceOnDisplay = 0f;
+        float distanceOnDisplayInMeters = 0f;
         try {
-            distanceOnDisplay = 1000*Float.parseFloat(distanceTextView.getText().toString());
+            float numberOnDisplay = Float.parseFloat(distanceTextView.getText().toString());
+            distanceOnDisplayInMeters = UnitsManager.isImperial() ? 1609.34f*numberOnDisplay
+                    : 1000*numberOnDisplay;
         }catch (NumberFormatException nfe){
             String message = "NumberFormatException while parsing distanceTextView on display: " + nfe.getMessage();
             Logger.e(TAG, message);
             Crashlytics.log(message);
             nfe.printStackTrace();
         }
-        if (distanceCoveredMeters < distanceOnDisplay || distanceCoveredMeters - distanceOnDisplay >= 1){
+        if (distanceCoveredMeters < distanceOnDisplayInMeters || distanceCoveredMeters - distanceOnDisplayInMeters >= 1){
             // Only when the delta is greater than 0.001 km we show the update
-            String distanceString = Utils.formatToKmsWithTwoDecimal(distanceCoveredMeters);
+            String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCoveredMeters);
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
             impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
@@ -225,7 +232,7 @@ public class RealRunFragment extends RunFragment {
         if (isAttachedToActivity()){
             updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs()));
             float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
-            String distanceString = Utils.formatToKmsWithTwoDecimal(totalDistance);
+            String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(totalDistance);
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), totalDistance);
             impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
@@ -286,7 +293,7 @@ public class RealRunFragment extends RunFragment {
         float distanceCovered = WorkoutSingleton.getInstance().getTotalDistanceInMeters(); // in meters
         int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCovered);
         impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
-        distanceTextView.setText(Utils.formatToKmsWithTwoDecimal(distanceCovered));
+        distanceTextView.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCovered));
         if (WorkoutSingleton.getInstance().getDataStore() != null){
             Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
             if (calorie != null){
@@ -385,7 +392,9 @@ public class RealRunFragment extends RunFragment {
         if (isAttachedToActivity() && !getActivity().isFinishing()){
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
             alertDialog.setTitle(getString(R.string.dialog_title_min_distance));
-            alertDialog.setMessage(getString(R.string.dialog_msg_min_distance, mCauseData.getMinDistance()));
+            int minDistance = (int) (UnitsManager.isImperial() ? 3.28f*mCauseData.getMinDistance() : mCauseData.getMinDistance());
+            String unit = UnitsManager.isImperial() ? "ft" : "m";
+            alertDialog.setMessage(getString(R.string.dialog_msg_min_distance, minDistance, unit));
             alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

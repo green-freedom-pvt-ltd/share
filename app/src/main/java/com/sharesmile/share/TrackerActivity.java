@@ -28,6 +28,7 @@ import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
+import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.GoogleFitStepCounter;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
@@ -450,7 +451,8 @@ public class TrackerActivity extends BaseActivity {
                                         if (TextUtils.isEmpty(reducedDistance)){
                                             errorMessage = getString(R.string.rfac_usain_bolt_message_without_distance);
                                         }else {
-                                            errorMessage = getString(R.string.rfac_usain_bolt_message_with_distance, reducedDistance);
+                                            errorMessage = getString(R.string.rfac_usain_bolt_message_with_distance,
+                                                    reducedDistance, UnitsManager.getDistanceLabel());
                                         }
                                         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
                                         v.vibrate(3000);

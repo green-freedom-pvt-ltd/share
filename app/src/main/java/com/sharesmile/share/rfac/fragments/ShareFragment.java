@@ -80,8 +80,12 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     TextView caloriesLabel;
 
     // Distance
-    @BindView(R.id.tv_share_distance_kms)
+    @BindView(R.id.tv_share_distance)
     TextView distance;
+
+    // Distance Unit
+    @BindView(R.id.tv_share_distance_unit)
+    TextView distanceUnit;
 
     @BindView(R.id.tv_share_screen_distance_label)
     TextView distanceLabel;
@@ -210,8 +214,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), distanceInMeters);
         impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
         initCaloriesContainer();
-        String distanceCovered = Utils.formatToKmsWithTwoDecimal(distanceInMeters);
+        String distanceCovered = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceInMeters);
         distance.setText(distanceCovered);
+        distanceUnit.setText(" " + UnitsManager.getDistanceLabel());
         distanceLabel.setText(getString(R.string.distance));
         durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
         durationLabel.setText(getString(R.string.duration));

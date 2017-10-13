@@ -44,6 +44,7 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.CurrencyCode;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -152,7 +153,7 @@ public class Utils {
         return caloriesString;
     }
 
-    private static DecimalFormat getDecimalFormat(String pattern){
+    public static DecimalFormat getDecimalFormat(String pattern){
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat(pattern, dfs);
@@ -162,18 +163,20 @@ public class Utils {
     }
 
     public static String formatCommaSeparated(long value){
-        String countryCode = UnitsManager.getCountryCode() != null ? UnitsManager.getCountryCode() : "IN";
-        if ("IN".equalsIgnoreCase(countryCode)){
-            return formatIndianCommaSeparated(value);
+        if (CurrencyCode.INR.equals(UnitsManager.getCurrencyCode())){
+//            return formatIndianCommaSeparated(value);
+            Locale locale = new Locale("EN", "IN");
+            NumberFormat format =  NumberFormat.getInstance(locale);
+            return format.format(value);
         }else {
-            Locale locale = new Locale("EN", countryCode);
+            Locale locale = new Locale("EN", "US");
             NumberFormat format =  NumberFormat.getInstance(locale);
             return format.format(value);
         }
     }
 
     public static String formatIndianCommaSeparated(long value){
-
+        Logger.d(TAG, "formatIndianCommaSeparated: value = " + value);
         // remove sign if present
         String raw = String.valueOf(Math.abs(value));
         int numDigits = raw.length();
@@ -1078,11 +1081,6 @@ public class Utils {
      * @return country code or null
      */
     public static String getUserCountry(Context context) {
-        //TODO: remove this hack
-        if (true){
-            return "US";
-        }
-
         try {
             final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             final String simCountry = tm.getSimCountryIso();

@@ -31,8 +31,6 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
         return frag;
     }
 
-    //TODO: Revisit and check if it needs to be rectified
-
     @Override
     public int getItemPosition(Object object) {
         CauseSwipeFragment fragment = (CauseSwipeFragment) object;

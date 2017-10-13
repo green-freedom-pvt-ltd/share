@@ -7,7 +7,7 @@ package com.sharesmile.share.core;
 public enum DistanceUnit {
 
     KILOMETER("km"),
-    MILES("miles");
+    MILES("mi");
 
     private String label;
 

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.rfac.models.ExchangeRate;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
@@ -29,6 +30,8 @@ import static com.sharesmile.share.core.Constants.PREFS_MY_EXCHANGE_RATE;
  */
 
 public class UnitsManager {
+
+    private static final String TAG = "UnitsManager";
 
     public static boolean defaultUnitsSet(){
         return SharedPrefsManager.getInstance().getBoolean(PREFS_DEFAULT_UNITS_SET, false);
@@ -64,10 +67,8 @@ public class UnitsManager {
     }
 
     private static List<ExchangeRate> getExchangeRates(){
-        //TODO: Remove this hack
-        List<ExchangeRate> rates = null;
-//                SharedPrefsManager.getInstance().getCollection(Constants.PREFS_MY_EXCHANGE_RATE,
-//                new TypeToken<ArrayList<ExchangeRate>>(){}.getType());
+        List<ExchangeRate> rates = SharedPrefsManager.getInstance().getCollection(Constants.PREFS_MY_EXCHANGE_RATE,
+                new TypeToken<ArrayList<ExchangeRate>>(){}.getType());
         if (rates == null || rates.isEmpty()){
             Gson gson = new Gson();
             rates = gson.fromJson(DEFAULT_EXCHANGE_RATE_JSON, new TypeToken<ArrayList<ExchangeRate>>(){}.getType());
@@ -127,16 +128,24 @@ public class UnitsManager {
         return DistanceUnit.fromString(distUnitString);
     }
 
-    public static String getCountryCode(){
-        return SharedPrefsManager.getInstance().getString(PREFS_MY_COUNTRY_CODE);
-    }
-
     public static String getCurrencySymbol(){
         return getCurrencyCode().getSymbol();
     }
 
     public static String getDistanceLabel(){
         return getDistanceUnit().getLabel();
+    }
+
+    public static boolean isImperial(){
+        return DistanceUnit.MILES.equals(getDistanceUnit());
+    }
+
+    public static String formatToMyDistanceUnitWithTwoDecimal(float distanceInMeters){
+        if (DistanceUnit.MILES.equals(getDistanceUnit())){
+            return Utils.getDecimalFormat("0.00").format(distanceInMeters*(0.000621));
+        }else {
+            return Utils.getDecimalFormat("0.00").format(distanceInMeters / 1000);
+        }
     }
 
     public static String getCurrencyFromCountry(String countryCode){
@@ -162,17 +171,27 @@ public class UnitsManager {
         return format.format(value);
     }
 
-    private static String formatAsPerCurrency(double value, Currency currency){
-        NumberFormat format =  NumberFormat.getInstance();
-        format.setCurrency(currency);
-        if (value > 1000){
+    private static String formatAsPerCurrency(double value, CurrencyCode currency){
+        Logger.d(TAG, "formatAsPerCurrency: " + currency +", value = " + value);
+        NumberFormat format = null;
+        if (CurrencyCode.INR.equals(currency)){
+            // If it is INR then we create instance using Indian Locale
+            format = NumberFormat.getInstance(new Locale("EN", "IN"));
+            // And we will remove all decimals
             format.setMaximumFractionDigits(0);
-        }else {
-            format.setMaximumFractionDigits(2);
-            format.setMinimumFractionDigits(2);
+        } else {
+            // If it is any other supported currency then we create instance using US Locale
+            format = NumberFormat.getInstance(new Locale("EN", "US"));
+            if (value > 1000){
+                format.setMaximumFractionDigits(0);
+            }else {
+                format.setMaximumFractionDigits(2);
+                format.setMinimumFractionDigits(2);
+            }
         }
-
-        return format.format(value);
+        String ret = format.format(value);
+        Logger.d(TAG, "Will return " + ret);
+        return ret;
     }
 
     public static String formatRupeeToMyCurrency(long rupeeAmount){
@@ -191,12 +210,13 @@ public class UnitsManager {
     }
 
     private static String formatInMyCurrency(double amount){
-        if (CurrencyCode.INR.equals(getCurrencyCode())){
-            return getCurrencySymbol() + " " + Utils.formatIndianCommaSeparated(Math.round(amount));
-        }else {
-            return getCurrencySymbol() + " " + formatAsPerCurrency(amount,
-                                Currency.getInstance(getCurrencyCode().toString()));
-        }
+        return getCurrencySymbol() + " " + formatAsPerCurrency(amount, getCurrencyCode());
+//        if (CurrencyCode.INR.equals(getCurrencyCode())){
+//            return getCurrencySymbol() + " " + Utils.formatIndianCommaSeparated(Math.round(amount));
+//        }else {
+//            return getCurrencySymbol() + " " + formatAsPerCurrency(amount,
+//                                Currency.getInstance(getCurrencyCode().toString()));
+//        }
     }
 
 

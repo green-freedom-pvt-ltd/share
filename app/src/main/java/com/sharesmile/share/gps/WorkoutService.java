@@ -788,7 +788,7 @@ public class WorkoutService extends Service implements
             distanceReduction = tracker.discardApprovalQueue();
             distReductionString =
                     (distanceReduction == 0) ? null :
-                            Utils.formatToKmsWithTwoDecimal(Math.abs(distanceReduction));
+                            UnitsManager.formatToMyDistanceUnitWithTwoDecimal(Math.abs(distanceReduction));
         }
 
         WorkoutSingleton.getInstance().incrementUsainBoltsCounter();

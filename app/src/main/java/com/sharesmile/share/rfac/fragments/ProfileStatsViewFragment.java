@@ -69,6 +69,9 @@ public class ProfileStatsViewFragment extends BaseFragment {
     @BindView(R.id.tv_km_distance)
     TextView distance;
 
+    @BindView(R.id.tv_distance_unit)
+    TextView distanceUnit;
+
     int position;
 
     private int totalAmountRaised;
@@ -127,14 +130,16 @@ public class ProfileStatsViewFragment extends BaseFragment {
         impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(totalAmountRaised));
         totalRuns.setText(numRuns + "");
         String totalDistanceString;
-        if (totalDistance > 100){
-            totalDistanceString = String.valueOf(Math.round(totalDistance));
-        } else if (totalDistance % 1 == 0){
-            totalDistanceString = String.valueOf(totalDistance);
+        double totalDistInMyUnits = UnitsManager.isImperial() ? totalDistance*0.621 : totalDistance;
+        if (totalDistInMyUnits > 100){
+            totalDistanceString = String.valueOf(Math.round(totalDistInMyUnits));
+        } else if (totalDistInMyUnits % 1 == 0){
+            totalDistanceString = String.valueOf(totalDistInMyUnits);
         } else {
-            totalDistanceString = String.valueOf(Utils.formatWithOneDecimal(totalDistance));
+            totalDistanceString = String.valueOf(Utils.formatWithOneDecimal(totalDistInMyUnits));
         }
         distance.setText(String.valueOf(totalDistanceString));
+        distanceUnit.setText(UnitsManager.getDistanceLabel());
     }
 
     private void setUpBarChart(){

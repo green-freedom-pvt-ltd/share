@@ -100,7 +100,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
                 }
 
                 if (mleaderBoardList != null && !mleaderBoardList.isEmpty()){
-                    renderSelfRank(scrollUp);
+                    renderSelfRank(scrollUp, false);
                 }
             }
         });
@@ -165,30 +165,32 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
         mRecyclerView.post(new Runnable() {
             @Override
             public void run() {
-                renderSelfRank(true);
+                renderSelfRank(true, true);
             }
         });
         hideProgressDialog();
     }
 
-    private void renderSelfRank(boolean scrollUp){
+    private void renderSelfRank(boolean scrollUp, boolean force){
         if (myLeaderBoardItemPosition >= 0){
             int lastItemPos = mLayoutManager.findLastVisibleItemPosition();
-//            Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
-//                    + myLeaderBoardItemPosition + ", scrollUp = " + scrollUp);
+            Logger.d(TAG, "renderSelfRank, lastItemPos = " + lastItemPos + ", myLeaderBoardItemPos = "
+                    + myLeaderBoardItemPosition + ", scrollUp = " + scrollUp + ", force = " + force);
             int limit = scrollUp ? myLeaderBoardItemPosition : myLeaderBoardItemPosition + 1;
             limit = limit + mLeaderBoardAdapter.getHeaderOffSet();
             if (lastItemPos < limit){
-                showSelfRankAtBottom();
+                showSelfRankAtBottom(force);
             }else {
                 hideSelfRankFromBottom();
             }
         }
     }
 
-    protected void showSelfRankAtBottom(){
-        if (!selfRankHolder.isVisible()){
+    protected void showSelfRankAtBottom(boolean force){
+        Logger.d(TAG, "showSelfRankAtBottom");
+        if (force || !selfRankHolder.isVisible()){
             // Need to show rank at the bottom
+            Logger.d(TAG, "showSelfRankAtBottom force");
             BaseLeaderBoardItem myLeaderBoardItem = mleaderBoardList.get(myLeaderBoardItemPosition);
             selfRankHolder.bindData(myLeaderBoardItem, myLeaderBoardItem.getRanking());
             selfRankHolder.show();

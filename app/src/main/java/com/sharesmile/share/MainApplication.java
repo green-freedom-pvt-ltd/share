@@ -312,7 +312,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         startSyncTasks();
         checkForFirstLaunchAfterInstall();
 
-        //TODO: Check whether this is the right place for CauseDataStore init call
         CauseDataStore.initialize(getContext());
         faqList = SharedPrefsManager.getInstance().getObject(Constants.KEY_FAQ_LIST, FaqList.class);
 

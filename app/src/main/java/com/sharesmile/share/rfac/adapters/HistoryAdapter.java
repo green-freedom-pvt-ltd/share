@@ -142,8 +142,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             cal.setTimeInMillis(startEpochMillis);
             mRunTime.setText(DateUtil.getCustomFormattedDate(cal.getTime(), HH_MM_AMPM));
             mCause.setText(workout.getCauseBrief());
-            String distanceCovered = Utils.formatWithOneDecimal(workout.getDistance());
-            mDistance.setText(distanceCovered + " km");
+            float distance = UnitsManager.isImperial() ? workout.getDistance()*0.621f : workout.getDistance();
+            String distanceCovered = Utils.formatWithOneDecimal(distance);
+            mDistance.setText(distanceCovered + " " + UnitsManager.getDistanceLabel());
             mImpact.setText(UnitsManager.formatRupeeToMyCurrency(workout.getRunAmount()));
             calories.setText(Utils.formatCalories(workout.getCalories() == null ? 0 : workout.getCalories()));
             long timeInSec = Utils.stringToSec(workout.getElapsedTime());

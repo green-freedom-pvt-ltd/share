@@ -45,7 +45,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="100"
+            android:layout_weight="92"
             android:orientation="vertical">
 
             <com.sharesmile.share.views.LBKTextView
@@ -70,7 +70,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="320">
+            android:layout_weight="336">
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
@@ -83,7 +83,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="110">
+            android:layout_weight="102">
 
             <com.sharesmile.share.views.MSBButton
                 android:id="@+id/btn_lets_run"

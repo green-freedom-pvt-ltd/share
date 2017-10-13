@@ -121,6 +121,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         getFragmentController().hideToolbar();
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SELECTION)
                 .buildAndDispatch();
+        render();
     }
 
     @Override
