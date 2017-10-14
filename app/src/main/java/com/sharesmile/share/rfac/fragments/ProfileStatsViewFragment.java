@@ -1,5 +1,7 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -110,6 +112,11 @@ public class ProfileStatsViewFragment extends BaseFragment {
         }else if (position == POSITION_ALL_TIME){
             setUpAllTimeStats();
         }
+
+        int height = (int) getResources().getDimension(R.dimen.super_large_text);
+        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
+                new float[]{0, 1}, Shader.TileMode.CLAMP);
+        impactInRupees.getPaint().setShader(textShader);
 
         displayStats();
         setUpBarChart();

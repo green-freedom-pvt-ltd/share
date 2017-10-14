@@ -92,7 +92,7 @@
                                 android:id="@+id/level_progress_bar"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
-                                android:background="@drawable/rounded_rectangle_blue_gradient"
+                                android:background="@drawable/rounded_rectangle_blue_green_gradient"
                                 android:layout_weight="0.1">
                             </View>
 

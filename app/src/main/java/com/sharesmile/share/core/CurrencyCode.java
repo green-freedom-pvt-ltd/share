@@ -12,7 +12,7 @@ public enum CurrencyCode {
     GBP("£"),
     MXN("$"),
     AUD("A$"),
-    CAD("C€"),
+    CAD("C$"),
     CHF("Fr"),
     CNY("元"),
     SEK("kr"),

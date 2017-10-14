@@ -215,17 +215,26 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         builder.setPositiveButton(getString(R.string.logout_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Logger.i("SettingsFragment", "Clearing all preferences and DB");
-                MainApplication.getInstance().getDbWrapper().clearAll();
-                SharedPrefsManager.getInstance().clearPrefs();
-                mListener.updateNavigationMenu();
-                updateSettingItems();
-                Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
-
+                performLogout();
+            }
+        });
+        builder.setNegativeButton(getString(R.string.settings_logout_cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
             }
         });
         builder.show();
 
+    }
+
+    private void performLogout(){
+        Logger.i("SettingsFragment", "Clearing all preferences and DB");
+        MainApplication.getInstance().getDbWrapper().clearAll();
+        SharedPrefsManager.getInstance().clearPrefs();
+        mListener.updateNavigationMenu();
+        updateSettingItems();
+        Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
     }
 
     @Override
