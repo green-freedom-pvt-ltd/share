@@ -154,12 +154,8 @@ public class CauseDataStore {
 
     }
 
-    private float getOverallImpact(CauseList causeList){
-        float overallAmount = 0;
-        for (CauseData causeData : causeList.getCauses()){
-            overallAmount += causeData.getAmountRaised();
-        }
-        return overallAmount;
+    private double getOverallImpact(CauseList causeList){
+        return causeList.getOverallImpactInRupees();
     }
 
 

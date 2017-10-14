@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -928,13 +929,13 @@ public class WorkoutService extends Service implements
         int pauseResumeDrawable;
         if (tracker.isRunning()){
             pauseResumeAction = getString(R.string.notification_action_pause);
-            pauseResumeLabel = "Pause";
-            contentTitle = "Impact";
+            pauseResumeLabel = getString(R.string.pause);
+            contentTitle = getString(R.string.impact_with_sponsor, mCauseData.getSponsor().getName());
             pauseResumeDrawable = R.drawable.ic_pause_black_24px;
         }else {
             pauseResumeAction = getString(R.string.notification_action_resume);
-            pauseResumeLabel = "Resume";
-            contentTitle = "Paused";
+            pauseResumeLabel = getString(R.string.resume);
+            contentTitle = getString(R.string.paused);
             pauseResumeDrawable = R.drawable.ic_play_arrow_black_24px;
         }
         Intent pauseResumeIntent = new Intent(this, NotificationActionReceiver.class);
@@ -950,7 +951,8 @@ public class WorkoutService extends Service implements
                                         ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
                                         : "")
                         )
-                        .setSmallIcon(getNotificationIcon()).setColor(getResources().getColor(R.color.denim_blue))
+                        .setSmallIcon(getNotificationIcon())
+                        .setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue))
                         .setLargeIcon(getLargeIcon())
                         .setTicker(getBaseContext().getResources().getString(R.string.app_name))
                         .setOngoing(true)
@@ -992,7 +994,7 @@ public class WorkoutService extends Service implements
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
+        return useWhiteIcon ? R.mipmap.ic_stat_onesignal_default : R.mipmap.ic_launcher;
     }
 
     final Runnable handleGpsInactivityRunnable = new Runnable() {

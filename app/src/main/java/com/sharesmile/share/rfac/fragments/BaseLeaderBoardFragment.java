@@ -118,6 +118,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
                     refreshItems();
                 }else {
                     MainApplication.showToast("Please connect to Internet");
+                    hideProgressDialog();
                 }
             }
         });

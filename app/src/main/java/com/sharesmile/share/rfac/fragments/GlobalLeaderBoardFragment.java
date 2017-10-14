@@ -84,8 +84,8 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
                 R.layout.leader_board_spinner, list);
         spinnerAdapter.setDropDownViewResource(R.layout.leader_board_spinner_list_item);
         intervalSpinner.setAdapter(spinnerAdapter);
-        // Set last month by default
-        intervalSpinner.setSelection(1);
+//        // Set last month by default
+//        intervalSpinner.setSelection(1);
     }
 
     @Override
@@ -164,6 +164,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
                 }else {
                     MainApplication.showToast("Network Error, Please try again");
                 }
+                hideProgressDialog();
             }
         }
     }

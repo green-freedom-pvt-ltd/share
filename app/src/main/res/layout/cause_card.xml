@@ -38,7 +38,7 @@
                     android:background="@color/white"
                     android:alpha="0.74">
 
-                    <com.sharesmile.share.views.MLTextView
+                    <com.sharesmile.share.views.LRTextView
                         android:id="@+id/category"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -57,12 +57,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
                 android:paddingBottom="12dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:background="@color/white"
                 android:orientation="vertical">
 
-                <com.sharesmile.share.views.MSBTextView
+                <com.sharesmile.share.views.LBKTextView
                     android:id="@+id/run_screen_title"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -72,7 +72,7 @@
                     android:textColor="@color/greyish_brown_two"
                     android:textSize="18sp" />
 
-                <com.sharesmile.share.views.MRTextView
+                <com.sharesmile.share.views.LRTextView
                     android:id="@+id/run_screen_sponsor"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -82,7 +82,7 @@
                     android:textColor="@color/warm_grey_three"
                     android:textSize="10sp" />
 
-                <com.sharesmile.share.views.MRTextView
+                <com.sharesmile.share.views.LRTextView
                     android:id="@+id/run_screen_description"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -155,14 +155,14 @@
                         android:layout_alignParentLeft="true"
                         android:clipChildren="false">
 
-                        <com.sharesmile.share.views.MSBTextView
+                        <com.sharesmile.share.views.LBTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/impact_runs"
                             android:textSize="6sp"
                             android:textColor="@color/greyish_brown_two"/>
 
-                        <com.sharesmile.share.views.MRTextView
+                        <com.sharesmile.share.views.LBTextView
                             android:id="@+id/num_impact_runs"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -180,14 +180,14 @@
                         android:layout_alignParentRight="true"
                         android:gravity="right">
 
-                        <com.sharesmile.share.views.MSBTextView
+                        <com.sharesmile.share.views.LBTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/cause_goal"
                             android:textSize="6sp"
                             android:textColor="@color/greyish_brown_two"/>
 
-                        <com.sharesmile.share.views.MRTextView
+                        <com.sharesmile.share.views.LBTextView
                             android:id="@+id/tv_goal_amount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            />
+            android:visibility="gone"/>
 
     </android.support.v7.widget.CardView>
 

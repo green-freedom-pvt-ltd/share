@@ -163,7 +163,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         builder.setContentText( notifText)
                 .setSmallIcon(getNotificationIcon())
-                .setColor(ContextCompat.getColor(getContext(), R.color.denim_blue))
+                .setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue))
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(notifTitle)
                 .setVibrate(vibratePattern)
@@ -218,7 +218,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     private static int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.drawable.ic_stat_onesignal_default : R.mipmap.ic_launcher;
+        return useWhiteIcon ? R.mipmap.ic_stat_onesignal_default : R.mipmap.ic_launcher;
     }
 
 

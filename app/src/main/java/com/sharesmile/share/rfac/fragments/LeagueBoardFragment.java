@@ -78,6 +78,7 @@ public class LeagueBoardFragment extends BaseLeagueFragment {
                     }else {
                         MainApplication.showToast("Network Error, Please try again");
                     }
+                    hideProgressDialog();
                 }
             }
         }

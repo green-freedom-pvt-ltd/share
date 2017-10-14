@@ -57,7 +57,7 @@
                 android:padding="5dp"
                 android:gravity="center"/>
 
-            <com.sharesmile.share.views.MRTextView
+            <com.sharesmile.share.views.LRTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
