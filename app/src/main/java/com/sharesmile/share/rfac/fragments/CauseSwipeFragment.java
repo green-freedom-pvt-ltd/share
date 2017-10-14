@@ -58,7 +58,7 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
     View cardContainer;
 
     @BindView(R.id.amount_remaining_percent)
-    TextView amountRemainingPercent;
+    TextView amountCompletedPercent;
 
     @BindView(R.id.amount_raised_progress_bar)
     View amountRaisedProgress;
@@ -141,8 +141,8 @@ public class CauseSwipeFragment extends BaseFragment implements View.OnClickList
         if (percent > 1){
             percent = 1;
         }
-        int remainingPercent = Math.round((1-percent)*100);
-        amountRemainingPercent.setText(remainingPercent + getString(R.string.amount_remaining_percent));
+        int completedPercent = Math.round((percent)*100);
+        amountCompletedPercent.setText(completedPercent+"%");
 
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) amountRaisedProgress.getLayoutParams();
         params.weight = percent;

@@ -92,7 +92,7 @@
                     android:maxLines="2"
                     android:text="@string/mini_description"
                     android:textColor="@color/black_64"
-                    android:textSize="10sp" />
+                    android:textSize="12sp" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -159,7 +159,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/impact_runs"
-                            android:textSize="6sp"
+                            android:textSize="8sp"
                             android:textColor="@color/greyish_brown_two"/>
 
                         <com.sharesmile.share.views.LBTextView
@@ -184,7 +184,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/cause_goal"
-                            android:textSize="6sp"
+                            android:textSize="8sp"
                             android:textColor="@color/greyish_brown_two"/>
 
                         <com.sharesmile.share.views.LBTextView
