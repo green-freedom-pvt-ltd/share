@@ -7,4 +7,5 @@
     android:paddingTop="?actionBarSize"
     tools:context="activities.ImpactLeagueActivity">
 
+
 </FrameLayout>

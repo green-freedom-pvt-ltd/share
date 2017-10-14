@@ -200,7 +200,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     protected void hideSelfRankFromBottom(){
-//        Logger.d(TAG, "hideSelfRankFromBottom");
+        Logger.d(TAG, "hideSelfRankFromBottom");
         if (selfRankHolder.isVisible()){
             selfRankHolder.hide();
             mRecyclerView.setPadding(0,0,0,0);
