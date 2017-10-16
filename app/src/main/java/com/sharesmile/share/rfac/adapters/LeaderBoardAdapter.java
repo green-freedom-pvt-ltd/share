@@ -152,14 +152,12 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             final int id = mParent.getMyId();
 
             if (id == leaderboard.getId()) {
-//                Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " matches");
-                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.light_gold));
+                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.bright_sky_blue));
                 container.setCardElevation(3f);
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.white));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.white));
                 mImpact.setTextColor(mContext.getResources().getColor(R.color.white));
             } else {
-//                Logger.d(TAG, "My teamId " + id + ", and currentTeamId " + leaderboard.getId() + " doesn't match");
                 container.setCardBackgroundColor(mContext.getResources().getColor(R.color.white));
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));

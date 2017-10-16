@@ -48,4 +48,5 @@
     <dimen name="view_pager_margin_top">40dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="super_large_text">36sp</dimen>
+    <dimen name="semi_super_large_text">34sp</dimen>
 </resources>

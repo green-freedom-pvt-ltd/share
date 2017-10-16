@@ -3,9 +3,6 @@ package com.sharesmile.share.rfac.fragments;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,7 +15,6 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.rfac.models.LeaderBoardData;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
@@ -96,7 +92,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
 
     @Override
     protected void setupToolbar() {
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
         setToolbarTitle(getResources().getString(R.string.leaderboard));
         getFragmentController().setToolbarElevation(0);
     }
@@ -113,30 +109,30 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
         super.onDestroyView();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_leaderboard, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.item_league:
-                if (LeaderBoardDataStore.getInstance().toShowLeague()){
-                    getFragmentController().replaceFragment(LeagueBoardFragment.getInstance(), true);
-                }else {
-                    getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
-                }
-                AnalyticsEvent.create(Event.ON_CLICK_CUP_ICON)
-                        .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
-                        .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
-                        .buildAndDispatch();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_leaderboard, menu);
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.item_league:
+//                if (LeaderBoardDataStore.getInstance().toShowLeague()){
+//                    getFragmentController().replaceFragment(LeagueBoardFragment.getInstance(), true);
+//                }else {
+//                    getFragmentController().performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
+//                }
+//                AnalyticsEvent.create(Event.ON_CLICK_CUP_ICON)
+//                        .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
+//                        .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+//                        .buildAndDispatch();
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//    }
 
     @Override
     protected void fetchData() {

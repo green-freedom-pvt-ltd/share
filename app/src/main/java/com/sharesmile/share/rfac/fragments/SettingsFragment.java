@@ -312,7 +312,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
         @Override
         public String toString() {
-            return label + " " + code;
+            return label + " " + code ;
         }
     }
 }

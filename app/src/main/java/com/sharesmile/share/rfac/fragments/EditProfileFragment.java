@@ -190,16 +190,13 @@ public class EditProfileFragment extends BaseFragment implements
             MainApplication.showToast("Please enter a valid name");
             return false;
         }
-        if (!Utils.isValidPhoneNumber(mNumber.getText().toString())){
-            MainApplication.showToast("Please enter a valid 10 digit phone number");
+        if (!validatePhoneNumber(mNumber.getText().toString())){
             return false;
         }
         try {
             String inputWeight = bodyWeightKgs.getText().toString();
-            if (TextUtils.isEmpty(inputWeight)){
-                MainApplication.showToast(R.string.enter_actual_weight);
-                return false;
-            }else {
+            if (!TextUtils.isEmpty(inputWeight)){
+                // Go for validation only when weight box is empty
                 float weight = Float.parseFloat(inputWeight);
                 if (weight < 10 || weight > 200){
                     MainApplication.showToast(R.string.enter_actual_weight);
@@ -210,6 +207,27 @@ public class EditProfileFragment extends BaseFragment implements
             Logger.e(TAG, "Exception while parsing body weight: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+        return true;
+    }
+
+    private boolean validatePhoneNumber(String number){
+        if (TextUtils.isEmpty(number)){
+            // Will not perform validation if there is no input for phone number
+            return true;
+        }
+        if ( "IN".equalsIgnoreCase(Utils.getUserCountry(MainApplication.getContext())) ){
+            // If it is an Indian Phone Number
+            if (!Utils.isValidIndianPhoneNumber(number)){
+                MainApplication.showToast("Please enter a valid 10 digit phone number");
+                return false;
+            }
+        }else {
+            // International Phone Number
+            if (!Utils.isValidInternationalPhoneNumber(number)){
+                MainApplication.showToast("Please enter a valid phone number");
+                return false;
+            }
         }
         return true;
     }
@@ -249,7 +267,7 @@ public class EditProfileFragment extends BaseFragment implements
         }
 
         if (!TextUtils.isEmpty(mNumber.getText())) {
-            if (Utils.isValidPhoneNumber(mNumber.getText().toString())){
+            if (Utils.isValidInternationalPhoneNumber(mNumber.getText().toString())){
                 userDetails.setPhoneNumber(mNumber.getText().toString());
                 Analytics.getInstance().setUserPhone(mNumber.getText().toString());
                 AnalyticsEvent.create(Event.ON_SET_PHONE_NUM)

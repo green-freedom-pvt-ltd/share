@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -85,8 +86,13 @@ public class Utils {
 
     private static final String TAG = "Utils";
 
+    // TODO: Need to modify this method to accommodate international phone numbers
     /* a utility to validate Indian phone number example - 03498985532, 5389829422 **/
-    public static boolean isValidPhoneNumber(String number) {
+    public static boolean isValidInternationalPhoneNumber(String number) {
+        return PhoneNumberUtils.isGlobalPhoneNumber(number);
+    }
+
+    public static boolean isValidIndianPhoneNumber(String number){
         if (!TextUtils.isEmpty(number)) {
             return number.matches("^0?(\\d{10})");
         }
