@@ -4,24 +4,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
-import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.ShareImageLoader;
-import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
 import com.sharesmile.share.views.MRTextView;
@@ -84,18 +78,18 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         return view;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_toolbar, menu);
-        MenuItem messageItem = menu.findItem(R.id.item_message);
-
-        RelativeLayout badge = (RelativeLayout) messageItem.getActionView();
-        View badgeIndicator = badge.findViewById(R.id.badge_indicator);
-        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
-        badgeIndicator.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
-
-        badge.setOnClickListener(this);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_toolbar, menu);
+//        MenuItem messageItem = menu.findItem(R.id.item_message);
+//
+//        RelativeLayout badge = (RelativeLayout) messageItem.getActionView();
+//        View badgeIndicator = badge.findViewById(R.id.badge_indicator);
+//        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
+//        badgeIndicator.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
+//
+//        badge.setOnClickListener(this);
+//    }
 
     private void init() {
 
@@ -147,10 +141,10 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
                             .buildAndDispatch();
                 }
                 break;
-            case R.id.badge_layout:
-                getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
-                AnalyticsEvent.create(Event.ON_CLICK_FEED).buildAndDispatch();
-                break;
+//            case R.id.badge_layout:
+//                getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
+//                AnalyticsEvent.create(Event.ON_CLICK_FEED).buildAndDispatch();
+//                break;
             default:
         }
     }
