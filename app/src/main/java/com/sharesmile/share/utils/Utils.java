@@ -224,7 +224,7 @@ public class Utils {
     }
 
     public static float convertDpToPixel(Context context, float dp) {
-        Context localContext = context;
+        Context localContext = context != null ? context : MainApplication.getContext();
         DisplayMetrics displayMetrics = localContext.getResources().getDisplayMetrics();
         return dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT);
     }

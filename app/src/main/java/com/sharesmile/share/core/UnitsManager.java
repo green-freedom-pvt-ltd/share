@@ -118,7 +118,7 @@ public class UnitsManager {
     }
 
     public static CurrencyCode getCurrencyCode(){
-        String currCodeString = SharedPrefsManager.getInstance().getString(PREFS_MY_CURRENCY);
+        String currCodeString = SharedPrefsManager.getInstance().getString(PREFS_MY_CURRENCY, "INR");
         return CurrencyCode.fromString(currCodeString);
     }
 

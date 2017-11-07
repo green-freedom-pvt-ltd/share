@@ -2,14 +2,14 @@ package com.sharesmile.share.rfac.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import com.sharesmile.share.rfac.fragments.OnBoardingFragment;
 
 /**
  * Created by Shine on 25/06/16.
  */
-public class OnBoardingAdapter extends FragmentStatePagerAdapter {
+public class OnBoardingAdapter extends FragmentPagerAdapter {
 
     public OnBoardingAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);

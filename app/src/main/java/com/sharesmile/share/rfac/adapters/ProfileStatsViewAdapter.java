@@ -10,7 +10,7 @@ import com.sharesmile.share.rfac.fragments.ProfileStatsViewFragment;
  * Created by ankitmaheshwari on 5/18/17.
  */
 
-public class ProfileStatsViewAdapter extends FragmentStatePagerAdapter {
+public class ProfileStatsViewAdapter extends FragmentPagerAdapter {
 
     public ProfileStatsViewAdapter(FragmentManager manager){
         super(manager);

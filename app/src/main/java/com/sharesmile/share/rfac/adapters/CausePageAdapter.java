@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.adapters;
 
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -40,6 +41,11 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
         } else {
             return POSITION_NONE;
         }
+    }
+
+    @Override
+    public Parcelable saveState() {
+        return null;
     }
 
     @Override
