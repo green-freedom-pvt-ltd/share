@@ -65,18 +65,10 @@ public class RunCountdownFragment extends BaseFragment {
 
         View v = inflater.inflate(R.layout.fragment_run_count_down, null);
         ButterKnife.bind(this,v);
-        countdown = (TextView) v.findViewById(R.id.tv_countdown);
-        RelativeLayout layout_countdown = (RelativeLayout) v.findViewById(R.id.start_countdown_layout);
-        layout_countdown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                proceedToRunProgress();
-                AnalyticsEvent.create(Event.ON_SKIP_COUNTDOWN)
-                        .buildAndDispatch();
-            }
-        });
+        countdown = v.findViewById(R.id.tv_countdown);
+        RelativeLayout layout_countdown = v.findViewById(R.id.start_countdown_layout);
         mFragmentManager = getFragmentManager();
-        Count = new CountDownTimer(10000, 1000) {
+        Count = new CountDownTimer(3000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 int seconds = (int) ((millisUntilFinished / 1000));

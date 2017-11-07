@@ -2,10 +2,10 @@ package com.sharesmile.share.gps;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.sharesmile.share.utils.Logger;
 
@@ -15,7 +15,7 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
  * Created by ankitmaheshwari on 6/26/17.
  */
 
-public class WorkoutServiceRetainerAlarm extends BroadcastReceiver {
+public class WorkoutServiceRetainerAlarm extends WakefulBroadcastReceiver {
 
     private static final String TAG = "WorkoutServiceRetainerAlarm";
     public static final String ACTION = "com.sharesmile.share.gps.START_ALARM";

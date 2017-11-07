@@ -57,12 +57,5 @@
         </RelativeLayout>
     </FrameLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_run_frame_layout"
-        android:layout_marginTop="50dp"
-        android:gravity="center_horizontal"
-        android:text="@string/tap_to_start"
-        android:textSize="18sp" />
+
 </RelativeLayout>

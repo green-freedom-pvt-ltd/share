@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.rfac.models.ExchangeRate;
-import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
@@ -172,7 +171,6 @@ public class UnitsManager {
     }
 
     private static String formatAsPerCurrency(double value, CurrencyCode currency){
-        Logger.d(TAG, "formatAsPerCurrency: " + currency +", value = " + value);
         NumberFormat format = null;
         if (CurrencyCode.INR.equals(currency)){
             // If it is INR then we create instance using Indian Locale
@@ -190,7 +188,6 @@ public class UnitsManager {
             }
         }
         String ret = format.format(value);
-        Logger.d(TAG, "Will return " + ret);
         return ret;
     }
 
@@ -209,33 +206,64 @@ public class UnitsManager {
         return formatInMyCurrency(amount);
     }
 
+    public static String impactToVoice(long rupeeAmount){
+        double amount = rupeeAmount / getExchangeRateForMyCurrency();
+        StringBuilder sb = new StringBuilder();
+        if (getCurrencySymbol().contains("$")){
+            int cents = (int)Math.round(amount*100);
+            int dollar = cents / 100;
+            cents = cents % 100;
+            if (dollar > 0){
+                sb.append(dollar).append(" dollars ");
+            }
+            sb.append(cents).append(" cents ");
+            return sb.toString();
+        }else if (CurrencyCode.INR.equals(getCurrencyCode())){
+            return String.format("%d rupees", rupeeAmount);
+        }else {
+            // Other currencies
+            NumberFormat format = null;
+            format = NumberFormat.getInstance(new Locale("EN", "US"));
+            if (amount > 100){
+                format.setMaximumFractionDigits(0);
+            }else {
+                format.setMaximumFractionDigits(2);
+            }
+            return format.format(amount) + " " + getCurrencySymbol();
+        }
+    }
+
+    public static String distanceToVoice(float distanceInMeters){
+        NumberFormat format = null;
+        StringBuilder sb = new StringBuilder();
+        format = NumberFormat.getInstance(new Locale("EN", "US"));
+        if (distanceInMeters > 100){
+            format.setMaximumFractionDigits(1);
+            if (DistanceUnit.KILOMETER.equals(getDistanceUnit())){
+                sb.append(format.format(distanceInMeters / 1000) + " ");
+            }else {
+                sb.append(format.format(distanceInMeters*(0.000621)) + " ");
+            }
+        }else {
+            sb.append("0 ");
+        }
+
+        if (DistanceUnit.KILOMETER.equals(getDistanceUnit())){
+            sb.append("kilometers");
+        }else {
+            sb.append("miles");
+        }
+
+        return sb.toString();
+    }
+
     private static String formatInMyCurrency(double amount){
         return getCurrencySymbol() + " " + formatAsPerCurrency(amount, getCurrencyCode());
-//        if (CurrencyCode.INR.equals(getCurrencyCode())){
-//            return getCurrencySymbol() + " " + Utils.formatIndianCommaSeparated(Math.round(amount));
-//        }else {
-//            return getCurrencySymbol() + " " + formatAsPerCurrency(amount,
-//                                Currency.getInstance(getCurrencyCode().toString()));
-//        }
     }
 
 
-    public static final long THOUSAND = 1000;
-    public static final long LAKH = 100000;
-    public static final long CRORE = 10000000;
-    public static final long ARAB = 1000000000;
-    public static final long KHARAB = 100000000000L;
 
-    private static final String padWithZeroes(long num, int expectedNumDigits){
-        int actualNumDigits = String.valueOf(num).length();
-        String ret = String.valueOf(num);
-        if (expectedNumDigits > actualNumDigits){
-            for (int i=0; i < expectedNumDigits - actualNumDigits; i++){
-                ret = "0" + ret;
-            }
-        }
-        return ret;
-    }
+
 
 
 

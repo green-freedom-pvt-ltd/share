@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.Calorie;
@@ -63,6 +64,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         dirtyWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
         approvedWorkoutData = new WorkoutDataImpl(beginTimeStamp, workoutId);
         usainBoltOcurredTimeStamps = new ArrayList<>();
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT, ClientConfig.getInstance().VOICE_UPDATE_INTERVAL);
         //Persist dirtyWorkoutData object over here
         persistBothWorkoutData();
     }
@@ -304,6 +306,22 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         approvedWorkoutData.incrementNumUpdates();
     }
 
+    @Override
+    public int getNextVoiceUpdateScheduledAt() {
+        return SharedPrefsManager.getInstance().getInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT);
+    }
+
+    @Override
+    public void updateAfterVoiceUpdate() {
+        Logger.d(TAG, "updateAfterVoiceUpdate");
+        int current = SharedPrefsManager.getInstance().getInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT);
+        while (current < getElapsedTime()){
+            current = ClientConfig.getInstance().VOICE_UPDATE_INTERVAL_INCREMENT_FACTOR*current
+                    + ClientConfig.getInstance().VOICE_UPDATE_INTERVAL;
+        }
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT, current);
+    }
+
     private void persistBothWorkoutData() {
         persistDirtyWorkoutData();
         if (approvedWorkoutData != null){
@@ -333,5 +351,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_APPROVED);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS);
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT);
     }
 }

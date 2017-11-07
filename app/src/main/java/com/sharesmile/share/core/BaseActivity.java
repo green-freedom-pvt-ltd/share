@@ -23,6 +23,7 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
+import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
@@ -60,6 +61,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
+        if (!CauseDataStore.getInstance().isCauseAvailableForRun(mCauseData)){
+            mCauseData = CauseDataStore.getInstance().getFirstCause();
+        }
         IntentFilter filter = new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(locationTrackerReceiver, filter);
     }
@@ -169,7 +173,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
             case START_RUN_TEST:
                 if (input instanceof CauseData) {
                     Intent intent = new Intent(this, TrackerActivity.class);
-                    intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, (CauseData) input);
+                    intent.putExtra(BUNDLE_CAUSE_DATA, (CauseData) input);
                     SharedPrefsManager.getInstance().setBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON, true);
                     startActivity(intent);
                 } else {
@@ -292,7 +296,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     private void showTrackingActivity() {
         Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity");
         Intent intent = new Intent(this, TrackerActivity.class);
-        intent.putExtra(TrackerActivity.BUNDLE_CAUSE_DATA, mCauseData);
+        intent.putExtra(BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);
     }
 

@@ -360,6 +360,31 @@ public class Utils {
         }
     }
 
+    public static final String secondsToVoiceUpdate(int secs) {
+        if (secs >= 3600) {
+            int totalMins = secs / 60;
+            int hour = totalMins / 60;
+            int min = totalMins % 60;
+            if (min == 0){
+                if (hour == 1){
+                    return String.format("1 hour");
+                }else {
+                    return String.format("%d hours", hour);
+                }
+            }else {
+                return String.format("%d hours %d minutes", hour, min);
+            }
+        } else {
+            int totalMins = secs / 60;
+            int totalSecs = secs % 60;
+            if (totalSecs == 0){
+                return String.format("%d minutes", totalMins);
+            }else {
+                return String.format("%d minutes %d seconds", totalMins, totalSecs);
+            }
+        }
+    }
+
     public static String createPrettyJSONStringFromObject(Object object) {
         return new GsonBuilder()
                 .setPrettyPrinting()

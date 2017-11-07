@@ -163,7 +163,6 @@ public class ProfileStatsViewFragment extends BaseFragment {
                 int val = Math.round(value);
                 if (val > 0){
                     return UnitsManager.formatRupeeToMyCurrency(val);
-//                            "\u20B9 " + String.valueOf(val);
                 }else {
                     return "";
                 }
@@ -188,7 +187,7 @@ public class ProfileStatsViewFragment extends BaseFragment {
         yAxis.setSpaceBottom(4);
         yAxis.setLabelCount(3, true);
 
-        yAxis.setCenterAxisLabels(true);
+        yAxis.setAxisMinimum(0);
         yAxis.setGridColor(ContextCompat.getColor(getContext(), R.color.black_5));
         yAxis.setDrawAxisLine(false);
         yAxis.setGridLineWidth(1f);
@@ -198,7 +197,6 @@ public class ProfileStatsViewFragment extends BaseFragment {
             public String getFormattedValue(float value, AxisBase axis) {
                 if (value > 10){
                     return UnitsManager.formatRupeeToMyCurrency(value);
-//                            "\u20B9 " + Math.round(value);
                 }
                 else if (value > 0){
                     // Earlier only one decimal was being shown

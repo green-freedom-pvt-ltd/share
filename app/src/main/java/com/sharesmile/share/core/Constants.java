@@ -110,6 +110,8 @@ public class Constants {
 
     public static final String PREF_USAIN_BOLT_OCURRED_TIME_STAMPS = "pref_usain_bolt_ocurred_time_stamps";
 
+    public static final String PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT = "pref_next_voice_update_scheduled_at";
+
     public static final String PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN = "pref_workout_data_num_steps_when_batch_begin";
 
     public static final String PREF_WORKOUT_LIFETIME_DISTANCE = "pref_workout_lifetime_distance_new";
@@ -163,6 +165,7 @@ public class Constants {
     public static final String PREF_FIRST_LAUNCH_EVENT_SENT = "first_launch_event_sent";
 
     public static final String PREF_DISABLE_ALERTS = "pref_disable_alerts";
+    public static final String PREF_DISABLE_VOICE_UPDATES = "pref_disable_voice_updates";
     public static final String PREF_DISABLE_GPS_UPDATES = "pref_disable_gps_updates";
     public static final String PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP = "pref_last_activity_detection_stopped_time_stamp";
 

@@ -1,5 +1,6 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -35,9 +36,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
 
 
 /**
@@ -64,6 +67,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     @BindView(R.id.notif_toggle)
     Switch notifToggle;
 
+    @BindView(R.id.notif_voice_updates)
+    Switch notifVoiceUpdates;
+
     @BindView(R.id.currency_spinner)
     Spinner currencySpinner;
 
@@ -72,6 +78,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     @BindView(R.id.gps_speed_updates)
     Switch gpsSpeedUpdates;
+
 
     private FragmentInterface mListener;
 
@@ -87,6 +94,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mLogout.setOnClickListener(this);
         notifToggle.setOnCheckedChangeListener(this);
         gpsSpeedUpdates.setOnCheckedChangeListener(this);
+        notifVoiceUpdates.setOnCheckedChangeListener(this);
         if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
             notifToggle.setChecked(false);
         }else {
@@ -97,10 +105,25 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         }else {
             gpsSpeedUpdates.setChecked(true);
         }
+        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_VOICE_UPDATES, false)){
+            notifVoiceUpdates.setChecked(false);
+        }else {
+            notifVoiceUpdates.setChecked(true);
+        }
         getFragmentController().updateToolBar(getString(R.string.action_settings), true);
         appVersionText.setText("App Version " + Utils.getAppVersion());
         setCurrencySpinner();
         setMeasurementSpinner();
+
+        new MaterialShowcaseView.Builder((Activity) getFragmentController())
+                .setTarget(notifToggle)
+                .setDismissText("GOT IT")
+                .setContentText("You can re enable walk reminder notifications from here")
+                .setDelay(200) // optional but starting animations immediately in onCreate can make them choppy
+                .setDismissOnTargetTouch(true)
+                .setTargetTouchable(true)
+                .show();
+
         return view;
 
     }
@@ -256,6 +279,15 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 }else {
                     // Disable Alerts and Reminders
                     SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
+                }
+                break;
+            case R.id.notif_voice_updates:
+                if (isChecked){
+                    // Enabled Alerts and Reminders
+                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_VOICE_UPDATES, false);
+                }else {
+                    // Disable Alerts and Reminders
+                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_VOICE_UPDATES, true);
                 }
                 break;
         }

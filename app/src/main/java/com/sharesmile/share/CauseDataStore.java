@@ -93,6 +93,20 @@ public class CauseDataStore {
         }
     }
 
+    public boolean isCauseAvailableForRun(CauseData causeData){
+        for (CauseData cause : causeList.getCauses()) {
+            if (cause.getId() == causeData.getId()){
+                return cause.isActive() && !cause.isCompleted();
+            }
+        }
+        return false;
+    }
+
+    public CauseData getFirstCause(){
+        return getCausesToShow().get(0);
+    }
+
+
     public List<CauseData> getCausesToShow(){
         List<CauseData> activeCauses = new ArrayList<>();
         if (causeList != null){

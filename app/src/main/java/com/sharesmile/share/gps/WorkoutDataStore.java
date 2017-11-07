@@ -92,4 +92,8 @@ public interface WorkoutDataStore {
 
 	void incrementNumUpdateEvents();
 
+	int getNextVoiceUpdateScheduledAt();
+
+	void updateAfterVoiceUpdate();
+
 }

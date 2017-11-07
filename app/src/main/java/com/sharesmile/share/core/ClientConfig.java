@@ -93,6 +93,9 @@ public class ClientConfig implements UnObfuscable{
     public  long DATA_SYNC_INTERVAL = 10800L;// in secs, i.e. every 3 hours
     public  long DATA_SYNC_INTERVAL_FLEX = 5400L;// in secs, i.e. every 1.5 hours
 
+    public  int VOICE_UPDATE_INTERVAL = 300;// in secs, i.e. every 5 mins
+    public  int VOICE_UPDATE_INTERVAL_INCREMENT_FACTOR = 2;
+
     private static ClientConfig instance;
 
     private ClientConfig(){

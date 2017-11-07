@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -64,6 +65,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -72,6 +74,7 @@ import static com.sharesmile.share.core.Config.WORKOUT_BEGINNING_LOCATION_CIRCUL
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_GPS_DISABLED;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USAIN_BOLT;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED_NOTIFICATION;
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
@@ -111,6 +114,8 @@ public class WorkoutService extends Service implements
     private CauseData mCauseData;
     private Handler handler;
 
+    TextToSpeech textToSpeech;
+
     private float distanceInKmsOnLastUpdateEvent = 0f;
 
     @Override
@@ -133,6 +138,8 @@ public class WorkoutService extends Service implements
         return START_STICKY;
     }
 
+    private boolean textToSpeechReady = false;
+
     private void startTracking() {
         Logger.d(TAG, "startTracking");
         if (tracker == null) {
@@ -150,6 +157,41 @@ public class WorkoutService extends Service implements
         ActivityDetector.getInstance().startActivityDetection();
         AnalyticsEvent.create(Event.ON_WORKOUT_START)
                 .buildAndDispatch();
+
+        textToSpeechReady = false;
+        textToSpeech = new TextToSpeech(getContext().getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+
+                    Locale locale = new Locale("en", "IN");
+                    int availability = textToSpeech.isLanguageAvailable(locale);
+                    Logger.d(TAG, "Indian accent availability: " + availability);
+                    switch (availability) {
+                        case TextToSpeech.LANG_NOT_SUPPORTED: {
+                            textToSpeech.setLanguage(Locale.US);
+                            break;
+                        }
+                        case TextToSpeech.LANG_MISSING_DATA: {
+                            textToSpeech.setLanguage(Locale.US);
+                            break;
+                        }
+                        case TextToSpeech.LANG_AVAILABLE: {
+                            textToSpeech.setLanguage(Locale.US);
+                            break;
+                        }
+                        case TextToSpeech.LANG_COUNTRY_AVAILABLE:
+                        case TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE: {
+                            textToSpeech.setLanguage(locale);
+                            break;
+                        }
+                    }
+
+                    textToSpeech.setLanguage(Locale.ENGLISH);
+                    textToSpeechReady = true;
+                }
+            }
+        });
     }
 
 
@@ -912,7 +954,7 @@ public class WorkoutService extends Service implements
         Notification notification = getForegroundNotificationBuilder().build();
         startForeground(WORKOUT_TRACK_NOTIFICATION_ID, notification);
         stopTimer();
-        handler.postDelayed(timer, NOTIFICATION_TIMER_TICK);
+        handler.postDelayed(notificationUpdateTimer, NOTIFICATION_TIMER_TICK);
     }
 
     private void updateStickyNotification() {
@@ -981,16 +1023,43 @@ public class WorkoutService extends Service implements
     }
 
     private void stopTimer(){
-        handler.removeCallbacks(timer);
+        handler.removeCallbacks(notificationUpdateTimer);
     }
 
-    private Runnable timer = new Runnable() {
+    private Runnable notificationUpdateTimer = new Runnable() {
         @Override
         public void run() {
             updateStickyNotification();
+            WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
+            if (dataStore != null
+                    && textToSpeechReady
+                    && !SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_VOICE_UPDATES)
+                    && dataStore.isWorkoutRunning()){
+                int nextVoiceUpdateAt = dataStore.getNextVoiceUpdateScheduledAt();
+                Logger.d(TAG, "nextVoiceUpdateAt = " + nextVoiceUpdateAt);
+                if (dataStore.getElapsedTime() >= nextVoiceUpdateAt){
+                    String toSpeak = getVoiceUpdateMessage();
+                    textToSpeech.setPitch(1);
+                    textToSpeech.setSpeechRate(0.8f);
+                    textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+                    dataStore.updateAfterVoiceUpdate();
+                }
+            }
+
             handler.postDelayed(this, NOTIFICATION_TIMER_TICK);
         }
     };
+
+    public String getVoiceUpdateMessage() {
+        float distance = getTotalDistanceCoveredInMeters();
+        int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), distance);
+
+        return getString(R.string.impact_voice_update_text,
+                UnitsManager.impactToVoice(rupees),
+                UnitsManager.distanceToVoice(distance),
+                Utils.secondsToVoiceUpdate((int)getWorkoutElapsedTimeInSecs()));
+
+    }
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);

@@ -91,12 +91,16 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
      */
     protected abstract UserFeedback addToFeedback(UserFeedback.Builder builder);
 
+
+
     protected void init(){
         inputContainer = new FeedbackInputContainer(getPromptText(), getHintText(),
                 userInputLayout, this);
         chatContainer = new FeedbackChatContainer(chatLayout, this);
         setupToolbar();
+
     }
+
 
     @Override
     public int getFeedbackLevel() {

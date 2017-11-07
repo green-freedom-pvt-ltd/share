@@ -281,7 +281,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                             WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
                             appContext.getString(R.string.notification_walk_engagement),
                             appContext.getString(R.string.notification_action_start),
-                            appContext.getString(R.string.notification_action_cancel)
+                            appContext.getString(R.string.notification_action_disable)
                     );
                     if (!isWorkoutActive()){
                         // Do not perform activity detection until the next 24 hours, unless user starts workout

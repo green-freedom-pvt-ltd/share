@@ -62,7 +62,6 @@ public class TrackerActivity extends BaseActivity {
     private static final int FEEDBACK = 2;
     private static final int LOGOUT = 3;
 
-    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     private CauseData mCauseData;
 
     @Override
@@ -74,7 +73,6 @@ public class TrackerActivity extends BaseActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
         runInTestMode = SharedPrefsManager.getInstance().getBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON);
-        mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
         if (mCauseData != null) {
             SharedPrefsManager.getInstance().setString(Constants.PREF_CAUSE_DATA, new Gson().toJson(mCauseData));
         } else {

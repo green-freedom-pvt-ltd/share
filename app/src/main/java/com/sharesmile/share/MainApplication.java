@@ -156,7 +156,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         long[] vibratePattern;
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
             // Long vibration for walk engagement notification
-            vibratePattern = new long[]{0, 800, 500, 2500}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+            vibratePattern = new long[]{0, 600, 500, 1500}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }else {
             vibratePattern = new long[]{0, 200, 100, 400}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }
@@ -182,9 +182,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                 }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
                     builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createStopRunIntent());
                 }else if (getContext().getString(R.string.notification_action_start).equals(action)){
-                    builder.addAction(R.drawable.ic_play_arrow_black_24px, "Start", getInstance().createAppIntent());
+                    builder.addAction(R.drawable.ic_play_arrow_black_24px, "Start",
+                            getInstance().createStartWorkoutIntent());
                 }else if (getContext().getString(R.string.notification_action_cancel).equals(action)){
                     builder.addAction(R.drawable.ic_close_black_24dp, "Cancel",
+                            createNotificationActionReceiverPendingIntent(action, notificationId));
+                }else if (getContext().getString(R.string.notification_action_disable).equals(action)){
+                    builder.addAction(R.drawable.ic_close_black_24dp, "Don't show this",
                             createNotificationActionReceiverPendingIntent(action, notificationId));
                 }
             }
@@ -384,6 +388,15 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     public PendingIntent createAppIntent(){
         Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        return resultPendingIntent;
+    }
+
+    public PendingIntent createStartWorkoutIntent(){
+        Intent resultIntent = new Intent(getInstance().getApplicationContext(), TrackerActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
