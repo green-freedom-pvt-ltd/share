@@ -74,6 +74,7 @@ import butterknife.ButterKnife;
 
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
+import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -103,11 +104,15 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }else {
             Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
             Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
-            Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip);
+            Boolean isReminderDisable =  getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
+            getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
+            boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
+            getIntent().removeExtra(INTENT_STOP_RUN);
+            Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip + ", isReminderDisable = "
+                    + isReminderDisable + ", intentStopRun = " + intentStopRun);
             if (!userLogin && !isLoginSkip) {
                 startLoginActivity();
             } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
-                boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
                 if (intentStopRun){
                     WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
                 }
@@ -117,9 +122,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 // Normal launch of MainActivity, render its layout
                 EventBus.getDefault().register(this);
                 ButterKnife.bind(this);
-                mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-                mNavigationView = (NavigationView) findViewById(R.id.shitstuff);
-                if (savedInstanceState == null) {
+                mDrawerLayout = findViewById(R.id.drawerLayout);
+                mNavigationView = findViewById(R.id.drawer_navigation);
+                if (isReminderDisable){
+                    loadSettingsFragmentWithOverlay();
+                }else if (savedInstanceState == null){
                     loadInitialFragment();
                 }
 
@@ -287,6 +294,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
     }
 
+    private void loadSettingsFragmentWithOverlay() {
+        addFragment(new HomeScreenFragment(), false);
+        replaceFragment(SettingsFragment.newInstance(true), true);
+    }
+
     private void showLeagueBoard(){
         LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
         replaceFragment(leageBoardFragment , true);
@@ -377,7 +389,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
         if (menuItem.getItemId() == R.id.nav_item_settings) {
             Logger.d(TAG, "settings clicked");
-            replaceFragment(new SettingsFragment(), true);
+            replaceFragment(SettingsFragment.newInstance(false), true);
         } else if (menuItem.getItemId() == R.id.nav_item_home) {
             showHome();
             AnalyticsEvent.create(Event.ON_SELECT_HOME_MENU)
@@ -429,6 +441,15 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     public void showHome() {
         replaceFragment(new HomeScreenFragment(), true);
+
+        Context appContext = getApplicationContext();
+        MainApplication.showRunNotification(
+                appContext.getString(R.string.notification_walk_engagement_title),
+                WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
+                appContext.getString(R.string.notification_walk_engagement),
+                appContext.getString(R.string.notification_action_start),
+                appContext.getString(R.string.notification_action_disable)
+        );
     }
 
     @Override

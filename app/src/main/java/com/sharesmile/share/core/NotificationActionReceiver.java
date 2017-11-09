@@ -9,7 +9,6 @@ import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
 import com.sharesmile.share.R;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
-import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.utils.Logger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -63,17 +62,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             Logger.i(TAG, "Action Dismiss");
             if (notifId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
                 ActivityDetector.getInstance().userDismissedWalkEngagementNotif();
-            }
-        } else if (context.getString(R.string.notification_action_disable).equals(action)){
-            Logger.i(TAG, "Action Disable");
-            if (notifId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
-                // TODO: Show the settings screen to user, where he can see the option to enable reminders again
-                Intent resultIntent = new Intent(context, MainActivity.class);
-
-
-                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                context.startActivity(intent);
-
             }
         }
     }

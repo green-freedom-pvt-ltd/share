@@ -51,7 +51,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     public static final int REQUEST_LEAGUE_REGISTRATION = 103;
 
     private static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
-    private CauseData mCauseData;
+    protected CauseData mCauseData;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -61,7 +61,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
-        if (!CauseDataStore.getInstance().isCauseAvailableForRun(mCauseData)){
+        if (mCauseData != null && !CauseDataStore.getInstance().isCauseAvailableForRun(mCauseData)){
             mCauseData = CauseDataStore.getInstance().getFirstCause();
         }
         IntentFilter filter = new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION);
@@ -294,7 +294,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
     private void showTrackingActivity() {
-        Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity");
+        Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity with causeData: " + mCauseData.getTitle());
         Intent intent = new Intent(this, TrackerActivity.class);
         intent.putExtra(BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);

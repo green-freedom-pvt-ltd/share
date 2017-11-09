@@ -110,7 +110,7 @@ public class Constants {
 
     public static final String PREF_USAIN_BOLT_OCURRED_TIME_STAMPS = "pref_usain_bolt_ocurred_time_stamps";
 
-    public static final String PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT = "pref_next_voice_update_scheduled_at";
+    public static final String PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT_INDEX = "pref_next_voice_update_scheduled_at_index";
 
     public static final String PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN = "pref_workout_data_num_steps_when_batch_begin";
 
@@ -127,6 +127,7 @@ public class Constants {
     public static final String PREF_IS_LOGIN = "pref_user_login";
     public static final String PREF_USER_ID = "pref_user_id";
     public static final String PREF_FIRST_TIME_USER = "pref_first_time_user";
+    public static final String PREF_IS_REMINDER_DISABLE = "pref_is_reminder_disable";
     public static final String PREF_TOTAL_RUN = "pref_total_run_count";
     public static final String PREF_TOTAL_IMPACT = "pref_total_impact";
 

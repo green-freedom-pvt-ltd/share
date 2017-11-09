@@ -17,6 +17,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
 
 import butterknife.BindView;
@@ -26,6 +27,8 @@ import butterknife.ButterKnife;
  * Created by apurvgandhwani on 3/31/2016.
  */
 public class RunCountdownFragment extends BaseFragment {
+
+    private static final String TAG = "RunCountdownFragment";
 
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
@@ -68,14 +71,16 @@ public class RunCountdownFragment extends BaseFragment {
         countdown = v.findViewById(R.id.tv_countdown);
         RelativeLayout layout_countdown = v.findViewById(R.id.start_countdown_layout);
         mFragmentManager = getFragmentManager();
-        Count = new CountDownTimer(3000, 1000) {
+        Count = new CountDownTimer(3150, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                int seconds = (int) ((millisUntilFinished / 1000));
+                Logger.d(TAG, "onTick: " + millisUntilFinished) ;
+                int seconds = Math.round ((millisUntilFinished / 1000));
                 countdown.setText(seconds + "");
             }
 
             public void onFinish() {
+                Logger.d(TAG, "onFinish") ;
                 proceedToRunProgress();
                 cancel();
             }

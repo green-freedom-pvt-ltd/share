@@ -43,7 +43,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     private static final String TAG = "RunFragment";
     public static final long TIMER_TICK = 1000; // in millis
-    public static final long NOTIFICATION_TIMER_TICK = 60000; // in millis
+    public static final long NOTIFICATION_TIMER_TICK = 10000; // in millis
 
 
     TrackerActivity myActivity;

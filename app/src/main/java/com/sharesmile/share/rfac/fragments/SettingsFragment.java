@@ -79,8 +79,20 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     @BindView(R.id.gps_speed_updates)
     Switch gpsSpeedUpdates;
 
+    MaterialShowcaseView materialShowcaseView;
+
+    private static final String SHOW_REMINDER_OVERLAY = "show_reminder_overlay";
 
     private FragmentInterface mListener;
+    private boolean showReminderOverlay;
+
+    public static SettingsFragment newInstance(boolean showReminderOverlay) {
+        SettingsFragment fragment = new SettingsFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(SHOW_REMINDER_OVERLAY, showReminderOverlay);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -88,6 +100,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         View view = inflater.inflate(R.layout.fragment_drawer_settings, null);
         ButterKnife.bind(this, view);
         updateSettingItems();
+        showReminderOverlay = getArguments().getBoolean(SHOW_REMINDER_OVERLAY);
         mShare.setOnClickListener(this);
         mTos.setOnClickListener(this);
         mRate.setOnClickListener(this);
@@ -115,17 +128,30 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         setCurrencySpinner();
         setMeasurementSpinner();
 
-        new MaterialShowcaseView.Builder((Activity) getFragmentController())
-                .setTarget(notifToggle)
-                .setDismissText("GOT IT")
-                .setContentText("You can re enable walk reminder notifications from here")
-                .setDelay(200) // optional but starting animations immediately in onCreate can make them choppy
-                .setDismissOnTargetTouch(true)
-                .setTargetTouchable(true)
-                .show();
+        if (showReminderOverlay){
+            SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+            notifToggle.setChecked(false);
+            materialShowcaseView = new MaterialShowcaseView.Builder((Activity) getFragmentController())
+                    .setTarget(notifToggle)
+                    .setDismissText(getString(R.string.settings_got_it))
+                    .setContentText(getString(R.string.settings_you_can_enable_reminders))
+                    .setDelay(200) // optional but starting animations immediately in onCreate can make them choppy
+                    .setDismissOnTargetTouch(true)
+                    .setTargetTouchable(true)
+                    .setDismissOnTouch(true)
+                    .show();
+        }
 
         return view;
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (materialShowcaseView != null && materialShowcaseView.isActivated()){
+            materialShowcaseView.hide();
+        }
     }
 
     private void setCurrencySpinner(){

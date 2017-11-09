@@ -156,7 +156,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         long[] vibratePattern;
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
             // Long vibration for walk engagement notification
-            vibratePattern = new long[]{0, 600, 500, 1500}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
+            vibratePattern = new long[]{0, 600, 500, 1200}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }else {
             vibratePattern = new long[]{0, 200, 100, 400}; // It's a { delay, vibrate, sleep, vibrate, sleep } pattern
         }
@@ -189,7 +189,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                             createNotificationActionReceiverPendingIntent(action, notificationId));
                 }else if (getContext().getString(R.string.notification_action_disable).equals(action)){
                     builder.addAction(R.drawable.ic_close_black_24dp, "Don't show this",
-                            createNotificationActionReceiverPendingIntent(action, notificationId));
+                            getInstance().createDisableRemindersIntent());
                 }
             }
         }
@@ -404,6 +404,17 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return resultPendingIntent;
     }
 
+    public PendingIntent createDisableRemindersIntent(){
+        Logger.d(TAG, "createDisableRemindersIntent");
+        Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
+        resultIntent.putExtra(Constants.PREF_IS_REMINDER_DISABLE, true);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(1, PendingIntent.FLAG_UPDATE_CURRENT);
+        return resultPendingIntent;
+    }
+
     public PendingIntent createStopRunIntent(){
         Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
         resultIntent.putExtra(MainActivity.INTENT_STOP_RUN, true);
@@ -567,31 +578,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_ID);
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID);
         WorkoutService.cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
-
-//        Logger.d(TAG, "Testing indiancommaseparated"
-//                + "   " + Utils.formatIndianCommaSeparated(0)
-//                + "   " + Utils.formatIndianCommaSeparated(23)
-//                + "   " + Utils.formatIndianCommaSeparated(9001)
-//                + "   " + Utils.formatIndianCommaSeparated(12001)
-//                + "   " + Utils.formatIndianCommaSeparated(10000)
-//                + "   " + Utils.formatIndianCommaSeparated(103000)
-//                + "   " + Utils.formatIndianCommaSeparated(702007)
-//                + "   " + Utils.formatIndianCommaSeparated(98000008)
-//                + "   " + Utils.formatIndianCommaSeparated(900020000)
-//                + "   " + Utils.formatIndianCommaSeparated(97181662908L)
-//        );
-
-//        String [] countries = { "US", "CA", "MX", "GB", "DE", "RU", "JP", "CN", "IN", "AU",
-//                "CH", "SE", "NZ", "SG", "HK", "NO", "KR", "TR", "RU", "BR", "ZA" };
-//
-//        for (String countryCode : countries){
-//            countryCode = countryCode.toUpperCase();
-//            Locale locale = new Locale("EN",countryCode);
-//            CurrencyCode currency = CurrencyCode.getInstance(locale);
-//            String symbol = UnitsManager.CURRENCY_CODE_TO_SYMBOL_MAP.get(currency.getCurrencyCode());
-//            System.out.println("For country " + countryCode + ", currency symbol is " + symbol
-//                    + " and code is " + currency.getCurrencyCode());
-//        }
 
     }
 

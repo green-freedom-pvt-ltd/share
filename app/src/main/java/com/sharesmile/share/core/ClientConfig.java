@@ -11,6 +11,7 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.sharesmile.share.core.Constants.PREF_CLIENT_CONFIG;
@@ -39,25 +40,25 @@ public class ClientConfig implements UnObfuscable{
 
     public  float USAIN_BOLT_RECENT_SPEED_LOWER_BOUND = 4.1f; // in m/s, i.e. 14.8 km/hr
 
-    public  float USAIN_BOLT_GPS_SPEED_LIMIT = 5.83f; // in m/s, i.e. 21 km/hr
+    public  float USAIN_BOLT_GPS_SPEED_LIMIT = 8.33f; // in m/s, i.e. 30 km/hr
 
     public  float USAIN_BOLT_WAIVER_STEPS_RATIO = 0.38f;
 
     public  long VIGILANCE_TIMER_INTERVAL = 17000; // in millisecs
 
-    public  float SOURCE_ACCEPTABLE_ACCURACY = 40; // in m
+    public  float SOURCE_ACCEPTABLE_ACCURACY = 30; // in m
 
-    public  float THRESHOLD_ACCURACY = 12; // in m
+    public  float THRESHOLD_ACCURACY = 15; // in m
 
-    public  float THRESHOLD_FACTOR = 4.75f;
+    public  float THRESHOLD_FACTOR = 4;
 
     public  long GPS_INACTIVITY_NOTIFICATION_DELAY = 50000; // in Millisecs
 
     // Activity Detector Config
     public  int CONFIDENCE_THRESHOLD_VEHICLE = 74;
     public  int CONFIDENCE_THRESHOLD_ON_FOOT = 75;
-    public  int CONFIDENCE_UPPER_THRESHOLD_STILL = 85;
-    public  int CONFIDENCE_LOWER_THRESHOLD_STILL = 20;
+    public  int CONFIDENCE_UPPER_THRESHOLD_STILL = 77;
+    public  int CONFIDENCE_LOWER_THRESHOLD_STILL = 7;
     // Minimum ON_FOOT confidence required for walk engagement notif
     public  int CONFIDENCE_THRESHOLD_WALK_ENGAGEMENT = 52;
 
@@ -69,7 +70,7 @@ public class ClientConfig implements UnObfuscable{
     public  long DETECTED_INTERVAL_ACTIVE = 2000; // in millisecs
 
     // If user remains continuously still for this much time then Still notification is shown
-    public  long STILL_NOTIFICATION_DISPLAY_INTERVAL = 25000; // in millisecs
+    public  long STILL_NOTIFICATION_DISPLAY_INTERVAL = 30000; // in millisecs
 
     // Walk engagement counter is invoked periodically after this interval
     public  long WALK_ENGAGEMENT_COUNTER_INTERVAL = 15000; // in millisecs
@@ -77,13 +78,13 @@ public class ClientConfig implements UnObfuscable{
     // Show walk engagement notif if user has been on foot continuously for this much amount of time
     public  long WALK_ENGAGEMENT_NOTIFICATION_INTERVAL = 90000;// in millisecs
 
-    public  long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 86400000;// in millisecs, i.e. 24 hours
+    public  long WALK_ENGAGEMENT_NOTIFICATION_THROTTLE_PERIOD = 172800000;// in millisecs, i.e. 48 hours
 
     // During tracking If GPS behaves bad continuously for this much amount of time, then BAD_GPS_NOTIF is shown
     public  long BAD_GPS_NOTIF_THRESHOLD_INTERVAL = 60000;
 
     // In a single DistRecord update delta_distance cannot be more than this value
-    public  float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 5000f;// in meters
+    public  float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 3500f;// in meters
 
     // ON_WORKOUT_UPDATE analytics event occurrs after this much distance
     public  float MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT = 0.5f;// in Kms
@@ -93,8 +94,13 @@ public class ClientConfig implements UnObfuscable{
     public  long DATA_SYNC_INTERVAL = 10800L;// in secs, i.e. every 3 hours
     public  long DATA_SYNC_INTERVAL_FLEX = 5400L;// in secs, i.e. every 1.5 hours
 
-    public  int VOICE_UPDATE_INTERVAL = 300;// in secs, i.e. every 5 mins
-    public  int VOICE_UPDATE_INTERVAL_INCREMENT_FACTOR = 2;
+    /************ Below parameters are not on server **********/
+
+//    public  List<Integer> VOICE_UPDATE_INTERVALS = Arrays.asList(1, 2, 3, 4, 6, 7, 9, 12,
+//            15, 18, 21, 24, 30, 36, 42, 48, 54);// in minutes
+
+    public  List<Integer> VOICE_UPDATE_INTERVALS = Arrays.asList(10, 20, 30, 45, 60, 75, 90, 120,
+            150, 180, 210, 240, 300, 360, 420, 480, 540);// in minutes
 
     private static ClientConfig instance;
 
@@ -119,6 +125,18 @@ public class ClientConfig implements UnObfuscable{
             }
         };
         return instance;
+    }
+
+    public int getVoiceUpdateIntervalAtIndexInSecs(int index){
+        int size = ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.size();
+        if (index < size){
+            return 60*ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(index);
+        }else {
+            int delta = ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 1)
+                    - ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 2);
+            return 60*( ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 1)
+                    + delta*(index - size + 1) );
+        }
     }
 
     private static synchronized void resetConfig(ClientConfig freshConfig){

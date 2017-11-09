@@ -127,7 +127,8 @@ public class FeedbackResolutionFragment extends FeedbackLevelThreeFragment {
             if (runId == 0){
                 WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
                 Workout workout = mWorkoutDao.queryBuilder()
-                        .where(WorkoutDao.Properties.WorkoutId.eq(clientRunId))
+                        .where(WorkoutDao.Properties.WorkoutId.eq(clientRunId),
+                                WorkoutDao.Properties.Is_sync.eq(true))
                         .unique();
                 runId = (workout != null && workout.getId() != null) ? workout.getId().intValue() : 0;
             }

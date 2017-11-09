@@ -259,7 +259,8 @@ public class EditProfileFragment extends BaseFragment implements
         }
 
 
-        if (!TextUtils.isEmpty(mBirthday.getText())) {
+        if (!TextUtils.isEmpty(mBirthday.getText().toString())) {
+            Logger.d(TAG, "Setting User Birthday as " + mBirthday.getText().toString());
             userDetails.setBirthday(mBirthday.getText().toString());
             AnalyticsEvent.create(Event.ON_SET_BIRTTHDAY)
                     .put("user_birthday", mBirthday.getText().toString())
@@ -318,7 +319,6 @@ public class EditProfileFragment extends BaseFragment implements
         int calender_day = calendar.get(Calendar.DAY_OF_MONTH);
         DatePickerDialog mDatePickerDialog = new DatePickerDialog(getActivity(), this, calender_year, calender_month, calender_day);
         mDatePickerDialog.show();
-
 
     }
 

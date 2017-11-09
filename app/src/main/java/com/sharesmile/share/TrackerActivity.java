@@ -62,15 +62,13 @@ public class TrackerActivity extends BaseActivity {
     private static final int FEEDBACK = 2;
     private static final int LOGOUT = 3;
 
-    private CauseData mCauseData;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracker);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerLayout = findViewById(R.id.drawerLayout);
 
         runInTestMode = SharedPrefsManager.getInstance().getBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON);
         if (mCauseData != null) {
@@ -93,14 +91,6 @@ public class TrackerActivity extends BaseActivity {
             invokeWorkoutService();
         }
 
-//        Window window = this.getWindow();
-//
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-//        {
-//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//            window.setStatusBarColor(Color.TRANSPARENT);
-//        }
 
     }
 
