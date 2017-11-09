@@ -309,7 +309,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public int getNextVoiceUpdateScheduledAt() {
         int index = SharedPrefsManager.getInstance().getInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT_INDEX);
-        return ClientConfig.getInstance().getVoiceUpdateIntervalAtIndexInSecs(index);
+        return (int) ClientConfig.getInstance().getVoiceUpdateIntervalAtIndexInSecs(index);
     }
 
     @Override

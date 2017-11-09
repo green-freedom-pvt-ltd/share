@@ -115,6 +115,7 @@ public class WorkoutService extends Service implements
     private Handler handler;
 
     TextToSpeech textToSpeech;
+    private boolean textToSpeechReady = false;
 
     private float distanceInKmsOnLastUpdateEvent = 0f;
 
@@ -137,8 +138,6 @@ public class WorkoutService extends Service implements
         startWorkout();
         return START_STICKY;
     }
-
-    private boolean textToSpeechReady = false;
 
     private void startTracking() {
         Logger.d(TAG, "startTracking");
@@ -1030,25 +1029,30 @@ public class WorkoutService extends Service implements
         @Override
         public void run() {
             updateStickyNotification();
-            WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
-            if (dataStore != null
-                    && textToSpeechReady
-                    && !SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_VOICE_UPDATES)
-                    && dataStore.isWorkoutRunning()){
-                int nextVoiceUpdateAt = dataStore.getNextVoiceUpdateScheduledAt();
-                Logger.d(TAG, "nextVoiceUpdateAt = " + nextVoiceUpdateAt);
-                if (dataStore.getElapsedTime() >= nextVoiceUpdateAt){
-                    String toSpeak = getVoiceUpdateMessage();
-                    textToSpeech.setPitch(1);
-                    textToSpeech.setSpeechRate(0.8f);
-                    textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
-                    dataStore.updateAfterVoiceUpdate();
-                }
-            }
-
+            playVoiceUpdate();
             handler.postDelayed(this, NOTIFICATION_TIMER_TICK);
         }
     };
+
+    private void playVoiceUpdate(){
+        WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
+        if (dataStore != null
+                && textToSpeechReady
+                && !SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_VOICE_UPDATES)
+                && dataStore.isWorkoutRunning()){
+            int nextVoiceUpdateAt = dataStore.getNextVoiceUpdateScheduledAt();
+            Logger.d(TAG, "nextVoiceUpdateAt = " + nextVoiceUpdateAt);
+            if (dataStore.getElapsedTime() >= nextVoiceUpdateAt){
+                String toSpeak = getVoiceUpdateMessage();
+
+
+                textToSpeech.setPitch(1);
+                textToSpeech.setSpeechRate(0.8f);
+                textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+                dataStore.updateAfterVoiceUpdate();
+            }
+        }
+    }
 
     public String getVoiceUpdateMessage() {
         float distance = getTotalDistanceCoveredInMeters();

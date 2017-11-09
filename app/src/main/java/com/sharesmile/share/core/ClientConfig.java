@@ -96,11 +96,12 @@ public class ClientConfig implements UnObfuscable{
 
     /************ Below parameters are not on server **********/
 
-//    public  List<Integer> VOICE_UPDATE_INTERVALS = Arrays.asList(1, 2, 3, 4, 6, 7, 9, 12,
-//            15, 18, 21, 24, 30, 36, 42, 48, 54);// in minutes
 
-    public  List<Integer> VOICE_UPDATE_INTERVALS = Arrays.asList(10, 20, 30, 45, 60, 75, 90, 120,
-            150, 180, 210, 240, 300, 360, 420, 480, 540);// in minutes
+//    public  List<Float> VOICE_UPDATE_INTERVALS = Arrays.asList(10f, 20f, 30f, 45f, 60f, 75f, 90f, 120f,
+//            150f, 180f, 210f, 240f, 300f, 360f, 420f, 480f, 540f);// in minutes
+
+    public  List<Float> VOICE_UPDATE_INTERVALS = Arrays.asList(0.33f, 0.66f, 1f, 1.33f, 1.66f, 2f, 2.5f, 3f,
+            3.5f, 4f, 4.5f, 5f, 5.5f, 6f, 420f, 480f, 540f);// in minutes
 
     private static ClientConfig instance;
 
@@ -127,12 +128,12 @@ public class ClientConfig implements UnObfuscable{
         return instance;
     }
 
-    public int getVoiceUpdateIntervalAtIndexInSecs(int index){
+    public float getVoiceUpdateIntervalAtIndexInSecs(int index){
         int size = ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.size();
         if (index < size){
             return 60*ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(index);
         }else {
-            int delta = ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 1)
+            float delta = ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 1)
                     - ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 2);
             return 60*( ClientConfig.getInstance().VOICE_UPDATE_INTERVALS.get(size - 1)
                     + delta*(index - size + 1) );

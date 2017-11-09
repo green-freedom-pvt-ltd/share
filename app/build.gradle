@@ -144,8 +144,8 @@ dependencies {
         exclude group: 'com.google.firebase'
     }
     compile 'com.android.support:multidex:1.0.1'
-    compile 'io.smooch:core:latest.release'
-    compile 'io.smooch:ui:latest.release'
+    compile 'io.smooch:core:5.4.0'
+    compile 'io.smooch:ui:5.4.0'
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
 }
 
