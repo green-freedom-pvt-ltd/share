@@ -74,7 +74,6 @@ import butterknife.ButterKnife;
 
 import static com.sharesmile.share.MainApplication.getContext;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -441,15 +440,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     public void showHome() {
         replaceFragment(new HomeScreenFragment(), true);
-
-        Context appContext = getApplicationContext();
-        MainApplication.showRunNotification(
-                appContext.getString(R.string.notification_walk_engagement_title),
-                WORKOUT_NOTIFICATION_WALK_ENGAGEMENT,
-                appContext.getString(R.string.notification_walk_engagement),
-                appContext.getString(R.string.notification_action_start),
-                appContext.getString(R.string.notification_action_disable)
-        );
     }
 
     @Override

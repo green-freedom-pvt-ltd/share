@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.speech.tts.TextToSpeech;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -44,6 +43,7 @@ import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.NotificationActionReceiver;
+import com.sharesmile.share.core.TTS;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
@@ -65,7 +65,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -114,8 +113,7 @@ public class WorkoutService extends Service implements
     private CauseData mCauseData;
     private Handler handler;
 
-    TextToSpeech textToSpeech;
-    private boolean textToSpeechReady = false;
+    TTS textToSpeech;
 
     private float distanceInKmsOnLastUpdateEvent = 0f;
 
@@ -156,41 +154,6 @@ public class WorkoutService extends Service implements
         ActivityDetector.getInstance().startActivityDetection();
         AnalyticsEvent.create(Event.ON_WORKOUT_START)
                 .buildAndDispatch();
-
-        textToSpeechReady = false;
-        textToSpeech = new TextToSpeech(getContext().getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
-
-                    Locale locale = new Locale("en", "IN");
-                    int availability = textToSpeech.isLanguageAvailable(locale);
-                    Logger.d(TAG, "Indian accent availability: " + availability);
-                    switch (availability) {
-                        case TextToSpeech.LANG_NOT_SUPPORTED: {
-                            textToSpeech.setLanguage(Locale.US);
-                            break;
-                        }
-                        case TextToSpeech.LANG_MISSING_DATA: {
-                            textToSpeech.setLanguage(Locale.US);
-                            break;
-                        }
-                        case TextToSpeech.LANG_AVAILABLE: {
-                            textToSpeech.setLanguage(Locale.US);
-                            break;
-                        }
-                        case TextToSpeech.LANG_COUNTRY_AVAILABLE:
-                        case TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE: {
-                            textToSpeech.setLanguage(locale);
-                            break;
-                        }
-                    }
-
-                    textToSpeech.setLanguage(Locale.ENGLISH);
-                    textToSpeechReady = true;
-                }
-            }
-        });
     }
 
 
@@ -1037,19 +1000,25 @@ public class WorkoutService extends Service implements
     private void playVoiceUpdate(){
         WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
         if (dataStore != null
-                && textToSpeechReady
                 && !SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_VOICE_UPDATES)
                 && dataStore.isWorkoutRunning()){
             int nextVoiceUpdateAt = dataStore.getNextVoiceUpdateScheduledAt();
             Logger.d(TAG, "nextVoiceUpdateAt = " + nextVoiceUpdateAt);
             if (dataStore.getElapsedTime() >= nextVoiceUpdateAt){
-                String toSpeak = getVoiceUpdateMessage();
+                final String toSpeak = getVoiceUpdateMessage();
 
+                textToSpeech = new TTS(getApplicationContext(), new TTS.InitCallback() {
+                    @Override
+                    public void initSuccess(TTS tts) {
+                        textToSpeech.queueSpeech(toSpeak);
+                        WorkoutSingleton.getInstance().getDataStore().updateAfterVoiceUpdate();
+                    }
 
-                textToSpeech.setPitch(1);
-                textToSpeech.setSpeechRate(0.8f);
-                textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
-                dataStore.updateAfterVoiceUpdate();
+                    @Override
+                    public void initFail(int reason) {
+                        Logger.d(TAG, "initFail: can't play voice update");
+                    }
+                });
             }
         }
     }

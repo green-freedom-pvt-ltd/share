@@ -2,6 +2,8 @@ package com.sharesmile.share.rfac;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -121,6 +123,11 @@ public class RealRunFragment extends RunFragment {
         distanceUnitTextView.setText(distanceLabel);
 
         ShareImageLoader.getInstance().loadImage(mCauseData.getSponsor().getLogoUrl(), mSponsorLogo);
+
+        int height = (int) getResources().getDimension(R.dimen.super_duper_large_text);
+        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
+                new float[]{0, 1}, Shader.TileMode.CLAMP);
+        impact.getPaint().setShader(textShader);
 
     }
 
