@@ -33,7 +33,6 @@ import com.sharesmile.share.gps.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
-import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.Qna;
@@ -222,7 +221,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     private static int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.mipmap.ic_stat_onesignal_default : R.mipmap.ic_launcher;
+        return useWhiteIcon ? R.mipmap.ic_notification_small : R.mipmap.ic_launcher;
     }
 
 
@@ -431,9 +430,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         if (!TextUtils.isEmpty(email)) {
             OneSignal.syncHashedEmail(email);
         }
-
-        int total_runs = SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN, 0);
-        OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT, String.valueOf(total_runs));
     }
 
     public void startSyncTasks() {

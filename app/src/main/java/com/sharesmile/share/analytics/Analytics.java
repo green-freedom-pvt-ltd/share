@@ -3,6 +3,7 @@ package com.sharesmile.share.analytics;
 import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
+import com.onesignal.OneSignal;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.rfac.models.UserDetails;
@@ -12,6 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.smooch.core.User;
+
+import static com.sharesmile.share.core.Constants.USER_PROP_AGE;
+import static com.sharesmile.share.core.Constants.USER_PROP_EMAIL;
+import static com.sharesmile.share.core.Constants.USER_PROP_GENDER;
+import static com.sharesmile.share.core.Constants.USER_PROP_NAME;
+import static com.sharesmile.share.core.Constants.USER_PROP_PHONE;
+import static com.sharesmile.share.core.Constants.USER_PROP_TEAM_CODE;
+import static com.sharesmile.share.core.Constants.USER_PROP_USER_ID;
 
 /**
  * Created by ankitm on 11/04/16.
@@ -80,7 +89,6 @@ public class Analytics {
             setUserPhoto(details.getSocialThumb());
             setUserImpactLeagueTeamCode(details.getTeamId());
 
-
             // Setting properties for smooch
 
             User.getCurrentUser().setFirstName(details.getFirstName());
@@ -92,27 +100,33 @@ public class Analytics {
             customProperties.put("phoneNumber", details.getPhoneNumber());
             customProperties.put("gender", details.getGenderUser());
             customProperties.put("teamId", details.getTeamId());
+
             User.getCurrentUser().addProperties(customProperties);
         }
     }
 
     public void setUserProperty(String propertyName, Object value){
         clevertapManager.setUserProperty(propertyName, value);
+        OneSignal.sendTag(propertyName, String.valueOf(value));
+
     }
 
     public void setUserName(String name){
-        Crashlytics.setString("Name", name);
-        clevertapManager.setUserProperty("Name", name);
+        Crashlytics.setString(USER_PROP_NAME, name);
+        clevertapManager.setUserProperty(USER_PROP_NAME, name);
+        OneSignal.sendTag(USER_PROP_NAME, name);
     }
 
     public void setUserEmail(String email){
-        Crashlytics.setString("Email", email);
-        clevertapManager.setUserProperty("Email", email);
+        Crashlytics.setString(USER_PROP_EMAIL, email);
+        clevertapManager.setUserProperty(USER_PROP_EMAIL, email);
+        OneSignal.sendTag(USER_PROP_EMAIL, email);
     }
 
     public void setUserId(int userId){
-        Crashlytics.setInt("UserId", userId);
+        Crashlytics.setInt(USER_PROP_USER_ID, userId);
         clevertapManager.setUserProperty("Identity", userId);
+        OneSignal.sendTag(USER_PROP_USER_ID, String.valueOf(userId));
     }
 
     /**
@@ -120,7 +134,8 @@ public class Analytics {
      * @param phone
      */
     public void setUserPhone(String phone){
-        clevertapManager.setUserProperty("Phone", phone);
+        clevertapManager.setUserProperty(USER_PROP_PHONE, phone);
+        OneSignal.sendTag(USER_PROP_PHONE, phone);
     }
 
     /**
@@ -128,16 +143,19 @@ public class Analytics {
      * @param gender
      */
     public void setUserGender(String gender){
-        clevertapManager.setUserProperty("Gender", gender);
+        clevertapManager.setUserProperty(USER_PROP_GENDER, gender);
+        OneSignal.sendTag(USER_PROP_GENDER, gender);
     }
 
     public void setUserImpactLeagueTeamCode(int teamCode){
-        Crashlytics.setInt("TeamCode", teamCode);
-        clevertapManager.setUserProperty("team_code", teamCode);
+        Crashlytics.setInt(USER_PROP_TEAM_CODE, teamCode);
+        clevertapManager.setUserProperty(USER_PROP_TEAM_CODE, teamCode);
+        OneSignal.sendTag(USER_PROP_TEAM_CODE, String.valueOf(teamCode));
     }
 
     public void setUserAge(int age){
-        clevertapManager.setUserProperty("Age", age);
+        clevertapManager.setUserProperty(USER_PROP_AGE, age);
+        OneSignal.sendTag(USER_PROP_AGE, String.valueOf(age));
     }
 
     public void setUserPhoto(String pictureUrl){

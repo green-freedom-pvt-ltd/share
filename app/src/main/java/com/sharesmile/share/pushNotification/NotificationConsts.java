@@ -13,9 +13,4 @@ public class NotificationConsts {
         public final static String PROFILE="profile";
         public final static String LEADERBOARD="leaderboard";
     }
-
-    public class UserTag {
-        public final static String RUN_COUNT="runs";
-
-    }
 }

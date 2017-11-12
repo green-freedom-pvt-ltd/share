@@ -9,6 +9,7 @@ import com.sharesmile.share.Events.ExitLeague;
 import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gcm.SyncService;
@@ -40,6 +41,9 @@ import java.util.Set;
 import Models.LeagueBoard;
 import Models.LeagueTeam;
 import Models.TeamLeaderBoard;
+
+import static com.sharesmile.share.core.Constants.USER_PROP_LEAGUE_NAME;
+import static com.sharesmile.share.core.Constants.USER_PROP_LEAGUE_TEAM_NAME;
 
 /**
  * Created by ankitmaheshwari on 5/12/17.
@@ -241,6 +245,12 @@ public class LeaderBoardDataStore {
 
     public void setLeagueBoardData(LeagueBoard leagueBoard){
         this.leagueBoard = leagueBoard;
+        Analytics.getInstance().setUserProperty(USER_PROP_LEAGUE_NAME, leagueBoard.getLeagueName());
+
+        final Map<String, Object> customProperties = new HashMap<>();
+        customProperties.put("leagueName", leagueBoard.getLeagueName());
+        io.smooch.core.User.getCurrentUser().addProperties(customProperties);
+
         SharedPrefsManager.getInstance().setObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, leagueBoard);
     }
 
@@ -273,6 +283,11 @@ public class LeaderBoardDataStore {
 
     public void setMyTeamLeaderBoardData(TeamLeaderBoard board){
         LeaderBoardDataStore.this.myTeamLeaderBoard = board;
+        Analytics.getInstance().setUserProperty(USER_PROP_LEAGUE_TEAM_NAME, myTeamLeaderBoard.getTeamName());
+        final Map<String, Object> customProperties = new HashMap<>();
+        customProperties.put("leagueTeamName", myTeamLeaderBoard.getTeamName());
+        io.smooch.core.User.getCurrentUser().addProperties(customProperties);
+
         SharedPrefsManager.getInstance().setObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, board);
     }
 
@@ -368,6 +383,14 @@ public class LeaderBoardDataStore {
                         Logger.d(TAG, "Successfully logged out from teamId: " + teamId);
                         // Remove all cached data
                         updateMyTeamId(0);
+                        Analytics.getInstance().setUserProperty(USER_PROP_LEAGUE_NAME, "");
+                        Analytics.getInstance().setUserProperty(USER_PROP_LEAGUE_TEAM_NAME, "");
+
+                        final Map<String, Object> customProperties = new HashMap<>();
+                        customProperties.put("leagueTeamName", "");
+                        customProperties.put("leagueName", "");
+                        io.smooch.core.User.getCurrentUser().addProperties(customProperties);
+
                         // Notify the UI about it
                         EventBus.getDefault().post(new ExitLeague(true));
                     }

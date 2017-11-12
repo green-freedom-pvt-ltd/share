@@ -33,7 +33,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.onesignal.OneSignal;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.BodyWeightChangedEvent;
 import com.sharesmile.share.LeaderBoardDataStore;
@@ -49,7 +48,6 @@ import com.sharesmile.share.core.CurrencyCode;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.models.Run;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -78,6 +76,14 @@ import java.util.Map;
 import Models.Level;
 
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
+import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
+import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
+import static com.sharesmile.share.core.Constants.USER_PROP_AVG_STRIDE_LENGTH;
+import static com.sharesmile.share.core.Constants.USER_PROP_LIFETIME_DISTANCE;
+import static com.sharesmile.share.core.Constants.USER_PROP_LIFETIME_STEPS;
+import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_AMT_RAISED;
+import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_CALORIES;
+import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_RUNS;
 
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
@@ -86,7 +92,6 @@ public class Utils {
 
     private static final String TAG = "Utils";
 
-    // TODO: Need to modify this method to accommodate international phone numbers
     /* a utility to validate Indian phone number example - 03498985532, 5389829422 **/
     public static boolean isValidInternationalPhoneNumber(String number) {
         return PhoneNumberUtils.isGlobalPhoneNumber(number);
@@ -854,23 +859,20 @@ public class Utils {
 
 
     private static void setTrackRecordForAnalytics(){
-        Analytics.getInstance().setUserProperty("LifeTimeDistance",
+        Analytics.getInstance().setUserProperty(USER_PROP_LIFETIME_DISTANCE,
                 SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE));
-        Analytics.getInstance().setUserProperty("LifeTimeSteps",
+        Analytics.getInstance().setUserProperty(USER_PROP_LIFETIME_STEPS,
                 SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS));
-        Analytics.getInstance().setUserProperty("AvgStrideLength", getAverageStrideLength());
-        Analytics.getInstance().setUserProperty("AvgSpeed", getLifetimeAverageSpeed());
-        Analytics.getInstance().setUserProperty("AvgCadence", getLifetimeAverageStepsPerSec());
-        Analytics.getInstance().setUserProperty("TotalCalories",
+        Analytics.getInstance().setUserProperty(USER_PROP_AVG_STRIDE_LENGTH, getAverageStrideLength());
+        Analytics.getInstance().setUserProperty(USER_PROP_AVG_SPEED, getLifetimeAverageSpeed());
+        Analytics.getInstance().setUserProperty(USER_PROP_AVG_CADENCE, getLifetimeAverageStepsPerSec());
+        Analytics.getInstance().setUserProperty(USER_PROP_TOTAL_CALORIES,
                 SharedPrefsManager.getInstance().getLong(Constants.PREF_TOTAL_CALORIES));
 
-        Analytics.getInstance().setUserProperty("TotalRuns",
+        Analytics.getInstance().setUserProperty(USER_PROP_TOTAL_RUNS,
                 SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN));
-        Analytics.getInstance().setUserProperty("TotalAmountRaised",
+        Analytics.getInstance().setUserProperty(USER_PROP_TOTAL_AMT_RAISED,
                 SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT));
-
-        OneSignal.sendTag(NotificationConsts.UserTag.RUN_COUNT,
-                String.valueOf(SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN)));
     }
 
     public static float getAverageStrideLength(){

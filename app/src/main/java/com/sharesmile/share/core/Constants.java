@@ -196,6 +196,26 @@ public class Constants {
     public static final String PAUSE_REASON_USER_CLICKED_NOTIFICATION = "user_clicked_notification";
     public static final String PAUSE_REASON_USER_CLICKED = "user_clicked";
 
+    public final static String USER_PROP_NAME="Name";
+    public final static String USER_PROP_EMAIL="Email";
+    public final static String USER_PROP_USER_ID="UserId";
+    public final static String USER_PROP_PHONE="Phone";
+    public final static String USER_PROP_GENDER="Gender";
+    public final static String USER_PROP_TEAM_CODE="TeamCode";
+    public final static String USER_PROP_AGE="Age";
+
+    public static final String USER_PROP_LIFETIME_DISTANCE = "LifeTimeDistance";
+    public static final String USER_PROP_LIFETIME_STEPS = "LifeTimeSteps";
+    public static final String USER_PROP_AVG_STRIDE_LENGTH = "AvgStrideLength";
+    public static final String USER_PROP_AVG_SPEED = "AvgSpeed";
+    public static final String USER_PROP_AVG_CADENCE = "AvgCadence";
+    public static final String USER_PROP_TOTAL_CALORIES = "TotalCalories";
+    public static final String USER_PROP_TOTAL_RUNS = "TotalRuns";
+    public static final String USER_PROP_TOTAL_AMT_RAISED = "TotalAmountRaised";
+    public final static String USER_PROP_LEAGUE_NAME="LeagueName";
+    public final static String USER_PROP_LEAGUE_TEAM_NAME="LeagueTeamName";
+
+
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";

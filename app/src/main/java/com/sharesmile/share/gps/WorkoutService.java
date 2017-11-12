@@ -1036,7 +1036,7 @@ public class WorkoutService extends Service implements
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.mipmap.ic_stat_onesignal_default : R.mipmap.ic_launcher;
+        return useWhiteIcon ? R.mipmap.ic_notification_small : R.mipmap.ic_launcher;
     }
 
     final Runnable handleGpsInactivityRunnable = new Runnable() {

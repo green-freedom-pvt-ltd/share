@@ -71,7 +71,8 @@
             android:cursorVisible="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            style="@style/edit_profile_text_style_value" />
+            style="@style/edit_profile_text_style_value"
+            android:textColor="@color/black_38"/>
 
         <View
             android:layout_width="match_parent"

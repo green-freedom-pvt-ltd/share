@@ -308,8 +308,6 @@ public class RunTracker implements Tracker {
 
 
     private synchronized void processLocation(Location point){
-        point.getAltitude();
-        point.getBearing();
         if (isRunning()){
             //Check if the start point has been detected since the workout started/resumed
             if (dataStore.coldStartAfterResume()){
@@ -354,7 +352,8 @@ public class RunTracker implements Tracker {
                         thresholdApplied = "in_vehicle";
                     }else {
                         if ( ActivityDetector.getInstance().isOnFoot() ||
-                                (listener.isCountingSteps() && listener.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
+                                (listener.isCountingSteps() &&
+                                        listener.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
                             // Can make a safe assumption that the person is on foot
                             spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                             thresholdApplied = "on_foot";
