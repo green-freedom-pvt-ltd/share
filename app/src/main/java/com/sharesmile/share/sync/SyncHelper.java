@@ -219,7 +219,8 @@ public class SyncHelper {
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPLOAD_USER_DATA)
                 .setExecutionWindow(0L, 300) // Within 5 mins
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).setPersisted(true)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());

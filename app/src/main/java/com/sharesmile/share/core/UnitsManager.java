@@ -123,7 +123,8 @@ public class UnitsManager {
     }
 
     public static DistanceUnit getDistanceUnit(){
-        String distUnitString = SharedPrefsManager.getInstance().getString(PREFS_MY_DISTANCE_UNIT);
+        String distUnitString = SharedPrefsManager.getInstance().getString(PREFS_MY_DISTANCE_UNIT,
+                DistanceUnit.KILOMETER.toString());
         return DistanceUnit.fromString(distUnitString);
     }
 

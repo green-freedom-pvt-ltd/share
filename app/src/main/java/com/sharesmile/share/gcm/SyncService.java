@@ -444,6 +444,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("body_weight", prev.getBodyWeight());
             jsonObject.put("body_height", prev.getBodyHeight());
             jsonObject.put("user_id", user_id);
+            
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
