@@ -48,7 +48,7 @@
             android:textSize="48sp"
             android:textStyle="bold"
             android:text="0"
-            android:textColor="@color/orange" />
+            android:textColor="@color/bright_sky_blue" />
 
         <com.sharesmile.share.views.LBTextView
             android:id="@+id/tv_impact"

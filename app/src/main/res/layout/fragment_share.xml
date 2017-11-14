@@ -42,7 +42,7 @@
                 android:textSize="34sp"
                 android:textStyle="bold"
                 android:text="\u20B9 657"
-                android:textColor="@color/orange" />
+                android:textColor="@color/bright_sky_blue" />
 
             <com.sharesmile.share.views.MRTextView
                 android:id="@+id/share_impact"

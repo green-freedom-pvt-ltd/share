@@ -3,8 +3,6 @@ package com.sharesmile.share.rfac.fragments;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -215,10 +213,10 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), distanceInMeters);
 
-        int height = (int) getResources().getDimension(R.dimen.semi_super_large_text);
-        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
-                new float[]{0, 1}, Shader.TileMode.CLAMP);
-        impactInRupees.getPaint().setShader(textShader);
+//        int height = (int) getResources().getDimension(R.dimen.semi_super_large_text);
+//        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
+//                new float[]{0, 1}, Shader.TileMode.CLAMP);
+//        impactInRupees.getPaint().setShader(textShader);
         impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
 
         initCaloriesContainer();
