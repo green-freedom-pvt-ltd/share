@@ -287,6 +287,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     private void loadInitialFragment() {
         addFragment(new HomeScreenFragment(), false);
+        // TODO: Fix the bug of Profile fragment loading just after Share Screen
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
             replaceFragment(new ProfileStatsFragment(), true);

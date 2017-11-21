@@ -443,13 +443,14 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("phone_number", prev.getPhoneNumber());
             jsonObject.put("body_weight", prev.getBodyWeight());
             jsonObject.put("body_height", prev.getBodyHeight());
+            jsonObject.put("birthday", prev.getBirthday());
             jsonObject.put("user_id", user_id);
-            
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
             Gson gson = new Gson();
-            UserDetails response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject, UserDetails.class);
+            UserDetails response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject,
+                    UserDetails.class);
             Logger.d(TAG, "Response for getUser:" + gson.toJson(response));
 
             MainApplication.getInstance().setUserDetails(response);

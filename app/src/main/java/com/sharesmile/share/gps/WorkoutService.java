@@ -1010,8 +1010,10 @@ public class WorkoutService extends Service implements
                 textToSpeech = new TTS(getApplicationContext(), new TTS.InitCallback() {
                     @Override
                     public void initSuccess(TTS tts) {
-                        textToSpeech.queueSpeech(toSpeak);
-                        WorkoutSingleton.getInstance().getDataStore().updateAfterVoiceUpdate();
+                        if (WorkoutSingleton.getInstance().getDataStore() != null){
+                            textToSpeech.queueSpeech(toSpeak);
+                            WorkoutSingleton.getInstance().getDataStore().updateAfterVoiceUpdate();
+                        }
                     }
 
                     @Override
