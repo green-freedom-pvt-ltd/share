@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
@@ -18,8 +19,10 @@ import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Value;
+import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
+import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -180,40 +183,39 @@ public class GoogleFitStepCounter implements StepCounter,
     public void onConnected(Bundle bundle) {
         Logger.d(TAG, "onConnected");
 
-
-        DataSource ESTIMATED_STEP_DELTAS = new DataSource.Builder()
-                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-                .setType(DataSource.TYPE_DERIVED)
-                .setStreamName("estimated_steps")
-                .setAppPackageName("com.google.android.gms")
-                .build();
-
-        registerFitnessDataListener(ESTIMATED_STEP_DELTAS, ESTIMATED_STEP_DELTAS.getDataType());
+//        DataSource ESTIMATED_STEP_DELTAS = new DataSource.Builder()
+//                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+//                .setType(DataSource.TYPE_DERIVED)
+//                .setStreamName("estimated_steps")
+//                .setAppPackageName("com.google.android.gms")
+//                .build();
+//
+//        registerFitnessDataListener(ESTIMATED_STEP_DELTAS, ESTIMATED_STEP_DELTAS.getDataType());
 
         // Temporarily trying with "estimated_steps" steam
 
-//        DataSourcesRequest dataSourceRequest = new DataSourcesRequest.Builder()
-//                .setDataTypes( DataType.TYPE_STEP_COUNT_DELTA)
-//                .setDataSourceTypes(DataSource.TYPE_DERIVED)
-//                .build();
-//
-//        ResultCallback<DataSourcesResult> dataSourcesResultCallback = new ResultCallback<DataSourcesResult>() {
-//            @Override
-//            public void onResult(DataSourcesResult dataSourcesResult) {
-//                Log.i(TAG, "onResult of dataSourcesResultCallback, Status: " + dataSourcesResult.getStatus().toString());
-//                for( DataSource dataSource : dataSourcesResult.getDataSources () ) {
-//                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: "
-//                            + dataSource.toDebugString() + ", type: " + dataSource.getDataType().getName());
-//                    if( DataType.TYPE_STEP_COUNT_DELTA.equals(dataSource.getDataType()) ) {
-//                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
-//                        registerFitnessDataListener(dataSource, dataSource.getDataType());
-//                    }
-//                }
-//            }
-//        };
+        DataSourcesRequest dataSourceRequest = new DataSourcesRequest.Builder()
+                .setDataTypes( DataType.TYPE_STEP_COUNT_DELTA)
+                .setDataSourceTypes(DataSource.TYPE_DERIVED)
+                .build();
 
-//        Fitness.SensorsApi.findDataSources(mApiClient, dataSourceRequest)
-//                .setResultCallback(dataSourcesResultCallback);
+        ResultCallback<DataSourcesResult> dataSourcesResultCallback = new ResultCallback<DataSourcesResult>() {
+            @Override
+            public void onResult(DataSourcesResult dataSourcesResult) {
+                Log.i(TAG, "onResult of dataSourcesResultCallback, Status: " + dataSourcesResult.getStatus().toString());
+                for( DataSource dataSource : dataSourcesResult.getDataSources () ) {
+                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: "
+                            + dataSource.toDebugString() + ", type: " + dataSource.getDataType().getName());
+                    if( DataType.TYPE_STEP_COUNT_DELTA.equals(dataSource.getDataType()) ) {
+                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
+                        registerFitnessDataListener(dataSource, dataSource.getDataType());
+                    }
+                }
+            }
+        };
+
+        Fitness.SensorsApi.findDataSources(mApiClient, dataSourceRequest)
+                .setResultCallback(dataSourcesResultCallback);
     }
 
     private void registerFitnessDataListener(final DataSource dataSource, final DataType dataType) {

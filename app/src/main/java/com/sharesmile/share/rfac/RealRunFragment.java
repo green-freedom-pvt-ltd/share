@@ -19,7 +19,6 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.WorkoutSingleton;
-import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.fragments.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -214,20 +213,28 @@ public class RealRunFragment extends RunFragment {
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
             impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
-            if (WorkoutSingleton.getInstance().getDataStore() != null){
-                Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
-                if (calorie != null){
-                    String caloriesString = "";
-                    if (calorie.getCalories() > 100){
-                        caloriesString = String.valueOf(Math.round(calorie.getCalories()));
-                    }else {
-                        caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
-                    }
-                    tvCalorieMets.setText(caloriesString);
-                }
-            }else {
-                tvCalorieMets.setText("0");
-            }
+            setCaloriesInTextView();
+        }
+    }
+
+    private void setCaloriesInTextView(){
+        if (WorkoutSingleton.getInstance().getDataStore() != null){
+            // TODO: This is just temporary to test number of steps with new estimated_steps stream
+            int numSteps = WorkoutSingleton.getInstance().getDataStore().getTotalSteps();
+            tvCalorieMets.setText(String.valueOf(numSteps));
+
+//            Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
+//            if (calorie != null){
+//                String caloriesString = "";
+//                if (calorie.getCalories() > 100){
+//                    caloriesString = String.valueOf(Math.round(calorie.getCalories()));
+//                }else {
+//                    caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
+//                }
+//                tvCalorieMets.setText(caloriesString);
+//            }
+        }else {
+            tvCalorieMets.setText("0");
         }
     }
 
@@ -241,26 +248,14 @@ public class RealRunFragment extends RunFragment {
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), totalDistance);
             impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
-            if (WorkoutSingleton.getInstance().getDataStore() != null){
-                Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
-                if (calorie != null){
-                    String caloriesString = "";
-                    if (calorie.getCalories() > 100){
-                        caloriesString = String.valueOf(Math.round(calorie.getCalories()));
-                    }else {
-                        caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
-                    }
-                    tvCalorieMets.setText(caloriesString);
-                }
-            }else {
-                tvCalorieMets.setText("0");
-            }
+            setCaloriesInTextView();
         }
     }
 
     @Override
     public void showSteps(int stepsSoFar, int elapsedTimeInSecs) {
         super.showSteps(stepsSoFar, elapsedTimeInSecs);
+        MainApplication.showToast("Steps: " + stepsSoFar);
     }
 
     @Override
@@ -299,18 +294,7 @@ public class RealRunFragment extends RunFragment {
         int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCovered);
         impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
         distanceTextView.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCovered));
-        if (WorkoutSingleton.getInstance().getDataStore() != null){
-            Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
-            if (calorie != null){
-                String caloriesString = "";
-                if (calorie.getCalories() > 100){
-                    caloriesString = String.valueOf(Math.round(calorie.getCalories()));
-                }else {
-                    caloriesString = Utils.formatWithOneDecimal(calorie.getCalories());
-                }
-                tvCalorieMets.setText(caloriesString);
-            }
-        }
+        setCaloriesInTextView();
 
         if (WorkoutSingleton.getInstance().toShowEndRunDialog()){
             showRunEndDialog();
