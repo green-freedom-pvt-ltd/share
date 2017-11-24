@@ -21,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.sharesmile.share.Events.GpsStateChangeEvent;
 import com.sharesmile.share.Events.MockLocationDetected;
@@ -139,6 +140,9 @@ public class WorkoutService extends Service implements
 
     private void startTracking() {
         Logger.d(TAG, "startTracking");
+        if (backgroundExecutorService == null){
+            return;
+        }
         if (tracker == null) {
             tracker = new RunTracker(backgroundExecutorService, this);
         }
@@ -923,7 +927,14 @@ public class WorkoutService extends Service implements
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (tracker != null && tracker.isActive()){
-            mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getForegroundNotificationBuilder().build());
+            // This try catch bug is to avoid crash due to runtimeexception
+            try{
+                mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getForegroundNotificationBuilder().build());
+            }catch (RuntimeException rte){
+                rte.printStackTrace();
+                Crashlytics.logException(rte);
+                Logger.e(TAG, "RuntimeException while updating sticky notification");
+            }
         }
     }
 
