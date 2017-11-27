@@ -562,13 +562,6 @@ public class WorkoutService extends Service implements
                         + "\n, loc2:\n" + loc2.toString()
                         + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
             tracker.incrementGpsSpike();
-            AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
-                    .put("spikey_distance", deltaDistance)
-                    .put("time_interval", deltaTime)
-                    .put("threshold_applied", thresholdApplied)
-                    .put("is_secondary_check", false)
-                    .addBundle(getWorkoutBundle())
-                    .buildAndDispatch();
             return true;
         }else {
             return false;

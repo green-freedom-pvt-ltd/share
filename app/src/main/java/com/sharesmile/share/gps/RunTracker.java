@@ -368,14 +368,6 @@ public class RunTracker implements Tracker {
                         toRecord = false;
                         Logger.i(TAG, "GPS spike detected in RunTracker, through secondary check");
                         dataStore.incrementGpsSpike();
-                        AnalyticsEvent.create(Event.DETECTED_GPS_SPIKE)
-                                .addBundle(getWorkoutBundle())
-                                .put("spikey_distance", dist)
-                                .put("time_interval", interval)
-                                .put("threshold_applied", thresholdApplied)
-                                .put("is_secondary_check", true)
-                                .put("time_considered_ad", ActivityDetector.getInstance().getTimeCoveredByHistoryQueueInSecs())
-                                .buildAndDispatch();
                     }else {
                         /*
                          Step 3: Record if point is accurate, i.e. accuracy better/lower than our threshold

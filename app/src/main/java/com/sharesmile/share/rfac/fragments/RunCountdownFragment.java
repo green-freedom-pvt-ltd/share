@@ -12,8 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -58,8 +56,6 @@ public class RunCountdownFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        AnalyticsEvent.create(Event.ON_LOAD_COUNTDOWN_SCREEN)
-                .buildAndDispatch();
     }
 
     @Nullable
