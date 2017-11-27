@@ -539,7 +539,8 @@ public class WorkoutService extends Service implements
         float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
 
         // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
-        if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
+        if (ActivityDetector.getInstance().isIsInVehicle()
+                || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
             spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
         }else {

@@ -381,12 +381,7 @@ public class Utils {
             }
         } else {
             int totalMins = secs / 60;
-            int totalSecs = secs % 60;
-            if (totalSecs == 0){
-                return String.format("%d minutes", totalMins);
-            }else {
-                return String.format("%d minutes %d seconds", totalMins, totalSecs);
-            }
+            return String.format("%d minutes", totalMins);
         }
     }
 

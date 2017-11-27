@@ -66,8 +66,8 @@ public class UsainBolt {
                 return true;
             }
 
-            // If ActivityDetector says that user is in a vehicle with confidence then user must be in a vehicle
-            if (ActivityDetector.getInstance().isIsInVehicle()){
+            // If ActivityDetector says that user is on wheels with confidence then user must be on wheels
+            if (ActivityDetector.getInstance().isOnWheels()){
                 Logger.d(TAG, "ActivityRecognition detected IN_VEHICLE, must be Usain Bolt");
                 AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
                         .addBundle(workoutService.getWorkoutBundle())

@@ -48,11 +48,13 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
     private boolean isInVehicle = false;
     private boolean isOnFoot = false;
     private boolean isStill = false;
+    private boolean isOnCycle = false;
     private int stillNotificationOccurredCounter = 0;
 
     private float runningConfidenceRecentAvg;
     private float walkingConfidenceRecentAvg;
     private float onFootConfidenceRecentAvg;
+    private float onCyclerConfidenceRecentAvg;
     private long timeCoveredByHistoryQueue;
 
     private CircularQueue<ActivityRecognitionResult> historyQueue;
@@ -269,8 +271,6 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     }, REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL);
                 }
             }
-//            MainApplication.showToast("Confidence: " + Math.round(onFootConfidenceRecentAvg)
-//                    + ", time: " + timeOnFootContinuously / 1000);
             if (timeOnFootContinuously >= ClientConfig.getInstance().WALK_ENGAGEMENT_NOTIFICATION_INTERVAL){
                 // User has been walking continuously for the past 2 mins without switching on ImpactRun
                 // Lets notify him/her to start the app
@@ -314,9 +314,11 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         int inVehicleConfidence = result.getActivityConfidence(DetectedActivity.IN_VEHICLE);
         float stillConfidence = result.getActivityConfidence(DetectedActivity.STILL);
         float onFootConfidence = result.getActivityConfidence(DetectedActivity.ON_FOOT);
+        float onCycleConfidence = result.getActivityConfidence(DetectedActivity.ON_BICYCLE);
 
         Logger.d(TAG, "handleActivityRecognitionResult: inVehicleConfidence = " + inVehicleConfidence
                     + ", stillConfidence = " + stillConfidence + ", onFootConfidence = " + onFootConfidence
+                    + ", onCycleConfidence = " + onCycleConfidence
                     + ", stillNotificationOccurredCounter " + stillNotificationOccurredCounter);
 
         // Add the fresh result in HistoryQueue
@@ -345,6 +347,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             float cumulativeStillConfidence = 0;
             float cumulativeRunningConfidence = 0;
             float cumulativeWalkingConfidence = 0;
+            float cumulativeCycleConfidence = 0;
             long validInterval = isWorkoutActive() ? ACTIVITY_VALID_INTERVAL_ACTIVE : ACTIVITY_VALID_INTERVAL_IDLE;
             synchronized (historyQueue){
                 while (i >= 0){
@@ -365,6 +368,7 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
                     cumulativeStillConfidence += elem.getActivityConfidence(DetectedActivity.STILL);
                     cumulativeRunningConfidence += elem.getActivityConfidence(DetectedActivity.RUNNING);
                     cumulativeWalkingConfidence += elem.getActivityConfidence(DetectedActivity.WALKING);
+                    cumulativeCycleConfidence += elem.getActivityConfidence(DetectedActivity.ON_BICYCLE);
                     count++;
                     i--;
                 }
@@ -374,6 +378,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             runningConfidenceRecentAvg = cumulativeRunningConfidence / count;
             walkingConfidenceRecentAvg = cumulativeWalkingConfidence / count;
             onFootConfidenceRecentAvg = cumulativeOnFootConfidence / count;
+            onCyclerConfidenceRecentAvg = cumulativeCycleConfidence / count;
+
 
             handler.removeCallbacks(resetConfidenceValuesRunnable);
             // Resetting these confidence values back to 0, if we don't receive activity recognition updates for sufficiently long period
@@ -382,7 +388,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             handler.postDelayed(resetConfidenceValuesRunnable, resetInterval);
 
             Logger.d(TAG, "handleActivityRecognitionResult, calculated avg confidence values, Vehicle: "
-                    + avgVehilceConfidence + ", Foot: " + onFootConfidenceRecentAvg + ", Still: " + avgStillConfidence);
+                    + avgVehilceConfidence + ", Foot: " + onFootConfidenceRecentAvg + ", Still: " + avgStillConfidence
+                    + ", Cycle: " + onCyclerConfidenceRecentAvg);
 
             if (avgStillConfidence > ClientConfig.getInstance().CONFIDENCE_UPPER_THRESHOLD_STILL){
                 isStill = true;
@@ -406,6 +413,14 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             }else {
                 isOnFoot = false;
             }
+
+            if (onCyclerConfidenceRecentAvg > ClientConfig.getInstance().CONFIDENCE_THRESHOLD_ON_CYCLE){
+                isOnCycle = true;
+                isStill = false; // isStill is forced set as false if the user is supposedly on foot
+                stillNotificationOccurredCounter = 0;
+            }else {
+                isOnCycle = false;
+            }
         }
     }
 
@@ -428,6 +443,10 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         return onFootConfidenceRecentAvg;
     }
 
+    public float getOnCycleConfidence(){
+        return onCyclerConfidenceRecentAvg;
+    }
+
     public int getTimeCoveredByHistoryQueueInSecs(){
         return (int) (timeCoveredByHistoryQueue / 1000);
     }
@@ -436,8 +455,16 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         return isInVehicle;
     }
 
+    public boolean isOnWheels(){
+        return isInVehicle || isOnCycle;
+    }
+
     public boolean isOnFoot(){
         return isOnFoot;
+    }
+
+    public boolean isOnCycle() {
+        return isOnCycle;
     }
 
     public String getCurrentActivity(){
@@ -447,6 +474,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             return "on_foot";
         }else if (isStill){
             return "still";
+        }else if (isOnCycle){
+            return "on_cycle";
         }else {
             return "not_known";
         }
@@ -461,10 +490,12 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         runningConfidenceRecentAvg = 0;
         walkingConfidenceRecentAvg = 0;
         onFootConfidenceRecentAvg = 0;
+        onCyclerConfidenceRecentAvg = 0;
         timeCoveredByHistoryQueue = 0;
         isInVehicle = false;
         isOnFoot = false;
         isStill = false;
+        isOnCycle = false;
         historyQueue.clear();
     }
 
