@@ -189,14 +189,6 @@ public class TrackerActivity extends BaseActivity {
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (isBoundToLocationService()) {
-            locationService.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     public File writeLogsToFile(Context context) {
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)

@@ -901,14 +901,6 @@ public class WorkoutService extends Service implements
         return tracker;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case GoogleFitStepCounter.REQUEST_OAUTH:
-                stepCounter.onActivityResult(requestCode, resultCode, data);
-                break;
-        }
-    }
-
 
     private void makeForegroundAndSticky() {
         Notification notification = getForegroundNotificationBuilder().build();

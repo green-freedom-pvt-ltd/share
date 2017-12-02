@@ -1,7 +1,5 @@
 package com.sharesmile.share.gps;
 
-import android.content.Intent;
-
 /**
  * Created by ankitm on 09/05/16.
  */
@@ -19,7 +17,6 @@ public interface StepCounter {
     void stopCounting();
     void pauseCounting();
     void resumeCounting();
-    void onActivityResult(int requestCode, int resultCode, Intent data);
 
     /**
      * Returns current step speed of the user, which is based on the last few step readings from sensor

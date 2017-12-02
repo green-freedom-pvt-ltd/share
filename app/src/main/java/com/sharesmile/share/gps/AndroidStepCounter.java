@@ -68,11 +68,6 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-    }
-
-    @Override
     public float getMovingAverageOfStepsPerSec() {
         if (historyQueue.isEmpty() || historyQueue.size() == 1){
             return -1;
