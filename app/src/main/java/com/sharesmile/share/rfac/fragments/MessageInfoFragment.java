@@ -85,7 +85,7 @@ public class MessageInfoFragment extends BaseFragment implements View.OnClickLis
     }
 
     private void updateActionbar() {
-        getFragmentController().updateToolBar(getString(R.string.messages), true);
+        getFragmentController().updateToolBar(getString(R.string.story), true);
     }
 
     @Override

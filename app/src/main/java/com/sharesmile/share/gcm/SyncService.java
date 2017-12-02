@@ -272,8 +272,10 @@ public class SyncService extends GcmTaskService {
     private static int syncWorkoutData(){
         synchronized (SyncService.class){
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            long clientVersion = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
-            boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
+            long clientVersion = SharedPrefsManager.getInstance()
+                    .getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
+            boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance()
+                    .getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
             if (isWorkoutDataUpToDate && clientVersion > 0){
                 String syncUrl;
                 syncUrl = Urls.getSyncRunUrl(clientVersion);
