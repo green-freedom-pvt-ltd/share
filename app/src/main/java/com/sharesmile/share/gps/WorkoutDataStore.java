@@ -96,4 +96,6 @@ public interface WorkoutDataStore {
 
 	void updateAfterVoiceUpdate();
 
+	int getCurrentBatchIndex();
+
 }

@@ -297,7 +297,7 @@ public class RealRunFragment extends RunFragment {
         setCaloriesInTextView();
 
         if (WorkoutSingleton.getInstance().toShowEndRunDialog()){
-            showRunEndDialog();
+            showStopDialog();
             WorkoutSingleton.getInstance().setToShowEndRunDialog(false);
         }
     }

@@ -23,6 +23,7 @@ public class GoogleApiHelperActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiCode = getIntent().getIntExtra(GoogleApiHelper.KEY_API_CODE, 0);
+
         ConnectionResult connectionResult
                 = getIntent().getParcelableExtra(GoogleApiHelper.KEY_RESOLUTION_PARCELABLE);
         try {

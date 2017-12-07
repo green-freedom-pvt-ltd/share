@@ -29,7 +29,7 @@ import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.UnitsManager;
-import com.sharesmile.share.gps.GoogleFitStepCounter;
+import com.sharesmile.share.googleapis.GoogleFitStepCounter;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.models.WorkoutData;

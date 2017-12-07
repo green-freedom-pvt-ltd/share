@@ -1,9 +1,11 @@
 package com.sharesmile.share.gps;
 
+import com.sharesmile.share.googleapis.GoogleTracker;
+
 /**
  * Created by ankitm on 09/05/16.
  */
-public interface StepCounter {
+public interface StepCounter extends GoogleTracker{
 
     int PERMISSION_NOT_GRANTED_BY_USER = 101;
     int SENSOR_API_NOT_ADDED = 102;
@@ -12,11 +14,6 @@ public interface StepCounter {
 
     int NUM_ELEMS_IN_HISTORY_QUEUE = 8;
     long STEP_COUNT_READING_VALID_INTERVAL = 25; // in secs
-
-    void startCounting();
-    void stopCounting();
-    void pauseCounting();
-    void resumeCounting();
 
     /**
      * Returns current step speed of the user, which is based on the last few step readings from sensor

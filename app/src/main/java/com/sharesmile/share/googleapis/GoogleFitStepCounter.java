@@ -1,4 +1,4 @@
-package com.sharesmile.share.gps;
+package com.sharesmile.share.googleapis;
 
 import android.content.Context;
 import android.util.Log;
@@ -15,7 +15,7 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
-import com.sharesmile.share.googleapis.GoogleApiHelper;
+import com.sharesmile.share.gps.StepCounter;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 
@@ -34,7 +34,6 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
     public static final int REQUEST_OAUTH = 1;
     private static final String AUTH_PENDING = "auth_state_pending";
 
-    private Context context;
     private Listener listener;
     boolean isPaused;
     GoogleApiHelper helper;
@@ -51,15 +50,14 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
 
 
     public GoogleFitStepCounter(Context context, Listener listener) {
-        this.context = context;
         this.listener = listener;
         this.helper = new GoogleApiHelper(GoogleApiHelper.API_LIVE_STEP_COUNTING, context);
-        startCounting();
+        start();
     }
 
     @Override
-    public void startCounting() {
-        Logger.d(TAG, "startCounting");
+    public void start() {
+        Logger.d(TAG, "start");
         synchronized (historyQueue){
             historyQueue.clear();
         }
@@ -69,8 +67,8 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
     }
 
     @Override
-    public void stopCounting() {
-        Logger.d(TAG, "stopCounting");
+    public void stop() {
+        Logger.d(TAG, "stop");
         if (helper.isConnected()){
             Fitness.SensorsApi.remove( helper.getGoogleApiClient(), this )
                     .setResultCallback(new ResultCallback<Status>() {
@@ -88,7 +86,7 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
     }
 
     @Override
-    public void pauseCounting() {
+    public void pause() {
         isPaused = true;
         synchronized (historyQueue){
             historyQueue.clear();
@@ -96,7 +94,7 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
     }
 
     @Override
-    public void resumeCounting() {
+    public void resume() {
         isPaused = false;
         synchronized (historyQueue){
             historyQueue.clear();
@@ -231,6 +229,9 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
 
     @Override
     public void connectionFailed() {
-
+        Logger.d(TAG, "User Denied permission to access Google Fit Data");
+        if (listener != null){
+            listener.notAvailable(PERMISSION_NOT_GRANTED_BY_USER);
+        }
     }
 }

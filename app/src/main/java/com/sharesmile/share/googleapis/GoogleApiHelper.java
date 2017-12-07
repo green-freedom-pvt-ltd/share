@@ -42,7 +42,7 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
     public GoogleApiHelper(int apiCode, Context context) {
         this.apiCode = apiCode;
         this.context = context;
-        buildApiClient();
+        this.googleApiClient = buildApiClient();
     }
 
     public void setListener(Listener listener){
@@ -57,7 +57,14 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
                         .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ));
                 break;
             case API_SESSION_RECORDING:
-
+                builder
+                        .addApi(Fitness.SESSIONS_API)
+                        .addApi(Fitness.HISTORY_API)
+                        .addApi(Fitness.RECORDING_API)
+                        .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
+                        .addScope(new Scope(Scopes.FITNESS_BODY_READ))
+                        .build();
                 break;
             case API_LIVE_DISTANCE_TRACKING:
 

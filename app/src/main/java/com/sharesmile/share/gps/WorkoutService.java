@@ -47,6 +47,8 @@ import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.core.TTS;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gcm.SyncService;
+import com.sharesmile.share.googleapis.GoogleFitStepCounter;
+import com.sharesmile.share.googleapis.GoogleFitnessSessionRecorder;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutBatch;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -107,6 +109,7 @@ public class WorkoutService extends Service implements
     private CircularQueue<Location> beginningLocationsRotatingQueue;
 
     private StepCounter stepCounter;
+    private GoogleFitnessSessionRecorder fitnessSessionRecorder;
 
     private ScheduledExecutorService backgroundExecutorService;
 
@@ -156,6 +159,8 @@ public class WorkoutService extends Service implements
         makeForegroundAndSticky();
 
         ActivityDetector.getInstance().startActivityDetection();
+        fitnessSessionRecorder = new GoogleFitnessSessionRecorder(this);
+        fitnessSessionRecorder.start();
         AnalyticsEvent.create(Event.ON_WORKOUT_START)
                 .buildAndDispatch();
     }
@@ -165,6 +170,12 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
+            if (fitnessSessionRecorder != null) {
+                fitnessSessionRecorder.stop();
+                fitnessSessionRecorder.readDistanceData(result);
+                fitnessSessionRecorder.readStepCountData(result);
+            }
+
             // Persist run only when distance is more than 100m
             //      & Usain Bolt count is less than 3 and
             //      & MockLocation is not enabled
@@ -265,7 +276,8 @@ public class WorkoutService extends Service implements
             if (!currentlyProcessingSteps) {
                 if (isKitkatWithStepSensor(getApplicationContext())) {
                     Logger.d(TAG, "Step Detector present! Will register");
-                    stepCounter = new AndroidStepCounter(this, this);
+//                    stepCounter = new AndroidStepCounter(this, this);
+                    stepCounter = new GoogleFitStepCounter(this, this);
                 } else {
                     Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
                     stepCounter = new GoogleFitStepCounter(this, this);
@@ -295,7 +307,7 @@ public class WorkoutService extends Service implements
             currentlyTracking = false;
             WorkoutServiceRetainerAlarm.cancelAlarm(this);
             if (stepCounter != null) {
-                stepCounter.stopCounting();
+                stepCounter.stop();
             }
             currentlyProcessingSteps = false;
             unBindFromActivityAndStop();
@@ -348,6 +360,7 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "notAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
         Analytics.getInstance().setUserProperty("StepCounter", "not_available");
+        MainApplication.showToast(R.string.google_fit_permission_rationale);
     }
 
     @Override
@@ -715,7 +728,10 @@ public class WorkoutService extends Service implements
                     .buildAndDispatch();
         }
         if (stepCounter != null ){
-            stepCounter.pauseCounting();
+            stepCounter.pause();
+        }
+        if (fitnessSessionRecorder != null){
+            fitnessSessionRecorder.pause();
         }
         updateStickyNotification();
         cancelAllWorkoutNotifications();
@@ -743,7 +759,10 @@ public class WorkoutService extends Service implements
                         .buildAndDispatch();
             }
             if (stepCounter != null){
-                stepCounter.resumeCounting();
+                stepCounter.resume();
+            }
+            if (fitnessSessionRecorder != null) {
+                fitnessSessionRecorder.resume();
             }
             updateStickyNotification();
             cancelAllWorkoutNotifications();

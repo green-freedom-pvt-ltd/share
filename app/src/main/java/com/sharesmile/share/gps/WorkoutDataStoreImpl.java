@@ -320,6 +320,11 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
                 currentIndex + 1);
     }
 
+    @Override
+    public int getCurrentBatchIndex() {
+        return dirtyWorkoutData.getCurrentBatchIndex();
+    }
+
     private void persistBothWorkoutData() {
         persistDirtyWorkoutData();
         if (approvedWorkoutData != null){

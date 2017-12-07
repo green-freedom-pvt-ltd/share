@@ -3,7 +3,6 @@ package com.sharesmile.share.gps;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -40,17 +39,17 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     public AndroidStepCounter(Context context, Listener listener){
         this.context = context;
         this.listener = listener;
-        startCounting();
+        start();
     }
 
     @Override
-    public void startCounting() {
+    public void start() {
         resetCounters();
         registerStepDetector();
     }
 
     @Override
-    public void stopCounting() {
+    public void stop() {
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
         }
@@ -58,12 +57,12 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     }
 
     @Override
-    public void pauseCounting() {
+    public void pause() {
         resetCounters();
     }
 
     @Override
-    public void resumeCounting() {
+    public void resume() {
 
     }
 

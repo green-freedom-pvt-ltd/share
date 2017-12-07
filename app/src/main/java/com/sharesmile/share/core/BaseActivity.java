@@ -61,7 +61,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCauseData = (CauseData) getIntent().getSerializableExtra(BUNDLE_CAUSE_DATA);
-        if (mCauseData != null && !CauseDataStore.getInstance().isCauseAvailableForRun(mCauseData)){
+        if (mCauseData != null && !CauseDataStore.getInstance()
+                .isCauseAvailableForRun(mCauseData)){
             mCauseData = CauseDataStore.getInstance().getFirstCause();
         }
         IntentFilter filter = new IntentFilter(Constants.LOCATION_TRACKER_BROADCAST_ACTION);
