@@ -2,9 +2,11 @@ package com.sharesmile.share.gps.models;
 
 import android.location.Location;
 
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Utils;
 
 import java.io.Serializable;
 
@@ -99,6 +101,37 @@ public class DistRecord implements UnObfuscable, Serializable{
 
     public Location getPrevLocation() {
         return prevLocation;
+    }
+
+    public void normaliseStepCountWrtStepCount(int currentSteps, int numStepsAtPreviousRecord,
+                                               float totalDistance){
+        int stepsInInterval = currentSteps - numStepsAtPreviousRecord;
+        long secsInInterval = getInterval() / 1000;
+        float distInInterval = getDist();
+
+        if (stepsInInterval <= 0){
+            // Can't perform normalisation if we don't have step count
+            return;
+        }
+
+        if (secsInInterval < ClientConfig.getInstance().MIN_INTERVAL_FOR_DISTANCE_NORMALISATION){
+            // Can't perform normalisation if time interval b/w two consecutive GPS points is less than min threshold
+            return;
+        }
+
+        float strideLengthSoFarInWorkout = (numStepsAtPreviousRecord == 0) ?
+                ClientConfig.getInstance().GLOBAL_AVERAGE_STRIDE_LENGTH
+                : (totalDistance - distInInterval) / numStepsAtPreviousRecord;
+
+        float strideLengthInInterval = distInInterval / stepsInInterval;
+
+        if (strideLengthInInterval < ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT){
+            // Stride length in this interval is too low, that means less distance is being recorded
+            // We need to normalise it with the strideLength recorded so far in the workout
+            float normalisedStrideLength = Utils.getNormalizedStrideLength(strideLengthSoFarInWorkout);
+            dist = stepsInInterval * normalisedStrideLength;
+            speed = (getElapsedTimeMs() == 0) ? 0 : ((dist * 1000) / getElapsedTimeMs());
+        }
     }
 
     @Override

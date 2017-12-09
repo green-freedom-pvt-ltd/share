@@ -114,6 +114,8 @@ public class Constants {
 
     public static final String PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN = "pref_workout_data_num_steps_when_batch_begin";
 
+    public static final String PREF_WORKOUT_DATA_NUM_STEPS_AT_PREVIOUS_RECORD = "pref_workout_data_num_steps_at_previous_record";
+
     public static final String PREF_WORKOUT_LIFETIME_DISTANCE = "pref_workout_lifetime_distance_new";
 
     public static final String PREF_WORKOUT_LIFETIME_STEPS = "pref_workout_lifetime_steps_new";

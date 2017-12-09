@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.sharesmile.share.core.Config.CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL;
+import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
@@ -36,6 +37,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     private WorkoutData dirtyWorkoutData;
     private WorkoutData approvedWorkoutData;
     private int numStepsWhenBatchBegan;
+    private int numStepsAtPreviousRecord;
 
     private List<Long> usainBoltOcurredTimeStamps;
 
@@ -51,6 +53,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             approvedWorkoutData.setCalories(new Calorie(0,0));
         }
         numStepsWhenBatchBegan = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
+        numStepsAtPreviousRecord = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_AT_PREVIOUS_RECORD);
         usainBoltOcurredTimeStamps = SharedPrefsManager.getInstance().getCollection(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS,
                 new TypeToken<ArrayList<Long>>(){}.getType());
     }
@@ -104,7 +107,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             }
 
             float averageStrideLength = (Utils.getAverageStrideLength() == 0)
-                        ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
+                        ? (GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
 
             // Normalising averageStrideLength obtained
             if (averageStrideLength < 0.25f){
@@ -130,8 +133,14 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         }
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
+
+        record.normaliseStepCountWrtStepCount(getTotalSteps(), numStepsAtPreviousRecord,
+                getTotalDistance());
+
         dirtyWorkoutData.addRecord(record, true);
+        setNumStepsAtPreviousRecord();
     }
+
 
     @Override
     public Properties getWorkoutBundle(){
@@ -195,7 +204,15 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         dirtyWorkoutData.workoutResume();
         approvedWorkoutData.workoutResume();
         numStepsWhenBatchBegan = getTotalSteps();
+        setNumStepsAtPreviousRecord();
         persistBothWorkoutData();
+    }
+
+    private void setNumStepsAtPreviousRecord(){
+        numStepsAtPreviousRecord = getTotalSteps();
+        // Persist the number of steps
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_AT_PREVIOUS_RECORD,
+                        numStepsAtPreviousRecord);
     }
 
     @Override

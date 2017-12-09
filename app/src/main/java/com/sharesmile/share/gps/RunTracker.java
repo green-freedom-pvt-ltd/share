@@ -3,8 +3,6 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
@@ -308,102 +306,102 @@ public class RunTracker implements Tracker {
 
 
     private synchronized void processLocation(Location point){
-        if (isRunning()){
-            //Check if the start point has been detected since the workout started/resumed
-            if (dataStore.coldStartAfterResume()){
-                // This is a potential source location
-                Logger.i(TAG, "Checking for source, accuracy = " + point.getAccuracy());
-                if (point.getAccuracy() < ClientConfig.getInstance().SOURCE_ACCEPTABLE_ACCURACY){
-                    // Set has source only when it has acceptable accuracy
-                    Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
-                    DistRecord startRecord = new DistRecord(point);
-                    dataStore.addRecord(startRecord);
-                    synchronized (recordHistoryQueue){
-                        recordHistoryQueue.add(startRecord);
-                    }
-                    SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, startRecord);
+        if (!isRunning()){
+            // Nothing to do
+            return;
+        }
+        //Check if the start point has been detected since the workout started/resumed
+        if (dataStore.coldStartAfterResume()){
+            // This is a potential source location
+            Logger.i(TAG, "Checking for source, accuracy = " + point.getAccuracy());
+            if (point.getAccuracy() < ClientConfig.getInstance().SOURCE_ACCEPTABLE_ACCURACY){
+                // Set has source only when it has acceptable accuracy
+                Logger.i(TAG, "Source Location with good accuracy fetched:\n " + point.toString());
+                DistRecord startRecord = new DistRecord(point);
+                dataStore.addRecord(startRecord);
+                synchronized (recordHistoryQueue){
+                    recordHistoryQueue.add(startRecord);
                 }
-            }else{
-                Logger.d(TAG,"Processing Location: " + point.toString());
-                Location prevLocation = getLastRecord().getLocation();
-                long prevTimeStamp = getLastRecord().getTimeStamp();
-                float interval = ((float) (DateUtil.getServerTimeInMillis() - prevTimeStamp)) / 1000;
-                float dist = prevLocation.distanceTo(point);
+                SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, startRecord);
+            }
+        }else{
+            Logger.d(TAG,"Processing Location: " + point.toString());
+            Location prevLocation = getLastRecord().getLocation();
+            long prevTimeStamp = getLastRecord().getTimeStamp();
+            float interval = ((float) (DateUtil.getServerTimeInMillis() - prevTimeStamp)) / 1000;
+            float dist = prevLocation.distanceTo(point);
 
-                // Step 1: Check whether threshold interval for recording has elapsed
-                if (interval > Config.THRESHOLD_INTEVAL){
+            // Step 1: Check whether threshold interval for recording has elapsed
+            if (interval > Config.THRESHOLD_INTEVAL){
 
-                    boolean toRecord = false;
+                boolean toRecord = false;
                     /*
                     Step 2: Secondary check for spike
                      */
-                    float deltaSpeedMs = dist / interval;
+                float deltaSpeedMs = dist / interval;
 
-                    float spikeFilterSpeedThreshold;
-                    String thresholdApplied;
+                float spikeFilterSpeedThreshold;
 
-                    // recent is avg GPS speed from recent few samples of accepted GPS points in the past 24 secs
-                    // GPS speed is obtained directly from location object and is calculated using doppler shift
-                    float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
+                // recent is avg GPS speed from recent few samples of accepted GPS points in the past 24 secs
+                // GPS speed is obtained directly from location object and is calculated using doppler shift
+                float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
 
-                    // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
-                    if (ActivityDetector.getInstance().isIsInVehicle() || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
-                        spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
-                        thresholdApplied = "in_vehicle";
+                // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
+                if (ActivityDetector.getInstance().isIsInVehicle()
+                        || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
+                    spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
+                }else {
+                    if ( ActivityDetector.getInstance().isOnFoot() ||
+                            (listener.isCountingSteps() &&
+                                    listener.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
+                        // Can make a safe assumption that the person is on foot
+                        spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                     }else {
-                        if ( ActivityDetector.getInstance().isOnFoot() ||
-                                (listener.isCountingSteps() &&
-                                        listener.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
-                            // Can make a safe assumption that the person is on foot
-                            spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
-                            thresholdApplied = "on_foot";
-                        }else {
-                            spikeFilterSpeedThreshold = ClientConfig.getInstance().SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
-                            thresholdApplied = "default";
-                        }
+                        spikeFilterSpeedThreshold = ClientConfig.getInstance().SECONDARY_SPIKE_FILTER_SPEED_THRESHOLD_DEFAULT;
                     }
+                }
 
-                    if (deltaSpeedMs > spikeFilterSpeedThreshold){
-                        // Insanely high velocity, must be a GPS spike
-                        toRecord = false;
-                        Logger.i(TAG, "GPS spike detected in RunTracker, through secondary check");
-                        dataStore.incrementGpsSpike();
-                    }else {
+                if (deltaSpeedMs > spikeFilterSpeedThreshold){
+                    // Insanely high velocity, must be a GPS spike
+                    toRecord = false;
+                    Logger.i(TAG, "GPS spike detected in RunTracker, through secondary check");
+                    dataStore.incrementGpsSpike();
+                }else {
                         /*
                          Step 3: Record if point is accurate, i.e. accuracy better/lower than our threshold
                                  Else
                                  Apply formula to check whether to record the point or not
                           */
-                        float accuracy = point.getAccuracy();
-                        if (accuracy < ClientConfig.getInstance().THRESHOLD_ACCURACY){
-                            Logger.d(TAG, "Accuracy Wins");
-                            toRecord = true;
-                        }else{
-                            toRecord = checkUsingFormula(dist, point.getAccuracy());
-                        }
+                    float accuracy = point.getAccuracy();
+                    if (accuracy < ClientConfig.getInstance().THRESHOLD_ACCURACY){
+                        Logger.d(TAG, "Accuracy Wins");
+                        toRecord = true;
+                    }else{
+                        toRecord = checkUsingFormula(dist, point.getAccuracy());
                     }
+                }
 
-                    // Step 4: Record if needed, else wait for next location
-                    if (toRecord){
-                        if (dist > ClientConfig.getInstance().DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT){
-                            // If it is making too big a jump in distance then we will not allow, even if the speed is in limit
-                            dist = 0;
-                        }
-                        DistRecord record = new DistRecord(point, prevLocation, prevTimeStamp,  dist);
-                        Logger.d(TAG, "Distance Recording: " + record.toString());
-                        double prevCalories = dataStore.getCalories().getCalories();
-                        dataStore.addRecord(record);
-                        synchronized (recordHistoryQueue){
-                            recordHistoryQueue.add(record);
-                        }
-                        SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);
-                        float deltaDistance = dist; // in meters
-                        int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs
-                        float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs
-                        double deltaCalories = dataStore.getCalories().getCalories() - prevCalories;
-                        listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
-                                deltaDistance, deltaTime, deltaSpeed, deltaCalories);
+                // Step 4: Record if needed, else wait for next location
+                if (toRecord){
+                    if (dist > ClientConfig.getInstance().DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT){
+                        // If it is making too big a jump in distance then we will not allow, even if the speed is in limit
+                        dist = 0;
                     }
+                    DistRecord record = new DistRecord(point, prevLocation, prevTimeStamp,  dist);
+                    Logger.d(TAG, "Distance Recording: " + record.toString());
+                    double prevCalories = dataStore.getCalories().getCalories();
+                    dataStore.addRecord(record);
+                    synchronized (recordHistoryQueue){
+                        recordHistoryQueue.add(record);
+                    }
+                    SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);
+                    // Change delta_distance
+                    float deltaDistance = dist; // in meters
+                    int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs
+                    float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs
+                    double deltaCalories = dataStore.getCalories().getCalories() - prevCalories;
+                    listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
+                            deltaDistance, deltaTime, deltaSpeed, deltaCalories);
                 }
             }
         }
@@ -414,7 +412,8 @@ public class RunTracker implements Tracker {
     }
 
     private boolean checkUsingFormula(float dist, float accuracy){
-        float deltaAccuracy = accuracy - (ClientConfig.getInstance().THRESHOLD_ACCURACY - Config.THRESHOLD_ACCURACY_OFFSET);
+        float deltaAccuracy = accuracy -
+                (ClientConfig.getInstance().THRESHOLD_ACCURACY - Config.THRESHOLD_ACCURACY_OFFSET);
         float value = (dist / deltaAccuracy);
         Logger.d(TAG, "Applying formula, dist = " + dist + " accuracy = " + accuracy + " value = " + value);
         if ( value > ClientConfig.getInstance().THRESHOLD_FACTOR){

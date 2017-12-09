@@ -43,6 +43,7 @@ import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.CurrencyCode;
 import com.sharesmile.share.core.UnitsManager;
@@ -878,6 +879,20 @@ public class Utils {
             return 0;
         }
         return ((float) lifetimeDistance*1000 ) / ((float) lifetimeSteps); // in meter/step
+    }
+
+    public static float getNormalizedStrideLength(float inputStrideLength){
+        // Calculate avgStrideLength (distance covered in one foot step) of the user
+        float normalisedStrideLength = (inputStrideLength == 0)
+                ? (ClientConfig.getInstance().GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
+        // Normalising averageStrideLength obtained
+        if (normalisedStrideLength < ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT){
+            normalisedStrideLength = ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT;
+        }
+        if (normalisedStrideLength > ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_UPPER_LIMIT){
+            normalisedStrideLength = ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_UPPER_LIMIT;
+        }
+        return normalisedStrideLength;
     }
 
     public static float getLifetimeAverageSpeed(){

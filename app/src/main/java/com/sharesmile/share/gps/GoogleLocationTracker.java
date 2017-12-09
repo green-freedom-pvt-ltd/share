@@ -34,7 +34,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.ClientConfig;
-import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
@@ -421,9 +420,10 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         state = State.API_CLIENT_CONNECTED;
         retryAttempt = 0;
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(Config.LOCATION_UPDATE_INTERVAL); // milliseconds
-        locationRequest.setMaxWaitTime(Config.LOCATION_UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(Config.LOCATION_UPDATE_INTERVAL); // the fastest rate in milliseconds at which your app can handle location updates
+        long interval = ClientConfig.getInstance().LOCATION_UPDATE_INTERVAL;
+        locationRequest.setInterval(interval); // milliseconds
+        locationRequest.setMaxWaitTime(interval);
+        locationRequest.setFastestInterval(1000); // the fastest rate in milliseconds at which your app can handle location updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (isActive){
             checkForLocationSettings(false);

@@ -8,9 +8,6 @@ import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
-import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT;
-import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT;
-
 /**
  * Created by ankitmaheshwari on 6/24/17.
  */
@@ -109,16 +106,7 @@ public class UsainBolt {
             // Calculate speed in the last recorded session
             float speedInSession = distanceInSession / timeElapsedInSecs;
 
-            // Calculate avgStrideLength (distance covered in one foot step) of the user
-            float averageStrideLength = (Utils.getAverageStrideLength() == 0)
-                    ? (Config.GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
-            // Normalising averageStrideLength obtained
-            if (averageStrideLength < GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT){
-                averageStrideLength = GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT;
-            }
-            if (averageStrideLength > GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT){
-                averageStrideLength = GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT;
-            }
+            float averageStrideLength = Utils.getNormalizedStrideLength(Utils.getAverageStrideLength());
             // Calculate expected num of steps in the recorded session based on speed and avgStrideLength
             int expectedNumOfSteps = (int) (distanceInSession / averageStrideLength);
             // ratio between actual steps counted and the expected num of steps in recorded session

@@ -96,14 +96,21 @@ public class ClientConfig implements UnObfuscable{
 
     /************ Below parameters are not on server **********/
 
-
     public  List<Float> VOICE_UPDATE_INTERVALS = Arrays.asList(10f, 20f, 30f, 45f, 60f, 75f, 90f, 120f,
             150f, 180f, 210f, 240f, 300f, 360f, 420f, 480f, 540f);// in minutes
 
-    public  int CONFIDENCE_THRESHOLD_ON_CYCLE = 70;
+    public int CONFIDENCE_THRESHOLD_ON_CYCLE = 70;
 
-//    public  List<Float> VOICE_UPDATE_INTERVALS = Arrays.asList(0.33f, 0.66f, 1f, 1.33f, 1.66f, 2f, 2.5f, 3f,
-//            3.5f, 4f, 4.5f, 5f, 5.5f, 6f, 420f, 480f, 540f);// in minutes
+    public long LOCATION_UPDATE_INTERVAL = 5000; // in millisecs
+
+    public long MIN_INTERVAL_FOR_DISTANCE_NORMALISATION = 10000; // in millisecs
+
+    public float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.7f; // in meters
+
+    public float GLOBAL_STRIDE_LENGTH_LOWER_LIMIT = 0.35f; // in meters
+
+    public float GLOBAL_STRIDE_LENGTH_UPPER_LIMIT = 1.1f; // in meters
+
 
     private static ClientConfig instance;
 

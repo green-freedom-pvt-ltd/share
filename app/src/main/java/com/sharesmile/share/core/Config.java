@@ -100,8 +100,6 @@ public class Config {
     public static final int GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE = 8;
 
 
-    public static final long LOCATION_UPDATE_INTERVAL = 1000; // in millisecs
-
     public static final int STEP_THRESHOLD_INTERVAL = 5000000; // in micro secs
 
     public static final long VIGILANCE_START_THRESHOLD = 80000; // in millisecs
@@ -113,12 +111,6 @@ public class Config {
     public static final float THRESHOLD_INTEVAL = 1; // in secs
 
     public static final float THRESHOLD_ACCURACY_OFFSET = 1f;
-
-    public static float GLOBAL_AVERAGE_STRIDE_LENGTH = 0.6f; // in meters
-
-    public static float GLOBAL_AVERAGE_STRIDE_LENGTH_LOWER_LIMIT = 0.3f; // in meters
-
-    public static float GLOBAL_AVERAGE_STRIDE_LENGTH_UPPER_LIMIT = 1.0f; // in meters
 
     public static float MIN_STEPS_PER_SECOND_FACTOR = 1f;
 

@@ -2,9 +2,6 @@ package com.sharesmile.share.googleapis;
 
 import android.content.Context;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.fitness.Fitness;
 import com.sharesmile.share.utils.Logger;
 
 /**
@@ -36,15 +33,6 @@ public class GoogleFitDistanceTracker implements GoogleTracker, GoogleApiHelper.
     public void stop() {
         Logger.d(TAG, "stop");
         if (helper.isConnected()){
-            Fitness.SensorsApi.remove( helper.getGoogleApiClient(), this )
-                    .setResultCallback(new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(Status status) {
-                            if (status.isSuccess() && helper.isConnected()) {
-                                helper.disconnect();
-                            }
-                        }
-                    });
         }
     }
 
