@@ -204,7 +204,7 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
         Logger.d(TAG, "onConnected");
 
         DataSourcesRequest dataSourceRequest = new DataSourcesRequest.Builder()
-                .setDataTypes( DataType.TYPE_STEP_COUNT_DELTA)
+                .setDataTypes( DataType.TYPE_STEP_COUNT_DELTA, DataType.TYPE_DISTANCE_DELTA)
                 .setDataSourceTypes(DataSource.TYPE_DERIVED)
                 .build();
 
@@ -216,6 +216,10 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
                     Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: "
                             + dataSource.toDebugString() + ", type: " + dataSource.getDataType().getName());
                     if( DataType.TYPE_STEP_COUNT_DELTA.equals(dataSource.getDataType()) ) {
+                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
+                        registerFitnessDataListener(dataSource, dataSource.getDataType());
+                    }
+                    if( DataType.TYPE_DISTANCE_DELTA.equals(dataSource.getDataType()) ) {
                         Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
                         registerFitnessDataListener(dataSource, dataSource.getDataType());
                     }

@@ -9,13 +9,17 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.FitnessStatusCodes;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.data.Value;
+import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.SessionReadRequest;
+import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.fitness.result.SessionReadResult;
 import com.google.android.gms.fitness.result.SessionStopResult;
 import com.google.gson.reflect.TypeToken;
@@ -31,7 +35,9 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static java.text.DateFormat.getTimeInstance;
@@ -169,58 +175,19 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         Logger.d(TAG, "Reading step count data between " + data.getBeginTimeStamp() + " and "
                 + DateUtil.getServerTimeInMillis() + " for workoutId " + data.getWorkoutId());
 
-        SessionReadRequest readRequest = new SessionReadRequest.Builder()
-                .setTimeInterval(data.getBeginTimeStamp() - 60000, System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-//                .setTimeInterval(1512629718705L, 1512629741533L, TimeUnit.SECONDS)
-                .read(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-                .setSessionName(getSessionName(data.getWorkoutId()))
-//                .setSessionName("session_00f768b5-1889-47f3-b9b3-18b25f98ed31_0")
-                .build();
-
-
         /*
+        SessionReadRequest readRequest = new SessionReadRequest.Builder()
+            .setTimeInterval(data.getBeginTimeStamp() - 60000, System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+//                .setTimeInterval(1512629718705L, 1512629741533L, TimeUnit.SECONDS)
+            .read(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+            .setSessionName(getSessionName(data.getWorkoutId()))
+//                .setSessionName("session_00f768b5-1889-47f3-b9b3-18b25f98ed31_0")
+            .build();
 
-        // [START read_session]
-        // Invoke the Sessions API to fetch the session with the query and wait for the result
-        // of the read request. Note: Fitness.SessionsApi.readSession() requires the
-        // ACCESS_FINE_LOCATION permission.
-        Fitness.getSessionsClient(MainApplication.getContext(),
-                GoogleSignIn.getLastSignedInAccount(MainApplication.getContext()))
-                .readSession(readRequest)
-                .addOnSuccessListener(new OnSuccessListener<SessionReadResponse>() {
-                    @Override
-                    public void onSuccess(SessionReadResponse sessionReadResponse) {
-                        // Get a list of the sessions that match the criteria to check the result.
-                        List<Session> sessions = sessionReadResponse.getSessions();
-                        Logger.d(TAG, "Session read was successful. Number of returned sessions is: "
-                                + sessions.size());
+            PendingResult<SessionReadResult> result =
+            Fitness.SessionsApi.readSession(helper.getGoogleApiClient(), readRequest);
 
-                        for (Session session : sessions) {
-                            // Process the session
-                            dumpSession(session);
-
-                            // Process the data sets for this session
-                            List<DataSet> dataSets = sessionReadResponse.getDataSet(session);
-                            for (DataSet dataSet : dataSets) {
-                                dumpDataSet(dataSet);
-                            }
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Logger.d(TAG , "Failed to read session");
-                    }
-                });
-
-        */
-
-
-        PendingResult<SessionReadResult> sessionReadResult =
-                Fitness.SessionsApi.readSession(helper.getGoogleApiClient(), readRequest);
-
-        sessionReadResult.setResultCallback(new ResultCallback<SessionReadResult>() {
+            sessionReadResult.setResultCallback(new ResultCallback<SessionReadResult>() {
             @Override
             public void onResult(SessionReadResult sessionReadResult) {
                 if (sessionReadResult.getStatus().isSuccess()) {
@@ -247,6 +214,134 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 }
             }
         });
+
+         */
+
+        DataSource ESTIMATED_STEP_DELTAS = new DataSource.Builder()
+                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .setType(DataSource.TYPE_DERIVED)
+                .setStreamName("estimated_steps")
+                .setAppPackageName("com.google.android.gms")
+                .build();
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(ESTIMATED_STEP_DELTAS,    DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .bucketByTime(1, TimeUnit.MINUTES)
+                .setTimeRange(data.getBeginTimeStamp(), System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .build();
+
+
+        PendingResult<DataReadResult> result =
+                Fitness.HistoryApi.readData(helper.getGoogleApiClient(), readRequest);
+
+        result.setResultCallback(new ResultCallback<DataReadResult>() {
+            @Override
+            public void onResult(@NonNull DataReadResult dataReadResult) {
+                DateFormat dateFormat = getTimeInstance();
+                if (dataReadResult.getBuckets().size() > 0) {
+                    Logger.d(TAG, "Buckets in result, number of buckets = "
+                            + dataReadResult.getBuckets().size());
+                    Map<String, Float> aggregateMap = new HashMap<>();
+                    aggregateMap.put(DISTANCE, 0f);
+                    aggregateMap.put(STEPS, 0f);
+                    aggregateMap.put(CALORIES, 0f);
+
+                    int count = 1;
+                    for (Bucket bucket : dataReadResult.getBuckets()) {
+                        Logger.d(TAG, "Bucket number " + count + " ::::: number of datasets = "
+                                + bucket.getDataSets().size());
+                        List<DataSet> dataSets = bucket.getDataSets();
+                        for (DataSet dataSet : dataSets) {
+                            Logger.d(TAG, "\ndataSet.dataType: " + dataSet.getDataType().getName());
+                            for (DataPoint dp : dataSet.getDataPoints()) {
+                                describeDataPoint(dp, dateFormat);
+                            }
+                            updateMapWithDataSet(dataSet, aggregateMap);
+                        }
+                        count++;
+                    }
+
+                    String update = "DISTANCE : " + (aggregateMap.get(DISTANCE) / 1000)
+                            + ", STEPS : " + aggregateMap.get(STEPS)
+                            + ", CALORIES : " + aggregateMap.get(CALORIES);
+
+                    Logger.d(TAG, update);
+                    MainApplication.showToast(update);
+
+                } else if (dataReadResult.getDataSets().size() > 0) {
+                    Logger.d(TAG, "Datasets in result : dataSet.size(): " + dataReadResult.getDataSets().size());
+                    for (DataSet dataSet : dataReadResult.getDataSets()) {
+                        Logger.d(TAG, "\ndataType: " + dataSet.getDataType().getName());
+                        for (DataPoint dp : dataSet.getDataPoints()) {
+                            describeDataPoint(dp, dateFormat);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void updateMapWithDataSet(DataSet dataSet, Map<String, Float> map){
+        DataType dataType = dataSet.getDataType();
+        String key = getKeyFor(dataType);
+        if (key != null){
+            float currValue = map.get(key);
+            for (DataPoint dp : dataSet.getDataPoints()) {
+                for(Field field : dataType.getFields()) {
+                    if (field.equals(getFieldFor(dataType))){
+                        if (field.equals(Field.FIELD_STEPS)){
+                            currValue = currValue +  dp.getValue(field).asInt();
+                        }else {
+                            currValue = currValue +  dp.getValue(field).asFloat();
+                        }
+                    }
+                }
+            }
+            map.put(key, currValue);
+        }
+    }
+
+    private Field getFieldFor(DataType dataType){
+        if (DataType.TYPE_DISTANCE_DELTA.equals(dataType)){
+            return Field.FIELD_DISTANCE;
+        }else if (DataType.TYPE_STEP_COUNT_DELTA.equals(dataType)){
+            return Field.FIELD_STEPS;
+        }else if (DataType.TYPE_CALORIES_EXPENDED.equals(dataType)){
+            return Field.FIELD_CALORIES;
+        }
+        return null;
+    }
+
+    private String getKeyFor(DataType dataType){
+        if (DataType.TYPE_DISTANCE_DELTA.equals(dataType)){
+            return DISTANCE;
+        }else if (DataType.TYPE_STEP_COUNT_DELTA.equals(dataType)){
+            return STEPS;
+        }else if (DataType.TYPE_CALORIES_EXPENDED.equals(dataType)){
+            return CALORIES;
+        }
+        return null;
+    }
+
+    public static final String DISTANCE = "distance";
+    public static final String STEPS = "steps";
+    public static final String CALORIES = "calories";
+
+
+    public void describeDataPoint(DataPoint dp, DateFormat dateFormat) {
+        String msg = "dataPoint: "
+                + "type: " + dp.getDataType().getName() +"\n"
+                + ", range: [" + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)) + "-" + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)) + "]\n"
+                + ", fields: [";
+
+        for(Field field : dp.getDataType().getFields()) {
+            msg += field.getName() + "=" + dp.getValue(field) + " ";
+        }
+
+        msg += "]";
+        Logger.d(TAG, msg);
     }
 
     private void dumpSession(Session session) {

@@ -26,6 +26,7 @@ public interface StepCounter extends GoogleTracker{
         void notAvailable(int reasonCode);
         void isReady();
         void onStepCount(int deltaSteps);
+        void onDistance(float distance);
 
     }
 }

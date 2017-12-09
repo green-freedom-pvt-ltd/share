@@ -53,8 +53,16 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(context);
         switch (apiCode){
             case API_LIVE_STEP_COUNTING:
-                builder.addApi(Fitness.SENSORS_API)
-                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ));
+//                builder.addApi(Fitness.SENSORS_API)
+//                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ));
+                builder
+                        .addApi(Fitness.SESSIONS_API)
+                        .addApi(Fitness.HISTORY_API)
+                        .addApi(Fitness.RECORDING_API)
+                        .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
+                        .addScope(new Scope(Scopes.FITNESS_BODY_READ))
+                        .build();
                 break;
             case API_SESSION_RECORDING:
                 builder
@@ -67,7 +75,14 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
                         .build();
                 break;
             case API_LIVE_DISTANCE_TRACKING:
-
+                builder
+                        .addApi(Fitness.SESSIONS_API)
+                        .addApi(Fitness.HISTORY_API)
+                        .addApi(Fitness.RECORDING_API)
+                        .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
+                        .addScope(new Scope(Scopes.FITNESS_BODY_READ))
+                        .build();
                 break;
             default:
                 throw new IllegalArgumentException("Api not supported for code: " + apiCode);
