@@ -1036,6 +1036,10 @@ public class Utils {
         return "location_data_" + workoutId + "_" + batchNum;
     }
 
+    public static double logBase2(double num){
+        return (Math.log(num) / Math.log(2));
+    }
+
     public static String UNIQUE_ID;
 
     /**

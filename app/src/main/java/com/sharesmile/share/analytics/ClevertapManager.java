@@ -50,7 +50,6 @@ public class ClevertapManager implements EventConsumer {
             // thrown if you haven’t requested the required permissions in your AndroidManifest.xml
             Logger.e(TAG, "you haven’t requested the required permissions in your AndroidManifest.xml");
         }
-
     }
 
     public void setUserProperty(String propertyName, Object value){

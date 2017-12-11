@@ -164,7 +164,7 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
                             Logger.i(TAG, "SensorApi successfully added for " + dataType.getName());
-                            listener.isReady();
+                            listener.stepCounterReady();
                         }else{
                             Logger.e(TAG, "SensorApi couldn't be added for " + dataType.getName());
                             listener.notAvailable(SENSOR_API_NOT_ADDED);

@@ -364,8 +364,8 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void isReady() {
-        Logger.d(TAG, "isReady");
+    public void stepCounterReady() {
+        Logger.d(TAG, "stepCounterReady");
         currentlyProcessingSteps = true;
         if (isKitkatWithStepSensor(getApplicationContext())){
             Analytics.getInstance().setUserProperty("StepCounter", "sensor_service");

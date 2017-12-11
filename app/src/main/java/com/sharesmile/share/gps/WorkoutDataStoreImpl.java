@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.sharesmile.share.core.Config.CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL;
-import static com.sharesmile.share.core.Config.GLOBAL_AVERAGE_STRIDE_LENGTH;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.
@@ -107,7 +106,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             }
 
             float averageStrideLength = (Utils.getAverageStrideLength() == 0)
-                        ? (GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
+                        ? (ClientConfig.getInstance().GLOBAL_AVERAGE_STRIDE_LENGTH) : Utils.getAverageStrideLength();
 
             // Normalising averageStrideLength obtained
             if (averageStrideLength < 0.25f){

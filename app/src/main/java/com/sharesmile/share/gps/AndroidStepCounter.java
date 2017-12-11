@@ -127,7 +127,7 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
         if (batchMode) {
             // batchMode was enabled successfully
             Logger.d(TAG, "Step Detector registered successfully");
-            listener.isReady();
+            listener.stepCounterReady();
             return;
         }
         listener.notAvailable(STEP_DETECTOR_NOT_SUPPORTED);

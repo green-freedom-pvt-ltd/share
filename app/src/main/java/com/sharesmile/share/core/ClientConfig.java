@@ -10,6 +10,7 @@ import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -86,7 +87,7 @@ public class ClientConfig implements UnObfuscable{
     // In a single DistRecord update delta_distance cannot be more than this value
     public  float DIST_INC_IN_SINGLE_GPS_UPDATE_UPPER_LIMIT = 3500f;// in meters
 
-    // ON_WORKOUT_UPDATE analytics event occurrs after this much distance
+    // ON_WORKOUT_UPDATE analytics event ocurrs after this much distance
     public  float MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT = 0.5f;// in Kms
 
     // Sync Config
@@ -110,6 +111,10 @@ public class ClientConfig implements UnObfuscable{
     public float GLOBAL_STRIDE_LENGTH_LOWER_LIMIT = 0.35f; // in meters
 
     public float GLOBAL_STRIDE_LENGTH_UPPER_LIMIT = 1.1f; // in meters
+
+    public float ACCEPTABLE_AVERAGE_SPEED_UPPER_LIMIT = 16.6667f; // in meters/sec i.e. 60 km/hr
+
+    public float ACCEPTABLE_AVERAGE_SPEED_LOWER_LIMIT = 8.3333f; // in meters/sec i.e. 30 km/hr
 
 
     private static ClientConfig instance;
@@ -200,5 +205,20 @@ public class ClientConfig implements UnObfuscable{
             e.printStackTrace();
             return ExpoBackoffTask.RESULT_FAILURE;
         }
+    }
+
+    public double getAcceptableAverageSpeed(double secs){
+        double U = ACCEPTABLE_AVERAGE_SPEED_UPPER_LIMIT;
+        double L = ACCEPTABLE_AVERAGE_SPEED_LOWER_LIMIT;
+        if (secs < 10){
+            // 10 * 2^0
+            return U;
+        }
+        if (secs > 5120){
+            // 10 * 2^9
+            return L;
+        }
+        double x = Utils.logBase2(secs / 10);
+        return U - (U - L)*(x / 9);
     }
 }
