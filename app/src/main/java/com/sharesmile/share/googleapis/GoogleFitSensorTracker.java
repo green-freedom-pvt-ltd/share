@@ -30,7 +30,6 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
 
     private static final String TAG = "GoogleFitSensorTracker";
 
-    GoogleApiHelper helper;
     DataType dataType;
     Listener listener;
 
@@ -38,7 +37,6 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
     long countingbeganTsMillis;
 
     public GoogleFitSensorTracker(Context context, DataType dataType, Listener listener) {
-        this.helper = new GoogleApiHelper(GoogleApiHelper.API_LIVE_STEP_COUNTING, context);
         this.dataType = dataType;
         this.listener = listener;
     }
@@ -46,24 +44,25 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
     @Override
     public void start() {
         Logger.d(TAG, "start");
-        helper.connect();
+        GoogleApiHelper.getInstance().register(this);
         countingbeganTsMillis = DateUtil.getServerTimeInMillis();
-        helper.setListener(this);
     }
 
     @Override
     public void stop() {
-        if (helper.isConnected()){
-            Fitness.SensorsApi.remove( helper.getGoogleApiClient(), this )
-                    .setResultCallback(new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(Status status) {
-                            if (status.isSuccess() && helper.isConnected()) {
-                                helper.disconnect();
-                            }
-                        }
-                    });
+        final GoogleApiHelper helper = GoogleApiHelper.getInstance();
+        if (!helper.isConnected()){
+            return;
         }
+        Fitness.SensorsApi.remove( helper.getGoogleApiClient(), this )
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        if (status.isSuccess()) {
+                            helper.unregister(GoogleFitSensorTracker.this);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -86,7 +85,7 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
                         TimeUnit.SECONDS)
                 .build();
 
-        Fitness.SensorsApi.add(helper.getGoogleApiClient(), request, this)
+        Fitness.SensorsApi.add(GoogleApiHelper.getInstance().getGoogleApiClient(), request, this)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
@@ -125,7 +124,8 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
             }
         };
 
-        Fitness.SensorsApi.findDataSources(helper.getGoogleApiClient(), dataSourceRequest)
+        Fitness.SensorsApi
+                .findDataSources(GoogleApiHelper.getInstance().getGoogleApiClient(), dataSourceRequest)
                 .setResultCallback(dataSourcesResultCallback);
     }
 
@@ -152,7 +152,7 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
             } else {
 //                String message = "Field: " + field.getName() + " Value: " + value;
 //                Logger.d(TAG, message);
-                if (helper.getFieldFor(dataType).getName().equals(field.getName())){
+                if (GoogleApiHelper.getInstance().getFieldFor(dataType).getName().equals(field.getName())){
                     // Step count data
                     Float deltaCount = Float.parseFloat(value.toString());
                     listener.onDeltaCount(

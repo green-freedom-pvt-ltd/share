@@ -7,7 +7,6 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -16,12 +15,8 @@ import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
-import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.fitness.request.DataReadRequest;
-import com.google.android.gms.fitness.request.SessionReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
-import com.google.android.gms.fitness.result.SessionReadResult;
-import com.google.android.gms.fitness.result.SessionStopResult;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -49,11 +44,9 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
     private static final String TAG = "GoogleFitnessSessionRecorder";
 
-    private GoogleApiHelper helper;
     List<String> sessionIds;
 
     public GoogleFitnessSessionRecorder(Context context) {
-        this.helper = new GoogleApiHelper(GoogleApiHelper.API_SESSION_RECORDING, context);
         this.sessionIds = SharedPrefsManager.getInstance().getCollection(Constants.PREF_FITNESS_SESSION_IDS,
                 new TypeToken<ArrayList<String>>(){}.getType());
         if (sessionIds == null){
@@ -63,6 +56,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
     @Override
     public void onConnected() {
+        Logger.d(TAG, "onConnected");
         subscribeToFitnessData();
         // Call resume to start the first session
         resume();
@@ -77,21 +71,19 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
     @Override
     public void start() {
         Logger.d(TAG, "start");
-        helper.setListener(this);
-        helper.connect();
+        GoogleApiHelper.getInstance().register(this);
     }
 
     private void subscribeToFitnessData(){
 
         subscribeToDataType(DataType.TYPE_STEP_COUNT_DELTA);
-        subscribeToDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE);
         subscribeToDataType(DataType.TYPE_DISTANCE_DELTA);
         subscribeToDataType(DataType.TYPE_CALORIES_EXPENDED);
 
     }
 
     private void subscribeToDataType(final DataType dataType){
-        Fitness.RecordingApi.subscribe(helper.getGoogleApiClient(), dataType)
+        Fitness.RecordingApi.subscribe(GoogleApiHelper.getInstance().getGoogleApiClient(), dataType)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
@@ -109,17 +101,17 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 });
     }
 
+    volatile int cancelCount = 0;
     private void cancelSubscriptions(){
-
+        cancelCount = 0;
         unsubscribeDataType(DataType.TYPE_STEP_COUNT_DELTA);
-        unsubscribeDataType(DataType.TYPE_DISTANCE_CUMULATIVE);
         unsubscribeDataType(DataType.TYPE_DISTANCE_DELTA);
         unsubscribeDataType(DataType.TYPE_CALORIES_EXPENDED);
 
     }
 
     private void unsubscribeDataType(final DataType dataType){
-        Fitness.RecordingApi.unsubscribe(helper.getGoogleApiClient(), dataType)
+        Fitness.RecordingApi.unsubscribe(GoogleApiHelper.getInstance().getGoogleApiClient(), dataType)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
@@ -128,21 +120,40 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                         } else {
                             Logger.d(TAG, "There was a problem in unsubscribing " + dataType.getName());
                         }
+                        updateCancelCount();
                     }
                 });
+    }
+
+    private synchronized void updateCancelCount(){
+        cancelCount++;
+        if (cancelCount == 3){
+            // All datatypes have been unsubscribed, we shall unregister from GoogleApiHelper
+            GoogleApiHelper.getInstance().unregister(this);
+            cancelCount = 0;
+        }
     }
 
     @Override
     public void stop() {
         Logger.d(TAG, "stop");
+        if (!GoogleApiHelper.getInstance().isConnected()){
+            return;
+        }
         pause();
         cancelSubscriptions();
-//        helper.disconnect();
     }
 
     @Override
     public void pause() {
         Logger.d(TAG, "pause");
+        /*
+
+        final GoogleApiHelper helper = GoogleApiHelper.getInstance();
+        if (!helper.isConnected()){
+            return;
+        }
+
         final String currentSessionId = getLatestSessionId();
         PendingResult<SessionStopResult> pendingResult =
                 Fitness.SessionsApi.stopSession(helper.getGoogleApiClient(), currentSessionId);
@@ -157,6 +168,8 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 }
             }
         });
+
+         */
     }
 
     public String getLatestSessionId(){
@@ -171,20 +184,28 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         return "session_" + workoutId;
     }
 
-    public void readStepCountData(){
-        WorkoutDataStore dataStore = WorkoutSingleton
-                .getInstance().getDataStore();
+    public void readWorkoutHistory(){
+        Logger.d(TAG, "readWorkoutHistory");
+        if (!GoogleApiHelper.getInstance().isConnected()){
+            return;
+        }
+        WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
+
+        // TODO: Need to segregate the read for batches
+
+        final Map<String, Float> aggregateMap = new HashMap<>();
+
         Logger.d(TAG, "Reading step count data between " + dataStore.getBeginTimeStamp() + " and "
                 + DateUtil.getServerTimeInMillis() + " for workoutId " + dataStore.getWorkoutId());
 
         DataSource ESTIMATED_STEP_DELTAS = new DataSource.Builder()
-                .setDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
                 .setType(DataSource.TYPE_DERIVED)
                 .setStreamName("estimated_steps")
                 .setAppPackageName("com.google.android.gms")
                 .build();
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(ESTIMATED_STEP_DELTAS,    DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(ESTIMATED_STEP_DELTAS,    DataType.TYPE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
@@ -194,7 +215,8 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
 
         PendingResult<DataReadResult> result =
-                Fitness.HistoryApi.readData(helper.getGoogleApiClient(), readRequest);
+                Fitness.HistoryApi.readData(GoogleApiHelper.getInstance().getGoogleApiClient(),
+                        readRequest);
 
         result.setResultCallback(new ResultCallback<DataReadResult>() {
             @Override
@@ -203,7 +225,6 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 if (dataReadResult.getBuckets().size() > 0) {
                     Logger.d(TAG, "Buckets in result, number of buckets = "
                             + dataReadResult.getBuckets().size());
-                    Map<String, Float> aggregateMap = new HashMap<>();
                     aggregateMap.put(DISTANCE, 0f);
                     aggregateMap.put(STEPS, 0f);
                     aggregateMap.put(CALORIES, 0f);
@@ -250,7 +271,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
             float currValue = map.get(key);
             for (DataPoint dp : dataSet.getDataPoints()) {
                 for(Field field : dataType.getFields()) {
-                    if (field.equals(helper.getFieldFor(dataType))){
+                    if (field.equals(GoogleApiHelper.getInstance().getFieldFor(dataType))){
                         if (field.equals(Field.FIELD_STEPS)){
                             currValue = currValue +  dp.getValue(field).asInt();
                         }else {
@@ -319,53 +340,11 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         }
     }
 
-    public void readDistanceData(){
-        WorkoutDataStore dataStore = WorkoutSingleton
-                .getInstance().getDataStore();
-        Logger.d(TAG, "Reading distance data between " + dataStore.getBeginTimeStamp() + " and "
-                + DateUtil.getServerTimeInMillis() + " for workoutId " + dataStore.getWorkoutId());
-        SessionReadRequest readRequest = new SessionReadRequest.Builder()
-                .setTimeInterval(dataStore.getBeginTimeStamp() - 1000, System.currentTimeMillis(),
-                        TimeUnit.MILLISECONDS)
-                .read(DataType.TYPE_DISTANCE_CUMULATIVE)
-                .setSessionName(getSessionName(dataStore.getWorkoutId()))
-                .build();
-
-        PendingResult<SessionReadResult> sessionReadResult =
-                Fitness.SessionsApi.readSession(helper.getGoogleApiClient(), readRequest);
-
-        sessionReadResult.setResultCallback(new ResultCallback<SessionReadResult>() {
-            @Override
-            public void onResult(SessionReadResult sessionReadResult) {
-                if (sessionReadResult.getStatus().isSuccess()) {
-                    Logger.d(TAG, "Successfully read distance data");
-                    float overallDistance = 0;
-                    for (Session session : sessionReadResult.getSessions()) {
-                        Logger.d(TAG, "Session name: " + session.getName() + ", session identifier "
-                                + session.getIdentifier());
-                        float distance = 0;
-                        for (DataSet dataSet : sessionReadResult.getDataSet(session)) {
-                            for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                                Value value = dataPoint.getValue(Field.FIELD_DISTANCE);
-                                Logger.d(TAG, "Datapoint distance = " + value);
-                                distance = distance + value.asFloat();
-                            }
-                        }
-                        Logger.d(TAG, "Total distance in session " + session.getIdentifier() + " = "
-                                + distance);
-                        overallDistance += distance;
-                    }
-                    Logger.d(TAG, "overallDistance = " + overallDistance);
-                } else {
-                    Logger.i(TAG, "Failed to read session data");
-                }
-            }
-        });
-    }
-
     @Override
     public void resume() {
         Logger.d(TAG, "resume");
+
+        /*
 
         WorkoutDataStore dataStore = WorkoutSingleton
                 .getInstance().getDataStore();
@@ -401,7 +380,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         // - The Google API client object
         // - The request object
         PendingResult<Status> pendingResult =
-                Fitness.SessionsApi.startSession(helper.getGoogleApiClient(), session);
+                Fitness.SessionsApi.startSession(GoogleApiHelper.getInstance().getGoogleApiClient(), session);
         pendingResult.setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
@@ -415,6 +394,8 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 }
             }
         });
+
+         */
 
     }
 }

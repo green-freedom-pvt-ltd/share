@@ -63,6 +63,11 @@ public class DateUtil {
         return ServerTimeKeeper.getServerTimeStampInMillis();
     }
 
+    public static long getSystemTimeForServerTime(long serverTimeStamp){
+        long delta = System.currentTimeMillis() - getServerTimeInMillis();
+        return serverTimeStamp + delta;
+    }
+
     public static Date getDefaultFormattedDate(String dateString, String format) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);

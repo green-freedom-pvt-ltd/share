@@ -13,12 +13,18 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.googleapis.event.GoogleApiResultEvent;
 import com.sharesmile.share.utils.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.lang.ref.WeakReference;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by ankitmaheshwari on 12/2/17.
@@ -32,84 +38,113 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
     public static final String KEY_RESOLUTION_PARCELABLE = "key_resolution_parcelable";
     public static final String KEY_API_CODE = "key_api_code";
 
-    public static final int API_SESSION_RECORDING = 1;
-    public static final int API_LIVE_DISTANCE_TRACKING = 2;
-    public static final int API_LIVE_STEP_COUNTING = 3;
+    public static final int GOOGLE_FIT_CONNECTION_RESOLUTION_CODE = 100;
 
-    GoogleApiClient googleApiClient;
-    private int apiCode;
+    private static GoogleApiHelper uniqueInstance;
+    Set<WeakReference<Listener>> listeners;
+
+    private GoogleApiClient googleApiClient;
     private Context context;
-    private Listener listener;
+    private State state;
 
-    public GoogleApiHelper(int apiCode, Context context) {
-        this.apiCode = apiCode;
+    private GoogleApiHelper(Context context) {
         this.context = context;
         this.googleApiClient = buildApiClient();
+        state = State.IDLE;
+        listeners = new HashSet<>();
     }
 
-    public void setListener(Listener listener){
-        this.listener = listener;
+    /**
+     Throws IllegalStateException if this class is not initialized
+
+     @return unique GoogleApiHelper instance
+     */
+    public static GoogleApiHelper getInstance() {
+        if (uniqueInstance == null) {
+            synchronized (GoogleApiHelper.class) {
+                if (uniqueInstance == null) {
+                    uniqueInstance = new GoogleApiHelper(MainApplication.getContext());
+                }
+            }
+        }
+        return uniqueInstance;
     }
 
     private GoogleApiClient buildApiClient(){
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(context);
-        switch (apiCode){
-            case API_LIVE_STEP_COUNTING:
-//                builder.addApi(Fitness.SENSORS_API)
-//                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ));
-                builder
-                        .addApi(Fitness.SESSIONS_API)
-                        .addApi(Fitness.HISTORY_API)
-                        .addApi(Fitness.RECORDING_API)
-                        .addApi(Fitness.SENSORS_API)
-                        .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
-                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
-                        .addScope(new Scope(Scopes.FITNESS_BODY_READ))
-                        .build();
-                break;
-            case API_SESSION_RECORDING:
-                builder
-                        .addApi(Fitness.SESSIONS_API)
-                        .addApi(Fitness.HISTORY_API)
-                        .addApi(Fitness.RECORDING_API)
-                        .addApi(Fitness.SENSORS_API)
-                        .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
-                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
-                        .addScope(new Scope(Scopes.FITNESS_BODY_READ))
-                        .build();
-                break;
-            case API_LIVE_DISTANCE_TRACKING:
-                builder
-                        .addApi(Fitness.SESSIONS_API)
-                        .addApi(Fitness.HISTORY_API)
-                        .addApi(Fitness.RECORDING_API)
-                        .addApi(Fitness.SENSORS_API)
-                        .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
-                        .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
-                        .addScope(new Scope(Scopes.FITNESS_BODY_READ))
-                        .build();
-                break;
-            default:
-                throw new IllegalArgumentException("Api not supported for code: " + apiCode);
-        }
+        builder.addApi(Fitness.SESSIONS_API)
+                .addApi(Fitness.HISTORY_API)
+                .addApi(Fitness.RECORDING_API)
+                .addApi(Fitness.SENSORS_API)
+                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
+                .addScope(new Scope(Scopes.FITNESS_BODY_READ));
+
         return builder.addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+    }
+
+    public void register(Listener listener){
+        Logger.i(TAG, "register");
+        if (listener == null){
+            return;
+        }
+
+        if (state == State.IDLE){
+            // Very first listener to be registered, will connect the googleAPI client
+            EventBus.getDefault().register(this);
+            connect();
+        }
+
+        boolean toAdd = true;
+        for (WeakReference<Listener> reference : listeners) {
+            if (listener.equals(reference.get())){
+                toAdd = false;
+            }
+        }
+        if (toAdd){
+            Logger.d(TAG, "Will register this listener for location updates");
+            WeakReference<Listener> reference = new WeakReference<>(listener);
+            listeners.add(reference);
+            if (state == State.CONNECTED){
+                listener.onConnected();
+            }
+        }
+    }
+
+    public void unregister(Listener listener){
+        Logger.d(TAG, "unregister");
+        if (listener == null){
+            return;
+        }
+
+        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+        while (iterator.hasNext()){
+            WeakReference<Listener> reference = iterator.next();
+            if (reference.get() != null){
+                if (listener.equals(reference.get())){
+                    iterator.remove();
+                }
+            }else {
+                iterator.remove();
+            }
+        }
+
+        if (listeners.isEmpty() && state != State.IDLE){
+            // All subscribers have been unregistered, so disconnect client and change state
+            googleApiClient.disconnect();
+            state = State.IDLE;
+            EventBus.getDefault().unregister(this);
+        }
 
     }
 
-    public void connect(){
-        EventBus.getDefault().register(this);
+    private void connect(){
         googleApiClient.connect();
+        state = State.CONNECTING;
     }
 
     public boolean isConnected(){
-        return googleApiClient != null && googleApiClient.isConnected();
-    }
-
-    public void disconnect(){
-        if (googleApiClient != null && googleApiClient.isConnected()){
-            googleApiClient.disconnect();
-        }
-        EventBus.getDefault().unregister(this);
+        return state == State.CONNECTED;
     }
 
     public GoogleApiClient getGoogleApiClient() {
@@ -119,24 +154,23 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(GoogleApiResultEvent event) {
         if( event.getResultCode() == Activity.RESULT_OK) {
-            if( !googleApiClient.isConnecting() && !googleApiClient.isConnected() ) {
-                googleApiClient.connect();
-            }
+            connect();
             return;
         } else if( event.getResultCode() == Activity.RESULT_CANCELED ) {
             Logger.e(TAG, "RESULT_CANCELED for requestCode " + event.getRequestCode());
-            if (listener != null){
-                listener.connectionFailed();
-            }
+            // Notify Listeners about the failure
+            state = State.IDLE;
+            EventBus.getDefault().unregister(this);
+            notifyFailure();
         }
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (listener != null){
-            listener.onConnected();
-        }
+        // Notify Listeners about success
+        state = State.CONNECTED;
+        notifySucces();
     }
 
     @Override
@@ -150,9 +184,36 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
         if (connectionResult.hasResolution()){
             Intent intent = new Intent(context, GoogleApiHelperActivity.class);
             intent.putExtra(KEY_RESOLUTION_PARCELABLE, connectionResult);
-            intent.putExtra(KEY_API_CODE, apiCode);
+            intent.putExtra(KEY_API_CODE, GOOGLE_FIT_CONNECTION_RESOLUTION_CODE);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+        }else {
+            String error = connectionResult.getErrorMessage();
+            MainApplication.showToast(error);
+            // Notify Listeners about the failure
+            state = State.IDLE;
+            EventBus.getDefault().unregister(this);
+            notifyFailure();
+        }
+    }
+
+    private void notifyFailure(){
+        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+        while (iterator.hasNext()){
+            WeakReference<Listener> reference = iterator.next();
+            if (reference.get() != null){
+                reference.get().connectionFailed();
+            }
+        }
+    }
+
+    private void notifySucces(){
+        Iterator<WeakReference<Listener>> iterator = listeners.iterator();
+        while (iterator.hasNext()){
+            WeakReference<Listener> reference = iterator.next();
+            if (reference.get() != null){
+                reference.get().onConnected();
+            }
         }
     }
 
@@ -170,5 +231,11 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
     public interface Listener{
         void onConnected();
         void connectionFailed();
+    }
+
+    public enum State{
+        IDLE,
+        CONNECTING,
+        CONNECTED;
     }
 }

@@ -36,8 +36,7 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
         stepCounter.stop();
         distanceTracker.stop();
         sessionRecorder.stop();
-        sessionRecorder.readDistanceData();
-        sessionRecorder.readStepCountData();
+        sessionRecorder.readWorkoutHistory();
     }
 
     @Override
