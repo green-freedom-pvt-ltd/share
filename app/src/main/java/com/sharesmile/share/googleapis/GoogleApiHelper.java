@@ -11,6 +11,8 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
 import com.sharesmile.share.googleapis.event.GoogleApiResultEvent;
 import com.sharesmile.share.utils.Logger;
 
@@ -59,6 +61,7 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
                         .addApi(Fitness.SESSIONS_API)
                         .addApi(Fitness.HISTORY_API)
                         .addApi(Fitness.RECORDING_API)
+                        .addApi(Fitness.SENSORS_API)
                         .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
                         .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                         .addScope(new Scope(Scopes.FITNESS_BODY_READ))
@@ -69,6 +72,7 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
                         .addApi(Fitness.SESSIONS_API)
                         .addApi(Fitness.HISTORY_API)
                         .addApi(Fitness.RECORDING_API)
+                        .addApi(Fitness.SENSORS_API)
                         .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
                         .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                         .addScope(new Scope(Scopes.FITNESS_BODY_READ))
@@ -79,6 +83,7 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
                         .addApi(Fitness.SESSIONS_API)
                         .addApi(Fitness.HISTORY_API)
                         .addApi(Fitness.RECORDING_API)
+                        .addApi(Fitness.SENSORS_API)
                         .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
                         .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                         .addScope(new Scope(Scopes.FITNESS_BODY_READ))
@@ -149,6 +154,17 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
+    }
+
+    public Field getFieldFor(DataType dataType){
+        if (DataType.TYPE_DISTANCE_DELTA.equals(dataType)){
+            return Field.FIELD_DISTANCE;
+        }else if (DataType.TYPE_STEP_COUNT_DELTA.equals(dataType)){
+            return Field.FIELD_STEPS;
+        }else if (DataType.TYPE_CALORIES_EXPENDED.equals(dataType)){
+            return Field.FIELD_CALORIES;
+        }
+        return null;
     }
 
     public interface Listener{

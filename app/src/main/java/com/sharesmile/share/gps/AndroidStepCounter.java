@@ -39,7 +39,6 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
     public AndroidStepCounter(Context context, Listener listener){
         this.context = context;
         this.listener = listener;
-        start();
     }
 
     @Override
@@ -130,7 +129,7 @@ public class AndroidStepCounter implements StepCounter, SensorEventListener {
             listener.stepCounterReady();
             return;
         }
-        listener.notAvailable(STEP_DETECTOR_NOT_SUPPORTED);
+        listener.stepCounterNotAvailable(STEP_DETECTOR_NOT_SUPPORTED);
     }
 
     @Override

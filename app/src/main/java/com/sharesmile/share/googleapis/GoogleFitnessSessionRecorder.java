@@ -28,7 +28,6 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutDataStore;
 import com.sharesmile.share.gps.WorkoutSingleton;
-import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
@@ -138,6 +137,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         Logger.d(TAG, "stop");
         pause();
         cancelSubscriptions();
+//        helper.disconnect();
     }
 
     @Override
@@ -171,54 +171,14 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         return "session_" + workoutId;
     }
 
-    public void readStepCountData(final WorkoutData data){
-        Logger.d(TAG, "Reading step count data between " + data.getBeginTimeStamp() + " and "
-                + DateUtil.getServerTimeInMillis() + " for workoutId " + data.getWorkoutId());
-
-        /*
-        SessionReadRequest readRequest = new SessionReadRequest.Builder()
-            .setTimeInterval(data.getBeginTimeStamp() - 60000, System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-//                .setTimeInterval(1512629718705L, 1512629741533L, TimeUnit.SECONDS)
-            .read(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-            .setSessionName(getSessionName(data.getWorkoutId()))
-//                .setSessionName("session_00f768b5-1889-47f3-b9b3-18b25f98ed31_0")
-            .build();
-
-            PendingResult<SessionReadResult> result =
-            Fitness.SessionsApi.readSession(helper.getGoogleApiClient(), readRequest);
-
-            sessionReadResult.setResultCallback(new ResultCallback<SessionReadResult>() {
-            @Override
-            public void onResult(SessionReadResult sessionReadResult) {
-                if (sessionReadResult.getStatus().isSuccess()) {
-                    Logger.d(TAG, "Successfully read step count data");
-                    int overallStepCount = 0;
-                    for (Session session : sessionReadResult.getSessions()) {
-                        dumpSession(session);
-                        int stepCount = 0;
-                        for (DataSet dataSet : sessionReadResult.getDataSet(session)) {
-                            dumpDataSet(dataSet);
-                            for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                                Value value = dataPoint.getValue(Field.FIELD_STEPS);
-                                Logger.d(TAG, "Datapoint steps = " + value);
-                                stepCount = stepCount + value.asInt();
-                            }
-                        }
-                        Logger.d(TAG, "Total Steps in session " + session.getIdentifier() + " = "
-                                + stepCount);
-                        overallStepCount += stepCount;
-                    }
-                    Logger.d(TAG, "overallStepCount = " + overallStepCount);
-                } else {
-                    Logger.i(TAG, "Failed to read session data");
-                }
-            }
-        });
-
-         */
+    public void readStepCountData(){
+        WorkoutDataStore dataStore = WorkoutSingleton
+                .getInstance().getDataStore();
+        Logger.d(TAG, "Reading step count data between " + dataStore.getBeginTimeStamp() + " and "
+                + DateUtil.getServerTimeInMillis() + " for workoutId " + dataStore.getWorkoutId());
 
         DataSource ESTIMATED_STEP_DELTAS = new DataSource.Builder()
-                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .setDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
                 .setType(DataSource.TYPE_DERIVED)
                 .setStreamName("estimated_steps")
                 .setAppPackageName("com.google.android.gms")
@@ -229,7 +189,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .bucketByTime(1, TimeUnit.MINUTES)
-                .setTimeRange(data.getBeginTimeStamp(), System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .setTimeRange(dataStore.getBeginTimeStamp(), System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .build();
 
 
@@ -290,7 +250,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
             float currValue = map.get(key);
             for (DataPoint dp : dataSet.getDataPoints()) {
                 for(Field field : dataType.getFields()) {
-                    if (field.equals(getFieldFor(dataType))){
+                    if (field.equals(helper.getFieldFor(dataType))){
                         if (field.equals(Field.FIELD_STEPS)){
                             currValue = currValue +  dp.getValue(field).asInt();
                         }else {
@@ -303,16 +263,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         }
     }
 
-    private Field getFieldFor(DataType dataType){
-        if (DataType.TYPE_DISTANCE_DELTA.equals(dataType)){
-            return Field.FIELD_DISTANCE;
-        }else if (DataType.TYPE_STEP_COUNT_DELTA.equals(dataType)){
-            return Field.FIELD_STEPS;
-        }else if (DataType.TYPE_CALORIES_EXPENDED.equals(dataType)){
-            return Field.FIELD_CALORIES;
-        }
-        return null;
-    }
+
 
     private String getKeyFor(DataType dataType){
         if (DataType.TYPE_DISTANCE_DELTA.equals(dataType)){
@@ -368,14 +319,16 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         }
     }
 
-    public void readDistanceData(final WorkoutData data){
-        Logger.d(TAG, "Reading distance data between " + data.getBeginTimeStamp() + " and "
-                + DateUtil.getServerTimeInMillis() + " for workoutId " + data.getWorkoutId());
+    public void readDistanceData(){
+        WorkoutDataStore dataStore = WorkoutSingleton
+                .getInstance().getDataStore();
+        Logger.d(TAG, "Reading distance data between " + dataStore.getBeginTimeStamp() + " and "
+                + DateUtil.getServerTimeInMillis() + " for workoutId " + dataStore.getWorkoutId());
         SessionReadRequest readRequest = new SessionReadRequest.Builder()
-                .setTimeInterval(data.getBeginTimeStamp() - 60000, System.currentTimeMillis(),
+                .setTimeInterval(dataStore.getBeginTimeStamp() - 1000, System.currentTimeMillis(),
                         TimeUnit.MILLISECONDS)
                 .read(DataType.TYPE_DISTANCE_CUMULATIVE)
-                .setSessionName(getSessionName(data.getWorkoutId()))
+                .setSessionName(getSessionName(dataStore.getWorkoutId()))
                 .build();
 
         PendingResult<SessionReadResult> sessionReadResult =

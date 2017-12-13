@@ -116,6 +116,8 @@ public class ClientConfig implements UnObfuscable{
 
     public float ACCEPTABLE_AVERAGE_SPEED_LOWER_LIMIT = 8.3333f; // in meters/sec i.e. 30 km/hr
 
+    public int GOOGLE_FIT_SENSOR_TRACKER_SAMPLING_RATE = 2; // in secs
+
 
     private static ClientConfig instance;
 

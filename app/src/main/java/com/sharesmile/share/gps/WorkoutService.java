@@ -48,7 +48,7 @@ import com.sharesmile.share.core.TTS;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.googleapis.GoogleFitStepCounter;
-import com.sharesmile.share.googleapis.GoogleFitnessSessionRecorder;
+import com.sharesmile.share.googleapis.GoogleFitTracker;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutBatch;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -109,8 +109,7 @@ public class WorkoutService extends Service implements
     private CircularQueue<Location> beginningLocationsRotatingQueue;
 
     private StepCounter stepCounter;
-    private GoogleFitnessSessionRecorder fitnessSessionRecorder;
-
+    private GoogleFitTracker googleFitTracker;
     private ScheduledExecutorService backgroundExecutorService;
 
     private Tracker tracker;
@@ -159,8 +158,6 @@ public class WorkoutService extends Service implements
         makeForegroundAndSticky();
 
         ActivityDetector.getInstance().startActivityDetection();
-        fitnessSessionRecorder = new GoogleFitnessSessionRecorder(this);
-        fitnessSessionRecorder.start();
         AnalyticsEvent.create(Event.ON_WORKOUT_START)
                 .buildAndDispatch();
     }
@@ -170,11 +167,6 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stopTracking");
         if (tracker != null) {
             WorkoutData result = tracker.endRun();
-            if (fitnessSessionRecorder != null) {
-                fitnessSessionRecorder.stop();
-                fitnessSessionRecorder.readDistanceData(result);
-                fitnessSessionRecorder.readStepCountData(result);
-            }
 
             // Persist run only when distance is more than 100m
             //      & Usain Bolt count is less than 3 and
@@ -277,12 +269,17 @@ public class WorkoutService extends Service implements
                 if (isKitkatWithStepSensor(getApplicationContext())) {
                     Logger.d(TAG, "Step Detector present! Will register");
 //                    stepCounter = new AndroidStepCounter(this, this);
+//                    stepCounter.start();
                     stepCounter = new GoogleFitStepCounter(this, this);
+                    stepCounter.start();
                 } else {
                     Logger.d(TAG, "Will initiate  GoogleFitStepCounter");
                     stepCounter = new GoogleFitStepCounter(this, this);
+                    stepCounter.start();
                 }
             }
+            googleFitTracker = new GoogleFitTracker(this);
+            googleFitTracker.start();
         }
 
     }
@@ -301,7 +298,9 @@ public class WorkoutService extends Service implements
                         .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                         .buildAndDispatch();
             }
-
+            if (googleFitTracker != null) {
+                googleFitTracker.stop();
+            }
             stopTracking();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
@@ -356,8 +355,8 @@ public class WorkoutService extends Service implements
     final IBinder mBinder = new MyBinder();
 
     @Override
-    public void notAvailable(int reasonCode) {
-        Logger.d(TAG, "notAvailable, reasonCode = " + reasonCode);
+    public void stepCounterNotAvailable(int reasonCode) {
+        Logger.d(TAG, "distanceTrackerNotAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
         Analytics.getInstance().setUserProperty("StepCounter", "not_available");
         MainApplication.showToast(R.string.google_fit_permission_rationale);
@@ -730,8 +729,8 @@ public class WorkoutService extends Service implements
         if (stepCounter != null ){
             stepCounter.pause();
         }
-        if (fitnessSessionRecorder != null){
-            fitnessSessionRecorder.pause();
+        if (googleFitTracker != null){
+            googleFitTracker.pause();
         }
         updateStickyNotification();
         cancelAllWorkoutNotifications();
@@ -761,8 +760,8 @@ public class WorkoutService extends Service implements
             if (stepCounter != null){
                 stepCounter.resume();
             }
-            if (fitnessSessionRecorder != null) {
-                fitnessSessionRecorder.resume();
+            if (googleFitTracker != null) {
+                googleFitTracker.resume();
             }
             updateStickyNotification();
             cancelAllWorkoutNotifications();

@@ -1,20 +1,8 @@
 package com.sharesmile.share.googleapis;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.data.Value;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
-import com.google.android.gms.fitness.request.OnDataPointListener;
-import com.google.android.gms.fitness.request.SensorRequest;
-import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.sharesmile.share.gps.StepCounter;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -22,12 +10,11 @@ import com.sharesmile.share.utils.Logger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by ankitm on 09/05/16.
  */
-public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, GoogleApiHelper.Listener{
+public class GoogleFitStepCounter implements StepCounter, GoogleFitSensorTracker.Listener{
 
     private static final String TAG = "GoogleFitStepCounter";
 
@@ -35,10 +22,7 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
     private static final String AUTH_PENDING = "auth_state_pending";
 
     private Listener listener;
-    boolean isPaused;
-    GoogleApiHelper helper;
-
-    long countingbeganTsMillis;
+    private GoogleFitSensorTracker tracker;
 
     private LinkedHashMap historyQueue = new LinkedHashMap<Long, Long>()
     {
@@ -51,43 +35,30 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
 
     public GoogleFitStepCounter(Context context, Listener listener) {
         this.listener = listener;
-        this.helper = new GoogleApiHelper(GoogleApiHelper.API_LIVE_STEP_COUNTING, context);
-        start();
+        tracker = new GoogleFitSensorTracker(context, DataType.TYPE_STEP_COUNT_DELTA, this);
     }
 
     @Override
     public void start() {
         Logger.d(TAG, "start");
+        tracker.start();
         synchronized (historyQueue){
             historyQueue.clear();
         }
-        helper.setListener(this);
-        helper.connect();
-        countingbeganTsMillis = DateUtil.getServerTimeInMillis();
     }
 
     @Override
     public void stop() {
         Logger.d(TAG, "stop");
-        if (helper.isConnected()){
-            Fitness.SensorsApi.remove( helper.getGoogleApiClient(), this )
-                    .setResultCallback(new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(Status status) {
-                            if (status.isSuccess() && helper.isConnected()) {
-                                helper.disconnect();
-                            }
-                        }
-                    });
-            synchronized (historyQueue){
-                historyQueue.clear();
-            }
+        tracker.stop();
+        synchronized (historyQueue){
+            historyQueue.clear();
         }
     }
 
     @Override
     public void pause() {
-        isPaused = true;
+        tracker.pause();
         synchronized (historyQueue){
             historyQueue.clear();
         }
@@ -95,11 +66,10 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
 
     @Override
     public void resume() {
-        isPaused = false;
+        tracker.resume();
         synchronized (historyQueue){
             historyQueue.clear();
         }
-        countingbeganTsMillis = DateUtil.getServerTimeInMillis();
     }
 
     @Override
@@ -150,92 +120,25 @@ public class GoogleFitStepCounter implements StepCounter, OnDataPointListener, G
         }
     }
 
-    private void registerFitnessDataListener(final DataSource dataSource, final DataType dataType) {
 
-        SensorRequest request = new SensorRequest.Builder()
-                .setDataSource( dataSource )
-                .setDataType( dataType )
-                .setSamplingRate( 1, TimeUnit.SECONDS )
-                .build();
 
-        Fitness.SensorsApi.add(helper.getGoogleApiClient(), request, this)
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        if (status.isSuccess()) {
-                            Logger.i(TAG, "SensorApi successfully added for " + dataType.getName());
-                            listener.stepCounterReady();
-                        }else{
-                            Logger.e(TAG, "SensorApi couldn't be added for " + dataType.getName());
-                            listener.notAvailable(SENSOR_API_NOT_ADDED);
-                        }
-                    }
-                });
+    @Override
+    public void isTrackerReady() {
+        listener.stepCounterReady();
     }
 
     @Override
-    public void onDataPoint(DataPoint dataPoint) {
-        Logger.d(TAG, "onDataPoint");
-        if (!isPaused){
-            for( Field field : dataPoint.getDataType().getFields() ) {
-                Value value = dataPoint.getValue( field );
-                long startTime = dataPoint.getStartTime(TimeUnit.MILLISECONDS);
-                if (startTime < countingbeganTsMillis){
-                    // This stepcount reading's interval started before the beginning of step counting, will ignore
-                    Logger.d(TAG, "Older step count reading, will ignore");
-                } else {
-                    String message = "Field: " + field.getName() + " Value: " + value;
-                    Logger.d(TAG, message);
-                    if (Field.FIELD_STEPS.getName().equals(field.getName())){
-                        // Step count data
-                        Long deltaSteps = Long.parseLong(value.toString());
-                        synchronized (historyQueue){
-                            historyQueue.put(dataPoint.getEndTime(TimeUnit.SECONDS), deltaSteps);
-                        }
-                        listener.onStepCount(deltaSteps.intValue());
-                    }
-                }
-            }
-        }
+    public void trackerNotAvailable() {
+        listener.stepCounterNotAvailable(PERMISSION_NOT_GRANTED_BY_USER);
     }
 
     @Override
-    public void onConnected() {
-        Logger.d(TAG, "onConnected");
-
-        DataSourcesRequest dataSourceRequest = new DataSourcesRequest.Builder()
-                .setDataTypes( DataType.TYPE_STEP_COUNT_DELTA, DataType.TYPE_DISTANCE_DELTA)
-                .setDataSourceTypes(DataSource.TYPE_DERIVED)
-                .build();
-
-        ResultCallback<DataSourcesResult> dataSourcesResultCallback = new ResultCallback<DataSourcesResult>() {
-            @Override
-            public void onResult(DataSourcesResult dataSourcesResult) {
-                Log.i(TAG, "onResult of dataSourcesResultCallback, Status: " + dataSourcesResult.getStatus().toString());
-                for( DataSource dataSource : dataSourcesResult.getDataSources () ) {
-                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: "
-                            + dataSource.toDebugString() + ", type: " + dataSource.getDataType().getName());
-                    if( DataType.TYPE_STEP_COUNT_DELTA.equals(dataSource.getDataType()) ) {
-                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
-                        registerFitnessDataListener(dataSource, dataSource.getDataType());
-                    }
-                    if( DataType.TYPE_DISTANCE_DELTA.equals(dataSource.getDataType()) ) {
-                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
-                        registerFitnessDataListener(dataSource, dataSource.getDataType());
-                    }
-                }
-            }
-        };
-
-        Fitness.SensorsApi.findDataSources(helper.getGoogleApiClient(), dataSourceRequest)
-                .setResultCallback(dataSourcesResultCallback);
-    }
-
-    @Override
-    public void connectionFailed() {
-        Logger.d(TAG, "User Denied permission to access Google Fit Data");
-        if (listener != null){
-            listener.notAvailable(PERMISSION_NOT_GRANTED_BY_USER);
+    public void onDeltaCount(long beginTs, long endTs, float deltaIncrement) {
+        Logger.d(TAG, "onDeltaCount, beginTs = " + beginTs + ", endTs = " + endTs
+                + ", delta in steps = " + deltaIncrement);
+        listener.onStepCount((int) deltaIncrement);
+        synchronized (historyQueue){
+            historyQueue.put(endTs, (long) deltaIncrement);
         }
     }
 }
