@@ -131,6 +131,7 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
 
         if (listeners.isEmpty() && state != State.IDLE){
             // All subscribers have been unregistered, so disconnect client and change state
+            Logger.d(TAG, "unregister: disconnecting googleApiClient and changing state to IDLE");
             googleApiClient.disconnect();
             state = State.IDLE;
             EventBus.getDefault().unregister(this);

@@ -103,7 +103,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
     volatile int cancelCount = 0;
     private void cancelSubscriptions(){
-        cancelCount = 0;
+
         unsubscribeDataType(DataType.TYPE_STEP_COUNT_DELTA);
         unsubscribeDataType(DataType.TYPE_DISTANCE_DELTA);
         unsubscribeDataType(DataType.TYPE_CALORIES_EXPENDED);
@@ -127,7 +127,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
     private synchronized void updateCancelCount(){
         cancelCount++;
-        if (cancelCount == 3){
+        if (cancelCount == 4){
             // All datatypes have been unsubscribed, we shall unregister from GoogleApiHelper
             GoogleApiHelper.getInstance().unregister(this);
             cancelCount = 0;
@@ -141,7 +141,9 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
             return;
         }
         pause();
+        cancelCount = 0;
         cancelSubscriptions();
+        readWorkoutHistory();
     }
 
     @Override
@@ -193,8 +195,6 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
         // TODO: Need to segregate the read for batches
 
-        final Map<String, Float> aggregateMap = new HashMap<>();
-
         Logger.d(TAG, "Reading step count data between " + dataStore.getBeginTimeStamp() + " and "
                 + DateUtil.getServerTimeInMillis() + " for workoutId " + dataStore.getWorkoutId());
 
@@ -221,47 +221,53 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
         result.setResultCallback(new ResultCallback<DataReadResult>() {
             @Override
             public void onResult(@NonNull DataReadResult dataReadResult) {
-                DateFormat dateFormat = getTimeInstance();
-                if (dataReadResult.getBuckets().size() > 0) {
-                    Logger.d(TAG, "Buckets in result, number of buckets = "
-                            + dataReadResult.getBuckets().size());
-                    aggregateMap.put(DISTANCE, 0f);
-                    aggregateMap.put(STEPS, 0f);
-                    aggregateMap.put(CALORIES, 0f);
-
-                    int count = 1;
-                    for (Bucket bucket : dataReadResult.getBuckets()) {
-                        Logger.d(TAG, "Bucket number " + count + " ::::: number of datasets = "
-                                + bucket.getDataSets().size());
-                        List<DataSet> dataSets = bucket.getDataSets();
-                        for (DataSet dataSet : dataSets) {
-                            Logger.d(TAG, "\ndataSet.dataType: " + dataSet.getDataType().getName());
-                            for (DataPoint dp : dataSet.getDataPoints()) {
-                                describeDataPoint(dp, dateFormat);
-                            }
-                            updateMapWithDataSet(dataSet, aggregateMap);
-                        }
-                        count++;
-                    }
-
-                    String update = "DISTANCE : " + (aggregateMap.get(DISTANCE) / 1000)
-                            + ", STEPS : " + aggregateMap.get(STEPS)
-                            + ", CALORIES : " + aggregateMap.get(CALORIES);
-
-                    Logger.d(TAG, update);
-                    MainApplication.showToast(update);
-
-                } else if (dataReadResult.getDataSets().size() > 0) {
-                    Logger.d(TAG, "Datasets in result : dataSet.size(): " + dataReadResult.getDataSets().size());
-                    for (DataSet dataSet : dataReadResult.getDataSets()) {
-                        Logger.d(TAG, "\ndataType: " + dataSet.getDataType().getName());
-                        for (DataPoint dp : dataSet.getDataPoints()) {
-                            describeDataPoint(dp, dateFormat);
-                        }
-                    }
-                }
+                handleDataReadResult(dataReadResult);
+                updateCancelCount();
             }
         });
+    }
+
+    private void handleDataReadResult(DataReadResult dataReadResult){
+        DateFormat dateFormat = getTimeInstance();
+        if (dataReadResult.getBuckets().size() > 0) {
+            Map<String, Float> aggregateMap = new HashMap<>();
+            Logger.d(TAG, "Buckets in result, number of buckets = "
+                    + dataReadResult.getBuckets().size());
+            aggregateMap.put(DISTANCE, 0f);
+            aggregateMap.put(STEPS, 0f);
+            aggregateMap.put(CALORIES, 0f);
+
+            int count = 1;
+            for (Bucket bucket : dataReadResult.getBuckets()) {
+                Logger.d(TAG, "Bucket number " + count + " ::::: number of datasets = "
+                        + bucket.getDataSets().size());
+                List<DataSet> dataSets = bucket.getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    Logger.d(TAG, "\ndataSet.dataType: " + dataSet.getDataType().getName());
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        describeDataPoint(dp, dateFormat);
+                    }
+                    updateMapWithDataSet(dataSet, aggregateMap);
+                }
+                count++;
+            }
+
+            String update = "DISTANCE : " + (aggregateMap.get(DISTANCE) / 1000)
+                    + ", STEPS : " + aggregateMap.get(STEPS)
+                    + ", CALORIES : " + aggregateMap.get(CALORIES);
+
+            Logger.d(TAG, update);
+            MainApplication.showToast(update);
+
+        } else if (dataReadResult.getDataSets().size() > 0) {
+            Logger.d(TAG, "Datasets in result : dataSet.size(): " + dataReadResult.getDataSets().size());
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                Logger.d(TAG, "\ndataType: " + dataSet.getDataType().getName());
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    describeDataPoint(dp, dateFormat);
+                }
+            }
+        }
     }
 
     private void updateMapWithDataSet(DataSet dataSet, Map<String, Float> map){
