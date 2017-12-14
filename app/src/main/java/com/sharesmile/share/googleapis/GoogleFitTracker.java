@@ -26,6 +26,7 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
 
     @Override
     public void start() {
+        Logger.d(TAG, "start");
         stepCounter.start();
         distanceTracker.start();
         sessionRecorder.start();
@@ -33,6 +34,7 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
 
     @Override
     public void stop() {
+        Logger.d(TAG, "stop");
         stepCounter.stop();
         distanceTracker.stop();
         sessionRecorder.stop();
@@ -40,6 +42,7 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
 
     @Override
     public void pause() {
+        Logger.d(TAG, "pause");
         stepCounter.pause();
         distanceTracker.pause();
         sessionRecorder.pause();
@@ -47,6 +50,7 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
 
     @Override
     public void resume() {
+        Logger.d(TAG, "resume");
         stepCounter.resume();
         distanceTracker.resume();
         sessionRecorder.resume();

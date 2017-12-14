@@ -2,10 +2,12 @@ package com.sharesmile.share.gps.models;
 
 import android.location.Location;
 
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.UnObfuscable;
 import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.io.Serializable;
@@ -105,6 +107,7 @@ public class DistRecord implements UnObfuscable, Serializable{
 
     public void normaliseStepCountWrtStepCount(int currentSteps, int numStepsAtPreviousRecord,
                                                float totalDistance){
+        Logger.d(TAG, "normaliseStepCountWrtStepCount");
         int stepsInInterval = currentSteps - numStepsAtPreviousRecord;
         long secsInInterval = getInterval() / 1000;
         float distInInterval = getDist();
@@ -114,7 +117,7 @@ public class DistRecord implements UnObfuscable, Serializable{
             return;
         }
 
-        if (secsInInterval < ClientConfig.getInstance().MIN_INTERVAL_FOR_DISTANCE_NORMALISATION){
+        if (secsInInterval > ClientConfig.getInstance().MIN_INTERVAL_FOR_DISTANCE_NORMALISATION){
             // Can't perform normalisation if time interval b/w two consecutive GPS points is less than min threshold
             return;
         }
@@ -125,12 +128,16 @@ public class DistRecord implements UnObfuscable, Serializable{
 
         float strideLengthInInterval = distInInterval / stepsInInterval;
 
+        Logger.d(TAG, "normaliseStepCountWrtStepCount: strideLengthInInterval = " + strideLengthInInterval);
         if (strideLengthInInterval < ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT){
             // Stride length in this interval is too low, that means less distance is being recorded
             // We need to normalise it with the strideLength recorded so far in the workout
             float normalisedStrideLength = Utils.getNormalizedStrideLength(strideLengthSoFarInWorkout);
             dist = stepsInInterval * normalisedStrideLength;
             speed = (getElapsedTimeMs() == 0) ? 0 : ((dist * 1000) / getElapsedTimeMs());
+            String message = "Normalised distance from " + distInInterval + " to " + dist;
+            Logger.d(TAG, message);
+            MainApplication.showToast(message);
         }
     }
 

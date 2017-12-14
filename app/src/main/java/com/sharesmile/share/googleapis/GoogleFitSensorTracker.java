@@ -1,7 +1,6 @@
 package com.sharesmile.share.googleapis;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -112,15 +111,29 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
         ResultCallback<DataSourcesResult> dataSourcesResultCallback = new ResultCallback<DataSourcesResult>() {
             @Override
             public void onResult(DataSourcesResult dataSourcesResult) {
-                Log.i(TAG, "onResult of dataSourcesResultCallback, Status: " + dataSourcesResult.getStatus().toString());
                 for( DataSource dataSource : dataSourcesResult.getDataSources () ) {
-                    Logger.d(TAG, "onResult of dataSourcesResultCallback, dataSource found: "
-                            + dataSource.toDebugString() + ", type: " + dataSource.getDataType().getName());
-                    if( dataType.equals(dataSource.getDataType()) ) {
-                        Logger.d(TAG, "onResult of dataSourcesResultCallback, will register FitnessDataListener");
-                        registerFitnessDataListener(dataSource, dataSource.getDataType());
+                    Logger.d(TAG, "onResult of dataSourcesResultCallback for dataType = " +dataType.getName()
+                            +", dataSource found: " + dataSource.toDebugString()
+                            + ", type: " + dataSource.getDataType().getName()
+                            + ", stream: " + dataSource.getStreamName()
+                            + ", streamIdentifier: " + dataSource.getStreamIdentifier()
+                            + ", name: " + dataSource.getName());
+                    if( dataType.equals(dataSource.getDataType())) {
+
+                        if (dataType.equals(DataType.TYPE_DISTANCE_DELTA)){
+                            // For distance sources we want the stream live_distance_from_steps only
+                            if ("live_distance_from_steps".equals(dataSource.getStreamName())){
+                                registerFitnessDataListener(dataSource, dataSource.getDataType());
+                                return;
+                            }
+                        }else {
+                            registerFitnessDataListener(dataSource, dataSource.getDataType());
+                            return;
+                        }
                     }
                 }
+                // If we reach here that means that we couldn't find an appropriate datatype
+                listener.trackerNotAvailable();
             }
         };
 
@@ -139,7 +152,6 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
 
     @Override
     public void onDataPoint(DataPoint dataPoint) {
-//        Logger.d(TAG, "onDataPoint");
         if (isPaused){
             return;
         }
@@ -150,7 +162,8 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
                 // This stepcount reading's interval started before the beginning of step counting, will ignore
                 Logger.d(TAG, "Older step count reading, will ignore");
             } else {
-//                String message = "Field: " + field.getName() + " Value: " + value;
+//                String message = "Field: " + field.getName() + " Value: " + value + " stream: "
+//                        + dataPoint.getDataSource().getStreamName();
 //                Logger.d(TAG, message);
                 if (GoogleApiHelper.getInstance().getFieldFor(dataType).getName().equals(field.getName())){
                     // Step count data
