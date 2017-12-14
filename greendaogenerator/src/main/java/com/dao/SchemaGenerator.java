@@ -37,7 +37,8 @@ public class SchemaGenerator {
         versions.add(new Version10(false));
         versions.add(new Version11(false));
         versions.add(new Version12(false));
-        versions.add(new Version13(true));
+        versions.add(new Version13(false));
+        versions.add(new Version14(true));
 
         validateSchemas(versions);
         toFileForceExists("../../Share/app/src/main/java-gen");

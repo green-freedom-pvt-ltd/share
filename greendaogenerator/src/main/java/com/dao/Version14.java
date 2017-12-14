@@ -62,6 +62,7 @@ public class Version14 extends SchemaVersion {
         workout.addIntProperty("estimatedSteps");
         workout.addDoubleProperty("estimatedCalories");
         workout.addIntProperty("googleFitStepCount");
+        workout.addDoubleProperty("googleFitDistance");
 
         Index workoutIdUniqueIndex = new Index();
         workoutIdUniqueIndex.addProperty(workoutId);
