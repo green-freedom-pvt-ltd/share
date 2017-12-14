@@ -668,17 +668,17 @@ public class Utils {
         }else if (mph <= 2){
             return (1.3 + 1.5*(mph - 1)); // 2.8 at 2 mph
         }else if (mph <= 2.5){
-            return 2.8 + 0.4*(mph - 2); // 3.0 at 2.5 mph
+            return 2.8 + 0.8*(mph - 2); // 3.2 at 2.5 mph
         }else if (mph <= 3.5){
-            return 3.0 + 1.3*(mph - 2.5); // 4.3 at 3.5 mph
+            return 3.2 + 1.4*(mph - 2.5); // 4.6 at 3.5 mph
         }else if (mph <= 4){
             if (ActivityDetector.getInstance().getRunningConfidence()
                     >= ActivityDetector.getInstance().getWalkingConfidence()){
                 // User is running
-                return 4.5 + 3*(mph - 3.5); // 6.0 at 4 mph
+                return 4.8 + 3.2*(mph - 3.5); // 6.4 at 4 mph
             }else {
                 // User is Walking
-                return 4.3 + 1.4*(mph - 3.5); // 5.0 at 4 mph
+                return 4.6 + 1.4*(mph - 3.5); // 5.3 at 4 mph
             }
         }
         /// All walking values uptill here, range 4-5 mph is ambiguous range need to decide between running and walking
@@ -686,35 +686,35 @@ public class Utils {
             if (ActivityDetector.getInstance().getRunningConfidence()
                     >= ActivityDetector.getInstance().getWalkingConfidence()){
                 // User is running
-                return 6 + 2.3*(mph - 4); // 8.3 at 5 mph
+                return 6.4 + 2.3*(mph - 4); // 8.7 at 5 mph
             }else {
                 // User is Walking
                 if (mph <= 4.5){
                     // 4 - 4.5 mph
-                    return 5 + 4*(mph - 4); // 7.0 at 4.5 mph
+                    return 5.3 + 4.2*(mph - 4); // 7.4 at 4.5 mph
                 }else {
                     // 4.5 - 5 mph
-                    return 7 + 2.6*(mph - 4.5); // 8.3 at 5 mph
+                    return 7.4 + 2.6*(mph - 4.5); // 8.7 at 5 mph
                 }
             }
         }else if (mph <= 6){
-            return 8.3 + 1.5*(mph - 5); // 9.8 at 6 mph
+            return 8.7 + 1.6*(mph - 5); // 10.3 at 6 mph
         }else if (mph <= 7){
-            return 9.8 + 1.2*(mph - 6); // 11.0 at 7mph
+            return 10.3 + 1.3*(mph - 6); // 11.6 at 7mph
         }else if (mph <= 7.7){
-            return 11 + 1.143*(mph - 7); // 11.8 at 7.7 mph
+            return 11.6 + 1.143*(mph - 7); // 12.4 at 7.7 mph
         }else if (mph <= 9){
-            return 11.8 + 0.77*(mph - 7.7); // 12.8 at 9 mph
+            return 12.4 + 0.77*(mph - 7.7); // 13.4 at 9 mph
         }else if (mph <= 10){
-            return 12.8 + 1.7*(mph - 9); // 14.5 at 10 mph
+            return 13.4 + 1.7*(mph - 9); // 15.1 at 10 mph
         }else if (mph <= 11){
-            return 14.5 + 1.5*(mph - 10); // 16 at 11 mph
+            return 15.1 + 1.5*(mph - 10); // 16.6 at 11 mph
         }else if (mph <= 12){
-            return 16 + 3*(mph - 11); // 19 at 12 mph
+            return 16.6 + 3*(mph - 11); // 19.6 at 12 mph
         }else if (mph <= 14){
-            return 19 + 2*(mph - 12); // 23 at 14 mph
+            return 19.6 + 2*(mph - 12); // 23.6 at 14 mph
         }else if (mph <= 15){
-            return 23 + 1*(mph - 14); // 24 at 15 mph
+            return 23.6 + 1*(mph - 14); // 24.6 at 15 mph
         }else {
             // For speeds greater than 15 mph (23 kmph) we assume that the person is driving so we don't add calories
             return 1.3;

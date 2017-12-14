@@ -39,6 +39,12 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
     @SerializedName("dis")
     private float cumulativeDistance;
 
+    @SerializedName("gstc")
+    private int googleFitStepCount; // Real time step count by GoogleFit
+
+    @SerializedName("gdis")
+    private float googleFitDistance; // Real Time distance by GoogleFit
+
     @SerializedName("nspk")
     private int cumulativeNumSpikes;
 
@@ -58,6 +64,8 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         gpsSpeed = source.gpsSpeed;
         cumulativeStepCount = source.cumulativeStepCount;
         cumulativeDistance = source.cumulativeDistance;
+        googleFitStepCount = source.googleFitStepCount;
+        googleFitDistance = source.googleFitDistance;
         cumulativeNumSpikes = source.cumulativeNumSpikes;
         if (source.flagged != null){
             flagged = source.flagged;
@@ -136,6 +144,22 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         this.cumulativeDistance = cumulativeDistance;
     }
 
+    public int getGoogleFitStepCount() {
+        return googleFitStepCount;
+    }
+
+    public void setGoogleFitStepCount(int googleFitStepCount) {
+        this.googleFitStepCount = googleFitStepCount;
+    }
+
+    public float getGoogleFitDistance() {
+        return googleFitDistance;
+    }
+
+    public void setGoogleFitDistance(float googleFitDistance) {
+        this.googleFitDistance = googleFitDistance;
+    }
+
     public int getCumulativeNumSpikes() {
         return cumulativeNumSpikes;
     }
@@ -162,6 +186,8 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         gpsSpeed = in.readFloat();
         cumulativeStepCount = in.readInt();
         cumulativeDistance = in.readFloat();
+        googleFitStepCount = in.readInt();
+        googleFitDistance = in.readFloat();
         cumulativeNumSpikes = in.readInt();
         byte flaggedVal = in.readByte();
         flagged = flaggedVal == 0x02 ? null : flaggedVal != 0x00;
@@ -183,6 +209,8 @@ public class WorkoutPoint implements UnObfuscable, Parcelable {
         dest.writeFloat(gpsSpeed);
         dest.writeInt(cumulativeStepCount);
         dest.writeFloat(cumulativeDistance);
+        dest.writeInt(googleFitStepCount);
+        dest.writeFloat(googleFitDistance);
         dest.writeInt(cumulativeNumSpikes);
         if (flagged == null) {
             dest.writeByte((byte) (0x02));
