@@ -98,4 +98,8 @@ public interface WorkoutDataStore {
 
 	int getCurrentBatchIndex();
 
+	void addGoogleFitSteps(int stepsToAdd);
+
+	void addGoogleFitDistance(float distanceToAdd);
+
 }

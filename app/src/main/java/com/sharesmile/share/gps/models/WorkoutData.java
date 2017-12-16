@@ -205,6 +205,26 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 	 */
 	void incrementNumUpdates();
 
+	void addEstimatedSteps(int stepsToAdd);
+
+	void addEstimatedDistance(float distanceToAdd);
+
+	void addEstimatedCalories(float caloriesToAdd);
+
+	int getEstimatedSteps();
+
+	float getEstimatedDistance();
+
+	float getEstimatedCalories();
+
+	void addGoogleFitSteps(int stepsToAdd);
+
+	void addGoogleFitDistance(float distanceToAdd);
+
+	int getGoogleFitSteps();
+
+	float getGoogleFitDistance();
+
 	/**
 	 * Converts this object to string
 	 * @return

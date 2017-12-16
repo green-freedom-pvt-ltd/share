@@ -711,6 +711,11 @@ public class SyncService extends GcmTaskService {
                 jsonObject.put("os_version", workout.getOsVersion());
                 jsonObject.put("device_id", workout.getDeviceId());
                 jsonObject.put("device_name", workout.getDeviceName());
+                jsonObject.put("estimated_steps", workout.getEstimatedSteps());
+                jsonObject.put("estimated_distance", workout.getEstimatedDistance());
+                jsonObject.put("estimated_calories", workout.getEstimatedCalories());
+                jsonObject.put("google_fit_distance", workout.getGoogleFitDistance());
+                jsonObject.put("google_fit_steps", workout.getGoogleFitStepCount());
 
                 Logger.d(TAG, "Will upload run: "+jsonObject.toString());
                 response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);

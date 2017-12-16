@@ -148,6 +148,10 @@ public class GoogleApiHelper implements GoogleApiClient.ConnectionCallbacks,
         return state == State.CONNECTED;
     }
 
+    public boolean isConnecting(){
+        return state == State.CONNECTING;
+    }
+
     public GoogleApiClient getGoogleApiClient() {
         return googleApiClient;
     }

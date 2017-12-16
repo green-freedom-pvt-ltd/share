@@ -36,6 +36,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private boolean mockLocationDetected;
 	private int numGpsSpikes;
 	private int numUpdateEvents;
+	private int estimatedSteps;
+	private float estimatedDistance;
+	private float estimatedCalories;
+	private int googleFitSteps;
+	private float googleFitDistance;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -78,6 +83,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		mockLocationDetected = source.mockLocationDetected;
 		numGpsSpikes = source.numGpsSpikes;
 		numUpdateEvents = source.numUpdateEvents;
+		estimatedSteps = source.estimatedSteps;
+		estimatedDistance = source.estimatedDistance;
+		estimatedCalories = source.estimatedCalories;
+		googleFitSteps = source.googleFitSteps;
+		googleFitDistance = source.googleFitDistance;
 	}
 
 	private void invokeNewBatch(long startTimeStamp, String workoutId){
@@ -167,6 +177,56 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public void incrementNumUpdates() {
 		numUpdateEvents++;
+	}
+
+	@Override
+	public void addEstimatedSteps(int stepsToAdd) {
+		estimatedSteps = estimatedSteps + stepsToAdd;
+	}
+
+	@Override
+	public void addEstimatedDistance(float distanceToAdd) {
+		estimatedDistance = estimatedDistance + distanceToAdd;
+	}
+
+	@Override
+	public void addEstimatedCalories(float caloriesToAdd) {
+		estimatedCalories = estimatedCalories + caloriesToAdd;
+	}
+
+	@Override
+	public int getEstimatedSteps() {
+		return estimatedSteps;
+	}
+
+	@Override
+	public float getEstimatedDistance() {
+		return estimatedDistance;
+	}
+
+	@Override
+	public float getEstimatedCalories() {
+		return estimatedCalories;
+	}
+
+	@Override
+	public void addGoogleFitSteps(int stepsToAdd) {
+		googleFitSteps = googleFitSteps + stepsToAdd;
+	}
+
+	@Override
+	public void addGoogleFitDistance(float distanceToAdd) {
+		googleFitDistance = googleFitDistance + distanceToAdd;
+	}
+
+	@Override
+	public int getGoogleFitSteps() {
+		return googleFitSteps;
+	}
+
+	@Override
+	public float getGoogleFitDistance() {
+		return googleFitDistance;
 	}
 
 	@Override
@@ -398,6 +458,12 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		mockLocationDetected = in.readByte() != 0x00;
 		numGpsSpikes = in.readInt();
 		numUpdateEvents = in.readInt();
+		estimatedSteps = in.readInt();
+		estimatedDistance = in.readFloat();
+		estimatedCalories = in.readFloat();
+		googleFitSteps = in.readInt();
+		googleFitDistance = in.readFloat();
+
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
 			in.readList(batches, WorkoutBatchImpl.class.getClassLoader());
@@ -428,6 +494,11 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeByte((byte) (mockLocationDetected ? 0x01 : 0x00));
 		dest.writeInt(numGpsSpikes);
 		dest.writeInt(numUpdateEvents);
+		dest.writeInt(estimatedSteps);
+		dest.writeFloat(estimatedDistance);
+		dest.writeFloat(estimatedCalories);
+		dest.writeInt(googleFitSteps);
+		dest.writeFloat(googleFitDistance);
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

@@ -198,7 +198,7 @@ public class Constants {
     public static final String PAUSE_REASON_USER_CLICKED_NOTIFICATION = "user_clicked_notification";
     public static final String PAUSE_REASON_USER_CLICKED = "user_clicked";
 
-    public static final String PREF_FITNESS_SESSION_IDS = "fitness_session_ids";
+    public static final String PREF_FITNESS_BATCHES = "fitness_batches";
 
     public final static String USER_PROP_NAME="Name";
     public final static String USER_PROP_EMAIL="Email";

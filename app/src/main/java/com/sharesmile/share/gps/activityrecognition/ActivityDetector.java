@@ -415,6 +415,8 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
             }
 
             if (onCyclerConfidenceRecentAvg > ClientConfig.getInstance().CONFIDENCE_THRESHOLD_ON_CYCLE){
+                Logger.d(TAG, "Cycling confidence above threshold, avgConfidence = " + onCyclerConfidenceRecentAvg);
+                MainApplication.showToast("Cycling confidence: " + onCyclerConfidenceRecentAvg);
                 isOnCycle = true;
                 isStill = false; // isStill is forced set as false if the user is supposedly on foot
                 stillNotificationOccurredCounter = 0;

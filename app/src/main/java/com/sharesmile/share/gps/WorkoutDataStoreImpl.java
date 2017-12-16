@@ -341,6 +341,20 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         return dirtyWorkoutData.getCurrentBatchIndex();
     }
 
+    @Override
+    public void addGoogleFitSteps(int stepsToAdd) {
+        if (isWorkoutRunning()){
+            dirtyWorkoutData.addGoogleFitSteps(stepsToAdd);
+        }
+    }
+
+    @Override
+    public void addGoogleFitDistance(float distanceToAdd) {
+        if (isWorkoutRunning()){
+            dirtyWorkoutData.addGoogleFitDistance(distanceToAdd);
+        }
+    }
+
     private void persistBothWorkoutData() {
         persistDirtyWorkoutData();
         if (approvedWorkoutData != null){

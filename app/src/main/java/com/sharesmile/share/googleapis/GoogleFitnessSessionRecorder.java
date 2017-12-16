@@ -21,9 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.WorkoutDataStore;
-import com.sharesmile.share.gps.WorkoutSingleton;
-import com.sharesmile.share.utils.DateUtil;
+import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
@@ -40,26 +38,21 @@ import static java.text.DateFormat.getTimeInstance;
  * Created by ankitmaheshwari on 12/1/17.
  */
 
-public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, GoogleTracker{
+public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, GoogleRecorder{
 
     private static final String TAG = "GoogleFitnessSessionRecorder";
 
-    List<String> sessionIds;
+    List<Batch> batches;
 
     public GoogleFitnessSessionRecorder(Context context) {
-        this.sessionIds = SharedPrefsManager.getInstance().getCollection(Constants.PREF_FITNESS_SESSION_IDS,
+        this.batches = SharedPrefsManager.getInstance().getCollection(Constants.PREF_FITNESS_BATCHES,
                 new TypeToken<ArrayList<String>>(){}.getType());
-        if (sessionIds == null){
-            sessionIds = new ArrayList<>();
-        }
     }
 
     @Override
     public void onConnected() {
         Logger.d(TAG, "onConnected");
         subscribeToFitnessData();
-        // Call resume to start the first session
-        resume();
     }
 
     @Override
@@ -71,6 +64,13 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
     @Override
     public void start() {
         Logger.d(TAG, "start");
+        if (batches == null){
+            // Fresh workout and very first batch
+            batches = new ArrayList<>();
+            Batch batch = new Batch(System.currentTimeMillis());
+            batches.add(batch);
+            SharedPrefsManager.getInstance().setCollection(Constants.PREF_FITNESS_BATCHES, batches);
+        }
         GoogleApiHelper.getInstance().register(this);
     }
 
@@ -101,7 +101,6 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 });
     }
 
-    volatile int cancelCount = 0;
     private void cancelSubscriptions(){
 
         unsubscribeDataType(DataType.TYPE_STEP_COUNT_DELTA);
@@ -125,9 +124,11 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 });
     }
 
+    volatile int cancelCount = 0;
     private synchronized void updateCancelCount(){
+        Logger.d(TAG, "updateCancelCount: cancelCount = " + cancelCount);
         cancelCount++;
-        if (cancelCount == 4){
+        if (cancelCount == 3){
             // All datatypes have been unsubscribed, we shall unregister from GoogleApiHelper
             GoogleApiHelper.getInstance().unregister(this);
             cancelCount = 0;
@@ -135,68 +136,50 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
     }
 
     @Override
-    public void stop() {
-        Logger.d(TAG, "stop");
+    public void readAndStop(WorkoutData result) {
+        Logger.d(TAG, "readAndStop");
+        int numBatches = batches.size();
+        Batch lastBatch = batches.get(numBatches - 1);
+        lastBatch.setEndTs(System.currentTimeMillis());
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_FITNESS_BATCHES);
+
         if (!GoogleApiHelper.getInstance().isConnected()){
             return;
         }
-        pause();
+
+        // Synchronous call to update WorkoutData result object
+        readWorkoutHistory(result);
+
         cancelCount = 0;
         cancelSubscriptions();
-        readWorkoutHistory();
     }
 
     @Override
     public void pause() {
         Logger.d(TAG, "pause");
-        /*
 
-        final GoogleApiHelper helper = GoogleApiHelper.getInstance();
-        if (!helper.isConnected()){
-            return;
-        }
+        int numBatches = batches.size();
+        Batch lastBatch = batches.get(numBatches - 1);
+        lastBatch.setEndTs(System.currentTimeMillis());
+        SharedPrefsManager.getInstance().setCollection(Constants.PREF_FITNESS_BATCHES, batches);
 
-        final String currentSessionId = getLatestSessionId();
-        PendingResult<SessionStopResult> pendingResult =
-                Fitness.SessionsApi.stopSession(helper.getGoogleApiClient(), currentSessionId);
-
-        pendingResult.setResultCallback(new ResultCallback<SessionStopResult>() {
-            @Override
-            public void onResult(SessionStopResult sessionStopResult) {
-                if( sessionStopResult.getStatus().isSuccess() ) {
-                    Logger.d(TAG, "Successfully stopped session " + currentSessionId);
-                } else {
-                    Logger.d(TAG, "Failed to stop session: " + currentSessionId);
-                }
-            }
-        });
-
-         */
     }
 
-    public String getLatestSessionId(){
-        return sessionIds == null ? null : sessionIds.get(sessionIds.size() - 1);
-    }
-
-    public static String getSessionIdentifier(String workoutId, int index){
-        return "session_" + workoutId + "_" + index;
-    }
-
-    public static String getSessionName(String workoutId){
-        return "session_" + workoutId;
-    }
-
-    public void readWorkoutHistory(){
+    public void readWorkoutHistory(WorkoutData resultToBeUpdated){
         Logger.d(TAG, "readWorkoutHistory");
         if (!GoogleApiHelper.getInstance().isConnected()){
             return;
         }
-        WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
 
-        // TODO: Need to segregate the read for batches
+        for (Batch batch : batches){
+            readBatchSynchronously(batch, resultToBeUpdated);
+        }
 
-        Logger.d(TAG, "Reading step count data between " + dataStore.getBeginTimeStamp() + " and "
-                + DateUtil.getServerTimeInMillis() + " for workoutId " + dataStore.getWorkoutId());
+    }
+
+    private void readBatchSynchronously(Batch batch, final WorkoutData result){
+        Logger.d(TAG, "Reading step count data between " + batch.getStartTs() + " and "
+                + batch.getEndTs());
 
         DataSource ESTIMATED_STEP_DELTAS = new DataSource.Builder()
                 .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
@@ -210,24 +193,46 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .bucketByTime(1, TimeUnit.MINUTES)
-                .setTimeRange(dataStore.getBeginTimeStamp(), System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .setTimeRange(batch.getStartTs(), batch.getEndTs(), TimeUnit.MILLISECONDS)
                 .build();
 
 
-        PendingResult<DataReadResult> result =
+        PendingResult<DataReadResult> pendingResult =
                 Fitness.HistoryApi.readData(GoogleApiHelper.getInstance().getGoogleApiClient(),
                         readRequest);
 
-        result.setResultCallback(new ResultCallback<DataReadResult>() {
-            @Override
-            public void onResult(@NonNull DataReadResult dataReadResult) {
-                handleDataReadResult(dataReadResult);
-                updateCancelCount();
-            }
-        });
+//        pendingResult.setResultCallback(new ResultCallback<DataReadResult>() {
+//            @Override
+//            public void onResult(@NonNull DataReadResult dataReadResult) {
+//                handleDataReadResult(dataReadResult, result);
+//                updateCancelCount();
+//            }
+//        });
+
+        try {
+            Logger.d(TAG, "readBatchSynchronously: time before read = " + System.currentTimeMillis());
+            DataReadResult dataReadResult = pendingResult.await(10, TimeUnit.SECONDS);
+            Logger.d(TAG, "readBatchSynchronously: time after read = " + System.currentTimeMillis());
+            handleDataReadResult(dataReadResult, result);
+        }catch (Throwable e){
+            Logger.d(TAG, "readBatchSynchronously: Exception " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
+
     }
 
-    private void handleDataReadResult(DataReadResult dataReadResult){
+    private void handleDataReadResult(DataReadResult dataReadResult, WorkoutData result){
+        Logger.d(TAG, "handleDataReadResult");
+        if (dataReadResult == null){
+            return;
+        }
+        if (!dataReadResult.getStatus().isSuccess()){
+            Logger.e(TAG, "Data read was not successful for workoutId " + result.getWorkoutId()
+                    + ", statusMessage = " + dataReadResult.getStatus().getStatusMessage()
+                    + ", status" + dataReadResult.getStatus().getStatus());
+        }
         DateFormat dateFormat = getTimeInstance();
         if (dataReadResult.getBuckets().size() > 0) {
             Map<String, Float> aggregateMap = new HashMap<>();
@@ -255,6 +260,11 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
             String update = "DISTANCE : " + (aggregateMap.get(DISTANCE) / 1000)
                     + ", STEPS : " + aggregateMap.get(STEPS)
                     + ", CALORIES : " + aggregateMap.get(CALORIES);
+
+            // Update result object
+            result.addEstimatedSteps(aggregateMap.get(STEPS).intValue());
+            result.addEstimatedDistance(aggregateMap.get(DISTANCE));
+            result.addEstimatedCalories(aggregateMap.get(CALORIES));
 
             Logger.d(TAG, update);
             MainApplication.showToast(update);
@@ -311,7 +321,8 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
     public void describeDataPoint(DataPoint dp, DateFormat dateFormat) {
         String msg = "dataPoint: "
                 + "type: " + dp.getDataType().getName() +"\n"
-                + ", range: [" + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)) + "-" + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)) + "]\n"
+                + ", range: [" + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS))
+                + "-" + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)) + "]\n"
                 + ", fields: [";
 
         for(Field field : dp.getDataType().getFields()) {
@@ -350,58 +361,36 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
     public void resume() {
         Logger.d(TAG, "resume");
 
-        /*
+        // Create new batch and persist it
+        Batch freshBatch = new Batch(System.currentTimeMillis());
+        batches.add(freshBatch);
+        SharedPrefsManager.getInstance().setCollection(Constants.PREF_FITNESS_BATCHES, batches);
 
-        WorkoutDataStore dataStore = WorkoutSingleton
-                .getInstance().getDataStore();
-        if (dataStore == null){
-            // Do Nothing, silently return
-            return;
-        }
-        int batchIndex = dataStore.getCurrentBatchIndex();
-        final String currentSessionIdentifier = getSessionIdentifier(dataStore.getWorkoutId(), batchIndex);
-        final String currentSessionName = getSessionName(dataStore.getWorkoutId());
+    }
 
-        if (!sessionIds.isEmpty() && currentSessionIdentifier.equals(getLatestSessionId())){
-            // Session is already created for ongoing batch, WorkoutService must've started after restart
-            // Don't create any new sessions
-            return;
+
+    private static class Batch {
+        long startTs;
+        long endTs;
+
+        public Batch(long startTs) {
+            this.startTs = startTs;
         }
 
-        // TODO: Make sure that this resume is called after batch is created
+        public long getStartTs() {
+            return startTs;
+        }
 
-        // 1. Create a session object
-        // (provide a name, identifier, description and start time)
+        public void setStartTs(long startTs) {
+            this.startTs = startTs;
+        }
 
-        Session session = new Session.Builder()
-                .setName(currentSessionName)
-                .setIdentifier(currentSessionIdentifier)
-                .setDescription("Running session on " + DateUtil.getDate().toString())
-                .setStartTime(System.currentTimeMillis() - 6000, TimeUnit.MILLISECONDS)
-                .setActivity(FitnessActivities.RUNNING_JOGGING)
-                .build();
+        public long getEndTs() {
+            return endTs;
+        }
 
-
-        // 2. Invoke the Sessions API with:
-        // - The Google API client object
-        // - The request object
-        PendingResult<Status> pendingResult =
-                Fitness.SessionsApi.startSession(GoogleApiHelper.getInstance().getGoogleApiClient(), session);
-        pendingResult.setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if (status.isSuccess()){
-                    Logger.d(TAG, "Successfully started session " + currentSessionIdentifier);
-                    sessionIds.add(currentSessionIdentifier);
-                    SharedPrefsManager.getInstance().setCollection(Constants.PREF_FITNESS_SESSION_IDS,
-                            sessionIds);
-                }else {
-                    Logger.d(TAG, "Problem while starting session: " + status.getStatusMessage());
-                }
-            }
-        });
-
-         */
-
+        public void setEndTs(long endTs) {
+            this.endTs = endTs;
+        }
     }
 }

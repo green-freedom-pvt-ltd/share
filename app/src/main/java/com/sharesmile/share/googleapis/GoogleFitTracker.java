@@ -3,13 +3,14 @@ package com.sharesmile.share.googleapis;
 import android.content.Context;
 
 import com.sharesmile.share.gps.StepCounter;
+import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 
 /**
  * Created by ankitmaheshwari on 12/12/17.
  */
 
-public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
+public class GoogleFitTracker implements StepCounter.Listener,
         GoogleFitDistanceTracker.Listener {
 
     private static final String TAG = "GoogleFitTracker";
@@ -17,14 +18,15 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
     GoogleFitStepCounter stepCounter;
     GoogleFitDistanceTracker distanceTracker;
     GoogleFitnessSessionRecorder sessionRecorder;
+    GoogleFitListener googleFitListener;
 
-    public GoogleFitTracker(Context context) {
+    public GoogleFitTracker(Context context, GoogleFitListener listener) {
         stepCounter = new GoogleFitStepCounter(context, this);
         distanceTracker = new GoogleFitDistanceTracker(context, this);
         sessionRecorder = new GoogleFitnessSessionRecorder(context);
+        googleFitListener = listener;
     }
 
-    @Override
     public void start() {
         Logger.d(TAG, "start");
         stepCounter.start();
@@ -32,15 +34,18 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
         sessionRecorder.start();
     }
 
-    @Override
-    public void stop() {
-        Logger.d(TAG, "stop");
+    /**
+     * Synchronously reads and updates the tracked data in result object and then stops tracking.
+     * Should not be called on the main thread.
+     * @param result
+     */
+    public void readAndStop(WorkoutData result) {
+        Logger.d(TAG, "readAndStop");
         stepCounter.stop();
         distanceTracker.stop();
-        sessionRecorder.stop();
+        sessionRecorder.readAndStop(result);
     }
 
-    @Override
     public void pause() {
         Logger.d(TAG, "pause");
         stepCounter.pause();
@@ -48,7 +53,6 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
         sessionRecorder.pause();
     }
 
-    @Override
     public void resume() {
         Logger.d(TAG, "resume");
         stepCounter.resume();
@@ -68,6 +72,7 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
 
     @Override
     public void onStepCount(int deltaSteps) {
+        googleFitListener.onGoogleFitStepCount(deltaSteps);
     }
 
     @Override
@@ -82,6 +87,11 @@ public class GoogleFitTracker implements GoogleTracker, StepCounter.Listener,
 
     @Override
     public void onDistanceUpdate(float deltaDistance) {
+        googleFitListener.onGoogleFitDistanceUpdate(deltaDistance);
+    }
 
+    public interface GoogleFitListener{
+        void onGoogleFitStepCount(int deltaSteps);
+        void onGoogleFitDistanceUpdate(float deltaDistance);
     }
 }

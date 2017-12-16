@@ -92,7 +92,7 @@ public class ClientConfig implements UnObfuscable{
 
     // Sync Config
     // All the client data is synced periodically after this interval
-    public  long DATA_SYNC_INTERVAL = 10800L;// in secs, i.e. every 3 hours
+    public  long DATA_SYNC_INTERVAL = 14400L;// in secs, i.e. every 3 hours
     public  long DATA_SYNC_INTERVAL_FLEX = 5400L;// in secs, i.e. every 1.5 hours
 
     /************ Below parameters are not on server **********/

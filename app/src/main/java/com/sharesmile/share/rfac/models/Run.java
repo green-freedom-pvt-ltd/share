@@ -97,6 +97,21 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("device_name")
     String deviceName ;
 
+    @SerializedName("estimated_steps")
+    int estimatedSteps ;
+
+    @SerializedName("estimated_distance")
+    double estimatedDistance ;
+
+    @SerializedName("estimated_calories")
+    double estimatedCalories ;
+
+    @SerializedName("google_fit_steps")
+    int googleFitSteps ;
+
+    @SerializedName("google_fit_distance")
+    double googleFitDistance ;
+
     public long getId() {
         return id;
     }
@@ -323,6 +338,46 @@ public class Run implements UnObfuscable, Serializable {
 
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
+    }
+
+    public int getEstimatedSteps() {
+        return estimatedSteps;
+    }
+
+    public void setEstimatedSteps(int estimatedSteps) {
+        this.estimatedSteps = estimatedSteps;
+    }
+
+    public double getEstimatedDistance() {
+        return estimatedDistance;
+    }
+
+    public void setEstimatedDistance(double estimatedDistance) {
+        this.estimatedDistance = estimatedDistance;
+    }
+
+    public double getEstimatedCalories() {
+        return estimatedCalories;
+    }
+
+    public void setEstimatedCalories(double estimatedCalories) {
+        this.estimatedCalories = estimatedCalories;
+    }
+
+    public int getGoogleFitSteps() {
+        return googleFitSteps;
+    }
+
+    public void setGoogleFitSteps(int googleFitSteps) {
+        this.googleFitSteps = googleFitSteps;
+    }
+
+    public double getGoogleFitDistance() {
+        return googleFitDistance;
+    }
+
+    public void setGoogleFitDistance(double googleFitDistance) {
+        this.googleFitDistance = googleFitDistance;
     }
 
     public String extractRelevantInfoAsString(){

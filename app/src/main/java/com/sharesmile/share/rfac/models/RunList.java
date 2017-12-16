@@ -156,6 +156,11 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setOsVersion(run.getOsVersion());
         workout.setDeviceId(run.getDeviceId());
         workout.setDeviceName(run.getDeviceName());
+        workout.setEstimatedSteps(run.getEstimatedSteps());
+        workout.setEstimatedDistance(run.getEstimatedDistance());
+        workout.setEstimatedCalories(run.getEstimatedCalories());
+        workout.setGoogleFitStepCount(run.getGoogleFitSteps());
+        workout.setGoogleFitDistance(run.getGoogleFitDistance());
         return workout;
     }
 

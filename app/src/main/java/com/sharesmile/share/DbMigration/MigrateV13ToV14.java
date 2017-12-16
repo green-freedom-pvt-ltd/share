@@ -22,7 +22,7 @@ public class MigrateV13ToV14 extends MigrationImpl{
         db.execSQL(getSqlQueryForAddingColumn(" 'ESTIMATED_DISTANCE' REAL"));
         db.execSQL(getSqlQueryForAddingColumn(" 'ESTIMATED_STEPS' INTEGER"));
         db.execSQL(getSqlQueryForAddingColumn(" 'ESTIMATED_CALORIES' REAL"));
-        db.execSQL(getSqlQueryForAddingColumn(" 'GOOGLE_FIT_STEPS' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'GOOGLE_FIT_STEP_COUNT' INTEGER"));
         db.execSQL(getSqlQueryForAddingColumn(" 'GOOGLE_FIT_DISTANCE' REAL"));
 
         return getMigratedVersion();
