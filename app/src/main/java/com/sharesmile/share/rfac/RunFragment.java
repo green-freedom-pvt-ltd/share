@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sharesmile.share.Events.GpsStateChangeEvent;
+import com.sharesmile.share.Events.UpdateUiOnAutoFlagWorkout;
 import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
@@ -182,9 +183,28 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UsainBoltForceExit usainBoltForceExit) {
         Logger.d(TAG, "onEvent: UsainBoltForceExit");
-        showForceExitDialogAfterStopRun(MainApplication.getContext().getString(R.string.you_are_in_vehicle),
-                MainApplication.getContext().getString(R.string.usain_bolt_force_exit_popup_content));
+        if (usainBoltForceExit.isAutoFlagged()){
+            showForceExitDialogAfterStopRun(
+                    MainApplication.getContext().getString(R.string.usain_bolt_force_exit_with_auto_flag_popup_title),
+                    MainApplication.getContext().getString(R.string.usain_bolt_force_exit_with_auto_flag_popup_content));
+        }else {
+            showForceExitDialogAfterStopRun(
+                    MainApplication.getContext().getString(R.string.usain_bolt_force_exit_popup_title),
+                    MainApplication.getContext().getString(R.string.usain_bolt_force_exit_popup_content));
+        }
         AnalyticsEvent.create(Event.ON_LOAD_USAIN_BOLT_FORCE_EXIT)
+                .put("auto_flag", usainBoltForceExit.isAutoFlagged())
+                .buildAndDispatch();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateUiOnAutoFlagWorkout updateUiOnAutoFlagWorkout) {
+        Logger.d(TAG, "onEvent: UpdateUiOnAutoFlagWorkout");
+        showForceExitDialogAfterStopRun(MainApplication.getContext().getString(R.string.auto_flag_workout),
+                MainApplication.getContext().getString(R.string.auto_flag_workout_content));
+        AnalyticsEvent.create(Event.ON_LOAD_AUTO_FLAG_WORKOUT_POPUP)
+                .put("avg_speed", updateUiOnAutoFlagWorkout.getAvgSpeed() * 3.6) // in Km/hr
+                .put("recorded_time", updateUiOnAutoFlagWorkout.getRecordedTime()) // in secs
                 .buildAndDispatch();
     }
 

@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +27,7 @@ import com.sharesmile.share.Events.GpsStateChangeEvent;
 import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
 import com.sharesmile.share.Events.ResumeWorkoutEvent;
+import com.sharesmile.share.Events.UpdateUiOnAutoFlagWorkout;
 import com.sharesmile.share.Events.UpdateUiOnMockLocation;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.Events.UpdateUiOnWorkoutResumeEvent;
@@ -179,7 +179,7 @@ public class WorkoutService extends Service implements
         WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         Workout workout = new Workout();
 
-        workout.setIsValidRun(true);
+        workout.setIsValidRun(!data.isAutoFlagged());
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
         workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
@@ -271,6 +271,21 @@ public class WorkoutService extends Service implements
             if (tracker != null) {
                 final WorkoutData result = tracker.endRun();
                 tracker = null;
+
+                if (result.isMockLocationDetected()){
+                    EventBus.getDefault().post(new UpdateUiOnMockLocation());
+                }
+                else if (result.hasConsecutiveUsainBolts()){
+                    if (result.isAutoFlagged()){
+                        EventBus.getDefault().post(new UsainBoltForceExit(true));
+                    }else {
+                        EventBus.getDefault().post(new UsainBoltForceExit(false));
+                    }
+                }else if (result.isAutoFlagged()){
+                    EventBus.getDefault().post(new UpdateUiOnAutoFlagWorkout(result.getAvgSpeed(),
+                            Math.round(result.getRecordedTime())));
+                }
+
                 sendWorkoutResultBroadcast(result);
                 // Do not perform activity detection until the next 24 hours, unless user starts workout
                 ActivityDetector.getInstance().stopActivityDetection();
@@ -280,13 +295,6 @@ public class WorkoutService extends Service implements
                         readGoogleFitHistoryAndPersistWorkoutData(result.copy());
                     }
                 }).start();
-
-//                backgroundExecutorService.submit(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                    }
-//                });
             }
 
             stopTimer();
@@ -376,7 +384,8 @@ public class WorkoutService extends Service implements
     public void stepCounterNotAvailable(int reasonCode) {
         Logger.d(TAG, "distanceTrackerNotAvailable, reasonCode = " + reasonCode);
         currentlyProcessingSteps = false;
-        Analytics.getInstance().setUserProperty("StepCounter", "not_available");
+        SharedPrefsManager.getInstance().setString(Constants.PREF_TYPE_STEP_COUNTER,
+                StepCounter.TYPE_NOT_AVAILABLE);
         MainApplication.showToast(R.string.google_fit_permission_rationale);
     }
 
@@ -385,9 +394,11 @@ public class WorkoutService extends Service implements
         Logger.d(TAG, "stepCounterReady");
         currentlyProcessingSteps = true;
         if (isKitkatWithStepSensor(getApplicationContext())){
-            Analytics.getInstance().setUserProperty("StepCounter", "sensor_service");
+            SharedPrefsManager.getInstance().setString(Constants.PREF_TYPE_STEP_COUNTER,
+                    StepCounter.TYPE_SENSOR_SERVICE);
         }else {
-            Analytics.getInstance().setUserProperty("StepCounter", "google_fit");
+            SharedPrefsManager.getInstance().setString(Constants.PREF_TYPE_STEP_COUNTER,
+                    StepCounter.TYPE_GOOGLE_FIT);
         }
     }
 
@@ -417,7 +428,6 @@ public class WorkoutService extends Service implements
                         getString(R.string.notification_disable_mock_location_title),
                         WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
                         getString(R.string.notification_disable_mock_location));
-                EventBus.getDefault().post(new UpdateUiOnMockLocation());
             }
         }catch (Exception e) {
             Logger.e(TAG, "Problem while handling MockLocationDetected event: " + e.getMessage());
@@ -819,15 +829,6 @@ public class WorkoutService extends Service implements
         manager.cancel(notificationId);
     }
 
-    public void sendStopWorkoutBroadcast(int problem) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(Constants.KEY_STOP_WORKOUT_PROBLEM, problem);
-        bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
-                Constants.BROADCAST_STOP_WORKOUT_CODE);
-        sendBroadcast(bundle);
-        stopWorkout();
-    }
-
     @Override
     public void workoutVigilanceSessiondefaulted(int problem) {
         Logger.d(TAG, "workoutVigilanceSessiondefaulted");
@@ -860,8 +861,7 @@ public class WorkoutService extends Service implements
                     getString(R.string.notification_action_stop)
             );
         }else {
-            // Force readAndStop workout, show notif, And blocking exit popup on UI
-            EventBus.getDefault().post(new UsainBoltForceExit());
+            // Force stop workout, show notif, And blocking exit popup on UI
             stopWorkout();
             MainApplication.showRunNotification(getString(R.string.notification_usain_bolt_force_exit_title),
                     WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID,

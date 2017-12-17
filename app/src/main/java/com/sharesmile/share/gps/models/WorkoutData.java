@@ -225,6 +225,12 @@ public interface WorkoutData extends UnObfuscable, Parcelable, Cloneable{
 
 	float getGoogleFitDistance();
 
+	boolean isAutoFlagged();
+
+	boolean hasConsecutiveUsainBolts();
+
+	void setHasConsecutiveUsainBolts(boolean value);
+
 	/**
 	 * Converts this object to string
 	 * @return

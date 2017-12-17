@@ -199,6 +199,7 @@ public class Constants {
     public static final String PAUSE_REASON_USER_CLICKED = "user_clicked";
 
     public static final String PREF_FITNESS_BATCHES = "fitness_batches";
+    public static final String PREF_TYPE_STEP_COUNTER = "type_step_counter";
 
     public final static String USER_PROP_NAME="Name";
     public final static String USER_PROP_EMAIL="Email";

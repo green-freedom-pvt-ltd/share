@@ -221,6 +221,20 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         approvedWorkoutData.incrementUsainBoltCounter();
         usainBoltOcurredTimeStamps.add(DateUtil.getServerTimeInMillis());
         persistBothWorkoutData();
+
+        int count = getUsainBoltCount();
+        if (count >= 3){
+            if (usainBoltOcurredTimeStamps.size() == count){
+                long latestTimeStamp = usainBoltOcurredTimeStamps.get(count - 1);
+                long firstTimeStamp = usainBoltOcurredTimeStamps.get(count - 3);
+                if (latestTimeStamp - firstTimeStamp <  CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL){
+                    // If three consecutive usain bolts have ocurred within 20 mins then user must be in a vehicle
+                    // In that case we set hasConsecutiveUsainBolts flag as true
+                    dirtyWorkoutData.setHasConsecutiveUsainBolts(true);
+                    approvedWorkoutData.setHasConsecutiveUsainBolts(true);
+                }
+            }
+        }
     }
 
     @Override
@@ -271,21 +285,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
     @Override
     public boolean hasConsecutiveUsainBolts() {
-        if (getUsainBoltCount() < 3){
-            return false;
-        }else {
-            int count = getUsainBoltCount();
-            if (usainBoltOcurredTimeStamps.size() != count){
-                return false;
-            }
-            long latestTimeStamp = usainBoltOcurredTimeStamps.get(count - 1);
-            long firstTimeStamp = usainBoltOcurredTimeStamps.get(count - 3);
-            if (latestTimeStamp - firstTimeStamp <  CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL){
-                // If three consecutive usain bolts have ocurred within 20 mins then user must be in a vehicle
-                return true;
-            }
-        }
-        return false;
+        return dirtyWorkoutData.hasConsecutiveUsainBolts();
     }
 
     @Override

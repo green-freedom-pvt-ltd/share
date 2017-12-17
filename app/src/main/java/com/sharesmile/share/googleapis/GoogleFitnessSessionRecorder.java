@@ -46,7 +46,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
 
     public GoogleFitnessSessionRecorder(Context context) {
         this.batches = SharedPrefsManager.getInstance().getCollection(Constants.PREF_FITNESS_BATCHES,
-                new TypeToken<ArrayList<String>>(){}.getType());
+                new TypeToken<ArrayList<Batch>>(){}.getType());
     }
 
     @Override

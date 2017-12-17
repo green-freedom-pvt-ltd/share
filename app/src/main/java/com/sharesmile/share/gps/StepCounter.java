@@ -15,6 +15,10 @@ public interface StepCounter extends GoogleTracker{
     int NUM_ELEMS_IN_HISTORY_QUEUE = 8;
     long STEP_COUNT_READING_VALID_INTERVAL = 25; // in secs
 
+    String TYPE_GOOGLE_FIT = "google_fit";
+    String TYPE_SENSOR_SERVICE = "sensor_service";
+    String TYPE_NOT_AVAILABLE = "not_available";
+
 
 
     /**

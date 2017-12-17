@@ -166,20 +166,18 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            if (data.getUsainBoltCount() >= 3){
+            if (data.hasConsecutiveUsainBolts()){
                 // Do nothing, ConsecutiveUsainBoltsForceExit blocking popup is on display
+                return;
+            }
+
+            if (data.isAutoFlagged()){
+                // Do nothing, Auto flag popup is on display
                 return;
             }
 
             exitRun(data);
 
-//            if (WorkoutSingleton.getInstance().toShowFeedbackDialog()){
-//                // Need to show post run feedback dialog before
-//                showPostRunFeedbackDialog(data);
-//                // ShareScreen will be launched after taking feedback from user
-//                return;
-//            }
-//            exitFeedback(data);
         }
     }
 

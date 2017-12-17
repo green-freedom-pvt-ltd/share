@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -41,6 +42,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	private float estimatedCalories;
 	private int googleFitSteps;
 	private float googleFitDistance;
+	private boolean autoFlagged;
+	private boolean hasConsecutiveUsainBolts;
 
 	private List<WorkoutBatchImpl> batches;
 
@@ -88,6 +91,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		estimatedCalories = source.estimatedCalories;
 		googleFitSteps = source.googleFitSteps;
 		googleFitDistance = source.googleFitDistance;
+		autoFlagged = source.autoFlagged;
+		hasConsecutiveUsainBolts = source.hasConsecutiveUsainBolts;
 	}
 
 	private void invokeNewBatch(long startTimeStamp, String workoutId){
@@ -227,6 +232,21 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 	@Override
 	public float getGoogleFitDistance() {
 		return googleFitDistance;
+	}
+
+	@Override
+	public boolean isAutoFlagged() {
+		return false;
+	}
+
+	@Override
+	public boolean hasConsecutiveUsainBolts() {
+		return hasConsecutiveUsainBolts;
+	}
+
+	@Override
+	public void setHasConsecutiveUsainBolts(boolean value) {
+		hasConsecutiveUsainBolts = value;
 	}
 
 	@Override
@@ -391,6 +411,12 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		}
 		setElapsedTime();
 		setRecordedTime();
+		int secs = Math.round(getRecordedTime());
+		if (getAvgSpeed() > ClientConfig.getInstance().getAcceptableAverageSpeed(secs)){
+			// If average speed after the workout is above the acceptable value then we
+			// say that the workout is suspicious and auto flag the workout
+			autoFlagged = true;
+		}
 		isActive = false;
 		return this;
 	}
@@ -463,6 +489,9 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		estimatedCalories = in.readFloat();
 		googleFitSteps = in.readInt();
 		googleFitDistance = in.readFloat();
+		autoFlagged = in.readByte() != 0x00;
+		hasConsecutiveUsainBolts = in.readByte() != 0x00;
+
 
 		if (in.readByte() == 0x01) {
 			batches = new ArrayList<WorkoutBatchImpl>();
@@ -499,6 +528,8 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		dest.writeFloat(estimatedCalories);
 		dest.writeInt(googleFitSteps);
 		dest.writeFloat(googleFitDistance);
+		dest.writeByte((byte) (autoFlagged ? 0x01 : 0x00));
+		dest.writeByte((byte) (hasConsecutiveUsainBolts ? 0x01 : 0x00));
 		if (batches == null) {
 			dest.writeByte((byte) (0x00));
 		} else {

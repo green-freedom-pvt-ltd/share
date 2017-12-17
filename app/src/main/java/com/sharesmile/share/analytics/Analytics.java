@@ -6,8 +6,10 @@ import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +90,8 @@ public class Analytics {
             setUserGender(details.getGenderUser());
             setUserPhoto(details.getSocialThumb());
             setUserImpactLeagueTeamCode(details.getTeamId());
+            setUserProperty("StepCounter",
+                    SharedPrefsManager.getInstance().getString(Constants.PREF_TYPE_STEP_COUNTER));
 
             // Setting properties for smooch
 

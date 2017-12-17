@@ -5,4 +5,14 @@ package com.sharesmile.share.Events;
  */
 
 public class UsainBoltForceExit {
+
+    private boolean autoFlagged;
+
+    public UsainBoltForceExit(boolean autoFlagged) {
+        this.autoFlagged = autoFlagged;
+    }
+
+    public boolean isAutoFlagged() {
+        return autoFlagged;
+    }
 }
