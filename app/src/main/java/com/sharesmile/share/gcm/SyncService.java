@@ -718,6 +718,7 @@ public class SyncService extends GcmTaskService {
                 jsonObject.put("google_fit_steps", workout.getGoogleFitStepCount());
                 jsonObject.put("step_counter",
                         SharedPrefsManager.getInstance().getString(Constants.PREF_TYPE_STEP_COUNTER));
+                jsonObject.put("usain_bolt_count", workout.getUsainBoltCount());
 
                 Logger.d(TAG, "Will upload run: "+jsonObject.toString());
                 response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);

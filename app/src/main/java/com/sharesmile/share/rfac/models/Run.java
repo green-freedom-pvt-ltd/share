@@ -112,6 +112,9 @@ public class Run implements UnObfuscable, Serializable {
     @SerializedName("google_fit_distance")
     double googleFitDistance ;
 
+    @SerializedName("usain_bolt_count")
+    int usainBoltCount ;
+
     public long getId() {
         return id;
     }
@@ -378,6 +381,14 @@ public class Run implements UnObfuscable, Serializable {
 
     public void setGoogleFitDistance(double googleFitDistance) {
         this.googleFitDistance = googleFitDistance;
+    }
+
+    public int getUsainBoltCount() {
+        return usainBoltCount;
+    }
+
+    public void setUsainBoltCount(int usainBoltCount) {
+        this.usainBoltCount = usainBoltCount;
     }
 
     public String extractRelevantInfoAsString(){

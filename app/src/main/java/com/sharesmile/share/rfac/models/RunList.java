@@ -161,6 +161,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setEstimatedCalories(run.getEstimatedCalories());
         workout.setGoogleFitStepCount(run.getGoogleFitSteps());
         workout.setGoogleFitDistance(run.getGoogleFitDistance());
+        workout.setUsainBoltCount(run.getUsainBoltCount());
         return workout;
     }
 

@@ -217,6 +217,7 @@ public class WorkoutService extends Service implements
         workout.setEstimatedCalories((double)data.getEstimatedCalories());
         workout.setGoogleFitStepCount(data.getGoogleFitSteps());
         workout.setGoogleFitDistance((double)data.getGoogleFitDistance());
+        workout.setUsainBoltCount(data.getUsainBoltCount());
 
 
         workoutDao.insertOrReplace(workout);
