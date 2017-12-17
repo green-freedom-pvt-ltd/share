@@ -3,10 +3,10 @@ package com.sharesmile.share.analytics.events;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.Collections;
 
@@ -104,10 +104,7 @@ public class AnalyticsEvent implements UnObfuscable {
         if (TextUtils.isEmpty(jsonString)) {
             return null;
         }
-
-        Gson gson = new Gson();
-        Properties props = gson.fromJson(jsonString, Properties.class);
-
+        Properties props = Utils.createObjectFromJSONString(jsonString, Properties.class);
         if (props == null || props.equals(Collections.emptyMap())) {
             return null;
         }

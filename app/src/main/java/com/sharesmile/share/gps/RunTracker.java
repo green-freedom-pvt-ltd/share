@@ -3,12 +3,17 @@ package com.sharesmile.share.gps;
 import android.location.Location;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton.State;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
+import com.sharesmile.share.gps.location.LocationDeserializer;
+import com.sharesmile.share.gps.location.LocationSerializer;
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
 import com.sharesmile.share.gps.models.WorkoutData;
@@ -16,7 +21,6 @@ import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -41,9 +45,9 @@ public class RunTracker implements Tracker {
             recordHistoryQueue = new CircularQueue<>(TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE);
             if (isActive()){
                 dataStore = WorkoutSingleton.getInstance().getDataStore();
-                String prevRecordAsString = SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD);
-                if (!TextUtils.isEmpty(prevRecordAsString)){
-                    recordHistoryQueue.add(Utils.createObjectFromJSONString(prevRecordAsString, DistRecord.class));
+                DistRecord prevRecord = retrievePrevDistRecord();
+                if (prevRecord != null){
+                    recordHistoryQueue.add(prevRecord);
                 }
             }else{
                 // User started workout
@@ -56,7 +60,7 @@ public class RunTracker implements Tracker {
     public synchronized WorkoutData endRun(){
         Logger.d(TAG, "endRun");
         WorkoutData workoutData = dataStore.clear();
-        SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD);
+        SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD_AS_STRING);
         WorkoutSingleton.getInstance().endWorkout();
         listener = null;
         return workoutData;
@@ -322,7 +326,7 @@ public class RunTracker implements Tracker {
                 synchronized (recordHistoryQueue){
                     recordHistoryQueue.add(startRecord);
                 }
-                SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, startRecord);
+                persistPrevDistRecord(startRecord);
             }
         }else{
             Logger.d(TAG,"Processing Location: " + point.toString());
@@ -394,7 +398,7 @@ public class RunTracker implements Tracker {
                     synchronized (recordHistoryQueue){
                         recordHistoryQueue.add(record);
                     }
-                    SharedPrefsManager.getInstance().setObject(Constants.PREF_PREV_DIST_RECORD, record);
+                    persistPrevDistRecord(record);
                     // Change delta_distance
                     float deltaDistance = dist; // in meters
                     int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs
@@ -405,6 +409,29 @@ public class RunTracker implements Tracker {
                 }
             }
         }
+    }
+
+    public DistRecord retrievePrevDistRecord(){
+        String prevRecordAsString =
+                SharedPrefsManager.getInstance().getString(Constants.PREF_PREV_DIST_RECORD_AS_STRING);
+        if (!TextUtils.isEmpty(prevRecordAsString)){
+            DistRecord prevRecord = getGsonInstanceForLocation().fromJson(prevRecordAsString, DistRecord.class);
+            return prevRecord;
+        }
+        return null;
+    }
+
+    public void persistPrevDistRecord(DistRecord prevDistRecord){
+        String recordAsString = getGsonInstanceForLocation().toJson(prevDistRecord);
+        SharedPrefsManager.getInstance().setString(Constants.PREF_PREV_DIST_RECORD_AS_STRING,
+                recordAsString);
+    }
+
+    private Gson getGsonInstanceForLocation(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Location.class, new LocationDeserializer());
+        gsonBuilder.registerTypeAdapter(Location.class, new LocationSerializer());
+        return gsonBuilder.create();
     }
 
     public Properties getWorkoutBundle(){

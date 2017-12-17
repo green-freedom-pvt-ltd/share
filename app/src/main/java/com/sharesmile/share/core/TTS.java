@@ -85,29 +85,7 @@ public final class TTS extends UtteranceProgressListener {
             @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS){
-                    Locale locale = new Locale("en", "IN");
-                    int availability = tts.isLanguageAvailable(locale);
-                    switch (availability) {
-                        case TextToSpeech.LANG_NOT_SUPPORTED: {
-                            tts.setLanguage(Locale.US);
-                            break;
-                        }
-                        case TextToSpeech.LANG_MISSING_DATA: {
-                            tts.setLanguage(Locale.US);
-                            break;
-                        }
-                        case TextToSpeech.LANG_AVAILABLE: {
-                            tts.setLanguage(Locale.US);
-                            break;
-                        }
-                        case TextToSpeech.LANG_COUNTRY_AVAILABLE:
-                        case TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE: {
-                            tts.setLanguage(locale);
-                            break;
-                        }
-                    }
                     tts.setLanguage(Locale.ENGLISH);
-
                     tts.setSpeechRate(0.8f);
                     tts.setOnUtteranceProgressListener(TTS.this);
                     callback.initSuccess(TTS.this);

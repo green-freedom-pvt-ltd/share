@@ -27,7 +27,7 @@ import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
-import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.rfac.activities.FeedbackActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;

@@ -5,6 +5,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Config;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;
 

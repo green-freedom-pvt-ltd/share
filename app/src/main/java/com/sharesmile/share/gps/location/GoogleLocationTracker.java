@@ -1,4 +1,4 @@
-package com.sharesmile.share.gps;
+package com.sharesmile.share.gps.location;
 
 import android.Manifest;
 import android.app.Activity;

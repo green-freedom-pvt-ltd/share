@@ -22,7 +22,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.gson.Gson;
 import com.sharesmile.share.Events.GpsStateChangeEvent;
 import com.sharesmile.share.Events.MockLocationDetected;
 import com.sharesmile.share.Events.PauseWorkoutEvent;
@@ -37,7 +36,6 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
@@ -51,6 +49,7 @@ import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.googleapis.GoogleFitStepCounter;
 import com.sharesmile.share.googleapis.GoogleFitTracker;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.gps.models.WorkoutBatch;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -125,7 +124,8 @@ public class WorkoutService extends Service implements
     public void onCreate() {
         super.onCreate();
         Logger.i(TAG, "onCreate");
-        mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
+        mCauseData = Utils.createObjectFromJSONString(
+                SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
                 CauseData.class);
         handler = new Handler();
         EventBus.getDefault().register(this);

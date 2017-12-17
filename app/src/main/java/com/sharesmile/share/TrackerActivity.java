@@ -23,7 +23,6 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.gson.Gson;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.BaseActivity;
 import com.sharesmile.share.core.Constants;
@@ -40,6 +39,7 @@ import com.sharesmile.share.rfac.fragments.RunCountdownFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,9 +72,13 @@ public class TrackerActivity extends BaseActivity {
 
         runInTestMode = SharedPrefsManager.getInstance().getBoolean(Constants.KEY_WORKOUT_TEST_MODE_ON);
         if (mCauseData != null) {
-            SharedPrefsManager.getInstance().setString(Constants.PREF_CAUSE_DATA, new Gson().toJson(mCauseData));
+            SharedPrefsManager.getInstance().setString(
+                    Constants.PREF_CAUSE_DATA,
+                    Utils.createJSONStringFromObject(mCauseData));
         } else {
-            mCauseData = new Gson().fromJson(SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA), CauseData.class);
+            mCauseData = Utils.createObjectFromJSONString(
+                    SharedPrefsManager.getInstance().getString(Constants.PREF_CAUSE_DATA),
+                    CauseData.class);
         }
 
         if (isTaskRoot()){

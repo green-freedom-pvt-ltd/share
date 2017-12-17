@@ -29,7 +29,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.core.UnitsManager;
-import com.sharesmile.share.gps.GoogleLocationTracker;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;

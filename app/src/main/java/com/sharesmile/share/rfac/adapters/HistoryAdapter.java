@@ -183,7 +183,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         mInterface.showCaloriesNotAvailableRationale();
                     }
                 }else {
-                    Logger.d("HistoryAdapter", "Flagged run card clicked: " + Utils.createJSONStringFromObject(workout));
+                    Logger.d("HistoryAdapter", "Flagged run card clicked: "
+                            + Utils.createJSONStringFromObject(workout));
                     mInterface.showFlaggedRunDialog(Utils.convertWorkoutToRun(workout));
                 }
             }
