@@ -236,7 +236,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 
 	@Override
 	public boolean isAutoFlagged() {
-		return false;
+		return autoFlagged;
 	}
 
 	@Override
@@ -412,9 +412,14 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		setElapsedTime();
 		setRecordedTime();
 		int secs = Math.round(getRecordedTime());
-		if (getAvgSpeed() > ClientConfig.getInstance().getAcceptableAverageSpeed(secs)){
+		float acceptableAvgSpeed = (float) ClientConfig.getInstance().getAcceptableAverageSpeed(secs);
+		Logger.d(TAG, "close, recordedTime = " + getRecordedTime() + ", avgSpeed = " + getAvgSpeed()
+				+ ", acceptableAvgSpeed = " + acceptableAvgSpeed);
+		if (getAvgSpeed() > acceptableAvgSpeed){
 			// If average speed after the workout is above the acceptable value then we
 			// say that the workout is suspicious and auto flag the workout
+			Logger.d(TAG, "close: AutoFlagging workout since avg speed (" +getAvgSpeed()
+					+ ") is greater than acceptableAvgSpeed ("+acceptableAvgSpeed+")");
 			autoFlagged = true;
 		}
 		isActive = false;

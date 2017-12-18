@@ -112,9 +112,9 @@ public class ClientConfig implements UnObfuscable{
 
     public float GLOBAL_STRIDE_LENGTH_UPPER_LIMIT = 1.1f; // in meters
 
-    public float ACCEPTABLE_AVERAGE_SPEED_UPPER_LIMIT = 16.6667f; // in meters/sec i.e. 60 km/hr
+    public float ACCEPTABLE_AVERAGE_SPEED_UPPER_LIMIT = 13.8889f; // in meters/sec i.e. 50 km/hr
 
-    public float ACCEPTABLE_AVERAGE_SPEED_LOWER_LIMIT = 8.3333f; // in meters/sec i.e. 30 km/hr
+    public float ACCEPTABLE_AVERAGE_SPEED_LOWER_LIMIT = 5.5556f; // in meters/sec i.e. 20 km/hr
 
     public int GOOGLE_FIT_SENSOR_TRACKER_SAMPLING_RATE = 2; // in secs
 
