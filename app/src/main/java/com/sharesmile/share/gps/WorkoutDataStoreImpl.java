@@ -331,9 +331,14 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     @Override
     public void updateAfterVoiceUpdate() {
         Logger.d(TAG, "updateAfterVoiceUpdate");
-        int currentIndex = SharedPrefsManager.getInstance().getInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT_INDEX);
+        int currentIndex = SharedPrefsManager.getInstance()
+                .getInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT_INDEX);
+        int nextProspect = currentIndex + 1;
+        while (ClientConfig.getInstance().getVoiceUpdateIntervalAtIndexInSecs(nextProspect) <= getElapsedTime()){
+            nextProspect++;
+        }
         SharedPrefsManager.getInstance().setInt(Constants.PREF_NEXT_VOICE_UPDATE_SCHEDULD_AT_INDEX,
-                currentIndex + 1);
+                nextProspect);
     }
 
     @Override
