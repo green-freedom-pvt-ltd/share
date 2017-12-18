@@ -51,7 +51,7 @@ public class UsainBolt {
             // recent is avg GPS speed from recent few samples of accepted GPS points in the past 24 secs
             // GPS speed is obtained directly from location object and is calculated using doppler shift
             float recentGpsSpeed = GoogleLocationTracker.getInstance().getRecentGpsSpeed();
-            // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
+            // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (30 km/hr) then user must be in a vehicle
             if (recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
                 Logger.d(TAG, "Recent GPS speed is greater than threshold, must be Usain Bolt");
                 AnalyticsEvent.create(Event.ON_USAIN_BOLT_ALERT)
