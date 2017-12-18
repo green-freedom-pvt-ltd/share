@@ -128,6 +128,7 @@ public class Analytics {
     }
 
     public void setUserId(int userId){
+        Crashlytics.setUserIdentifier(String.valueOf(userId));
         Crashlytics.setInt(USER_PROP_USER_ID, userId);
         clevertapManager.setUserProperty("Identity", userId);
         OneSignal.sendTag(USER_PROP_USER_ID, String.valueOf(userId));

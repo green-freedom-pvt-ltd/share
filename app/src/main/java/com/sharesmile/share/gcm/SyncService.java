@@ -124,8 +124,8 @@ public class SyncService extends GcmTaskService {
         syncLeagueBoardData();
         updateCauseData();
         updateFaqs();
-        syncWorkoutData();
         uploadPendingWorkoutsData();
+        syncWorkoutData();
 
         // Returning success as result does not matter
         return GcmNetworkManager.RESULT_SUCCESS;
@@ -316,9 +316,17 @@ public class SyncService extends GcmTaskService {
             while (iterator.hasNext()){
                 Workout workout = iterator.next();
                 if (TextUtils.isEmpty(workout.getWorkoutId())){
-                    // Generating new client_run_id and scheduling the run for sync
+                    // This run was created on backend, Generating new client_run_id and scheduling the run for sync
                     workout.setWorkoutId(UUID.randomUUID().toString());
                     workout.setIs_sync(false);
+                }else {
+                    // Existing run, lets take the appropriate value for setShouldSyncLocationData from the storedWorkout
+                    Workout storedWorkout = mWorkoutDao.queryBuilder()
+                            .where(WorkoutDao.Properties.WorkoutId.eq(workout.getWorkoutId()))
+                            .unique();
+                    if (storedWorkout != null){
+                        workout.setShouldSyncLocationData(storedWorkout.getShouldSyncLocationData());
+                    }
                 }
                 mWorkoutDao.insertOrReplace(workout);
             }
@@ -551,7 +559,8 @@ public class SyncService extends GcmTaskService {
                     .put("batch_num", -1)
                     .put("exception_message", failureMessage)
                     .buildAndDispatch();
-            return false;
+            // Returning true so that the service doesn't retry upload of location data for this workout
+            return true;
         }
 
         Gson gson = new Gson();
@@ -647,7 +656,7 @@ public class SyncService extends GcmTaskService {
             // If internet not available then silently exit
             return false;
         }
-        Logger.d(TAG, "uploadPendingWorkoutData called for client_run_id: " + workout.getWorkoutId()
+        Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId()
                 + ", distance: " + workout.getDistance() + ", date: " + workout.getDate());
         int user_id = SharedPrefsManager.getInstance().getInt(Constants.PREF_USER_ID);
         JSONObject jsonObject = new JSONObject();
@@ -830,7 +839,6 @@ public class SyncService extends GcmTaskService {
                         workout.setVersion(1L);
                     }
                 }
-//                Logger.d(TAG, "Will insert: " + gson.toJson(workout));
                 mWorkoutDao.insertOrReplace(workout);
             }
 
@@ -839,8 +847,10 @@ public class SyncService extends GcmTaskService {
                 return forceRefreshAllWorkoutData(runList.getNextUrl());
             } else {
                 // All the runs are pulled from server and written into DB
-                Logger.d(TAG, "forceRefreshAllWorkoutData, Setting SyncedTimeStampMillis as: " + refreshAllTimeStamp);
-                SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION, (refreshAllTimeStamp / 1000));
+                Logger.d(TAG, "forceRefreshAllWorkoutData, Setting SyncedTimeStampMillis as: "
+                        + refreshAllTimeStamp);
+                SharedPrefsManager.getInstance().setLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION,
+                        (refreshAllTimeStamp / 1000));
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, true);
                 Utils.updateTrackRecordFromDb();
                 EventBus.getDefault().post(new DBEvent.RunDataUpdated());

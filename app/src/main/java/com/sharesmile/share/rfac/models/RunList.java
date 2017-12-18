@@ -71,22 +71,6 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         return new ArrayListIterator();
     }
 
-
-  /*  @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public Workout next() {
-        return null;
-    }
-
-    @Override
-    public void remove() {
-
-    }*/
-
     private class ArrayListIterator implements Iterator<Workout> {
 
         private long remaining = getRunList().size();
@@ -124,7 +108,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         Workout workout = new Workout(run.getId()); //
         workout.setWorkoutId(run.getClientRunId()); //
         workout.setSteps(Math.round(run.getNumSteps()));
-        workout.setIs_sync(true); // Setting is_sync as true because this run is fetched from server, so must be synced
+        workout.setIs_sync(true); // Setting is_sync as true because this run is fetched from server, so it must be already synced
         // Not setting shouldSyncLocationData boolean on purpose
         workout.setDate(run.getDate());
         workout.setCauseBrief(run.getCauseName());
@@ -162,6 +146,7 @@ public class RunList implements UnObfuscable, Serializable, Iterable {
         workout.setGoogleFitStepCount(run.getGoogleFitSteps());
         workout.setGoogleFitDistance(run.getGoogleFitDistance());
         workout.setUsainBoltCount(run.getUsainBoltCount());
+        workout.setShouldSyncLocationData(false);
         return workout;
     }
 

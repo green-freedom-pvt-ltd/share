@@ -221,11 +221,10 @@ public class WorkoutService extends Service implements
 
 
         workoutDao.insertOrReplace(workout);
-        Utils.updateTrackRecordFromDb();
-
         String key = Utils.getWorkoutLocationDataPendingQueuePrefKey(workout.getWorkoutId());
         SharedPrefsManager.getInstance().setObject(key, data);
 
+        Utils.updateTrackRecordFromDb();
         SyncService.pushWorkoutDataWithBackoff();
     }
 

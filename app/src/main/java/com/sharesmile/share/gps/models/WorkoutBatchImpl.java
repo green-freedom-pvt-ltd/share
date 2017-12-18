@@ -160,7 +160,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 			}else {
 				throw new IllegalStateException("InputStream null for file: " + locationDataFileName);
 			}
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			String message = "Exception occurred while reading WorkoutPoint from file: " + locationDataFileName
 					+ ", exception: " + ex.getMessage();
 			Logger.e(TAG, message);
