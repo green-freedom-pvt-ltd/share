@@ -3,6 +3,7 @@ package com.sharesmile.share.googleapis;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -175,6 +176,12 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
             readBatchSynchronously(batch, resultToBeUpdated);
         }
 
+        String update = "DISTANCE : " + (resultToBeUpdated.getEstimatedDistance() / 1000)
+                + ", STEPS : " + resultToBeUpdated.getEstimatedSteps()
+                + ", CALORIES : " + resultToBeUpdated.getEstimatedCalories();
+        Logger.d(TAG, update);
+        MainApplication.showToast(update);
+
     }
 
     private void readBatchSynchronously(Batch batch, final WorkoutData result){
@@ -201,25 +208,19 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 Fitness.HistoryApi.readData(GoogleApiHelper.getInstance().getGoogleApiClient(),
                         readRequest);
 
-//        pendingResult.setResultCallback(new ResultCallback<DataReadResult>() {
-//            @Override
-//            public void onResult(@NonNull DataReadResult dataReadResult) {
-//                handleDataReadResult(dataReadResult, result);
-//                updateCancelCount();
-//            }
-//        });
-
         try {
             Logger.d(TAG, "readBatchSynchronously: time before read = " + System.currentTimeMillis());
             DataReadResult dataReadResult = pendingResult.await(10, TimeUnit.SECONDS);
             Logger.d(TAG, "readBatchSynchronously: time after read = " + System.currentTimeMillis());
             handleDataReadResult(dataReadResult, result);
         }catch (Throwable e){
-            Logger.d(TAG, "readBatchSynchronously: Exception " + e.getMessage());
+            String message = "Exception while reading batch for workoutId " + result.getWorkoutId()
+                    + " Exception: " + e.getMessage();
+            Crashlytics.log(message);
+            Crashlytics.logException(e);
+            Logger.e(TAG, message);
             e.printStackTrace();
         }
-
-
 
     }
 
@@ -257,17 +258,10 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 count++;
             }
 
-            String update = "DISTANCE : " + (aggregateMap.get(DISTANCE) / 1000)
-                    + ", STEPS : " + aggregateMap.get(STEPS)
-                    + ", CALORIES : " + aggregateMap.get(CALORIES);
-
             // Update result object
             result.addEstimatedSteps(aggregateMap.get(STEPS).intValue());
             result.addEstimatedDistance(aggregateMap.get(DISTANCE));
             result.addEstimatedCalories(aggregateMap.get(CALORIES));
-
-            Logger.d(TAG, update);
-            MainApplication.showToast(update);
 
         } else if (dataReadResult.getDataSets().size() > 0) {
             Logger.d(TAG, "Datasets in result : dataSet.size(): " + dataReadResult.getDataSets().size());
