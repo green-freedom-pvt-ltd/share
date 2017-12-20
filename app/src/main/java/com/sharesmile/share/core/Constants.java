@@ -102,7 +102,7 @@ public class Constants {
 
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";
 
-    public static final String PREF_PREV_DIST_RECORD = "pref_prev_dist_record";
+    public static final String PREF_PREV_DIST_RECORD_AS_STRING = "pref_prev_dist_record_as_string";
 
     public static final String PREF_WORKOUT_DATA_DIRTY = "pref_workout_data_dirty";
 
