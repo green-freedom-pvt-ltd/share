@@ -40,7 +40,7 @@ public class RealRunFragment extends RunFragment {
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
     TextView time;
-    TextView distanceTextViewd;
+    TextView distanceTextView;
     TextView distanceUnitTextView;
     TextView impact;
     Button pauseButton;
