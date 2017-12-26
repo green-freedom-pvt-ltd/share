@@ -206,7 +206,8 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        float distanceInMeters = mWorkoutData.getDistance();
+        // TODO: POC Need to remove this hack
+        float distanceInMeters = mWorkoutData.getGoogleFitDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
 
         Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
