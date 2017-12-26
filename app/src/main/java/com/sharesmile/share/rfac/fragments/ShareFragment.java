@@ -247,7 +247,8 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     private void initCaloriesContainer(){
         if (MainApplication.getInstance().getBodyWeight() > 0){
-            double calories = mWorkoutData.getCalories().getCalories();
+            // TODO: POC Need to remove this hack
+            int calories = mWorkoutData.getGoogleFitSteps();
             caloriesNotAvailableContainer.setVisibility(View.GONE);
             caloriesAvailableContainer.setVisibility(View.VISIBLE);
             caloriesBurned.setText(String.valueOf(Math.round(calories)));
