@@ -360,6 +360,16 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
         }
     }
 
+    @Override
+    public int getGoogleFitSteps() {
+        return dirtyWorkoutData.getGoogleFitSteps();
+    }
+
+    @Override
+    public float getGoogleFitDistance() {
+        return dirtyWorkoutData.getGoogleFitDistance();
+    }
+
     private void persistBothWorkoutData() {
         persistDirtyWorkoutData();
         if (approvedWorkoutData != null){

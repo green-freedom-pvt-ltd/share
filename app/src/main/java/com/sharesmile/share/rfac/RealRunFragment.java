@@ -40,7 +40,7 @@ public class RealRunFragment extends RunFragment {
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
     TextView time;
-    TextView distanceTextView;
+    TextView distanceTextViewd;
     TextView distanceUnitTextView;
     TextView impact;
     Button pauseButton;
@@ -242,7 +242,8 @@ public class RealRunFragment extends RunFragment {
         Logger.d(TAG, "refreshWorkoutData");
         if (isAttachedToActivity()){
             updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs()));
-            float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
+            // TODO: POC Need to remove this hack
+            float totalDistance = WorkoutSingleton.getInstance().getGoogleFitDistanceInMeters();
             String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(totalDistance);
             distanceTextView.setText(distanceString);
             int rupees = Utils.convertDistanceToRupees(getConversionFactor(), totalDistance);
@@ -289,7 +290,8 @@ public class RealRunFragment extends RunFragment {
             pauseButton.setText(R.string.pause);
         }
 
-        float distanceCovered = WorkoutSingleton.getInstance().getTotalDistanceInMeters(); // in meters
+        // TODO: POC Need to remove this hack
+        float distanceCovered = WorkoutSingleton.getInstance().getGoogleFitDistanceInMeters(); // in meters
         int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCovered);
         impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
         distanceTextView.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCovered));

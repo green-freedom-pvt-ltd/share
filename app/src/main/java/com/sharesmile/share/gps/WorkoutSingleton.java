@@ -181,6 +181,13 @@ public class WorkoutSingleton {
         return 0;
     }
 
+    public float getGoogleFitDistanceInMeters(){
+        if (dataStore != null){
+            return dataStore.getGoogleFitDistance();
+        }
+        return 0;
+    }
+
     public float getAvgSpeed(){
         if (dataStore != null){
             return dataStore.getAvgSpeed();

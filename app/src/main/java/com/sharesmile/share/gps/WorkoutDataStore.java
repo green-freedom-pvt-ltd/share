@@ -102,4 +102,8 @@ public interface WorkoutDataStore {
 
 	void addGoogleFitDistance(float distanceToAdd);
 
+	int getGoogleFitSteps();
+
+	float getGoogleFitDistance();
+
 }
