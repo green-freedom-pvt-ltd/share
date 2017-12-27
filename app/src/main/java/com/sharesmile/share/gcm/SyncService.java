@@ -728,11 +728,14 @@ public class SyncService extends GcmTaskService {
                 jsonObject.put("step_counter",
                         SharedPrefsManager.getInstance().getString(Constants.PREF_TYPE_STEP_COUNTER));
                 jsonObject.put("usain_bolt_count", workout.getUsainBoltCount());
+                jsonObject.put("is_flag", !workout.getIsValidRun());
+
 
                 Logger.d(TAG, "Will upload run: "+jsonObject.toString());
                 response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
             }
 
+            Logger.d(TAG, "POST run api call, Response: is_flag = " + response.isFlag());
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             workout.setId(response.getId());
             workout.setIs_sync(true);
