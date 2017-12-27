@@ -122,7 +122,8 @@ public class GoogleFitSensorTracker implements GoogleTracker, GoogleApiHelper.Li
 
                         if (dataType.equals(DataType.TYPE_DISTANCE_DELTA)){
                             // For distance sources we want the stream live_distance_from_steps only
-                            if ("live_distance_from_steps".equals(dataSource.getStreamName())){
+//                            live_distance_from_steps
+                            if ("live_distance_from_location".equals(dataSource.getStreamName())){
                                 registerFitnessDataListener(dataSource, dataSource.getDataType());
                                 return;
                             }

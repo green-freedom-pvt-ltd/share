@@ -904,7 +904,9 @@ public class WorkoutService extends Service implements
     @Override
     public float getTotalDistanceCoveredInMeters() {
         if (tracker != null && tracker.isActive()){
-            return tracker.getTotalDistanceCovered();
+            // TODO: POC Need to remove this
+            return WorkoutSingleton.getInstance().getGoogleFitDistanceInMeters();
+//            return tracker.getTotalDistanceCovered();
         }
         return 0;
     }
