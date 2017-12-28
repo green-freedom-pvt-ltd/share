@@ -971,11 +971,9 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
-        // TODO: POC Need to remove this
-        String amountString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(getTotalDistanceCoveredInMeters()) + " km";
 
-//        int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), getTotalDistanceCoveredInMeters());
-//        String amountString = UnitsManager.formatRupeeToMyCurrency(rupees);
+        int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), getTotalDistanceCoveredInMeters());
+        String amountString = UnitsManager.formatRupeeToMyCurrency(rupees);
 
         String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeDrawable;
@@ -1000,9 +998,7 @@ public class WorkoutService extends Service implements
                         .setContentTitle(contentTitle)
                         .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
-                                // TODO: POC Need to remove this
-                                        ? " in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
-//                                        ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
+                                        ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
                                         : "")
                         )
                         .setSmallIcon(getNotificationIcon())
