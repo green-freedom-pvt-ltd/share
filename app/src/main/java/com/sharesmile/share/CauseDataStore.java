@@ -84,7 +84,8 @@ public class CauseDataStore {
             for (CauseData causeData : causeList.getCauses()) {
                 if (causeData.getApplicationUpdate() != null) {
                     int latestVersion = SharedPrefsManager.getInstance().getInt(Constants.PREF_LATEST_APP_VERSION, 0);
-                    if (latestVersion < causeData.getApplicationUpdate().app_version && causeData.getApplicationUpdate().app_version > BuildConfig.VERSION_CODE) {
+                    if (latestVersion < causeData.getApplicationUpdate().app_version
+                            && causeData.getApplicationUpdate().app_version > BuildConfig.VERSION_CODE) {
                         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_APP_UPDATE_DIALOG, true);
                         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FORCE_UPDATE, causeData.getApplicationUpdate().force_update);
                         SharedPrefsManager.getInstance().setInt(Constants.PREF_LATEST_APP_VERSION, causeData.getApplicationUpdate().app_version);
