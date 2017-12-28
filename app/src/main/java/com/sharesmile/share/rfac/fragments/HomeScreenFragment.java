@@ -42,8 +42,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -208,6 +206,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .buildAndDispatch();
                 }else {
                     // If it is not completed then it must be an active on going cause
+                    CauseDataStore.getInstance().registerCauseSelection(causeData);
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
                     AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                             .addBundle(causeData.getCauseBundle())
@@ -268,12 +267,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             // No cause data to show
             Snackbar.make(mContentView, getString(R.string.some_error_occurred), Snackbar.LENGTH_INDEFINITE).show();
         }
-        Collections.sort(causes, new Comparator<CauseData>() {
-            @Override
-            public int compare(CauseData lhs, CauseData rhs) {
-                return lhs.getOrderPriority() - rhs.getOrderPriority();
-            }
-        });
+        CauseDataStore.getInstance().sortCauses(causes);
         mAdapter.setData(causes);
         mRunButton.setVisibility(View.VISIBLE);
         hideProgressDialog();

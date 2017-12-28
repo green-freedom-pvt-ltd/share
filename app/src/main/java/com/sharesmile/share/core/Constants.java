@@ -98,6 +98,8 @@ public class Constants {
 
     public static final String KEY_LAST_VISIBLE_CAUSE_LIST = "key_last_visible_cause_list_v2";
 
+    public static final String KEY_LAST_CAUSE_SELECTED = "key_last_cause_selected";
+
     public static final String KEY_FAQ_LIST = "key_faq_list";
 
     public static final String PREF_WORKOUT_STATE = "pref_workout_state";

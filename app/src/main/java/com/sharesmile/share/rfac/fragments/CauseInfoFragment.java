@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -78,19 +79,6 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         return view;
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.menu_toolbar, menu);
-//        MenuItem messageItem = menu.findItem(R.id.item_message);
-//
-//        RelativeLayout badge = (RelativeLayout) messageItem.getActionView();
-//        View badgeIndicator = badge.findViewById(R.id.badge_indicator);
-//        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
-//        badgeIndicator.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
-//
-//        badge.setOnClickListener(this);
-//    }
-
     private void init() {
 
         mRunButton.setOnClickListener(this);
@@ -135,16 +123,13 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
                     Utils.shareImageWithMessage(getContext(), cause.getCauseCompletedImage(),
                             cause.getCauseCompletedShareMessageTemplate());
                 }else {
+                    CauseDataStore.getInstance().registerCauseSelection(cause);
                     getFragmentController().performOperation(IFragmentController.START_RUN, cause);
                     AnalyticsEvent.create(Event.ON_CLICK_BEGIN_RUN)
                             .addBundle(cause.getCauseBundle())
                             .buildAndDispatch();
                 }
                 break;
-//            case R.id.badge_layout:
-//                getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
-//                AnalyticsEvent.create(Event.ON_CLICK_FEED).buildAndDispatch();
-//                break;
             default:
         }
     }

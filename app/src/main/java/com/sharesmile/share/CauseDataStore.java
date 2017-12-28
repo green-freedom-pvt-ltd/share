@@ -17,6 +17,8 @@ import com.sharesmile.share.utils.Urls;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -104,6 +106,28 @@ public class CauseDataStore {
 
     public CauseData getFirstCause(){
         return getCausesToShow().get(0);
+    }
+
+    public void registerCauseSelection(CauseData selectedCause){
+        SharedPrefsManager.getInstance().setObject(Constants.KEY_LAST_CAUSE_SELECTED, selectedCause);
+    }
+
+    public void sortCauses(List<CauseData> causes){
+        CauseData lastSelectedCause = SharedPrefsManager.getInstance()
+                .getObject(Constants.KEY_LAST_CAUSE_SELECTED, CauseData.class);
+        final int lastSelectedCauseId = (lastSelectedCause == null) ? -1 : (int)lastSelectedCause.getId();
+        Collections.sort(causes, new Comparator<CauseData>() {
+            @Override
+            public int compare(CauseData lhs, CauseData rhs) {
+                if (lhs.getId() == lastSelectedCauseId){
+                    return -1;
+                }else if (rhs.getId() == lastSelectedCauseId){
+                    return 1;
+                } else {
+                    return lhs.getOrderPriority() - rhs.getOrderPriority();
+                }
+            }
+        });
     }
 
 
