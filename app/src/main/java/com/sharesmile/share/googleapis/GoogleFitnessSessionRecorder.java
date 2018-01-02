@@ -181,9 +181,6 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 + ", CALORIES : " + resultToBeUpdated.getEstimatedCalories();
         Logger.d(TAG, update);
 
-        // TODO: POC Need to remove this hack
-        MainApplication.showToast(update);
-
     }
 
     private void readBatchSynchronously(Batch batch, final WorkoutData result){

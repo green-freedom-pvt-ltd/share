@@ -206,8 +206,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // TODO: POC Need to remove this hack
-        float distanceInMeters = mWorkoutData.getGoogleFitDistance();
+        float distanceInMeters = mWorkoutData.getDistance();
         float elapsedTimeInSecs = mWorkoutData.getElapsedTime();
 
         Logger.d(TAG, "Elapsed Time in secs is " + elapsedTimeInSecs);
@@ -247,8 +246,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     private void initCaloriesContainer(){
         if (MainApplication.getInstance().getBodyWeight() > 0){
-            // TODO: POC Need to remove this hack
-            int calories = mWorkoutData.getGoogleFitSteps();
+            double calories = mWorkoutData.getCalories().getCalories();
             caloriesNotAvailableContainer.setVisibility(View.GONE);
             caloriesAvailableContainer.setVisibility(View.VISIBLE);
             caloriesBurned.setText(String.valueOf(Math.round(calories)));

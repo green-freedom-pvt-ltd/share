@@ -293,8 +293,7 @@ public class RunTracker implements Tracker {
         float deltaTime = dataStore.getRecordedTime() - recordedTimeBeforeDiscard; // in secs
         float deltaSpeed = (deltaDistance / deltaTime) * 3.6f; // in km/hrs
         double deltaCalories = dataStore.getCalories().getCalories() - caloriesBeforeDiscard;
-        // TODO: POC Need to remove this hack
-        listener.updateWorkoutRecord(dataStore.getGoogleFitDistance(), dataStore.getAvgSpeed(),
+        listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
                 deltaDistance, Math.round(deltaTime), deltaSpeed, deltaCalories);
         return deltaDistance;
     }
@@ -405,8 +404,7 @@ public class RunTracker implements Tracker {
                     int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs
                     float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs
                     double deltaCalories = dataStore.getCalories().getCalories() - prevCalories;
-                    // TODO: POC Need to remove this hack
-                    listener.updateWorkoutRecord(dataStore.getGoogleFitDistance(), dataStore.getAvgSpeed(),
+                    listener.updateWorkoutRecord(dataStore.getTotalDistance(), dataStore.getAvgSpeed(),
                             deltaDistance, deltaTime, deltaSpeed, deltaCalories);
                 }
             }

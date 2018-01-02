@@ -409,16 +409,14 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		if (!isPaused()){
 			workoutPause(null);
 		}
-		distance = 2000;
 		setElapsedTime();
 		setRecordedTime();
 		int secs = Math.round(getRecordedTime());
 		float acceptableAvgSpeed = (float) ClientConfig.getInstance().getAcceptableAverageSpeed(secs);
 		Logger.d(TAG, "close, recordedTime = " + getRecordedTime() + ", avgSpeed = " + getAvgSpeed()
 				+ ", acceptableAvgSpeed = " + acceptableAvgSpeed);
-		// TODO: POC Need to remove this hack
-		if (true){
-//		if (getAvgSpeed() > acceptableAvgSpeed){
+
+		if (getAvgSpeed() > acceptableAvgSpeed){
 			// If average speed after the workout is above the acceptable value then we
 			// say that the workout is suspicious and auto flag the workout
 			Logger.d(TAG, "close: AutoFlagging workout since avg speed (" +getAvgSpeed()
