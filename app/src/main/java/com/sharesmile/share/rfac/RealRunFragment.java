@@ -218,10 +218,6 @@ public class RealRunFragment extends RunFragment {
 
     private void setCaloriesInTextView(){
         if (WorkoutSingleton.getInstance().getDataStore() != null){
-//            // TODO: This is just temporary to test number of steps with new estimated_steps stream
-//            int numSteps = WorkoutSingleton.getInstance().getDataStore().getTotalSteps();
-//            tvCalorieMets.setText(String.valueOf(numSteps));
-
             Calorie calorie = WorkoutSingleton.getInstance().getDataStore().getCalories();
             if (calorie != null){
                 String caloriesString = "";

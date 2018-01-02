@@ -180,7 +180,6 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 + ", STEPS : " + resultToBeUpdated.getEstimatedSteps()
                 + ", CALORIES : " + resultToBeUpdated.getEstimatedCalories();
         Logger.d(TAG, update);
-//        MainApplication.showToast(update);
 
     }
 

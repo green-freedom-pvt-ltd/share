@@ -29,7 +29,7 @@ public final class TTS extends UtteranceProgressListener {
     private final AudioManager.OnAudioFocusChangeListener afl = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            // TODO React to audio-focus changes here!
+
         }
     };
 

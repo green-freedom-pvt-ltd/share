@@ -415,6 +415,7 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 		float acceptableAvgSpeed = (float) ClientConfig.getInstance().getAcceptableAverageSpeed(secs);
 		Logger.d(TAG, "close, recordedTime = " + getRecordedTime() + ", avgSpeed = " + getAvgSpeed()
 				+ ", acceptableAvgSpeed = " + acceptableAvgSpeed);
+
 		if (getAvgSpeed() > acceptableAvgSpeed){
 			// If average speed after the workout is above the acceptable value then we
 			// say that the workout is suspicious and auto flag the workout

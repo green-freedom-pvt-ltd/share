@@ -971,7 +971,10 @@ public class WorkoutService extends Service implements
     }
 
     private NotificationCompat.Builder getForegroundNotificationBuilder() {
+
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), getTotalDistanceCoveredInMeters());
+        String amountString = UnitsManager.formatRupeeToMyCurrency(rupees);
+
         String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeDrawable;
         if (tracker.isRunning()){
@@ -993,7 +996,7 @@ public class WorkoutService extends Service implements
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle(contentTitle)
-                        .setContentText(UnitsManager.formatRupeeToMyCurrency(rupees)
+                        .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
                                         ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
                                         : "")
