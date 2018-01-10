@@ -127,7 +127,8 @@ public class DistRecord implements UnObfuscable, Serializable{
 
         float strideLengthInInterval = distInInterval / stepsInInterval;
 
-        Logger.d(TAG, "normaliseStepCountWrtStepCount: strideLengthInInterval = " + strideLengthInInterval);
+        Logger.d(TAG, "normaliseStepCountWrtStepCount: strideLengthInInterval = " + strideLengthInInterval
+                + ", strideLengthSoFarInWorkout = " + strideLengthSoFarInWorkout);
         if (strideLengthInInterval < ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT){
             // Stride length in this interval is too low, that means less distance is being recorded
             // We need to normalise it with the strideLength recorded so far in the workout

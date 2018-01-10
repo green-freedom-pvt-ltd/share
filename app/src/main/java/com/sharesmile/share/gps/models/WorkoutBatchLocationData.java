@@ -30,14 +30,6 @@ public class WorkoutBatchLocationData implements UnObfuscable, Serializable {
     @SerializedName("was_in_vehicle")
     private boolean wasInVehicle;
 
-    public boolean isWasInVehicle() {
-        return wasInVehicle;
-    }
-
-    public void setWasInVehicle(boolean wasInVehicle) {
-        this.wasInVehicle = wasInVehicle;
-    }
-
     @SerializedName("location_array")
     private List<WorkoutPoint> locationArray;
 
@@ -79,6 +71,14 @@ public class WorkoutBatchLocationData implements UnObfuscable, Serializable {
 
     public void setEndTimeEpoch(long endTimeEpoch) {
         this.endTimeEpoch = endTimeEpoch;
+    }
+
+    public boolean isWasInVehicle() {
+        return wasInVehicle;
+    }
+
+    public void setWasInVehicle(boolean wasInVehicle) {
+        this.wasInVehicle = wasInVehicle;
     }
 
     public List<WorkoutPoint> getLocationArray() {
