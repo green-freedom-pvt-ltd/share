@@ -137,7 +137,6 @@ public class DistRecord implements UnObfuscable, Serializable{
             speed = (getElapsedTimeMs() == 0) ? 0 : ((dist * 1000) / getElapsedTimeMs());
             String message = "Normalised distance from " + distInInterval + " to " + dist;
             Logger.d(TAG, message);
-//            MainApplication.showToast(message);
         }
     }
 

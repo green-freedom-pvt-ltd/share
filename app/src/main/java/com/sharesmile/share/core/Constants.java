@@ -222,6 +222,8 @@ public class Constants {
     public final static String USER_PROP_LEAGUE_NAME="LeagueName";
     public final static String USER_PROP_LEAGUE_TEAM_NAME="LeagueTeamName";
 
+    public static final String FEED_WEBVIEW_DEFAULT_URL = "http://blog.impactapp.in/";
+
 
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";

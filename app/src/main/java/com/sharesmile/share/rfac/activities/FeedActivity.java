@@ -1,5 +1,7 @@
 package com.sharesmile.share.rfac.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -8,6 +10,8 @@ import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.ToolbarActivity;
 import com.sharesmile.share.rfac.fragments.FeedFragment;
 import com.sharesmile.share.utils.Logger;
+
+import static com.sharesmile.share.core.Constants.FEED_WEBVIEW_DEFAULT_URL;
 
 /**
  * Created by ankitmaheshwari on 1/10/18.
@@ -21,13 +25,16 @@ public class FeedActivity extends ToolbarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            loadInitialFragment();
+
+        if (isDeepLink()){
+            handleDeeplink();
+        }else{
+            loadInitialFragment(FEED_WEBVIEW_DEFAULT_URL);
         }
     }
 
-    public void loadInitialFragment() {
-        addFragment(FeedFragment.newInstance(), false);
+    public void loadInitialFragment(String webViewUrl) {
+        addFragment(FeedFragment.newInstance(webViewUrl), false);
     }
 
     @Override
@@ -58,5 +65,21 @@ public class FeedActivity extends ToolbarActivity {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_feed;
+    }
+
+    private void handleDeeplink(){
+        Logger.d(TAG, "Coming from Deeplink, url: " + getIntent().getData().toString());
+        loadInitialFragment(getIntent().getData().toString());
+    }
+
+    public boolean isDeepLink(){
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        Uri data = intent.getData();
+
+        if (Intent.ACTION_VIEW.equals(action) && data != null){
+            return true;
+        }
+        return false;
     }
 }

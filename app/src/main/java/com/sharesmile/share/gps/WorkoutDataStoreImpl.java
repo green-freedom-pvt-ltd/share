@@ -36,7 +36,7 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     private WorkoutData dirtyWorkoutData;
     private WorkoutData approvedWorkoutData;
     private int numStepsWhenBatchBegan;
-    private int numStepsAtPreviousRecord;
+//    private int numStepsAtPreviousRecord;
 
     private List<Long> usainBoltOcurredTimeStamps;
 
@@ -52,7 +52,6 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
             approvedWorkoutData.setCalories(new Calorie(0,0));
         }
         numStepsWhenBatchBegan = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_WHEN_BATCH_BEGIN);
-        numStepsAtPreviousRecord = SharedPrefsManager.getInstance().getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_AT_PREVIOUS_RECORD);
         usainBoltOcurredTimeStamps = SharedPrefsManager.getInstance().getCollection(Constants.PREF_USAIN_BOLT_OCURRED_TIME_STAMPS,
                 new TypeToken<ArrayList<Long>>(){}.getType());
     }
@@ -133,6 +132,8 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
 
         Logger.d(TAG, "addRecord: adding record to ApprovalQueue: " + record.toString());
 
+        int numStepsAtPreviousRecord = SharedPrefsManager.getInstance()
+                .getInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_AT_PREVIOUS_RECORD);
         record.normaliseStepCountWrtStepCount(getTotalSteps(), numStepsAtPreviousRecord,
                 getTotalDistance());
 
@@ -208,10 +209,9 @@ public class WorkoutDataStoreImpl implements WorkoutDataStore{
     }
 
     private void setNumStepsAtPreviousRecord(){
-        numStepsAtPreviousRecord = getTotalSteps();
         // Persist the number of steps
         SharedPrefsManager.getInstance().setInt(Constants.PREF_WORKOUT_DATA_NUM_STEPS_AT_PREVIOUS_RECORD,
-                        numStepsAtPreviousRecord);
+                getTotalSteps());
     }
 
     @Override

@@ -24,10 +24,13 @@ public class FeedFragment extends BaseFragment {
     @BindView(R.id.wv_main)
     WebView webview;
 
-    public static FeedFragment newInstance() {
+    public static final String KEY_URL = "key_url";
 
+    private String url;
+
+    public static FeedFragment newInstance(String url) {
         Bundle args = new Bundle();
-
+        args.putString(KEY_URL, url);
         FeedFragment fragment = new FeedFragment();
         fragment.setArguments(args);
         return fragment;
@@ -38,14 +41,19 @@ public class FeedFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feed, null);
         ButterKnife.bind(this, view);
+        url = getArguments().getString(KEY_URL);
         init();
         return view;
     }
 
     private void init(){
-        webview.getSettings().setJavaScriptEnabled(true); // enable javascript
-        webview.loadUrl("http://blog.impactapp.in/");
+        setupWebView();
         getFragmentController().updateToolBar(getString(R.string.title_feed), true);
+    }
+
+    private void setupWebView(){
+        webview.getSettings().setJavaScriptEnabled(true); // enable javascript
+        webview.loadUrl(url);
     }
 
 

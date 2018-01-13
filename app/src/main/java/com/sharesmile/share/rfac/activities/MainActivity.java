@@ -196,6 +196,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     } else {
                         showLeaderBoard();
                     }
+                }else if (screen.equals(NotificationConsts.Screen.IMPACT_LEAGUE)){
+                    if (!MainApplication.isLogin()) {
+                        showLoginActivity();
+                    } else {
+                        showImpactLeague();
+                    }
                 }
             }
         }
@@ -298,10 +304,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         replaceFragment(SettingsFragment.newInstance(true), true);
     }
 
-    private void showLeagueBoard(){
-        LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
-        replaceFragment(leageBoardFragment , true);
-    }
+
 
     @Override
     public int getFrameLayoutId() {
@@ -409,11 +412,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             AnalyticsEvent.create(Event.ON_SELECT_LEADERBOARD_MENU)
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_impact_league) {
-            if (LeaderBoardDataStore.getInstance().toShowLeague()){
-                showLeagueBoard();
-            }else {
-                performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
-            }
+            showImpactLeague();
             AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_NAVIGATION_MENU)
                     .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
                     .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
@@ -423,6 +422,15 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         mDrawerLayout.closeDrawers();
 
         return false;
+    }
+
+    private void showImpactLeague(){
+        if (LeaderBoardDataStore.getInstance().toShowLeague()){
+            LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
+            replaceFragment(leageBoardFragment , true);
+        }else {
+            performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
+        }
     }
 
     private void showLeaderBoard() {
