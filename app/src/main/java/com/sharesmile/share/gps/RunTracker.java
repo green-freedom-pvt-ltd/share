@@ -400,7 +400,7 @@ public class RunTracker implements Tracker {
                     }
                     persistPrevDistRecord(record);
                     // Change delta_distance
-                    float deltaDistance = dist; // in meters
+                    float deltaDistance = record.getDist(); // in meters
                     int deltaTime = Math.round( record.getInterval() / 1000f ); // in secs
                     float deltaSpeed = record.getSpeed() * 3.6f; // in km/hrs
                     double deltaCalories = dataStore.getCalories().getCalories() - prevCalories;

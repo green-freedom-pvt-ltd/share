@@ -320,7 +320,8 @@ public class SyncService extends GcmTaskService {
                     workout.setWorkoutId(UUID.randomUUID().toString());
                     workout.setIs_sync(false);
                 }else {
-                    // Existing run, lets take the appropriate value for setShouldSyncLocationData from the storedWorkout
+                    // Existing run, lets take the appropriate value for setShouldSyncLocationData
+                    // from the storedWorkout
                     Workout storedWorkout = mWorkoutDao.queryBuilder()
                             .where(WorkoutDao.Properties.WorkoutId.eq(workout.getWorkoutId()))
                             .unique();

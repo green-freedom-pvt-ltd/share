@@ -198,7 +198,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
-                .bucketByTime(1, TimeUnit.MINUTES)
+                .bucketByTime(5, TimeUnit.MINUTES)
                 .setTimeRange(batch.getStartTs(), batch.getEndTs(), TimeUnit.MILLISECONDS)
                 .build();
 
@@ -263,6 +263,7 @@ public class GoogleFitnessSessionRecorder implements  GoogleApiHelper.Listener, 
             result.addEstimatedCalories(aggregateMap.get(CALORIES));
 
         } else if (dataReadResult.getDataSets().size() > 0) {
+            // This piece of code is just for logging purpose
             Logger.d(TAG, "Datasets in result : dataSet.size(): " + dataReadResult.getDataSets().size());
             for (DataSet dataSet : dataReadResult.getDataSets()) {
                 Logger.d(TAG, "\ndataType: " + dataSet.getDataType().getName());

@@ -174,6 +174,23 @@ public class WorkoutService extends Service implements
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
+    private void updateGoogleFitDetailsInSyncedWorkoutAndStartSync(WorkoutData data){
+        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        Workout storedWorkout = mWorkoutDao.queryBuilder()
+                .where(WorkoutDao.Properties.WorkoutId.eq(data.getWorkoutId()))
+                .unique();
+
+        storedWorkout.setEstimatedSteps(data.getEstimatedSteps());
+        storedWorkout.setEstimatedDistance((double)data.getEstimatedDistance());
+        storedWorkout.setEstimatedCalories((double)data.getEstimatedCalories());
+
+        mWorkoutDao.insertOrReplace(storedWorkout);
+        String key = Utils.getWorkoutLocationDataPendingQueuePrefKey(storedWorkout.getWorkoutId());
+        SharedPrefsManager.getInstance().setObject(key, data);
+
+        SyncService.pushWorkoutDataWithBackoff();
+    }
+
     private void persistWorkoutInDb(WorkoutData data){
 
         WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
@@ -211,21 +228,13 @@ public class WorkoutService extends Service implements
         workout.setDeviceId(Utils.getUniqueId(getContext()));
         workout.setDeviceName(Utils.getDeviceName());
         workout.setShouldSyncLocationData(true);
-
-        workout.setEstimatedSteps(data.getEstimatedSteps());
-        workout.setEstimatedDistance((double)data.getEstimatedDistance());
-        workout.setEstimatedCalories((double)data.getEstimatedCalories());
+        workout.setUsainBoltCount(data.getUsainBoltCount());
         workout.setGoogleFitStepCount(data.getGoogleFitSteps());
         workout.setGoogleFitDistance((double)data.getGoogleFitDistance());
-        workout.setUsainBoltCount(data.getUsainBoltCount());
-
 
         workoutDao.insertOrReplace(workout);
-        String key = Utils.getWorkoutLocationDataPendingQueuePrefKey(workout.getWorkoutId());
-        SharedPrefsManager.getInstance().setObject(key, data);
 
         Utils.updateTrackRecordFromDb();
-        SyncService.pushWorkoutDataWithBackoff();
     }
 
     @Override
@@ -289,12 +298,28 @@ public class WorkoutService extends Service implements
                 sendWorkoutResultBroadcast(result);
                 // Do not perform activity detection until the next 24 hours, unless user starts workout
                 ActivityDetector.getInstance().stopActivityDetection();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        readGoogleFitHistoryAndPersistWorkoutData(result.copy());
+
+                // Persist run only when distance is more than 100m
+                //      & MockLocation is not enabled
+                if (result.getDistance() >= mCauseData.getMinDistance()
+                        && !result.isMockLocationDetected()) {
+                    persistWorkoutInDb(result);
+                    // Start background thread to read estimated data from GoogleFit.
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            readGoogleFitHistoryAndUpdateWorkout(result.copy());
+                        }
+                    }).start();
+                }else {
+                    // Delete the files in which location data of all the batches of this workout was stored
+                    for (int i=0; i< result.getBatches().size(); i++) {
+                        WorkoutBatch batch = result.getBatches().get(i);
+                        if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+                            Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
+                        }
                     }
-                }).start();
+                }
             }
 
             stopTimer();
@@ -311,23 +336,13 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void readGoogleFitHistoryAndPersistWorkoutData(WorkoutData result){
+    private void readGoogleFitHistoryAndUpdateWorkout(WorkoutData result){
+        // Synchronously read estimated data and update the WorkoutData result object
         googleFitTracker.readAndStop(result);
-        // Persist run only when distance is more than 100m
-        //      & MockLocation is not enabled
-        if (result.getDistance() >= mCauseData.getMinDistance()
-                && !result.isMockLocationDetected()) {
-            persistWorkoutInDb(result);
-        }else {
-            // Delete the files in which location data of all the batches of this workout was stored
-            for (int i=0; i< result.getBatches().size(); i++) {
-                WorkoutBatch batch = result.getBatches().get(i);
-                if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
-                    Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
-                }
-            }
-        }
 
+        updateGoogleFitDetailsInSyncedWorkoutAndStartSync(result);
+
+        // We send the Workout complete event only after we have the estimated data with us
         AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
                 .addBundle(result.getWorkoutBundle())
                 .put("cause_id", mCauseData.getId())
