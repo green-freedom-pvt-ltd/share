@@ -217,7 +217,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
             case R.id.bt_home_feed:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
-                AnalyticsEvent.create(Event.ON_CLICK_FEED).buildAndDispatch();
+                AnalyticsEvent.create(Event.ON_CLICK_FEED)
+                        .put("source", "feed_icon_home_screen")
+                        .buildAndDispatch();
                 break;
             case R.id.bt_home_drawer:
                 getFragmentController().performOperation(IFragmentController.OPEN_DRAWER, null);

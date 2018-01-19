@@ -33,6 +33,11 @@
         android:title="@string/title_about_us" />
 
     <item
+        android:id="@+id/nav_item_feed"
+        android:icon="@drawable/svg_ic_group_black"
+        android:title="@string/title_feed" />
+
+    <item
         android:id="@+id/nav_item_help"
         android:icon="@drawable/svg_ic_help_black"
         android:title="@string/help_center" />

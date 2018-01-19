@@ -398,7 +398,13 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_login) {
             showLoginActivity();
-        } else if (menuItem.getItemId() == R.id.nav_item_help) {
+        } else if (menuItem.getItemId() == R.id.nav_item_feed){
+            showMessageCenter();
+            AnalyticsEvent.create(Event.ON_CLICK_FEED)
+                    .put("source", "navigation_drawer")
+                    .buildAndDispatch();
+        }
+        else if (menuItem.getItemId() == R.id.nav_item_help) {
             performOperation(OPEN_HELP_CENTER,false);
             AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
                     .buildAndDispatch();

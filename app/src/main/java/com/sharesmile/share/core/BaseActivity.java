@@ -418,7 +418,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
     public void showMessageCenter() {
-
         Logger.d(TAG, "showFeedActivity: Will start FeedActivity");
         Intent intent = new Intent(this, FeedActivity.class);
         startActivity(intent);
