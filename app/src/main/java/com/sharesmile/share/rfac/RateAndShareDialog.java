@@ -27,8 +27,11 @@ public class RateAndShareDialog extends BaseDialog {
     @BindView(R.id.btn_share_the_app)
     View shareAppButton;
 
-    public RateAndShareDialog(Context context, int theme){
+    boolean showRateButton;
+
+    public RateAndShareDialog(Context context, int theme, boolean showRateButton){
         super(context, theme);
+        this.showRateButton = showRateButton;
     }
 
     @Override
@@ -39,6 +42,11 @@ public class RateAndShareDialog extends BaseDialog {
         ButterKnife.bind(this);
         setCanceledOnTouchOutside(true);
         setCancelable(true);
+        if (showRateButton){
+            rateUsButton.setVisibility(View.VISIBLE);
+        }else {
+            rateUsButton.setVisibility(View.GONE);
+        }
     }
 
     @OnClick(R.id.btn_rate_us_5)

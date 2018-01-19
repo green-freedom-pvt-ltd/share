@@ -1,6 +1,8 @@
 package com.sharesmile.share.rfac.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,11 +79,33 @@ public abstract class BaseLeagueFragment extends BaseLeaderBoardFragment {
                 getFragmentController().performOperation(OPEN_HELP_CENTER,false);
                 return true;
             case R.id.menu_exit:
-                LeaderBoardDataStore.getInstance().exitLeague();
-                showProgressDialog();
+                showExitLeagueConfirmationDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showExitLeagueConfirmationDialog() {
+        if (isAttachedToActivity() && !getActivity().isFinishing()){
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setTitle(getString(R.string.exit_league_title));
+            String leagueName = LeaderBoardDataStore.getInstance().getLeagueName() == null
+                    ? "League" : LeaderBoardDataStore.getInstance().getLeagueName();
+            alertDialog.setMessage(getString(R.string.exit_league_message, leagueName));
+            alertDialog.setPositiveButton(getString(R.string.yes_sure), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    LeaderBoardDataStore.getInstance().exitLeague();
+                    showProgressDialog();
+                }
+            });
+
+            alertDialog.setNegativeButton(getString(R.string.not_now), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog.show();
         }
     }
 

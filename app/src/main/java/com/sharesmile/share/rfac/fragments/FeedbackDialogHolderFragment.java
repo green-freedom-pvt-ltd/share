@@ -6,12 +6,14 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
 import com.sharesmile.share.rfac.RateAndShareDialog;
 import com.sharesmile.share.rfac.models.TellYourFriendsDialog;
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import base.BaseDialog;
@@ -119,7 +121,8 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
     }
 
     protected void showRateAndShareDialog(final WorkoutData workoutData){
-        feedbackDialog = new RateAndShareDialog(getActivity(), R.style.BackgroundDimDialog);
+        boolean isRated = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_DID_USER_RATE_APP, false);
+        feedbackDialog = new RateAndShareDialog(getActivity(), R.style.BackgroundDimDialog, !isRated);
         feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -140,6 +143,7 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 // User chose to Rate
                 if (isAttachedToActivity()){
                     Utils.redirectToPlayStore(getContext());
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_DID_USER_RATE_APP, true);
                     dialog.dismiss();
                     AnalyticsEvent.create(Event.ON_CLICK_RATE_US_AFTER_FEEDBACK)
                             .addBundle(workoutData.getWorkoutBundle())

@@ -224,6 +224,8 @@ public class Constants {
 
     public static final String FEED_WEBVIEW_DEFAULT_URL = "http://blog.impactapp.in/";
 
+    public static final String PREF_DID_USER_RATE_APP = "pref_did_user_rate_app";
+
 
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";

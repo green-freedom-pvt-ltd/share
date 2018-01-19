@@ -211,24 +211,43 @@
             android:clipToPadding="false"
             android:paddingBottom="18dp">
 
-            <com.sharesmile.share.views.MRButton
+            <LinearLayout
                 android:id="@+id/btn_pause"
-                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
                 android:layout_height="46dp"
                 android:layout_weight="0.5"
                 android:layout_marginRight="10dp"
                 android:background="@drawable/rounded_rectangle_white"
-                android:text="@string/pause"
-                android:textColor="@color/black_50" />
+                android:gravity="center"
+                android:elevation="2dp">
 
-            <com.sharesmile.share.views.MRButton
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/iv_pause_resume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_play_arrow_black_50_24px"/>
+
+                <com.sharesmile.share.views.MSBTextView
+                    android:id="@+id/tv_pause_resume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pause"
+                    android:textColor="@color/black_50"
+                    android:textSize="16sp"
+                    android:layout_marginLeft="2dp"/>
+
+            </LinearLayout>
+
+            <com.sharesmile.share.views.MSBButton
                 android:id="@+id/btn_stop"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="46dp"
                 android:layout_weight="0.5"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/rounded_rectangle_blue"
-                android:text="@string/stop"
+                android:text="@string/finish"
+                android:textSize="16sp"
                 android:textColor="@color/white" />
 
         </LinearLayout>

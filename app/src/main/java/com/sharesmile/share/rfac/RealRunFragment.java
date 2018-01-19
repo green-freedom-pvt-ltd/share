@@ -3,7 +3,9 @@ package com.sharesmile.share.rfac;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,7 +45,7 @@ public class RealRunFragment extends RunFragment {
     TextView distanceTextView;
     TextView distanceUnitTextView;
     TextView impact;
-    Button pauseButton;
+    View pauseButton;
     Button stopButton;
 
     @BindView(R.id.img_sponsor_logo)
@@ -66,6 +68,12 @@ public class RealRunFragment extends RunFragment {
 
     @BindView(R.id.live_timer_container)
     View timerContainer;
+
+    @BindView(R.id.iv_pause_resume)
+    ImageView pauseResumeIcon;
+
+    @BindView(R.id.tv_pause_resume)
+    TextView pauseResumeTextView;
 
     private CauseData mCauseData;
 
@@ -92,9 +100,28 @@ public class RealRunFragment extends RunFragment {
         distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
         distanceUnitTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance_unit);
         impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
-        pauseButton = (Button) baseView.findViewById(R.id.btn_pause);
-        stopButton = (Button) baseView.findViewById(R.id.btn_stop);
+        pauseButton = baseView.findViewById(R.id.btn_pause);
+        stopButton = baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
+
+        pauseButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        v.setAlpha(0.5f);
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL: {
+                        v.setAlpha(1f);
+                        break;
+                    }
+                }
+                return false;
+            }
+        });
+
         stopButton.setOnClickListener(this);
         musicHookButton.setOnClickListener(this);
 
@@ -261,12 +288,24 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     protected void onPauseRun() {
-        pauseButton.setText(R.string.resume);
+        setPauseResumeButton(true);
     }
 
     @Override
     protected void onResumeRun() {
-        pauseButton.setText(R.string.pause);
+        setPauseResumeButton(false);
+    }
+
+    private void setPauseResumeButton(boolean paused){
+        if (paused){
+            pauseResumeTextView.setText(R.string.resume);
+            pauseResumeIcon.setImageResource(R.drawable.ic_play_arrow_black_50_24px);
+            impact.setTextColor(ContextCompat.getColor(getContext(), R.color.black_38));
+        }else {
+            pauseResumeTextView.setText(R.string.pause);
+            pauseResumeIcon.setImageResource(R.drawable.ic_pause_black_50_24px);
+            impact.setTextColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+        }
     }
 
     @Override
@@ -280,9 +319,9 @@ public class RealRunFragment extends RunFragment {
     protected void onContinuedRun(boolean isPaused) {
         Logger.d(TAG, "onContinuedRun , isPaused = " + isPaused);
         if (!isRunning()) {
-            pauseButton.setText(R.string.resume);
+            setPauseResumeButton(true);
         } else {
-            pauseButton.setText(R.string.pause);
+            setPauseResumeButton(false);
         }
 
         float distanceCovered = WorkoutSingleton.getInstance().getTotalDistanceInMeters(); // in meters
@@ -352,7 +391,7 @@ public class RealRunFragment extends RunFragment {
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
             alertDialog.setTitle(getString(R.string.finish_workout));
             alertDialog.setMessage(getString(R.string.finish_workout_message));
-            alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            alertDialog.setPositiveButton(getString(R.string.yes_sure), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (isAttachedToActivity()){
                         endRun(true);
@@ -360,7 +399,7 @@ public class RealRunFragment extends RunFragment {
                 }
             });
 
-            alertDialog.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(getString(R.string.not_now), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
@@ -379,14 +418,14 @@ public class RealRunFragment extends RunFragment {
             int minDistance = (int) (UnitsManager.isImperial() ? 3.28f*mCauseData.getMinDistance() : mCauseData.getMinDistance());
             String unit = UnitsManager.isImperial() ? "ft" : "m";
             alertDialog.setMessage(getString(R.string.dialog_msg_min_distance, minDistance, unit));
-            alertDialog.setPositiveButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(getString(R.string.dialog_positive_button_min_distance), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
 
                 }
             });
 
-            alertDialog.setNegativeButton(getString(R.string.dialog_negative_button_min_distance), new DialogInterface.OnClickListener() {
+            alertDialog.setPositiveButton(getString(R.string.dialog_negative_button_min_distance), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (isAttachedToActivity()) {
                         endRun(true);
@@ -422,7 +461,7 @@ public class RealRunFragment extends RunFragment {
 
                 }
             });
-            alertDialog.setNegativeButton(getString(R.string.stop), new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(getString(R.string.finish), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (isAttachedToActivity()){
                         endRun(true);
