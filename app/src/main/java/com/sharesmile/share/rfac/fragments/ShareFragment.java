@@ -3,6 +3,8 @@ package com.sharesmile.share.rfac.fragments;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -135,8 +137,8 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     @BindView(R.id.btn_share)
     View shareButton;
 
-    @BindView(R.id.tv_share_skip)
-    View shareSkipButton;
+    @BindView(R.id.btn_share_continue)
+    View shareContinueButton;
 
     // Sharable Content
 
@@ -213,11 +215,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), distanceInMeters);
 
-//        int height = (int) getResources().getDimension(R.dimen.semi_super_large_text);
-//        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
-//                new float[]{0, 1}, Shader.TileMode.CLAMP);
-//        impactInRupees.getPaint().setShader(textShader);
+        setGradientOnImpactAmount();
         impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
+        setGradientOnTitle();
 
         initCaloriesContainer();
         String distanceCovered = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceInMeters);
@@ -242,6 +242,20 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
             showPostRunFeedbackDialog(mWorkoutData);
         }
 
+    }
+
+    private void setGradientOnImpactAmount(){
+        int height = (int) getResources().getDimension(R.dimen.semi_super_large_text);
+        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
+                new float[]{0, 1}, Shader.TileMode.CLAMP);
+        impactInRupees.getPaint().setShader(textShader);
+    }
+
+    private void setGradientOnTitle(){
+        int height = (int) getResources().getDimension(R.dimen.semi_large_text);
+        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xfffad961,0xfff76b1c},
+                new float[]{0, 1}, Shader.TileMode.CLAMP);
+        shareScreenTitle.getPaint().setShader(textShader);
     }
 
     private void initCaloriesContainer(){
@@ -360,8 +374,8 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 //        }
     }
 
-    @OnClick(R.id.tv_share_skip)
-    public void onSkipClick(){
+    @OnClick(R.id.btn_share_continue)
+    public void onContinueClick(){
         openHomeActivityAndFinish();
     }
 

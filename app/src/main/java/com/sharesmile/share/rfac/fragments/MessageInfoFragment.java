@@ -25,7 +25,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Shine on 8/27/2016.
+ * This Fragment is not being used anymore
+ * @Deprecated
  */
 public class MessageInfoFragment extends BaseFragment implements View.OnClickListener {
 

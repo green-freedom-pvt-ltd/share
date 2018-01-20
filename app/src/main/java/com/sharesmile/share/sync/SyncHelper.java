@@ -2,37 +2,26 @@ package com.sharesmile.share.sync;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.gson.Gson;
-import com.sharesmile.share.Events.DBEvent;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gcm.SyncService;
 import com.sharesmile.share.gcm.TaskConstants;
-import com.sharesmile.share.network.NetworkDataProvider;
-import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.rfac.models.FraudData;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Urls;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
-
-import Models.CampaignList;
-import Models.MessageList;
 
 import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
@@ -118,43 +107,6 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
-    public static void syncMessageCenterData(Context context) {
-        SyncTaskManger.fetchMessageData(context);
-    }
-
-    public static boolean fetchMessage() {
-        MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
-        long messageCount = messageDao.queryBuilder().count();
-        String url = Urls.getMessageUrl();
-        return fetchMessages(url, messageCount);
-    }
-
-    private static boolean fetchMessages(String url, long prevMessagesCount) {
-
-        try {
-            MessageList messageList = NetworkDataProvider.doGetCall(url, MessageList.class);
-            if (messageList == null){
-                return false;
-            }
-            MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
-            messageDao.insertOrReplaceInTx(messageList);
-            if (prevMessagesCount < messageList.getTotalMessageCount()){
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, true);
-            }
-            Logger.d(TAG, "Feed Messages fetched successfully");
-            if (!TextUtils.isEmpty(messageList.getNextUrl())) {
-                return fetchMessages(messageList.getNextUrl(), prevMessagesCount);
-            }else {
-                EventBus.getDefault().post(new DBEvent.MessageDataUpdated());
-                return true;
-            }
-        } catch (NetworkException e) {
-            e.printStackTrace();
-            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
-            return false;
-        }
-    }
-
     public static void syncUserFromDB(){
         if (MainApplication.getInstance().getUserDetails() == null){
             int user_id = MainApplication.getInstance().getUserID();
@@ -180,37 +132,6 @@ public class SyncHelper {
                     MainApplication.getInstance().setUserDetails(details);
                 }
             }
-        }
-    }
-
-    public static void syncCampaignData(Context context) {
-        SyncTaskManger.startCampaign(context);
-    }
-
-
-    public static void fetchCampaign(Context context) {
-
-        CampaignList.Campaign campaign = null;
-        CampaignList.Campaign oldCampaign = SharedPrefsManager.getInstance().getObject(Constants.PREF_CAMPAIGN_DATA, CampaignList.Campaign.class);
-        try {
-            CampaignList campaignList = NetworkDataProvider.doGetCall(Urls.getCampaignUrl(), CampaignList.class);
-            if (campaignList.getTotalCount() > 0) {
-                SharedPrefsManager.getInstance().setObject(Constants.PREF_CAMPAIGN_DATA, campaignList.getCampaignList().get(0));
-                campaign = campaignList.getCampaignList().get(0);
-                if (oldCampaign != null && oldCampaign.getId() != campaign.getId()) {
-                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CAMPAIGN_SHOWN_ONCE, false);
-                }
-            } else {
-                SharedPrefsManager.getInstance().removeKey(Constants.PREF_CAMPAIGN_DATA);
-            }
-
-        } catch (NetworkException e) {
-            e.printStackTrace();
-            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
-            campaign = SharedPrefsManager.getInstance().getObject(Constants.PREF_CAMPAIGN_DATA, CampaignList.Campaign.class);
-        }
-        if (campaign != null) {
-            EventBus.getDefault().post(new DBEvent.CampaignDataUpdated(campaign));
         }
     }
 

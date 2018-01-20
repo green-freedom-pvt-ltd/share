@@ -99,8 +99,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         drawerButton.setOnClickListener(this);
         badge.setOnClickListener(this);
 
-        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
-        badgeIndictor.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
+        refreshFeedBadgeIndicator();
 
         int height = (int) getResources().getDimension(R.dimen.super_large_text);
         Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
@@ -110,6 +109,13 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         showProgressDialog();
         return view;
 
+    }
+
+    private void refreshFeedBadgeIndicator(){
+        boolean newFeedArticleAvailable = SharedPrefsManager.getInstance()
+                .getBoolean(Constants.PREF_NEW_FEED_ARTICLE_AVAILABLE, false);
+        Logger.d(TAG, "Setting feed indicator: " + newFeedArticleAvailable);
+        badgeIndictor.setVisibility(newFeedArticleAvailable ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -128,6 +134,12 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             // Trigger an update call
             CauseDataStore.getInstance().updateCauseData();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshFeedBadgeIndicator();
     }
 
     @Override

@@ -15,6 +15,7 @@ import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.MessageDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -57,11 +58,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import Models.CampaignList;
 import Models.FaqList;
+import Models.FeedLatestArticleResponse;
 import Models.LeagueBoard;
+import Models.MessageList;
 import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.LeaderBoardDataStore.ALL_INTERVALS;
+import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
 import static com.sharesmile.share.gcm.TaskConstants.PUSH_FRAUD_DATA;
 import static com.sharesmile.share.gcm.TaskConstants.PUSH_USER_FEEDBACK;
 import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
@@ -126,11 +131,98 @@ public class SyncService extends GcmTaskService {
         updateFaqs();
         uploadPendingWorkoutsData();
         syncWorkoutData();
+        syncFeed();
+        fetchCampaign();
 
         // Returning success as result does not matter
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
+    public static void fetchCampaign() {
+
+        CampaignList.Campaign campaign = null;
+        CampaignList.Campaign oldCampaign = SharedPrefsManager.getInstance().getObject(Constants.PREF_CAMPAIGN_DATA, CampaignList.Campaign.class);
+        try {
+            CampaignList campaignList = NetworkDataProvider.doGetCall(Urls.getCampaignUrl(), CampaignList.class);
+            if (campaignList.getTotalCount() > 0) {
+                SharedPrefsManager.getInstance().setObject(Constants.PREF_CAMPAIGN_DATA, campaignList.getCampaignList().get(0));
+                campaign = campaignList.getCampaignList().get(0);
+                if (oldCampaign != null && oldCampaign.getId() != campaign.getId()) {
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CAMPAIGN_SHOWN_ONCE, false);
+                }
+            } else {
+                SharedPrefsManager.getInstance().removeKey(Constants.PREF_CAMPAIGN_DATA);
+            }
+
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
+            campaign = SharedPrefsManager.getInstance().getObject(Constants.PREF_CAMPAIGN_DATA, CampaignList.Campaign.class);
+        }
+        if (campaign != null) {
+            EventBus.getDefault().post(new DBEvent.CampaignDataUpdated(campaign));
+        }
+    }
+
+    @Deprecated
+    public static boolean fetchMessage() {
+        MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
+        long messageCount = messageDao.queryBuilder().count();
+        String url = Urls.getMessageUrl();
+        return fetchMessages(url, messageCount);
+    }
+
+    @Deprecated
+    private static boolean fetchMessages(String url, long prevMessagesCount) {
+
+        try {
+            MessageList messageList = NetworkDataProvider.doGetCall(url, MessageList.class);
+            if (messageList == null){
+                return false;
+            }
+            MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
+            messageDao.insertOrReplaceInTx(messageList);
+            if (prevMessagesCount < messageList.getTotalMessageCount()){
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, true);
+            }
+            Logger.d(TAG, "Feed Messages fetched successfully");
+            if (!TextUtils.isEmpty(messageList.getNextUrl())) {
+                return fetchMessages(messageList.getNextUrl(), prevMessagesCount);
+            }else {
+                EventBus.getDefault().post(new DBEvent.MessageDataUpdated());
+                return true;
+            }
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean syncFeed(){
+        Logger.d(TAG, "syncFeed");
+        try {
+            FeedLatestArticleResponse response
+                    = NetworkDataProvider.doGetCall(Urls.getFeedLatestArticleUrl(), FeedLatestArticleResponse.class);
+            if (response == null){
+                return false;
+            }
+            long latestArtileCreationTsMillis = response.getCreationEpochSecs()*1000;
+
+            long feedLastSeenTs = SharedPrefsManager.getInstance().getLong(PREF_LAST_TIME_FEED_WAS_SEEN);
+
+            if (latestArtileCreationTsMillis > feedLastSeenTs){
+                Logger.d(TAG, "New feed article available");
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_NEW_FEED_ARTICLE_AVAILABLE, true);
+            }
+            return true;
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException while fetching latest article's creation time"
+                    + e.getMessageFromServer() + e.getMessage());
+            return false;
+        }
+    }
 
     public static int syncServerTime(){
         // Force sync servertime but do not retry on failure

@@ -1,5 +1,10 @@
 package com.sharesmile.share.utils;
 
+import android.net.Uri;
+import android.text.TextUtils;
+
+import java.util.List;
+
 /**
  * Created by Shine on 01/05/16.
  */
@@ -33,6 +38,9 @@ public class Urls {
     private static final String LEAGUEBOARD_URL = "/api/teamboardv2/";
     private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboardv2/";
     private static final String SERVER_TIME_URL = "/api/servertime/";
+
+    private static final String BLOG_BASE_URL = "http://blog.impactapp.in";
+    private static final String BLOG_LATEST_ARTICLE_URL = "/articles/latest";
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -137,5 +145,42 @@ public class Urls {
 
     public static String getTeamLeaderBoardUrl() {
         return getBaseUrl() + TEAMLEADERBOARD_URL;
+    }
+
+    public static String getFeedLatestArticleUrl(){
+        return BLOG_BASE_URL + BLOG_LATEST_ARTICLE_URL;
+    }
+
+    public static String getFeedUrl(){
+        return BLOG_BASE_URL;
+    }
+
+    public static boolean isFeedArticlesListUrl(String url){
+        if (TextUtils.isEmpty(url)){
+            return false;
+        }
+        final Uri uri = Uri.parse(url);
+        String host = uri.getHost();
+        if (Uri.parse(BLOG_BASE_URL).getHost().equals(host)){
+            String lastpathSegment = uri.getLastPathSegment();
+            return TextUtils.isEmpty(lastpathSegment) || "articles".equals(lastpathSegment);
+        }
+        return false;
+    }
+
+    public static boolean isFeedArticleDetailUrl(String url){
+        if (TextUtils.isEmpty(url)){
+            return false;
+        }
+        final Uri uri = Uri.parse(url);
+        String host = uri.getHost();
+        if (Uri.parse(BLOG_BASE_URL).getHost().equals(host)){
+            List<String> pathSegments = uri.getPathSegments();
+            int size = pathSegments.size();
+            if (size > 1){
+                return "articles".equals(pathSegments.get(size-2));
+            }
+        }
+        return false;
     }
 }

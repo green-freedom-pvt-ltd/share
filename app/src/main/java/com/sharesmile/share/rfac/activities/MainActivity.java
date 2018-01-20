@@ -55,7 +55,6 @@ import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
 import com.sharesmile.share.rfac.fragments.WebViewFragment;
-import com.sharesmile.share.sync.SyncHelper;
 import com.sharesmile.share.utils.CustomTypefaceSpan;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ShareImageLoader;
@@ -137,7 +136,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 mNavigationView.setNavigationItemSelectedListener(this);
                 updateNavigationMenu();
                 checkAppVersionAndShowUpdatePopupIfRequired();
-                SyncHelper.syncCampaignData(getApplicationContext());
                 handleNotificationIntent();
                 Analytics.getInstance().setUserProperties();
             }

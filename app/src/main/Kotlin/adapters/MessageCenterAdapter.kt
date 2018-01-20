@@ -49,7 +49,7 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
 
         public fun bindData(data: Message) {
 
-            itemView.date.text = DateUtil.getCustomFormattedDate(DateUtil.getDefaultFormattedDate(data.message_date, DateUtil.DEFAULT_DATE_FORMAT_DATE_ONLY), DateUtil.USER_FORMAT_DATE_DATE_ONLY);
+            itemView.date.text = DateUtil.getCustomFormattedDate(DateUtil.getFormattedDate(data.message_date, DateUtil.DEFAULT_DATE_FORMAT_DATE_ONLY), DateUtil.USER_FORMAT_DATE_DATE_ONLY);
             itemView.description.text = data.messageBrief
 
             ShareImageLoader.getInstance().loadImage(data.message_image, itemView.message_image,

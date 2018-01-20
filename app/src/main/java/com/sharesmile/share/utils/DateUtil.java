@@ -15,6 +15,7 @@ public class DateUtil {
     public static String USER_FORMAT_DATE = "dd-MMM-yyyy hh:mm a";
     public static String USER_FORMAT_DATE_DATE_ONLY = "dd-MMM-yyyy";
     public static String MILLISEC_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static String MILLISEC_DATE_FORMAT_TZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static String HH_MM_AMPM = "hh:mm a";
 
 
@@ -52,7 +53,7 @@ public class DateUtil {
     }
 
     public static Date getDefaultFormattedDate(String dateString) {
-        return getDefaultFormattedDate(dateString, DEFAULT_DATE_FORMAT);
+        return getFormattedDate(dateString, DEFAULT_DATE_FORMAT);
     }
 
     public static Date getDate(){
@@ -68,7 +69,7 @@ public class DateUtil {
         return serverTimeStamp + delta;
     }
 
-    public static Date getDefaultFormattedDate(String dateString, String format) {
+    public static Date getFormattedDate(String dateString, String format) {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         try {

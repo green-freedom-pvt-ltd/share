@@ -141,6 +141,7 @@ public class Constants {
     public static final String PREF_AUTH_TOKEN = "pref_auth_token";
     public static final String PREF_CAUSE_DATA = "perf_cause_data";
     public static final String PREF_UNREAD_MESSAGE = "perf_has_unread_message";
+    public static final String PREF_NEW_FEED_ARTICLE_AVAILABLE = "pref_new_feed_article_available";
     public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
     public static final String PREF_USER_DETAILS="pref_user_details";
@@ -225,7 +226,7 @@ public class Constants {
     public static final String FEED_WEBVIEW_DEFAULT_URL = "http://blog.impactapp.in/";
 
     public static final String PREF_DID_USER_RATE_APP = "pref_did_user_rate_app";
-
+    public static final String PREF_LAST_TIME_FEED_WAS_SEEN = "pref_last_time_feed_was_seen";
 
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
