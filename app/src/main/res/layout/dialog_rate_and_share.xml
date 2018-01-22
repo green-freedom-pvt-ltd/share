@@ -22,6 +22,7 @@
         android:gravity="center_horizontal">
 
         <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_rate_share_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
@@ -31,6 +32,7 @@
             android:textColor="@color/black_64"/>
 
         <com.sharesmile.share.views.MRTextView
+            android:id="@+id/tv_rate_share_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"

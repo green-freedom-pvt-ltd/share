@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.utils.Logger;
@@ -27,6 +28,12 @@ public class RateAndShareDialog extends BaseDialog {
     @BindView(R.id.btn_share_the_app)
     View shareAppButton;
 
+    @BindView(R.id.tv_rate_share_title)
+    TextView titleView;
+
+    @BindView(R.id.tv_rate_share_content)
+    TextView contentView;
+
     boolean showRateButton;
 
     public RateAndShareDialog(Context context, int theme, boolean showRateButton){
@@ -43,8 +50,12 @@ public class RateAndShareDialog extends BaseDialog {
         setCanceledOnTouchOutside(true);
         setCancelable(true);
         if (showRateButton){
+            titleView.setText(getContext().getString(R.string.awesome));
+            contentView.setText(getContext().getString(R.string.spread_love_message));
             rateUsButton.setVisibility(View.VISIBLE);
         }else {
+            titleView.setText(getContext().getString(R.string.share_impact));
+            contentView.setText(getContext().getString(R.string.more_fun_with_friends));
             rateUsButton.setVisibility(View.GONE);
         }
     }
