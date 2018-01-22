@@ -18,6 +18,7 @@ import com.sharesmile.share.R
 import com.sharesmile.share.core.BaseFragment
 import com.sharesmile.share.core.Constants
 import com.sharesmile.share.rfac.fragments.MessageInfoFragment
+import com.sharesmile.share.sync.SyncHelper
 import com.sharesmile.share.utils.SharedPrefsManager
 import com.sharesmile.share.utils.Utils
 import kotlinx.android.synthetic.main.fragment_message_center.*
@@ -27,7 +28,6 @@ import org.greenrobot.eventbus.ThreadMode
 
 /**
  * This Fragment is not being used anymore
- * @Deprecated
  */
 class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterface {
 
@@ -50,8 +50,8 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
         recycler_view.adapter = mAdapter;
         recycler_view.setHasFixedSize(true);
         fragmentController.updateToolBar(getString(R.string.title_messages), true);
-        // Messages have been deprecated, so there is no sync anymore
-//        SyncHelper.syncMessageCenterData(context)
+        // Rolling back to old feed
+        SyncHelper.syncMessageCenterData()
         fetchMessageDataFromDb()
     }
 

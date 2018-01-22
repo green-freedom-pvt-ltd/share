@@ -26,7 +26,6 @@ import butterknife.ButterKnife;
 
 /**
  * This Fragment is not being used anymore
- * @Deprecated
  */
 public class MessageInfoFragment extends BaseFragment implements View.OnClickListener {
 

@@ -112,10 +112,15 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     }
 
     private void refreshFeedBadgeIndicator(){
-        boolean newFeedArticleAvailable = SharedPrefsManager.getInstance()
-                .getBoolean(Constants.PREF_NEW_FEED_ARTICLE_AVAILABLE, false);
-        Logger.d(TAG, "Setting feed indicator: " + newFeedArticleAvailable);
-        badgeIndictor.setVisibility(newFeedArticleAvailable ? View.VISIBLE : View.GONE);
+
+        // Rolling back to old feed
+        boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
+        badgeIndictor.setVisibility(hasUnreadMessage ? View.VISIBLE : View.GONE);
+
+//        boolean newFeedArticleAvailable = SharedPrefsManager.getInstance()
+//                .getBoolean(Constants.PREF_NEW_FEED_ARTICLE_AVAILABLE, false);
+//        Logger.d(TAG, "Setting feed indicator: " + newFeedArticleAvailable);
+//        badgeIndictor.setVisibility(newFeedArticleAvailable ? View.VISIBLE : View.GONE);
     }
 
     @Override

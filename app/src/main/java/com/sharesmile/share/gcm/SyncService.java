@@ -131,7 +131,9 @@ public class SyncService extends GcmTaskService {
         updateFaqs();
         uploadPendingWorkoutsData();
         syncWorkoutData();
-        syncFeed();
+        // Rolling back to old feed
+//        syncFeed();
+        fetchMessage();
         fetchCampaign();
 
         // Returning success as result does not matter
@@ -164,15 +166,14 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    @Deprecated
     public static boolean fetchMessage() {
+        Logger.d(TAG, "fetchMessage");
         MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
         long messageCount = messageDao.queryBuilder().count();
         String url = Urls.getMessageUrl();
         return fetchMessages(url, messageCount);
     }
 
-    @Deprecated
     private static boolean fetchMessages(String url, long prevMessagesCount) {
 
         try {

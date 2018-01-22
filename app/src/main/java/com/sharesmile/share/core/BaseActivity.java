@@ -28,7 +28,6 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TrackerActivity;
 import com.sharesmile.share.gps.location.GoogleLocationTracker;
-import com.sharesmile.share.rfac.activities.FeedActivity;
 import com.sharesmile.share.rfac.activities.FeedbackActivity;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
@@ -38,6 +37,7 @@ import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 
 import activities.ImpactLeagueActivity;
+import fragments.MessageCenterFragment;
 
 import static com.sharesmile.share.core.Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION;
 
@@ -418,9 +418,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
     public void showMessageCenter() {
-        Logger.d(TAG, "showFeedActivity: Will start FeedActivity");
-        Intent intent = new Intent(this, FeedActivity.class);
-        startActivity(intent);
+        // Rolling back to old feed
+        replaceFragment(new MessageCenterFragment(), true);
+
+//        Logger.d(TAG, "showFeedActivity: Will start FeedActivity");
+//        Intent intent = new Intent(this, FeedActivity.class);
+//        startActivity(intent);
     }
 
     @Override

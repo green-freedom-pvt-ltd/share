@@ -1,6 +1,7 @@
 package com.sharesmile.share.sync;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -148,4 +149,12 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
+    public static void syncMessageCenterData() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                SyncService.fetchMessage();
+            }
+        });
+    }
 }
