@@ -2,8 +2,17 @@ package fragments
 
 import Models.LeagueTeam
 import android.app.Activity
+import android.graphics.Color
+import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +51,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view?.findViewById<Button>(R.id.submit_btn)?.setOnClickListener(this);
+        prepareTextView()
     }
 
     override fun onClick(v: View?) {
@@ -125,6 +135,34 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         activity.setResult(Activity.RESULT_OK)
         activity.finish()
 
+    }
+
+    private fun prepareTextView(){
+        val ss = SpannableString(context.getString(R.string.impact_league_description))
+        setTextSpan(ss, 25, 38, "http://il.impactrun.com/")
+        setTextSpan(ss, 226, 249, "mailto:contact@impactrun.com")
+        val textView = view!!.tv_impact_league_description
+        textView.text = ss
+        textView.movementMethod = LinkMovementMethod.getInstance()
+        textView.highlightColor = Color.TRANSPARENT
+    }
+
+    private fun setTextSpan(ss: SpannableString, startIndex: Int, endIndex: Int, url: String?){
+        val font = Typeface.createFromAsset(context.assets, "fonts/Lato-Bold.ttf")
+        ss.setSpan(CustomTypefaceSpan("", font), startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(textView: View) {
+                Utils.launchUri(context, Uri.parse(url))
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                val linkColor = ContextCompat.getColor(activity, R.color.bright_sky_blue)
+                ds.color = linkColor
+                ds.isUnderlineText = false
+            }
+        }
+        ss.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
     private fun invalidCode(error: NetworkException?) {

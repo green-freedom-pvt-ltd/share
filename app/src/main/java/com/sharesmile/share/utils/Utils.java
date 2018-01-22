@@ -1,6 +1,5 @@
 package com.sharesmile.share.utils;
 
-import Models.Level;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,12 +28,18 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.sharesmile.share.*;
+import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.Events.BodyWeightChangedEvent;
+import com.sharesmile.share.LeaderBoardDataStore;
+import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -48,17 +53,38 @@ import com.sharesmile.share.rfac.models.Run;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import static com.sharesmile.share.core.Constants.*;
+import Models.Level;
+
+import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
+import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
+import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
+import static com.sharesmile.share.core.Constants.USER_PROP_AVG_STRIDE_LENGTH;
+import static com.sharesmile.share.core.Constants.USER_PROP_LIFETIME_DISTANCE;
+import static com.sharesmile.share.core.Constants.USER_PROP_LIFETIME_STEPS;
+import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_AMT_RAISED;
+import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_CALORIES;
+import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_RUNS;
 
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
@@ -471,6 +497,15 @@ public class Utils {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
         } catch (android.content.ActivityNotFoundException e) {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+    public static void launchUri(Context context, Uri uri){
+        Logger.d(TAG, "Launching uri: " + uri.toString());
+        try {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (android.content.ActivityNotFoundException e) {
+            Logger.d(TAG, "Couldn't launchUri: " + uri.toString());
         }
     }
 
