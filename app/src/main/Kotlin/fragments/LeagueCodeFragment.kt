@@ -19,9 +19,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import base.BaseFragment2
 import com.google.gson.Gson
+import com.sharesmile.share.CauseDataStore
 import com.sharesmile.share.LeaderBoardDataStore
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
+import com.sharesmile.share.analytics.events.AnalyticsEvent
+import com.sharesmile.share.analytics.events.Event
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
@@ -85,7 +88,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
             override fun onNetworkFailure(ne: NetworkException?) {
                 if (fragmentListener != null){
                     fragmentListener.showActivityContent()
-                    invalidCode(ne)
+                    invalidCode(code, ne)
                 }
             }
 
@@ -94,13 +97,13 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
                     val gson = Gson()
                     Logger.d("LeagueCodeFragment", "LeagueTeam response: " + gson.toJson(leagueTeam))
                     fragmentListener.showActivityContent()
-                    getTeamDetails(leagueTeam!!, code)
+                    getTeamDetailsAndExit(leagueTeam!!, code)
                 }
             }
         })
     }
 
-    private fun getTeamDetails(leagueData: LeagueTeam, code: String) {
+    private fun getTeamDetailsAndExit(leagueData: LeagueTeam, code: String) {
         var location: ArrayList<String> = ArrayList<String>()
         var department: ArrayList<String> = ArrayList<String>()
 
@@ -131,6 +134,9 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
                 return
             }
         }
+        // Trigger an update call for causes
+        CauseDataStore.getInstance().updateCauseData()
+        
         // Pass success result to MainActivity and exit
         activity.setResult(Activity.RESULT_OK)
         activity.finish()
@@ -153,6 +159,13 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(textView: View) {
                 Utils.launchUri(context, Uri.parse(url))
+                if (startIndex == 25){
+                    AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_WEB_LINK)
+                            .buildAndDispatch()
+                }else if (startIndex == 226){
+                    AnalyticsEvent.create(Event.ON_CLICK_CONTACT_US_EMAIL_LINK)
+                            .buildAndDispatch()
+                }
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -165,14 +178,18 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         ss.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
-    private fun invalidCode(error: NetworkException?) {
-
+    private fun invalidCode(code: String, error: NetworkException?) {
+        var errorMessage = "Error, please try again"
         if (error?.httpStatusCode == 406) {
-            view!!.code_layout.error = "Sorry, the team is already full."
-
-        } else {
-            view!!.code_layout.error = "Sorry, that’s not the code."
+            errorMessage = "Sorry, the team is already full."
+        } else if (error?.httpStatusCode == 400) {
+            errorMessage = "Sorry, that’s not the code."
         }
+        view!!.code_layout.error = errorMessage
+        AnalyticsEvent.create(Event.ON_ERROR_ENTER_SECRET_CODE)
+                .put("secret_code", code)
+                .put("error", errorMessage)
+                .buildAndDispatch()
     }
 
     override fun screenTitle(): String {

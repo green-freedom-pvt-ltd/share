@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.CurrencyCode;
@@ -105,9 +107,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mTos.setOnClickListener(this);
         mRate.setOnClickListener(this);
         mLogout.setOnClickListener(this);
-        notifToggle.setOnCheckedChangeListener(this);
-        gpsSpeedUpdates.setOnCheckedChangeListener(this);
-        notifVoiceUpdates.setOnCheckedChangeListener(this);
         if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
             notifToggle.setChecked(false);
         }else {
@@ -142,6 +141,10 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                     .show();
         }
 
+        notifToggle.setOnCheckedChangeListener(this);
+        gpsSpeedUpdates.setOnCheckedChangeListener(this);
+        notifVoiceUpdates.setOnCheckedChangeListener(this);
+
         return view;
 
     }
@@ -165,42 +168,22 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             list.add(new CurrencySpinnerItem(currencyCode.getSymbol(), currencyCode.toString()));
             count++;
         }
-        currencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Selected
-                Logger.d(TAG, "onItemSelected: " + list.get(position).getCode());
-                UnitsManager.setCurrencyCode(CurrencyCode.fromString(list.get(position).getCode()));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
         CurrencyAdapter spinnerAdapter = new CurrencyAdapter(this.getContext(),
                 R.layout.currency_spinner_layout, R.id.tv_currency_spinner, list);
         currencySpinner.setAdapter(spinnerAdapter);
         currencySpinner.setSelection(initialPos);
-
-    }
-
-    private void setMeasurementSpinner(){
-        List<String> list = new ArrayList<>();
-        list.add("km");
-        list.add("miles");
-
-        measurementSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        currencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            int check;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Logger.d(TAG, "position = " + position);
-                if (position == 0){
-                    // km
-                    UnitsManager.setDistanceUnit(DistanceUnit.KILOMETER);
-                }else {
-                    // miles
-                    UnitsManager.setDistanceUnit(DistanceUnit.MILES);
+                // Selected
+                if (++check > 1){
+                    String currencyCode = list.get(position).getCode();
+                    Logger.d(TAG, "onItemSelected: " + currencyCode);
+                    UnitsManager.setCurrencyCode(CurrencyCode.fromString(currencyCode));
+                    AnalyticsEvent.create(Event.ON_SELECT_CURRENCY)
+                            .put("currency_code", currencyCode)
+                            .buildAndDispatch();
                 }
             }
 
@@ -210,6 +193,13 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             }
         });
 
+    }
+
+    private void setMeasurementSpinner(){
+        List<String> list = new ArrayList<>();
+        list.add("km");
+        list.add("miles");
+
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this.getContext(),
                 R.layout.currency_spinner_layout, R.id.tv_currency_spinner, list);
         measurementSpinner.setAdapter(spinnerAdapter);
@@ -218,6 +208,34 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         }else {
             measurementSpinner.setSelection(1);
         }
+
+        measurementSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            int check;
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (++check > 1){
+                    Logger.d(TAG, "position = " + position);
+                    if (position == 0){
+                        // km
+                        UnitsManager.setDistanceUnit(DistanceUnit.KILOMETER);
+                        AnalyticsEvent.create(Event.ON_SELECT_DISTANCE_UNIT)
+                                .put("distance_unit", DistanceUnit.KILOMETER.toString())
+                                .buildAndDispatch();
+                    }else {
+                        // miles
+                        UnitsManager.setDistanceUnit(DistanceUnit.MILES);
+                        AnalyticsEvent.create(Event.ON_SELECT_DISTANCE_UNIT)
+                                .put("distance_unit", DistanceUnit.MILES.toString())
+                                .buildAndDispatch();
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void updateSettingItems() {
@@ -248,6 +266,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 break;
             case R.id.rate:
                 Utils.redirectToPlayStore(getContext());
+                AnalyticsEvent.create(Event.ON_CLICK_RATE_US_IN_SETTINGS)
+                        .buildAndDispatch();
                 break;
             case R.id.tos:
                 Toast.makeText(getContext(), "open Tos", Toast.LENGTH_SHORT).show();
@@ -264,6 +284,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         builder.setPositiveButton(getString(R.string.logout_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                AnalyticsEvent.create(Event.ON_LOGOUT_APP)
+                        .put("user_id", MainApplication.getInstance().getUserID())
+                        .buildAndDispatch();
                 performLogout();
             }
         });
@@ -284,6 +307,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mListener.updateNavigationMenu();
         updateSettingItems();
         Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -299,6 +323,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 }
                 break;
             case R.id.notif_toggle:
+                AnalyticsEvent.create(Event.ON_TOGGLE_REMINDER)
+                        .put("is_enabled", isChecked)
+                        .buildAndDispatch();
                 if (isChecked){
                     // Enabled Alerts and Reminders
                     SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
@@ -308,6 +335,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 }
                 break;
             case R.id.notif_voice_updates:
+                AnalyticsEvent.create(Event.ON_TOGGLE_VOICE_UPDATE)
+                        .put("is_enabled", isChecked)
+                        .buildAndDispatch();
                 if (isChecked){
                     // Enabled Alerts and Reminders
                     SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_VOICE_UPDATES, false);
@@ -341,8 +371,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.currency_spinner_list_item, parent, false);
             }
             CurrencySpinnerItem rowItem = getItem(position);
-            TextView symbol = (TextView) convertView.findViewById(R.id.tv_currency_spinner_item_symbol);
-            TextView code = (TextView) convertView.findViewById(R.id.tv_currency_spinner_item_code);
+            TextView symbol = convertView.findViewById(R.id.tv_currency_spinner_item_symbol);
+            TextView code = convertView.findViewById(R.id.tv_currency_spinner_item_code);
 
             symbol.setText(rowItem.label);
             code.setText(rowItem.code);

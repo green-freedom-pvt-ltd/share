@@ -10,6 +10,8 @@ import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.Events.LeagueBoardDataUpdated;
 import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ExpoBackoffTask;
 import com.sharesmile.share.gcm.SyncService;
@@ -381,6 +383,10 @@ public class LeaderBoardDataStore {
                     @Override
                     public void onNetworkSuccess(LeagueTeam leagueTeam) {
                         Logger.d(TAG, "Successfully logged out from teamId: " + teamId);
+                        AnalyticsEvent.create(Event.ON_EXIT_LEAGUE)
+                                .put("team_id", teamId)
+                                .put("league_name", getLeagueName())
+                                .buildAndDispatch();
                         // Remove all cached data
                         updateMyTeamId(0);
                         Analytics.getInstance().setUserProperty(USER_PROP_LEAGUE_NAME, "");
@@ -393,6 +399,7 @@ public class LeaderBoardDataStore {
 
                         // Notify the UI about it
                         EventBus.getDefault().post(new ExitLeague(true));
+
                     }
                 });
     }

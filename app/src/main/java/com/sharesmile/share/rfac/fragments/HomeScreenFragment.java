@@ -93,7 +93,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         viewPager.setPageTransformer(false, new ViewPagerTransformer());
         viewPager.setPageMargin(getResources().getDimensionPixelOffset(R.dimen.view_pager_page_margin));
         viewPager.setPadding(getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_left), 0, getResources().getDimensionPixelOffset(R.dimen.view_pager_margin_right), 0);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(1);
         viewPager.setAdapter(mAdapter);
 
         drawerButton.setOnClickListener(this);
@@ -136,6 +136,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         super.onStart();
         Logger.d(TAG, "onStart");
         if (render()){
+            Logger.d(TAG, "onStart: Triggering updateCauseData because render returned true");
             // Trigger an update call
             CauseDataStore.getInstance().updateCauseData();
         }
@@ -160,6 +161,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "render");
         if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
             // Data not fetched in DataStore
+            Logger.d(TAG, "render: Data not fetched in CauseDataStore");
             showProgressDialog();
             if (!NetworkUtils.isNetworkConnected(getContext())){
                 Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE)
@@ -177,6 +179,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             return false;
         } else if (mAdapter.getCount() <= 0){
             // Data not being shown on screen
+            Logger.d(TAG, "render: Data not being shown on screen");
             showProgressDialog();
             setOverallImpactTextView(CauseDataStore.getInstance().getOverallImpact());
             setCausedata(CauseDataStore.getInstance().getCausesToShow());
@@ -184,6 +187,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             return true;
         } else if (CauseDataStore.getInstance().isNewUpdateAvailable()){
             // Old Data on display
+            Logger.d(TAG, "render: Old data on display, need to refresh it");
             int lastSeenImpact = CauseDataStore.getInstance().getLastSeenOverallImpact();
             int updatedImpact = CauseDataStore.getInstance().getOverallImpact();
             if (updatedImpact > lastSeenImpact){
@@ -281,12 +285,19 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     }
 
     public void setCausedata(List<CauseData> causes) {
-        Logger.d(TAG, "setCausedata");
+        Logger.d(TAG, "setCausedata: number of cause cards = " + causes.size());
         if (causes == null || causes.isEmpty()){
             // No cause data to show
             Snackbar.make(mContentView, getString(R.string.some_error_occurred), Snackbar.LENGTH_INDEFINITE).show();
         }
         CauseDataStore.getInstance().sortCauses(causes);
+
+        StringBuilder sb = new StringBuilder("Cause cards: ");
+        for (CauseData cause : causes){
+            sb.append(cause.getTitle() + ", ");
+        }
+        Logger.d(TAG, "setCausedata: " + sb.toString());
+
         mAdapter.setData(causes);
         mRunButton.setVisibility(View.VISIBLE);
         hideProgressDialog();

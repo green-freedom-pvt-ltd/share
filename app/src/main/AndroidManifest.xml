@@ -82,21 +82,22 @@
             android:parentActivityName=".rfac.activities.MainActivity"
             android:screenOrientation="portrait">
 
-            <intent-filter>
 
-                <data
-                    android:host="blog.impactapp.in"
-                    android:scheme="http"/>
+            <!--<intent-filter>-->
 
-                <data
-                    android:host="blog.impactapp.in"
-                    android:pathPrefix="/articles"
-                    android:scheme="http"/>
+                <!--<data-->
+                    <!--android:host="blog.impactapp.in"-->
+                    <!--android:scheme="http"/>-->
 
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-            </intent-filter>
+                <!--<data-->
+                    <!--android:host="blog.impactapp.in"-->
+                    <!--android:pathPrefix="/articles"-->
+                    <!--android:scheme="http"/>-->
+
+                <!--<action android:name="android.intent.action.VIEW"/>-->
+                <!--<category android:name="android.intent.category.DEFAULT"/>-->
+                <!--<category android:name="android.intent.category.BROWSABLE"/>-->
+            <!--</intent-filter>-->
 
         </activity>
 

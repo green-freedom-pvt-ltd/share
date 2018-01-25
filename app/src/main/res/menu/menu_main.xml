@@ -34,7 +34,7 @@
 
     <item
         android:id="@+id/nav_item_feed"
-        android:icon="@drawable/svg_ic_group_black"
+        android:icon="@drawable/ic_public_black"
         android:title="@string/title_feed" />
 
     <item

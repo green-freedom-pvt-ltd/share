@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.ClientConfig;
 import com.sharesmile.share.core.Constants;
@@ -422,6 +424,9 @@ public class WorkoutDataImpl implements WorkoutData, Parcelable {
 			Logger.d(TAG, "close: AutoFlagging workout since avg speed (" +getAvgSpeed()
 					+ ") is greater than acceptableAvgSpeed ("+acceptableAvgSpeed+")");
 			autoFlagged = true;
+			AnalyticsEvent.create(Event.ON_AUTO_FLAG_WORKOUT)
+					.addBundle(getWorkoutBundle())
+					.buildAndDispatch();
 		}
 		isActive = false;
 		return this;
