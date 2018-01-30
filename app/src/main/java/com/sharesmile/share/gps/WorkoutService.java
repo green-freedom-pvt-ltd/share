@@ -273,7 +273,7 @@ public class WorkoutService extends Service implements
                         .addBundle(getWorkoutBundle())
                         .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
                         .put("num_spikes", WorkoutSingleton.getInstance().getDataStore().getNumGpsSpikes())
-                        .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
+                        .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                         .buildAndDispatch();
             }
 

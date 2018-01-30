@@ -97,6 +97,24 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    private boolean isActivityVisible;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isActivityVisible = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isActivityVisible = false;
+    }
+
+    public boolean isActivityVisible() {
+        return isActivityVisible;
+    }
+
     @Override
     public void replaceFragment(BaseFragment fragmentToBeLoaded, boolean addToBackStack) {
         boolean allowStateLoss = true;
@@ -283,6 +301,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.d(getName(), "onActivityResult: with requestCode = " + requestCode + ", resultCode = " + resultCode);
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case Constants.CODE_LOCATION_SETTINGS_RESOLUTION:
@@ -309,7 +328,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
-            if (bundle != null) {
+            if (bundle != null && isActivityVisible()) {
                 int broadcastCategory = bundle
                         .getInt(Constants.LOCATION_TRACKER_BROADCAST_CATEGORY);
                 Logger.d(TAG, "locationTrackerReceiver onReceive with broadcastCategory = " + broadcastCategory);
@@ -356,6 +375,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     }
 
     private void handleFixLocationSettingsBroadcast(Bundle bundle) {
+        Logger.d(getName(), "handleFixLocationSettingsBroadcast");
         synchronized (BaseActivity.class) {
             if (!blockLocationEnablePopup) {
                 Status status = bundle.getParcelable(Constants.KEY_LOCATION_SETTINGS_PARCELABLE);
@@ -373,8 +393,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
                         }
                     }, 1000);
                 } catch (IntentSender.SendIntentException e) {
-                    // Ignore the error.
+                    Logger.d(getName(), "handleFixLocationSettingsBroadcast: Error while starting " +
+                            "resolution for result: " + e.getMessage());
+                    e.printStackTrace();
                 }
+            }else {
+                Logger.d(getName(), "handleFixLocationSettingsBroadcast: Not showing location enable popup because it is blocked");
             }
         }
     }
