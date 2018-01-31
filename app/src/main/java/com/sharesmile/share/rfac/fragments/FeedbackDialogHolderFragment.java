@@ -11,7 +11,6 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
 import com.sharesmile.share.rfac.RateAndShareDialog;
-import com.sharesmile.share.rfac.models.TellYourFriendsDialog;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -78,46 +77,6 @@ public abstract class FeedbackDialogHolderFragment extends BaseFragment {
                 .put("bolt_count", workoutData.getUsainBoltCount())
                 .put("num_update_events", workoutData.getNumUpdateEvents())
                 .buildAndDispatch();
-    }
-
-    protected void showTellYourFriendsDialog(final WorkoutData workoutData){
-        feedbackDialog = new TellYourFriendsDialog(getActivity(), R.style.BackgroundDimDialog);
-        feedbackDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                Logger.d(TAG, "TakeEmailDialog: onCancel");
-                // User cancelled the dialog without acting on it, lets just trigger exit
-                exitFeedback(workoutData);
-            }
-        });
-        feedbackDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                Logger.d(TAG, "TakeEmailDialog: onDismiss");
-                // Dialog dismissed explicitly
-                exitFeedback(workoutData);
-            }
-        });
-        feedbackDialog.setListener(new BaseDialog.Listener() {
-            @Override
-            public void onPrimaryClick(BaseDialog dialog) {
-                if (isAttachedToActivity()){
-                    Utils.share(getActivity(), getString(R.string.share_msg));
-                    dialog.dismiss();
-                    AnalyticsEvent.create(Event.ON_CLICK_TELL_YOUR_FRIENDS)
-                            .addBundle(workoutData.getWorkoutBundle())
-                            .put("num_spikes", workoutData.getNumGpsSpikes())
-                            .put("bolt_count", workoutData.getUsainBoltCount())
-                            .buildAndDispatch();
-                }
-            }
-
-            @Override
-            public void onSecondaryClick(BaseDialog dialog) {
-                // Will never be called
-            }
-        });
-        feedbackDialog.show();
     }
 
     protected void showRateAndShareDialog(final WorkoutData workoutData){

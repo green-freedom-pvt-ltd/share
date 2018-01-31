@@ -51,6 +51,7 @@ import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.HomeScreenFragment;
+import com.sharesmile.share.rfac.fragments.HowItWorksFragment;
 import com.sharesmile.share.rfac.fragments.LeagueBoardFragment;
 import com.sharesmile.share.rfac.fragments.ProfileStatsFragment;
 import com.sharesmile.share.rfac.fragments.SettingsFragment;
@@ -429,6 +430,10 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_NAVIGATION_MENU)
                     .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
                     .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+                    .buildAndDispatch();
+        } else if (menuItem.getItemId() == R.id.nav_item_how_it_works) {
+            replaceFragment(HowItWorksFragment.newInstance(), true);
+            AnalyticsEvent.create(Event.ON_CLICK_HOW_IT_WORKS_NAVIGATION_MENU)
                     .buildAndDispatch();
         }
 

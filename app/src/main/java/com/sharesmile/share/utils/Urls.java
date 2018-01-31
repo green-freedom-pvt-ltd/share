@@ -41,6 +41,14 @@ public class Urls {
 
     private static final String BLOG_BASE_URL = "http://blog.impactapp.in";
     private static final String BLOG_LATEST_ARTICLE_URL = "/articles/latest";
+    private static final String BLOG_HOW_IT_WORKS_CONTENT_URL = "/articles/howitworks";
+
+    private static final String IMPACT_ASSETS_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-image-assets";
+
+    private static final String HOW_IT_WORKS_S3_FOLDER = "/howitworks/";
+
+
+
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -182,5 +190,13 @@ public class Urls {
             }
         }
         return false;
+    }
+
+    public static String getHowItWorksIllustration(int index){
+        return IMPACT_ASSETS_S3_BUCKET_URL + HOW_IT_WORKS_S3_FOLDER + index + ".png";
+    }
+
+    public static String getHowItWorksContentUrl(){
+        return BLOG_BASE_URL + BLOG_HOW_IT_WORKS_CONTENT_URL;
     }
 }

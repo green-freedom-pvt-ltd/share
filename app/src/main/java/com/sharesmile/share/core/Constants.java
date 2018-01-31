@@ -2,6 +2,8 @@ package com.sharesmile.share.core;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
+import com.sharesmile.share.rfac.models.HowItWorksRowItem;
+import com.sharesmile.share.utils.Urls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -228,6 +230,8 @@ public class Constants {
     public static final String PREF_DID_USER_RATE_APP = "pref_did_user_rate_app";
     public static final String PREF_LAST_TIME_FEED_WAS_SEEN = "pref_last_time_feed_was_seen";
 
+    public static final String PREF_HOW_IT_WORKS_CONTENT = "pref_how_it_works_content";
+
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
@@ -272,6 +276,59 @@ public class Constants {
             add(FeedbackCategory.GPS_ISSUE.copy());
             add(FeedbackCategory.ZERO_DISTANCE.copy());
             add(FeedbackCategory.STILL_SOMETHING_ELSE.copy());
+        }};
+    }
+
+    public static final String getDefaultHowItWorksResponse(){
+        return "{\n" +
+                "  \"how_it_works_steps\": [\n" +
+                "    {\n" +
+                "      \"title\": \"1. NGOs come on-board\",\n" +
+                "      \"content\": \"We check all the documents and past work of a registered NGO. After studying their proposed project plan, we welcome the NGO to Impact family.\",\n" +
+                "      \"image_url\": \"https://s3.ap-south-1.amazonaws.com/impact-image-assets/howitworks/1.png\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"title\": \"2. Companies pledge their support\",\n" +
+                "      \"content\": \"Our kind corporate partners fund the NGO projects with their Corporate Social Responsibility (CSR) budget. A cause campaign goes live on the app as soon as the charity amount is pledged by the company. \",\n" +
+                "      \"image_url\": \"https://s3.ap-south-1.amazonaws.com/impact-image-assets/howitworks/2.png\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"title\": \"3. Campaign goes live on the app\",\n" +
+                "      \"content\": \"Once a cause is live, our users walk and jog every day to achieve the charity goal.\",\n" +
+                "      \"image_url\": \"https://s3.ap-south-1.amazonaws.com/impact-image-assets/howitworks/3.png\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"title\": \"4. Funds get transferred  for on-ground Impact\",\n" +
+                "      \"content\": \"After the cause reaches 100%, the funding company sends the money to the NGO and the NGO shares a project report after the usage of funds. We share the report as soon as it is available with us.\",\n" +
+                "      \"image_url\": \"https://s3.ap-south-1.amazonaws.com/impact-image-assets/howitworks/4.png\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+    }
+
+    public static final List<HowItWorksRowItem> getDefaultHowItWorksRowItems() {
+        return new ArrayList<HowItWorksRowItem>() {{
+            add(new HowItWorksRowItem("1. NGOs come on-board",
+                    "We check all the documents and past work of a registered NGO. " +
+                            "After studying their proposed project plan, we welcome " +
+                            "the NGO to Impact family.",
+                    Urls.getHowItWorksIllustration(0)));
+
+            add(new HowItWorksRowItem("2. Companies pledge their support",
+                    "Our kind corporate partners fund the NGO projects with their " +
+                            "Corporate Social Responsibility (CSR) budget. A cause campaign goes " +
+                            "live on the app as soon as the charity amount is pledged by the company. ",
+                    Urls.getHowItWorksIllustration(1)));
+
+            add(new HowItWorksRowItem("3. Campaign goes live on the app",
+                    "Once a cause is live, our users walk and jog every day to achieve the charity goal.",
+                    Urls.getHowItWorksIllustration(2)));
+
+            add(new HowItWorksRowItem("4. Funds get transferred for on-ground Impact",
+                    "After the cause reaches 100%, the funding company sends the money to the NGO " +
+                            "and the NGO shares a project report after the usage of funds. " +
+                            "We share the report as soon as it is available with us.",
+                    Urls.getHowItWorksIllustration(3)));
         }};
     }
 

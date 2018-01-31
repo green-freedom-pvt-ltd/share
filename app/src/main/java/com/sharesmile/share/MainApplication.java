@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,13 +29,14 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.core.UnitsManager;
-import com.sharesmile.share.gcm.SyncService;
-import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.MainActivity;
+import com.sharesmile.share.rfac.models.HowItWorksResponse;
+import com.sharesmile.share.rfac.models.HowItWorksRowItem;
 import com.sharesmile.share.rfac.models.Qna;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.sync.SyncHelper;
@@ -440,13 +440,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         ClientConfig.sync();
         SyncHelper.scheduleDataSync(this);
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                SyncService.syncFeed();
-            }
-        });
-
         boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         Logger.d(TAG, "startSyncTasks: isWorkoutDataUpToDate = " + isWorkoutDataUpToDate);
         if (!isWorkoutDataUpToDate){
@@ -570,6 +563,17 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                     .dispatch();
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_LAUNCH_EVENT_SENT, true);
         }
+    }
+
+    public List<HowItWorksRowItem> getHowItWorksSteps(){
+        HowItWorksResponse content
+                = SharedPrefsManager.getInstance().getObject(Constants.PREF_HOW_IT_WORKS_CONTENT,
+                    HowItWorksResponse.class);
+        if (content == null){
+            Gson gson = new Gson();
+            content = gson.fromJson(Constants.getDefaultHowItWorksResponse(), HowItWorksResponse.class);
+        }
+        return content.getSteps();
     }
 
     @Override

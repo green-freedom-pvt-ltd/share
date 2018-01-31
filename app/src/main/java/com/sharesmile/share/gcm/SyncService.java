@@ -33,6 +33,7 @@ import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.models.CauseList;
 import com.sharesmile.share.rfac.models.FraudData;
+import com.sharesmile.share.rfac.models.HowItWorksResponse;
 import com.sharesmile.share.rfac.models.LeaderBoardList;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunList;
@@ -133,6 +134,7 @@ public class SyncService extends GcmTaskService {
         syncWorkoutData();
         // Rolling back to old feed
 //        syncFeed();
+        syncHowItWorksContent();
         fetchMessage();
         fetchCampaign();
 
@@ -196,6 +198,26 @@ public class SyncService extends GcmTaskService {
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e.getMessageFromServer() + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean syncHowItWorksContent(){
+        Logger.d(TAG, "syncHowItWorksContent");
+        try {
+            HowItWorksResponse response
+                    = NetworkDataProvider.doGetCall(Urls.getHowItWorksContentUrl(), HowItWorksResponse.class);
+            if (response == null){
+                return false;
+            }
+
+            SharedPrefsManager.getInstance().setObject(Constants.PREF_HOW_IT_WORKS_CONTENT, response);
+
+            return true;
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException while fetching content for how_it_works"
+                    + e.getMessageFromServer() + e.getMessage());
             return false;
         }
     }

@@ -52,5 +52,10 @@
         android:icon="@drawable/svg_ic_settings_applications_black"
         android:title="@string/action_settings" />
 
+    <item
+        android:id="@+id/nav_item_how_it_works"
+        android:icon="@drawable/how_it_works"
+        android:title="@string/action_how_it_works" />
+
 
 </menu>

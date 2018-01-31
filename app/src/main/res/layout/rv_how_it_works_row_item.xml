@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp">
+
+
+    <com.sharesmile.share.views.LBKTextView
+        android:id="@+id/tv_how_it_works_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/greyish_brown_two"
+        android:text="@string/how_it_works_dummy_title"
+        android:gravity="center"
+        android:layout_marginBottom="12dp"/>
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/iv_how_it_works_illustration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerInside"
+        android:src="@drawable/howitworks_illustration"
+        android:layout_marginBottom="6dp"/>
+
+    <com.sharesmile.share.views.LRTextView
+        android:id="@+id/tv_how_it_works_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/greyish_brown_two"
+        android:text="@string/how_it_works_dummy_content"
+        android:gravity="center"
+        android:layout_marginBottom="12dp"/>
+
+
+
+
+</LinearLayout>
