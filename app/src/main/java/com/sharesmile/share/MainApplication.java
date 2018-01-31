@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,11 +29,10 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.DbWrapper;
 import com.sharesmile.share.core.NotificationActionReceiver;
 import com.sharesmile.share.core.UnitsManager;
-import com.sharesmile.share.gcm.SyncService;
-import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
+import com.sharesmile.share.gps.location.GoogleLocationTracker;
 import com.sharesmile.share.pushNotification.NotificationHandler;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.Qna;
@@ -439,13 +437,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         SyncHelper.syncUserFromDB();
         ClientConfig.sync();
         SyncHelper.scheduleDataSync(this);
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                SyncService.syncFeed();
-            }
-        });
 
         boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         Logger.d(TAG, "startSyncTasks: isWorkoutDataUpToDate = " + isWorkoutDataUpToDate);
