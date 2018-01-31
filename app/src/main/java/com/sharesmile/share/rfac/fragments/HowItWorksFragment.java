@@ -53,13 +53,15 @@ public class HowItWorksFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_how_it_works, null);
         ButterKnife.bind(this, view);
         init();
         return view;
     }
 
     private void init(){
+        // Step: add a toolbar
+        getFragmentController().updateToolBar(getString(R.string.action_how_it_works), true);
         // Step: setup Recyclerview
         adapter = new HowItWorksAdapter(MainApplication.getInstance().getHowItWorksSteps());
         linearLayoutManager = new LinearLayoutManager(getContext());
