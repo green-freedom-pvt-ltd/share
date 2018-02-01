@@ -4,15 +4,33 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <com.sharesmile.share.views.MLButton
+    <LinearLayout
         android:id="@+id/begin_run"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:background="@color/bright_sky_blue"
-        android:text="Begin Run"
-        android:textAllCaps="true"
-        android:textColor="@color/white" />
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.sharesmile.share.views.MSBTextView
+            android:id="@+id/tv_lets_run"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/begin_run"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+
+        <ImageView
+            android:id="@+id/iv_lets_run"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/lets_go_icon"
+            android:scaleType="centerInside"
+            android:layout_marginLeft="8dp"/>
+
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"

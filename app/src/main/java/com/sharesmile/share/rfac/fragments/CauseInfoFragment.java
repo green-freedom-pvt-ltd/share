@@ -6,8 +6,8 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.R;
@@ -34,7 +34,13 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     public static final String BUNDLE_CAUSE_OBJECT = "bundle_cause_object";
 
     @BindView(R.id.begin_run)
-    Button mRunButton;
+    View mRunButton;
+
+    @BindView(R.id.tv_lets_run)
+    TextView mRunButtonText;
+
+    @BindView(R.id.iv_lets_run)
+    View mRunButtonImage;
 
     @BindView(R.id.run_screen_sponser)
     MLTextView mSponsor;
@@ -100,11 +106,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         ShareImageLoader.getInstance().loadImage(imageUrl, mCauseImage,
                 ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
 
-        if (cause.isCompleted()){
-            mRunButton.setText(getString(R.string.tell_your_friends));
-        }else {
-            mRunButton.setText(getString(R.string.rfac_begin_run));
-        }
+        setLetsRunButton(cause.isCompleted());
 
         updateActionbar();
     }
@@ -134,6 +136,15 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
+    private void setLetsRunButton(boolean isCauseCompleted){
+        if (isCauseCompleted){
+            mRunButtonText.setText(getString(R.string.tell_your_friends));
+            mRunButtonImage.setVisibility(View.GONE);
+        } else {
+            mRunButtonText.setText(getString(R.string.begin_run));
+            mRunButtonImage.setVisibility(View.VISIBLE);
+        }
+    }
 
 
 }
