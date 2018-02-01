@@ -85,7 +85,7 @@
             android:layout_height="0dp"
             android:layout_weight="102">
 
-            <com.sharesmile.share.views.MSBButton
+            <LinearLayout
                 android:id="@+id/btn_lets_run"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
@@ -93,10 +93,26 @@
                 android:layout_marginRight="52dp"
                 android:background="@drawable/rounded_corner"
                 android:layout_centerInParent="true"
-                android:text="@string/let_go"
-                android:textAllCaps="true"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.sharesmile.share.views.MSBTextView
+                    android:id="@+id/tv_lets_run"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/let_go"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:id="@+id/iv_lets_run"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/lets_go_icon"
+                    android:layout_marginLeft="8dp"/>
+
+            </LinearLayout>
 
         </RelativeLayout>
 

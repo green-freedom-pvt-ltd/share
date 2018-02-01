@@ -15,7 +15,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -54,7 +53,13 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     ViewPager viewPager;
 
     @BindView(R.id.btn_lets_run)
-    Button mRunButton;
+    View mRunButton;
+
+    @BindView(R.id.tv_lets_run)
+    TextView mRunButtonText;
+
+    @BindView(R.id.iv_lets_run)
+    View mRunButtonImage;
 
     @BindView(R.id.content_view)
     LinearLayout mContentView;
@@ -266,10 +271,16 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Override
     public void onPageSelected(int position) {
         CauseData causeData = mAdapter.getItemAtPosition(position);
-        if (causeData.isCompleted()){
-            mRunButton.setText(getString(R.string.tell_your_friends));
+        setLetsRunButton(causeData.isCompleted());
+    }
+
+    private void setLetsRunButton(boolean isCauseCompleted){
+        if (isCauseCompleted){
+            mRunButtonText.setText(getString(R.string.tell_your_friends));
+            mRunButtonImage.setVisibility(View.GONE);
         }else {
-            mRunButton.setText(getString(R.string.let_go));
+            mRunButtonText.setText(getString(R.string.let_go));
+            mRunButtonImage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -299,6 +310,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "setCausedata: " + sb.toString());
 
         mAdapter.setData(causes);
+        setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
         mRunButton.setVisibility(View.VISIBLE);
         hideProgressDialog();
 
