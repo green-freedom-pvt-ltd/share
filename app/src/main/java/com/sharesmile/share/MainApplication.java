@@ -556,6 +556,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return getInstance().lifecycleHelper.isApplicationVisible();
     }
 
+
+    public long getUsersWorkoutCount(){
+        WorkoutDao mWorkoutDao = getDbWrapper().getWorkoutDao();
+        return mWorkoutDao.count();
+    }
+
     private void checkForFirstLaunchAfterInstall(){
         if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_LAUNCH_EVENT_SENT)){
             AnalyticsEvent.create(Event.FIRST_LAUNCH_AFTER_INSTALL)

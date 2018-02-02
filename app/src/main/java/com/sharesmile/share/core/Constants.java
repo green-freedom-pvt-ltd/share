@@ -232,6 +232,10 @@ public class Constants {
 
     public static final String PREF_HOW_IT_WORKS_CONTENT = "pref_how_it_works_content";
 
+    public static final String PREF_SCREEN_LAUNCH_COUNT_PREFIX = "pref_screen_launch_count_";
+
+    public static final String NAVIGATION_DRAWER = "navigation_drawer";
+
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";

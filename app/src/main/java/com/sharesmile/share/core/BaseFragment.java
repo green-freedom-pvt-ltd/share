@@ -1,9 +1,13 @@
 package com.sharesmile.share.core;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
 import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.utils.SharedPrefsManager;
 
 /**
  * Created by ankitmaheshwari1 on 11/01/16.
@@ -29,6 +33,17 @@ public class BaseFragment extends Fragment {
     public void setToolbarTitle(String title){
         Logger.d(TAG, "setToolbarTitle: " + title);
         getFragmentController().updateToolBar(title, true);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        int launchCount = SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + getName());
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + getName(), ++launchCount);
+    }
+
+    public int getScreenLaunchCount(){
+        return SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + getName());
     }
 
     @Override

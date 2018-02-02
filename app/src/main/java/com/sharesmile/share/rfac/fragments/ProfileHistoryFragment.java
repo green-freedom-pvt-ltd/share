@@ -133,7 +133,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
     }
 
     public void fetchRunDataFromDb() {
-        Logger.d(TAG, "fetchRunDataFromDb");
+        Logger.d(TAG, "fetchRunDataFromDb, total workout count = " + MainApplication.getInstance().getUsersWorkoutCount());
         boolean isWorkoutDataUpToDate =
                 SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         if (isWorkoutDataUpToDate){

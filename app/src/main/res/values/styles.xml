@@ -9,6 +9,11 @@
         <item name="actionMenuTextAppearance">@style/MyActionBar.MenuTextStyle</item>
         <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
         <item name="android:itemTextAppearance">@style/myCustomMenuTextApearance</item>
+        <item name="MaterialTapTargetPromptTheme">@style/MaterialTapTargetPromptTheme</item>
+    </style>
+
+    <style name="MaterialTapTargetPromptTheme">
+        <item name="mttp_backgroundColour">@color/black_87</item>
     </style>
 
     <style name="myCustomMenuTextApearance" parent="@android:style/TextAppearance.Widget.IconMenu.Item">

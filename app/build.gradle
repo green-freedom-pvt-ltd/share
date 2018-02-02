@@ -22,7 +22,6 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
     mavenCentral()
     maven { url "https://clojars.org/repo/" }
-
 }
 
 
@@ -102,6 +101,7 @@ android {
 }
 
 dependencies {
+
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
 
@@ -147,6 +147,7 @@ dependencies {
     compile 'io.smooch:core:5.4.0'
     compile 'io.smooch:ui:5.4.0'
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
+    compile 'uk.co.samuelwall:material-tap-target-prompt:2.6.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

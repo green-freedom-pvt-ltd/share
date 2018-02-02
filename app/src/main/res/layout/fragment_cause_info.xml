@@ -27,7 +27,6 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/lets_go_icon"
-            android:scaleType="centerInside"
             android:layout_marginLeft="8dp"/>
 
     </LinearLayout>

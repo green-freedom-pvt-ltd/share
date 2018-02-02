@@ -14,6 +14,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -49,6 +50,7 @@ import com.sharesmile.share.core.PermissionCallback;
 import com.sharesmile.share.core.ToolbarActivity;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.pushNotification.NotificationConsts;
+import com.sharesmile.share.rfac.OnboardingOverlay;
 import com.sharesmile.share.rfac.fragments.GlobalLeaderBoardFragment;
 import com.sharesmile.share.rfac.fragments.HomeScreenFragment;
 import com.sharesmile.share.rfac.fragments.HowItWorksFragment;
@@ -69,10 +71,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+
 import Models.CampaignList;
 import butterknife.ButterKnife;
 
 import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 
 
@@ -132,6 +137,29 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, getToolbar(), R.string.app_name,
                         R.string.app_name);
 
+                mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+                    @Override
+                    public void onDrawerSlide(View view, float v) {
+
+                    }
+
+                    @Override
+                    public void onDrawerOpened(View view) {
+                        Logger.d(TAG, "onDrawerOpened");
+                        checkForOverlayOnDrawer();
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View view) {
+                        Logger.d(TAG, "onDrawerClosed");
+                    }
+
+                    @Override
+                    public void onDrawerStateChanged(int i) {
+
+                    }
+                });
+
                 mDrawerToggle.syncState();
                 Logger.d(TAG, "Will setNavigationItemSelectedListener on mNavigationView");
                 mNavigationView.setNavigationItemSelectedListener(this);
@@ -141,6 +169,42 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 Analytics.getInstance().setUserProperties();
             }
         }
+    }
+
+    private void checkForOverlayOnDrawer(){
+        incrementDrawerOpenCount();
+
+        int drawerOpenCount = getDrawerOpenCount();
+        long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+
+        Logger.d(TAG, "checkForOverlayOnDrawer: drawerOpenCount = " + drawerOpenCount + ", workoutCount = " + workoutCount);
+
+        if (OnboardingOverlay.HELP_CENTER.isEligibleForDisplay(drawerOpenCount, workoutCount)){
+            MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // This is a hack to get hold of the anchor view for help center menu item
+                    NavigationView navigationView = findViewById(R.id.drawer_navigation);
+                    ArrayList<View> views = new ArrayList<>();
+                    navigationView.findViewsWithText(views, getString(R.string.help_center), View.FIND_VIEWS_WITH_TEXT);
+                    if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                        Utils.showOverlay(OnboardingOverlay.HELP_CENTER,
+                                views.get(0),
+                                MainActivity.this,
+                                true);
+                    }
+                }
+            }, OnboardingOverlay.HELP_CENTER.getDelayInMillis());
+        }
+    }
+
+    private void incrementDrawerOpenCount(){
+        int launchCount = SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + NAVIGATION_DRAWER);
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + NAVIGATION_DRAWER, ++launchCount);
+    }
+
+    public int getDrawerOpenCount(){
+        return SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + NAVIGATION_DRAWER);
     }
 
     private void startTrackingActivity(){
@@ -274,11 +338,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             profileMenu.setVisible(true);
             leaderboardMenu.setVisible(true);
             impactLeagueMenu.setVisible(true);
-//            if (LeaderBoardDataStore.getInstance().toShowLeague()){
-//                impactLeagueMenu.setVisible(true);
-//            }else {
-//                impactLeagueMenu.setVisible(false);
-//            }
         } else {
             loginMenu.setVisible(true);
             profileMenu.setVisible(false);
@@ -413,7 +472,9 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     .buildAndDispatch();
         }
         else if (menuItem.getItemId() == R.id.nav_item_help) {
-            performOperation(OPEN_HELP_CENTER,false);
+            performOperation(OPEN_HELP_CENTER, false);
+            SharedPrefsManager.getInstance()
+                    .setBoolean(OnboardingOverlay.HELP_CENTER.getDidUsePrefKey(), true);
             AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {

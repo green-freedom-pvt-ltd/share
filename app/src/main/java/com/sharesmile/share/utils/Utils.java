@@ -49,6 +49,7 @@ import com.sharesmile.share.core.CurrencyCode;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.rfac.OnboardingOverlay;
 import com.sharesmile.share.rfac.models.Run;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -75,6 +76,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import Models.Level;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
+import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectanglePromptBackground;
+import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
@@ -85,6 +89,9 @@ import static com.sharesmile.share.core.Constants.USER_PROP_LIFETIME_STEPS;
 import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_AMT_RAISED;
 import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_CALORIES;
 import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_RUNS;
+import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_DISMISSED;
+import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_FINISHED;
+import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_FOCAL_PRESSED;
 
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
@@ -1154,6 +1161,72 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void showOverlay(final OnboardingOverlay overlay, View target, Activity activity, boolean isRectangular){
+        Logger.d(TAG, "showOverlay: " + overlay.name());
+        final MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
+        builder.setTarget(target);
+        builder.setPrimaryText(overlay.getTitle());
+        builder.setSecondaryText(overlay.getDescription());
+        if (isRectangular){
+            builder.setPromptBackground(new RectanglePromptBackground());
+            builder.setPromptFocal(new RectanglePromptFocal());
+        }
+        builder.setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener()
+        {
+            @Override
+            public void onPromptStateChanged(MaterialTapTargetPrompt prompt, int state)
+            {
+                if (state == STATE_FOCAL_PRESSED)
+                {
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " +  STATE_FOCAL_PRESSED);
+                }
+                if (state == STATE_DISMISSED){
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
+                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
+                }
+                if (state == STATE_FINISHED){
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
+                    prompt.dismiss();
+                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
+                }
+            }
+        });
+        builder.show();
+    }
+
+    public static void showOverlay(final OnboardingOverlay overlay, int targetViewId, Activity activity, boolean isRectangular){
+        Logger.d(TAG, "showOverlay: " + overlay.name());
+        final MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
+        builder.setTarget(targetViewId);
+        builder.setPrimaryText(overlay.getTitle());
+        builder.setSecondaryText(overlay.getDescription());
+        if (isRectangular){
+            builder.setPromptBackground(new RectanglePromptBackground());
+            builder.setPromptFocal(new RectanglePromptFocal());
+        }
+        builder.setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener()
+        {
+            @Override
+            public void onPromptStateChanged(MaterialTapTargetPrompt prompt, int state)
+            {
+                if (state == STATE_FOCAL_PRESSED)
+                {
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " +  STATE_FOCAL_PRESSED);
+                }
+                if (state == STATE_DISMISSED){
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
+                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
+                }
+                if (state == STATE_FINISHED){
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
+                    prompt.dismiss();
+                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
+                }
+            }
+        });
+        builder.show();
     }
 
 

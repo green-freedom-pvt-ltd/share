@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.sharesmile.share.CauseDataStore;
 import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -31,6 +32,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.rfac.OnboardingOverlay;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
@@ -134,7 +136,52 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onViewCreated");
         getFragmentController().hideToolbar();
         render();
+        prepareOnboardingOverlays();
     }
+
+    private void prepareOnboardingOverlays(){
+
+        int screenLaunchCount = getScreenLaunchCount();
+        long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+        Logger.d(TAG, "prepareOnboardingOverlays, screenLaunchCount = " + screenLaunchCount
+                + ", workoutCount = " + workoutCount);
+
+//        if (OnboardingOverlay.SWIPE_CAUSE.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+//            // Show swipe screen overlay
+//
+//        } else {
+//            checkAndScheduleMaterialTapOverlays(screenLaunchCount, workoutCount);
+//        }
+
+        checkAndScheduleMaterialTapOverlays(screenLaunchCount, workoutCount);
+
+    }
+
+    private void checkAndScheduleMaterialTapOverlays(int screenLaunchCount, long workoutCount){
+        if (OnboardingOverlay.LETS_GO.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+            scheduleOverlay(OnboardingOverlay.LETS_GO, mRunButton, true);
+        }else if (OnboardingOverlay.DRAWER.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+            scheduleOverlay(OnboardingOverlay.DRAWER, drawerButton, false);
+        }else if (OnboardingOverlay.FEED.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+            scheduleOverlay(OnboardingOverlay.FEED, badge, false);
+        }else if (OnboardingOverlay.OVERALL_IMAPACT.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+            scheduleOverlay(OnboardingOverlay.OVERALL_IMAPACT, overallImpactTextView, true);
+        }
+    }
+
+    private void scheduleOverlay(final OnboardingOverlay overlay, final View target,
+                                 final boolean isRectangular){
+        Logger.d(TAG, "scheduleOverlay: " + overlay.name());
+        MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isAttachedToActivity() && isResumed()){
+                    Utils.showOverlay(overlay, target, getActivity(), isRectangular);
+                }
+            }
+        }, overlay.getDelayInMillis());
+    }
+
 
     @Override
     public void onStart() {
@@ -230,10 +277,12 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
                             .buildAndDispatch();
-                }else {
+                } else {
                     // If it is not completed then it must be an active on going cause
                     CauseDataStore.getInstance().registerCauseSelection(causeData);
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
+                    SharedPrefsManager.getInstance()
+                            .setBoolean(OnboardingOverlay.LETS_GO.getDidUsePrefKey(), true);
                     AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
@@ -243,12 +292,16 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
             case R.id.bt_home_feed:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
+                SharedPrefsManager.getInstance()
+                        .setBoolean(OnboardingOverlay.FEED.getDidUsePrefKey(), true);
                 AnalyticsEvent.create(Event.ON_CLICK_FEED)
                         .put("source", "feed_icon_home_screen")
                         .buildAndDispatch();
                 break;
             case R.id.bt_home_drawer:
                 getFragmentController().performOperation(IFragmentController.OPEN_DRAWER, null);
+                SharedPrefsManager.getInstance()
+                        .setBoolean(OnboardingOverlay.DRAWER.getDidUsePrefKey(), true);
                 break;
             default:
 
