@@ -68,5 +68,7 @@ public interface IFragmentController {
 
     boolean isDrawerOpened();
 
+    boolean isDrawerVisible();
+
 
 }

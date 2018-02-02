@@ -15,7 +15,7 @@ public class ShowOverlayRunnable implements Runnable {
     private OnboardingOverlay overlay;
     private View target;
     private boolean isRectangular;
-    private boolean cancel;
+    private boolean cancelled;
 
     public ShowOverlayRunnable(BaseFragment parentFragment, OnboardingOverlay overlay,
                                View target, boolean isRectangular) {
@@ -27,10 +27,18 @@ public class ShowOverlayRunnable implements Runnable {
 
     @Override
     public void run() {
-        if (parentFragment.isAttachedToActivity()
+        if (!cancelled
+                && parentFragment.isAttachedToActivity()
                 && parentFragment.isResumed()
-                && !parentFragment.getFragmentController().isDrawerOpened()){
+                && !parentFragment.getFragmentController().isDrawerVisible()){
             Utils.showOverlay(overlay, target, parentFragment.getActivity(), isRectangular);
         }
+    }
+
+    public void cancel(){
+        cancelled = true;
+        overlay = null;
+        target = null;
+        parentFragment = null;
     }
 }

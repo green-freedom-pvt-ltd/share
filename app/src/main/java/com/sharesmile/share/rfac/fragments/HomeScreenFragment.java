@@ -34,6 +34,7 @@ import com.sharesmile.share.core.IFragmentController;
 import com.sharesmile.share.core.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.OnboardingOverlay;
+import com.sharesmile.share.rfac.ShowOverlayRunnable;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.utils.Logger;
@@ -167,7 +168,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 public void run() {
                     if (isAttachedToActivity()
                             && isResumed()
-                            && !getFragmentController().isDrawerOpened()){
+                            && !getFragmentController().isDrawerVisible()){
                         // Show swipe screen overlay
                         swipeToPickOverlay.setVisibility(View.VISIBLE);
                     }
@@ -191,21 +192,25 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+    private ShowOverlayRunnable showOverlayRunnable;
+
     private void scheduleOverlay(final OnboardingOverlay overlay, final View target,
                                  final boolean isRectangular){
         Logger.d(TAG, "scheduleOverlay: " + overlay.name());
-        MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isAttachedToActivity()
-                        && isResumed()
-                        && !getFragmentController().isDrawerOpened()){
-                    Utils.showOverlay(overlay, target, getActivity(), isRectangular);
-                }
-            }
-        }, overlay.getDelayInMillis());
+        if (showOverlayRunnable != null){
+            showOverlayRunnable.cancel();
+        }
+        showOverlayRunnable = new ShowOverlayRunnable(this, overlay, target, isRectangular);
+        MainApplication.getMainThreadHandler().postDelayed(showOverlayRunnable, overlay.getDelayInMillis());
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (showOverlayRunnable != null){
+            showOverlayRunnable.cancel();
+        }
+    }
 
     @Override
     public void onStart() {

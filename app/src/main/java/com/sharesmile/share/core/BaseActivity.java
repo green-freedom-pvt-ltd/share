@@ -463,4 +463,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     public boolean isDrawerOpened() {
         return false;
     }
+
+    /*
+        Only MainActivity, which has a drawer, overrides this method
+     */
+    @Override
+    public boolean isDrawerVisible() {
+        return false;
+    }
 }

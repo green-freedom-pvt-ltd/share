@@ -10,7 +10,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 public enum OnboardingOverlay {
 
-    SWIPE_CAUSE(1, 3000, 10000, "pref_did_swipe_cause"),
+    SWIPE_CAUSE(1, 4000, 10000, "pref_did_swipe_cause"),
     LETS_GO(1, 2000, 10000, "pref_did_use_lets_go_overlay"),
     DRAWER(3, 3000, 10000, "pref_did_use_hamburger"),
     FEED(7, 3000, 10000, "pref_did_use_feed"),

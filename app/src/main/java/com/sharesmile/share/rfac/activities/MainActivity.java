@@ -94,6 +94,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     private InputMethodManager inputMethodManager;
     private boolean isAppUpdateDialogShown = false;
 
+    private OverlayRunnable overlayRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
@@ -139,17 +141,27 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 @Override
                 public void onDrawerOpened(View view) {
                     Logger.d(TAG, "onDrawerOpened");
+                    if (overlayRunnable != null){
+                        overlayRunnable.cancel();
+                    }
                     checkForOverlayOnDrawer();
                 }
 
                 @Override
                 public void onDrawerClosed(View view) {
                     Logger.d(TAG, "onDrawerClosed");
+                    if (overlayRunnable != null){
+                        overlayRunnable.cancel();
+                    }
                 }
 
                 @Override
-                public void onDrawerStateChanged(int i) {
-
+                public void onDrawerStateChanged(int state) {
+                    if (state != DrawerLayout.STATE_IDLE){
+                        if (overlayRunnable != null){
+                            overlayRunnable.cancel();
+                        }
+                    }
                 }
             });
 
@@ -172,21 +184,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "checkForOverlayOnDrawer: drawerOpenCount = " + drawerOpenCount + ", workoutCount = " + workoutCount);
 
         if (OnboardingOverlay.HELP_CENTER.isEligibleForDisplay(drawerOpenCount, workoutCount)){
-            MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // This is a hack to get hold of the anchor view for help center menu item
-                    NavigationView navigationView = findViewById(R.id.drawer_navigation);
-                    ArrayList<View> views = new ArrayList<>();
-                    navigationView.findViewsWithText(views, getString(R.string.help_center), View.FIND_VIEWS_WITH_TEXT);
-                    if (isDrawerOpened()){
-                        Utils.showOverlay(OnboardingOverlay.HELP_CENTER,
-                                views.get(0),
-                                MainActivity.this,
-                                true);
-                    }
-                }
-            }, OnboardingOverlay.HELP_CENTER.getDelayInMillis());
+            overlayRunnable = new OverlayRunnable();
+            MainApplication.getMainThreadHandler().postDelayed(overlayRunnable, OnboardingOverlay.HELP_CENTER.getDelayInMillis());
         }
     }
 
@@ -392,6 +391,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     @Override
     public boolean isDrawerOpened() {
         return mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
+    @Override
+    public boolean isDrawerVisible() {
+        return mDrawerLayout.isDrawerVisible(GravityCompat.START);
     }
 
     public void showHomeAsUpEnable(boolean showUp) {
@@ -693,6 +697,31 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         image.setImageResource(imgRes);
         TextView textView = (TextView) view.findViewById(R.id.app_name);
         textView.setText(appName);
+    }
+
+    public class OverlayRunnable implements Runnable {
+
+        private boolean cancelled;
+
+        @Override
+        public void run() {
+            if (!cancelled && isActivityVisible()){
+                // This is a hack to get hold of the anchor view for help center menu item
+                NavigationView navigationView = findViewById(R.id.drawer_navigation);
+                ArrayList<View> views = new ArrayList<>();
+                navigationView.findViewsWithText(views, getString(R.string.help_center), View.FIND_VIEWS_WITH_TEXT);
+                if (isDrawerOpened()){
+                    Utils.showOverlay(OnboardingOverlay.HELP_CENTER,
+                            views.get(0),
+                            MainActivity.this,
+                            true);
+                }
+            }
+        }
+
+        public void cancel(){
+            cancelled = true;
+        }
     }
 
 
