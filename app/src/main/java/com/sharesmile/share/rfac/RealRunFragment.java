@@ -391,7 +391,7 @@ public class RealRunFragment extends RunFragment {
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
             alertDialog.setTitle(getString(R.string.finish_workout));
             alertDialog.setMessage(getString(R.string.finish_workout_message));
-            alertDialog.setPositiveButton(getString(R.string.yes_sure), new DialogInterface.OnClickListener() {
+            alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     if (isAttachedToActivity()){
                         endRun(true);
@@ -399,7 +399,7 @@ public class RealRunFragment extends RunFragment {
                 }
             });
 
-            alertDialog.setNegativeButton(getString(R.string.not_now), new DialogInterface.OnClickListener() {
+            alertDialog.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
