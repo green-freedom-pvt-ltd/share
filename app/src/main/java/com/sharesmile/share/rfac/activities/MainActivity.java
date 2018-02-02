@@ -99,75 +99,67 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-        boolean isFirstTimeUser = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_FIRST_TIME_USER, true);
-
-        if (isFirstTimeUser){
-            // Very first launch of app, show onboarding
-            startOnboardingActivity();
-            finish();
-        }else {
-            Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
-            Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
-            Boolean isReminderDisable =  getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
-            getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
-            boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
-            getIntent().removeExtra(INTENT_STOP_RUN);
-            Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip + ", isReminderDisable = "
-                    + isReminderDisable + ", intentStopRun = " + intentStopRun);
-            if (!userLogin && !isLoginSkip) {
-                startLoginActivity();
-            } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
-                if (intentStopRun){
-                    WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
-                }
-                startTrackingActivity();
-            } else {
-                Logger.d(TAG, "render MainActivity UI");
-                // Normal launch of MainActivity, render its layout
-                EventBus.getDefault().register(this);
-                ButterKnife.bind(this);
-                mDrawerLayout = findViewById(R.id.drawerLayout);
-                mNavigationView = findViewById(R.id.drawer_navigation);
-                if (isReminderDisable){
-                    loadSettingsFragmentWithOverlay();
-                }else if (savedInstanceState == null){
-                    loadInitialFragment();
-                }
-
-                mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, getToolbar(), R.string.app_name,
-                        R.string.app_name);
-
-                mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-                    @Override
-                    public void onDrawerSlide(View view, float v) {
-
-                    }
-
-                    @Override
-                    public void onDrawerOpened(View view) {
-                        Logger.d(TAG, "onDrawerOpened");
-                        checkForOverlayOnDrawer();
-                    }
-
-                    @Override
-                    public void onDrawerClosed(View view) {
-                        Logger.d(TAG, "onDrawerClosed");
-                    }
-
-                    @Override
-                    public void onDrawerStateChanged(int i) {
-
-                    }
-                });
-
-                mDrawerToggle.syncState();
-                Logger.d(TAG, "Will setNavigationItemSelectedListener on mNavigationView");
-                mNavigationView.setNavigationItemSelectedListener(this);
-                updateNavigationMenu();
-                checkAppVersionAndShowUpdatePopupIfRequired();
-                handleNotificationIntent();
-                Analytics.getInstance().setUserProperties();
+        Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
+        Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
+        Boolean isReminderDisable =  getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
+        getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
+        boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
+        getIntent().removeExtra(INTENT_STOP_RUN);
+        Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip + ", isReminderDisable = "
+                + isReminderDisable + ", intentStopRun = " + intentStopRun);
+        if (!userLogin && !isLoginSkip) {
+            startLoginActivity();
+        } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
+            if (intentStopRun){
+                WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
             }
+            startTrackingActivity();
+        } else {
+            Logger.d(TAG, "render MainActivity UI");
+            // Normal launch of MainActivity, render its layout
+            EventBus.getDefault().register(this);
+            ButterKnife.bind(this);
+            mDrawerLayout = findViewById(R.id.drawerLayout);
+            mNavigationView = findViewById(R.id.drawer_navigation);
+            if (isReminderDisable){
+                loadSettingsFragmentWithOverlay();
+            }else if (savedInstanceState == null){
+                loadInitialFragment();
+            }
+
+            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, getToolbar(), R.string.app_name,
+                    R.string.app_name);
+
+            mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+                @Override
+                public void onDrawerSlide(View view, float v) {
+
+                }
+
+                @Override
+                public void onDrawerOpened(View view) {
+                    Logger.d(TAG, "onDrawerOpened");
+                    checkForOverlayOnDrawer();
+                }
+
+                @Override
+                public void onDrawerClosed(View view) {
+                    Logger.d(TAG, "onDrawerClosed");
+                }
+
+                @Override
+                public void onDrawerStateChanged(int i) {
+
+                }
+            });
+
+            mDrawerToggle.syncState();
+            Logger.d(TAG, "Will setNavigationItemSelectedListener on mNavigationView");
+            mNavigationView.setNavigationItemSelectedListener(this);
+            updateNavigationMenu();
+            checkAppVersionAndShowUpdatePopupIfRequired();
+            handleNotificationIntent();
+            Analytics.getInstance().setUserProperties();
         }
     }
 
@@ -218,13 +210,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
-        startActivity(intent);
-        finish();
-    }
-
-    private void startOnboardingActivity() {
-        Intent intent = new Intent(this, OnBoardingActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
