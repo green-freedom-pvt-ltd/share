@@ -17,7 +17,7 @@
             android:id="@+id/tv_lets_run"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/begin_run"
+            android:text="@string/let_go"
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="16sp"/>

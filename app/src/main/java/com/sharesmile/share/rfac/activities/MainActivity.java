@@ -179,7 +179,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     NavigationView navigationView = findViewById(R.id.drawer_navigation);
                     ArrayList<View> views = new ArrayList<>();
                     navigationView.findViewsWithText(views, getString(R.string.help_center), View.FIND_VIEWS_WITH_TEXT);
-                    if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                    if (isDrawerOpened()){
                         Utils.showOverlay(OnboardingOverlay.HELP_CENTER,
                                 views.get(0),
                                 MainActivity.this,
@@ -389,6 +389,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         showHomeAsUpEnable(showAsUpEnable);
     }
 
+    @Override
+    public boolean isDrawerOpened() {
+        return mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
     public void showHomeAsUpEnable(boolean showUp) {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -413,7 +418,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+        if (isDrawerOpened()) {
             mDrawerLayout.closeDrawer(Gravity.LEFT);
             return;
         }
@@ -458,8 +463,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
         else if (menuItem.getItemId() == R.id.nav_item_help) {
             performOperation(OPEN_HELP_CENTER, false);
-            SharedPrefsManager.getInstance()
-                    .setBoolean(OnboardingOverlay.HELP_CENTER.getDidUsePrefKey(), true);
+            OnboardingOverlay.HELP_CENTER.registerUseOfOverlay();
             AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
                     .buildAndDispatch();
         } else if (menuItem.getItemId() == R.id.nav_item_share) {

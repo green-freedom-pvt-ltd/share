@@ -11,11 +11,11 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 public enum OnboardingOverlay {
 
     SWIPE_CAUSE(1, 3000, 10000, "pref_did_swipe_cause"),
-    LETS_GO(1, 4000, 10000, "pref_did_use_lets_go_overlay"),
+    LETS_GO(1, 2000, 10000, "pref_did_use_lets_go_overlay"),
     DRAWER(3, 3000, 10000, "pref_did_use_hamburger"),
     FEED(7, 3000, 10000, "pref_did_use_feed"),
     OVERALL_IMAPACT(10, 3000, 10000, "pref_did_see_impact_so_far"),
-    HELP_CENTER(2, 300, 10000, "pref_did_use_help_center");
+    HELP_CENTER(8, 300, 10000, "pref_did_use_help_center");
 
     private int minLaunchCount;
     private int delayInMillis;
@@ -41,7 +41,7 @@ public enum OnboardingOverlay {
         return maxWorkoutCount;
     }
 
-    public String getDidUsePrefKey() {
+    private String getDidUsePrefKey() {
         return didUsePrefKey;
     }
 
@@ -87,5 +87,9 @@ public enum OnboardingOverlay {
         return  !SharedPrefsManager.getInstance().getBoolean(getDidUsePrefKey())
                     && screenLaunchCount >= getMinLaunchCount()
                     && workoutCount <= getMaxWorkoutCount();
+    }
+
+    public void registerUseOfOverlay(){
+        SharedPrefsManager.getInstance().setBoolean(getDidUsePrefKey(), true);
     }
 }

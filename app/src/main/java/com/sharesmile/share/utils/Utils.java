@@ -1184,45 +1184,12 @@ public class Utils {
                 }
                 if (state == STATE_DISMISSED){
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
-                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
+                    overlay.registerUseOfOverlay();
                 }
                 if (state == STATE_FINISHED){
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
                     prompt.dismiss();
-                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
-                }
-            }
-        });
-        builder.show();
-    }
-
-    public static void showOverlay(final OnboardingOverlay overlay, int targetViewId, Activity activity, boolean isRectangular){
-        Logger.d(TAG, "showOverlay: " + overlay.name());
-        final MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
-        builder.setTarget(targetViewId);
-        builder.setPrimaryText(overlay.getTitle());
-        builder.setSecondaryText(overlay.getDescription());
-        if (isRectangular){
-            builder.setPromptBackground(new RectanglePromptBackground());
-            builder.setPromptFocal(new RectanglePromptFocal());
-        }
-        builder.setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener()
-        {
-            @Override
-            public void onPromptStateChanged(MaterialTapTargetPrompt prompt, int state)
-            {
-                if (state == STATE_FOCAL_PRESSED)
-                {
-                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " +  STATE_FOCAL_PRESSED);
-                }
-                if (state == STATE_DISMISSED){
-                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
-                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
-                }
-                if (state == STATE_FINISHED){
-                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
-                    prompt.dismiss();
-                    SharedPrefsManager.getInstance().setBoolean(overlay.getDidUsePrefKey(), true);
+                    overlay.registerUseOfOverlay();
                 }
             }
         });

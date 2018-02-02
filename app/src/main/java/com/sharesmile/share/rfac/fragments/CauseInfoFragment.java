@@ -141,7 +141,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
             mRunButtonText.setText(getString(R.string.tell_your_friends));
             mRunButtonImage.setVisibility(View.GONE);
         } else {
-            mRunButtonText.setText(getString(R.string.begin_run));
+            mRunButtonText.setText(getString(R.string.let_go));
             mRunButtonImage.setVisibility(View.VISIBLE);
         }
     }

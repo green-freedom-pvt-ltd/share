@@ -456,4 +456,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         super.onDestroy();
     }
 
+    /*
+        Only MainActivity, which has a drawer, overrides this method
+     */
+    @Override
+    public boolean isDrawerOpened() {
+        return false;
+    }
 }

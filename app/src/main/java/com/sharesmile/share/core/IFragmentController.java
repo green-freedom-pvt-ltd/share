@@ -66,5 +66,7 @@ public interface IFragmentController {
 
     void setToolbarElevation(float dpValue);
 
+    boolean isDrawerOpened();
+
 
 }
