@@ -174,7 +174,7 @@ public class WorkoutService extends Service implements
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
-    private void updateGoogleFitDetailsInSyncedWorkoutAndStartSync(WorkoutData data){
+    private void updateGoogleFitDetailsInSyncedWorkout(WorkoutData data){
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         Workout storedWorkout = mWorkoutDao.queryBuilder()
                 .where(WorkoutDao.Properties.WorkoutId.eq(data.getWorkoutId()))
@@ -185,10 +185,6 @@ public class WorkoutService extends Service implements
         storedWorkout.setEstimatedCalories((double)data.getEstimatedCalories());
 
         mWorkoutDao.insertOrReplace(storedWorkout);
-        String key = Utils.getWorkoutLocationDataPendingQueuePrefKey(storedWorkout.getWorkoutId());
-        SharedPrefsManager.getInstance().setObject(key, data);
-
-        SyncService.pushWorkoutDataWithBackoff();
     }
 
     private void persistWorkoutInDb(WorkoutData data){
@@ -235,6 +231,8 @@ public class WorkoutService extends Service implements
         workoutDao.insertOrReplace(workout);
 
         Utils.updateTrackRecordFromDb();
+        String key = Utils.getWorkoutLocationDataPendingQueuePrefKey(data.getWorkoutId());
+        SharedPrefsManager.getInstance().setObject(key, data);
     }
 
     @Override
@@ -323,11 +321,21 @@ public class WorkoutService extends Service implements
         if (result.getDistance() >= mCauseData.getMinDistance()
                 && !result.isMockLocationDetected()) {
             persistWorkoutInDb(result);
+            // We send the Workout complete event only after we have the estimated data with us
+            AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
+                    .addBundle(result.getWorkoutBundle())
+                    .put("cause_id", mCauseData.getId())
+                    .put("cause_title", mCauseData.getTitle())
+                    .put("num_spikes", result.getNumGpsSpikes())
+                    .put("bolt_count", result.getUsainBoltCount())
+                    .put("num_update_events", result.getNumUpdateEvents())
+                    .buildAndDispatch();
+
             // Start background thread to read estimated data from GoogleFit.
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    readGoogleFitHistoryAndUpdateWorkout(result.copy());
+                    readGoogleFitHistoryAndTriggerSync(result.copy());
                 }
             }).start();
         }else {
@@ -341,23 +349,15 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void readGoogleFitHistoryAndUpdateWorkout(WorkoutData result){
-        // Synchronously read estimated data and update the WorkoutData result object
-        googleFitTracker.readAndStop(result);
+    private void readGoogleFitHistoryAndTriggerSync(WorkoutData result){
+        if (googleFitTracker != null){
+            // Synchronously read estimated data and update the WorkoutData result object
+            googleFitTracker.readAndStop(result);
+            updateGoogleFitDetailsInSyncedWorkout(result);
+        }
 
-        updateGoogleFitDetailsInSyncedWorkoutAndStartSync(result);
-
-        // We send the Workout complete event only after we have the estimated data with us
-        AnalyticsEvent.create(Event.ON_WORKOUT_COMPLETE)
-                .addBundle(result.getWorkoutBundle())
-                .put("cause_id", mCauseData.getId())
-                .put("cause_title", mCauseData.getTitle())
-                .put("num_spikes", result.getNumGpsSpikes())
-                .put("bolt_count", result.getUsainBoltCount())
-                .put("num_update_events", result.getNumUpdateEvents())
-                .put("estimated_distance", result.getEstimatedDistance())
-                .put("estimated_steps", result.getEstimatedSteps())
-                .buildAndDispatch();
+        // Trigger Sync on server
+        SyncService.pushWorkoutDataWithBackoff();
     }
 
 
