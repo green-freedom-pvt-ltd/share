@@ -2,7 +2,7 @@ package com.sharesmile.share.rfac;
 
 import android.view.View;
 
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.rfac.fragments.HomeScreenFragment;
 import com.sharesmile.share.utils.Utils;
 
 /**
@@ -11,15 +11,15 @@ import com.sharesmile.share.utils.Utils;
 
 public class ShowOverlayRunnable implements Runnable {
 
-    BaseFragment parentFragment;
+    HomeScreenFragment homescreenFragment;
     private OnboardingOverlay overlay;
     private View target;
     private boolean isRectangular;
     private boolean cancelled;
 
-    public ShowOverlayRunnable(BaseFragment parentFragment, OnboardingOverlay overlay,
+    public ShowOverlayRunnable(HomeScreenFragment parentFragment, OnboardingOverlay overlay,
                                View target, boolean isRectangular) {
-        this.parentFragment = parentFragment;
+        this.homescreenFragment = parentFragment;
         this.overlay = overlay;
         this.target = target;
         this.isRectangular = isRectangular;
@@ -28,10 +28,16 @@ public class ShowOverlayRunnable implements Runnable {
     @Override
     public void run() {
         if (!cancelled
-                && parentFragment.isAttachedToActivity()
-                && parentFragment.isResumed()
-                && !parentFragment.getFragmentController().isDrawerVisible()){
-            Utils.showOverlay(overlay, target, parentFragment.getActivity(), isRectangular);
+                && homescreenFragment.isAttachedToActivity()
+                && homescreenFragment.isResumed()
+                && !homescreenFragment.getFragmentController().isDrawerVisible() ){
+            if (OnboardingOverlay.LETS_GO.equals(overlay)
+                    && (homescreenFragment.getCurrentCause() == null
+                        || homescreenFragment.getCurrentCause().isCompleted())){
+                // Won't show Let's Go overlay for a completed cause card
+                return;
+            }
+            Utils.showOverlay(overlay, target, homescreenFragment.getActivity(), isRectangular);
         }
     }
 
@@ -39,6 +45,6 @@ public class ShowOverlayRunnable implements Runnable {
         cancelled = true;
         overlay = null;
         target = null;
-        parentFragment = null;
+        homescreenFragment = null;
     }
 }

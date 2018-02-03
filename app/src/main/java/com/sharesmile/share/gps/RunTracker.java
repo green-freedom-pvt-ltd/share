@@ -16,7 +16,6 @@ import com.sharesmile.share.gps.location.LocationDeserializer;
 import com.sharesmile.share.gps.location.LocationSerializer;
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
-import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
@@ -51,19 +50,17 @@ public class RunTracker implements Tracker {
                 }
             }else{
                 // User started workout
+                SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD_AS_STRING);
                 dataStore = WorkoutSingleton.getInstance().beginWorkout();
                 resumeRun();
             }
         }
     }
 
-    public synchronized WorkoutData endRun(){
+    public synchronized void endRun(){
         Logger.d(TAG, "endRun");
-        WorkoutData workoutData = dataStore.clear();
         SharedPrefsManager.getInstance().removeKey(Constants.PREF_PREV_DIST_RECORD_AS_STRING);
-        WorkoutSingleton.getInstance().endWorkout();
         listener = null;
-        return workoutData;
     }
 
 

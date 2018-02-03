@@ -15,7 +15,7 @@ public enum OnboardingOverlay {
     DRAWER(3, 3000, 10000, "pref_did_use_hamburger"),
     FEED(7, 3000, 10000, "pref_did_use_feed"),
     OVERALL_IMAPACT(10, 3000, 10000, "pref_did_see_impact_so_far"),
-    HELP_CENTER(8, 300, 10000, "pref_did_use_help_center");
+    HELP_CENTER(8, 250, 10000, "pref_did_use_help_center");
 
     private int minLaunchCount;
     private int delayInMillis;

@@ -277,50 +277,12 @@ public class WorkoutService extends Service implements
                         .buildAndDispatch();
             }
 
-            if (tracker != null) {
-                final WorkoutData result = tracker.endRun();
-                tracker = null;
-
-                if (result.isMockLocationDetected()){
-                    EventBus.getDefault().post(new UpdateUiOnMockLocation());
-                }
-                else if (result.hasConsecutiveUsainBolts()){
-                    if (result.isAutoFlagged()){
-                        EventBus.getDefault().post(new UsainBoltForceExit(true));
-                    }else {
-                        EventBus.getDefault().post(new UsainBoltForceExit(false));
-                    }
-                }else if (result.isAutoFlagged()){
-                    EventBus.getDefault().post(new UpdateUiOnAutoFlagWorkout(result.getAvgSpeed(),
-                            Math.round(result.getRecordedTime())));
-                }
-
-                sendWorkoutResultBroadcast(result);
-                // Do not perform activity detection until the next 24 hours, unless user starts workout
-                ActivityDetector.getInstance().stopActivityDetection();
-
-                // Persist run only when distance is more than 100m
-                //      & MockLocation is not enabled
-                if (result.getDistance() >= mCauseData.getMinDistance()
-                        && !result.isMockLocationDetected()) {
-                    persistWorkoutInDb(result);
-                    // Start background thread to read estimated data from GoogleFit.
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            readGoogleFitHistoryAndUpdateWorkout(result.copy());
-                        }
-                    }).start();
-                }else {
-                    // Delete the files in which location data of all the batches of this workout was stored
-                    for (int i=0; i< result.getBatches().size(); i++) {
-                        WorkoutBatch batch = result.getBatches().get(i);
-                        if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
-                            Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
-                        }
-                    }
-                }
+            if (tracker != null){
+                tracker.endRun();
             }
+
+            WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
+            handleWorkoutResult(result);
 
             stopTimer();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
@@ -333,6 +295,49 @@ public class WorkoutService extends Service implements
             unBindFromActivityAndStop();
             distanceInKmsOnLastUpdateEvent = 0f;
             cancelAllWorkoutNotifications();
+        }
+    }
+
+    private void handleWorkoutResult(final WorkoutData result){
+
+        if (result.isMockLocationDetected()){
+            EventBus.getDefault().post(new UpdateUiOnMockLocation());
+        }
+        else if (result.hasConsecutiveUsainBolts()){
+            if (result.isAutoFlagged()){
+                EventBus.getDefault().post(new UsainBoltForceExit(true));
+            }else {
+                EventBus.getDefault().post(new UsainBoltForceExit(false));
+            }
+        }else if (result.isAutoFlagged()){
+            EventBus.getDefault().post(new UpdateUiOnAutoFlagWorkout(result.getAvgSpeed(),
+                    Math.round(result.getRecordedTime())));
+        }
+
+        sendWorkoutResultBroadcast(result);
+        // Do not perform activity detection until the next 24 hours, unless user starts workout
+        ActivityDetector.getInstance().stopActivityDetection();
+
+        // Persist run only when distance is more than 100m
+        //      & MockLocation is not enabled
+        if (result.getDistance() >= mCauseData.getMinDistance()
+                && !result.isMockLocationDetected()) {
+            persistWorkoutInDb(result);
+            // Start background thread to read estimated data from GoogleFit.
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    readGoogleFitHistoryAndUpdateWorkout(result.copy());
+                }
+            }).start();
+        }else {
+            // Delete the files in which location data of all the batches of this workout was stored
+            for (int i=0; i< result.getBatches().size(); i++) {
+                WorkoutBatch batch = result.getBatches().get(i);
+                if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+                    Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
+                }
+            }
         }
     }
 

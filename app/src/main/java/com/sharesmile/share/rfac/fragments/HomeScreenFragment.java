@@ -168,7 +168,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 public void run() {
                     if (isAttachedToActivity()
                             && isResumed()
-                            && !getFragmentController().isDrawerVisible()){
+                            && !getFragmentController().isDrawerVisible()
+                            && !CauseDataStore.getInstance().getCausesToShow().isEmpty()){
                         // Show swipe screen overlay
                         swipeToPickOverlay.setVisibility(View.VISIBLE);
                     }
@@ -394,6 +395,13 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         mRunButton.setVisibility(View.VISIBLE);
         hideProgressDialog();
 
+    }
+
+    public CauseData getCurrentCause(){
+        if (viewPager != null){
+            return mAdapter.getItemAtPosition(viewPager.getCurrentItem());
+        }
+        return null;
     }
 
     private void setOverallImpactTextView(int overallImpact){

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -83,9 +84,11 @@ public class WorkoutSingleton {
         return dataStore;
     }
 
-    public void endWorkout(){
+    public synchronized WorkoutData endWorkout(){
+        WorkoutData workoutData = dataStore.clear();
         setState(State.IDLE);
         dataStore = null;
+        return workoutData;
     }
 
     public void pauseWorkout(String reason){

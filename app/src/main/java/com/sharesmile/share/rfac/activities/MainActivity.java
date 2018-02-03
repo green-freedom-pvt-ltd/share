@@ -437,8 +437,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
-
         Logger.d(TAG, "onNavigationItemSelected");
+
+        if (overlayRunnable != null){
+            overlayRunnable.cancel();
+        }
 
         if (menuItem.getItemId() == R.id.nav_item_profile) {
             replaceFragment(new ProfileStatsFragment(), true);

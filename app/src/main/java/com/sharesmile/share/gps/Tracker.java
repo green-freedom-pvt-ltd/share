@@ -4,14 +4,13 @@ import android.location.Location;
 
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
-import com.sharesmile.share.gps.models.WorkoutData;
 
 /**
  * Created by ankitm on 22/03/16.
  */
 public interface Tracker {
 
-	WorkoutData endRun();
+	void endRun();
 	void pauseRun(String reason);
 	void resumeRun();
 	boolean isActive();
