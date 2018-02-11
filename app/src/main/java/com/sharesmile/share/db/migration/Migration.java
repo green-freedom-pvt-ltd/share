@@ -1,8 +1,10 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.sharesmile.share.db.UpgradeHelper;
 
 /**
 * Migration abstraction designed to be a chain of responsibility pattern.

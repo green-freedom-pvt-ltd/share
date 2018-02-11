@@ -1,15 +1,17 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 /**
- * Created by ankitmaheshwari on 4/26/17.
+ * Created by ankitmaheshwari on 12/17/17.
  */
 
-public class MigrateV6ToV7 extends MigrationImpl {
+public class MigrateV14ToV15 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -17,8 +19,9 @@ public class MigrateV6ToV7 extends MigrationImpl {
     @Override
     public int applyMigration(@NonNull SQLiteDatabase db,
                               int currentVersion) {
+
         prepareMigration(db, currentVersion);
-        db.execSQL(getSqlStringForMigration());
+        db.execSQL(getSqlQueryForAddingColumn(" 'USAIN_BOLT_COUNT' INTEGER"));
 
         return getMigratedVersion();
     }
@@ -28,7 +31,7 @@ public class MigrateV6ToV7 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 6;
+        return 14;
     }
 
     /**
@@ -36,7 +39,7 @@ public class MigrateV6ToV7 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 7;
+        return 15;
     }
 
     /**
@@ -44,11 +47,11 @@ public class MigrateV6ToV7 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV5ToV6();
+        return new MigrateV13ToV14();
     }
 
-    private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN 'VERSION' INTEGER";
+    private String getSqlQueryForAddingColumn(String columnDef) {
+        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN " + columnDef;
     }
 
 }

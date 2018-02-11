@@ -1,21 +1,17 @@
-package com.sharesmile.share.DbMigration;
-
-/**
- * Created by shine on 11/09/16.
- */
+package com.sharesmile.share.db.migration.history;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.v4.CauseDao;
-
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 /**
- * Migration from Version1 to Version2
- *
- * @author Jeremy
+ * Created by ankitmaheshwari on 6/15/17.
  */
-public class MigrateV3ToV4 extends MigrationImpl {
+
+public class MigrateV8ToV9 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -25,7 +21,7 @@ public class MigrateV3ToV4 extends MigrationImpl {
                               int currentVersion) {
         prepareMigration(db, currentVersion);
 
-        db.execSQL(getSqlStringForMigration());
+        db.execSQL(getSqlQueryForAddingColumn(" 'TEAM_ID' INTEGER"));
 
         return getMigratedVersion();
     }
@@ -35,7 +31,7 @@ public class MigrateV3ToV4 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 3;
+        return 8;
     }
 
     /**
@@ -43,7 +39,7 @@ public class MigrateV3ToV4 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 4;
+        return 9;
     }
 
     /**
@@ -51,10 +47,11 @@ public class MigrateV3ToV4 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV2ToV3();
+        return new MigrateV7ToV8();
     }
 
-    private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + CauseDao.TABLENAME + "' ADD COLUMN 'ORDER_PRIORITY' INTEGER DEFAULT 0";
+    private String getSqlQueryForAddingColumn(String columnDef) {
+        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN " + columnDef;
     }
+
 }

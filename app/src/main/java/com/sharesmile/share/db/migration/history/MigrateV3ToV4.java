@@ -1,15 +1,23 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
+
+/**
+ * Created by shine on 11/09/16.
+ */
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
+import com.sharesmile.share.v4.CauseDao;
+
 
 /**
- * Created by ankitmaheshwari on 6/27/17.
+ * Migration from Version1 to Version2
+ *
+ * @author Jeremy
  */
-
-public class MigrateV9ToV10 extends MigrationImpl {
+public class MigrateV3ToV4 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -17,9 +25,9 @@ public class MigrateV9ToV10 extends MigrationImpl {
     @Override
     public int applyMigration(@NonNull SQLiteDatabase db,
                               int currentVersion) {
-
         prepareMigration(db, currentVersion);
-        db.execSQL(getSqlQueryForAddingColumn(" 'NUM_SPIKES' INTEGER"));
+
+        db.execSQL(getSqlStringForMigration());
 
         return getMigratedVersion();
     }
@@ -29,7 +37,7 @@ public class MigrateV9ToV10 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 9;
+        return 3;
     }
 
     /**
@@ -37,7 +45,7 @@ public class MigrateV9ToV10 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 10;
+        return 4;
     }
 
     /**
@@ -45,11 +53,10 @@ public class MigrateV9ToV10 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV8ToV9();
+        return new MigrateV2ToV3();
     }
 
-    private String getSqlQueryForAddingColumn(String columnDef) {
-        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN " + columnDef;
+    private String getSqlStringForMigration() {
+        return "ALTER TABLE '" + CauseDao.TABLENAME + "' ADD COLUMN 'ORDER_PRIORITY' INTEGER DEFAULT 0";
     }
-
 }

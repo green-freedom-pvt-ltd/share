@@ -1,13 +1,16 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 /**
- * Created by samvedana on 24/11/14.
+ * Created by shine on 11/09/16.
  */
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.v2.MessageDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
+import com.sharesmile.share.v3.LeaderBoardDao;
+import com.sharesmile.share.v3.MessageDao;
 
 
 /**
@@ -15,7 +18,7 @@ import com.sharesmile.share.v2.MessageDao;
  *
  * @author Jeremy
  */
-public class MigrateV1ToV2 extends MigrationImpl {
+public class MigrateV2ToV3 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -25,7 +28,11 @@ public class MigrateV1ToV2 extends MigrationImpl {
                               int currentVersion) {
         prepareMigration(db, currentVersion);
 
-        MessageDao.createTable(db, true);
+        db.execSQL(getSqlStringForMigration());
+
+        //created LeaderBoard table
+        LeaderBoardDao.createTable(db, true);
+
 
         return getMigratedVersion();
     }
@@ -35,14 +42,6 @@ public class MigrateV1ToV2 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getMigratedVersion() {
         return 2;
     }
 
@@ -50,7 +49,19 @@ public class MigrateV1ToV2 extends MigrationImpl {
      * {@inheritDoc}
      */
     @Override
+    public int getMigratedVersion() {
+        return 3;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Migration getPreviousMigration() {
-        return null;
+        return new MigrateV1ToV2();
+    }
+
+    private String getSqlStringForMigration() {
+        return  "ALTER TABLE '" + MessageDao.TABLENAME + "' ADD COLUMN 'VIDEO_ID' TEXT DEFAULT NULL";
     }
 }

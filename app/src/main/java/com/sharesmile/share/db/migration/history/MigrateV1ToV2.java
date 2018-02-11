@@ -1,15 +1,23 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
+
+/**
+ * Created by samvedana on 24/11/14.
+ */
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
+import com.sharesmile.share.v2.MessageDao;
+
 
 /**
- * Created by ankitmaheshwari on 5/15/17.
+ * Migration from Version1 to Version2
+ *
+ * @author Jeremy
  */
-
-public class MigrateV7ToV8 extends MigrationImpl {
+public class MigrateV1ToV2 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -18,7 +26,8 @@ public class MigrateV7ToV8 extends MigrationImpl {
     public int applyMigration(@NonNull SQLiteDatabase db,
                               int currentVersion) {
         prepareMigration(db, currentVersion);
-        db.execSQL(getSqlStringForMigration());
+
+        MessageDao.createTable(db, true);
 
         return getMigratedVersion();
     }
@@ -28,7 +37,7 @@ public class MigrateV7ToV8 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 7;
+        return 1;
     }
 
     /**
@@ -36,7 +45,7 @@ public class MigrateV7ToV8 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 8;
+        return 2;
     }
 
     /**
@@ -44,11 +53,6 @@ public class MigrateV7ToV8 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV6ToV7();
+        return null;
     }
-
-    private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN 'CALORIES' REAL";
-    }
-
 }

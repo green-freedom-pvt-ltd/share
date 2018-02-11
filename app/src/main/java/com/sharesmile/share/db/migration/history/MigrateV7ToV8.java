@@ -1,15 +1,17 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.LeaderBoardDao;
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 /**
- * Created by ankitmaheshwari on 3/31/17.
+ * Created by ankitmaheshwari on 5/15/17.
  */
 
-public class MigrateV5ToV6 extends MigrationImpl {
+public class MigrateV7ToV8 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -28,7 +30,7 @@ public class MigrateV5ToV6 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 5;
+        return 7;
     }
 
     /**
@@ -36,7 +38,7 @@ public class MigrateV5ToV6 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 6;
+        return 8;
     }
 
     /**
@@ -44,11 +46,11 @@ public class MigrateV5ToV6 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV4ToV5();
+        return new MigrateV6ToV7();
     }
 
     private String getSqlStringForMigration() {
-        return "ALTER TABLE '" + LeaderBoardDao.TABLENAME + "' ADD COLUMN 'RANK' INTEGER";
+        return "ALTER TABLE '" + WorkoutDao.TABLENAME + "' ADD COLUMN 'CALORIES' REAL";
     }
 
 }

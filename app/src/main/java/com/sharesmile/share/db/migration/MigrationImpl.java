@@ -1,4 +1,4 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration;
 
 /**
 * Created by samvedana on 24/11/14.

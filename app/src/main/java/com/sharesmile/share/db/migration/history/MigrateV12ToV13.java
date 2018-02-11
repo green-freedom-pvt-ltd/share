@@ -1,15 +1,17 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 /**
- * Created by ankitmaheshwari on 12/17/17.
+ * Created by ankitmaheshwari
  */
 
-public class MigrateV14ToV15 extends MigrationImpl {
+public class MigrateV12ToV13 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -19,7 +21,7 @@ public class MigrateV14ToV15 extends MigrationImpl {
                               int currentVersion) {
 
         prepareMigration(db, currentVersion);
-        db.execSQL(getSqlQueryForAddingColumn(" 'USAIN_BOLT_COUNT' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'CAUSE_ID' INTEGER"));
 
         return getMigratedVersion();
     }
@@ -29,7 +31,7 @@ public class MigrateV14ToV15 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 14;
+        return 12;
     }
 
     /**
@@ -37,7 +39,7 @@ public class MigrateV14ToV15 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 15;
+        return 13;
     }
 
     /**
@@ -45,7 +47,7 @@ public class MigrateV14ToV15 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV13ToV14();
+        return new MigrateV11ToV12();
     }
 
     private String getSqlQueryForAddingColumn(String columnDef) {
@@ -53,3 +55,4 @@ public class MigrateV14ToV15 extends MigrationImpl {
     }
 
 }
+

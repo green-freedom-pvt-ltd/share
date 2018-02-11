@@ -1,10 +1,12 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 import java.util.ArrayList;
 import java.util.List;

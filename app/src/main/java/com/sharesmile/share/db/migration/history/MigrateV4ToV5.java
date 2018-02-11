@@ -1,4 +1,4 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 /**
  * Created by shine on 11/09/16.
@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
+
 public class MigrateV4ToV5 extends MigrationImpl {
 
     /**

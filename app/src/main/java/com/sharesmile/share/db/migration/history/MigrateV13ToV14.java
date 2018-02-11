@@ -1,15 +1,17 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db.migration.history;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 /**
- * Created by ankitmaheshwari
+ * Created by ankitmaheshwari on 12/15/17.
  */
 
-public class MigrateV12ToV13 extends MigrationImpl {
+public class MigrateV13ToV14 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -19,7 +21,11 @@ public class MigrateV12ToV13 extends MigrationImpl {
                               int currentVersion) {
 
         prepareMigration(db, currentVersion);
-        db.execSQL(getSqlQueryForAddingColumn(" 'CAUSE_ID' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'ESTIMATED_DISTANCE' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'ESTIMATED_STEPS' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'ESTIMATED_CALORIES' REAL"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'GOOGLE_FIT_STEP_COUNT' INTEGER"));
+        db.execSQL(getSqlQueryForAddingColumn(" 'GOOGLE_FIT_DISTANCE' REAL"));
 
         return getMigratedVersion();
     }
@@ -29,14 +35,6 @@ public class MigrateV12ToV13 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 12;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getMigratedVersion() {
         return 13;
     }
 
@@ -44,8 +42,16 @@ public class MigrateV12ToV13 extends MigrationImpl {
      * {@inheritDoc}
      */
     @Override
+    public int getMigratedVersion() {
+        return 14;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Migration getPreviousMigration() {
-        return new MigrateV11ToV12();
+        return new MigrateV12ToV13();
     }
 
     private String getSqlQueryForAddingColumn(String columnDef) {
@@ -53,4 +59,3 @@ public class MigrateV12ToV13 extends MigrationImpl {
     }
 
 }
-

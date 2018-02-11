@@ -1,4 +1,4 @@
-package com.sharesmile.share.DbMigration;
+package com.sharesmile.share.db;
 
 
 import android.content.Context;
@@ -7,6 +7,20 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.sharesmile.share.DaoMaster;
+import com.sharesmile.share.db.migration.history.MigrateV10ToV11;
+import com.sharesmile.share.db.migration.history.MigrateV11ToV12;
+import com.sharesmile.share.db.migration.history.MigrateV12ToV13;
+import com.sharesmile.share.db.migration.history.MigrateV13ToV14;
+import com.sharesmile.share.db.migration.history.MigrateV14ToV15;
+import com.sharesmile.share.db.migration.history.MigrateV1ToV2;
+import com.sharesmile.share.db.migration.history.MigrateV2ToV3;
+import com.sharesmile.share.db.migration.history.MigrateV3ToV4;
+import com.sharesmile.share.db.migration.history.MigrateV4ToV5;
+import com.sharesmile.share.db.migration.history.MigrateV5ToV6;
+import com.sharesmile.share.db.migration.history.MigrateV6ToV7;
+import com.sharesmile.share.db.migration.history.MigrateV7ToV8;
+import com.sharesmile.share.db.migration.history.MigrateV8ToV9;
+import com.sharesmile.share.db.migration.history.MigrateV9ToV10;
 
 
 /**

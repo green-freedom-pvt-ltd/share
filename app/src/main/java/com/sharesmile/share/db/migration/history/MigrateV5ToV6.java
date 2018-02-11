@@ -1,23 +1,17 @@
-package com.sharesmile.share.DbMigration;
-
-/**
- * Created by shine on 11/09/16.
- */
+package com.sharesmile.share.db.migration.history;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.v3.LeaderBoardDao;
-import com.sharesmile.share.v3.Message;
-import com.sharesmile.share.v3.MessageDao;
-
+import com.sharesmile.share.LeaderBoardDao;
+import com.sharesmile.share.db.migration.Migration;
+import com.sharesmile.share.db.migration.MigrationImpl;
 
 /**
- * Migration from Version1 to Version2
- *
- * @author Jeremy
+ * Created by ankitmaheshwari on 3/31/17.
  */
-public class MigrateV2ToV3 extends MigrationImpl {
+
+public class MigrateV5ToV6 extends MigrationImpl {
 
     /**
      * {@inheritDoc}
@@ -26,12 +20,7 @@ public class MigrateV2ToV3 extends MigrationImpl {
     public int applyMigration(@NonNull SQLiteDatabase db,
                               int currentVersion) {
         prepareMigration(db, currentVersion);
-
         db.execSQL(getSqlStringForMigration());
-
-        //created LeaderBoard table
-        LeaderBoardDao.createTable(db, true);
-
 
         return getMigratedVersion();
     }
@@ -41,7 +30,7 @@ public class MigrateV2ToV3 extends MigrationImpl {
      */
     @Override
     public int getTargetVersion() {
-        return 2;
+        return 5;
     }
 
     /**
@@ -49,7 +38,7 @@ public class MigrateV2ToV3 extends MigrationImpl {
      */
     @Override
     public int getMigratedVersion() {
-        return 3;
+        return 6;
     }
 
     /**
@@ -57,10 +46,11 @@ public class MigrateV2ToV3 extends MigrationImpl {
      */
     @Override
     public Migration getPreviousMigration() {
-        return new MigrateV1ToV2();
+        return new MigrateV4ToV5();
     }
 
     private String getSqlStringForMigration() {
-        return  "ALTER TABLE '" + MessageDao.TABLENAME + "' ADD COLUMN 'VIDEO_ID' TEXT DEFAULT NULL";
+        return "ALTER TABLE '" + LeaderBoardDao.TABLENAME + "' ADD COLUMN 'RANK' INTEGER";
     }
+
 }

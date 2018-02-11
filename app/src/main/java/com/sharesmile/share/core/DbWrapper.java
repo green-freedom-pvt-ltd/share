@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
-import com.sharesmile.share.DbMigration.UpgradeHelper;
+import com.sharesmile.share.db.UpgradeHelper;
 import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.UserDao;
