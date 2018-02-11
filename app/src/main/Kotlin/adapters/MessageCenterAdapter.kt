@@ -6,13 +6,13 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.sharesmile.share.MainApplication.getContext
+import com.sharesmile.share.core.application.MainApplication.getContext
 import com.sharesmile.share.Message
 import com.sharesmile.share.R
 import com.sharesmile.share.analytics.events.AnalyticsEvent
 import com.sharesmile.share.analytics.events.Event
 import com.sharesmile.share.utils.DateUtil
-import com.sharesmile.share.utils.ShareImageLoader
+import com.sharesmile.share.core.ShareImageLoader
 import kotlinx.android.synthetic.main.item_message_center.view.*
 import java.util.*
 

@@ -3,7 +3,7 @@ package com.sharesmile.share.rfac.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;

@@ -12,7 +12,7 @@ import com.sharesmile.share.core.base.BaseFragment
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
-import com.sharesmile.share.utils.Urls
+import com.sharesmile.share.core.config.Urls
 import kotlinx.android.synthetic.main.fragment_faq.view.*
 
 

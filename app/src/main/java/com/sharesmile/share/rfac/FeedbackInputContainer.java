@@ -8,7 +8,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 
 import butterknife.BindView;

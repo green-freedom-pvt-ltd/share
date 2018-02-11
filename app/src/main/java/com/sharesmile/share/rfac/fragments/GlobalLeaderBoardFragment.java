@@ -10,8 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.sharesmile.share.leaderboard.GlobalLeaderBoardDataUpdated;
-import com.sharesmile.share.LeaderBoardDataStore;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -28,9 +28,9 @@ import java.util.List;
 
 import butterknife.BindView;
 
-import static com.sharesmile.share.LeaderBoardDataStore.ALL_TIME_INTERVAL;
-import static com.sharesmile.share.LeaderBoardDataStore.LAST_MONTH_INTERVAL;
-import static com.sharesmile.share.LeaderBoardDataStore.LAST_WEEK_INTERVAL;
+import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_TIME_INTERVAL;
+import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.LAST_MONTH_INTERVAL;
+import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.LAST_WEEK_INTERVAL;
 
 /**
  * Created by ankitmaheshwari on 8/5/17.

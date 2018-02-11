@@ -9,7 +9,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.base.ToolbarActivity;
 import com.sharesmile.share.rfac.fragments.FeedFragment;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import static com.sharesmile.share.core.Constants.FEED_WEBVIEW_DEFAULT_URL;
 

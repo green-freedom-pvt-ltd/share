@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import base.BaseDialog;
 import butterknife.BindView;

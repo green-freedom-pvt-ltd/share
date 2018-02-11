@@ -6,11 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.rfac.models.UserDetails;
-import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.Logger;
 
 import base.BaseDialog;
 import butterknife.BindView;

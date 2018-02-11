@@ -3,7 +3,7 @@ package com.sharesmile.share.core;
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.HowItWorksRowItem;
-import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.core.config.Urls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,9 +36,9 @@ public class Constants {
 
     public static final int CODE_GOOGLE_PLAY_SERVICES_RESOLUTION = 104;
 
-    public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.gps.location";
+    public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.tracking.location";
 
-    public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.gps.location.tracker";
+    public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.tracking.location.tracker";
 
     public static final String WORKOUT_SERVICE_BROADCAST_CATEGORY = "location_service_braodcast_category";
 

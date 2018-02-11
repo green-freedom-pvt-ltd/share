@@ -9,7 +9,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.rfac.ImageBannerContainer;
 import com.sharesmile.share.rfac.StatsBannerContainer;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import Models.LeagueBoard;
 

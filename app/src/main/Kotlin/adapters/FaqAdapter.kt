@@ -7,15 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.sharesmile.share.CustomJSONObject
-import com.sharesmile.share.MainApplication
+import com.sharesmile.share.core.application.MainApplication
 import com.sharesmile.share.R
 import com.sharesmile.share.core.base.IFragmentController
+import com.sharesmile.share.core.config.Urls
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
 import com.sharesmile.share.rfac.fragments.HomeScreenFragment
 import com.sharesmile.share.rfac.models.Qna
-import com.sharesmile.share.utils.Urls
 import kotlinx.android.synthetic.main.faq_item_user_input.view.*
 import kotlinx.android.synthetic.main.feedback_qna_item.view.*
 import org.json.JSONObject

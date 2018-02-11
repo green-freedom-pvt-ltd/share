@@ -5,7 +5,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.SharedPrefsManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

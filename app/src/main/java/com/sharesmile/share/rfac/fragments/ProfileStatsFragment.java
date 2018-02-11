@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -25,10 +25,10 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
-import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ShareImageLoader;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 

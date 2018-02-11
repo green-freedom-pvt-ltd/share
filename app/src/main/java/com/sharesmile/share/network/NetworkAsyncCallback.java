@@ -4,8 +4,8 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.sharesmile.share.core.base.UnObfuscable;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ServerTimeKeeper;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;

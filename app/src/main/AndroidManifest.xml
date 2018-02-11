@@ -28,14 +28,14 @@
         android:required="true" />
 
     <application
-        android:name=".MainApplication"
+        android:name=".core.application.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".TrackerActivity"
+            android:name=".tracking.ui.TrackerActivity"
             android:label="@string/app_name"
             android:parentActivityName=".rfac.activities.MainActivity"
             android:screenOrientation="portrait"
@@ -46,7 +46,7 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".googleapis.GoogleApiHelperActivity"
+            android:name=".tracking.google.GoogleApiHelperActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"/>
 
@@ -96,10 +96,10 @@
 
 
         <service
-            android:name=".gps.WorkoutService"
+            android:name=".tracking.workout.service.WorkoutService"
             android:exported="false" />
         <service
-            android:name=".gps.activityrecognition.ActivityRecognizedService"
+            android:name=".tracking.activityrecognition.ActivityRecognizedService"
             android:exported="false" />
 
         <meta-data
@@ -202,21 +202,21 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".gps.WorkoutServiceRetainerAlarm" android:exported="true">
+        <receiver android:name=".tracking.workout.service.WorkoutServiceRetainerAlarm" android:exported="true">
             <intent-filter>
                 <action android:name="com.sharesmile.share.gps.START_ALARM" >
                 </action>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".gps.activityrecognition.InvokeActivityDetectionAlarm" android:exported="true">
+        <receiver android:name=".tracking.activityrecognition.InvokeActivityDetectionAlarm" android:exported="true">
             <intent-filter>
                 <action android:name="com.sharesmile.share.gps.activityrecognition.START_ACTIVITY_DETECTION_ALARM" >
                 </action>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".core.time.TimeChangedReceiver">
+        <receiver android:name=".core.timekeeping.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" >
                 </action>

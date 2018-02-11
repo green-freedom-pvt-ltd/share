@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
@@ -27,9 +27,9 @@ import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.RunHistoryDateHeaderItem;
 import com.sharesmile.share.rfac.models.RunHistoryDetailsItem;
 import com.sharesmile.share.rfac.models.RunHistoryItem;
-import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;

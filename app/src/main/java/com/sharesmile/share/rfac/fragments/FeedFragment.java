@@ -16,10 +16,10 @@ import android.widget.ProgressBar;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ServerTimeKeeper;
-import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.config.Urls;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

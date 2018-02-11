@@ -5,13 +5,13 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.application.MainApplication.getContext;
 
 /**
  * Created by ankitmaheshwari on 9/3/17.

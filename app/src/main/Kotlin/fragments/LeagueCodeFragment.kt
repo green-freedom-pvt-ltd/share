@@ -19,17 +19,18 @@ import android.view.ViewGroup
 import android.widget.Button
 import base.BaseFragment2
 import com.google.gson.Gson
-import com.sharesmile.share.CauseDataStore
-import com.sharesmile.share.LeaderBoardDataStore
-import com.sharesmile.share.MainApplication
+import com.sharesmile.share.core.cause.CauseDataStore
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore
+import com.sharesmile.share.core.application.MainApplication
 import com.sharesmile.share.R
 import com.sharesmile.share.analytics.events.AnalyticsEvent
 import com.sharesmile.share.analytics.events.Event
-import com.sharesmile.share.network.NetworkAsyncCallback
-import com.sharesmile.share.network.NetworkDataProvider
-import com.sharesmile.share.network.NetworkException
+import com.sharesmile.share.core.Logger
+import com.sharesmile.share.core.config.Urls
+import com.sharesmile.share.network.*
 import com.sharesmile.share.rfac.models.UserDetails
 import com.sharesmile.share.utils.*
+import com.sharesmile.share.views.CustomTypefaceSpan
 import kotlinx.android.synthetic.main.fragment_secret_code.view.*
 import java.util.*
 

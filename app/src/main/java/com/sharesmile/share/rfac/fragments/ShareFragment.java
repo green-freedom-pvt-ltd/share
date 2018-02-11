@@ -18,20 +18,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.login.LoginImpl;
 import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.gps.WorkoutSingleton;
-import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.CauseImageData;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;

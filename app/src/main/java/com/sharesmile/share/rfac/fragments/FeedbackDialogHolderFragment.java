@@ -8,11 +8,11 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.IFragmentController;
-import com.sharesmile.share.gps.models.WorkoutData;
+import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.rfac.PostRunFeedbackDialog;
 import com.sharesmile.share.rfac.RateAndShareDialog;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import base.BaseDialog;

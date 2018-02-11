@@ -22,15 +22,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.rfac.models.UserDetails;
-import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Calendar;

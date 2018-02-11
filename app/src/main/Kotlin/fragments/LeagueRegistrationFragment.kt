@@ -12,15 +12,15 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
 import base.BaseFragment2
-import com.sharesmile.share.MainApplication
+import com.sharesmile.share.core.application.MainApplication
 import com.sharesmile.share.R
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
-import com.sharesmile.share.utils.BasicNameValuePair
-import com.sharesmile.share.utils.NameValuePair
-import com.sharesmile.share.utils.ShareImageLoader
-import com.sharesmile.share.utils.Urls
+import com.sharesmile.share.network.BasicNameValuePair
+import com.sharesmile.share.network.NameValuePair
+import com.sharesmile.share.core.ShareImageLoader
+import com.sharesmile.share.core.config.Urls
 import kotlinx.android.synthetic.main.fragment_league_registration.view.*
 import java.util.*
 

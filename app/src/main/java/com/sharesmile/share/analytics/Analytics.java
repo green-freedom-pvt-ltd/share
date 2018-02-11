@@ -4,12 +4,12 @@ import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 import com.onesignal.OneSignal;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.models.UserDetails;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 
 import java.util.HashMap;
 import java.util.Map;

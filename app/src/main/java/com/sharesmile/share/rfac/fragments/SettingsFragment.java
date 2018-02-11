@@ -20,7 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -29,8 +29,8 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.home.settings.CurrencyCode;
 import com.sharesmile.share.home.settings.DistanceUnit;
 import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;

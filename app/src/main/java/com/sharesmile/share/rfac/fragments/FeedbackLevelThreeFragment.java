@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -28,8 +28,8 @@ import com.sharesmile.share.rfac.activities.MainActivity;
 import com.sharesmile.share.rfac.models.FeedbackNode;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.rfac.models.UserFeedback;
-import com.sharesmile.share.sync.SyncHelper;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import base.BaseDialog;

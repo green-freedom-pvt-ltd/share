@@ -18,8 +18,8 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.rfac.models.LeaderBoardItem;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 
@@ -30,7 +30,7 @@ import Models.LeagueBoard;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.sharesmile.share.MainApplication.getContext;
+import static com.sharesmile.share.core.application.MainApplication.getContext;
 
 /**
  * Created by piyush on 9/1/16.

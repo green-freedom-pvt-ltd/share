@@ -3,7 +3,7 @@ package com.sharesmile.share;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 /**
  * Created by Shine on 30/04/16.
@@ -29,21 +29,4 @@ public class ViewPagerTransformer implements ViewPager.PageTransformer {
             page.setScaleY(MIN_SCALE);
         }
     }
-
-//    public static void disableTransformationFor200Ms(){
-//        Logger.d(TAG, "Setting disableTransformation as true");
-//        disableTransformation = true;
-//        AsyncTask.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(200);
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
-//                Logger.d(TAG, "Setting disableTransformation as false");
-//                disableTransformation = false;
-//            }
-//        });
-//    }
 }

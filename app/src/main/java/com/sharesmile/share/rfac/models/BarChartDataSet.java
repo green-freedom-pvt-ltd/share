@@ -4,10 +4,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.github.mikephil.charting.data.BarEntry;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import java.util.ArrayList;
 import java.util.Calendar;

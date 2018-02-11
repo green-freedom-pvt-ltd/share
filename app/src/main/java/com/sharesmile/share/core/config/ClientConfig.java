@@ -3,15 +3,14 @@ package com.sharesmile.share.core.config;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.network.FailureType;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
-import com.sharesmile.share.utils.Urls;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Arrays;

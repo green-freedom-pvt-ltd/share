@@ -11,12 +11,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.UserFeedback;
-import com.sharesmile.share.sync.SyncHelper;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.utils.DateUtil;
 
 import butterknife.BindView;

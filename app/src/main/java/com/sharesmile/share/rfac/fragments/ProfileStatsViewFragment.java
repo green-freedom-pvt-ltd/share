@@ -26,8 +26,8 @@ import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.rfac.CustomBarChartRenderer;
 import com.sharesmile.share.rfac.models.BarChartDataSet;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;

@@ -2,14 +2,14 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.text.TextUtils;
 
-import com.sharesmile.share.impactleague.LeagueBoardDataUpdated;
-import com.sharesmile.share.impactleague.LeagueDataEvent;
-import com.sharesmile.share.LeaderBoardDataStore;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.impactleague.event.LeagueBoardDataUpdated;
+import com.sharesmile.share.impactleague.event.LeagueDataEvent;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import java.util.ArrayList;
 import java.util.List;

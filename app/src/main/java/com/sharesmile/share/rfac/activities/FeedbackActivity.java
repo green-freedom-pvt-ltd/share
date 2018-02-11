@@ -14,7 +14,7 @@ import com.sharesmile.share.rfac.fragments.PastWorkoutIssueFragment;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.FeedbackResolution;
 import com.sharesmile.share.rfac.models.Run;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 

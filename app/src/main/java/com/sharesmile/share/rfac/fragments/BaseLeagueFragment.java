@@ -7,11 +7,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.sharesmile.share.impactleague.ExitLeague;
-import com.sharesmile.share.impactleague.LeagueBoardDataUpdated;
-import com.sharesmile.share.impactleague.LeagueDataEvent;
-import com.sharesmile.share.impactleague.TeamLeaderBoardDataFetched;
-import com.sharesmile.share.LeaderBoardDataStore;
+import com.sharesmile.share.impactleague.event.ExitLeague;
+import com.sharesmile.share.impactleague.event.LeagueBoardDataUpdated;
+import com.sharesmile.share.impactleague.event.LeagueDataEvent;
+import com.sharesmile.share.impactleague.event.TeamLeaderBoardDataFetched;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.R;
 
 import org.greenrobot.eventbus.EventBus;

@@ -7,7 +7,7 @@ import android.telephony.TelephonyManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 

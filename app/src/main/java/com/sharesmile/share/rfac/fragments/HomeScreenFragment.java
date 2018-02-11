@@ -21,9 +21,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.sharesmile.share.CauseDataStore;
+import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -37,8 +37,8 @@ import com.sharesmile.share.rfac.OnboardingOverlay;
 import com.sharesmile.share.rfac.ShowOverlayRunnable;
 import com.sharesmile.share.rfac.adapters.CausePageAdapter;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;

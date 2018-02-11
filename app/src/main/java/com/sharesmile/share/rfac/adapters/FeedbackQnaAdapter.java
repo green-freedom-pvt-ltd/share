@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.rfac.models.Qna;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import java.util.List;
 

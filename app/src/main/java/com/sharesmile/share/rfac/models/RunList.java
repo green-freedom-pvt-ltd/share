@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.io.Serializable;

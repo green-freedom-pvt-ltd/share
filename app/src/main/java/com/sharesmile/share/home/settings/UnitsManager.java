@@ -4,10 +4,10 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.models.ExchangeRate;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.text.NumberFormat;

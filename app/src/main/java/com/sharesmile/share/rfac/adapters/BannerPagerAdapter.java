@@ -4,7 +4,7 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 /**
  * Created by ankitmaheshwari on 9/3/17.

@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.TextView;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
@@ -15,7 +15,7 @@ import com.sharesmile.share.rfac.models.FeedbackResolution;
 import com.sharesmile.share.rfac.models.Run;
 import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import butterknife.BindView;
 

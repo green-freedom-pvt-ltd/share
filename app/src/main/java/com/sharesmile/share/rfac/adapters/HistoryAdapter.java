@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.home.settings.UnitsManager;
@@ -19,7 +19,7 @@ import com.sharesmile.share.rfac.models.RunHistoryDateHeaderItem;
 import com.sharesmile.share.rfac.models.RunHistoryDetailsItem;
 import com.sharesmile.share.rfac.models.RunHistoryItem;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.Calendar;

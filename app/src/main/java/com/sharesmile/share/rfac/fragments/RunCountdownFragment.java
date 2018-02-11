@@ -15,8 +15,8 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

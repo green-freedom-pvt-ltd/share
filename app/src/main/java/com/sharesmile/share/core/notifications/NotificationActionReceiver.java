@@ -5,11 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.sharesmile.share.tracking.PauseWorkoutEvent;
-import com.sharesmile.share.tracking.ResumeWorkoutEvent;
+import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
+import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
 import com.sharesmile.share.R;
-import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
+import com.sharesmile.share.core.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 

@@ -10,33 +10,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sharesmile.share.tracking.GpsStateChangeEvent;
-import com.sharesmile.share.tracking.UpdateUiOnAutoFlagWorkout;
-import com.sharesmile.share.tracking.UpdateUiOnMockLocation;
-import com.sharesmile.share.tracking.UpdateUiOnWorkoutPauseEvent;
-import com.sharesmile.share.tracking.UpdateUiOnWorkoutResumeEvent;
-import com.sharesmile.share.tracking.UsainBoltForceExit;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.tracking.event.GpsStateChangeEvent;
+import com.sharesmile.share.tracking.event.UpdateUiOnAutoFlagWorkout;
+import com.sharesmile.share.tracking.event.UpdateUiOnMockLocation;
+import com.sharesmile.share.tracking.event.UpdateUiOnWorkoutPauseEvent;
+import com.sharesmile.share.tracking.event.UpdateUiOnWorkoutResumeEvent;
+import com.sharesmile.share.tracking.event.UsainBoltForceExit;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.TrackerActivity;
+import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gps.WorkoutSingleton;
-import com.sharesmile.share.gps.models.WorkoutData;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.models.WorkoutData;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_BAD;
-import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_INACTIVE;
-import static com.sharesmile.share.gps.WorkoutSingleton.GPS_STATE_OK;
+import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_BAD;
+import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_INACTIVE;
+import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_OK;
 
 public abstract class RunFragment extends BaseFragment implements View.OnClickListener {
 

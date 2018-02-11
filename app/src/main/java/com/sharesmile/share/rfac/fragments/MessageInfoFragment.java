@@ -17,7 +17,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
 

@@ -4,9 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import io.fabric.sdk.android.services.concurrency.AsyncTask;
 

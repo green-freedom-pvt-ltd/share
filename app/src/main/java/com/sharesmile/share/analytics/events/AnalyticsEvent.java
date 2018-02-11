@@ -3,7 +3,7 @@ package com.sharesmile.share.analytics.events;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.Utils;

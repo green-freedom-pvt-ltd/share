@@ -7,8 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 
 /**
  * Created by ankitmaheshwari1 on 11/01/16.

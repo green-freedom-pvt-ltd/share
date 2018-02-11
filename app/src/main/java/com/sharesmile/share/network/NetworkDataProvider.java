@@ -3,11 +3,10 @@ package com.sharesmile.share.network;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.UnObfuscable;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.NameValuePair;
-import com.sharesmile.share.utils.ServerTimeKeeper;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;

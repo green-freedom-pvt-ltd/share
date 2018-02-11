@@ -2,7 +2,7 @@ package com.sharesmile.share.core.notifications;
 
 import com.clevertap.android.sdk.FcmTokenListenerService;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import io.smooch.core.Smooch;
 

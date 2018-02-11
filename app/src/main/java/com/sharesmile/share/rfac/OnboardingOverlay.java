@@ -1,8 +1,8 @@
 package com.sharesmile.share.rfac;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.utils.SharedPrefsManager;
+import com.sharesmile.share.core.SharedPrefsManager;
 
 /**
  * Created by ankitmaheshwari on 2/1/18.

@@ -13,13 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;

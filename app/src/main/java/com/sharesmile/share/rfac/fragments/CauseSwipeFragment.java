@@ -18,8 +18,8 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.utils.Logger;
-import com.sharesmile.share.utils.ShareImageLoader;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;

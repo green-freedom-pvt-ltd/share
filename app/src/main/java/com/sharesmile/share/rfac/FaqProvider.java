@@ -1,10 +1,10 @@
 package com.sharesmile.share.rfac;
 
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.MainApplication;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.rfac.models.Qna;
-import com.sharesmile.share.utils.Logger;
+import com.sharesmile.share.core.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
