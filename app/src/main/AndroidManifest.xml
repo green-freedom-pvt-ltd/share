@@ -163,21 +163,21 @@
         <!-- Facebook login END -->
 
         <service
-            android:name="com.sharesmile.share.core.CustomFirebaseInstanceIdService">
+            android:name="com.sharesmile.share.core.notifications.CustomFirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name="com.sharesmile.share.core.CustomFirebaseMessagingService">
+            android:name="com.sharesmile.share.core.notifications.CustomFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".gcm.SyncService"
+            android:name=".core.sync.SyncService"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
             <intent-filter>
@@ -194,7 +194,7 @@
         </receiver>
 
         <receiver
-            android:name=".core.NotificationActionReceiver">
+            android:name=".core.notifications.NotificationActionReceiver">
             <intent-filter>
                 <action android:name="com.sharesmile.share.notification.action.PAUSE"/>
                 <action android:name="com.sharesmile.share.notification.action.RESUME"/>
@@ -216,20 +216,10 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".core.TimeChangedReceiver">
+        <receiver android:name=".core.time.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" >
                 </action>
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".core.BootReceiver"
-            android:enabled="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
@@ -239,16 +229,6 @@
             android:theme="@style/AppTheme" />
         <activity android:name="activities.ImpactLeagueActivity"
             android:screenOrientation="portrait"/>
-
-        <provider
-            android:name=".core.ShareFileProvider"
-            android:authorities="${applicationId}.core.my.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
-        </provider>
 
         <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
     </application>

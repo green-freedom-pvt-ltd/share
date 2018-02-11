@@ -3,8 +3,8 @@ package com.sharesmile.share.rfac.fragments;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.sharesmile.share.Events.LeagueDataEvent;
-import com.sharesmile.share.Events.TeamLeaderBoardDataFetched;
+import com.sharesmile.share.impactleague.LeagueDataEvent;
+import com.sharesmile.share.impactleague.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;

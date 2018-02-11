@@ -1,8 +1,8 @@
 package com.sharesmile.share.gps;
 
 import com.crashlytics.android.Crashlytics;
-import com.sharesmile.share.core.ClientConfig;
-import com.sharesmile.share.core.Config;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
 import com.sharesmile.share.utils.DateUtil;
@@ -11,7 +11,7 @@ import com.sharesmile.share.utils.Logger;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.sharesmile.share.core.Config.MIN_NUM_SPIKES_RATE_FOR_BAD_GPS;
+import static com.sharesmile.share.core.config.Config.MIN_NUM_SPIKES_RATE_FOR_BAD_GPS;
 
 /**
  * Created by ankitm on 18/03/16.

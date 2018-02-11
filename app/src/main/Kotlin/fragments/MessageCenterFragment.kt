@@ -10,12 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.gson.Gson
-import com.sharesmile.share.Events.DBEvent
+import com.sharesmile.share.core.event.UpdateEvent
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.Message
 import com.sharesmile.share.MessageDao
 import com.sharesmile.share.R
-import com.sharesmile.share.core.BaseFragment
+import com.sharesmile.share.core.base.BaseFragment
 import com.sharesmile.share.core.Constants
 import com.sharesmile.share.rfac.fragments.MessageInfoFragment
 import com.sharesmile.share.sync.SyncHelper
@@ -62,7 +62,7 @@ class MessageCenterFragment : BaseFragment(), MessageCenterAdapter.MessageInterf
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEvent(runDataUpdated: DBEvent.MessageDataUpdated) {
+    fun onEvent(runDataUpdated: UpdateEvent.MessageDataUpdated) {
         fetchMessageDataFromDb()
     }
 

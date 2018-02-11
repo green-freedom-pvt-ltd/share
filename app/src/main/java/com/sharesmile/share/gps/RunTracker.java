@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.ClientConfig;
-import com.sharesmile.share.core.Config;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.WorkoutSingleton.State;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
@@ -23,7 +23,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.sharesmile.share.core.Config.TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE;
+import static com.sharesmile.share.core.config.Config.TRACKER_RECORD_HISTORY_QUEUE_MAX_SIZE;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.

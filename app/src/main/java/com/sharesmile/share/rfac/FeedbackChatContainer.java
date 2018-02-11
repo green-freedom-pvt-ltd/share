@@ -12,7 +12,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
-import static com.sharesmile.share.core.Config.CHAT_TOOL_TIP_DISPLAY_MAX_COUNT;
+import static com.sharesmile.share.core.config.Config.CHAT_TOOL_TIP_DISPLAY_MAX_COUNT;
 import static com.sharesmile.share.core.Constants.PREFS_CHAT_TOOLTIP_DISPLAY_COUNT;
 
 /**

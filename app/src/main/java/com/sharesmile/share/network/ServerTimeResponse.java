@@ -1,7 +1,7 @@
 package com.sharesmile.share.network;
 
 import com.google.gson.annotations.SerializedName;
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 
 /**
  * Created by ankitmaheshwari on 6/9/17.

@@ -3,7 +3,7 @@ package com.sharesmile.share.gps.models;
 import android.location.Location;
 import android.os.Parcelable;
 
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 
 import java.util.List;
 

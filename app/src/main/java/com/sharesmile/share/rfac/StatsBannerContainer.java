@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.utils.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 

@@ -12,8 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.ClientConfig;
-import com.sharesmile.share.core.Config;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.gps.RunPathFragment;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;

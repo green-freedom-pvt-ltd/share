@@ -22,16 +22,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.CauseDataStore;
-import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.ViewPagerTransformer;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.OnboardingOverlay;
 import com.sharesmile.share.rfac.ShowOverlayRunnable;
@@ -336,7 +336,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DBEvent.CauseDataUpdated causeDataUpdated) {
+    public void onEvent(UpdateEvent.CauseDataUpdated causeDataUpdated) {
         Logger.d(TAG, "onEvent: CauseDataUpdated");
         if (isVisible()){
             render();

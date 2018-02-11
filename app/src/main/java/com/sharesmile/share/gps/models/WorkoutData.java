@@ -4,7 +4,7 @@ import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 
 import java.util.List;
 

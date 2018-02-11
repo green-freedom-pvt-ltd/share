@@ -2,7 +2,7 @@ package com.sharesmile.share.rfac.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 
 import java.io.Serializable;
 import java.util.List;

@@ -2,9 +2,9 @@ package com.sharesmile.share.gps.models;
 
 import android.location.Location;
 
-import com.sharesmile.share.core.ClientConfig;
-import com.sharesmile.share.core.Config;
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
+import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;

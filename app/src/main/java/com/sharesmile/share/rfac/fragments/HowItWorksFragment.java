@@ -12,7 +12,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.rfac.adapters.HowItWorksAdapter;
 import com.sharesmile.share.rfac.models.HowItWorksRowItem;

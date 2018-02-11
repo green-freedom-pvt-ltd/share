@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.rfac.models.LeaderBoardItem;
 import com.sharesmile.share.utils.Logger;

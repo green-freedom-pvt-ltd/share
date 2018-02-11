@@ -3,7 +3,7 @@ package com.sharesmile.share.network;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.ServerTimeKeeper;
 import com.squareup.okhttp.Callback;

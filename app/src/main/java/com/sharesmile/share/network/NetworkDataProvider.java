@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.NameValuePair;
 import com.sharesmile.share.utils.ServerTimeKeeper;

@@ -8,7 +8,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.ClientConfig;
+import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;

@@ -24,11 +24,11 @@ import com.onesignal.OneSignal;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.ClientConfig;
+import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.DbWrapper;
-import com.sharesmile.share.core.NotificationActionReceiver;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.db.DbWrapper;
+import com.sharesmile.share.core.notifications.NotificationActionReceiver;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.gps.activityrecognition.ActivityDetector;
@@ -58,11 +58,11 @@ import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
-import static com.sharesmile.share.core.NotificationActionReceiver.NOTIFICATION_ID;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.NOTIFICATION_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 
 /**

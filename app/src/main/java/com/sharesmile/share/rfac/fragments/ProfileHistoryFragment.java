@@ -11,16 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.IFragmentController;
+import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.rfac.adapters.HistoryAdapter;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.Run;
@@ -128,7 +128,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DBEvent.RunDataUpdated runDataUpdated) {
+    public void onEvent(UpdateEvent.RunDataUpdated runDataUpdated) {
         fetchRunDataFromDb();
     }
 

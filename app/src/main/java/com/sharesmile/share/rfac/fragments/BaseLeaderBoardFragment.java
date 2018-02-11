@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.LeaderBoardAdapter;
 import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;

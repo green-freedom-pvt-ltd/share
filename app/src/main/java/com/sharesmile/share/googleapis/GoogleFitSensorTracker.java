@@ -14,7 +14,7 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
-import com.sharesmile.share.core.ClientConfig;
+import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 

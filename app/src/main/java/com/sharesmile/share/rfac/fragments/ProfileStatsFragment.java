@@ -15,14 +15,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.rfac.adapters.ProfileStatsViewAdapter;
 import com.sharesmile.share.sync.SyncHelper;
@@ -141,7 +141,7 @@ public class ProfileStatsFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DBEvent.RunDataUpdated runDataUpdated) {
+    public void onEvent(UpdateEvent.RunDataUpdated runDataUpdated) {
         initUi();
     }
 

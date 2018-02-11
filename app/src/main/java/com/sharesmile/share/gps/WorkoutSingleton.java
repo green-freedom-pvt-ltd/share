@@ -12,7 +12,7 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
 
 /**
  * Created by ankitmaheshwari on 4/3/17.

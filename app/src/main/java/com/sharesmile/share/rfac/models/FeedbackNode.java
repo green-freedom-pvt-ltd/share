@@ -1,6 +1,6 @@
 package com.sharesmile.share.rfac.models;
 
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 
 import java.io.Serializable;
 

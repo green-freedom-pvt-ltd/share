@@ -1,8 +1,8 @@
 package com.sharesmile.share.rfac;
 
-import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.gcm.SyncService;
+import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.rfac.models.Qna;
 import com.sharesmile.share.utils.Logger;
 
@@ -36,7 +36,7 @@ public class FaqProvider implements QnaProvider{
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DBEvent.FaqsUpdated faqsUpdated) {
+    public void onEvent(UpdateEvent.FaqsUpdated faqsUpdated) {
         Logger.d(TAG, "onEvent: FaqsUpdated");
         EventBus.getDefault().unregister(this);
         if (callbackWeakReference != null && callbackWeakReference.get() != null){

@@ -9,7 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.sharesmile.share.Events.GlobalLeaderBoardDataUpdated;
+import com.sharesmile.share.leaderboard.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;

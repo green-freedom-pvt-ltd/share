@@ -9,7 +9,7 @@ import android.widget.Toast
 import com.sharesmile.share.CustomJSONObject
 import com.sharesmile.share.MainApplication
 import com.sharesmile.share.R
-import com.sharesmile.share.core.IFragmentController
+import com.sharesmile.share.core.base.IFragmentController
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException

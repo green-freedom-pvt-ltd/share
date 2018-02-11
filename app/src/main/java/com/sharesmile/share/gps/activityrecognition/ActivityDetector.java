@@ -19,7 +19,7 @@ import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.ClientConfig;
+import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.Logger;
@@ -27,14 +27,14 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.sharesmile.share.MainApplication.showRunNotification;
-import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
-import static com.sharesmile.share.core.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
-import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
-import static com.sharesmile.share.core.Config.ACTIVITY_VALID_INTERVAL_IDLE;
-import static com.sharesmile.share.core.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
+import static com.sharesmile.share.core.config.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL;
+import static com.sharesmile.share.core.config.Config.ACTIVITY_RESET_CONFIDENCE_VALUES_INTERVAL_INACTIVE;
+import static com.sharesmile.share.core.config.Config.ACTIVITY_VALID_INTERVAL_ACTIVE;
+import static com.sharesmile.share.core.config.Config.ACTIVITY_VALID_INTERVAL_IDLE;
+import static com.sharesmile.share.core.config.Config.REMOVE_WALK_ENGAGEMENT_NOTIF_INTERVAL;
 import static com.sharesmile.share.core.Constants.PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
-import static com.sharesmile.share.core.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_STILL_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_WALK_ENGAGEMENT;
 
 /**
  * Created by ankitmaheshwari on 3/10/17.

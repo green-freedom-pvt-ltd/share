@@ -12,10 +12,10 @@ import com.google.gson.Gson;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
-import com.sharesmile.share.core.ClientConfig;
+import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.gcm.SyncService;
-import com.sharesmile.share.gcm.TaskConstants;
+import com.sharesmile.share.core.sync.SyncService;
+import com.sharesmile.share.core.sync.TaskConstants;
 import com.sharesmile.share.rfac.models.FraudData;
 import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.rfac.models.UserFeedback;
@@ -26,7 +26,7 @@ import java.util.List;
 
 import static com.sharesmile.share.core.Constants.PREF_AUTH_TOKEN;
 import static com.sharesmile.share.core.Constants.PREF_USER_EMAIL;
-import static com.sharesmile.share.gcm.TaskConstants.SYNC_DATA;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_DATA;
 
 /**
  * Created by Shine on 20/07/16.

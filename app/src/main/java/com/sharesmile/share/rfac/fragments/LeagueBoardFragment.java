@@ -2,8 +2,8 @@ package com.sharesmile.share.rfac.fragments;
 
 import android.text.TextUtils;
 
-import com.sharesmile.share.Events.LeagueBoardDataUpdated;
-import com.sharesmile.share.Events.LeagueDataEvent;
+import com.sharesmile.share.impactleague.LeagueBoardDataUpdated;
+import com.sharesmile.share.impactleague.LeagueDataEvent;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;

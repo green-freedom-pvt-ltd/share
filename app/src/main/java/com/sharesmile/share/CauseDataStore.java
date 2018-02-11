@@ -2,9 +2,9 @@ package com.sharesmile.share;
 
 import android.content.Context;
 
-import com.sharesmile.share.Events.DBEvent;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
@@ -163,7 +163,7 @@ public class CauseDataStore {
             public void onNetworkSuccess(CauseList list) {
                 Logger.d(TAG, "Successfully fetched CauseList data");
                 updateCauseList(list);
-                EventBus.getDefault().post(new DBEvent.CauseDataUpdated(causeList));
+                EventBus.getDefault().post(new UpdateEvent.CauseDataUpdated(causeList));
             }
         });
     }

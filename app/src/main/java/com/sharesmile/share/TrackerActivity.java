@@ -24,10 +24,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.BaseActivity;
+import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.core.UnitsManager;
+import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.googleapis.GoogleFitStepCounter;
 import com.sharesmile.share.gps.WorkoutService;
 import com.sharesmile.share.gps.WorkoutSingleton;

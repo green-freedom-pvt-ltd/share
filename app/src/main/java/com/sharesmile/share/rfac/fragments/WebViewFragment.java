@@ -14,7 +14,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.utils.Urls;
 
 import butterknife.BindView;

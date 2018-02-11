@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.BaseFragment;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.gps.models.WorkoutData;
 import com.sharesmile.share.utils.Logger;
 import com.sharesmile.share.utils.Utils;

@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.sharesmile.share.R
-import com.sharesmile.share.core.BaseFragment
+import com.sharesmile.share.core.base.BaseFragment
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException

@@ -8,8 +8,8 @@ import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.ClientConfig;
-import com.sharesmile.share.core.Config;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.gps.models.Calorie;
 import com.sharesmile.share.gps.models.DistRecord;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sharesmile.share.core.Config.CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL;
+import static com.sharesmile.share.core.config.Config.CONSECUTIVE_USAIN_BOLT_WAIVER_TIME_INTERVAL;
 
 /**
  * Created by ankitmaheshwari1 on 21/02/16.

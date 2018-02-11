@@ -31,9 +31,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.sharesmile.share.Events.MockLocationDetected;
+import com.sharesmile.share.tracking.MockLocationDetected;
 import com.sharesmile.share.MainApplication;
-import com.sharesmile.share.core.ClientConfig;
+import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
@@ -48,8 +48,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import static com.sharesmile.share.core.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
-import static com.sharesmile.share.core.Config.GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE;
+import static com.sharesmile.share.core.config.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
+import static com.sharesmile.share.core.config.Config.GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 
 

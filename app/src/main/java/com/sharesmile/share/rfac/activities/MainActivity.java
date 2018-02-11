@@ -35,8 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sharesmile.share.BuildConfig;
-import com.sharesmile.share.Events.DBEvent;
-import com.sharesmile.share.Events.LeagueBoardDataUpdated;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.impactleague.LeagueBoardDataUpdated;
 import com.sharesmile.share.LeaderBoardDataStore;
 import com.sharesmile.share.MainApplication;
 import com.sharesmile.share.R;
@@ -45,9 +45,9 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.IFragmentController;
-import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.core.ToolbarActivity;
+import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.core.base.ToolbarActivity;
 import com.sharesmile.share.gps.WorkoutSingleton;
 import com.sharesmile.share.pushNotification.NotificationConsts;
 import com.sharesmile.share.rfac.OnboardingOverlay;
@@ -572,7 +572,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DBEvent.CampaignDataUpdated campaignDataUpdated) {
+    public void onEvent(UpdateEvent.CampaignDataUpdated campaignDataUpdated) {
         showPromoModal(campaignDataUpdated.getCampaign());
     }
 

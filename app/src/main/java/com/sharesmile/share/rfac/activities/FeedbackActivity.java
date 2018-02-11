@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.PermissionCallback;
-import com.sharesmile.share.core.ToolbarActivity;
+import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.core.base.ToolbarActivity;
 import com.sharesmile.share.rfac.FeedbackResolutionFactory;
 import com.sharesmile.share.rfac.fragments.FeedbackResolutionFragment;
 import com.sharesmile.share.rfac.fragments.HelpCenterFragment;

@@ -8,7 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.sharesmile.share.core.Config;
+import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Logger;
 

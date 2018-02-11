@@ -1,10 +1,8 @@
 package Models
 
 import com.google.gson.annotations.SerializedName
-import com.sharesmile.share.MainApplication
 import com.sharesmile.share.Message
-import com.sharesmile.share.core.UnObfuscable
-import com.squareup.picasso.Picasso
+import com.sharesmile.share.core.base.UnObfuscable
 import java.io.Serializable
 import java.util.*
 

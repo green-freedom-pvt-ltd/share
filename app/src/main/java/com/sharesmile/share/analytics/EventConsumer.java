@@ -1,7 +1,7 @@
 package com.sharesmile.share.analytics;
 
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.core.UnObfuscable;
+import com.sharesmile.share.core.base.UnObfuscable;
 
 import org.json.JSONException;
 
