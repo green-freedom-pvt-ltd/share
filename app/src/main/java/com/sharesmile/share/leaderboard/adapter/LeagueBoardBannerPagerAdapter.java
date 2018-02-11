@@ -8,8 +8,8 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.rfac.ImageBannerContainer;
-import com.sharesmile.share.rfac.StatsBannerContainer;
+import com.sharesmile.share.leaderboard.ImageBannerContainer;
+import com.sharesmile.share.leaderboard.StatsBannerContainer;
 
 import Models.LeagueBoard;
 

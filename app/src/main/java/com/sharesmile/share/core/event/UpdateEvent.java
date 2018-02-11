@@ -1,6 +1,6 @@
 package com.sharesmile.share.core.event;
 
-import com.sharesmile.share.rfac.models.CauseList;
+import com.sharesmile.share.core.CauseList;
 
 import Models.CampaignList;
 

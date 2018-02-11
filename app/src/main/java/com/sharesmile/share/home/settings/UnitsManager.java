@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.rfac.models.ExchangeRate;
+import com.sharesmile.share.home.ExchangeRate;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 

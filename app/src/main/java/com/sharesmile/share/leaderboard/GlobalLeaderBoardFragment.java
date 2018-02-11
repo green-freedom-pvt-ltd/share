@@ -14,9 +14,6 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
-import com.sharesmile.share.rfac.models.LeaderBoardData;
-import com.sharesmile.share.rfac.models.LeaderBoardList;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.sharesmile.share.home.CauseSwipeFragment;
-import com.sharesmile.share.rfac.models.CauseData;
+import com.sharesmile.share.core.CauseData;
 import com.sharesmile.share.core.Logger;
 
 import java.util.ArrayList;

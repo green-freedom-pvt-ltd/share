@@ -2,7 +2,7 @@ package Models
 
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.core.base.UnObfuscable
-import com.sharesmile.share.rfac.models.BaseLeaderBoardItem
+import com.sharesmile.share.leaderboard.BaseLeaderBoardItem
 import com.sharesmile.share.utils.Utils
 import java.io.Serializable
 import java.util.*

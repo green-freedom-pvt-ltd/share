@@ -15,7 +15,6 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.home.howitworks.HowItWorksAdapter;
-import com.sharesmile.share.rfac.models.HowItWorksRowItem;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.List;

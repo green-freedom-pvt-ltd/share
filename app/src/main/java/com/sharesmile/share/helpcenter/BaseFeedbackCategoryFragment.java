@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.helpcenter.adapter.FeedbackCategoryAdapter;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
 
 import java.util.List;
 

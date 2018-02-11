@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
+import com.sharesmile.share.helpcenter.FeedbackCategory;
 
 import java.util.List;
 

@@ -9,14 +9,7 @@ import android.view.View;
 
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.rfac.FaqProvider;
-import com.sharesmile.share.rfac.QnaProvider;
 import com.sharesmile.share.helpcenter.adapter.FeedbackQnaAdapter;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.FeedbackNode;
-import com.sharesmile.share.rfac.models.FeedbackQna;
-import com.sharesmile.share.rfac.models.Qna;
-import com.sharesmile.share.rfac.models.UserFeedback;
 import com.sharesmile.share.core.Logger;
 
 import java.util.List;

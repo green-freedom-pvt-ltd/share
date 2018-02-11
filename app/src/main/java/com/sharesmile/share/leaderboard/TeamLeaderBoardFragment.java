@@ -7,7 +7,6 @@ import com.sharesmile.share.leaderboard.impactleague.event.LeagueDataEvent;
 import com.sharesmile.share.leaderboard.impactleague.event.TeamLeaderBoardDataFetched;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 
 import java.util.ArrayList;
 import java.util.List;

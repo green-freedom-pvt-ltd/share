@@ -18,8 +18,8 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
-import com.sharesmile.share.rfac.models.LeaderBoardItem;
+import com.sharesmile.share.leaderboard.BaseLeaderBoardItem;
+import com.sharesmile.share.leaderboard.LeaderBoardItem;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 

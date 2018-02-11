@@ -1,8 +1,8 @@
 package com.sharesmile.share.core;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.HowItWorksRowItem;
+import com.sharesmile.share.helpcenter.FeedbackCategory;
+import com.sharesmile.share.home.HowItWorksRowItem;
 import com.sharesmile.share.core.config.Urls;
 
 import java.util.ArrayList;

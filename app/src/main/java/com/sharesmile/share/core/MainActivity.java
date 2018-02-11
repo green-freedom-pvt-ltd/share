@@ -54,7 +54,7 @@ import com.sharesmile.share.leaderboard.LeagueBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.profile.ProfileStatsFragment;
-import com.sharesmile.share.rfac.OnboardingOverlay;
+import com.sharesmile.share.home.OnboardingOverlay;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.ShareUtils;

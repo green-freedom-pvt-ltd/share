@@ -18,7 +18,6 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.leaderboard.adapter.LeaderBoardAdapter;
-import com.sharesmile.share.rfac.models.BaseLeaderBoardItem;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 

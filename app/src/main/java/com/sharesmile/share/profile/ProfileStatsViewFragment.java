@@ -24,8 +24,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.rfac.CustomBarChartRenderer;
-import com.sharesmile.share.rfac.models.BarChartDataSet;
+import com.sharesmile.share.leaderboard.BarChartDataSet;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
@@ -36,7 +35,7 @@ import butterknife.ButterKnife;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
 import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
-import static com.sharesmile.share.rfac.models.BarChartDataSet.TYPE_WEEKLY;
+import static com.sharesmile.share.leaderboard.BarChartDataSet.TYPE_WEEKLY;
 
 /**
  * Created by ankitmaheshwari on 5/18/17.

@@ -31,9 +31,9 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.helpcenter.FeedbackActivity;
 import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.rfac.models.CauseData;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.core.CauseData;
+import com.sharesmile.share.helpcenter.FeedbackCategory;
+import com.sharesmile.share.tracking.Run;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 

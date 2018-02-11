@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.rfac.models.HowItWorksRowItem;
+import com.sharesmile.share.home.HowItWorksRowItem;
 import com.sharesmile.share.core.ShareImageLoader;
 
 import java.util.List;

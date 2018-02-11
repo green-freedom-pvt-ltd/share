@@ -7,7 +7,6 @@ import android.view.View;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.rfac.models.FeedbackNode;
 
 /**
  * Created by ankitmaheshwari on 8/26/17.

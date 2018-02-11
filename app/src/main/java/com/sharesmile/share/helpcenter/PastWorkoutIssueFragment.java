@@ -8,11 +8,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.rfac.FeedbackResolutionFactory;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.FeedbackNode;
-import com.sharesmile.share.rfac.models.FeedbackResolution;
-import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.tracking.Run;
 
 import java.util.List;
 

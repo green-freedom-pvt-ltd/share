@@ -28,7 +28,7 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;

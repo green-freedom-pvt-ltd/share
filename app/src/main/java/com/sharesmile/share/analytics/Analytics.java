@@ -7,7 +7,7 @@ import com.onesignal.OneSignal;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.rfac.models.UserDetails;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 

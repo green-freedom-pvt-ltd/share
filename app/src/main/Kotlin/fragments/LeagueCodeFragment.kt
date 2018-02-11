@@ -28,7 +28,7 @@ import com.sharesmile.share.analytics.events.Event
 import com.sharesmile.share.core.Logger
 import com.sharesmile.share.core.config.Urls
 import com.sharesmile.share.network.*
-import com.sharesmile.share.rfac.models.UserDetails
+import com.sharesmile.share.login.UserDetails
 import com.sharesmile.share.utils.*
 import com.sharesmile.share.views.CustomTypefaceSpan
 import kotlinx.android.synthetic.main.fragment_secret_code.view.*

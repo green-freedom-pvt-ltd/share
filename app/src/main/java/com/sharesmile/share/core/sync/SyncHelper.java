@@ -14,9 +14,9 @@ import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.rfac.models.FraudData;
-import com.sharesmile.share.rfac.models.UserDetails;
-import com.sharesmile.share.rfac.models.UserFeedback;
+import com.sharesmile.share.tracking.FraudData;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.helpcenter.UserFeedback;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 

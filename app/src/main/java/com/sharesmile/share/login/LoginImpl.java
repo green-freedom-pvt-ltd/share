@@ -34,8 +34,6 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.rfac.models.GoogleOauthResponse;
-import com.sharesmile.share.rfac.models.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.network.BasicNameValuePair;
 import com.sharesmile.share.utils.JsonHelper;

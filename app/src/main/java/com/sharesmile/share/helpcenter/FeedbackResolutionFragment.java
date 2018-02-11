@@ -9,11 +9,7 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.FeedbackNode;
-import com.sharesmile.share.rfac.models.FeedbackResolution;
-import com.sharesmile.share.rfac.models.Run;
-import com.sharesmile.share.rfac.models.UserFeedback;
+import com.sharesmile.share.tracking.Run;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.core.Logger;
 

@@ -7,11 +7,8 @@ import android.support.annotation.Nullable;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.base.ToolbarActivity;
-import com.sharesmile.share.rfac.FeedbackResolutionFactory;
 import com.sharesmile.share.login.LoginActivity;
-import com.sharesmile.share.rfac.models.FeedbackCategory;
-import com.sharesmile.share.rfac.models.FeedbackResolution;
-import com.sharesmile.share.rfac.models.Run;
+import com.sharesmile.share.tracking.Run;
 import com.sharesmile.share.core.Logger;
 
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
