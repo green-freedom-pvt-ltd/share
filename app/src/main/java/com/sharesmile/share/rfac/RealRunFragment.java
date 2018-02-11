@@ -23,7 +23,7 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.models.Calorie;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.rfac.fragments.ShareFragment;
+import com.sharesmile.share.tracking.ShareFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;

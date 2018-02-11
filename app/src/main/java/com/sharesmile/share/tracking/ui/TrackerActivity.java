@@ -36,7 +36,7 @@ import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.rfac.RealRunFragment;
 import com.sharesmile.share.rfac.RunFragment;
 import com.sharesmile.share.rfac.TestRunFragment;
-import com.sharesmile.share.rfac.fragments.RunCountdownFragment;
+import com.sharesmile.share.tracking.RunCountdownFragment;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;

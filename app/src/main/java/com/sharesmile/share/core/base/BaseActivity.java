@@ -29,8 +29,8 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
-import com.sharesmile.share.rfac.activities.FeedbackActivity;
-import com.sharesmile.share.rfac.activities.MainActivity;
+import com.sharesmile.share.helpcenter.FeedbackActivity;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.rfac.models.CauseData;
 import com.sharesmile.share.rfac.models.FeedbackCategory;
 import com.sharesmile.share.rfac.models.Run;
@@ -38,7 +38,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 
 import activities.ImpactLeagueActivity;
-import fragments.MessageCenterFragment;
+import fragments.FeedListFragment;
 
 import static com.sharesmile.share.core.Constants.CODE_GOOGLE_PLAY_SERVICES_RESOLUTION;
 
@@ -444,7 +444,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
     public void showMessageCenter() {
         // Rolling back to old feed
-        replaceFragment(new MessageCenterFragment(), true);
+        replaceFragment(new FeedListFragment(), true);
 
 //        Logger.d(TAG, "showFeedActivity: Will start FeedActivity");
 //        Intent intent = new Intent(this, FeedActivity.class);

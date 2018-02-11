@@ -39,7 +39,7 @@ import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.core.notifications.OneSignalNotificationHandler;
-import com.sharesmile.share.rfac.activities.MainActivity;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.rfac.models.HowItWorksResponse;
 import com.sharesmile.share.rfac.models.HowItWorksRowItem;
 import com.sharesmile.share.rfac.models.Qna;

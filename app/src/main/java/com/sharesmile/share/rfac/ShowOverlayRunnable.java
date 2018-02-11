@@ -2,7 +2,7 @@ package com.sharesmile.share.rfac;
 
 import android.view.View;
 
-import com.sharesmile.share.rfac.fragments.HomeScreenFragment;
+import com.sharesmile.share.home.HomeScreenFragment;
 import com.sharesmile.share.utils.Utils;
 
 /**

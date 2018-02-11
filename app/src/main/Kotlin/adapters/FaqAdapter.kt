@@ -14,7 +14,7 @@ import com.sharesmile.share.core.config.Urls
 import com.sharesmile.share.network.NetworkAsyncCallback
 import com.sharesmile.share.network.NetworkDataProvider
 import com.sharesmile.share.network.NetworkException
-import com.sharesmile.share.rfac.fragments.HomeScreenFragment
+import com.sharesmile.share.home.HomeScreenFragment
 import com.sharesmile.share.rfac.models.Qna
 import kotlinx.android.synthetic.main.faq_item_user_input.view.*
 import kotlinx.android.synthetic.main.feedback_qna_item.view.*

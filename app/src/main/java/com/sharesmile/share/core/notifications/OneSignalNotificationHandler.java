@@ -9,7 +9,7 @@ import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.rfac.activities.MainActivity;
+import com.sharesmile.share.core.MainActivity;
 
 import org.json.JSONObject;
 
