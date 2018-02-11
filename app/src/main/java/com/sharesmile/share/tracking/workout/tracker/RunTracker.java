@@ -458,7 +458,7 @@ public class RunTracker implements Tracker {
         return (getState() != State.IDLE);
     }
 
-    interface UpdateListner {
+    public interface UpdateListner {
 
         void updateWorkoutRecord(float totalDistance, float avgSpeed,
                                  float deltaDistance, int deltaTime,

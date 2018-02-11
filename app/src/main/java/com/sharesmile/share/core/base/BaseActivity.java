@@ -31,9 +31,9 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.helpcenter.FeedbackActivity;
 import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.core.CauseData;
-import com.sharesmile.share.helpcenter.FeedbackCategory;
-import com.sharesmile.share.tracking.Run;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.helpcenter.category.FeedbackCategory;
+import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 
@@ -446,8 +446,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         // Rolling back to old feed
         replaceFragment(new FeedListFragment(), true);
 
-//        Logger.d(TAG, "showFeedActivity: Will start FeedActivity");
-//        Intent intent = new Intent(this, FeedActivity.class);
+//        Logger.d(TAG, "showFeedActivity: Will start WebFeedActivity");
+//        Intent intent = new Intent(this, WebFeedActivity.class);
 //        startActivity(intent);
     }
 

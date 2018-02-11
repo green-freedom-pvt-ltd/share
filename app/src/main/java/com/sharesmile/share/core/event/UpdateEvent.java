@@ -1,6 +1,6 @@
 package com.sharesmile.share.core.event;
 
-import com.sharesmile.share.core.CauseList;
+import com.sharesmile.share.core.cause.model.CauseList;
 
 import Models.CampaignList;
 

@@ -56,8 +56,8 @@ import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.CauseData;
-import com.sharesmile.share.tracking.FraudData;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.tracking.workout.data.model.FraudData;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.tracking.stepcount.AndroidStepCounter;
@@ -94,7 +94,7 @@ import static com.sharesmile.share.core.notifications.NotificationActionReceiver
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_BAD;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_INACTIVE;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_OK;
-import static com.sharesmile.share.tracking.RunFragment.NOTIFICATION_TIMER_TICK;
+import static com.sharesmile.share.tracking.ui.RunFragment.NOTIFICATION_TIMER_TICK;
 
 //import com.squareup.leakcanary.RefWatcher;
 

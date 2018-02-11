@@ -2,7 +2,7 @@ package Models
 
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.core.base.UnObfuscable
-import com.sharesmile.share.helpcenter.Qna
+import com.sharesmile.share.helpcenter.levelthree.qna.model.Qna
 import java.io.Serializable
 import java.util.*
 

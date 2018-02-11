@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.leaderboard.global.model.LeaderBoardData;
+import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
 import com.sharesmile.share.leaderboard.impactleague.event.ExitLeague;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.leaderboard.impactleague.event.TeamLeaderBoardDataFetched;

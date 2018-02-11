@@ -70,7 +70,7 @@
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
-            android:name=".feed.FeedActivity"
+            android:name=".feed.web.WebFeedActivity"
             android:label="@string/app_name"
             android:parentActivityName=".core.MainActivity"
             android:screenOrientation="portrait">

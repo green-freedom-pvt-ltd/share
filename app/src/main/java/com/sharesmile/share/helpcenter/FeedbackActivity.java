@@ -7,8 +7,14 @@ import android.support.annotation.Nullable;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.base.ToolbarActivity;
+import com.sharesmile.share.helpcenter.category.FeedbackCategory;
+import com.sharesmile.share.helpcenter.category.levelone.HelpCenterFragment;
+import com.sharesmile.share.helpcenter.category.leveltwo.PastWorkoutIssueFragment;
+import com.sharesmile.share.helpcenter.levelthree.resolution.FeedbackResolution;
+import com.sharesmile.share.helpcenter.levelthree.resolution.FeedbackResolutionFactory;
+import com.sharesmile.share.helpcenter.levelthree.resolution.FeedbackResolutionFragment;
 import com.sharesmile.share.login.LoginActivity;
-import com.sharesmile.share.tracking.Run;
+import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.core.Logger;
 
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
@@ -38,17 +44,6 @@ public class FeedbackActivity extends ToolbarActivity {
     protected int getLayoutId() {
         return R.layout.activty_feedback;
     }
-
-//    @Override
-//    public void performOperation(int operationId, Object input) {
-//        switch (operationId) {
-//            case LOGIN_FOR_RESULT:
-//                showLoginActivity();
-//                break;
-//            default:
-//                super.performOperation(operationId, input);
-//        }
-//    }
 
     private void showLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);

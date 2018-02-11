@@ -45,16 +45,16 @@ import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.base.ToolbarActivity;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.notifications.NotificationConsts;
-import com.sharesmile.share.home.HomeScreenFragment;
-import com.sharesmile.share.home.HowItWorksFragment;
-import com.sharesmile.share.home.SettingsFragment;
-import com.sharesmile.share.leaderboard.GlobalLeaderBoardFragment;
+import com.sharesmile.share.home.homescreen.HomeScreenFragment;
+import com.sharesmile.share.home.howitworks.HowItWorksFragment;
+import com.sharesmile.share.home.settings.SettingsFragment;
+import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.leaderboard.LeagueBoardFragment;
+import com.sharesmile.share.leaderboard.impactleague.LeagueBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.login.LoginActivity;
-import com.sharesmile.share.profile.ProfileStatsFragment;
-import com.sharesmile.share.home.OnboardingOverlay;
+import com.sharesmile.share.profile.ProfileFragment;
+import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.ShareUtils;
@@ -240,7 +240,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     if (!MainApplication.isLogin()) {
                         showLoginActivity();
                     } else {
-                        replaceFragment(new ProfileStatsFragment(), true);
+                        replaceFragment(new ProfileFragment(), true);
                     }
                 } else if (screen.equals(NotificationConsts.Screen.LEADERBOARD)) {
                     if (!MainApplication.isLogin()) {
@@ -342,7 +342,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         addFragment(new HomeScreenFragment(), false);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
-            replaceFragment(new ProfileStatsFragment(), true);
+            replaceFragment(new ProfileFragment(), true);
         }
     }
 
@@ -440,7 +440,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
 
         if (menuItem.getItemId() == R.id.nav_item_profile) {
-            replaceFragment(new ProfileStatsFragment(), true);
+            replaceFragment(new ProfileFragment(), true);
             AnalyticsEvent.create(Event.ON_SELECT_PROFILE_MENU)
                     .buildAndDispatch();
         }
