@@ -181,12 +181,12 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                 Logger.i(TAG, "Setting pendingIntent for " + action);
                 if (getContext().getString(R.string.notification_action_pause).equals(action)){
                     builder.addAction(R.drawable.ic_pause_black_24px, "Pause",
-                            createNotificationActionReceiverPendingIntent(action, notificationId));
+                            getInstance().createPauseOrStopRunIntent(MainActivity.INTENT_PAUSE_RUN,getContext().getString(R.string.notification_action_pause)));
                 }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume",
-                            createNotificationActionReceiverPendingIntent(action, notificationId));
+                            getInstance().createPauseOrStopRunIntent(MainActivity.INTENT_RESUME_RUN,getContext().getString(R.string.notification_action_resume)));
                 }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
-                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createStopRunIntent());
+                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createPauseOrStopRunIntent(MainActivity.INTENT_STOP_RUN,getContext().getString(R.string.notification_action_stop)));
                 }else if (getContext().getString(R.string.notification_action_start).equals(action)){
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Start",
                             getInstance().createStartWorkoutIntent());
@@ -421,9 +421,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return resultPendingIntent;
     }
 
-    public PendingIntent createStopRunIntent(){
+    public PendingIntent createPauseOrStopRunIntent(String intent_run,String action){
         Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
-        resultIntent.putExtra(MainActivity.INTENT_STOP_RUN, true);
+        resultIntent.setAction(action);
+        resultIntent.putExtra(intent_run, true);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
