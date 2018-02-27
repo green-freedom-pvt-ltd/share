@@ -10,12 +10,12 @@ import com.sharesmile.share.utils.SharedPrefsManager;
 
 public enum OnboardingOverlay {
 
-    SWIPE_CAUSE(1, 4000, 10000, "pref_did_swipe_cause"),
-    LETS_GO(1, 2000, 10000, "pref_did_use_lets_go_overlay"),
-    DRAWER(3, 3000, 10000, "pref_did_use_hamburger"),
-    FEED(7, 3000, 10000, "pref_did_use_feed"),
-    OVERALL_IMAPACT(10, 3000, 10000, "pref_did_see_impact_so_far"),
-    HELP_CENTER(8, 250, 10000, "pref_did_use_help_center");
+    SWIPE_CAUSE(1, 4000, 0, "pref_did_swipe_cause"),
+    LETS_GO(1, 2000, 0, "pref_did_use_lets_go_overlay"),
+    DRAWER(3, 3000, 5, "pref_did_use_hamburger"),
+    FEED(7, 3000, 5, "pref_did_use_feed"),
+    OVERALL_IMAPACT(10, 3000, 5, "pref_did_see_impact_so_far"),
+    HELP_CENTER(8, 250, 5, "pref_did_use_help_center");
 
     private int minLaunchCount;
     private int delayInMillis;
