@@ -385,6 +385,10 @@ public class SyncService extends GcmTaskService {
      * @return
      */
     private static int syncWorkoutData(){
+        if (!MainApplication.isLogin()){
+            // Can't sync workouts for a non logged in User
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
         synchronized (SyncService.class){
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             long clientVersion = SharedPrefsManager.getInstance()
@@ -608,6 +612,10 @@ public class SyncService extends GcmTaskService {
 
 
     private static int uploadPendingWorkoutsData() {
+        if (!MainApplication.isLogin()){
+            // Can't sync workouts for a non logged in User
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
         synchronized (SyncService.class){
 
             // Step: Upload all the Pending Workouts
