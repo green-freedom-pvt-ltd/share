@@ -181,18 +181,15 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                 Logger.i(TAG, "Setting pendingIntent for " + action);
                 if (getContext().getString(R.string.notification_action_pause).equals(action)){
                     builder.addAction(R.drawable.ic_pause_black_24px, "Pause",
-                            getInstance().createPauseOrStopRunIntent(MainActivity.INTENT_PAUSE_RUN,getContext().getString(R.string.notification_action_pause)));
+                            getInstance().createNotificationActionIntent(MainActivity.INTENT_PAUSE_RUN,getContext().getString(R.string.notification_action_pause)));
                 }else if (getContext().getString(R.string.notification_action_resume).equals(action)){
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Resume",
-                            getInstance().createPauseOrStopRunIntent(MainActivity.INTENT_RESUME_RUN,getContext().getString(R.string.notification_action_resume)));
+                            getInstance().createNotificationActionIntent(MainActivity.INTENT_RESUME_RUN,getContext().getString(R.string.notification_action_resume)));
                 }else if (getContext().getString(R.string.notification_action_stop).equals(action)){
-                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createPauseOrStopRunIntent(MainActivity.INTENT_STOP_RUN,getContext().getString(R.string.notification_action_stop)));
+                    builder.addAction(R.drawable.ic_stop_black_24px, "Stop", getInstance().createNotificationActionIntent(MainActivity.INTENT_STOP_RUN,getContext().getString(R.string.notification_action_stop)));
                 }else if (getContext().getString(R.string.notification_action_start).equals(action)){
                     builder.addAction(R.drawable.ic_play_arrow_black_24px, "Start",
                             getInstance().createStartWorkoutIntent());
-                }else if (getContext().getString(R.string.notification_action_cancel).equals(action)){
-                    builder.addAction(R.drawable.ic_close_black_24dp, "Cancel",
-                            createNotificationActionReceiverPendingIntent(action, notificationId));
                 }else if (getContext().getString(R.string.notification_action_disable).equals(action)){
                     builder.addAction(R.drawable.ic_close_black_24dp, "Don't show this",
                             getInstance().createDisableRemindersIntent());
@@ -421,10 +418,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return resultPendingIntent;
     }
 
-    public PendingIntent createPauseOrStopRunIntent(String intent_run,String action){
+    public PendingIntent createNotificationActionIntent(int notificationActionCode,String action){
         Intent resultIntent = new Intent(getInstance().getApplicationContext(), MainActivity.class);
         resultIntent.setAction(action);
-        resultIntent.putExtra(intent_run, true);
+        resultIntent.putExtra(MainActivity.INTENT_NOTIFICATION_RUN, notificationActionCode);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =

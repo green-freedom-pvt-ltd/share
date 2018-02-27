@@ -45,10 +45,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         Logger.d(TAG, "onReceive with action " + action + " and notifId: " + notifId);
         if(context.getString(R.string.notification_action_pause).equals(action)) {
             Logger.i(TAG, "Action Pause");
-//            EventBus.getDefault().post(new PauseWorkoutEvent());
         } else if(context.getString(R.string.notification_action_resume).equals(action)) {
             Logger.i(TAG, "Action Resume");
-//            EventBus.getDefault().post(new ResumeWorkoutEvent());
         } else if(context.getString(R.string.notification_action_stop).equals(action)) {
             Logger.i(TAG,"Action Stop");
         } else if(context.getString(R.string.notification_action_cancel).equals(action)) {
