@@ -418,11 +418,6 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "Internet not available while syncing runs with URL: " + syncUrl);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
-        if(!MainApplication.isLogin())
-        {
-            Logger.d(TAG, "User not logged in, cannot sync data to server");
-            return GcmNetworkManager.RESULT_FAILURE;
-        }
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(syncUrl);
             if (syncWorkoutTimeStamp == 0){
