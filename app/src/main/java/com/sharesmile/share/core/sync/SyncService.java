@@ -385,6 +385,11 @@ public class SyncService extends GcmTaskService {
      */
     private static int syncWorkoutData(){
         synchronized (SyncService.class){
+            if(!MainApplication.isLogin())
+            {
+                Logger.d(TAG, "User not logged in, cannot sync data to server");
+                return GcmNetworkManager.RESULT_FAILURE;
+            }
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
             long clientVersion = SharedPrefsManager.getInstance()
                     .getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
@@ -607,46 +612,49 @@ public class SyncService extends GcmTaskService {
 
 
     private static int uploadPendingWorkoutsData() {
-        synchronized (SyncService.class){
-
-            // Step: Upload all the Pending Workouts
-            Logger.d(TAG, "uploadPendingWorkoutData");
-            boolean isSuccess = true;
-            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-            List<Workout> mWorkoutList = mWorkoutDao.queryBuilder()
-                    .where(WorkoutDao.Properties.Is_sync.eq(false))
-                    .list();
-
-            if (mWorkoutList != null && mWorkoutList.size() > 0) {
-                for (Workout workout : mWorkoutList) {
-                    boolean resultW = uploadWorkoutData(workout);
-                    isSuccess = isSuccess && resultW;
-                }
+        synchronized (SyncService.class) {
+            if (!MainApplication.isLogin()) {
+                    Logger.d(TAG,"uploadPendingWorkoutData: User not logged in, did not sync data to server.");
+                    return ExpoBackoffTask.RESULT_FAILURE;
             }
+                // Step: Upload all the Pending Workouts
+                Logger.d(TAG, "uploadPendingWorkoutData");
+                boolean isSuccess = true;
+                WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+                List<Workout> mWorkoutList = mWorkoutDao.queryBuilder()
+                        .where(WorkoutDao.Properties.Is_sync.eq(false))
+                        .list();
 
-            // Step: Upload all pending WorkoutLocationData
-            Logger.d(TAG, "uploadPendingWorkoutData, Will upload locationData");
-            List<Workout> pendingLocationWorkoutsList = mWorkoutDao.queryBuilder()
-                    .where(
-                            WorkoutDao.Properties.Is_sync.eq(true),
-                            WorkoutDao.Properties.ShouldSyncLocationData.eq(true)
-                    ).list();
-
-            if (pendingLocationWorkoutsList == null || pendingLocationWorkoutsList.isEmpty()){
-                Logger.d(TAG, "uploadPendingWorkoutsData: Didn't find any pending WorkoutLocationData to be uploaded");
-            }else {
-                for (Workout workout : pendingLocationWorkoutsList) {
-                    boolean resultL = uploadWorkoutLocationData(workout);
-                    if (resultL){
-                        // If all batches of this workout are uploaded successfully, we update the boolean flag in DB
-                        workout.setShouldSyncLocationData(false);
-                        mWorkoutDao.insertOrReplace(workout);
+                if (mWorkoutList != null && mWorkoutList.size() > 0) {
+                    for (Workout workout : mWorkoutList) {
+                        boolean resultW = uploadWorkoutData(workout);
+                        isSuccess = isSuccess && resultW;
                     }
-                    isSuccess = isSuccess && resultL;
                 }
-            }
 
-            return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
+                // Step: Upload all pending WorkoutLocationData
+                Logger.d(TAG, "uploadPendingWorkoutData, Will upload locationData");
+                List<Workout> pendingLocationWorkoutsList = mWorkoutDao.queryBuilder()
+                        .where(
+                                WorkoutDao.Properties.Is_sync.eq(true),
+                                WorkoutDao.Properties.ShouldSyncLocationData.eq(true)
+                        ).list();
+
+                if (pendingLocationWorkoutsList == null || pendingLocationWorkoutsList.isEmpty()) {
+                    Logger.d(TAG, "uploadPendingWorkoutsData: Didn't find any pending WorkoutLocationData to be uploaded");
+                } else {
+                    for (Workout workout : pendingLocationWorkoutsList) {
+                        boolean resultL = uploadWorkoutLocationData(workout);
+                        if (resultL) {
+                            // If all batches of this workout are uploaded successfully, we update the boolean flag in DB
+                            workout.setShouldSyncLocationData(false);
+                            mWorkoutDao.insertOrReplace(workout);
+                        }
+                        isSuccess = isSuccess && resultL;
+                    }
+                }
+
+                return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
     }

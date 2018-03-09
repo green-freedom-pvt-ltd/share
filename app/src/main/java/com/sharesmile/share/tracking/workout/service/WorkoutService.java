@@ -22,6 +22,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.tracking.workout.tracker.RunTracker;
 import com.sharesmile.share.tracking.workout.tracker.Tracker;
 import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
@@ -1003,22 +1004,25 @@ public class WorkoutService extends Service implements
         String amountString = UnitsManager.formatRupeeToMyCurrency(rupees);
 
         String pauseResumeAction, pauseResumeLabel, contentTitle;
+        int pauseResumeIntent;
         int pauseResumeDrawable;
         if (tracker.isRunning()){
             pauseResumeAction = getString(R.string.notification_action_pause);
             pauseResumeLabel = getString(R.string.pause);
             contentTitle = getString(R.string.impact_with_sponsor, mCauseData.getSponsor().getName());
+            pauseResumeIntent = MainActivity.INTENT_PAUSE_RUN;
             pauseResumeDrawable = R.drawable.ic_pause_black_24px;
         }else {
             pauseResumeAction = getString(R.string.notification_action_resume);
             pauseResumeLabel = getString(R.string.resume);
             contentTitle = getString(R.string.paused);
+            pauseResumeIntent = MainActivity.INTENT_RESUME_RUN;
             pauseResumeDrawable = R.drawable.ic_play_arrow_black_24px;
         }
-        Intent pauseResumeIntent = new Intent(this, NotificationActionReceiver.class);
+        /*Intent pauseResumeIntent = new Intent(this, NotificationActionReceiver.class);
         pauseResumeIntent.setAction(pauseResumeAction);
         PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);*/
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -1036,8 +1040,8 @@ public class WorkoutService extends Service implements
                         .setVisibility(1);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
-            mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel , pendingIntentPauseResume)
-                    .addAction(R.drawable.ic_stop_black_24px, "Stop" , MainApplication.getInstance().createStopRunIntent());
+            mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel , MainApplication.getInstance().createNotificationActionIntent(pauseResumeIntent,pauseResumeAction))
+                    .addAction(R.drawable.ic_stop_black_24px, "Stop" , MainApplication.getInstance().createNotificationActionIntent(MainActivity.INTENT_STOP_RUN,getString(R.string.notification_action_stop)));
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

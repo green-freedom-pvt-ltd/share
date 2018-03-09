@@ -80,7 +80,10 @@ import static com.sharesmile.share.core.application.MainApplication.getContext;
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
 
     private static final String TAG = "MainActivity";
-    public static final String INTENT_STOP_RUN = "intent_stop_run";
+    public static final String INTENT_NOTIFICATION_RUN = "intent_notification_run";
+    public static final int INTENT_STOP_RUN = 1;
+    public static final int INTENT_PAUSE_RUN=2;
+    public static final int INTENT_RESUME_RUN=3;
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
@@ -101,14 +104,15 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
         Boolean isReminderDisable =  getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
         getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
-        boolean intentStopRun = getIntent().getBooleanExtra(INTENT_STOP_RUN, false);
-        getIntent().removeExtra(INTENT_STOP_RUN);
+        int intentNotificationRun = getIntent().getIntExtra(INTENT_NOTIFICATION_RUN, 0);
+        getIntent().removeExtra(INTENT_NOTIFICATION_RUN);
+
         Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip + ", isReminderDisable = "
-                + isReminderDisable + ", intentStopRun = " + intentStopRun);
+                + isReminderDisable + ", intentNotificationRun = " + intentNotificationRun);
         if (!userLogin && !isLoginSkip) {
             startLoginActivity();
         } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
-            if (intentStopRun){
+            if (intentNotificationRun == INTENT_STOP_RUN){
                 WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
             }
             startTrackingActivity();
