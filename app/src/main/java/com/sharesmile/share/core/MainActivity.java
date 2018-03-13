@@ -55,6 +55,8 @@ import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdate
 import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
+import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
+import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.ShareUtils;
@@ -114,6 +116,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
             if (intentNotificationRun == INTENT_STOP_RUN){
                 WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
+            }else if(intentNotificationRun==INTENT_PAUSE_RUN)
+            {
+                EventBus.getDefault().post(new PauseWorkoutEvent());
+            }else if(intentNotificationRun == INTENT_RESUME_RUN)
+            {
+                EventBus.getDefault().post(new ResumeWorkoutEvent());
             }
             startTrackingActivity();
         } else {
