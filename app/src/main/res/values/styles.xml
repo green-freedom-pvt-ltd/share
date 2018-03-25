@@ -84,6 +84,8 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/black_separator</item>
         <item name="android:alpha">0.5</item>
+        <item name="android:layout_marginTop">24dp</item>
+
     </style>
 
     <style name="edit_profile_text_style_value" >
@@ -125,4 +127,16 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="profile_stats_header">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black_80</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+    <style name="profile_stats_header_right">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/black_80</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
 </resources>
