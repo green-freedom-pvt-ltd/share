@@ -121,9 +121,9 @@ public class CauseDataStore {
         Collections.sort(causes, new Comparator<CauseData>() {
             @Override
             public int compare(CauseData lhs, CauseData rhs) {
-                if (lhs.getId() == lastSelectedCauseId){
+                if (lhs.getId() == lastSelectedCauseId && !lhs.isCompleted()){
                     return -1;
-                }else if (rhs.getId() == lastSelectedCauseId){
+                }else if (rhs.getId() == lastSelectedCauseId && !rhs.isCompleted()){
                     return 1;
                 } else {
                     return lhs.getOrderPriority() - rhs.getOrderPriority();
