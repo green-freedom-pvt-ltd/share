@@ -208,6 +208,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 locationQueue.clear();
             }
             isActive = false;
+            shouldPromtUser = false;
         }
     }
 
