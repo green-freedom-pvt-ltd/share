@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true">
 
     <LinearLayout
@@ -17,6 +18,7 @@
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_marginTop="15dp"
+            android:layout_marginBottom="22dp"
             >
             <com.sharesmile.share.views.CircularImageView
                 android:layout_width="match_parent"
@@ -27,19 +29,33 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
+                app:srcCompat="@drawable/ic_pencil_edit_white"
+                android:background="@drawable/rounded_circle_blue"
+                android:padding="6dp"
                 />
         </RelativeLayout>
-        <com.sharesmile.share.views.MLTextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            >
+        <com.sharesmile.share.views.LRTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="First Name"
+            android:text="FIRST NAME"
             style="@style/edit_profile_text_style_label"/>
-
-        <EditText
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_first_name_error"
+                />
+        </LinearLayout>
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_profile_first_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:imeOptions="actionDone"
             style="@style/edit_profile_text_style_value"/>
 
@@ -49,17 +65,29 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Last Name"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LAST NAME"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_last_name_error"
+                />
+        </LinearLayout>
 
-        <EditText
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_profile_last_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:imeOptions="actionDone"
             style="@style/edit_profile_text_style_value"/>
 
@@ -69,17 +97,29 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TITLE 1"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TITLE 1"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_title_1_error"
+                />
+        </LinearLayout>
 
-        <EditText
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_profile_title1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:clickable="false"
             android:cursorVisible="false"
             android:focusable="false"
@@ -97,17 +137,29 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TITLE 2"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TITLE 2"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_title_2_error"
+                />
+        </LinearLayout>
 
-        <EditText
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_profile_title2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:clickable="false"
             android:cursorVisible="false"
             android:focusable="false"
@@ -125,17 +177,29 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Email"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EMAIL"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_email_error"
+                />
+        </LinearLayout>
 
-        <EditText
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_profile_general_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:clickable="false"
             android:cursorVisible="false"
             android:focusable="false"
@@ -149,17 +213,29 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Phone Number"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PHONE NUMBER"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_phone_number_error"
+                />
+        </LinearLayout>
 
-        <EditText
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_profile_general_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:inputType="phone"
             style="@style/edit_profile_text_style_value" />
 
@@ -169,17 +245,29 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Body Weight in KGs"
-            style="@style/edit_profile_text_style_label" />
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BODY WEIGHT IN KGs"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_body_weight_error"
+                />
+        </LinearLayout>
 
-        <EditText
+        <com.sharesmile.share.views.LREditText
             android:id="@+id/et_body_weight_kg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:inputType="number"
             style="@style/edit_profile_text_style_value"/>
 
@@ -189,18 +277,30 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Birthday"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BIRTHDAY"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_birthday_error"
+                />
+        </LinearLayout>
 
-        <TextView
+        <com.sharesmile.share.views.LRTextView
             android:id="@+id/et_profile_general_birthday"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:hint="DD-MM-YYYY "
+            android:hint="DD-MM-YYYY"
             style="@style/edit_profile_text_style_value" />
 
         <View
@@ -209,18 +309,31 @@
             android:layout_marginTop="13dp"
             android:background="#c0c0c0" />
 
-        <com.sharesmile.share.views.MLTextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gender"
-            style="@style/edit_profile_text_style_label"/>
+            android:layout_marginTop="24dp"
+            >
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GENDER"
+                style="@style/edit_profile_text_style_label"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/edit_profile_error_text_style_label"
+                android:id="@+id/tv_edit_profile_gender_error"
+                />
+        </LinearLayout>
 
         <RadioGroup
             android:id="@+id/gender_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="44dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <RadioButton
@@ -229,17 +342,26 @@
                 android:layout_height="wrap_content"
                 android:checked="false"
                 android:text="Male"
-                android:textColor="@color/greyish_brown_two"/>
+                android:textColor="@color/black_separator"
+                android:fontFamily="@font/Lato-Regular"
+                android:textSize="14sp"
+                android:button="@drawable/edit_profile_gender_radio_selector"
+                android:paddingStart="10dp"
+                />
 
             <RadioButton
                 android:id="@+id/rb_share_female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_toRightOf="@+id/rb_share_male"
+                android:layout_marginStart="50dp"
                 android:checked="false"
                 android:text="Female"
-                android:textColor="@color/greyish_brown_two"/>
+                android:textColor="@color/black_separator"
+                android:fontFamily="@font/Lato-Regular"
+                android:textSize="14sp"
+                android:button="@drawable/edit_profile_gender_radio_selector"
+                android:paddingStart="10dp"
+                />
         </RadioGroup>
 
 
