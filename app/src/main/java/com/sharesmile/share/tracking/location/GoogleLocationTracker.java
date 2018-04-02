@@ -75,7 +75,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     private LocationManager locationManager;
     private int numSatellitesConnected;
     private CircularQueue<Location> locationQueue;
-
+    private boolean shouldPromtUser = false;
     private GoogleLocationTracker(Context appContext) {
         this.appContext = appContext;
         this.handler = new Handler();
@@ -208,11 +208,13 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
                 locationQueue.clear();
             }
             isActive = false;
+            shouldPromtUser = false;
         }
     }
 
     public void startLocationTracking(final boolean shouldPromptUser) {
         Logger.d(TAG, "startLocationTracking");
+        this.shouldPromtUser = shouldPromptUser;
         isActive = true;
         if (state == State.NEEDS_PERMISSION){
             Logger.i(TAG, "Needs location permission to start workout");
@@ -426,7 +428,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         locationRequest.setFastestInterval(1000); // the fastest rate in milliseconds at which your app can handle location updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (isActive){
-            checkForLocationSettings(false);
+            checkForLocationSettings(shouldPromtUser);
         }
 
         fetchInitialLocation();

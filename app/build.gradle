@@ -6,7 +6,6 @@ buildscript {
 
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
 
@@ -14,7 +13,6 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
@@ -27,7 +25,7 @@ repositories {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.3'
 
     defaultConfig {
         applicationId "com.sharesmile.share"
@@ -77,14 +75,16 @@ android {
         }
     }
 
+    flavorDimensions("prod","beta")
     productFlavors {
         prod {
             minSdkVersion 16
+            dimension = "prod"
         }
         beta {
             minSdkVersion 21
+            dimension = "beta"
         }
-
     }
     aaptOptions {
         additionalParameters "--no-version-vectors"
@@ -132,7 +132,7 @@ dependencies {
     compile 'com.onesignal:OneSignal:3.6.1@aar'
     compile 'com.facebook.android:facebook-android-sdk:4.25.0'
     compile 'com.jakewharton:butterknife:8.0.1'
-    apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.0.1'
     compile 'de.greenrobot:greendao:2.1.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     //CirclePageIndicator
@@ -148,6 +148,7 @@ dependencies {
     compile 'io.smooch:ui:5.4.0'
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
     compile 'uk.co.samuelwall:material-tap-target-prompt:2.6.0'
+    compile group: 'com.neenbedankt.gradle.plugins', name: 'android-apt', version: '1.8'
 }
 
 apply plugin: 'com.google.gms.google-services'

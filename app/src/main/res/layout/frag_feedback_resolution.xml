@@ -18,18 +18,16 @@
                 android:id="@+id/tv_feedback_explanation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="@color/greyish_brown_two"
                 android:text="@string/feedback_dummy_explanation"
-                />
+                android:textColor="@color/greyish_brown_two"
+                android:textSize="14sp" />
 
             <include
                 android:id="@+id/feedback_user_input"
                 layout="@layout/feedback_user_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"/>
-
+                android:layout_marginTop="22dp" />
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
@@ -38,13 +36,13 @@
         android:id="@+id/feedback_chat_layout"
         layout="@layout/chat_fab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <ProgressBar
         android:id="@+id/feedback_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </RelativeLayout>

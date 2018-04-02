@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    card_view:cardCornerRadius="5dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:gravity="center_horizontal"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_close_black_24dp"
+            />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <ProgressBar
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:indeterminateDrawable="@drawable/progress_gradient_bg"
+            android:max="360"
+            />
+            <LinearLayout
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                >
+                <com.sharesmile.share.views.LBTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="58sp"
+                    android:text="15"
+                    android:textColor="@color/clr_5d"
+                    />
+                <com.sharesmile.share.views.LBTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Days Streak"
+                    android:textSize="20sp"
+                    android:textColor="@color/clr_5d"
+                    />
+            </LinearLayout>
+        </RelativeLayout>
+        <com.sharesmile.share.views.LBTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1km left, Let's Go"
+            android:textSize="18sp"
+            android:textColor="@color/clr_5d"
+            />
+        <com.sharesmile.share.views.LBTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BEST 20"
+            android:textSize="18sp"
+            android:textColor="#ff9414"
+            />
+        <com.sharesmile.share.views.MSBButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner"
+            android:text="@string/tell_your_friends"
+            android:textColor="@color/white"
+            android:padding="14sp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+
+            />
+        <com.sharesmile.share.views.LBTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EDIT GOAL"
+            android:textColor="@color/bright_sky_blue"
+            android:textSize="14sp"
+            />
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+

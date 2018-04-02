@@ -81,17 +81,24 @@
     </style>
 
     <style name="edit_profile_text_style_label" >
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">10sp</item>
         <item name="android:textColor">@color/black_separator</item>
         <item name="android:alpha">0.5</item>
-    </style>
 
+    </style>
+    <style name="edit_profile_error_text_style_label" >
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/clr_d0021b</item>
+        <item name="android:layout_marginLeft">10dp</item>
+
+    </style>
     <style name="edit_profile_text_style_value" >
         <item name="android:textSize">14sp</item>
         <item name="android:lineSpacingExtra">0.4sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:background">#00000000</item>
-        <item name="android:textColor">@color/greyish_brown_two</item>
+        <item name="android:textColor">@color/black_separator</item>
+        <item name="android:layout_marginTop">10dp</item>
     </style>
 
     <style name="footerButtonStyle" parent="buttonStyle">
@@ -125,4 +132,16 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="profile_stats_header">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black_80</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+    <style name="profile_stats_header_right">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/black_80</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
 </resources>

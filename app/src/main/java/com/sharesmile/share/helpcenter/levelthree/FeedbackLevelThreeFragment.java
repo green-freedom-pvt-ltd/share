@@ -13,11 +13,11 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.helpcenter.BaseFeedbackFragment;
@@ -97,7 +97,6 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
                 userInputLayout, this);
         chatContainer = new FeedbackChatContainer(chatLayout, this);
         setupToolbar();
-
     }
 
 
