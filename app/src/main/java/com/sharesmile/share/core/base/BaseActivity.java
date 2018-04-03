@@ -317,6 +317,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     private void showTrackingActivity() {
         Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity with causeData: " + mCauseData.getTitle());
         Intent intent = new Intent(this, TrackerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);
     }
