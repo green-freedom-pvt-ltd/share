@@ -22,32 +22,34 @@ import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.R;
-import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.config.ClientConfig;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.db.DbWrapper;
 import com.sharesmile.share.core.notifications.NotificationActionReceiver;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.tracking.workout.service.WorkoutService;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
-import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.core.notifications.OneSignalNotificationHandler;
-import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.db.DbWrapper;
+import com.sharesmile.share.helpcenter.levelthree.qna.model.Qna;
 import com.sharesmile.share.home.howitworks.model.HowItWorksResponse;
 import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
-import com.sharesmile.share.helpcenter.levelthree.qna.model.Qna;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
+import com.sharesmile.share.tracking.location.GoogleLocationTracker;
+import com.sharesmile.share.tracking.ui.TrackerActivity;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.workout.service.WorkoutService;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,7 @@ import io.smooch.core.SmoochCallback;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
+import static com.sharesmile.share.core.Constants.PREF_GOAL_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
@@ -471,6 +474,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
     }
 
+    public String getGoalDetails(){
+        return SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+    }
+
     public float getBodyWeight(){
         if (isLogin() && getUserDetails() != null){
             return getUserDetails().getBodyWeight();
@@ -489,7 +496,10 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                     .buildAndDispatch();
         }
     }
-
+    public void setGoalDetails(JSONArray goalDetails) {
+        Logger.d(TAG, "setGoalDetails as: " + goalDetails);
+        SharedPrefsManager.getInstance().setString(PREF_GOAL_DETAILS, goalDetails.toString());
+    }
     public void setUserDetails(UserDetails details){
 
         UserDetails oldDetails = getUserDetails();

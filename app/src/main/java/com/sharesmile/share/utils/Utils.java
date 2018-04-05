@@ -37,6 +37,7 @@ import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.core.application.MainApplication;
@@ -70,6 +71,8 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -1197,6 +1200,13 @@ public class Utils {
             }
         });
         builder.show();
+    }
+
+    public static String getCurrentDateDDMMYYYY()
+    {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
 

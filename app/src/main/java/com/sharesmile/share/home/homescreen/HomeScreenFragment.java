@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.application.MainApplication;
@@ -30,17 +31,28 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.profile.streak.model.Goal;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -126,8 +138,56 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         });
 
         showProgressDialog();
+        //TODO : getDataFrom server
+        setGoalData();
         return view;
 
+    }
+
+    private void setGoalData() {
+        JSONArray jsonArray = new JSONArray();
+
+
+        try {
+            Goal goal = new Goal();
+            goal.setId(1);
+            goal.setName("Casual");
+            goal.setIconCount(0);
+            goal.setValue(0.2);
+
+            JSONObject jsonObject = new JSONObject(new Gson().toJson(goal));
+            jsonArray.put(jsonObject);
+
+            goal = new Goal();
+            goal.setId(2);
+            goal.setName("Regular");
+            goal.setIconCount(1);
+            goal.setValue(0.5);
+
+            jsonObject = new JSONObject(new Gson().toJson(goal));
+            jsonArray.put(jsonObject);
+
+            goal = new Goal();
+            goal.setId(3);
+            goal.setName("Serious");
+            goal.setIconCount(2);
+            goal.setValue(1);
+
+            jsonObject = new JSONObject(new Gson().toJson(goal));
+            jsonArray.put(jsonObject);
+
+            goal = new Goal();
+            goal.setId(4);
+            goal.setName("Insane");
+            goal.setIconCount(3);
+            goal.setValue(1.2);
+
+            jsonObject = new JSONObject(new Gson().toJson(goal));
+            jsonArray.put(jsonObject);
+            MainApplication.getInstance().setGoalDetails(jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void refreshFeedBadgeIndicator(){
@@ -149,6 +209,58 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         getFragmentController().hideToolbar();
         render();
         prepareOnboardingOverlays();
+        checkStreak();
+
+    }
+
+
+    private void checkStreak() {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        if(userDetails.getStreakCurrentDate()==null || userDetails.getStreakCurrentDate().length()==0)
+        {
+            //TODO : remove static values
+            userDetails.setStreakRunProgress(0);
+            userDetails.setStreakCount(0);
+            userDetails.setStreakMaxCount(0);
+            userDetails.setStreakGoalDistance(0.5);
+            userDetails.setStreakGoalID(2);
+            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+            MainApplication.getInstance().setUserDetails(userDetails);
+            return;
+        }
+
+        try {
+            if(userDetails.getStreakCurrentDate()!=null && userDetails.getStreakCurrentDate().length()>0) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                Date currentDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
+                        .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+                long diff = currentDate.getTime() - streakDate.getTime();
+                float dayCount = (float) diff / (24 * 60 * 60 * 1000);
+                if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
+                    if ((dayCount > 1)) {
+                        userDetails.setStreakRunProgress(0);
+                        userDetails.setStreakCount(0);
+                        userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                    } else if (dayCount == 1) {
+                        userDetails.setStreakRunProgress(0);
+                        userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                    }
+                }
+            }else
+            {
+                userDetails.setStreakRunProgress(0);
+                userDetails.setStreakCount(0);
+                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+            }
+            if(userDetails.getStreakCount()>userDetails.getStreakMaxCount())
+                userDetails.setStreakMaxCount(userDetails.getStreakCount());
+
+            MainApplication.getInstance().setUserDetails(userDetails);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void prepareOnboardingOverlays(){
@@ -305,6 +417,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .buildAndDispatch();
                 } else {
                     // If it is not completed then it must be an active on going cause
+                    checkStreak();
                     CauseDataStore.getInstance().registerCauseSelection(causeData);
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
                     OnboardingOverlay.LETS_GO.registerUseOfOverlay();

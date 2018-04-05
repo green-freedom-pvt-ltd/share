@@ -147,6 +147,7 @@ public class Constants {
     public static final String PREF_IS_SIGN_UP_USER ="pref_sign_up_user" ;
     public static final String PREF_FIRST_RUN_FEEDBACK = "pref_first_run_feedback";
     public static final String PREF_USER_DETAILS="pref_user_details";
+    public static final String PREF_GOAL_DETAILS="pref_goal_details";
 
     public static final String PREF_GLOBAL_LEADERBOARD_CACHED_DATA ="pref_global_leader_board_cached_data_new";
 //    public static final String PREF_GLOBAL_LAST_WEEK_LEADERBOARD_CACHED_DATA ="pref_global_leaderboard_cached_data";
@@ -242,6 +243,9 @@ public class Constants {
     public static String SHARE_PLACEHOLDER_AMOUNT = "<amount>";
     public static String SHARE_PLACEHOLDER_SPONSOR = "<sponsor_company>";
     public static String SHARE_PLACEHOLDER_PARTNER = "<partner_ngo>";
+
+    public static int FROM_THANK_YOU_SCREEN_FOR_STREAK = 1;
+    public static int FROM_PROFILE_FOR_STREAK = 2;
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{

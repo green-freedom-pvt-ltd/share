@@ -25,9 +25,9 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.login.LoginImpl;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.streak.StreakFragment;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.cause.model.CauseImageData;
 import com.sharesmile.share.core.Logger;
@@ -376,20 +376,13 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     @OnClick(R.id.btn_share_continue)
     public void onContinueClick(){
-        openHomeActivityAndFinish();
+        openStreakFragment();
     }
 
-    private void openHomeActivityAndFinish(){
-        if (getActivity() != null){
-
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra(Constants.BUNDLE_SHOW_RUN_STATS, true);
-            startActivity(intent);
-
-            getActivity().finish();
-        }
+    private void openStreakFragment() {
+        getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK), true);
     }
+
 
     private void showLoginSkipDialog() {
 

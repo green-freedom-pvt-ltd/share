@@ -15,20 +15,43 @@
         android:padding="16dp"
         android:gravity="center_horizontal"
         >
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:src="@drawable/ic_close_black_24dp"
-            />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/ic_arrow_back"
+                android:id="@+id/iv_back"
+                />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_close_black_24dp"
+                android:id="@+id/iv_close"
+                />
+        </RelativeLayout>
+<LinearLayout
+    android:id="@+id/sharable_container"
+    android:layout_weight="1"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         <ProgressBar
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:indeterminateDrawable="@drawable/progress_gradient_bg"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:progressDrawable="@drawable/progress_gradient_bg"
             android:max="360"
+            android:progress="0"
+            android:secondaryProgress="360"
+            android:id="@+id/streak_progress"
             />
             <LinearLayout
                 android:layout_centerInParent="true"
@@ -43,6 +66,7 @@
                     android:textSize="58sp"
                     android:text="15"
                     android:textColor="@color/clr_5d"
+                    android:id="@+id/tv_streak_count"
                     />
                 <com.sharesmile.share.views.LBTextView
                     android:layout_width="wrap_content"
@@ -50,23 +74,54 @@
                     android:text="Days Streak"
                     android:textSize="20sp"
                     android:textColor="@color/clr_5d"
+                    android:layout_marginBottom="4dp"
                     />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="14dp"
+                    android:id="@+id/lt_streak_goal_icons"
+                    >
+
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
+    <LinearLayout
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
         <com.sharesmile.share.views.LBTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1km left, Let's Go"
             android:textSize="18sp"
             android:textColor="@color/clr_5d"
+            android:id="@+id/tv_streak_distance"
             />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
         <com.sharesmile.share.views.LBTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BEST 20"
             android:textSize="18sp"
-            android:textColor="#ff9414"
+            android:textColor="@color/white"
+            android:id="@+id/tv_streak_best"
+            android:background="@drawable/max_streak_bg"
+            android:gravity="center|top"
+            android:paddingTop="5dp"
             />
+    </LinearLayout>
+</LinearLayout>
+    <LinearLayout
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
         <com.sharesmile.share.views.MSBButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,15 +131,24 @@
             android:padding="14sp"
             android:layout_marginLeft="60dp"
             android:layout_marginRight="60dp"
+            android:id="@+id/btn_tell_your_friends"
 
             />
+    </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
         <com.sharesmile.share.views.LBTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="EDIT GOAL"
             android:textColor="@color/bright_sky_blue"
             android:textSize="14sp"
+            android:id="@+id/tv_edit_goal"
             />
+        </LinearLayout>
 
     </LinearLayout>
 

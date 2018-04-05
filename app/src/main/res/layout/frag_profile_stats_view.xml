@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="340dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="6dp"
-    android:paddingBottom="6dp">
+    android:paddingBottom="6dp"
+    android:background="@color/white"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    >
 
     <com.sharesmile.share.views.MRTextView
         android:id="@+id/tv_to_left"
@@ -23,7 +27,8 @@
         android:textSize="14sp"
         android:text="Last 7 days"
         android:layout_centerHorizontal="true"
-        android:textColor="@color/black_57"/>
+        android:textColor="@color/black_57"
+        android:visibility="gone"/>
 
     <com.sharesmile.share.views.MRTextView
         android:id="@+id/tv_to_right"
@@ -47,7 +52,9 @@
         android:textSize="36sp"
         android:textStyle="bold"
         android:text="\u20B9 657"
-        android:textColor="@color/orange" />
+        android:textColor="@color/orange"
+        android:visibility="gone"
+        />
 
     <com.sharesmile.share.views.MRTextView
         android:layout_width="wrap_content"
@@ -56,7 +63,9 @@
         android:layout_below="@id/tv_impact"
         android:textSize="12sp"
         android:text="@string/raised"
-        android:textColor="@color/black_38" />
+        android:textColor="@color/black_38"
+        android:visibility="gone"
+        />
 
     <LinearLayout
         android:id="@+id/cal_container"

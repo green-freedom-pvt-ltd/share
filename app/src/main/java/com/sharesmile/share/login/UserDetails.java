@@ -8,7 +8,7 @@ import com.sharesmile.share.utils.Utils;
  * Created by ankitmaheshwari on 4/24/17.
  */
 
-public class UserDetails implements UnObfuscable{
+public class UserDetails implements UnObfuscable {
 
     @SerializedName("user_id")
     private int userId;
@@ -51,6 +51,89 @@ public class UserDetails implements UnObfuscable{
     @SerializedName("body_height")
     private int bodyHeight;
 
+    //streak details
+    @SerializedName("streak_count")
+    private int streakCount;
+    @SerializedName("streak_max_count")
+    private int streakMaxCount;
+    @SerializedName("streak_run_progress")
+    private double streakRunProgress;
+    @SerializedName("streak_current_date")
+    private String streakCurrentDate;
+    @SerializedName("streak_goal_distance")
+    private double streakGoalDistance = 0.5;
+    @SerializedName("streak_goal_id")
+    private int streakGoalID;
+
+    public boolean isStreakAdded() {
+        return streakAdded;
+    }
+
+    public void setStreakAdded(boolean streakAdded) {
+        this.streakAdded = streakAdded;
+    }
+
+    @SerializedName("streak_added")
+    private boolean streakAdded;
+
+    public double getStreakGoalDistance() {
+        return streakGoalDistance;
+    }
+
+    public void setStreakGoalDistance(double streakGoalDistance) {
+        this.streakGoalDistance = streakGoalDistance;
+    }
+
+    public int getStreakGoalID() {
+        return streakGoalID;
+    }
+
+    public void setStreakGoalID(int streakGoalID) {
+        this.streakGoalID = streakGoalID;
+    }
+
+    public int getStreakMaxCount() {
+        return streakMaxCount;
+    }
+
+    public void setStreakMaxCount(int streakMaxCount) {
+        this.streakMaxCount = streakMaxCount;
+    }
+
+    public int getStreakCount() {
+        return streakCount;
+    }
+
+    public void addStreakCount(int addStreakCount) {
+        this.streakCount += addStreakCount;
+        if(streakMaxCount<streakCount)
+            setStreakMaxCount(streakCount);
+    }
+
+    public void setStreakCount(int streakCount) {
+        this.streakCount = streakCount;
+    }
+
+    public double getStreakRunProgress() {
+        return streakRunProgress;
+    }
+
+    public void addStreakRunProgress(double runDistance) {
+        streakRunProgress += runDistance;
+    }
+
+    public void setStreakRunProgress(double streakRunProgress) {
+        this.streakRunProgress = streakRunProgress;
+    }
+
+    public String getStreakCurrentDate() {
+        return streakCurrentDate;
+    }
+
+    public void setStreakCurrentDate(String streakCurrentDate) {
+        this.streakCurrentDate = streakCurrentDate;
+    }
+
     public int getUserId() {
         return userId;
     }
@@ -67,7 +150,7 @@ public class UserDetails implements UnObfuscable{
         return lastName;
     }
 
-    public String getFullName(){
+    public String getFullName() {
         return Utils.dedupName(getFirstName(), getLastName());
     }
 
@@ -217,12 +300,12 @@ public class UserDetails implements UnObfuscable{
         this.bodyHeight = bodyHeight;
     }
 
-    public static class TotalAmount{
+    public static class TotalAmount {
         @SerializedName("total_amount")
         public int totalAmount;
     }
 
-    public static class TotalDistance{
+    public static class TotalDistance {
         @SerializedName("total_distance")
         public float totalDistance;
     }
