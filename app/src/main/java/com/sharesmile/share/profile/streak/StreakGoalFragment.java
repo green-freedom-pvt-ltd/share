@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.streak.model.Goal;
 
 import java.util.ArrayList;
@@ -81,8 +82,11 @@ public class StreakGoalFragment extends BaseFragment {
         switch (item.getItemId()) {
             case R.id.item_save:
                 int position = streakGoalAdapter.getPosition();
-                MainApplication.getInstance().getUserDetails().setStreakGoalID(goals.get(position).getId());
-                MainApplication.getInstance().getUserDetails().setStreakGoalDistance(goals.get(position).getValue());
+                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+                userDetails.setStreakGoalID(goals.get(position).getId());
+                userDetails.setStreakGoalDistance(goals.get(position).getValue());
+                userDetails.addStreakCount();
+                MainApplication.getInstance().setUserDetails(userDetails);
                 getFragmentController().goBack();
                 return true;
 

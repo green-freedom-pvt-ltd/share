@@ -104,8 +104,12 @@ public class UserDetails implements UnObfuscable {
         return streakCount;
     }
 
-    public void addStreakCount(int addStreakCount) {
-        this.streakCount += addStreakCount;
+    public void addStreakCount() {
+        if (!isStreakAdded() && getStreakRunProgress() >= getStreakGoalDistance()) {
+            this.streakCount += 1;
+            setStreakAdded(true);
+        }
+
         if(streakMaxCount<streakCount)
             setStreakMaxCount(streakCount);
     }

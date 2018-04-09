@@ -296,15 +296,9 @@ public class WorkoutService extends Service implements
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             if(distanceCovered>=0.1) {
-                boolean addStreak = true;
-                if(userDetails.getStreakRunProgress()>=userDetails.getStreakGoalDistance())
-                {
-                    addStreak = false;
-                }
+
                 userDetails.addStreakRunProgress(distanceCovered);
-                if (addStreak && userDetails.getStreakRunProgress() >= userDetails.getStreakGoalDistance()) {
-                    userDetails.addStreakCount(1);
-                }
+                userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
             }
 

@@ -20,6 +20,7 @@
     android:textColor="@color/black_64"
     android:fontFamily="@font/lato_bold"
     android:id="@+id/goal_name"
+    android:clickable="false"
     />
     <LinearLayout
         android:layout_marginLeft="5dp"

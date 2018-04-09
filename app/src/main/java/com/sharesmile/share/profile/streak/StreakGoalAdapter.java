@@ -34,7 +34,7 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
     private List<Goal> list;
     Context context;
 
-    int position;
+    int position = -1;
     public StreakGoalAdapter(List<Goal> list,Context context) {
         this.list = list;
         this.context = context;
@@ -80,7 +80,7 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
 
         void bindData(Goal item){
             goalName.setText(item.getName());
-            if(MainApplication.getInstance().getUserDetails().getStreakGoalID() == item.getId())
+            if((position == -1 && MainApplication.getInstance().getUserDetails().getStreakGoalID() == item.getId()) || position == getAdapterPosition())
             {
                 goalName.setChecked(true);
                 position = getAdapterPosition();
@@ -98,7 +98,6 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
                 goalStreakIcons.addView(imageView);
             }
             goalStreakDistance.setText(item.getValue()+" km per day");
-
         }
         @OnClick(R.id.goal_row)
         void onClicked()

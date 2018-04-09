@@ -485,6 +485,11 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return 0;
     }
 
+    public void setGoalDetails(JSONArray goalDetails) {
+        Logger.d(TAG, "setGoalDetails as: " + goalDetails);
+        SharedPrefsManager.getInstance().setString(PREF_GOAL_DETAILS, goalDetails.toString());
+    }
+
     public void setBodyWeight(float bodyWeight){
         UserDetails details = getUserDetails();
         if (details != null){
@@ -496,13 +501,20 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
                     .buildAndDispatch();
         }
     }
-    public void setGoalDetails(JSONArray goalDetails) {
-        Logger.d(TAG, "setGoalDetails as: " + goalDetails);
-        SharedPrefsManager.getInstance().setString(PREF_GOAL_DETAILS, goalDetails.toString());
-    }
+
     public void setUserDetails(UserDetails details){
 
         UserDetails oldDetails = getUserDetails();
+        if(!(details.getStreakCurrentDate()!=null && details.getStreakCurrentDate().length()>0) &&
+                (oldDetails!=null && oldDetails.getStreakCurrentDate()!=null && oldDetails.getStreakCurrentDate().length()>0))
+        {
+            details.setStreakGoalDistance(oldDetails.getStreakGoalDistance());
+            details.setStreakGoalID(oldDetails.getStreakGoalID());
+            details.setStreakMaxCount(oldDetails.getStreakMaxCount());
+            details.setStreakCount(oldDetails.getStreakCount());
+            details.setStreakCurrentDate(oldDetails.getStreakCurrentDate());
+            details.setStreakRunProgress(oldDetails.getStreakRunProgress());
+        }
         Gson gson = new Gson();
         Logger.d(TAG, "setUserDetails as: " + gson.toJson(details));
         SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);

@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -363,7 +365,18 @@ public class ProfileFragment extends BaseFragment {
         barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
                 barChart.getViewPortHandler()));
         barChart.invalidate();
-        barChart.setTouchEnabled(false);
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                float width = barChart.getWidth();
+                float scale = ((width*31)/7)/width;
+                barChart.zoom(scale,1,barChart.getWidth()*scale,0);
+                barChart.setScaleEnabled(false);
+            }
+        };
+        handler.postDelayed(null,100);
+//        barChart.setTouchEnabled(false);
 //        barChart.getData().setHighlightEnabled(false);
 //        barChart.setPinchZoom(false);
 //        barChart.setDoubleTapToZoomEnabled(false);

@@ -121,7 +121,7 @@ public class StreakFragment extends BaseFragment {
         streakGoalIconsLayout.removeAllViews();
         double distanceDiff = (MainApplication.getInstance().getUserDetails().getStreakGoalDistance() - MainApplication.getInstance().getUserDetails().getStreakRunProgress());
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if(distanceDiff<=0) {
+        if(distanceDiff<=0 || userDetails.isStreakAdded()) {
             streakDistance.setText("Congratulations!!! "+Utils.formatToKmsWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+" kms done.");
         }else
         {
@@ -129,7 +129,7 @@ public class StreakFragment extends BaseFragment {
         }
 
         double progress;
-        if(distanceDiff<=0)
+        if(distanceDiff<=0 || userDetails.isStreakAdded())
             progress = 360;
         else
             progress = (MainApplication.getInstance().getUserDetails().getStreakRunProgress()*360.0)/MainApplication.getInstance().getUserDetails().getStreakGoalDistance();

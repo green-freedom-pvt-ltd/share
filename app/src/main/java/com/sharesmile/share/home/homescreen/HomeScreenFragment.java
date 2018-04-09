@@ -220,11 +220,12 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         {
             //TODO : remove static values
             userDetails.setStreakRunProgress(0);
-            userDetails.setStreakCount(0);
-            userDetails.setStreakMaxCount(0);
+            userDetails.setStreakCount(103);
+            userDetails.setStreakMaxCount(103);
             userDetails.setStreakGoalDistance(0.5);
             userDetails.setStreakGoalID(2);
             userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+            userDetails.setStreakAdded(false);
             MainApplication.getInstance().setUserDetails(userDetails);
             return;
         }
@@ -240,9 +241,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                     if ((dayCount > 1)) {
                         userDetails.setStreakRunProgress(0);
-                        userDetails.setStreakCount(0);
+                        userDetails.setStreakCount(101);
+                        userDetails.setStreakAdded(false);
                         userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                     } else if (dayCount == 1) {
+                        userDetails.setStreakAdded(false);
                         userDetails.setStreakRunProgress(0);
                         userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                     }
@@ -250,7 +253,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             }else
             {
                 userDetails.setStreakRunProgress(0);
-                userDetails.setStreakCount(0);
+                userDetails.setStreakCount(102);
                 userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
             }
             if(userDetails.getStreakCount()>userDetails.getStreakMaxCount())
