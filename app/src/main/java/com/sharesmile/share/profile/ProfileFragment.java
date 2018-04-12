@@ -29,6 +29,8 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.application.MainApplication;
@@ -45,6 +47,7 @@ import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
+import com.sharesmile.share.profile.stats.BarChartEntry;
 import com.sharesmile.share.profile.stats.CustomBarChartRenderer;
 import com.sharesmile.share.profile.streak.StreakFragment;
 import com.sharesmile.share.utils.Utils;
@@ -62,13 +65,12 @@ import butterknife.OnClick;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
 import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
-import static com.sharesmile.share.profile.stats.BarChartDataSet.TYPE_WEEKLY;
 
 /**
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileFragment extends BaseFragment {
+public class ProfileFragment extends BaseFragment implements OnChartValueSelectedListener {
 
     private static final String TAG = "ProfileFragment";
 
@@ -109,26 +111,26 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.chart)
     BarChart barChart;
 
-    @BindView(R.id.tv_to_left)
-    TextView toTheLeft;
-
-    @BindView(R.id.tv_duration)
-    TextView duration;
-
-    @BindView(R.id.tv_to_right)
-    TextView toTheRight;
-
-    @BindView(R.id.tv_total_runs)
-    TextView totalRuns;
-
-    @BindView(R.id.tv_km_distance)
-    TextView distance;
-
-    @BindView(R.id.tv_distance_unit)
-    TextView distanceUnit;
-
     @BindView(R.id.tv_streak)
     TextView streakValue;
+
+    @BindView(R.id.tv_stats_impact)
+    TextView statsImpact;
+
+    @BindView(R.id.tv_stats_kms)
+    TextView statsKms;
+
+    @BindView(R.id.tv_stats_workout)
+    TextView statsWorkout;
+
+    @BindView(R.id.tv_my_stats_daily)
+    TextView myStatsDaily;
+
+    @BindView(R.id.tv_my_stats_weekly)
+    TextView myStatsWeekly;
+
+    @BindView(R.id.tv_my_stats_monthly)
+    TextView myStatsMonthly;
 
 
     int position;
@@ -137,6 +139,7 @@ public class ProfileFragment extends BaseFragment {
     private int numRuns;
     private double totalDistance;
     private BarChartDataSet barChartDataSet;
+    float zoom;
 
 
     @Nullable
@@ -239,7 +242,7 @@ public class ProfileFragment extends BaseFragment {
                 runHistoryButton.setVisibility(View.GONE);
             }
             //streak value
-            streakValue.setText(MainApplication.getInstance().getUserDetails().getStreakCount()+"");
+            streakValue.setText(MainApplication.getInstance().getUserDetails().getStreakCount() + "");
 
             setupToolbar();
 
@@ -248,9 +251,12 @@ public class ProfileFragment extends BaseFragment {
             Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
                     new float[]{0, 1}, Shader.TileMode.CLAMP);
             impactInRupees.getPaint().setShader(textShader);
+            textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
+                    new float[]{0, 1}, Shader.TileMode.CLAMP);
+//            statsImpact.getPaint().setShader(textShader);
 
             displayStats();
-            setUpBarChart();
+            setUpBarChart(BarChartDataSet.TYPE_WEEKLY);
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
             Logger.e(TAG, "Must fetch historical run data before");
@@ -262,10 +268,24 @@ public class ProfileFragment extends BaseFragment {
         }
     }
 
-    private void setUpAllTimeStats(){
-        toTheLeft.setVisibility(View.GONE);
-        toTheRight.setVisibility(View.GONE);
-        duration.setText(R.string.profile_stats_all_time);
+    @OnClick({R.id.tv_my_stats_daily,R.id.tv_my_stats_weekly,R.id.tv_my_stats_monthly})
+    void onMyStatsClick(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.tv_my_stats_daily :
+                setUpBarChart(BarChartDataSet.TYPE_DAILY);
+                break;
+            case R.id.tv_my_stats_weekly :
+                setUpBarChart(BarChartDataSet.TYPE_WEEKLY);
+                break;
+            case R.id.tv_my_stats_monthly :
+                setUpBarChart(BarChartDataSet.TYPE_MONTHLY);
+                break;
+        }
+    }
+
+    private void setUpAllTimeStats() {
         totalAmountRaised = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
         numRuns = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_RUN);
         totalDistance = SharedPrefsManager.getInstance().getLong(PREF_WORKOUT_LIFETIME_DISTANCE);
@@ -273,24 +293,15 @@ public class ProfileFragment extends BaseFragment {
                 + ", totalDistance: " + totalDistance + ", numRuns: " + numRuns);
     }
 
-    private void displayStats(){
+    private void displayStats() {
         impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(totalAmountRaised));
-        totalRuns.setText(numRuns + "");
-        String totalDistanceString;
-        double totalDistInMyUnits = UnitsManager.isImperial() ? totalDistance*0.621 : totalDistance;
-        if (totalDistInMyUnits > 100){
-            totalDistanceString = String.valueOf(Math.round(totalDistInMyUnits));
-        } else if (totalDistInMyUnits % 1 == 0){
-            totalDistanceString = String.valueOf(totalDistInMyUnits);
-        } else {
-            totalDistanceString = String.valueOf(Utils.formatWithOneDecimal(totalDistInMyUnits));
-        }
-        distance.setText(String.valueOf(totalDistanceString));
-        distanceUnit.setText(UnitsManager.getDistanceLabel());
+
     }
 
-    private void setUpBarChart(){
-        barChartDataSet = new BarChartDataSet(TYPE_WEEKLY);
+    private void setUpBarChart(int type) {
+        setBG(type);
+        barChart.removeAllViews();
+        barChartDataSet = new BarChartDataSet(type);
 
         BarDataSet dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
         dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
@@ -301,9 +312,9 @@ public class ProfileFragment extends BaseFragment {
             public String getFormattedValue(float value, Entry entry, int dataSetIndex,
                                             ViewPortHandler viewPortHandler) {
                 int val = Math.round(value);
-                if (val > 0){
+                if (val > 0) {
                     return UnitsManager.formatRupeeToMyCurrency(val);
-                }else {
+                } else {
                     return "";
                 }
             }
@@ -311,6 +322,7 @@ public class ProfileFragment extends BaseFragment {
 
         dataSet.setValueFormatter(intValueFormatter);
         BarData data = new BarData(dataSet);
+
         barChart.setData(data);
         barChart.setDrawGridBackground(false);
 
@@ -335,13 +347,12 @@ public class ProfileFragment extends BaseFragment {
         yAxis.setValueFormatter(new IAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                if (value > 10){
+                if (value > 10) {
                     return UnitsManager.formatRupeeToMyCurrency(value);
-                }
-                else if (value > 0){
+                } else if (value > 0) {
                     // Earlier only one decimal was being shown
                     return UnitsManager.formatRupeeToMyCurrency(value);
-                }else {
+                } else {
                     return "";
                 }
             }
@@ -359,36 +370,89 @@ public class ProfileFragment extends BaseFragment {
                 int index = (int) value;
                 return barChartDataSet.getLabelForIndex(index);
             }
-        } ;
-        xAxis.setValueFormatter(valueFormatter);
+        };
+//        xAxis.setValueFormatter(valueFormatter);
         barChart.setDrawBorders(false);
-        barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
-                barChart.getViewPortHandler()));
+//        barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
+//                barChart.getViewPortHandler()));
         barChart.invalidate();
-        Handler handler = new Handler(){
+        barChart.setOnChartValueSelectedListener(this);
+        Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 float width = barChart.getWidth();
-                float scale = ((width*31)/7)/width;
-                barChart.zoom(scale,1,barChart.getWidth()*scale,0);
-                barChart.setScaleEnabled(false);
+                int size = barChartDataSet.getNoOfValuesInXAxis()>=7?7: (int) barChartDataSet.getNoOfValuesInXAxis();
+                float scale = ((width * barChartDataSet.getNoOfValuesInXAxis()) / 7) / width;
+                barChart.setScaleYEnabled(false);
+                barChart.setScaleXEnabled(false);
+//                barChart.resetZoom();
+                if(zoom == 0)
+                    zoom = scale;
+                else
+                {
+                    zoom = scale - zoom;
+                    if(zoom<0)
+                        zoom = 0;
+                }
+                barChart.zoom(zoom, 1, width * scale, 0);
+                barChart.highlightValue(barChartDataSet.getBarEntries().size() - 1, 0);
             }
         };
-        handler.postDelayed(null,100);
+//        if(zoom!=0)
+//            barChart.zoom(-zoom,1,0,0);
+        handler.postDelayed(null, 100);
+
 //        barChart.setTouchEnabled(false);
 //        barChart.getData().setHighlightEnabled(false);
 //        barChart.setPinchZoom(false);
 //        barChart.setDoubleTapToZoomEnabled(false);
     }
+
+    private void setBG(int type) {
+        myStatsDaily.setBackgroundResource(R.drawable.bg_my_stats_daily);
+        myStatsDaily.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        myStatsWeekly.setBackgroundResource(R.drawable.bg_my_stats_weekly);
+        myStatsWeekly.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        myStatsMonthly.setBackgroundResource(R.drawable.bg_my_stats_monthly);
+        myStatsMonthly.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        switch (type)
+        {
+            case BarChartDataSet.TYPE_DAILY :
+                myStatsDaily.setBackgroundResource(R.drawable.bg_my_stats_daily_hover);
+                myStatsDaily.setTextColor(getResources().getColor(R.color.white));
+                break;
+            case BarChartDataSet.TYPE_WEEKLY :
+                myStatsWeekly.setBackgroundResource(R.drawable.bg_my_stats_weekly_hover);
+                myStatsWeekly.setTextColor(getResources().getColor(R.color.white));
+                break;
+            case BarChartDataSet.TYPE_MONTHLY :
+                myStatsMonthly.setBackgroundResource(R.drawable.bg_my_stats_monthly_hover);
+                myStatsMonthly.setTextColor(getResources().getColor(R.color.white));
+                break;
+        }
+    }
+
     private void setupToolbar() {
         setHasOptionsMenu(true);
         setToolbarTitle(getResources().getString(R.string.profile));
     }
 
     @OnClick(R.id.tv_streak)
-    void streakClick()
-    {
+    void streakClick() {
         getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_PROFILE_FOR_STREAK), true);
+    }
+
+    @Override
+    public void onValueSelected(Entry entry, Highlight highlight) {
+        statsImpact.setText(getContext().getString(R.string.rupee_symbol) + " " + ((int) entry.getY()));
+        BarChartEntry barChartEntry = barChartDataSet.getBarChartEntry((int) entry.getX());
+        statsWorkout.setText(barChartEntry.getCount() + "");
+        statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+    }
+
+    @Override
+    public void onNothingSelected() {
+
     }
 }
