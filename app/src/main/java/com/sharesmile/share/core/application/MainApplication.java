@@ -514,6 +514,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             details.setStreakCount(oldDetails.getStreakCount());
             details.setStreakCurrentDate(oldDetails.getStreakCurrentDate());
             details.setStreakRunProgress(oldDetails.getStreakRunProgress());
+            details.setStreakAdded(oldDetails.isStreakAdded());
         }
         Gson gson = new Gson();
         Logger.d(TAG, "setUserDetails as: " + gson.toJson(details));
