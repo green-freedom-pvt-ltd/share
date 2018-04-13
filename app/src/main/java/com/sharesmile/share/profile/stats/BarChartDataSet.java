@@ -65,7 +65,10 @@ public class BarChartDataSet {
     }
 
     public String getLabelForIndex(int index) {
+        if(entries.get(index)!=null)
         return entries.get(index).getLabel();
+        else
+            return index+"";
     }
 
     public Map<Integer, BarChartEntry> getBarChartEntries() {
@@ -125,7 +128,7 @@ public class BarChartDataSet {
         long begin = getEpochForBeginningOfWeek(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
-        entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(thisDayOfLastWeek)));
+        entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
         int dayOfWeek = thisDayOfLastWeek;
 
         while (index >= 0) {
@@ -136,7 +139,7 @@ public class BarChartDataSet {
             begin = getEpochForBeginningOfWeek(calendar) - (86400000 * 7);
             end = prevInterval.getBeginTimeStamp();
             impact = getImpactInInterval(begin, end);
-            entries.put(index - 1, new BarChartEntry(begin, end, impact, getDayLabel(prevDayOfWeek)));
+            entries.put(index - 1, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
             index--;
             dayOfWeek = prevDayOfWeek;
         }
@@ -188,7 +191,7 @@ public class BarChartDataSet {
         long begin = getEpochForBeginningOfMonth(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
-        entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(thisDayOfLastWeek)));
+        entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
         int dayOfWeek = thisDayOfLastWeek;
 
         while (index >= 0) {
@@ -201,7 +204,7 @@ public class BarChartDataSet {
             begin = getEpochForBeginningOfMonth(calendar);
             end = calendar.getTimeInMillis();
             impact = getImpactInInterval(begin, end);
-            entries.put(index - 1, new BarChartEntry(begin, end, impact, getDayLabel(prevDayOfWeek)));
+            entries.put(index - 1, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
             index--;
             dayOfWeek = prevDayOfWeek;
         }
@@ -363,8 +366,20 @@ public class BarChartDataSet {
         return currentTs - millisElapsedSinceBeginning;
     }
 
-    public static final String getDayLabel(long dayOfWeek) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE");
+    public final String getDayLabel(long dayOfWeek) {
+        SimpleDateFormat simpleDateFormat ;
+        switch (type)
+        {
+            case TYPE_DAILY :
+            case TYPE_WEEKLY :
+                simpleDateFormat = new SimpleDateFormat("dd/MM");
+                break;
+            case TYPE_MONTHLY :
+                simpleDateFormat = new SimpleDateFormat("MMM");
+                break;
+                default:
+                    simpleDateFormat = new SimpleDateFormat("dd/MM");
+        }
         Date date = new Date(dayOfWeek);
         return simpleDateFormat.format(date).toUpperCase();
         /*switch (dayOfWeek){

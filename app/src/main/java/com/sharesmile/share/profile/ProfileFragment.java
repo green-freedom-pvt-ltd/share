@@ -26,6 +26,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
@@ -56,6 +57,9 @@ import com.sharesmile.share.views.CircularImageView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Models.Level;
 import butterknife.BindView;
@@ -140,6 +144,7 @@ public class ProfileFragment extends BaseFragment implements OnChartValueSelecte
     private double totalDistance;
     private BarChartDataSet barChartDataSet;
     float zoom;
+    float width = 0,scale = 0;
 
 
     @Nullable
@@ -256,7 +261,7 @@ public class ProfileFragment extends BaseFragment implements OnChartValueSelecte
 //            statsImpact.getPaint().setShader(textShader);
 
             displayStats();
-            setUpBarChart(BarChartDataSet.TYPE_WEEKLY);
+            setUpBarChart(BarChartDataSet.TYPE_DAILY);
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
             Logger.e(TAG, "Must fetch historical run data before");
@@ -268,21 +273,20 @@ public class ProfileFragment extends BaseFragment implements OnChartValueSelecte
         }
     }
 
-    @OnClick({R.id.tv_my_stats_daily,R.id.tv_my_stats_weekly,R.id.tv_my_stats_monthly})
-    void onMyStatsClick(View view)
-    {
-        switch (view.getId())
-        {
-            case R.id.tv_my_stats_daily :
+    @OnClick({R.id.tv_my_stats_daily, R.id.tv_my_stats_weekly, R.id.tv_my_stats_monthly})
+    void onMyStatsClick(View view) {
+        switch (view.getId()) {
+            case R.id.tv_my_stats_daily:
                 setUpBarChart(BarChartDataSet.TYPE_DAILY);
                 break;
-            case R.id.tv_my_stats_weekly :
+            case R.id.tv_my_stats_weekly:
                 setUpBarChart(BarChartDataSet.TYPE_WEEKLY);
                 break;
-            case R.id.tv_my_stats_monthly :
+            case R.id.tv_my_stats_monthly:
                 setUpBarChart(BarChartDataSet.TYPE_MONTHLY);
                 break;
         }
+
     }
 
     private void setUpAllTimeStats() {
@@ -300,33 +304,58 @@ public class ProfileFragment extends BaseFragment implements OnChartValueSelecte
 
     private void setUpBarChart(int type) {
         setBG(type);
-        barChart.removeAllViews();
+        configBarChart();
         barChartDataSet = new BarChartDataSet(type);
+        List<BarEntry> barEntries = barChartDataSet.getBarEntries();
 
-        BarDataSet dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
-        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-        dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-
-        IValueFormatter intValueFormatter = new IValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, Entry entry, int dataSetIndex,
-                                            ViewPortHandler viewPortHandler) {
-                int val = Math.round(value);
-                if (val > 0) {
-                    return UnitsManager.formatRupeeToMyCurrency(val);
-                } else {
-                    return "";
+        BarDataSet dataSet;
+        if (barChart.getData() != null && barChart.getData().getDataSetCount() > 0) {
+            dataSet = (BarDataSet) barChart.getData().getDataSetByIndex(0);
+            dataSet.setValues(barEntries);
+            barChart.getData().notifyDataChanged();
+            barChart.notifyDataSetChanged();
+        } else {
+            dataSet = new BarDataSet(barChartDataSet.getBarEntries(), "Stats");
+            dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+            dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+            IValueFormatter intValueFormatter = new IValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, Entry entry, int dataSetIndex,
+                                                ViewPortHandler viewPortHandler) {
+                    int val = Math.round(value);
+                    if (val > 0) {
+                        return UnitsManager.formatRupeeToMyCurrency(val);
+                    } else {
+                        return "";
+                    }
                 }
+            };
+
+            dataSet.setValueFormatter(intValueFormatter);
+            BarData data = new BarData(dataSet);
+
+            barChart.setData(data);
+        }
+        barChart.post(new Runnable() {
+            @Override
+            public void run() {
+                width = barChart.getWidth();
+                int size = barChartDataSet.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSet.getNoOfValuesInXAxis();
+                scale = ((width * barChartDataSet.getNoOfValuesInXAxis()) / size) / width;
+                barChart.fitScreen();
+                barChart.zoom(scale, 1, width * scale, 0);
+                barChart.highlightValue(barChartDataSet.getBarEntries().size() - 1, 0);
+                barChart.invalidate();
             }
-        };
+        });
+//        barChart.setTouchEnabled(false);
+//        barChart.getData().setHighlightEnabled(false);
+//        barChart.setPinchZoom(false);
+//        barChart.setDoubleTapToZoomEnabled(false);
+    }
 
-        dataSet.setValueFormatter(intValueFormatter);
-        BarData data = new BarData(dataSet);
-
-        barChart.setData(data);
+    private void configBarChart() {
         barChart.setDrawGridBackground(false);
-
-
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisRight().setDrawGridLines(false);
         Description desc = new Description();
@@ -363,50 +392,23 @@ public class ProfileFragment extends BaseFragment implements OnChartValueSelecte
         xAxis.setDrawGridLines(false);
         xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.black_5));
         xAxis.setAxisLineWidth(1.0f);
+        xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         IAxisValueFormatter valueFormatter = new IAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 int index = (int) value;
-                return barChartDataSet.getLabelForIndex(index);
+                return barChartDataSet.getLabelForIndex(index)/*value+""*/;
             }
         };
-//        xAxis.setValueFormatter(valueFormatter);
+        xAxis.setValueFormatter(valueFormatter);
         barChart.setDrawBorders(false);
 //        barChart.setRenderer(new CustomBarChartRenderer(barChart, barChart.getAnimator(),
 //                barChart.getViewPortHandler()));
-        barChart.invalidate();
         barChart.setOnChartValueSelectedListener(this);
-        Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                float width = barChart.getWidth();
-                int size = barChartDataSet.getNoOfValuesInXAxis()>=7?7: (int) barChartDataSet.getNoOfValuesInXAxis();
-                float scale = ((width * barChartDataSet.getNoOfValuesInXAxis()) / 7) / width;
-                barChart.setScaleYEnabled(false);
-                barChart.setScaleXEnabled(false);
-//                barChart.resetZoom();
-                if(zoom == 0)
-                    zoom = scale;
-                else
-                {
-                    zoom = scale - zoom;
-                    if(zoom<0)
-                        zoom = 0;
-                }
-                barChart.zoom(zoom, 1, width * scale, 0);
-                barChart.highlightValue(barChartDataSet.getBarEntries().size() - 1, 0);
-            }
-        };
-//        if(zoom!=0)
-//            barChart.zoom(-zoom,1,0,0);
-        handler.postDelayed(null, 100);
-
-//        barChart.setTouchEnabled(false);
-//        barChart.getData().setHighlightEnabled(false);
-//        barChart.setPinchZoom(false);
-//        barChart.setDoubleTapToZoomEnabled(false);
+        barChart.setPinchZoom(false);
+        barChart.setDoubleTapToZoomEnabled(false);
+        barChart.setScaleEnabled(false);
     }
 
     private void setBG(int type) {
@@ -416,17 +418,16 @@ public class ProfileFragment extends BaseFragment implements OnChartValueSelecte
         myStatsWeekly.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         myStatsMonthly.setBackgroundResource(R.drawable.bg_my_stats_monthly);
         myStatsMonthly.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        switch (type)
-        {
-            case BarChartDataSet.TYPE_DAILY :
+        switch (type) {
+            case BarChartDataSet.TYPE_DAILY:
                 myStatsDaily.setBackgroundResource(R.drawable.bg_my_stats_daily_hover);
                 myStatsDaily.setTextColor(getResources().getColor(R.color.white));
                 break;
-            case BarChartDataSet.TYPE_WEEKLY :
+            case BarChartDataSet.TYPE_WEEKLY:
                 myStatsWeekly.setBackgroundResource(R.drawable.bg_my_stats_weekly_hover);
                 myStatsWeekly.setTextColor(getResources().getColor(R.color.white));
                 break;
-            case BarChartDataSet.TYPE_MONTHLY :
+            case BarChartDataSet.TYPE_MONTHLY:
                 myStatsMonthly.setBackgroundResource(R.drawable.bg_my_stats_monthly_hover);
                 myStatsMonthly.setTextColor(getResources().getColor(R.color.white));
                 break;
