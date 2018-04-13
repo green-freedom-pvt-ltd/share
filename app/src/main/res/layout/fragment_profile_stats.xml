@@ -281,9 +281,11 @@
                                 android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
-
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
                     <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/chart"
+                        android:id="@+id/chart_daily"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_below="@id/tv_last_week"
@@ -293,7 +295,29 @@
                         android:paddingRight="16dp">
 
                     </com.github.mikephil.charting.charts.BarChart>
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_weekly"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/tv_last_week"
+                            android:layout_marginBottom="29dp"
+                            android:layout_marginTop="12dp"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp">
 
+                        </com.github.mikephil.charting.charts.BarChart>
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_monthly"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/tv_last_week"
+                            android:layout_marginBottom="29dp"
+                            android:layout_marginTop="12dp"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp">
+
+                        </com.github.mikephil.charting.charts.BarChart>
+                    </RelativeLayout>
                 </LinearLayout>
 
             </LinearLayout>

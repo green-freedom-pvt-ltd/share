@@ -114,7 +114,31 @@
                 android:background="@drawable/settings_spinner_background"
                 android:layout_weight="3.7"/>
         </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal">
 
+            <com.sharesmile.share.views.MLTextView
+                android:id="@+id/tv_set_reminder"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/settings_reminder"
+                android:textColor="@color/MontserratRegular"
+                android:textSize="16sp"
+                android:background="@drawable/bg_my_stats_weekly"
+                android:layout_alignParentLeft="true"/>
+
+            <com.sharesmile.share.views.MLTextView
+                android:id="@+id/tv_reminder_time"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textColor="@color/MontserratRegular"
+                android:textSize="16sp"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
         <com.sharesmile.share.views.MLTextView
             android:id="@+id/tos"
             android:layout_width="match_parent"

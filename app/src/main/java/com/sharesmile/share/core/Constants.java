@@ -237,6 +237,7 @@ public class Constants {
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
 
+    public static final String REMINDER_TIME = "reminder_time";
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";

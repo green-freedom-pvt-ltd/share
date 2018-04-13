@@ -1,6 +1,8 @@
 package com.sharesmile.share.utils;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,6 +40,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.settings.AlarmReceiver;
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.core.application.MainApplication;
@@ -71,6 +74,7 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -1209,5 +1213,38 @@ public class Utils {
         return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
+    public static void setReminderTime(String time,Context context)
+    {
+        SharedPrefsManager.getInstance().setString(Constants.REMINDER_TIME,time);
+        Calendar calendar = Calendar.getInstance();
+        String[] hhmm = time.split(":");
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hhmm[0]));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(hhmm[1]));
+        calendar.set(Calendar.SECOND, 0);
+        if(calendar.before(Calendar.getInstance()))
+        {
+            calendar.add(Calendar.DAY_OF_MONTH,1);
+        }
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context,0,intent,0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,alarmPendingIntent);
+
+    }
+
+    public static Calendar getReminderTime()
+    {
+        Calendar calendar = Calendar.getInstance();
+        String time = SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME,calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        try {
+            calendar.setTimeInMillis(simpleDateFormat.parse(time).getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return calendar;
+    }
 
 }

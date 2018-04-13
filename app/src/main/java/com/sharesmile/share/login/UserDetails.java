@@ -64,6 +64,8 @@ public class UserDetails implements UnObfuscable {
     private double streakGoalDistance = 0.5;
     @SerializedName("streak_goal_id")
     private int streakGoalID;
+    @SerializedName("streak_added")
+    private boolean streakAdded;
 
     public boolean isStreakAdded() {
         return streakAdded;
@@ -72,9 +74,6 @@ public class UserDetails implements UnObfuscable {
     public void setStreakAdded(boolean streakAdded) {
         this.streakAdded = streakAdded;
     }
-
-    @SerializedName("streak_added")
-    private boolean streakAdded;
 
     public double getStreakGoalDistance() {
         return streakGoalDistance;

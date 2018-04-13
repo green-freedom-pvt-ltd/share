@@ -1,6 +1,7 @@
 package com.sharesmile.share.home.settings;
 
 import android.app.Activity;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.sharesmile.share.core.application.MainApplication;
@@ -30,11 +32,15 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
@@ -77,6 +83,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     @BindView(R.id.gps_speed_updates)
     Switch gpsSpeedUpdates;
+
+    @BindView(R.id.tv_set_reminder)
+    TextView setReminder;
+
+    @BindView(R.id.tv_reminder_time)
+    TextView reminderTime;
 
     MaterialShowcaseView materialShowcaseView;
 
@@ -123,7 +135,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         appVersionText.setText("App Version " + Utils.getAppVersion());
         setCurrencySpinner();
         setMeasurementSpinner();
-
+        setReminderTimeTv();
         if (showReminderOverlay){
             SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
             notifToggle.setChecked(false);
@@ -399,6 +411,30 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         public String toString() {
             return label + " " + code ;
         }
+    }
+
+    @OnClick(R.id.tv_set_reminder)
+    void setReminder()
+    {
+        Calendar calendar = Utils.getReminderTime();
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                Utils.setReminderTime(hour+":"+minute,getContext());
+                setReminderTimeTv();
+
+            }
+        }, calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE),true);
+        timePickerDialog.show();
+    }
+
+    private void setReminderTimeTv() {
+        Calendar calendar1 = Utils.getReminderTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        Date date = new Date();
+        date.setTime(calendar1.getTimeInMillis());
+        reminderTime.setText(simpleDateFormat.format(date));
     }
 }
 
