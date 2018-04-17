@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white">
 
     <LinearLayout
@@ -36,6 +37,13 @@
                 android:text="@string/settings_reminders"
                 android:textColor="@color/MontserratRegular"
                 android:textSize="16sp"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/greyish_brown_two"
+                tools:text="06:00 AM"
+                />
             <Switch
                 android:id="@+id/notif_toggle"
                 android:layout_width="0dp"

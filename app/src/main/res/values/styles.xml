@@ -144,4 +144,11 @@
         <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_alignParentBottom">true</item>
     </style>
+
+    <style name="onboarding_title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/clr_cb050505</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_centerHorizontal">true</item>
+    </style>
 </resources>

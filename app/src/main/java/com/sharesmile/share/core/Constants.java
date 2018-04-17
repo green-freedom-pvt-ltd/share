@@ -239,6 +239,8 @@ public class Constants {
 
     public static final String REMINDER_TIME = "reminder_time";
 
+    public static final String PREF_ONBOARDING_REQUIRED = "onboarding_required";
+
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";
     public static String SHARE_PLACEHOLDER_AMOUNT = "<amount>";

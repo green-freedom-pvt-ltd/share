@@ -775,8 +775,8 @@ public class SyncService extends GcmTaskService {
      */
     private static boolean uploadWorkoutData(Workout workout) {
 
-        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
-            // If internet not available then silently exit
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext()) || !MainApplication.isLogin()){
+            // If internet not available then silently exit || user not logged in
             return false;
         }
         Logger.d(TAG, "uploadWorkoutData called for client_run_id: " + workout.getWorkoutId()

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -139,55 +140,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
         showProgressDialog();
         //TODO : getDataFrom server
-        setGoalData();
         return view;
 
-    }
-
-    private void setGoalData() {
-        JSONArray jsonArray = new JSONArray();
-
-
-        try {
-            Goal goal = new Goal();
-            goal.setId(1);
-            goal.setName("Casual");
-            goal.setIconCount(0);
-            goal.setValue(0.2);
-
-            JSONObject jsonObject = new JSONObject(new Gson().toJson(goal));
-            jsonArray.put(jsonObject);
-
-            goal = new Goal();
-            goal.setId(2);
-            goal.setName("Regular");
-            goal.setIconCount(1);
-            goal.setValue(0.5);
-
-            jsonObject = new JSONObject(new Gson().toJson(goal));
-            jsonArray.put(jsonObject);
-
-            goal = new Goal();
-            goal.setId(3);
-            goal.setName("Serious");
-            goal.setIconCount(2);
-            goal.setValue(1);
-
-            jsonObject = new JSONObject(new Gson().toJson(goal));
-            jsonArray.put(jsonObject);
-
-            goal = new Goal();
-            goal.setId(4);
-            goal.setName("Insane");
-            goal.setIconCount(3);
-            goal.setValue(1.2);
-
-            jsonObject = new JSONObject(new Gson().toJson(goal));
-            jsonArray.put(jsonObject);
-            MainApplication.getInstance().setGoalDetails(jsonArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     private void refreshFeedBadgeIndicator(){
@@ -211,6 +165,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         prepareOnboardingOverlays();
         checkStreak();
 
+        DrawerLayout drawerLayout = ((DrawerLayout)getActivity().findViewById(R.id.drawerLayout));
+        if(drawerLayout!=null)
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
 
@@ -247,7 +204,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                         } else if (dayCount == 1) {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);
-                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+//                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                         }
                     }
                 } else {

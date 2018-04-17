@@ -192,25 +192,27 @@
                                 style="@style/profile_stats_header_right"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/profile_stats_daily"
                                 android:background="@drawable/bg_my_stats_daily"
-                                />
+                                android:text="@string/profile_stats_daily"
+                                android:textColor="@color/colorPrimaryDark"/>
+
                             <com.sharesmile.share.views.LBTextView
                                 android:id="@+id/tv_my_stats_weekly"
                                 style="@style/profile_stats_header_right"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/profile_stats_weekly"
                                 android:background="@drawable/bg_my_stats_weekly"
-                                />
+                                android:text="@string/profile_stats_weekly"
+                                android:textColor="@color/colorPrimaryDark"/>
+
                             <com.sharesmile.share.views.LBTextView
                                 android:id="@+id/tv_my_stats_monthly"
                                 style="@style/profile_stats_header_right"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/profile_stats_monthly"
                                 android:background="@drawable/bg_my_stats_monthly"
-                                />
+                                android:text="@string/profile_stats_monthly"
+                                android:textColor="@color/colorPrimaryDark"/>
                         </LinearLayout>
 
                     </LinearLayout>
@@ -233,7 +235,7 @@
                             android:textColor="@color/clr_0288aa"
                             android:textSize="36sp"
                             android:textStyle="bold"
-                            tools:text="\u20B9 65700000" />
+                            android:text="\u20B9 0" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -249,7 +251,7 @@
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/black_57"
                                 android:textSize="20sp"
-                                tools:text="3" />
+                                android:text="0" />
 
                             <com.sharesmile.share.views.LBTextView
                                 android:layout_width="wrap_content"
@@ -271,7 +273,7 @@
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/black_57"
                                 android:textSize="20sp"
-                                tools:text="3" />
+                                android:text="0" />
 
                             <com.sharesmile.share.views.LBTextView
                                 android:layout_width="wrap_content"
@@ -281,20 +283,27 @@
                                 android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-                    <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/chart_daily"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/tv_last_week"
-                        android:layout_marginBottom="29dp"
-                        android:layout_marginTop="12dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp">
+                        <ProgressBar
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:id="@+id/progress_bar_stats_graph"
+                            />
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_daily"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/tv_last_week"
+                            android:layout_marginBottom="29dp"
+                            android:layout_marginTop="12dp"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:visibility="invisible" />
 
-                    </com.github.mikephil.charting.charts.BarChart>
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/chart_weekly"
                             android:layout_width="match_parent"
@@ -303,9 +312,9 @@
                             android:layout_marginBottom="29dp"
                             android:layout_marginTop="12dp"
                             android:paddingLeft="16dp"
-                            android:paddingRight="16dp">
+                            android:paddingRight="16dp"
+                            android:visibility="invisible" />
 
-                        </com.github.mikephil.charting.charts.BarChart>
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/chart_monthly"
                             android:layout_width="match_parent"
@@ -314,9 +323,8 @@
                             android:layout_marginBottom="29dp"
                             android:layout_marginTop="12dp"
                             android:paddingLeft="16dp"
-                            android:paddingRight="16dp">
-
-                        </com.github.mikephil.charting.charts.BarChart>
+                            android:paddingRight="16dp"
+                            android:visibility="invisible" />
                     </RelativeLayout>
                 </LinearLayout>
 

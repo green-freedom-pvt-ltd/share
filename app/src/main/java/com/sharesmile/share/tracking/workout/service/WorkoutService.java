@@ -296,7 +296,7 @@ public class WorkoutService extends Service implements
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             if(distanceCovered>=0.1) {
-
+                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                 userDetails.addStreakRunProgress(distanceCovered);
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);

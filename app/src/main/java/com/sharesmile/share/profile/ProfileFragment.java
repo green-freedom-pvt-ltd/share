@@ -3,6 +3,7 @@ package com.sharesmile.share.profile;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -140,6 +141,9 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.tv_my_stats_monthly)
     TextView myStatsMonthly;
 
+    @BindView(R.id.progress_bar_stats_graph)
+    ProgressBar progressBarStatsGraph;
+
 
     int position;
 
@@ -149,7 +153,7 @@ public class ProfileFragment extends BaseFragment {
     private BarChartDataSet barChartDataSetDaily;
     private BarChartDataSet barChartDataSetWeekly;
     private BarChartDataSet barChartDataSetMonthly;
-
+    private SetUpBarChartAsync setUpBarChartAsync;
 
     @Nullable
     @Override
@@ -260,16 +264,11 @@ public class ProfileFragment extends BaseFragment {
             Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
                     new float[]{0, 1}, Shader.TileMode.CLAMP);
             impactInRupees.getPaint().setShader(textShader);
-            textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
-                    new float[]{0, 1}, Shader.TileMode.CLAMP);
-//            statsImpact.getPaint().setShader(textShader);
 
             displayStats();
             configBarChart();
-            setUpBarChart(BarChartDataSet.TYPE_DAILY);
-            setUpBarChart(BarChartDataSet.TYPE_WEEKLY);
-            setUpBarChart(BarChartDataSet.TYPE_MONTHLY);
-            showChart(BarChartDataSet.TYPE_DAILY);
+            setUpBarChartAsync = new SetUpBarChartAsync();
+            setUpBarChartAsync.execute();
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
             Logger.e(TAG, "Must fetch historical run data before");
@@ -283,40 +282,52 @@ public class ProfileFragment extends BaseFragment {
 
     @OnClick({R.id.tv_my_stats_daily, R.id.tv_my_stats_weekly, R.id.tv_my_stats_monthly})
     void onMyStatsClick(View view) {
+        int type;
         switch (view.getId()) {
             case R.id.tv_my_stats_daily:
-                showChart(BarChartDataSet.TYPE_DAILY);
+                type = BarChartDataSet.TYPE_DAILY;
                 break;
             case R.id.tv_my_stats_weekly:
-                showChart(BarChartDataSet.TYPE_WEEKLY);
+                type = BarChartDataSet.TYPE_WEEKLY;
                 break;
             case R.id.tv_my_stats_monthly:
-                showChart(BarChartDataSet.TYPE_MONTHLY);
+                type = BarChartDataSet.TYPE_MONTHLY;
                 break;
+            default:
+                type = BarChartDataSet.TYPE_DAILY;
         }
-
+        if (setUpBarChartAsync.getStatus() != AsyncTask.Status.RUNNING) {
+            showChart(type);
+        } else {
+            setUpBarChartAsync.setType(type);
+            setBG(type);
+        }
     }
-    private void showChart(int type)
-    {
+
+    private void showChart(int type) {
         setBG(type);
         barChartDaily.setVisibility(View.INVISIBLE);
         barChartWeekly.setVisibility(View.INVISIBLE);
         barChartMonthly.setVisibility(View.INVISIBLE);
-        switch (type)
-        {
-            case BarChartDataSet.TYPE_DAILY :
-                barChartDaily.setVisibility(View.VISIBLE);
-                barChartDaily.highlightValue(barChartDataSetDaily.getBarEntries().size() - 1, 0);
-                break;
-            case BarChartDataSet.TYPE_WEEKLY :
-                barChartWeekly.setVisibility(View.VISIBLE);
-                barChartWeekly.highlightValue(barChartDataSetWeekly.getBarEntries().size() - 1, 0);
-                break;
-            case BarChartDataSet.TYPE_MONTHLY :
-                barChartMonthly.setVisibility(View.VISIBLE);
-                barChartMonthly.highlightValue(barChartDataSetMonthly.getBarEntries().size() - 1, 0);
-                break;
+        try {
+            switch (type) {
+                case BarChartDataSet.TYPE_DAILY:
+                    barChartDaily.setVisibility(View.VISIBLE);
+                    barChartDaily.highlightValue(barChartDataSetDaily.getBarEntries().size() - 1, 0);
+                    break;
+                case BarChartDataSet.TYPE_WEEKLY:
+                    barChartWeekly.setVisibility(View.VISIBLE);
+                    barChartWeekly.highlightValue(barChartDataSetWeekly.getBarEntries().size() - 1, 0);
+                    break;
+                case BarChartDataSet.TYPE_MONTHLY:
+                    barChartMonthly.setVisibility(View.VISIBLE);
+                    barChartMonthly.highlightValue(barChartDataSetMonthly.getBarEntries().size() - 1, 0);
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     private void setUpAllTimeStats() {
@@ -332,41 +343,51 @@ public class ProfileFragment extends BaseFragment {
 
     }
 
-    private void setUpBarChart(int type) {
-        setBG(type);
-        switch (type) {
-            case BarChartDataSet.TYPE_DAILY:
-                barChartDataSetDaily = new BarChartDataSet(type);
-                List<BarEntry> barEntries = barChartDataSetDaily.getBarEntries();
+    class SetUpBarChartAsync extends AsyncTask<Void, Void, Void> {
 
+        int type = BarChartDataSet.TYPE_DAILY;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBarStatsGraph.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            barChartDataSetDaily = new BarChartDataSet(BarChartDataSet.TYPE_DAILY);
+            barChartDataSetWeekly = new BarChartDataSet(BarChartDataSet.TYPE_WEEKLY);
+            barChartDataSetMonthly = new BarChartDataSet(BarChartDataSet.TYPE_MONTHLY);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (isVisible()) {
                 BarDataSet dataSet;
-                if (barChartDaily.getData() != null && barChartDaily.getData().getDataSetCount() > 0) {
-                    dataSet = (BarDataSet) barChartDaily.getData().getDataSetByIndex(0);
-                    dataSet.setValues(barEntries);
-                    barChartDaily.getData().notifyDataChanged();
-                    barChartDaily.notifyDataSetChanged();
-                } else {
-                    dataSet = new BarDataSet(barChartDataSetDaily.getBarEntries(), "Stats");
-                    dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-                    dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-                    IValueFormatter intValueFormatter = new IValueFormatter() {
-                        @Override
-                        public String getFormattedValue(float value, Entry entry, int dataSetIndex,
-                                                        ViewPortHandler viewPortHandler) {
-                            int val = Math.round(value);
-                            if (val > 0) {
-                                return UnitsManager.formatRupeeToMyCurrency(val);
-                            } else {
-                                return "";
-                            }
+                dataSet = new BarDataSet(barChartDataSetDaily.getBarEntries(), "Stats");
+                dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+                dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+                IValueFormatter intValueFormatter = new IValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, Entry entry, int dataSetIndex,
+                                                    ViewPortHandler viewPortHandler) {
+                        int val = Math.round(value);
+                        if (val > 0) {
+                            return UnitsManager.formatRupeeToMyCurrency(val);
+                        } else {
+                            return "";
                         }
-                    };
+                    }
+                };
 
-                    dataSet.setValueFormatter(intValueFormatter);
-                    BarData data = new BarData(dataSet);
+                dataSet.setValueFormatter(intValueFormatter);
+                BarData dataDaily = new BarData(dataSet);
 
-                    barChartDaily.setData(data);
-                }
+                barChartDaily.setData(dataDaily);
+//                }
                 barChartDaily.post(new Runnable() {
                     @Override
                     public void run() {
@@ -379,40 +400,14 @@ public class ProfileFragment extends BaseFragment {
                         barChartDaily.invalidate();
                     }
                 });
-                break;
-
-            case BarChartDataSet.TYPE_WEEKLY:
-                barChartDataSetWeekly = new BarChartDataSet(type);
-                List<BarEntry> barEntriesWeekly = barChartDataSetWeekly.getBarEntries();
 
                 BarDataSet dataSetWeekly;
-                if (barChartWeekly.getData() != null && barChartWeekly.getData().getDataSetCount() > 0) {
-                    dataSetWeekly = (BarDataSet) barChartWeekly.getData().getDataSetByIndex(0);
-                    dataSetWeekly.setValues(barEntriesWeekly);
-                    barChartWeekly.getData().notifyDataChanged();
-                    barChartWeekly.notifyDataSetChanged();
-                } else {
-                    dataSetWeekly = new BarDataSet(barChartDataSetWeekly.getBarEntries(), "Stats");
-                    dataSetWeekly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-                    dataSetWeekly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-                    IValueFormatter intValueFormatter = new IValueFormatter() {
-                        @Override
-                        public String getFormattedValue(float value, Entry entry, int dataSetIndex,
-                                                        ViewPortHandler viewPortHandler) {
-                            int val = Math.round(value);
-                            if (val > 0) {
-                                return UnitsManager.formatRupeeToMyCurrency(val);
-                            } else {
-                                return "";
-                            }
-                        }
-                    };
-
-                    dataSetWeekly.setValueFormatter(intValueFormatter);
-                    BarData data = new BarData(dataSetWeekly);
-
-                    barChartWeekly.setData(data);
-                }
+                dataSetWeekly = new BarDataSet(barChartDataSetWeekly.getBarEntries(), "Stats");
+                dataSetWeekly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+                dataSetWeekly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+                dataSetWeekly.setValueFormatter(intValueFormatter);
+                BarData dataWeekly = new BarData(dataSetWeekly);
+                barChartWeekly.setData(dataWeekly);
                 barChartWeekly.post(new Runnable() {
                     @Override
                     public void run() {
@@ -425,40 +420,15 @@ public class ProfileFragment extends BaseFragment {
                         barChartWeekly.invalidate();
                     }
                 });
-                break;
-
-            case BarChartDataSet.TYPE_MONTHLY:
-                barChartDataSetMonthly = new BarChartDataSet(type);
-                List<BarEntry> barEntriesMonthly = barChartDataSetMonthly.getBarEntries();
 
                 BarDataSet dataSetMonthly;
-                if (barChartMonthly.getData() != null && barChartMonthly.getData().getDataSetCount() > 0) {
-                    dataSetMonthly = (BarDataSet) barChartMonthly.getData().getDataSetByIndex(0);
-                    dataSetMonthly.setValues(barEntriesMonthly);
-                    barChartMonthly.getData().notifyDataChanged();
-                    barChartMonthly.notifyDataSetChanged();
-                } else {
-                    dataSetMonthly = new BarDataSet(barChartDataSetMonthly.getBarEntries(), "Stats");
-                    dataSetMonthly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-                    dataSetMonthly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-                    IValueFormatter intValueFormatter = new IValueFormatter() {
-                        @Override
-                        public String getFormattedValue(float value, Entry entry, int dataSetIndex,
-                                                        ViewPortHandler viewPortHandler) {
-                            int val = Math.round(value);
-                            if (val > 0) {
-                                return UnitsManager.formatRupeeToMyCurrency(val);
-                            } else {
-                                return "";
-                            }
-                        }
-                    };
+                dataSetMonthly = new BarDataSet(barChartDataSetMonthly.getBarEntries(), "Stats");
+                dataSetMonthly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+                dataSetMonthly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+                dataSetMonthly.setValueFormatter(intValueFormatter);
+                BarData dataMonthly = new BarData(dataSetMonthly);
 
-                    dataSetMonthly.setValueFormatter(intValueFormatter);
-                    BarData data = new BarData(dataSetMonthly);
-
-                    barChartMonthly.setData(data);
-                }
+                barChartMonthly.setData(dataMonthly);
                 barChartMonthly.post(new Runnable() {
                     @Override
                     public void run() {
@@ -471,7 +441,13 @@ public class ProfileFragment extends BaseFragment {
                         barChartMonthly.invalidate();
                     }
                 });
-                break;
+                showChart(type);
+                progressBarStatsGraph.setVisibility(View.GONE);
+            }
+        }
+
+        private void setType(int type) {
+            this.type = type;
         }
     }
 

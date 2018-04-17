@@ -263,7 +263,7 @@ public class BarChartDataSet {
         barChartSetData.impact = Math.round(cursor.getFloat(cursor.getColumnIndex(WorkoutDao.Properties.RunAmount.columnName)));
         barChartSetData.runs = cursor.getFloat(cursor.getColumnIndex(WorkoutDao.Properties.Distance.columnName));
         barChartSetData.count = Math.round(cursor.getFloat(cursor.getColumnIndex("countOfRows")));
-
+        cursor.close();
 
         // Let's try with "Date" column also
         Cursor cursorDate = database.rawQuery("SELECT "
@@ -279,14 +279,12 @@ public class BarChartDataSet {
         barChartSetDataDate.impact = Math.round(cursorDate.getFloat(cursorDate.getColumnIndex(WorkoutDao.Properties.RunAmount.columnName)));
         barChartSetDataDate.runs = cursorDate.getFloat(cursorDate.getColumnIndex(WorkoutDao.Properties.Distance.columnName));
         barChartSetDataDate.count = Math.round(cursorDate.getFloat(cursorDate.getColumnIndex("countOfRows")));
-
+        cursorDate.close();
         if (barChartSetDataDate.impact > barChartSetData.impact) {
             barChartSetData.impact = barChartSetDataDate.impact;
             barChartSetData.runs = barChartSetDataDate.runs;
             barChartSetData.count = barChartSetDataDate.count;
         }
-
-
         Logger.d(TAG, "Amount raised between " + beginTsMillis + " and " + endTsMillis + " is " + barChartSetData.impact + " with " + barChartSetData.runs + "kms , " + barChartSetData.count + " rows");
         return barChartSetData;
     }
@@ -313,7 +311,9 @@ public class BarChartDataSet {
                 + "FROM " + WorkoutDao.TABLENAME, null);
         cursor.moveToFirst();
         Logger.d(TAG, "getFirstRun : " + cursor.getLong(0));
-        return cursor.getLong(0);
+        long l = cursor.getLong(0);
+        cursor.close();
+        return l;
     }
 
     /**

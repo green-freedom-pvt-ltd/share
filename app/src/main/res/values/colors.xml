@@ -39,6 +39,7 @@
 
     <color name="white_50">#7fffffff</color>
     <color name="white_95">#f2ffffff</color>
+    <color name="white_10">#98ffffff</color>
     <color name="black_very_light">#0f000000</color>
     <color name="very_light_grey">#f0f0f0</color>
     <color name="white_dark">#eeeeee</color>
@@ -79,6 +80,7 @@
     <color name="clr_5d">#5d5d5d</color>
     <color name="clr_d5">#d5d5d5</color>
     <color name="clr_0288aa">#0288aa</color>
+    <color name="clr_cb050505">#cb050505</color>
 
     <color name="Smooch_accent">#00B9FF</color>
     <color name="Smooch_accentDark">#008DC3</color>

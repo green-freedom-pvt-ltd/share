@@ -53,6 +53,7 @@ import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.impactleague.LeagueBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.login.LoginActivity;
+import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
@@ -84,8 +85,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     private static final String TAG = "MainActivity";
     public static final String INTENT_NOTIFICATION_RUN = "intent_notification_run";
     public static final int INTENT_STOP_RUN = 1;
-    public static final int INTENT_PAUSE_RUN=2;
-    public static final int INTENT_RESUME_RUN=3;
+    public static final int INTENT_PAUSE_RUN = 2;
+    public static final int INTENT_RESUME_RUN = 3;
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
@@ -104,7 +105,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
         Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
         Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
-        Boolean isReminderDisable =  getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
+        Boolean isReminderDisable = getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
         getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
         int intentNotificationRun = getIntent().getIntExtra(INTENT_NOTIFICATION_RUN, 0);
         getIntent().removeExtra(INTENT_NOTIFICATION_RUN);
@@ -114,26 +115,27 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         if (!userLogin && !isLoginSkip) {
             startLoginActivity();
         } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
-            if (intentNotificationRun == INTENT_STOP_RUN){
+            if (intentNotificationRun == INTENT_STOP_RUN) {
                 WorkoutSingleton.getInstance().setToShowEndRunDialog(true);
-            }else if(intentNotificationRun==INTENT_PAUSE_RUN)
-            {
+            } else if (intentNotificationRun == INTENT_PAUSE_RUN) {
                 EventBus.getDefault().post(new PauseWorkoutEvent());
-            }else if(intentNotificationRun == INTENT_RESUME_RUN)
-            {
+            } else if (intentNotificationRun == INTENT_RESUME_RUN) {
                 EventBus.getDefault().post(new ResumeWorkoutEvent());
             }
             startTrackingActivity();
-        } else {
+        } else if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ONBOARDING_REQUIRED,true))
+        {
+            startOnBoardingActivity();
+        }else {
             Logger.d(TAG, "render MainActivity UI");
             // Normal launch of MainActivity, render its layout
             EventBus.getDefault().register(this);
             ButterKnife.bind(this);
             mDrawerLayout = findViewById(R.id.drawerLayout);
             mNavigationView = findViewById(R.id.drawer_navigation);
-            if (isReminderDisable){
+            if (isReminderDisable) {
                 loadSettingsFragmentWithOverlay();
-            }else if (savedInstanceState == null){
+            } else if (savedInstanceState == null) {
                 loadInitialFragment();
             }
 
@@ -149,7 +151,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 @Override
                 public void onDrawerOpened(View view) {
                     Logger.d(TAG, "onDrawerOpened");
-                    if (overlayRunnable != null){
+                    if (overlayRunnable != null) {
                         overlayRunnable.cancel();
                     }
                     checkForOverlayOnDrawer();
@@ -158,15 +160,16 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 @Override
                 public void onDrawerClosed(View view) {
                     Logger.d(TAG, "onDrawerClosed");
-                    if (overlayRunnable != null){
+                    if (overlayRunnable != null) {
                         overlayRunnable.cancel();
                     }
                 }
 
                 @Override
                 public void onDrawerStateChanged(int state) {
-                    if (state != DrawerLayout.STATE_IDLE){
-                        if (overlayRunnable != null){
+                    Logger.d(TAG,"State : "+state);
+                    if (state != DrawerLayout.STATE_IDLE) {
+                        if (overlayRunnable != null) {
                             overlayRunnable.cancel();
                         }
                     }
@@ -183,7 +186,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
     }
 
-    private void checkForOverlayOnDrawer(){
+    private void checkForOverlayOnDrawer() {
         incrementDrawerOpenCount();
 
         int drawerOpenCount = getDrawerOpenCount();
@@ -191,22 +194,22 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
         Logger.d(TAG, "checkForOverlayOnDrawer: drawerOpenCount = " + drawerOpenCount + ", workoutCount = " + workoutCount);
 
-        if (OnboardingOverlay.HELP_CENTER.isEligibleForDisplay(drawerOpenCount, workoutCount)){
+        if (OnboardingOverlay.HELP_CENTER.isEligibleForDisplay(drawerOpenCount, workoutCount)) {
             overlayRunnable = new OverlayRunnable();
             MainApplication.getMainThreadHandler().postDelayed(overlayRunnable, OnboardingOverlay.HELP_CENTER.getDelayInMillis());
         }
     }
 
-    private void incrementDrawerOpenCount(){
+    private void incrementDrawerOpenCount() {
         int launchCount = SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + NAVIGATION_DRAWER);
         SharedPrefsManager.getInstance().setInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + NAVIGATION_DRAWER, ++launchCount);
     }
 
-    public int getDrawerOpenCount(){
+    public int getDrawerOpenCount() {
         return SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + NAVIGATION_DRAWER);
     }
 
-    private void startTrackingActivity(){
+    private void startTrackingActivity() {
         Intent intent = new Intent(this, TrackerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -217,6 +220,13 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
+        startActivity(intent);
+        finish();
+    }
+
+    private void startOnBoardingActivity() {
+        Intent intent = new Intent(this, OnBoardingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
@@ -260,7 +270,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     } else {
                         showLeaderBoard();
                     }
-                }else if (screen.equals(NotificationConsts.Screen.IMPACT_LEAGUE)){
+                } else if (screen.equals(NotificationConsts.Screen.IMPACT_LEAGUE)) {
                     if (!MainApplication.isLogin()) {
                         showLoginActivity();
                     } else {
@@ -310,7 +320,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             @Override
             public void onDismiss(DialogInterface dialog) {
                 AnalyticsEvent.create(Event.ON_DISMISS_APP_UPDATE_POPUP).buildAndDispatch();
-                if (forceUpdate){
+                if (forceUpdate) {
                     finish();
                 }
             }
@@ -362,7 +372,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         addFragment(new HomeScreenFragment(), false);
         replaceFragment(SettingsFragment.newInstance(true), true);
     }
-
 
 
     @Override
@@ -431,10 +440,9 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     @Override
     public void onBackPressed() {
         if (isDrawerOpened()) {
-            mDrawerLayout.closeDrawer(Gravity.LEFT);
+            mDrawerLayout.closeDrawer(Gravity.START);
             return;
         }
-
         hideKeyboard(null);
         if (getFragmentManager().getBackStackEntryCount() == 1) {
             ActivityCompat.finishAffinity(this);
@@ -443,72 +451,81 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
     }
 
+
+
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
-        Logger.d(TAG, "onNavigationItemSelected");
 
-        if (overlayRunnable != null){
+        Logger.d(TAG, "onNavigationItemSelected");
+        if (overlayRunnable != null) {
             overlayRunnable.cancel();
         }
-
-        if (menuItem.getItemId() == R.id.nav_item_profile) {
-            replaceFragment(new ProfileFragment(), true);
-            AnalyticsEvent.create(Event.ON_SELECT_PROFILE_MENU)
-                    .buildAndDispatch();
-        }
-
-        if (menuItem.getItemId() == R.id.nav_item_settings) {
-            Logger.d(TAG, "settings clicked");
-            replaceFragment(SettingsFragment.newInstance(false), true);
-        } else if (menuItem.getItemId() == R.id.nav_item_home) {
-            showHome();
-            AnalyticsEvent.create(Event.ON_SELECT_HOME_MENU)
-                    .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_login) {
-            showLoginActivity();
-        } else if (menuItem.getItemId() == R.id.nav_item_feed){
-            showMessageCenter();
-            AnalyticsEvent.create(Event.ON_CLICK_FEED)
-                    .put("source", "navigation_drawer")
-                    .buildAndDispatch();
-        }
-        else if (menuItem.getItemId() == R.id.nav_item_help) {
-            performOperation(OPEN_HELP_CENTER, false);
-            OnboardingOverlay.HELP_CENTER.registerUseOfOverlay();
-            AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
-                    .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_share) {
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        switch (menuItem.getItemId()) {
+            case R.id.nav_item_profile:
+                replaceFragment(new ProfileFragment(), true);
+                AnalyticsEvent.create(Event.ON_SELECT_PROFILE_MENU)
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_settings:
+                Logger.d(TAG, "settings clicked");
+                replaceFragment(SettingsFragment.newInstance(false), true);
+                break;
+            case R.id.nav_item_home:
+                showHome();
+                AnalyticsEvent.create(Event.ON_SELECT_HOME_MENU)
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_login:
+                showLoginActivity();
+                break;
+            case R.id.nav_item_feed:
+                showMessageCenter();
+                AnalyticsEvent.create(Event.ON_CLICK_FEED)
+                        .put("source", "navigation_drawer")
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_help:
+                performOperation(OPEN_HELP_CENTER, false);
+                OnboardingOverlay.HELP_CENTER.registerUseOfOverlay();
+                AnalyticsEvent.create(Event.ON_SELECT_HELP_MENU)
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_share:
 //            replaceFragment(ShareFragment.newInstance(WorkoutDataImpl.getDummyWorkoutData(), CauseDataStore.getInstance().getCausesToShow().get(0)), true);
-            share();
-            AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
-                    .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_leaderboard) {
-            showLeaderBoard();
-            AnalyticsEvent.create(Event.ON_SELECT_LEADERBOARD_MENU)
-                    .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_impact_league) {
-            showImpactLeague();
-            AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_NAVIGATION_MENU)
-                    .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
-                    .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
-                    .buildAndDispatch();
-        } else if (menuItem.getItemId() == R.id.nav_item_how_it_works) {
-            replaceFragment(HowItWorksFragment.newInstance(), true);
-            AnalyticsEvent.create(Event.ON_CLICK_HOW_IT_WORKS_NAVIGATION_MENU)
-                    .buildAndDispatch();
+                share();
+                AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_leaderboard:
+                showLeaderBoard();
+                AnalyticsEvent.create(Event.ON_SELECT_LEADERBOARD_MENU)
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_impact_league:
+                showImpactLeague();
+                AnalyticsEvent.create(Event.ON_CLICK_IMPACT_LEAGUE_NAVIGATION_MENU)
+                        .put("team_id", LeaderBoardDataStore.getInstance().getMyTeamId())
+                        .put("league_name", LeaderBoardDataStore.getInstance().getLeagueName())
+                        .buildAndDispatch();
+                break;
+            case R.id.nav_item_how_it_works:
+                replaceFragment(HowItWorksFragment.newInstance(), true);
+                AnalyticsEvent.create(Event.ON_CLICK_HOW_IT_WORKS_NAVIGATION_MENU)
+                        .buildAndDispatch();
+                break;
+
         }
-
-        mDrawerLayout.closeDrawers();
-
         return false;
     }
 
-    private void showImpactLeague(){
+    private void showImpactLeague() {
         Logger.d(TAG, "showImpactLeague");
-        if (LeaderBoardDataStore.getInstance().toShowLeague()){
+        if (LeaderBoardDataStore.getInstance().toShowLeague()) {
             LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
-            replaceFragment(leageBoardFragment , true);
-        }else {
+            replaceFragment(leageBoardFragment, true);
+        } else {
             performOperation(IFragmentController.SHOW_LEAGUE_ACTIVITY, null);
         }
     }
@@ -582,7 +599,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(LeagueBoardDataUpdated dataUpdated) {
-        if (dataUpdated.isSuccess()){
+        if (dataUpdated.isSuccess()) {
             updateNavigationMenu();
         }
     }
@@ -712,12 +729,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
         @Override
         public void run() {
-            if (!cancelled && isActivityVisible()){
+            if (!cancelled && isActivityVisible()) {
                 // This is a hack to get hold of the anchor view for help center menu item
                 NavigationView navigationView = findViewById(R.id.drawer_navigation);
                 ArrayList<View> views = new ArrayList<>();
                 navigationView.findViewsWithText(views, getString(R.string.help_center), View.FIND_VIEWS_WITH_TEXT);
-                if (isDrawerOpened()){
+                if (isDrawerOpened()) {
                     Utils.showOverlay(OnboardingOverlay.HELP_CENTER,
                             views.get(0),
                             MainActivity.this,
@@ -726,7 +743,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             }
         }
 
-        public void cancel(){
+        public void cancel() {
             cancelled = true;
         }
     }

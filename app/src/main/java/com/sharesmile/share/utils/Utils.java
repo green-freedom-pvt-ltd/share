@@ -853,7 +853,7 @@ public class Utils {
         long totalSteps = cursor.getLong(2);
         long totalRecordedTime = Math.round(cursor.getDouble(3));
         long totalCalories = Math.round(cursor.getDouble(4));
-
+        cursor.close();
         Logger.d(TAG, "updateTrackRecordFromDb: totalAmountRaised: " + totalAmountRaised
                 + ", totalDistance: " + totalDistance + ", totalSteps: " + totalSteps
                 + ", totalRecordedTime: " + totalRecordedTime + ", totalCalories: " + totalCalories

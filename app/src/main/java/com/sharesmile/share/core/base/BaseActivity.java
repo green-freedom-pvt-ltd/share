@@ -82,15 +82,20 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
         if (!getSupportFragmentManager().isDestroyed()) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction
-                    .add(getFrameLayoutId(), fragmentToBeLoaded, fragmentToBeLoaded.getName());
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
-            }
-            if (allowStateLoss) {
-                fragmentTransaction.commitAllowingStateLoss();
-            } else {
-                fragmentTransaction.commit();
+            if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {
+                fragmentTransaction
+                        .add(getFrameLayoutId(), fragmentToBeLoaded, fragmentToBeLoaded.getName());
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(fragmentToBeLoaded.getName(),0);
             }
         } else {
             Logger.e(getName(), "addFragmen: Actvity Destroyed, won't perform FT to load" +
@@ -122,15 +127,20 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
         if (!getSupportFragmentManager().isDestroyed()) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(getFrameLayoutId(), fragmentToBeLoaded,
-                    fragmentToBeLoaded.getName());
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
-            }
-            if (allowStateLoss) {
-                fragmentTransaction.commitAllowingStateLoss();
-            } else {
-                fragmentTransaction.commit();
+            if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {
+                fragmentTransaction.replace(getFrameLayoutId(), fragmentToBeLoaded,
+                        fragmentToBeLoaded.getName());
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(fragmentToBeLoaded.getName(),0);
             }
         } else {
             Logger.e(getName(), "replaceFragment: Actvity Destroyed, won't perform FT to load" +
