@@ -30,6 +30,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
@@ -1247,4 +1248,16 @@ public class Utils {
         return calendar;
     }
 
+    public static void setNumberPicker(NumberPicker picker,String s[],int setDefault) {
+        picker.setMinValue(0);
+        picker.setMaxValue(s.length-1);
+        //implement array string to number picker
+        picker.setDisplayedValues(s);
+        picker.setWrapSelectorWheel(false);
+        //disable soft keyboard
+        picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+        if(setDefault!=-1)
+        picker.setValue(setDefault);
+    }
 }

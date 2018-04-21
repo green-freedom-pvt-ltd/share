@@ -20,6 +20,8 @@ import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.R;
 import com.sharesmile.share.WorkoutDao;
@@ -43,6 +45,7 @@ import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
@@ -50,6 +53,7 @@ import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.workout.service.WorkoutService;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -486,6 +490,43 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public void setGoalDetails(JSONArray goalDetails) {
+        goalDetails = new JSONArray();
+        ArrayList<Goal> goals  = new ArrayList<>();
+        Goal goal = new Goal();
+        goal.setId(1);
+        goal.setName("Casual");
+        goal.setIconCount(0);
+        goal.setValue(0.2);
+        goals.add(goal);
+
+        goal = new Goal();
+        goal.setId(2);
+        goal.setName("Regular");
+        goal.setIconCount(1);
+        goal.setValue(0.5);
+        goals.add(goal);
+
+        goal = new Goal();
+        goal.setId(3);
+        goal.setName("Serious");
+        goal.setIconCount(2);
+        goal.setValue(0.7);
+        goals.add(goal);
+
+        goal = new Goal();
+        goal.setId(4);
+        goal.setName("Insane");
+        goal.setIconCount(3);
+        goal.setValue(1);
+        goals.add(goal);
+
+        try {
+            goalDetails = new JSONArray(new Gson().toJson(
+                    goals,
+                    new TypeToken<ArrayList<Goal>>() {}.getType()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Logger.d(TAG, "setGoalDetails as: " + goalDetails);
         SharedPrefsManager.getInstance().setString(PREF_GOAL_DETAILS, goalDetails.toString());
     }

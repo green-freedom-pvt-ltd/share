@@ -4,12 +4,21 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
-    <NumberPicker
+    android:gravity="center_horizontal"
+    >
+    <LinearLayout
+        android:layout_marginTop="@dimen/onboarding_margin_top"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <com.sharesmile.share.views.CustomNumberPicker
+        android:id="@+id/height_picker"
         android:layout_width="124dp"
-        android:layout_height="wrap_content"></NumberPicker>
+        android:layout_height="wrap_content"/>
 
-    <NumberPicker
+    <com.sharesmile.share.views.CustomNumberPicker
+        android:id="@+id/height_unit_picker"
         android:layout_width="124dp"
-        android:layout_height="wrap_content"></NumberPicker>
+        android:layout_height="wrap_content"/>
+    </LinearLayout>
 </LinearLayout>

@@ -72,7 +72,6 @@
             android:id="@+id/main_frame_layout_onboarding"
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_below="@+id/onboarding_question_tv"
             android:layout_weight="0.8"
             />
         </LinearLayout>
@@ -95,7 +94,8 @@
             android:layout_marginBottom="29dp"
             android:text="@string/weight_required_for"
             android:textColor="@color/white"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:gravity="right"/>
 
         <com.sharesmile.share.views.MSBTextView
             android:id="@+id/continue_tv"

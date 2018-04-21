@@ -1,22 +1,29 @@
 package com.sharesmile.share.onboarding;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.base.PermissionCallback;
-import com.sharesmile.share.onboarding.Fragments.FragmentBirthday;
-import com.sharesmile.share.onboarding.Fragments.FragmentGender;
-import com.sharesmile.share.onboarding.Fragments.FragmentHeight;
-import com.sharesmile.share.onboarding.Fragments.FragmentWeight;
-import com.sharesmile.share.onboarding.Fragments.FragmentWelcome;
+import com.sharesmile.share.onboarding.fragments.FragmentAskReminder;
+import com.sharesmile.share.onboarding.fragments.FragmentBirthday;
+import com.sharesmile.share.onboarding.fragments.FragmentGender;
+import com.sharesmile.share.onboarding.fragments.FragmentGoals;
+import com.sharesmile.share.onboarding.fragments.FragmentHeight;
+import com.sharesmile.share.onboarding.fragments.FragmentSetReminder;
+import com.sharesmile.share.onboarding.fragments.FragmentWeight;
+import com.sharesmile.share.onboarding.fragments.FragmentWelcome;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +55,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
         ButterKnife.bind(this);
+        MainApplication.getInstance().setGoalDetails(null);
         loadInitialFragment();
     }
 
@@ -127,7 +135,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount()-1).getName());
                 if(fragment instanceof FragmentWelcome)
                 {
-                    setBackAndContinue(FragmentWelcome.TAG);
+                    setBackAndContinue(FragmentWelcome.TAG,getResources().getString(R.string.continue_txt));
                 }
             }
         },100);
@@ -152,6 +160,31 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 }else if(fragment instanceof FragmentHeight)
                 {
                     replaceFragment(new FragmentBirthday(), true);
+                }else if(fragment instanceof FragmentBirthday)
+                {
+                    replaceFragment(new FragmentGoals(), true);
+                }else if(fragment instanceof FragmentGoals)
+                {
+                    replaceFragment(new FragmentAskReminder(), true);
+                }else if(fragment instanceof FragmentAskReminder)
+                {
+                    String continueText = continueTv.getText().toString();
+                    if(continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
+                        replaceFragment(new FragmentSetReminder(), true);
+                    }else if(continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
+                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ONBOARDING_REQUIRED,false);
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                }else if(fragment instanceof FragmentSetReminder)
+                {
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ONBOARDING_REQUIRED,false);
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 }
             }
         }
@@ -166,28 +199,40 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     @Override
-    public void setBackAndContinue(String name) {
+    public void setBackAndContinue(String name,String continueTextName) {
         onboardingQuestion.setVisibility(View.VISIBLE);
         progressLayout.setVisibility(View.VISIBLE);
         continueTv.setText(getString(R.string.continue_txt));
-        continueTv.setTextColor(getResources().getColor(R.color.white));
+
+        backTv.setVisibility(View.VISIBLE);
+        continueTv.setVisibility(View.VISIBLE);
+        setContinueTextColor(R.color.white);
         switch (name) {
             case FragmentWelcome.TAG:
                 backTv.setVisibility(View.INVISIBLE);
                 continueTv.setVisibility(View.VISIBLE);
-                continueTv.setText(getString(R.string.start_my_journey_txt));
+                continueTv.setText(continueTextName);
                 onboardingQuestion.setVisibility(View.GONE);
                 progressLayout.setVisibility(View.GONE);
                 break;
             case FragmentGender.TAG:
-                backTv.setVisibility(View.VISIBLE);
-                continueTv.setVisibility(View.VISIBLE);
-//                continueTv.setTextColor(getResources().getColor(R.color.white_10));
+                setContinueTextColor(R.color.white_10);
                 break;
             case FragmentWeight.TAG :
-                backTv.setVisibility(View.VISIBLE);
-                continueTv.setVisibility(View.VISIBLE);
+                break;
+            case FragmentGoals.TAG :
+                break;
+            case FragmentAskReminder.TAG :
+                setContinueTextColor(R.color.white_10);
+                continueTv.setText(continueTextName);
                 break;
         }
     }
+
+    @Override
+    public void setContinueTextColor(int color) {
+        continueTv.setTextColor(getResources().getColor(color));
+    }
+
+
 }
