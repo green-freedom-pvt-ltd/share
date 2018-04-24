@@ -56,12 +56,18 @@ public class FragmentHeight extends BaseFragment {
     private void setData() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         int height = userDetails.getBodyHeight();
+        if(height==0)
+        {
+            heightPicker.setValue(cmsHeight.size()/2);
+        }else
+        {
         if(heightUnitPicker.getValue()==0)
         {
             heightPicker.setValue(cmsHeight.indexOf(height+""));
         }else
         {
             heightPicker.setValue(inchHeight.indexOf(cmsToInches(height)));
+        }
         }
     }
 
@@ -83,17 +89,27 @@ public class FragmentHeight extends BaseFragment {
         heightUnitPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                int cms_ = 0;
                 if(i1==0)
                 {
                     String inchesFeet = inchArray[heightPicker.getValue()];
                     String cms = inchesTocms(inchesFeet);
+                    cms_ = Integer.parseInt(cms);
+                    if(cms_>200) {
+                        cms_ = 200;
+                        cms = "200";
+                    }
                     Utils.setNumberPicker(heightPicker, cmsArray, cmsHeight.indexOf(cms));
                 }else if(i1==1)
                 {
                     String cms = cmsArray[heightPicker.getValue()];
+                    cms_ = Integer.parseInt(cms);
                     String inchesFeet = cmsToInches(Integer.parseInt(cms));
                     Utils.setNumberPicker(heightPicker, inchArray, inchHeight.indexOf(inchesFeet));
                 }
+                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+                userDetails.setBodyHeight(cms_);
+                MainApplication.getInstance().setUserDetails(userDetails);
             }
         });
     }
@@ -102,6 +118,7 @@ public class FragmentHeight extends BaseFragment {
     {
         int feet = (int) (cms/30.48);
         int inches = (int) Math.round((cms%30.48) * 0.393701);
+        inches = inches==12?11:inches;
         return feet + "' "+inches+"\"";
     }
 

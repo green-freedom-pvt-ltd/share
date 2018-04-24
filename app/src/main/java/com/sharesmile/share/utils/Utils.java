@@ -35,6 +35,7 @@ import android.widget.NumberPicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Logger;
@@ -42,6 +43,7 @@ import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.AlarmReceiver;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.core.application.MainApplication;
@@ -64,6 +66,8 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -92,6 +96,7 @@ import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectangleProm
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
+import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_STRIDE_LENGTH;
@@ -1216,23 +1221,35 @@ public class Utils {
 
     public static void setReminderTime(String time,Context context)
     {
+        SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET,true);
         SharedPrefsManager.getInstance().setString(Constants.REMINDER_TIME,time);
         Calendar calendar = Calendar.getInstance();
         String[] hhmm = time.split(":");
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hhmm[0]));
-        calendar.set(Calendar.MINUTE, Integer.parseInt(hhmm[1]));
-        calendar.set(Calendar.SECOND, 0);
-        if(calendar.before(Calendar.getInstance()))
-        {
-            calendar.add(Calendar.DAY_OF_MONTH,1);
+        if(hhmm.length==2) {
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hhmm[0]));
+            calendar.set(Calendar.MINUTE, Integer.parseInt(hhmm[1]));
+            calendar.set(Calendar.SECOND, 0);
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(context, AlarmReceiver.class);
+            PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
         }
+
+    }
+
+    public static void cancelReminderTime(Context context)
+    {
+        SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET,false);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context,0,intent,0);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,alarmPendingIntent);
-
+        alarmManager.cancel(alarmPendingIntent);
     }
 
     public static Calendar getReminderTime()
@@ -1249,6 +1266,7 @@ public class Utils {
     }
 
     public static void setNumberPicker(NumberPicker picker,String s[],int setDefault) {
+        picker.setValue(0);
         picker.setMinValue(0);
         picker.setMaxValue(s.length-1);
         //implement array string to number picker
@@ -1259,5 +1277,36 @@ public class Utils {
 
         if(setDefault!=-1)
         picker.setValue(setDefault);
+    }
+
+    public static boolean checkUserLoggedInBefore(int userId) {
+        try {
+            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN,"{}"));
+            if(jsonObject.has(userId+""))
+            {
+                return true;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void setUserLoggedIn(UserDetails userDetails) {
+        try {
+            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN,"{}"));
+            JSONObject user = new JSONObject();
+            user.put("streak_goal_id",userDetails.getStreakGoalID());
+            user.put("streak_goal_distance",userDetails.getStreakGoalDistance());
+            user.put("streak_count",userDetails.getStreakCount());
+            user.put("streak_current_date",userDetails.getStreakCurrentDate());
+            user.put("streak_goal_id",userDetails.getStreakGoalID());
+            user.put("streak_goal_id",userDetails.getStreakGoalID());
+            user.put("reminder_time",SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME,""));
+            jsonObject.put(userDetails.getUserId()+"",user);
+            SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN,jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

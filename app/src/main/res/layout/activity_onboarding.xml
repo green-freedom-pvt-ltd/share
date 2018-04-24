@@ -5,20 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@drawable/onboarding_bg"
     >
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/onboarding_bg" />
-
     <RelativeLayout
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="32dp">
+        android:paddingTop="32dp"
+        android:paddingBottom="30dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        >
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -82,8 +80,10 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:text="@string/back_txt"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"/>
 
         <com.sharesmile.share.views.LRTextView
             android:id="@+id/screen_explain_tv"
@@ -95,7 +95,9 @@
             android:text="@string/weight_required_for"
             android:textColor="@color/white"
             android:textSize="12sp"
-            android:gravity="right"/>
+            android:gravity="right"
+
+            />
 
         <com.sharesmile.share.views.MSBTextView
             android:id="@+id/continue_tv"
@@ -105,6 +107,9 @@
             android:layout_alignParentRight="true"
             android:text="@string/continue_txt"
             android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            />
     </RelativeLayout>
 </RelativeLayout>

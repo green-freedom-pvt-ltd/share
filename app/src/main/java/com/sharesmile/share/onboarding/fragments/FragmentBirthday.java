@@ -22,7 +22,7 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FragmentBirthday extends BaseFragment {
+public class FragmentBirthday extends BaseFragment implements NumberPicker.OnValueChangeListener {
     public static final String TAG = "FragmentBirthday";
     @BindView(R.id.date_picker)
     NumberPicker datePicker;
@@ -81,12 +81,9 @@ public class FragmentBirthday extends BaseFragment {
         yearPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         yearPicker.setValue(calendar.get(Calendar.YEAR));
         setDatePicker();
-        monthPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                setDatePicker();
-            }
-        });
+        monthPicker.setOnValueChangedListener(this);
+        datePicker.setOnValueChangedListener(this);
+        yearPicker.setOnValueChangedListener(this);
 
     }
 
@@ -103,5 +100,17 @@ public class FragmentBirthday extends BaseFragment {
         datePicker.setWrapSelectorWheel(false);
         //disable soft keyboard
         datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+    }
+
+    @Override
+    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        if(numberPicker.getId() == monthPicker.getId())
+        {
+            setDatePicker();
+        }
+        String yymmdd = (yearPicker.getValue()+1900)+"-"+months[monthPicker.getValue()]+"-"+datePicker.getValue();
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        userDetails.setBirthday(yymmdd);
+        MainApplication.getInstance().setUserDetails(userDetails);
     }
 }

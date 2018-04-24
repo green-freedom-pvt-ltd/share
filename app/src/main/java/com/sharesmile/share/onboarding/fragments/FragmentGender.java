@@ -81,21 +81,26 @@ public class FragmentGender extends BaseFragment {
     private void selectBG(int id)
     {
         femaleCardView.setCardBackgroundColor(getResources().getColor(R.color.white));
+        femaleImageView.setImageResource(R.drawable.female);
         femaleTextView.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
 
         maleCardView.setCardBackgroundColor(getResources().getColor(R.color.white));
+        maleImageView.setImageResource(R.drawable.male);
         maleTextView.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         switch (id)
         {
             case R.id.female_cv :
                 femaleCardView.setCardBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 femaleTextView.setTextColor(getResources().getColor(R.color.white));
+                femaleImageView.setImageResource(R.drawable.female_white);
                 userDetails.setGenderUser("f");
                 break;
             case R.id.male_cv :
                 maleCardView.setCardBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 maleTextView.setTextColor(getResources().getColor(R.color.white));
+                maleImageView.setImageResource(R.drawable.male_white);
                 userDetails.setGenderUser("m");
                 break;
         }

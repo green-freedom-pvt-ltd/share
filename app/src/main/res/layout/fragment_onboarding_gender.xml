@@ -32,6 +32,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="centerInside"
                 android:layout_weight="1"
+                android:src="@drawable/female"
                 />
             <com.sharesmile.share.views.LBTextView
                 android:id="@+id/female_tv"
@@ -64,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:scaleType="centerInside"
                     android:layout_weight="1"
+                    android:src="@drawable/male"
                     />
                 <com.sharesmile.share.views.LBTextView
                     android:id="@+id/male_tv"

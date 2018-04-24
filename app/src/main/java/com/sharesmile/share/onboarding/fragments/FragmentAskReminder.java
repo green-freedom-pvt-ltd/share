@@ -24,16 +24,17 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class FragmentAskReminder extends BaseFragment implements CompoundButton.OnCheckedChangeListener {
+public class FragmentAskReminder extends BaseFragment implements View.OnClickListener {
     public static final String TAG = "FragmentAskReminder";
     CommonActions commonActions;
     @BindView(R.id.yes)
-    RadioButton yes;
+    TextView yes;
     @BindView(R.id.no)
-    RadioButton no;
+    TextView no;
 
-    boolean isChecked = false;
+    int actionSelected = -1;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,32 +50,35 @@ public class FragmentAskReminder extends BaseFragment implements CompoundButton.
         commonActions.setExplainText(getContext().getResources().getString(R.string.set_reminder_for_daily_jog_walk), getContext().getResources().getString(R.string.reminder_explain_txt));
         commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
         commonActions.setContinueTextColor(R.color.white_10);
-        yes.setOnCheckedChangeListener(this);
-        no.setOnCheckedChangeListener(this);
-
     }
 
-    private void setChecked(CompoundButton compoundButton) {
-        yes.setChecked(false);
-        no.setChecked(false);
-        compoundButton.setChecked(true);
-        isChecked = false;
-        if(yes.isChecked())
+    private void setChecked() {
+        yes.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_unselected,0,0,0);
+        no.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_unselected,0,0,0);
+
+        if(actionSelected == 1)
         {
             commonActions.setBackAndContinue(TAG,getResources().getString(R.string.set_reminder));
             commonActions.setContinueTextColor(R.color.white);
-        }else if(no.isChecked())
+            yes.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
+        }else if(actionSelected == 0)
         {
             commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
             commonActions.setContinueTextColor(R.color.white);
+            no.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
         }
     }
-
-    @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        if(!isChecked) {
-            isChecked = true;
-            setChecked(compoundButton);
+    @OnClick({R.id.yes_layout,R.id.no_layout})
+    public void onClick(View view) {
+        switch (view.getId())
+        {
+            case R.id.yes_layout :
+                actionSelected = 1;
+                break;
+            case R.id.no_layout :
+                actionSelected = 0;
+                break;
         }
+        setChecked();
     }
 }

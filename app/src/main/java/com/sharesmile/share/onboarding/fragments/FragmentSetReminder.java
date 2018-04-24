@@ -18,7 +18,7 @@ import com.sharesmile.share.utils.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FragmentSetReminder extends BaseFragment {
+public class FragmentSetReminder extends BaseFragment implements NumberPicker.OnValueChangeListener {
     public static final String TAG = "FragmentSetReminder";
     CommonActions commonActions;
     @BindView(R.id.hour_picker)
@@ -51,6 +51,8 @@ public class FragmentSetReminder extends BaseFragment {
 
         hourPicker.setMinValue(1);
         hourPicker.setMaxValue(12);
+        hourPicker.setValue(6);
+        Utils.setReminderTime("06:00",getContext());
         hourPicker.setWrapSelectorWheel(false);
         hourPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         String minutes[] = new String[60/5];
@@ -59,8 +61,29 @@ public class FragmentSetReminder extends BaseFragment {
             minutes[i] = (i*5)<10?"0"+i*5:i*5+"";
         }
         Utils.setNumberPicker(minutePicker,minutes,0);
-
+        hourPicker.setWrapSelectorWheel(true);
+        minutePicker.setWrapSelectorWheel(true);
+        hourPicker.setOnValueChangedListener(this);
+        minutePicker.setOnValueChangedListener(this);
+        ampmPicker.setOnValueChangedListener(this);
     }
 
+    @Override
+    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        int hour = hourPicker.getValue();
+        int minute = minutePicker.getValue();
+        int ampm = ampmPicker.getValue();
 
+        if(ampm!=0 && hour!=12)
+        {
+         hour+=12;
+        }else if(hour==12 && ampm==0)
+        {
+            hour = 0;
+        }
+
+        String hour_s = hour<10?"0"+hour:hour+"";
+        String minute_s = minute<10?"0"+minute:minute+"";
+        Utils.setReminderTime(hour_s+":"+minute_s,getContext());
+    }
 }

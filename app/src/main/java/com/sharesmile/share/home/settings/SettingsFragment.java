@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -30,7 +31,11 @@ import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.utils.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +51,8 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
+import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
+import static com.sharesmile.share.core.Constants.REMINDER_SET;
 
 
 /**
@@ -116,11 +123,11 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mTos.setOnClickListener(this);
         mRate.setOnClickListener(this);
         mLogout.setOnClickListener(this);
-        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
-            notifToggle.setChecked(false);
-        }else {
-            notifToggle.setChecked(true);
-        }
+//        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
+            notifToggle.setChecked(SharedPrefsManager.getInstance().getBoolean(REMINDER_SET, false));
+//        }else {
+//            notifToggle.setChecked(true);
+//        }
         if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_GPS_UPDATES, true)){
             gpsSpeedUpdates.setChecked(false);
         }else {
@@ -312,10 +319,24 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     private void performLogout(){
         Logger.i("SettingsFragment", "Clearing all preferences and DB");
         MainApplication.getInstance().getDbWrapper().clearAll();
+        //TODO : temp saving the values at client, till server is getting ready
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN,"{}"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         SharedPrefsManager.getInstance().clearPrefs();
+        SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN,jsonObject.toString());
         mListener.updateNavigationMenu();
         updateSettingItems();
         Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
+        startActivity(intent);
+        getActivity().finish();
 
     }
 
@@ -337,10 +358,15 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                         .buildAndDispatch();
                 if (isChecked){
                     // Enabled Alerts and Reminders
-                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+//                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+
+                    setReminder();
+
                 }else {
                     // Disable Alerts and Reminders
-                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
+                    Utils.cancelReminderTime(getContext());
+                    setReminderTimeTv();
+//                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
                 }
                 break;
             case R.id.notif_voice_updates:
@@ -413,28 +439,45 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
-    @OnClick(R.id.tv_set_reminder)
+    @OnClick(R.id.reminder_layout)
     void setReminder()
     {
-        Calendar calendar = Utils.getReminderTime();
+        if(notifToggle.isChecked()) {
+            Calendar calendar = Utils.getReminderTime();
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                Utils.setReminderTime(hour+":"+minute,getContext());
-                setReminderTimeTv();
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                    Utils.setReminderTime(hour + ":" + minute, getContext());
+                    setReminderTimeTv();
 
-            }
-        }, calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE),true);
-        timePickerDialog.show();
+                }
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
+            timePickerDialog.show();
+            timePickerDialog.setCancelable(false);
+            timePickerDialog.setCanceledOnTouchOutside(false);
+            timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                        notifToggle.setChecked(SharedPrefsManager.getInstance().getBoolean(Constants.REMINDER_SET,true));
+                }
+            });
+        }
     }
 
     private void setReminderTimeTv() {
         Calendar calendar1 = Utils.getReminderTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
         Date date = new Date();
         date.setTime(calendar1.getTimeInMillis());
         reminderTime.setText(simpleDateFormat.format(date));
+        if(notifToggle.isChecked())
+        {
+            reminderTime.setTextColor(getResources().getColor(R.color.greyish_brown_two));
+        }else
+        {
+            reminderTime.setTextColor(getResources().getColor(R.color.black_18));
+        }
     }
 }
 

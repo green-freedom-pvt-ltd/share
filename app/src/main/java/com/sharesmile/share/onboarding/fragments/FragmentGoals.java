@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -39,7 +40,7 @@ public class FragmentGoals extends BaseFragment {
     @BindView(R.id.layout_goals)
     LinearLayout layoutGoals;
 
-    ArrayList<RadioButton> radioButtons;
+    ArrayList<View> radioButtons;
     boolean checkRunning = false;
     @Nullable
     @Override
@@ -53,7 +54,7 @@ public class FragmentGoals extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         commonActions = ((OnBoardingActivity)getActivity());
-        commonActions.setExplainText(getContext().getResources().getString(R.string.pick_a_daily_goal),getContext().getResources().getString(R.string.reminder_explain_txt));
+        commonActions.setExplainText(getContext().getResources().getString(R.string.pick_a_daily_goal),getContext().getResources().getString(R.string.maintain_daily_streak));
         commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
         setGoals();
     }
@@ -66,18 +67,20 @@ public class FragmentGoals extends BaseFragment {
         {
             Goal goal = goals.get(i);
             View view = LayoutInflater.from(getContext()).inflate(R.layout.row_onboarding,null,false);
-            RadioButton goalName = view.findViewById(R.id.goal_name);
+            TextView goalName = view.findViewById(R.id.goal_name);
             TextView goalStreakDistance = view.findViewById(R.id.goal_streak_distance);
             goalName.setText(goal.getName());
+            goalName.setTag(goal);
             goalStreakDistance.setText(goal.getValue()+" km per day");
-            goalName.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            RelativeLayout goalRow = view.findViewById(R.id.goal_row);
+            goalRow.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if(!checkRunning)
-                    setChecked(compoundButton);
+                public void onClick(View view) {
+                    setChecked(view);
                 }
             });
-            radioButtons.add(goalName);
+
+            radioButtons.add(view);
             layoutGoals.addView(view);
         }
         int goalID = MainApplication.getInstance().getUserDetails().getStreakGoalID();
@@ -87,24 +90,28 @@ public class FragmentGoals extends BaseFragment {
             {
                 if(goals.get(i).getId() == goalID)
                 {
-                    radioButtons.get(i).setChecked(true);
+                    ((TextView)radioButtons.get(i).findViewById(R.id.goal_name)).setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
                     break;
                 }
             }
         }else
         {
-            radioButtons.get(0).setChecked(true);
+            ((TextView)radioButtons.get(0).findViewById(R.id.goal_name)).setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
         }
     }
 
-    private void setChecked(CompoundButton compoundButton) {
+    private void setChecked(View view) {
         checkRunning = true;
         for (int i = 0; i < radioButtons.size(); i++) {
-            radioButtons.get(i).setChecked(false);
+            ((TextView)radioButtons.get(i).findViewById(R.id.goal_name)).setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_unselected,0,0,0);
         }
-        compoundButton.setChecked(true);
+        ((TextView)view.findViewById(R.id.goal_name)).setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
         checkRunning = false;
-
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        TextView goalName = view.findViewById(R.id.goal_name);
+        userDetails.setStreakGoalID(((Goal)goalName.getTag()).getId());
+        userDetails.setStreakGoalDistance(((Goal)goalName.getTag()).getValue());
+        MainApplication.getInstance().setUserDetails(userDetails);
     }
 
 }

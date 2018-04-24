@@ -17,6 +17,7 @@ import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
@@ -26,6 +27,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if(WorkoutSingleton.getInstance().isWorkoutActive())
+        {
+            return;
+        }
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 

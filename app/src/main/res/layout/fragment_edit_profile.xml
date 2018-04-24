@@ -154,19 +154,22 @@
             android:id="@+id/gender_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
-            <RadioButton
+            <com.sharesmile.share.views.LBTextView
                 android:id="@+id/rb_share_male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
                 android:text="Male"
-                android:textColor="@color/greyish_brown_two"/>
+                android:textColor="@color/greyish_brown_two"
+                android:drawableLeft="@drawable/radio_unselected"
+                android:drawablePadding="10dp"
+                />
 
-            <RadioButton
+            <com.sharesmile.share.views.LBTextView
                 android:id="@+id/rb_share_female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -174,7 +177,10 @@
                 android:layout_toRightOf="@+id/rb_share_male"
                 android:checked="false"
                 android:text="Female"
-                android:textColor="@color/greyish_brown_two"/>
+                android:textColor="@color/greyish_brown_two"
+                android:drawableLeft="@drawable/radio_unselected"
+                android:drawablePadding="10dp"
+                />
         </RadioGroup>
 
 

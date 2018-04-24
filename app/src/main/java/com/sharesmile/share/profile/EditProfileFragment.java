@@ -41,8 +41,7 @@ import butterknife.ButterKnife;
 /**
  * Created by apurvgandhwani on 3/29/2016.
  */
-public class EditProfileFragment extends BaseFragment implements
-        RadioGroup.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener,
+public class EditProfileFragment extends BaseFragment implements DatePickerDialog.OnDateSetListener,
         View.OnClickListener, TextWatcher {
 
     private static final String TAG = "EditProfileFragment";
@@ -65,14 +64,13 @@ public class EditProfileFragment extends BaseFragment implements
     @BindView(R.id.et_body_weight_kg)
     EditText bodyWeightKgs;
 
-    @BindView(R.id.gender_group)
-    RadioGroup mRadioGroup;
-
     @BindView(R.id.rb_share_male)
-    RadioButton mMaleRadioBtn;
+    TextView mMaleRadioBtn;
 
     @BindView(R.id.rb_share_female)
-    RadioButton mFemaleRadioBtn;
+    TextView mFemaleRadioBtn;
+
+    int gender = -1;
 
     private UserDetails userDetails;
 
@@ -118,7 +116,8 @@ public class EditProfileFragment extends BaseFragment implements
     }
 
     private void init() {
-        mRadioGroup.setOnCheckedChangeListener(this);
+        mFemaleRadioBtn.setOnClickListener(this);
+        mMaleRadioBtn.setOnClickListener(this);
         mBirthday.setOnClickListener(this);
         fillUserDetails();
         setupToolbar();
@@ -166,17 +165,28 @@ public class EditProfileFragment extends BaseFragment implements
             mBirthday.setText(userDetails.getBirthday());
         }
         if (!TextUtils.isEmpty(userDetails.getGenderUser())) {
-            if (userDetails.getGenderUser().toLowerCase().startsWith("m")) {
-                mMaleRadioBtn.setChecked(true);
-            } else {
-                mFemaleRadioBtn.setChecked(false);
+            String gender = MainApplication.getInstance().getUserDetails().getGenderUser();
+            if(gender.toLowerCase().startsWith("m"))
+            {
+                this.gender = 1;
+            }else if(gender.toLowerCase().startsWith("f"))
+            {
+                this.gender = 0;
             }
+            setGender();
         }
     }
-
-    @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-
+    void setGender()
+    {
+        if(gender == 1)
+        {
+            mMaleRadioBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
+            mFemaleRadioBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_unselected,0,0,0);
+        }else if(gender == 0)
+        {
+            mMaleRadioBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_unselected,0,0,0);
+            mFemaleRadioBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
+        }
     }
 
     private boolean validateUserDetails(){
@@ -291,15 +301,15 @@ public class EditProfileFragment extends BaseFragment implements
             }
         }
 
-        if (mFemaleRadioBtn.isChecked() || mMaleRadioBtn.isChecked()) {
-            if (mFemaleRadioBtn.isChecked()){
+
+            if (gender == 0){
                 userDetails.setGenderUser("f");
                 Analytics.getInstance().setUserGender("F");
-            }else {
+            }else if(gender == 1){
                 userDetails.setGenderUser("m");
                 Analytics.getInstance().setUserGender("M");
             }
-        }
+
         MainApplication.getInstance().setUserDetails(userDetails);
         SyncHelper.oneTimeUploadUserData();
         MainApplication.showToast("Saved!");
@@ -333,6 +343,15 @@ public class EditProfileFragment extends BaseFragment implements
         switch (v.getId()) {
             case R.id.et_profile_general_birthday:
                 showDatePicker();
+                break;
+            case R.id.rb_share_male :
+                gender = 1;
+                setGender();
+                break;
+            case R.id.rb_share_female :
+                gender = 0;
+                setGender();
+                break;
         }
     }
 

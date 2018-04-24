@@ -29,5 +29,6 @@
         android:text="@string/every_step"
         android:textColor="@color/clr_cb050505"
         android:textSize="14sp"
+        android:id="@+id/change_maker_tv_2"
         />
 </RelativeLayout>

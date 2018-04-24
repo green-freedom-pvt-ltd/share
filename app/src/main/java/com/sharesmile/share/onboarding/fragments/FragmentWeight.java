@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.User;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FragmentWeight extends BaseFragment {
+public class FragmentWeight extends BaseFragment implements NumberPicker.OnValueChangeListener {
     public static final String TAG = "FragmentWeight";
 
     @BindView(R.id.weight_picker)
@@ -58,7 +59,8 @@ public class FragmentWeight extends BaseFragment {
         {
             weightPicker.setValue(weightStrings.indexOf(((int)userWeight)+""));
         }
-        weightDecimalPicker.setValue((int) (userWeight%10));
+        int decimal = (int) ((userWeight*10)%((int)userWeight));
+        weightDecimalPicker.setValue(decimal);
     }
 
     private void setWeights() {
@@ -77,5 +79,18 @@ public class FragmentWeight extends BaseFragment {
         }
         String sd[] = weightDecimalStrings.toArray(new String[weightDecimalStrings.size()-1]);
         Utils.setNumberPicker(weightDecimalPicker,sd,0);
+
+        weightPicker.setOnValueChangedListener(this);
+        weightDecimalPicker.setOnValueChangedListener(this);
+    }
+
+    @Override
+    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        float w = weightPicker.getValue()+40;
+        float wd = weightDecimalPicker.getValue()/10.0f;
+
+        userDetails.setBodyWeight(w+wd);
+        MainApplication.getInstance().setUserDetails(userDetails);
     }
 }

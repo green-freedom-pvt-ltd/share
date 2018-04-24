@@ -234,12 +234,13 @@ public class Constants {
     public static final String PREF_HOW_IT_WORKS_CONTENT = "pref_how_it_works_content";
 
     public static final String PREF_SCREEN_LAUNCH_COUNT_PREFIX = "pref_screen_launch_count_";
+    //TODO : actually done at the server end but temp doing it at client end
+    public static final String PREF_USERS_LOGGED_IN = "pref_user_login_id";
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
 
     public static final String REMINDER_TIME = "reminder_time";
-
-    public static final String PREF_ONBOARDING_REQUIRED = "onboarding_required";
+    public static final String REMINDER_SET = "reminder_set";
 
     public static String SHARE_PLACEHOLDER_FIRST_NAME = "<first_name>";
     public static String SHARE_PLACEHOLDER_DISTANCE = "<distance>";

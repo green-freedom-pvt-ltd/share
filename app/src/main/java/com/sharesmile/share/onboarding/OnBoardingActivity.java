@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,18 +17,23 @@ import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.onboarding.fragments.FragmentAskReminder;
 import com.sharesmile.share.onboarding.fragments.FragmentBirthday;
 import com.sharesmile.share.onboarding.fragments.FragmentGender;
 import com.sharesmile.share.onboarding.fragments.FragmentGoals;
 import com.sharesmile.share.onboarding.fragments.FragmentHeight;
 import com.sharesmile.share.onboarding.fragments.FragmentSetReminder;
+import com.sharesmile.share.onboarding.fragments.FragmentThankYou;
 import com.sharesmile.share.onboarding.fragments.FragmentWeight;
 import com.sharesmile.share.onboarding.fragments.FragmentWelcome;
+import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 
 
 public class OnBoardingActivity extends BaseActivity implements CommonActions {
@@ -47,12 +53,16 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     @BindView(R.id.progress_lt)
     LinearLayout progressLayout;
 
+    @BindView(R.id.level_progress_bar)
+    View levelProgressBar;
+
     private static final String TAG = "OnBoardingActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
         setContentView(R.layout.activity_onboarding);
         ButterKnife.bind(this);
         MainApplication.getInstance().setGoalDetails(null);
@@ -111,14 +121,18 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     private void loadInitialFragment() {
-        addFragment(new FragmentWelcome(), true);
+        addFragment(new FragmentWelcome(), false);
     }
 
     @OnClick({R.id.continue_tv, R.id.back_tv})
     void onClick(View view) {
         switch (view.getId()) {
             case R.id.continue_tv:
+                int i = getSupportFragmentManager().getBackStackEntryCount();
+                if(i!=0)
                 continueAction(getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName()));
+                else
+                    continueAction(null);
                 break;
             case R.id.back_tv:
                 backAction(getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName()));
@@ -132,55 +146,48 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         postPopBackStack.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount()-1).getName());
-                if(fragment instanceof FragmentWelcome)
-                {
-                    setBackAndContinue(FragmentWelcome.TAG,getResources().getString(R.string.continue_txt));
+                int i = getSupportFragmentManager().getBackStackEntryCount();
+
+                if (i==0) {
+                    setBackAndContinue(FragmentWelcome.TAG, getResources().getString(R.string.start_my_journey_txt));
+                }else {
+                    Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
                 }
             }
-        },100);
+        }, 100);
     }
 
     private void continueAction(Fragment fragment) {
-        if (fragment instanceof FragmentWelcome) {
+        if (fragment instanceof FragmentWelcome || fragment == null) {
             replaceFragment(new FragmentGender(), true);
-        }else
-        {
-            if(continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10))
-            {
+        } else {
+            if (continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10)) {
 
-            }else
-            {
-                if(fragment instanceof FragmentGender)
-                {
+            } else {
+                if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
-                }else if(fragment instanceof FragmentWeight)
-                {
+                } else if (fragment instanceof FragmentWeight) {
                     replaceFragment(new FragmentHeight(), true);
-                }else if(fragment instanceof FragmentHeight)
-                {
+                } else if (fragment instanceof FragmentHeight) {
                     replaceFragment(new FragmentBirthday(), true);
-                }else if(fragment instanceof FragmentBirthday)
-                {
+                } else if (fragment instanceof FragmentBirthday) {
                     replaceFragment(new FragmentGoals(), true);
-                }else if(fragment instanceof FragmentGoals)
-                {
+                } else if (fragment instanceof FragmentGoals) {
                     replaceFragment(new FragmentAskReminder(), true);
-                }else if(fragment instanceof FragmentAskReminder)
-                {
+                } else if (fragment instanceof FragmentAskReminder) {
                     String continueText = continueTv.getText().toString();
-                    if(continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
+                    if (continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
                         replaceFragment(new FragmentSetReminder(), true);
-                    }else if(continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
-                        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ONBOARDING_REQUIRED,false);
-                        Intent intent = new Intent(this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
+                    } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
+                        Utils.setReminderTime("",this);
+                        replaceFragment(new FragmentThankYou(), true);
                     }
-                }else if(fragment instanceof FragmentSetReminder)
+                } else if (fragment instanceof FragmentSetReminder) {
+                    replaceFragment(new FragmentThankYou(), true);
+                }else if(fragment instanceof FragmentThankYou)
                 {
-                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ONBOARDING_REQUIRED,false);
+                    SyncHelper.oneTimeUploadUserData();
+                    Utils.setUserLoggedIn(MainApplication.getInstance().getUserDetails());
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -193,13 +200,13 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     @Override
-    public void setExplainText(String question,String text) {
+    public void setExplainText(String question, String text) {
         onboardingQuestion.setText(question);
         screenExplainTv.setText(text);
     }
 
     @Override
-    public void setBackAndContinue(String name,String continueTextName) {
+    public void setBackAndContinue(String name, String continueTextName) {
         onboardingQuestion.setVisibility(View.VISIBLE);
         progressLayout.setVisibility(View.VISIBLE);
         continueTv.setText(getString(R.string.continue_txt));
@@ -216,15 +223,33 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 progressLayout.setVisibility(View.GONE);
                 break;
             case FragmentGender.TAG:
+                setProgressLevel(1.0f);
                 setContinueTextColor(R.color.white_10);
                 break;
-            case FragmentWeight.TAG :
+            case FragmentWeight.TAG:
+                setProgressLevel(2.0f);
                 break;
-            case FragmentGoals.TAG :
+            case FragmentHeight.TAG:
+                setProgressLevel(3.0f);
                 break;
-            case FragmentAskReminder.TAG :
+            case FragmentBirthday.TAG:
+                setProgressLevel(4.0f);
+                break;
+            case FragmentGoals.TAG:
+                setProgressLevel(5.0f);
+                break;
+            case FragmentAskReminder.TAG:
+
                 setContinueTextColor(R.color.white_10);
                 continueTv.setText(continueTextName);
+                break;
+            case FragmentSetReminder.TAG:
+                setProgressLevel(7.0f);
+                break;
+            case FragmentThankYou.TAG:
+                continueTv.setText(continueTextName);
+                onboardingQuestion.setVisibility(View.GONE);
+                progressLayout.setVisibility(View.GONE);
                 break;
         }
     }
@@ -234,5 +259,8 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         continueTv.setTextColor(getResources().getColor(color));
     }
 
-
+    public void setProgressLevel(float weight) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, weight/7);
+        levelProgressBar.setLayoutParams(layoutParams);
+    }
 }

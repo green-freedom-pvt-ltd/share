@@ -1,6 +1,7 @@
 package com.sharesmile.share.core;
 
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -78,6 +79,8 @@ import butterknife.ButterKnife;
 import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
 
 
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -109,9 +112,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
         int intentNotificationRun = getIntent().getIntExtra(INTENT_NOTIFICATION_RUN, 0);
         getIntent().removeExtra(INTENT_NOTIFICATION_RUN);
-
+        NotificationManager manager = (NotificationManager) MainApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(REMINDER_NOTIFICATION_ID);
         Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip + ", isReminderDisable = "
                 + isReminderDisable + ", intentNotificationRun = " + intentNotificationRun);
+        //TODO : temp
+        MainApplication.getInstance().setGoalDetails(null);
         if (!userLogin && !isLoginSkip) {
             startLoginActivity();
         } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
@@ -123,7 +129,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 EventBus.getDefault().post(new ResumeWorkoutEvent());
             }
             startTrackingActivity();
-        } else if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ONBOARDING_REQUIRED,true))
+        } else if(!Utils.checkUserLoggedInBefore(MainApplication.getInstance().getUserDetails().getUserId()))
         {
             startOnBoardingActivity();
         }else {
