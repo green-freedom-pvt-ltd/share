@@ -177,7 +177,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
             }
             itemList.add(data.getLeaderBoardDbObject());
         }
-        render(itemList, myPos);
+        render(itemList, myPos,0);
     }
 
     @Override

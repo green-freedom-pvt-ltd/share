@@ -65,6 +65,7 @@ import Models.LeagueBoard;
 import Models.MessageList;
 import Models.TeamLeaderBoard;
 
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_PENDING_WORKOUT;
 import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_INTERVALS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_FRAUD_DATA;
@@ -82,7 +83,7 @@ public class SyncService extends GcmTaskService {
     public int onRunTask(TaskParams taskParams) {
         Logger.d(TAG, "runtask started: " + taskParams.getTag());
         try {
-            switch (taskParams.getTag()){
+            switch (taskParams.getTag()) {
                 case UPLOAD_USER_DATA:
                     return uploadUserData();
                 case SYNC_DATA:
@@ -95,10 +96,12 @@ public class SyncService extends GcmTaskService {
                     Bundle feedbackExtras = taskParams.getExtras();
                     String feedbackString = feedbackExtras.getString(TaskConstants.FEEDBACK_DATA_JSON);
                     return pushUserFeedback(feedbackString);
+                case UPLOAD_PENDING_WORKOUT:
+                    return uploadPendingWorkoutsData();
                 default:
                     return GcmNetworkManager.RESULT_SUCCESS;
             }
-        } catch (Throwable th){
+        } catch (Throwable th) {
             String message = "Exception while performing sync task: " + taskParams.getTag()
                     + ", exception message: " + th.getMessage();
             th.printStackTrace();
@@ -120,7 +123,7 @@ public class SyncService extends GcmTaskService {
         MainApplication.getInstance().startSyncTasks();
     }
 
-    public static int syncData(){
+    public static int syncData() {
         Logger.d(TAG, "syncData");
         ClientConfig.sync();
         syncServerTime();
@@ -179,18 +182,18 @@ public class SyncService extends GcmTaskService {
 
         try {
             MessageList messageList = NetworkDataProvider.doGetCall(url, MessageList.class);
-            if (messageList == null){
+            if (messageList == null) {
                 return false;
             }
             MessageDao messageDao = MainApplication.getInstance().getDbWrapper().getDaoSession().getMessageDao();
             messageDao.insertOrReplaceInTx(messageList);
-            if (prevMessagesCount < messageList.getTotalMessageCount()){
+            if (prevMessagesCount < messageList.getTotalMessageCount()) {
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_UNREAD_MESSAGE, true);
             }
             Logger.d(TAG, "Feed Messages fetched successfully");
             if (!TextUtils.isEmpty(messageList.getNextUrl())) {
                 return fetchMessages(messageList.getNextUrl(), prevMessagesCount);
-            }else {
+            } else {
                 EventBus.getDefault().post(new UpdateEvent.MessageDataUpdated());
                 return true;
             }
@@ -201,12 +204,12 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    public static boolean syncHowItWorksContent(){
+    public static boolean syncHowItWorksContent() {
         Logger.d(TAG, "syncHowItWorksContent");
         try {
             HowItWorksResponse response
                     = NetworkDataProvider.doGetCall(Urls.getHowItWorksContentUrl(), HowItWorksResponse.class);
-            if (response == null){
+            if (response == null) {
                 return false;
             }
 
@@ -221,19 +224,19 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    public static boolean syncFeed(){
+    public static boolean syncFeed() {
         Logger.d(TAG, "syncFeed");
         try {
             FeedLatestArticleResponse response
                     = NetworkDataProvider.doGetCall(Urls.getFeedLatestArticleUrl(), FeedLatestArticleResponse.class);
-            if (response == null){
+            if (response == null) {
                 return false;
             }
-            long latestArtileCreationTsMillis = response.getCreationEpochSecs()*1000;
+            long latestArtileCreationTsMillis = response.getCreationEpochSecs() * 1000;
 
             long feedLastSeenTs = SharedPrefsManager.getInstance().getLong(PREF_LAST_TIME_FEED_WAS_SEEN);
 
-            if (latestArtileCreationTsMillis > feedLastSeenTs){
+            if (latestArtileCreationTsMillis > feedLastSeenTs) {
                 Logger.d(TAG, "New feed article available");
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_NEW_FEED_ARTICLE_AVAILABLE, true);
             }
@@ -246,24 +249,24 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    public static int syncServerTime(){
+    public static int syncServerTime() {
         // Force sync servertime but do not retry on failure
-        if (NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+        if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             ServerTimeKeeper.getInstance().forceSyncTimerWithServerTime(false);
         }
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
-    public static int syncGlobalLeaderBoardData(){
+    public static int syncGlobalLeaderBoardData() {
 
         Logger.d(TAG, "syncGlobalLeaderBoardData");
-        if (!MainApplication.isLogin()){
+        if (!MainApplication.isLogin()) {
             return ExpoBackoffTask.RESULT_FAILURE;
         }
 
         int result = ExpoBackoffTask.RESULT_SUCCESS;
 
-        for (String interval : ALL_INTERVALS){
+        for (String interval : ALL_INTERVALS) {
             try {
                 Logger.d(TAG, "Will sync GlobalLeaderBoard, interval: " + interval);
                 LeaderBoardList list =
@@ -274,7 +277,7 @@ public class SyncService extends GcmTaskService {
                 EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, interval));
             } catch (NetworkException e) {
                 Logger.e(TAG, "Exception occurred while syncing GlobalLeaderBoardData data ("
-                        +interval+") from network: " + e);
+                        + interval + ") from network: " + e);
                 e.printStackTrace();
                 result = ExpoBackoffTask.RESULT_RESCHEDULE;
             }
@@ -282,15 +285,15 @@ public class SyncService extends GcmTaskService {
         return result;
     }
 
-    public static int syncLeagueBoardData(){
+    public static int syncLeagueBoardData() {
         Logger.d(TAG, "syncLeagueBoardData");
-        if (!MainApplication.isLogin()){
+        if (!MainApplication.isLogin()) {
             return ExpoBackoffTask.RESULT_FAILURE;
         }
 
         int result = ExpoBackoffTask.RESULT_SUCCESS;
 
-        if (LeaderBoardDataStore.getInstance().toSyncLeaugeData()){
+        if (LeaderBoardDataStore.getInstance().toSyncLeaugeData()) {
             // Go for sync only when an active league is present and is still visible to team members
             try {
                 Logger.d(TAG, "Will sync LeagueBoard");
@@ -300,10 +303,10 @@ public class SyncService extends GcmTaskService {
                 // Notify LeaderBoardFragment about it
                 EventBus.getDefault().post(new LeagueBoardDataUpdated(true));
             } catch (NetworkException ne) {
-                String log= "NetworkException while fetching my (user_id = "
-                        +MainApplication.getInstance().getUserDetails().getUserId()
-                        +", and team_id = "+LeaderBoardDataStore.getInstance().getMyTeamId()
-                        +") LeaugeBoardData: " + ne;
+                String log = "NetworkException while fetching my (user_id = "
+                        + MainApplication.getInstance().getUserDetails().getUserId()
+                        + ", and team_id = " + LeaderBoardDataStore.getInstance().getMyTeamId()
+                        + ") LeaugeBoardData: " + ne;
                 Logger.e(TAG, log);
                 ne.printStackTrace();
                 Crashlytics.log(log);
@@ -314,7 +317,7 @@ public class SyncService extends GcmTaskService {
             try {
                 Logger.d(TAG, "Will sync MyTeamLeaderBoard");
                 int leagueTeamId = LeaderBoardDataStore.getInstance().getMyTeamId();
-                if (leagueTeamId > 0){
+                if (leagueTeamId > 0) {
                     Map<String, String> queryParams = new HashMap<>();
                     queryParams.put("team_id", String.valueOf(leagueTeamId));
                     TeamLeaderBoard myTeamLeaderBoard = NetworkDataProvider
@@ -325,10 +328,10 @@ public class SyncService extends GcmTaskService {
                     EventBus.getDefault().post(new TeamLeaderBoardDataFetched(leagueTeamId, true, myTeamLeaderBoard));
                 }
             } catch (NetworkException ne) {
-                String log= "NetworkException while fetching my (user_id = "
-                        +MainApplication.getInstance().getUserDetails().getUserId()
-                        +", and team_id = "+LeaderBoardDataStore.getInstance().getMyTeamId()
-                        +") TeamLeaderBoardData: " + ne;
+                String log = "NetworkException while fetching my (user_id = "
+                        + MainApplication.getInstance().getUserDetails().getUserId()
+                        + ", and team_id = " + LeaderBoardDataStore.getInstance().getMyTeamId()
+                        + ") TeamLeaderBoardData: " + ne;
                 Logger.e(TAG, log);
                 ne.printStackTrace();
                 Crashlytics.log(log);
@@ -336,7 +339,7 @@ public class SyncService extends GcmTaskService {
                 return ExpoBackoffTask.RESULT_RESCHEDULE;
             }
 
-        }else {
+        } else {
             Logger.d(TAG, "Will NOT sync LeagueBoard");
         }
 
@@ -369,7 +372,7 @@ public class SyncService extends GcmTaskService {
             e.printStackTrace();
             EventBus.getDefault().post(new UpdateEvent.FaqsUpdated(false));
             return GcmNetworkManager.RESULT_FAILURE;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             Logger.e(TAG, "Exception occurred while fetching updated Faqs list: " + ex.getMessage());
             ex.printStackTrace();
             EventBus.getDefault().post(new UpdateEvent.FaqsUpdated(false));
@@ -381,12 +384,12 @@ public class SyncService extends GcmTaskService {
     /**
      * Constructs the sync URL using clientVersion and then fetches all runs with version above clientVersion
      * and then insert or update all of those runs in DB
+     *
      * @return
      */
-    private static int syncWorkoutData(){
-        synchronized (SyncService.class){
-            if(!MainApplication.isLogin())
-            {
+    private static int syncWorkoutData() {
+        synchronized (SyncService.class) {
+            if (!MainApplication.isLogin()) {
                 Logger.d(TAG, "User not logged in, cannot sync data to server");
                 return GcmNetworkManager.RESULT_FAILURE;
             }
@@ -395,35 +398,35 @@ public class SyncService extends GcmTaskService {
                     .getLong(Constants.PREF_WORKOUT_DATA_SYNC_VERSION);
             boolean isWorkoutDataUpToDate = SharedPrefsManager.getInstance()
                     .getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
-            if (isWorkoutDataUpToDate && clientVersion > 0){
+            if (isWorkoutDataUpToDate && clientVersion > 0) {
                 String syncUrl;
                 syncUrl = Urls.getSyncRunUrl(clientVersion);
                 Logger.d(TAG, "Starting sync with client_version: " + clientVersion);
                 syncWorkoutTimeStamp = 0;
                 return syncWorkoutData(syncUrl, mWorkoutDao);
-            }else {
+            } else {
                 // Need to force refresh Workout Data
                 Logger.e(TAG, "Must fetch historical runs before");
                 SyncHelper.forceRefreshEntireWorkoutHistory();
-                return  GcmNetworkManager.RESULT_FAILURE;
+                return GcmNetworkManager.RESULT_FAILURE;
             }
         }
     }
 
     private static long syncWorkoutTimeStamp;
 
-    private static int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao){
-        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+    private static int syncWorkoutData(String syncUrl, WorkoutDao mWorkoutDao) {
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // If internet not available then silently exit
             Logger.d(TAG, "Internet not available while syncing runs with URL: " + syncUrl);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(syncUrl);
-            if (syncWorkoutTimeStamp == 0){
-                if (response.headers().getDate("Date") != null){
+            if (syncWorkoutTimeStamp == 0) {
+                if (response.headers().getDate("Date") != null) {
                     syncWorkoutTimeStamp = response.headers().getDate("Date").getTime();
-                }else {
+                } else {
                     syncWorkoutTimeStamp = DateUtil.getServerTimeInMillis();
                 }
             }
@@ -432,19 +435,19 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "Syncing these runs in DB " + gson.toJson(runList));
 
             Iterator<Workout> iterator = runList.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 Workout workout = iterator.next();
-                if (TextUtils.isEmpty(workout.getWorkoutId())){
+                if (TextUtils.isEmpty(workout.getWorkoutId())) {
                     // This run was created on backend, Generating new client_run_id and scheduling the run for sync
                     workout.setWorkoutId(UUID.randomUUID().toString());
                     workout.setIs_sync(false);
-                }else {
+                } else {
                     // Existing run, lets take the appropriate value for setShouldSyncLocationData
                     // from the storedWorkout
                     Workout storedWorkout = mWorkoutDao.queryBuilder()
                             .where(WorkoutDao.Properties.WorkoutId.eq(workout.getWorkoutId()))
                             .unique();
-                    if (storedWorkout != null){
+                    if (storedWorkout != null) {
                         workout.setShouldSyncLocationData(storedWorkout.getShouldSyncLocationData());
                     }
                 }
@@ -465,14 +468,14 @@ public class SyncService extends GcmTaskService {
             }
         } catch (NetworkException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException while syncing runs with URL: "+syncUrl+", Exception: " + e);
+            Logger.d(TAG, "NetworkException while syncing runs with URL: " + syncUrl + ", Exception: " + e);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         }
     }
 
-    public static int pushUserFeedback(String feedbackString){
-        Logger.d(TAG, "pushUserFeedback with: " + feedbackString );
-        if (TextUtils.isEmpty(feedbackString)){
+    public static int pushUserFeedback(String feedbackString) {
+        Logger.d(TAG, "pushUserFeedback with: " + feedbackString);
+        if (TextUtils.isEmpty(feedbackString)) {
             Logger.d(TAG, "Can't push FeedbackString in TaskParams is empty");
             return GcmNetworkManager.RESULT_FAILURE;
         }
@@ -480,20 +483,20 @@ public class SyncService extends GcmTaskService {
             NetworkDataProvider.doPostCall(Urls.getFeedBackUrl(), feedbackString, UserFeedback.class);
             Logger.d(TAG, "Successfully pushed feedback");
             return GcmNetworkManager.RESULT_SUCCESS;
-        }catch (NetworkException ne){
+        } catch (NetworkException ne) {
             ne.printStackTrace();
             Logger.d(TAG, "NetworkException: " + ne);
-            String log= "Couldn't post user feedback to URL: " + Urls.getFeedBackUrl()
+            String log = "Couldn't post user feedback to URL: " + Urls.getFeedBackUrl()
                     + ", Feedback: " + feedbackString;
             Logger.e(TAG, log);
             Crashlytics.log(log);
-            Crashlytics.log("Push user feedback (id="+MainApplication.getInstance().getUserDetails().getUserId()
-                    +") networkException, messageFromServer: " + ne);
+            Crashlytics.log("Push user feedback (id=" + MainApplication.getInstance().getUserDetails().getUserId()
+                    + ") networkException, messageFromServer: " + ne);
             Crashlytics.logException(ne);
             return GcmNetworkManager.RESULT_RESCHEDULE;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            String log= "Couldn't post user feedback to URL: " + Urls.getFeedBackUrl()
+            String log = "Couldn't post user feedback to URL: " + Urls.getFeedBackUrl()
                     + ", Feedback: " + feedbackString;
             Logger.e(TAG, log);
             Logger.e(TAG, "Exception: " + e.getMessage());
@@ -503,11 +506,11 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private int pushFraudData(String fraudDataString){
-        if (!MainApplication.isLogin()){
+    private int pushFraudData(String fraudDataString) {
+        if (!MainApplication.isLogin()) {
             return GcmNetworkManager.RESULT_FAILURE;
         }
-        if (TextUtils.isEmpty(fraudDataString)){
+        if (TextUtils.isEmpty(fraudDataString)) {
             Logger.d(TAG, "Can't push FraudDtaString in TaskParams is empty");
             return GcmNetworkManager.RESULT_FAILURE;
         }
@@ -521,7 +524,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("cause_id", fraudData.getCauseId());
             jsonObject.put("usain_bolt_count", fraudData.getUsainBoltCount());
             // Send team_id only when it is greater than 0
-            if (fraudData.getTeamId() > 0){
+            if (fraudData.getTeamId() > 0) {
                 jsonObject.put("team_id", fraudData.getTeamId());
             }
             jsonObject.put("timestamp", fraudData.getTimeStamp());
@@ -531,15 +534,15 @@ public class SyncService extends GcmTaskService {
 
             return GcmNetworkManager.RESULT_SUCCESS;
 
-        }catch (JSONException e){
+        } catch (JSONException e) {
             e.printStackTrace();
             Logger.d(TAG, "JSONException: " + e.getMessage());
             Crashlytics.logException(e);
             return GcmNetworkManager.RESULT_RESCHEDULE;
-        }catch (NetworkException ne){
+        } catch (NetworkException ne) {
             ne.printStackTrace();
             Logger.d(TAG, "NetworkException: " + ne);
-            String log= "Couldn't post fraudData to URL: " + Urls.getFraudstersUrl() + ", FraudData: " + fraudDataString;
+            String log = "Couldn't post fraudData to URL: " + Urls.getFraudstersUrl() + ", FraudData: " + fraudDataString;
             Logger.e(TAG, log);
             Crashlytics.log(log);
             Crashlytics.log("Push fraud data networkException, messageFromServer: " + ne
@@ -551,16 +554,16 @@ public class SyncService extends GcmTaskService {
 
 
     private static int uploadUserData() {
-        if (!MainApplication.isLogin()){
+        if (!MainApplication.isLogin()) {
             // Can't sync a non logged in User
             return GcmNetworkManager.RESULT_FAILURE;
         }
         int user_id = MainApplication.getInstance().getUserID();
-        Logger.d(TAG, "uploadUserData for userId: " + user_id );
+        Logger.d(TAG, "uploadUserData for userId: " + user_id);
         try {
 
             UserDetails prev = MainApplication.getInstance().getUserDetails();
-            if (prev == null){
+            if (prev == null) {
                 // Ideally this condition should never happen
                 Logger.d(TAG, "Can't UPLOAD, MemberDetails not present");
                 return GcmNetworkManager.RESULT_FAILURE;
@@ -573,6 +576,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("phone_number", prev.getPhoneNumber());
             jsonObject.put("body_weight", prev.getBodyWeight());
             jsonObject.put("body_height", prev.getBodyHeight());
+            jsonObject.put("body_height_unit", prev.getBodyHeight());
             jsonObject.put("birthday", prev.getBirthday());
             jsonObject.put("user_id", user_id);
 
@@ -599,7 +603,7 @@ public class SyncService extends GcmTaskService {
     }
 
 
-    public static void pushWorkoutDataWithBackoff(){
+    public static void pushWorkoutDataWithBackoff() {
         Logger.d(TAG, "pushWorkoutDataWithBackoff");
         ExpoBackoffTask task = new ExpoBackoffTask(2000) {
             @Override
@@ -614,53 +618,54 @@ public class SyncService extends GcmTaskService {
     private static int uploadPendingWorkoutsData() {
         synchronized (SyncService.class) {
             if (!MainApplication.isLogin()) {
-                    Logger.d(TAG,"uploadPendingWorkoutData: User not logged in, did not sync data to server.");
-                    return ExpoBackoffTask.RESULT_FAILURE;
+                Logger.d(TAG, "uploadPendingWorkoutData: User not logged in, did not sync data to server.");
+                return ExpoBackoffTask.RESULT_FAILURE;
             }
-                // Step: Upload all the Pending Workouts
-                Logger.d(TAG, "uploadPendingWorkoutData");
-                boolean isSuccess = true;
-                WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
-                List<Workout> mWorkoutList = mWorkoutDao.queryBuilder()
-                        .where(WorkoutDao.Properties.Is_sync.eq(false))
-                        .list();
+            // Step: Upload all the Pending Workouts
+            Logger.d(TAG, "uploadPendingWorkoutData");
+            boolean isSuccess = true;
+            WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+            List<Workout> mWorkoutList = mWorkoutDao.queryBuilder()
+                    .where(WorkoutDao.Properties.Is_sync.eq(false))
+                    .list();
 
-                if (mWorkoutList != null && mWorkoutList.size() > 0) {
-                    for (Workout workout : mWorkoutList) {
-                        boolean resultW = uploadWorkoutData(workout);
-                        isSuccess = isSuccess && resultW;
-                    }
+            if (mWorkoutList != null && mWorkoutList.size() > 0) {
+                for (Workout workout : mWorkoutList) {
+                    boolean resultW = uploadWorkoutData(workout);
+                    isSuccess = isSuccess && resultW;
                 }
+            }
 
-                // Step: Upload all pending WorkoutLocationData
-                Logger.d(TAG, "uploadPendingWorkoutData, Will upload locationData");
-                List<Workout> pendingLocationWorkoutsList = mWorkoutDao.queryBuilder()
-                        .where(
-                                WorkoutDao.Properties.Is_sync.eq(true),
-                                WorkoutDao.Properties.ShouldSyncLocationData.eq(true)
-                        ).list();
+            // Step: Upload all pending WorkoutLocationData
+            Logger.d(TAG, "uploadPendingWorkoutData, Will upload locationData");
+            List<Workout> pendingLocationWorkoutsList = mWorkoutDao.queryBuilder()
+                    .where(
+                            WorkoutDao.Properties.Is_sync.eq(true),
+                            WorkoutDao.Properties.ShouldSyncLocationData.eq(true)
+                    ).list();
 
-                if (pendingLocationWorkoutsList == null || pendingLocationWorkoutsList.isEmpty()) {
-                    Logger.d(TAG, "uploadPendingWorkoutsData: Didn't find any pending WorkoutLocationData to be uploaded");
-                } else {
-                    for (Workout workout : pendingLocationWorkoutsList) {
-                        boolean resultL = uploadWorkoutLocationData(workout);
-                        if (resultL) {
-                            // If all batches of this workout are uploaded successfully, we update the boolean flag in DB
-                            workout.setShouldSyncLocationData(false);
-                            mWorkoutDao.insertOrReplace(workout);
-                        }
-                        isSuccess = isSuccess && resultL;
+            if (pendingLocationWorkoutsList == null || pendingLocationWorkoutsList.isEmpty()) {
+                Logger.d(TAG, "uploadPendingWorkoutsData: Didn't find any pending WorkoutLocationData to be uploaded");
+            } else {
+                for (Workout workout : pendingLocationWorkoutsList) {
+                    boolean resultL = uploadWorkoutLocationData(workout);
+                    if (resultL) {
+                        // If all batches of this workout are uploaded successfully, we update the boolean flag in DB
+                        workout.setShouldSyncLocationData(false);
+                        mWorkoutDao.insertOrReplace(workout);
                     }
+                    isSuccess = isSuccess && resultL;
                 }
+            }
 
-                return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
+            EventBus.getDefault().post(new UpdateEvent.PendingWorkoutUploaded());
+            return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
     }
 
-    private static boolean uploadWorkoutLocationData(Workout workout){
-        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())){
+    private static boolean uploadWorkoutLocationData(Workout workout) {
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // If internet not available then silently exit
             return false;
         }
@@ -672,7 +677,7 @@ public class SyncService extends GcmTaskService {
         String prefKey = Utils.getWorkoutLocationDataPendingQueuePrefKey(workoutId);
         WorkoutData workoutData = SharedPrefsManager.getInstance().getObject(prefKey, WorkoutDataImpl.class);
 
-        if (workoutData == null){
+        if (workoutData == null) {
             String failureMessage = "Can't find WorkoutData for " + workoutId;
             Logger.d(TAG, "uploadWorkoutLocationData, " + failureMessage);
             AnalyticsEvent.create(Event.ON_LOCATION_DATA_SYNC)
@@ -689,7 +694,7 @@ public class SyncService extends GcmTaskService {
         Gson gson = new Gson();
         Logger.d(TAG, "uploadWorkoutLocationData will upload locationData from: " + gson.toJson(workoutData));
 
-        for (int i=0; i< workoutData.getBatches().size(); i++){
+        for (int i = 0; i < workoutData.getBatches().size(); i++) {
             WorkoutBatch batch = workoutData.getBatches().get(i);
 
             // Step: Construct WorkoutBatchLocationData object for this batch
@@ -717,7 +722,7 @@ public class SyncService extends GcmTaskService {
                         .put("client_run_id", workoutId)
                         .buildAndDispatch();
 
-            }catch (NetworkException e){
+            } catch (NetworkException e) {
                 e.printStackTrace();
                 String message = "NetworkException while uploading WorkoutLocationData: " + e.getMessage()
                         + "\n WorkoutLocationData: " + locationDataString;
@@ -735,7 +740,7 @@ public class SyncService extends GcmTaskService {
                         .put("failure_type", e.getFailureType())
                         .buildAndDispatch();
                 return false;
-            }catch (Throwable ex){
+            } catch (Throwable ex) {
                 String message = "Exception while uploading WorkoutLocationData: " + ex.getMessage()
                         + "\n WorkoutLocationData: " + locationDataString;
                 Logger.e(TAG, message);
@@ -754,10 +759,10 @@ public class SyncService extends GcmTaskService {
         }
 
         // Delete the files in which location data of all the batches of this workout was stored
-        for (int i=0; i< workoutData.getBatches().size(); i++) {
+        for (int i = 0; i < workoutData.getBatches().size(); i++) {
             WorkoutBatch batch = workoutData.getBatches().get(i);
             String fileName = batch.getLocationDataFileName();
-            if (!TextUtils.isEmpty(fileName) && MainApplication.getContext().deleteFile(fileName)){
+            if (!TextUtils.isEmpty(fileName) && MainApplication.getContext().deleteFile(fileName)) {
                 Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
             }
         }
@@ -770,12 +775,13 @@ public class SyncService extends GcmTaskService {
 
     /**
      * Uploads WorkoutData and stores the run_id received in workoutDao object
+     *
      * @param workout
      * @return true on success and false on failure
      */
     private static boolean uploadWorkoutData(Workout workout) {
 
-        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext()) || !MainApplication.isLogin()){
+        if (!NetworkUtils.isNetworkConnected(MainApplication.getContext()) || !MainApplication.isLogin()) {
             // If internet not available then silently exit || user not logged in
             return false;
         }
@@ -786,39 +792,39 @@ public class SyncService extends GcmTaskService {
         try {
 
             boolean isUpdateRequest = false;
-            if (workout.getVersion() != null && workout.getVersion() > 0){
+            if (workout.getVersion() != null && workout.getVersion() > 0) {
                 // Need to make a PUT request to update this already existing run on server
                 jsonObject.put("run_id", workout.getId());
-                isUpdateRequest  = true;
-            }else {
+                isUpdateRequest = true;
+            } else {
                 // Version is not set, means this is a newly created run on client and needs to be POSTed on server
                 isUpdateRequest = false;
             }
 
             Run response;
-            if (isUpdateRequest){
+            if (isUpdateRequest) {
                 // Need to make PUT request with just client_run_id in post data
                 jsonObject.put("client_run_id", workout.getWorkoutId());
                 String updateUrl = Urls.getUpdateRunUrl() + workout.getId() + "/";
                 response = NetworkDataProvider.doPutCall(updateUrl, jsonObject, Run.class);
-            }else {
+            } else {
                 // Need to make POST request to create a new Run
                 jsonObject.put("user_id", user_id);
                 jsonObject.put("cause_run_title", workout.getCauseBrief());
-                if (workout.getCauseId() != null && workout.getCauseId() > 0){
+                if (workout.getCauseId() != null && workout.getCauseId() > 0) {
                     jsonObject.put("cause_id", workout.getCauseId());
                 }
                 jsonObject.put("distance", workout.getDistance());
 
-                if (workout.getBeginTimeStamp() != null){
+                if (workout.getBeginTimeStamp() != null) {
                     jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
                     jsonObject.put("start_time_epoch", workout.getBeginTimeStamp());
-                }else if (workout.getDate() != null){
+                } else if (workout.getDate() != null) {
                     jsonObject.put("start_time", DateUtil.getDefaultFormattedDate(workout.getDate()));
                     jsonObject.put("start_time_epoch", workout.getDate().getTime());
                 }
 
-                if (workout.getEndTimeStamp() != null){
+                if (workout.getEndTimeStamp() != null) {
                     jsonObject.put("end_time", DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
                     jsonObject.put("end_time_epoch", workout.getEndTimeStamp());
                 }
@@ -834,7 +840,7 @@ public class SyncService extends GcmTaskService {
                 jsonObject.put("end_location_long", workout.getEndPointLongitude());
                 jsonObject.put("version", workout.getVersion());
                 jsonObject.put("calories_burnt", workout.getCalories() == null ? 0 : workout.getCalories());
-                if (workout.getTeamId() != null && workout.getTeamId() > 0){
+                if (workout.getTeamId() != null && workout.getTeamId() > 0) {
                     jsonObject.put("team_id", workout.getTeamId());
                 }
                 jsonObject.put("num_spikes", workout.getNumSpikes());
@@ -854,7 +860,7 @@ public class SyncService extends GcmTaskService {
                 jsonObject.put("is_flag", !workout.getIsValidRun());
 
 
-                Logger.d(TAG, "Will upload run: "+jsonObject.toString());
+                Logger.d(TAG, "Will upload run: " + jsonObject.toString());
                 response = NetworkDataProvider.doPostCall(Urls.getRunUrl(), jsonObject, Run.class);
             }
 
@@ -899,8 +905,7 @@ public class SyncService extends GcmTaskService {
                     .put("exception_message", e.getMessage())
                     .buildAndDispatch();
             return false;
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             String message = "Run sync Exception: " + ex.getMessage() + "\n Run: " + jsonObject.toString();
             Logger.e(TAG, message);
             ex.printStackTrace();
@@ -914,7 +919,7 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    public static void forceRefreshEntireWorkoutHistoryWithBackoff(){
+    public static void forceRefreshEntireWorkoutHistoryWithBackoff() {
         ExpoBackoffTask task = new ExpoBackoffTask() {
             @Override
             public int performtask() {
@@ -940,10 +945,10 @@ public class SyncService extends GcmTaskService {
         Gson gson = new Gson();
         try {
             Response response = NetworkDataProvider.getResponseForGetCall(runUrl);
-            if (refreshAllTimeStamp == 0){
-                if (response.headers().getDate("Date") != null){
+            if (refreshAllTimeStamp == 0) {
+                if (response.headers().getDate("Date") != null) {
                     refreshAllTimeStamp = response.headers().getDate("Date").getTime();
-                }else {
+                } else {
                     refreshAllTimeStamp = DateUtil.getServerTimeInMillis();
                 }
             }
@@ -954,13 +959,13 @@ public class SyncService extends GcmTaskService {
             WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
 
             Iterator<Workout> iterator = runList.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 Workout workout = iterator.next();
-                if (TextUtils.isEmpty(workout.getWorkoutId())){
+                if (TextUtils.isEmpty(workout.getWorkoutId())) {
                     // Generating new client_run_id and scheduling the run for sync
                     workout.setWorkoutId(UUID.randomUUID().toString());
                     workout.setIs_sync(false);
-                    if (workout.getVersion() == 0){
+                    if (workout.getVersion() == 0) {
                         // Setting dummy version just make sure that this record is updated using PUT request
                         workout.setVersion(1L);
                     }
@@ -986,8 +991,8 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "NetworkException in forceRefreshAllWorkoutData: " + e);
             e.printStackTrace();
             Crashlytics.log("forceRefreshAllWorkoutData networkException for user_id ("
-                    +MainApplication.getInstance().getUserID() +"), messageFromServer: " + e
-                    +", while syncing runs at URL: " + runUrl);
+                    + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
+                    + ", while syncing runs at URL: " + runUrl);
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_FORCE_REFRESH_FAILURE)
                     .put("exception_message", e.getMessage())
@@ -1001,7 +1006,7 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "Exception in forceRefreshAllWorkoutData: " + e.getMessage());
             e.printStackTrace();
             Crashlytics.log("forceRefreshAllWorkoutData Exception for user_id ("
-                    +MainApplication.getInstance().getUserID() +"), while syncing runs at URL: " +runUrl);
+                    + MainApplication.getInstance().getUserID() + "), while syncing runs at URL: " + runUrl);
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_FORCE_REFRESH_FAILURE)
                     .put("exception_message", e.getMessage())

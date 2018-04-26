@@ -11,6 +11,8 @@ public class TaskConstants {
 
     public static final String UPLOAD_USER_DATA = "upload_user_data";
 
+    public static final String UPLOAD_PENDING_WORKOUT = "upload_pending_workout";
+
     public static final String SYNC_DATA = "sync_data";
 
     public static final String FRAUD_DATA_JSON = "fraud_data_parcelable";

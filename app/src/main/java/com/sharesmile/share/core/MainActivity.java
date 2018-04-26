@@ -6,7 +6,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -75,6 +77,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import Models.CampaignList;
@@ -458,28 +462,30 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             ActivityCompat.finishAffinity(this);
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment fragment = fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1).getName());
-            if(fragment instanceof StreakGoalFragment)
-            {
-                StreakGoalFragment streakGoalFragment = (StreakGoalFragment) fragment;
-                if(streakGoalFragment.goals.get(streakGoalFragment.streakGoalAdapter.getPosition()).getId() != MainApplication.getInstance().getUserDetails().getStreakGoalID())
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Changes are not saved.");
-                    builder.setNegativeButton("DISCARD", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            getSupportFragmentManager().popBackStack();
-                        }
-                    });
-                    builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            StreakGoalFragment fragment = (StreakGoalFragment) getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
-                            fragment.saveGoal();
-                        }
-                    });
-                    builder.create().show();
+            if(fragmentManager.getBackStackEntryCount()>0) {
+                Fragment fragment = fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1).getName());
+                if (fragment instanceof StreakGoalFragment) {
+                    StreakGoalFragment streakGoalFragment = (StreakGoalFragment) fragment;
+                    if (streakGoalFragment.goals.get(streakGoalFragment.streakGoalAdapter.getPosition()).getId() != MainApplication.getInstance().getUserDetails().getStreakGoalID()) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setMessage("Changes are not saved.");
+                        builder.setNegativeButton("DISCARD", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                getSupportFragmentManager().popBackStack();
+                            }
+                        });
+                        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                StreakGoalFragment fragment = (StreakGoalFragment) getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
+                                fragment.saveGoal();
+                            }
+                        });
+                        builder.create().show();
+                    } else {
+                        super.onBackPressed();
+                    }
                 }else
                 {
                     super.onBackPressed();
@@ -536,6 +542,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 share();
                 AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                         .buildAndDispatch();
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
             case R.id.nav_item_leaderboard:
                 showLeaderBoard();
@@ -579,7 +586,17 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void share() {
-        Utils.share(this, getString(R.string.share_msg));
+        AssetManager assetManager = getAssets();
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open("images/share_image_2.jpg");
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+            // handle exception
+        }
+        Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
+                getString(R.string.share_msg));
     }
 
     public void showHome() {

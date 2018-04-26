@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Logger;
@@ -44,12 +45,15 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Context mContext;
 
     int headerOffSet = 0;
+    int noOfUnsyncWorkout = 0;
+    boolean showUnsync = false;
 
-    public LeaderBoardAdapter(Context context, Parent parent) {
+    public LeaderBoardAdapter(Context context, Parent parent, List<Workout> mWorkoutList) {
         this.mContext = context;
         this.mParent = parent;
         headerOffSet = (mParent != null && mParent.toShowBanner()) ? 1 : 0;
         Logger.d(TAG, "LeaderBoardAdapter, setting headeroffset as " + headerOffSet);
+        noOfUnsyncWorkout = mWorkoutList!=null?mWorkoutList.size():0;
     }
 
     @Override
@@ -113,6 +117,10 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return new LeaderBoardViewHolder(myListItem);
     }
 
+    public void setShowUnsync(boolean b) {
+        showUnsync = b;
+    }
+
     public class LeaderBoardViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_leaderboard)
@@ -129,6 +137,11 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @BindView(R.id.container_list_item)
         CardView container;
 
+        @BindView(R.id.container_show_unsync)
+        LinearLayout containerShowUnsync;
+
+        @BindView(R.id.not_sync_tv)
+        TextView notSync;
 
         public LeaderBoardViewHolder(View itemView) {
             super(itemView);
@@ -141,6 +154,19 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
 
         public void bindData(final BaseLeaderBoardItem leaderboard, int rank) {
+            if(showUnsync && itemList.indexOf(leaderboard)==0 && headerOffSet == 0 && noOfUnsyncWorkout>0)
+            {
+                if(noOfUnsyncWorkout==1) {
+                    notSync.setText(noOfUnsyncWorkout + " workout not yet synced!");
+                }else
+                {
+                    notSync.setText(noOfUnsyncWorkout + " workouts not yet synced!");
+                }
+                containerShowUnsync.setVisibility(View.VISIBLE);
+            }else
+            {
+                containerShowUnsync.setVisibility(View.GONE);
+            }
             mleaderBoard.setText(String.valueOf(rank));
 
             ShareImageLoader.getInstance().loadImage(leaderboard.getImage(), mProfileImage,

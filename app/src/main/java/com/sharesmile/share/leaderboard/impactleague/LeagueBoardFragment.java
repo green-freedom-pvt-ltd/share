@@ -102,7 +102,7 @@ public class LeagueBoardFragment extends BaseLeagueFragment {
         if (!TextUtils.isEmpty(leagueName)){
             setToolbarTitle(leagueName);
         }
-        render(itemList, myPos);
+        render(itemList, myPos,myTeamId);
     }
 
     @Override

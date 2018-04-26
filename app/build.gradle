@@ -31,8 +31,8 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 233
-        versionName "2.7.9.6"
+        versionCode 234
+        versionName "2.7.9.7"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -98,17 +98,18 @@ android {
         disable 'InvalidPackage'
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-
-//    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
-//    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
-//    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
-
+    //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+    //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+    //    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
     compile 'com.google.android.gms:play-services-location:11.6.0'
     compile 'com.google.android.gms:play-services-maps:11.6.0'
     compile 'com.google.android.gms:play-services-fitness:11.6.0'
@@ -148,7 +149,7 @@ dependencies {
     compile 'io.smooch:ui:5.4.0'
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
     compile 'uk.co.samuelwall:material-tap-target-prompt:2.6.0'
-    compile group: 'com.neenbedankt.gradle.plugins', name: 'android-apt', version: '1.8'
+    compile 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 }
 
 apply plugin: 'com.google.gms.google-services'

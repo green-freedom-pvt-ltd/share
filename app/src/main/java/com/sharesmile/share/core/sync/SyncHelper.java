@@ -147,6 +147,19 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
+    public static void uploadPendingWorkout() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_PENDING_WORKOUT)
+                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
     public static void syncMessageCenterData() {
         AsyncTask.execute(new Runnable() {
             @Override

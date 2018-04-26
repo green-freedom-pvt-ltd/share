@@ -102,7 +102,7 @@ public class TeamLeaderBoardFragment extends BaseLeagueFragment {
             }
             itemList.add(data.convertToLeaderBoard());
         }
-        render(itemList, myPos);
+        render(itemList, myPos,mTeamId);
     }
 
     @Override

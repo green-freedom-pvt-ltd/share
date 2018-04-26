@@ -40,6 +40,11 @@ public class UpdateEvent {
         }
     }
 
+    public static class PendingWorkoutUploaded {
+        public PendingWorkoutUploaded() {
+        }
+    }
+
     public static class MessageDataUpdated {
         public MessageDataUpdated() {
         }
