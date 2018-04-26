@@ -40,7 +40,7 @@ public class FragmentThankYou extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         commonActions = ((OnBoardingActivity) getActivity());
         commonActions.setExplainText("", "");
-        commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt)+">");
+        commonActions.setBackAndContinue(TAG, "LET\'S GO >>");
         welcome.setText(getResources().getString(R.string.thank_you));
         changeMaker.setText(getResources().getString(R.string.life_as_change_maker2));
         changeMaker2.setText(getResources().getString(R.string.every_step2));

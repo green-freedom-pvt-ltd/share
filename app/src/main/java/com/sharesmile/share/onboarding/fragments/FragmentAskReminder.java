@@ -50,6 +50,7 @@ public class FragmentAskReminder extends BaseFragment implements View.OnClickLis
         commonActions.setExplainText(getContext().getResources().getString(R.string.set_reminder_for_daily_jog_walk), getContext().getResources().getString(R.string.reminder_explain_txt));
         commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
         commonActions.setContinueTextColor(R.color.white_10);
+        setChecked();
     }
 
     private void setChecked() {
@@ -61,11 +62,13 @@ public class FragmentAskReminder extends BaseFragment implements View.OnClickLis
             commonActions.setBackAndContinue(TAG,getResources().getString(R.string.set_reminder));
             commonActions.setContinueTextColor(R.color.white);
             yes.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
+            ((OnBoardingActivity)getActivity()).setProgressLevel(6.0f);
         }else if(actionSelected == 0)
         {
             commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
             commonActions.setContinueTextColor(R.color.white);
             no.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
+            ((OnBoardingActivity)getActivity()).setProgressLevel(7.0f);
         }
     }
     @OnClick({R.id.yes_layout,R.id.no_layout})

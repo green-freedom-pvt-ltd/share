@@ -2,12 +2,18 @@ package com.sharesmile.share.profile;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +38,7 @@ import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
+import com.sharesmile.share.views.CustomTypefaceSpan;
 
 import java.util.Calendar;
 
@@ -98,16 +105,26 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_profile_save, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        boolean b = checkUser();
+        if(b)
+        {
+            Utils.setMenuText(menu.findItem(R.id.item_save_profile),getContext(),getString(R.string.save),getResources().getColor(R.color.black_38));
+        }else
+        {
+            Utils.setMenuText(menu.findItem(R.id.item_save_profile),getContext(),getString(R.string.save),getResources().getColor(R.color.colorPrimaryDark));
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_save_profile:
-                if (validateUserDetails()){
-                    saveUserDetails();
-                    isEdited = false;
-                    getActivity().onBackPressed();
+                if(!checkUser()) {
+                    if (validateUserDetails()) {
+                        saveUserDetails();
+                        isEdited = false;
+                        getActivity().onBackPressed();
+                    }
                 }
                 return true;
             default:
@@ -133,6 +150,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         mFirstName.addTextChangedListener(this);
         mLastName.addTextChangedListener(this);
         mNumber.addTextChangedListener(this);
+        bodyWeightKgs.addTextChangedListener(this);
         mBirthday.addTextChangedListener(this);
     }
 
@@ -175,6 +193,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             }
             setGender();
         }
+        setMenuColor();
     }
     void setGender()
     {
@@ -221,6 +240,53 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         return true;
     }
 
+    private void setMenuColor()
+    {
+        getActivity().invalidateOptionsMenu();
+    }
+
+    private boolean checkUser()
+    {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        boolean b = true;
+        if(!mFirstName.getText().toString().equals(userDetails.getFirstName()))
+        {
+            b = false;
+        }
+        if(!mLastName.getText().toString().equals(userDetails.getLastName()))
+        {
+            b = false;
+        }
+        if(!mEmail.getText().toString().equals(userDetails.getEmail()==null?"":userDetails.getEmail()))
+        {
+            b = false;
+        }
+        if(!mNumber.getText().toString().equals(userDetails.getPhoneNumber()==null?"":userDetails.getPhoneNumber()))
+        {
+            b = false;
+        }
+        if(!bodyWeightKgs.getText().toString().equals(userDetails.getBodyWeight()+""))
+        {
+            b = false;
+        }
+        if(!mBirthday.getText().toString().equals(userDetails.getBirthday()))
+        {
+            b = false;
+        }
+        String gender = "";
+        if(this.gender == 0)
+        {
+            gender = "f";
+        }else if(this.gender == 1)
+        {
+            gender = "m";
+        }
+        if(!userDetails.getGenderUser().startsWith(gender))
+        {
+            b = false;
+        }
+        return b;
+    }
     private boolean validatePhoneNumber(String number){
         if (TextUtils.isEmpty(number)){
             // Will not perform validation if there is no input for phone number
@@ -322,19 +388,16 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     }
 
     public void showDatePicker() {
-
         Calendar calendar = Calendar.getInstance();
         int calender_month = calendar.get(Calendar.MONTH);
         int calender_year = calendar.get(Calendar.YEAR);
         int calender_day = calendar.get(Calendar.DAY_OF_MONTH);
         DatePickerDialog mDatePickerDialog = new DatePickerDialog(getActivity(), this, calender_year, calender_month, calender_day);
         mDatePickerDialog.show();
-
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
         mBirthday.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
     }
 
@@ -347,10 +410,12 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             case R.id.rb_share_male :
                 gender = 1;
                 setGender();
+                setMenuColor();
                 break;
             case R.id.rb_share_female :
                 gender = 0;
                 setGender();
+                setMenuColor();
                 break;
         }
     }
@@ -409,7 +474,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+        setMenuColor();
     }
 
     @Override

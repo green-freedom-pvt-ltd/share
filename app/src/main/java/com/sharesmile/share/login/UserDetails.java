@@ -50,6 +50,8 @@ public class UserDetails implements UnObfuscable {
     private float bodyWeight;
     @SerializedName("body_height")
     private int bodyHeight;
+    @SerializedName("body_height_unit")
+    private int bodyHeightUnit; // 0=cms,1=inches
 
     //streak details
     @SerializedName("streak_count")
@@ -267,6 +269,14 @@ public class UserDetails implements UnObfuscable {
 
     public void setBirthday(String birthday) {
         this.birthday = birthday;
+    }
+
+    public int getBodyHeightUnit() {
+        return bodyHeightUnit;
+    }
+
+    public void setBodyHeightUnit(int bodyHeightUnit) {
+        this.bodyHeightUnit = bodyHeightUnit;
     }
 
     public void setTotalAmount(int totalAmount) {

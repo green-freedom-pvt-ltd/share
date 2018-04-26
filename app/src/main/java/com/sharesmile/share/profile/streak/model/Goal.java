@@ -8,7 +8,7 @@ public class Goal {
     @SerializedName("name")
     private String name;
     @SerializedName("value")
-    private double value;
+    private int value;
     @SerializedName("iconCount")
     private int iconCount;
 
@@ -28,11 +28,11 @@ public class Goal {
         this.name = name;
     }
 
-    public double getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(int value) {
         this.value = value;
     }
 

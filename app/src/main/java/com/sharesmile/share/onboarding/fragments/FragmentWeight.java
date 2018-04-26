@@ -1,5 +1,6 @@
 package com.sharesmile.share.onboarding.fragments;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.utils.Utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -84,6 +86,16 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
         weightDecimalPicker.setOnValueChangedListener(this);
     }
 
+    private void changeDividerColor(NumberPicker picker, int color) {
+        try {
+            Field mField = NumberPicker.class.getDeclaredField("mSelectionDivider");
+            mField.setAccessible(true);
+            ColorDrawable colorDrawable = new ColorDrawable(color);
+            mField.set(picker, colorDrawable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();

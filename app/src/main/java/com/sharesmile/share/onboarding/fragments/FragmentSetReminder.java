@@ -28,6 +28,7 @@ public class FragmentSetReminder extends BaseFragment implements NumberPicker.On
     @BindView(R.id.am_pm_picker)
     NumberPicker ampmPicker;
     String ampm[] = {"AM","PM"};
+    String minutes[];
     boolean isChecked = false;
     @Nullable
     @Override
@@ -55,7 +56,7 @@ public class FragmentSetReminder extends BaseFragment implements NumberPicker.On
         Utils.setReminderTime("06:00",getContext());
         hourPicker.setWrapSelectorWheel(false);
         hourPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-        String minutes[] = new String[60/5];
+        minutes = new String[60/5];
         for(int i=0;i<12;i++)
         {
             minutes[i] = (i*5)<10?"0"+i*5:i*5+"";
@@ -71,7 +72,7 @@ public class FragmentSetReminder extends BaseFragment implements NumberPicker.On
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
         int hour = hourPicker.getValue();
-        int minute = minutePicker.getValue();
+        String minute = minutes[minutePicker.getValue()];
         int ampm = ampmPicker.getValue();
 
         if(ampm!=0 && hour!=12)
@@ -83,7 +84,6 @@ public class FragmentSetReminder extends BaseFragment implements NumberPicker.On
         }
 
         String hour_s = hour<10?"0"+hour:hour+"";
-        String minute_s = minute<10?"0"+minute:minute+"";
-        Utils.setReminderTime(hour_s+":"+minute_s,getContext());
+        Utils.setReminderTime(hour_s+":"+minute,getContext());
     }
 }

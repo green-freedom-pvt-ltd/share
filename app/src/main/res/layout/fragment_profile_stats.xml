@@ -87,9 +87,11 @@
                                 android:layout_height="wrap_content"
                                 android:drawableLeft="@drawable/streak_icon"
                                 android:drawablePadding="5dp"
-                                android:text="18"
+                                tools:text="18"
                                 android:textColor="@color/streak_orange"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                android:gravity="center"
+                                />
                         </LinearLayout>
 
                         <LinearLayout
@@ -103,12 +105,13 @@
                                 android:layout_width="0dip"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.9"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:gravity="center">
 
                                 <RelativeLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp">
+                                    >
 
                                     <com.sharesmile.share.views.LBTextView
                                         android:id="@+id/tv_level_num"
@@ -133,7 +136,7 @@
                                 <FrameLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="7dp"
-                                    android:layout_marginTop="2dp">
+                                    android:layout_marginTop="3dp">
 
                                     <RelativeLayout
                                         android:layout_width="match_parent"
@@ -344,7 +347,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:text="@string/see_workouts"
+                    android:text="@string/workout_history"
                     android:textAllCaps="true"
                     android:textColor="@color/clr_32"
                     android:textSize="12sp" />

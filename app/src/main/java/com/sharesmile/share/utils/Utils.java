@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -21,10 +22,15 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -61,6 +67,7 @@ import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.tracking.workout.data.model.Run;
+import com.sharesmile.share.views.CustomTypefaceSpan;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -1221,23 +1228,28 @@ public class Utils {
 
     public static void setReminderTime(String time,Context context)
     {
-        SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET,true);
-        SharedPrefsManager.getInstance().setString(Constants.REMINDER_TIME,time);
-        Calendar calendar = Calendar.getInstance();
-        String[] hhmm = time.split(":");
-        if(hhmm.length==2) {
-            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hhmm[0]));
-            calendar.set(Calendar.MINUTE, Integer.parseInt(hhmm[1]));
-            calendar.set(Calendar.SECOND, 0);
-            if (calendar.before(Calendar.getInstance())) {
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
-            }
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(context, AlarmReceiver.class);
-            PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        if(time.length() == 0)
+        {
+            SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET,false);
+        }else {
+            SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET, true);
+            SharedPrefsManager.getInstance().setString(Constants.REMINDER_TIME, time);
+            Calendar calendar = Calendar.getInstance();
+            String[] hhmm = time.split(":");
+            if (hhmm.length == 2) {
+                calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hhmm[0]));
+                calendar.set(Calendar.MINUTE, Integer.parseInt(hhmm[1]));
+                calendar.set(Calendar.SECOND, 0);
+                if (calendar.before(Calendar.getInstance())) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                    calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                        calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
+            }
         }
 
     }
@@ -1308,5 +1320,15 @@ public class Utils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setMenuText(MenuItem menuItem,Context context,String s,int color) {
+        SpannableString spannableString = new SpannableString(s);
+        spannableString.setSpan(new AbsoluteSizeSpan(50), 0,spannableString.length(), 0); // set size
+        Typeface font = Typeface.createFromAsset(context.getAssets(), "fonts/Lato-Bold.ttf");
+        spannableString.setSpan(new CustomTypefaceSpan("", font), 0, spannableString.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        spannableString.setSpan(new ForegroundColorSpan(color),0,spannableString.length(),0);
+        menuItem.setTitle(spannableString);
+
     }
 }

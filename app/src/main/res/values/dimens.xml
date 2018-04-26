@@ -57,5 +57,5 @@
     <dimen name="my_stats_bg_padding_top_bottom">5dp</dimen>
     <dimen name="my_stats_bg_padding_stroke_width">1dp</dimen>
 
-    <dimen name="onboarding_margin_top">64dp</dimen>
+    <dimen name="onboarding_margin_top">25dp</dimen>
 </resources>

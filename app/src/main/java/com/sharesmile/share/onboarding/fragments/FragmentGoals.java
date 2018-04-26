@@ -71,7 +71,7 @@ public class FragmentGoals extends BaseFragment {
             TextView goalStreakDistance = view.findViewById(R.id.goal_streak_distance);
             goalName.setText(goal.getName());
             goalName.setTag(goal);
-            goalStreakDistance.setText(goal.getValue()+" km per day");
+            goalStreakDistance.setText(goal.getValue()+"km per day");
             RelativeLayout goalRow = view.findViewById(R.id.goal_row);
             goalRow.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -96,7 +96,7 @@ public class FragmentGoals extends BaseFragment {
             }
         }else
         {
-            ((TextView)radioButtons.get(0).findViewById(R.id.goal_name)).setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
+            setChecked(radioButtons.get(0));
         }
     }
 
@@ -111,6 +111,12 @@ public class FragmentGoals extends BaseFragment {
         TextView goalName = view.findViewById(R.id.goal_name);
         userDetails.setStreakGoalID(((Goal)goalName.getTag()).getId());
         userDetails.setStreakGoalDistance(((Goal)goalName.getTag()).getValue());
+
+        userDetails.setStreakRunProgress(0);
+        userDetails.setStreakCount(0);
+        userDetails.setStreakMaxCount(0);
+        userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+        userDetails.setStreakAdded(false);
         MainApplication.getInstance().setUserDetails(userDetails);
     }
 

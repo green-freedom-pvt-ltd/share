@@ -496,28 +496,28 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         goal.setId(1);
         goal.setName("Casual");
         goal.setIconCount(0);
-        goal.setValue(0.2);
+        goal.setValue(1);
         goals.add(goal);
 
         goal = new Goal();
         goal.setId(2);
         goal.setName("Regular");
         goal.setIconCount(1);
-        goal.setValue(0.5);
+        goal.setValue(3);
         goals.add(goal);
 
         goal = new Goal();
         goal.setId(3);
         goal.setName("Serious");
         goal.setIconCount(2);
-        goal.setValue(0.7);
+        goal.setValue(7);
         goals.add(goal);
 
         goal = new Goal();
         goal.setId(4);
         goal.setName("Insane");
         goal.setIconCount(3);
-        goal.setValue(1);
+        goal.setValue(10);
         goals.add(goal);
 
         try {

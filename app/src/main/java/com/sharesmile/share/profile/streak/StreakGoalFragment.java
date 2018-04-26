@@ -18,6 +18,7 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.streak.model.Goal;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +38,11 @@ public class StreakGoalFragment extends BaseFragment {
 
     LinearLayoutManager linearLayoutManager;
     
-    StreakGoalAdapter streakGoalAdapter;
-    ArrayList<Goal> goals;
+    public StreakGoalAdapter streakGoalAdapter;
+    public ArrayList<Goal> goals;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
-
     }
 
     @Nullable
@@ -66,11 +65,19 @@ public class StreakGoalFragment extends BaseFragment {
         initUi();
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_pick_a_goal, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        if(streakGoalAdapter==null || streakGoalAdapter.getPosition()==-1)
+        {
+            Utils.setMenuText(menu.findItem(R.id.item_save), getContext(), getString(R.string.save), getResources().getColor(R.color.black_38));
+        }else if(MainApplication.getInstance().getUserDetails().getStreakGoalID() == goals.get(streakGoalAdapter.getPosition()).getId()) {
+            Utils.setMenuText(menu.findItem(R.id.item_save), getContext(), getString(R.string.save), getResources().getColor(R.color.black_38));
+        }else
+        {
+            Utils.setMenuText(menu.findItem(R.id.item_save), getContext(), getString(R.string.save), getResources().getColor(R.color.colorPrimaryDark));
+        }
     }
     private void setupToolbar() {
         setHasOptionsMenu(true);
@@ -81,18 +88,30 @@ public class StreakGoalFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_save:
-                int position = streakGoalAdapter.getPosition();
-                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-                userDetails.setStreakGoalID(goals.get(position).getId());
-                userDetails.setStreakGoalDistance(goals.get(position).getValue());
-                userDetails.addStreakCount();
-                MainApplication.getInstance().setUserDetails(userDetails);
-                getFragmentController().goBack();
+                if(MainApplication.getInstance().getUserDetails().getStreakGoalID() != goals.get(streakGoalAdapter.getPosition()).getId()) {
+                    saveGoal();
+                }else
+                {
+                    
+                }
+
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void saveGoal() {
+        int position = streakGoalAdapter.getPosition();
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        userDetails.setStreakGoalID(goals.get(position).getId());
+        userDetails.setStreakGoalDistance(goals.get(position).getValue());
+        userDetails.addStreakCount();
+        MainApplication.getInstance().setUserDetails(userDetails);
+        MainApplication.showToast(getResources().getString(R.string.goal_saved));
+        getFragmentController().goBack();
+
     }
 
     private void initUi() {
@@ -102,7 +121,4 @@ public class StreakGoalFragment extends BaseFragment {
         streakGoalAdapter = new StreakGoalAdapter(goals,getContext());
         streakGoalRecycler.setAdapter(streakGoalAdapter);
     }
-
-
-
 }

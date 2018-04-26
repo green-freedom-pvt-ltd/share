@@ -108,7 +108,10 @@ public class FragmentBirthday extends BaseFragment implements NumberPicker.OnVal
         {
             setDatePicker();
         }
-        String yymmdd = (yearPicker.getValue()+1900)+"-"+months[monthPicker.getValue()]+"-"+datePicker.getValue();
+        String mm = monthPicker.getValue()<10?"0"+(monthPicker.getValue()+1):(monthPicker.getValue()+1)+"";
+        String dd = datePicker.getValue()<10?"0"+datePicker.getValue():datePicker.getValue()+"";
+
+        String yymmdd = (yearPicker.getValue())+"-"+mm+"-"+dd;
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         userDetails.setBirthday(yymmdd);
         MainApplication.getInstance().setUserDetails(userDetails);

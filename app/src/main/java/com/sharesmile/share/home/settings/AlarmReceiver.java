@@ -40,8 +40,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context)
-                            .setContentTitle("Lets Go!")
-                            .setContentText("It's time for your workout, lets get fit and do good.")
+                            .setContentTitle("Let\'s Go \uD83C\uDFC3")
+                            .setContentText("Time to create some Impact.")
                             .setSmallIcon(getNotificationIcon())
                             .setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue))
                             .setLargeIcon(getLargeIcon(context))
@@ -51,8 +51,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                             .setSound( Uri.parse("android.resource://"
                                     + context.getPackageName() + "/" + R.raw.slow_spring_board))
                     .setVibrate(new long[]{0,100,200,300})
-                            .setStyle(new NotificationCompat.BigTextStyle()
-                                    .bigText("It's time for your workout, lets do good & get fit."));
+                            ;
 
 
 //            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {

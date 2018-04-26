@@ -11,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
@@ -104,6 +105,7 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
         {
                 position = getAdapterPosition();
                 notifyDataSetChanged();
+                ((MainActivity)context).invalidateOptionsMenu();
         }
     }
 

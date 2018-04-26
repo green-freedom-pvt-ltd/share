@@ -162,7 +162,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
             replaceFragment(new FragmentGender(), true);
         } else {
             if (continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10)) {
-
+                MainApplication.showToast(getResources().getString(R.string.select_an_option));
             } else {
                 if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
@@ -239,7 +239,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 setProgressLevel(5.0f);
                 break;
             case FragmentAskReminder.TAG:
-
+//                setProgressLevel(6.0f);
                 setContinueTextColor(R.color.white_10);
                 continueTv.setText(continueTextName);
                 break;

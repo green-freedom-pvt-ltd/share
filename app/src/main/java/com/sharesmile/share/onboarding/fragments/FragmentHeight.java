@@ -56,12 +56,14 @@ public class FragmentHeight extends BaseFragment {
     private void setData() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         int height = userDetails.getBodyHeight();
+        int height_unit = userDetails.getBodyHeightUnit();
+
         if(height==0)
         {
             heightPicker.setValue(cmsHeight.size()/2);
         }else
         {
-        if(heightUnitPicker.getValue()==0)
+        if(height_unit==0)
         {
             heightPicker.setValue(cmsHeight.indexOf(height+""));
         }else
@@ -69,6 +71,7 @@ public class FragmentHeight extends BaseFragment {
             heightPicker.setValue(inchHeight.indexOf(cmsToInches(height)));
         }
         }
+        heightUnitPicker.setValue(height_unit);
     }
 
     private void setPicker() {
@@ -84,8 +87,36 @@ public class FragmentHeight extends BaseFragment {
             inchHeight.add(inchesString);
         }
         cmsArray = cmsHeight.toArray(new String[cmsHeight.size()]);
-        Utils.setNumberPicker(heightPicker, cmsArray, heightPicker.getValue());
         inchArray = inchHeight.toArray(new String[inchHeight.size()]);
+        if(MainApplication.getInstance().getUserDetails().getBodyHeightUnit() == 0)
+        {
+            Utils.setNumberPicker(heightPicker, cmsArray, heightPicker.getValue());
+        }else
+        {
+            Utils.setNumberPicker(heightPicker, inchArray, heightPicker.getValue());
+        }
+        heightPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+
+                if(heightUnitPicker.getValue()==0)
+                {
+                    userDetails.setBodyHeight(Integer.parseInt(cmsArray[heightPicker.getValue()]));
+                }else
+                {
+                    String inchesFeet = inchArray[heightPicker.getValue()];
+                    String cms = inchesTocms(inchesFeet);
+                    int cms_ = Integer.parseInt(cms);
+                    if(cms_>200) {
+                        cms_ = 200;
+                    }
+                    userDetails.setBodyHeight(cms_);
+                }
+                userDetails.setBodyHeightUnit(heightUnitPicker.getValue());
+                MainApplication.getInstance().setUserDetails(userDetails);
+            }
+        });
         heightUnitPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker numberPicker, int i, int i1) {
@@ -109,6 +140,7 @@ public class FragmentHeight extends BaseFragment {
                 }
                 UserDetails userDetails = MainApplication.getInstance().getUserDetails();
                 userDetails.setBodyHeight(cms_);
+                userDetails.setBodyHeightUnit(i1);
                 MainApplication.getInstance().setUserDetails(userDetails);
             }
         });

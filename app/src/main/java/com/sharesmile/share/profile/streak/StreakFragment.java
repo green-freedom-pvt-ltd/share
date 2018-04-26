@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -23,7 +25,11 @@ import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -68,6 +74,7 @@ public class StreakFragment extends BaseFragment {
     @BindView(R.id.sharable_container)
     View sharableContainer;
 
+    ArrayList<Goal> goals;
     int from;
 
     public static StreakFragment newInstance(int from) {
@@ -102,6 +109,7 @@ public class StreakFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getFragmentController().hideToolbar();
+        goals = new Gson().fromJson(MainApplication.getInstance().getGoalDetails(), new TypeToken<List<Goal>>(){}.getType());
         initUi();
     }
 
@@ -119,6 +127,22 @@ public class StreakFragment extends BaseFragment {
         }
         streakCount.setText(MainApplication.getInstance().getUserDetails().getStreakCount()+"");
         streakGoalIconsLayout.removeAllViews();
+        for (Goal goal :
+                goals) {
+            if(goal.getId() == MainApplication.getInstance().getUserDetails().getStreakGoalID())
+            {
+                for (int i = 0; i < goal.getIconCount(); i++) {
+                    ImageView imageView = new ImageView(getContext());
+                    imageView.setImageResource(R.drawable.streak_icon);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(30, 32);
+                    layoutParams.setMargins(5,5,5,5);
+                    imageView.setLayoutParams(layoutParams);
+                    streakGoalIconsLayout.addView(imageView);
+                }
+                break;
+            }
+        }
+
         double distanceDiff = (MainApplication.getInstance().getUserDetails().getStreakGoalDistance() - MainApplication.getInstance().getUserDetails().getStreakRunProgress());
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if(distanceDiff<=0 || userDetails.isStreakAdded()) {
