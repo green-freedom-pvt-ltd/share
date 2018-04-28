@@ -55,6 +55,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     View selectIssueContainer;
     RecyclerView mRecyclerView;
+    LinearLayoutManager linearLayoutManager;
     ProgressBar mProgress;
     private List<Workout> mWorkoutList;
     private List<RunHistoryItem> mHistoryItemsList;
@@ -116,12 +117,14 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         Logger.d(TAG, "init");
         mHistoryAdapter = new HistoryAdapter(this, isRunSelection);
         mRecyclerView.setAdapter(mHistoryAdapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext()) {
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
             @Override
-            public boolean canScrollVertically() {
-                return false;
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                swipeRefreshLayout.setEnabled(linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0);
             }
-        };
+        });
         mRecyclerView.setLayoutManager(linearLayoutManager);
         if (isRunSelection) {
             selectIssueContainer.setVisibility(View.VISIBLE);
@@ -133,18 +136,18 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
                 @Override
                 public void onRefresh() {
                     swipeRefreshLayout.setRefreshing(true);
-                    if (NetworkUtils.isNetworkConnected(getContext())){
-                        if(containerShowUnsync.getVisibility() == View.VISIBLE)
-                        SyncHelper.uploadPendingWorkout();
+                    if (NetworkUtils.isNetworkConnected(getContext())) {
+                        if (containerShowUnsync.getVisibility() == View.VISIBLE)
+                            SyncHelper.uploadPendingWorkout();
                         else
                             swipeRefreshLayout.setRefreshing(false);
-                    }else {
+                    } else {
                         MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
             });
-            swipeRefreshLayout.setColorSchemeResources(new int[]{R.color.sky_blue,R.color.sky_blue_dark});
+            swipeRefreshLayout.setColorSchemeResources(new int[]{R.color.sky_blue, R.color.sky_blue_dark});
         }
         fetchRunDataFromDb();
         setUnsyncLayout();
@@ -165,14 +168,13 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 //                    amountOfWorkoutNotSynced += ((RunHistoryDetailsItem) runHistoryItem).getWorkout().getRunAmount();
                 }
             }
-            if(noOfWorkoutNotSynced>=1) {
+            if (noOfWorkoutNotSynced >= 1) {
                 containerShowUnsync.setVisibility(View.VISIBLE);
                 if (noOfWorkoutNotSynced == 1)
                     notSync.setText(noOfWorkoutNotSynced + " workout not yet synced!");
                 else
                     notSync.setText(noOfWorkoutNotSynced + " workouts not yet synced!");
-            }else
-            {
+            } else {
                 containerShowUnsync.setVisibility(View.GONE);
             }
         }
