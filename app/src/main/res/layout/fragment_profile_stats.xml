@@ -91,6 +91,7 @@
                                 android:textColor="@color/streak_orange"
                                 android:textSize="18sp"
                                 android:gravity="center"
+                                android:padding="5dp"
                                 />
                         </LinearLayout>
 

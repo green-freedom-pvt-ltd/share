@@ -27,6 +27,7 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -1324,7 +1325,7 @@ public class Utils {
 
     public static void setMenuText(MenuItem menuItem,Context context,String s,int color) {
         SpannableString spannableString = new SpannableString(s);
-        spannableString.setSpan(new AbsoluteSizeSpan(50), 0,spannableString.length(), 0); // set size
+        spannableString.setSpan(new RelativeSizeSpan(0.8f), 0,spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); // set size
         Typeface font = Typeface.createFromAsset(context.getAssets(), "fonts/Lato-Bold.ttf");
         spannableString.setSpan(new CustomTypefaceSpan("", font), 0, spannableString.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         spannableString.setSpan(new ForegroundColorSpan(color),0,spannableString.length(),0);
