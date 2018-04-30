@@ -191,6 +191,10 @@ public class StreakFragment extends BaseFragment {
         }else if(from == Constants.FROM_PROFILE_FOR_STREAK)
         {
             getFragmentController().replaceFragment(new StreakGoalFragment(), true);
+            AnalyticsEvent.create(Event.ON_EDIT_GOAL)
+                    .put("goal_id",MainApplication.getInstance().getUserDetails().getStreakGoalID())
+                    .put("goal_distance",MainApplication.getInstance().getUserDetails().getStreakGoalDistance())
+                    .buildAndDispatch();
         }
     }
 

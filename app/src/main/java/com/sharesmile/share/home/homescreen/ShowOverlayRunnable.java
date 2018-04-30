@@ -36,7 +36,7 @@ public class ShowOverlayRunnable implements Runnable {
                 // Won't show Let's Go overlay for a completed cause card
                 return;
             }
-            Utils.showOverlay(overlay, target, homescreenFragment.getActivity(), isRectangular);
+            Utils.setOverlay(overlay, target, homescreenFragment.getActivity(), isRectangular,true,null).show();
         }
     }
 

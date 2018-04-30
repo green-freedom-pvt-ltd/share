@@ -83,6 +83,7 @@ import java.util.ArrayList;
 
 import Models.CampaignList;
 import butterknife.ButterKnife;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
@@ -486,7 +487,16 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     } else {
                         super.onBackPressed();
                     }
-                }else
+                }else if(fragment instanceof ProfileFragment)
+                {
+                    if(((ProfileFragment)fragment).materialTapTargetPrompt ==null  || (((ProfileFragment)fragment).materialTapTargetPrompt !=null &&
+                            (((ProfileFragment)fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_DISMISSED ||
+                            ((ProfileFragment)fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_FINISHED)))
+                    {
+                        getSupportFragmentManager().popBackStack();
+                    }
+                }
+                else
                 {
                     super.onBackPressed();
                 }
@@ -791,10 +801,10 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 ArrayList<View> views = new ArrayList<>();
                 navigationView.findViewsWithText(views, getString(R.string.help_center), View.FIND_VIEWS_WITH_TEXT);
                 if (isDrawerOpened()) {
-                    Utils.showOverlay(OnboardingOverlay.HELP_CENTER,
+                    Utils.setOverlay(OnboardingOverlay.HELP_CENTER,
                             views.get(0),
                             MainActivity.this,
-                            true);
+                            true,true,null).show();
                 }
             }
         }

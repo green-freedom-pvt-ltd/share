@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -34,6 +35,8 @@ import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
@@ -41,6 +44,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.core.sync.SyncHelper;
@@ -66,6 +70,7 @@ import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
@@ -132,6 +137,9 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.tv_stats_workout)
     TextView statsWorkout;
 
+    @BindView(R.id.stats_layout)
+    LinearLayout stats_layout;
+
     @BindView(R.id.tv_my_stats_daily)
     TextView myStatsDaily;
 
@@ -154,6 +162,7 @@ public class ProfileFragment extends BaseFragment {
     private BarChartDataSet barChartDataSetWeekly;
     private BarChartDataSet barChartDataSetMonthly;
     private SetUpBarChartAsync setUpBarChartAsync;
+    public MaterialTapTargetPrompt materialTapTargetPrompt;
 
     @Nullable
     @Override
@@ -174,6 +183,7 @@ public class ProfileFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initUi();
+        prepareStatsOnboardingOverlays();
     }
 
     @Override
@@ -283,19 +293,27 @@ public class ProfileFragment extends BaseFragment {
     @OnClick({R.id.tv_my_stats_daily, R.id.tv_my_stats_weekly, R.id.tv_my_stats_monthly})
     void onMyStatsClick(View view) {
         int type;
+        String stats = "";
+
         switch (view.getId()) {
             case R.id.tv_my_stats_daily:
                 type = BarChartDataSet.TYPE_DAILY;
+                stats = "type_daily";
                 break;
             case R.id.tv_my_stats_weekly:
                 type = BarChartDataSet.TYPE_WEEKLY;
+                stats = "type_weekly";
                 break;
             case R.id.tv_my_stats_monthly:
                 type = BarChartDataSet.TYPE_MONTHLY;
+                stats = "type_monthly";
                 break;
             default:
                 type = BarChartDataSet.TYPE_DAILY;
         }
+        AnalyticsEvent.create(Event.ON_SET_BIRTTHDAY)
+                .put("stats_type", stats)
+                .buildAndDispatch();
         if (setUpBarChartAsync.getStatus() != AsyncTask.Status.RUNNING) {
             showChart(type);
         } else {
@@ -683,5 +701,61 @@ public class ProfileFragment extends BaseFragment {
     @OnClick(R.id.tv_streak)
     void streakClick() {
         getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_PROFILE_FOR_STREAK), true);
+        AnalyticsEvent.create(Event.ON_CLICK_STREAK_ICON)
+                .buildAndDispatch();
+    }
+
+    OverlayStatsRunnable overlayRunnable;
+
+    /*private void prepareStreakOnboardingOverlays() {
+        if (OnboardingOverlay.STREAK_COUNT.isEligibleForDisplay(1, 0)) {
+            overlayRunnable = new OverlayStreakRunnable();
+            MainApplication.getMainThreadHandler().postDelayed(overlayRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
+        }
+    }*/
+
+    private void prepareStatsOnboardingOverlays() {
+        if (OnboardingOverlay.MY_STATS.isEligibleForDisplay(1, 0)) {
+            overlayRunnable = new OverlayStatsRunnable();
+            MainApplication.getMainThreadHandler().postDelayed(overlayRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
+        }
+    }
+
+    /*public class OverlayStreakRunnable implements Runnable {
+        private boolean cancelled;
+        @Override
+        public void run() {
+            if (!cancelled && isVisible()) {
+                // This is a hack to get hold of the anchor view for help center menu item
+                materialTapTargetPrompt = Utils.showOverlay(OnboardingOverlay.STREAK_COUNT,
+                        streakValue,
+                        getActivity(),
+                        true, false);
+            }
+        }
+        public void cancel() {
+            cancelled = true;
+        }
+    }*/
+
+    public class OverlayStatsRunnable implements Runnable {
+        private boolean cancelled;
+        @Override
+        public void run() {
+            if (!cancelled && isVisible()) {
+                // This is a hack to get hold of the anchor view for help center menu item
+                materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.MY_STATS,
+                        stats_layout,
+                        getActivity(),
+                        true, true, Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
+                                streakValue,
+                                getActivity(),
+                                true, false,null));
+                materialTapTargetPrompt.show();
+            }
+        }
+        public void cancel() {
+            cancelled = true;
+        }
     }
 }

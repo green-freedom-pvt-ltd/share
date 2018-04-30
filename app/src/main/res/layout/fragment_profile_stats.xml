@@ -187,6 +187,7 @@
                             android:text="@string/profile_stats_my_stats" />
 
                         <LinearLayout
+                            android:id="@+id/stats_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical">

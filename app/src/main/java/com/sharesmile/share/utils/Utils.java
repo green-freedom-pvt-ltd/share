@@ -25,7 +25,6 @@ import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
@@ -42,7 +41,6 @@ import android.widget.NumberPicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Logger;
@@ -1187,9 +1185,9 @@ public class Utils {
         return null;
     }
 
-    public static void showOverlay(final OnboardingOverlay overlay, View target, Activity activity, boolean isRectangular){
+    public static MaterialTapTargetPrompt setOverlay(final OnboardingOverlay overlay, View target, Activity activity, boolean isRectangular, boolean isDissmissEnable, MaterialTapTargetPrompt nextPromt){
         Logger.d(TAG, "showOverlay: " + overlay.name());
-        final MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
+        MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
         builder.setTarget(target);
         builder.setPrimaryText(overlay.getTitle());
         builder.setSecondaryText(overlay.getDescription());
@@ -1197,6 +1195,9 @@ public class Utils {
             builder.setPromptBackground(new RectanglePromptBackground());
             builder.setPromptFocal(new RectanglePromptFocal());
         }
+        builder.setAutoDismiss(isDissmissEnable);
+        builder.setAutoFinish(isDissmissEnable);
+        builder.setCaptureTouchEventOutsidePrompt(isDissmissEnable);
         builder.setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener()
         {
             @Override
@@ -1205,19 +1206,27 @@ public class Utils {
                 if (state == STATE_FOCAL_PRESSED)
                 {
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " +  STATE_FOCAL_PRESSED);
+                    overlay.registerUseOfOverlay();
+                    prompt.dismiss();
                 }
                 if (state == STATE_DISMISSED){
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
                     overlay.registerUseOfOverlay();
+                    prompt.dismiss();
+                    if(nextPromt!=null)
+                    nextPromt.show();
                 }
                 if (state == STATE_FINISHED){
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
                     prompt.dismiss();
                     overlay.registerUseOfOverlay();
+                    if(nextPromt!=null)
+                        nextPromt.show();
                 }
             }
         });
-        builder.show();
+        MaterialTapTargetPrompt materialTapTargetPrompt = builder.create();
+        return materialTapTargetPrompt;
     }
 
     public static String getCurrentDateDDMMYYYY()
@@ -1250,6 +1259,10 @@ public class Utils {
 
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
+
+                AnalyticsEvent.create(Event.ON_SET_REMINDER)
+                        .put("reminder_time", time)
+                        .buildAndDispatch();
             }
         }
 
