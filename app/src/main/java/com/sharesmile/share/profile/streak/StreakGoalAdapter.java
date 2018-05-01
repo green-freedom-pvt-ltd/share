@@ -93,7 +93,7 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
             for (int i = 0; i < item.getIconCount(); i++) {
                 ImageView imageView = new ImageView(context);
                 imageView.setImageResource(R.drawable.streak_icon);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(30, 32);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 53);
                 layoutParams.setMargins(5,5,5,5);
                 imageView.setLayoutParams(layoutParams);
                 goalStreakIcons.addView(imageView);

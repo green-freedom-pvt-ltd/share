@@ -89,7 +89,10 @@ public class BarChartDataSet {
         int thisDayOfLastWeek = today.get(Calendar.DAY_OF_WEEK); // SUNDAY:1 MONDAY:2 and so on
         long firstRun = getFirstRun();
         days = TimeUnit.DAYS.convert(currentTimeStampMillis - firstRun, TimeUnit.MILLISECONDS);
+        days = days == 0 ?1:days;
         int index = (int) (days - 1);
+        if(index<6)
+            index=6;
         long begin = getEpochForBeginningOfDay(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
@@ -107,7 +110,7 @@ public class BarChartDataSet {
             dayOfWeek = prevDayOfWeek;
         }
         barEntries = new ArrayList<>(7);
-        for (int i = 0; i < days; i++) {
+        for (int i = 0; i < (days<7?7:days); i++) {
             barEntries.add(i, new BarEntry(i, entries.get(i).getImpactInRupees()));
         }
     }
@@ -125,6 +128,8 @@ public class BarChartDataSet {
 
         weeks = getWeeksBetween(firstRun, currentTimeStampMillis);
         int index = (int) (weeks - 1);
+        if(index<6)
+            index=6;
         long begin = getEpochForBeginningOfWeek(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
@@ -144,7 +149,7 @@ public class BarChartDataSet {
             dayOfWeek = prevDayOfWeek;
         }
         barEntries = new ArrayList<>(7);
-        for (int i = 0; i < weeks; i++) {
+        for (int i = 0; i < (weeks<7?7:weeks); i++) {
             barEntries.add(i, new BarEntry(i, entries.get(i).getImpactInRupees()));
         }
     }
@@ -188,6 +193,8 @@ public class BarChartDataSet {
 
         months = getMonthsBetween(firstRun, currentTimeStampMillis);
         int index = (int) (months - 1);
+        if(index<6)
+            index = 6;
         long begin = getEpochForBeginningOfMonth(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
@@ -209,7 +216,7 @@ public class BarChartDataSet {
             dayOfWeek = prevDayOfWeek;
         }
         barEntries = new ArrayList<>(7);
-        for (int i = 0; i < months; i++) {
+        for (int i = 0; i < (months<7?7:months); i++) {
             barEntries.add(i, new BarEntry(i, entries.get(i).getImpactInRupees()));
         }
     }

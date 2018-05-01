@@ -2,15 +2,13 @@ package com.sharesmile.share.profile;
 
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
+import android.graphics.Rect;
 import android.graphics.Shader;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,33 +26,29 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
-import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.home.homescreen.OnboardingOverlay;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.home.homescreen.OnboardingOverlay;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
 import com.sharesmile.share.profile.stats.BarChartEntry;
-import com.sharesmile.share.profile.stats.CustomBarChartRenderer;
 import com.sharesmile.share.profile.streak.StreakFragment;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
@@ -63,18 +57,17 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
+import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
 import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
+import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
 
 /**
  * Created by ankitmaheshwari on 4/28/17.
@@ -89,6 +82,12 @@ public class ProfileFragment extends BaseFragment {
 
     @BindView(R.id.tv_profile_name)
     TextView name;
+
+    @BindView(R.id.img_profile_stats_2)
+    CircularImageView imageView2;
+
+    @BindView(R.id.tv_profile_name_2)
+    TextView name2;
 
     @BindView(R.id.tv_level)
     TextView levelDist;
@@ -152,8 +151,15 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.progress_bar_stats_graph)
     ProgressBar progressBarStatsGraph;
 
+    @BindView(R.id.workout_layout)
+    NestedScrollView workoutLayout;
 
-    int position;
+    @BindView(R.id.no_workout_layout)
+    LinearLayout noWorkoutLayout;
+    @BindView(R.id.btn_lets_run)
+    LinearLayout letsGo;
+
+    Rect scrollBounds;
 
     private int totalAmountRaised;
     private int numRuns;
@@ -182,8 +188,12 @@ public class ProfileFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+        if(workoutCount>0)
+        {
+            incrementProfileScreenVisitCount();
+        }
         initUi();
-        prepareStatsOnboardingOverlays();
     }
 
     @Override
@@ -196,11 +206,16 @@ public class ProfileFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_share_profile:
-                Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
-                Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
-                        getString(R.string.share_stats));
-                AnalyticsEvent.create(Event.ON_CLICK_PROFILE_SHARE)
-                        .buildAndDispatch();
+                if(SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT)>0) {
+                    Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
+                    Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
+                            getString(R.string.share_stats));
+                    AnalyticsEvent.create(Event.ON_CLICK_PROFILE_SHARE)
+                            .buildAndDispatch();
+                }else
+                {
+                    MainApplication.showToast(getResources().getString(R.string.no_workout_profile_txt_toast));
+                }
                 return true;
             case R.id.item_edit_profile:
                 getFragmentController().replaceFragment(new EditProfileFragment(), true);
@@ -235,50 +250,67 @@ public class ProfileFragment extends BaseFragment {
         if (isWorkoutDataUpToDate) {
             hideProgressDialog();
             String url = MainApplication.getInstance().getUserDetails().getSocialThumb();
-            ShareImageLoader.getInstance().loadImage(url, imageView,
-                    ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
-            // Name of user
-            name.setText(MainApplication.getInstance().getUserDetails().getFullName());
-
-            // Level and Level's progress
-            int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
-            Level level = Utils.getLevel(lifeTimeImpact);
-            levelDist.setText(UnitsManager.formatRupeeToMyCurrency(level.getMinImpact()) + "/" + UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
-            levelNum.setText("Level " + level.getLevel());
-            float progressPercent =
-                    ((float) (lifeTimeImpact - level.getMinImpact())) / (level.getMaxImpact() - level.getMinImpact());
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) levelProgressBar.getLayoutParams();
-            params.weight = progressPercent;
-            levelProgressBar.setLayoutParams(params);
-
-//            viewPager.setAdapter(new ProfileStatsViewAdapter(getChildFragmentManager()));
-            if (SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN) > 0) {
-                runHistoryButton.setVisibility(View.VISIBLE);
-                runHistoryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getFragmentController().replaceFragment(ProfileHistoryFragment.newInstance(false), true);
-                        AnalyticsEvent.create(Event.ON_CLICK_SEE_WORKOUTS).buildAndDispatch();
-                    }
-                });
-            } else {
-                runHistoryButton.setVisibility(View.GONE);
-            }
-            //streak value
-            streakValue.setText(MainApplication.getInstance().getUserDetails().getStreakCount() + "");
 
             setupToolbar();
 
-            setUpAllTimeStats();
-            int height = (int) getResources().getDimension(R.dimen.super_large_text);
-            Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
-                    new float[]{0, 1}, Shader.TileMode.CLAMP);
-            impactInRupees.getPaint().setShader(textShader);
+            // Level and Level's progress
+            int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
 
-            displayStats();
-            configBarChart();
-            setUpBarChartAsync = new SetUpBarChartAsync();
-            setUpBarChartAsync.execute();
+            if(lifeTimeImpact==0)
+            {
+                workoutLayout.setVisibility(View.GONE);
+                noWorkoutLayout.setVisibility(View.VISIBLE);
+                ShareImageLoader.getInstance().loadImage(url, imageView2,
+                        ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+                // Name of user
+                name2.setText(MainApplication.getInstance().getUserDetails().getFullName());
+            }else {
+
+                workoutLayout.setVisibility(View.VISIBLE);
+                noWorkoutLayout.setVisibility(View.GONE);
+                ShareImageLoader.getInstance().loadImage(url, imageView,
+                        ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+                // Name of user
+                name.setText(MainApplication.getInstance().getUserDetails().getFullName());
+                Level level = Utils.getLevel(lifeTimeImpact);
+                levelDist.setText(UnitsManager.formatRupeeToMyCurrency(level.getMinImpact()) + "/" + UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
+                levelNum.setText("Level " + level.getLevel());
+                float progressPercent =
+                        ((float) (lifeTimeImpact - level.getMinImpact())) / (level.getMaxImpact() - level.getMinImpact());
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) levelProgressBar.getLayoutParams();
+                params.weight = progressPercent;
+                levelProgressBar.setLayoutParams(params);
+
+//            viewPager.setAdapter(new ProfileStatsViewAdapter(getChildFragmentManager()));
+                if (SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN) > 0) {
+                    runHistoryButton.setVisibility(View.VISIBLE);
+                    runHistoryButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getFragmentController().replaceFragment(ProfileHistoryFragment.newInstance(false), true);
+                            AnalyticsEvent.create(Event.ON_CLICK_SEE_WORKOUTS).buildAndDispatch();
+                        }
+                    });
+                } else {
+                    runHistoryButton.setVisibility(View.GONE);
+                }
+                //streak value
+                streakValue.setText(MainApplication.getInstance().getUserDetails().getStreakCount() + "");
+
+
+
+                setUpAllTimeStats();
+                int height = (int) getResources().getDimension(R.dimen.super_large_text);
+                Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
+                        new float[]{0, 1}, Shader.TileMode.CLAMP);
+                impactInRupees.getPaint().setShader(textShader);
+
+                displayStats();
+                configBarChart();
+                setUpBarChartAsync = new SetUpBarChartAsync();
+                setUpBarChartAsync.execute();
+                prepareStreakOnboardingOverlays();
+            }
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
             Logger.e(TAG, "Must fetch historical run data before");
@@ -289,7 +321,11 @@ public class ProfileFragment extends BaseFragment {
             MainApplication.showToast("Please check your internet connection");
         }
     }
-
+    @OnClick(R.id.btn_lets_run)
+    void letsGo()
+    {
+        goBack();
+    }
     @OnClick({R.id.tv_my_stats_daily, R.id.tv_my_stats_weekly, R.id.tv_my_stats_monthly})
     void onMyStatsClick(View view) {
         int type;
@@ -345,7 +381,30 @@ public class ProfileFragment extends BaseFragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        scrollBounds = new Rect();
+        workoutLayout.getHitRect(scrollBounds);
+        workoutLayout.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if(barChartDaily!=null)
+            {
+                if(barChartDaily.getLocalVisibleRect(scrollBounds))
+                {
+                    int sh = scrollBounds.height();
+                    int bh = barChartDaily.getHeight();
+                    if(!barChartDaily.getLocalVisibleRect(scrollBounds) ||
+                            sh < bh)
+                    {
+                        Logger.d(TAG,"PARTIALLY VISIBLE");
+                    }else
+                    {
+                        Logger.d(TAG,"VISIBLE");
+                        prepareStatsOnboardingOverlays();
+                    }
+                }else
+                {
+                    Logger.d(TAG,"NOT VISIBLE");
+                }
+            }
+        });
     }
 
     private void setUpAllTimeStats() {
@@ -405,7 +464,6 @@ public class ProfileFragment extends BaseFragment {
                 BarData dataDaily = new BarData(dataSet);
 
                 barChartDaily.setData(dataDaily);
-//                }
                 barChartDaily.post(new Runnable() {
                     @Override
                     public void run() {
@@ -418,7 +476,6 @@ public class ProfileFragment extends BaseFragment {
                         barChartDaily.invalidate();
                     }
                 });
-
                 BarDataSet dataSetWeekly;
                 dataSetWeekly = new BarDataSet(barChartDataSetWeekly.getBarEntries(), "Stats");
                 dataSetWeekly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
@@ -705,38 +762,51 @@ public class ProfileFragment extends BaseFragment {
                 .buildAndDispatch();
     }
 
-    OverlayStatsRunnable overlayRunnable;
+    OverlayStatsRunnable overlayStatsRunnable;
+    OverlayStreakRunnable overlayStreakRunnable;
 
-    /*private void prepareStreakOnboardingOverlays() {
-        if (OnboardingOverlay.STREAK_COUNT.isEligibleForDisplay(1, 0)) {
-            overlayRunnable = new OverlayStreakRunnable();
-            MainApplication.getMainThreadHandler().postDelayed(overlayRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
-        }
-    }*/
-
-    private void prepareStatsOnboardingOverlays() {
-        if (OnboardingOverlay.MY_STATS.isEligibleForDisplay(1, 0)) {
-            overlayRunnable = new OverlayStatsRunnable();
-            MainApplication.getMainThreadHandler().postDelayed(overlayRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
+    private void prepareStreakOnboardingOverlays() {
+        if (OnboardingOverlay.STREAK_COUNT.isEligibleForDisplay(1, 0) && overlayStreakRunnable == null) {
+            overlayStreakRunnable = new OverlayStreakRunnable();
+            MainApplication.getMainThreadHandler().postDelayed(overlayStreakRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
         }
     }
 
-    /*public class OverlayStreakRunnable implements Runnable {
+    private void prepareStatsOnboardingOverlays() {
+        long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+        int profileScreenVisit = getProfileOpenCount();
+
+        if (OnboardingOverlay.MY_STATS.isEligibleForDisplay(profileScreenVisit, workoutCount>0?1:2) && overlayStatsRunnable==null) {
+            overlayStatsRunnable = new OverlayStatsRunnable();
+            MainApplication.getMainThreadHandler().postDelayed(overlayStatsRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
+        }
+    }
+
+    private void incrementProfileScreenVisitCount() {
+        int launchCount = getProfileOpenCount();
+        SharedPrefsManager.getInstance().setInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + PROFILE_SCREEN, ++launchCount);
+    }
+
+    public int getProfileOpenCount() {
+        return SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + PROFILE_SCREEN);
+    }
+    public class OverlayStreakRunnable implements Runnable {
         private boolean cancelled;
         @Override
         public void run() {
             if (!cancelled && isVisible()) {
                 // This is a hack to get hold of the anchor view for help center menu item
-                materialTapTargetPrompt = Utils.showOverlay(OnboardingOverlay.STREAK_COUNT,
+                materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
                         streakValue,
                         getActivity(),
                         true, false);
+                materialTapTargetPrompt.show();
             }
         }
         public void cancel() {
             cancelled = true;
         }
-    }*/
+    }
 
     public class OverlayStatsRunnable implements Runnable {
         private boolean cancelled;
@@ -744,13 +814,21 @@ public class ProfileFragment extends BaseFragment {
         public void run() {
             if (!cancelled && isVisible()) {
                 // This is a hack to get hold of the anchor view for help center menu item
+                BarChart barChart = null;
+                if(barChartDaily.getVisibility() == View.VISIBLE)
+                {
+                    barChart = barChartDaily;
+                }else if(barChartWeekly.getVisibility() == View.VISIBLE)
+                {
+                    barChart = barChartWeekly;
+                }else if(barChartMonthly.getVisibility() == View.VISIBLE)
+                {
+                    barChart = barChartMonthly;
+                }
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.MY_STATS,
-                        stats_layout,
+                        barChart,
                         getActivity(),
-                        true, true, Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
-                                streakValue,
-                                getActivity(),
-                                true, false,null));
+                        true, true);
                 materialTapTargetPrompt.show();
             }
         }

@@ -238,6 +238,7 @@ public class Constants {
     public static final String PREF_USERS_LOGGED_IN = "pref_user_login_id";
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
+    public static final String PROFILE_SCREEN = "profile_screen";
 
     public static final String REMINDER_TIME = "reminder_time";
     public static final String REMINDER_SET = "reminder_set";

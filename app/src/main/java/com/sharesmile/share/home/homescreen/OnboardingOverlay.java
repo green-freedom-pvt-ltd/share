@@ -17,7 +17,7 @@ public enum OnboardingOverlay {
     OVERALL_IMAPACT(10, 3000, 5, "pref_did_see_impact_so_far"),
     HELP_CENTER(8, 250, 5, "pref_did_use_help_center"),
     STREAK_COUNT(1, 250, 0, "pref_did_open_profile"),
-    MY_STATS(1, 250, 0, "pref_did_see_my_stats");
+    MY_STATS(2, 0, 1, "pref_did_see_my_stats");
 
     private int minLaunchCount;
     private int delayInMillis;
@@ -94,7 +94,8 @@ public enum OnboardingOverlay {
     }
 
     public boolean isEligibleForDisplay(int screenLaunchCount, long workoutCount) {
-        return !SharedPrefsManager.getInstance().getBoolean(getDidUsePrefKey())
+        boolean b = SharedPrefsManager.getInstance().getBoolean(getDidUsePrefKey());
+        return !b
                 && screenLaunchCount >= getMinLaunchCount()
                 && workoutCount <= getMaxWorkoutCount();
     }

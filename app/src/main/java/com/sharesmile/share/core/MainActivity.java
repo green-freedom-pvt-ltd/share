@@ -804,7 +804,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     Utils.setOverlay(OnboardingOverlay.HELP_CENTER,
                             views.get(0),
                             MainActivity.this,
-                            true,true,null).show();
+                            true,true).show();
                 }
             }
         }

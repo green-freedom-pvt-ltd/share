@@ -61,10 +61,10 @@ public class FragmentGender extends BaseFragment {
         String gender = userDetails.getGenderUser();
         if(gender!=null && gender.length()>0)
         {
-            if(gender.equalsIgnoreCase("m"))
+            if(gender.toLowerCase().startsWith("m"))
             {
                 maleCardView.performClick();
-            }else if(gender.equalsIgnoreCase("f"))
+            }else if(gender.toLowerCase().startsWith("f"))
             {
                 femaleCardView.performClick();
             }

@@ -134,7 +134,7 @@ public class StreakFragment extends BaseFragment {
                 for (int i = 0; i < goal.getIconCount(); i++) {
                     ImageView imageView = new ImageView(getContext());
                     imageView.setImageResource(R.drawable.streak_icon);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(30, 32);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 53);
                     layoutParams.setMargins(5,5,5,5);
                     imageView.setLayoutParams(layoutParams);
                     streakGoalIconsLayout.addView(imageView);
@@ -146,10 +146,10 @@ public class StreakFragment extends BaseFragment {
         double distanceDiff = (MainApplication.getInstance().getUserDetails().getStreakGoalDistance() - MainApplication.getInstance().getUserDetails().getStreakRunProgress());
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if(distanceDiff<=0 || userDetails.isStreakAdded()) {
-            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+"kms done today! Congrats");
+            streakDistance.setText(Utils.formatWithOneDecimal((float)userDetails.getStreakRunProgress())+"kms done today! Congrats");
         }else
         {
-            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float) distanceDiff*1000)+" kms left, Let's Go.");
+            streakDistance.setText(Utils.formatWithOneDecimal((float) distanceDiff)+" kms left, Let's Go.");
         }
 
         double progress;

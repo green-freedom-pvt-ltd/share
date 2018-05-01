@@ -98,6 +98,7 @@ import java.util.Map;
 
 import Models.Level;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
+import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.FullscreenPromptBackground;
 import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectanglePromptBackground;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
@@ -1185,14 +1186,16 @@ public class Utils {
         return null;
     }
 
-    public static MaterialTapTargetPrompt setOverlay(final OnboardingOverlay overlay, View target, Activity activity, boolean isRectangular, boolean isDissmissEnable, MaterialTapTargetPrompt nextPromt){
+    public static MaterialTapTargetPrompt setOverlay(final OnboardingOverlay overlay, View target, Activity activity, boolean isRectangular, boolean isDissmissEnable){
         Logger.d(TAG, "showOverlay: " + overlay.name());
         MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
         builder.setTarget(target);
+
         builder.setPrimaryText(overlay.getTitle());
         builder.setSecondaryText(overlay.getDescription());
         if (isRectangular){
-            builder.setPromptBackground(new RectanglePromptBackground());
+            builder.setPromptBackground(new FullscreenPromptBackground());
+//            builder.setPromptBackground(new RectanglePromptBackground());
             builder.setPromptFocal(new RectanglePromptFocal());
         }
         builder.setAutoDismiss(isDissmissEnable);
@@ -1213,15 +1216,11 @@ public class Utils {
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
                     overlay.registerUseOfOverlay();
                     prompt.dismiss();
-                    if(nextPromt!=null)
-                    nextPromt.show();
                 }
                 if (state == STATE_FINISHED){
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
                     prompt.dismiss();
                     overlay.registerUseOfOverlay();
-                    if(nextPromt!=null)
-                        nextPromt.show();
                 }
             }
         });
