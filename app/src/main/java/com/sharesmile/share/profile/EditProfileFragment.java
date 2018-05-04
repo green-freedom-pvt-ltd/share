@@ -2,18 +2,12 @@ package com.sharesmile.share.profile;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,8 +17,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -37,8 +30,10 @@ import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.profile.editprofiledialogs.EditBirthday;
+import com.sharesmile.share.profile.editprofiledialogs.EditHeight;
+import com.sharesmile.share.profile.editprofiledialogs.EditWeight;
 import com.sharesmile.share.utils.Utils;
-import com.sharesmile.share.views.CustomTypefaceSpan;
 
 import java.util.Calendar;
 
@@ -49,7 +44,7 @@ import butterknife.ButterKnife;
  * Created by apurvgandhwani on 3/29/2016.
  */
 public class EditProfileFragment extends BaseFragment implements DatePickerDialog.OnDateSetListener,
-        View.OnClickListener, TextWatcher {
+        View.OnClickListener, TextWatcher , SaveData{
 
     private static final String TAG = "EditProfileFragment";
 
@@ -71,11 +66,20 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @BindView(R.id.et_body_weight_kg)
     EditText bodyWeightKgs;
 
+    @BindView(R.id.et_body_height)
+    EditText bodyHeight;
+
+    @BindView(R.id.et_body_height_unit)
+    EditText bodyHeightUnit;
+
     @BindView(R.id.rb_share_male)
     TextView mMaleRadioBtn;
 
     @BindView(R.id.rb_share_female)
     TextView mFemaleRadioBtn;
+
+    @BindView(R.id.lt_body_height)
+    LinearLayout bodyHeightLayout;
 
     int gender = -1;
 
@@ -92,7 +96,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.fragment_edit_profile, null);
         getActivity().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
@@ -133,9 +136,11 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     }
 
     private void init() {
+        bodyHeightLayout.setOnClickListener(this);
         mFemaleRadioBtn.setOnClickListener(this);
         mMaleRadioBtn.setOnClickListener(this);
         mBirthday.setOnClickListener(this);
+        bodyWeightKgs.setOnClickListener(this);
         fillUserDetails();
         setupToolbar();
         setTextWatcher();
@@ -177,6 +182,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
         if (userDetails.getBodyWeight() > 0f) {
             bodyWeightKgs.setText(userDetails.getBodyWeight() + "");
+        }
+
+        if (userDetails.getBodyHeight() > 0f) {
+            if(userDetails.getBodyHeightUnit() == 0) {
+                bodyHeight.setText(userDetails.getBodyHeight()+"");
+                bodyHeightUnit.setText("cms");
+            }else
+            {
+                bodyHeight.setText(Utils.cmsToInches(userDetails.getBodyHeight()) + "");
+                bodyHeightUnit.setText("");
+            }
         }
 
         if (!TextUtils.isEmpty(userDetails.getBirthday())) {
@@ -269,6 +285,19 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         {
             b = false;
         }
+        int bodyHeight = userDetails.getBodyHeight();
+        String bodyHeightString = "";
+        if(userDetails.getBodyHeightUnit() == 0)
+        {
+            bodyHeightString = bodyHeight+"";
+        }else
+        {
+            bodyHeightString = Utils.cmsToInches(bodyHeight);
+        }
+        if(!this.bodyHeight.getText().toString().equals(bodyHeightString))
+        {
+            b = false;
+        }
         if(!mBirthday.getText().toString().equals(userDetails.getBirthday()))
         {
             b = false;
@@ -281,7 +310,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         {
             gender = "m";
         }
-        if(!userDetails.getGenderUser().startsWith(gender))
+        if(!userDetails.getGenderUser().toLowerCase().startsWith(gender))
         {
             b = false;
         }
@@ -405,7 +434,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.et_profile_general_birthday:
-                showDatePicker();
+//                showDatePicker();
+                EditBirthday editBirthday = new EditBirthday(getContext(),this,userDetails);
+                editBirthday.show();
                 break;
             case R.id.rb_share_male :
                 gender = 1;
@@ -416,6 +447,14 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 gender = 0;
                 setGender();
                 setMenuColor();
+                break;
+            case R.id.lt_body_height :
+                EditHeight editHeight = new EditHeight(getContext(),bodyHeight.getText().toString(),userDetails.getBodyHeightUnit(),this,userDetails);
+                editHeight.show();
+                break;
+            case R.id.et_body_weight_kg :
+                EditWeight editWeight = new EditWeight(getContext(),this,userDetails);
+                editWeight.show();
                 break;
         }
     }
@@ -482,6 +521,12 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         // Some text is changed
         Logger.i(TAG, "afterTextChanged: " + s.toString());
         isEdited = true;
+    }
+
+    @Override
+    public void saveDetails(UserDetails userDetails) {
+        this.userDetails = userDetails;
+        fillUserDetails();
     }
 }
 

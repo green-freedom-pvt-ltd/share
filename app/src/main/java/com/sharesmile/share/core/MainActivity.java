@@ -552,7 +552,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 share();
                 AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                         .buildAndDispatch();
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
             case R.id.nav_item_leaderboard:
                 showLeaderBoard();

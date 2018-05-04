@@ -174,10 +174,9 @@ public class StreakFragment extends BaseFragment {
     @OnClick(R.id.btn_tell_your_friends)
     void tellYourFriends()
     {
-        //TODO : change message
         Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
-                getString(R.string.share_stats));
+                getString(R.string.share_streak));
         AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                 .buildAndDispatch();
     }

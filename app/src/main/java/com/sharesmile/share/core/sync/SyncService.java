@@ -356,7 +356,7 @@ public class SyncService extends GcmTaskService {
         } catch (NetworkException e) {
             Logger.e(TAG, "Exception occurred while fetching updated cause list from network");
             e.printStackTrace();
-            return GcmNetworkManager.RESULT_FAILURE;
+            return GcmNetworkManager.RESULT_RESCHEDULE;
         }
     }
 
@@ -371,7 +371,7 @@ public class SyncService extends GcmTaskService {
             Logger.e(TAG, "Exception occurred while fetching updated Faqs list from network: " + e.getMessage());
             e.printStackTrace();
             EventBus.getDefault().post(new UpdateEvent.FaqsUpdated(false));
-            return GcmNetworkManager.RESULT_FAILURE;
+            return GcmNetworkManager.RESULT_RESCHEDULE;
         } catch (Exception ex) {
             Logger.e(TAG, "Exception occurred while fetching updated Faqs list: " + ex.getMessage());
             ex.printStackTrace();
@@ -574,9 +574,9 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("last_name", prev.getLastName());
             jsonObject.put("gender_user", prev.getGenderUser());
             jsonObject.put("phone_number", prev.getPhoneNumber());
-            jsonObject.put("body_weight", prev.getBodyWeight());
+            jsonObject.put("body_weight", Utils.formatWithOneDecimal(prev.getBodyWeight()));
             jsonObject.put("body_height", prev.getBodyHeight());
-            jsonObject.put("body_height_unit", prev.getBodyHeight());
+            jsonObject.put("body_height_unit", prev.getBodyHeightUnit());
             jsonObject.put("birthday", prev.getBirthday());
             jsonObject.put("user_id", user_id);
 
@@ -594,7 +594,7 @@ public class SyncService extends GcmTaskService {
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e);
-            return GcmNetworkManager.RESULT_FAILURE;
+            return GcmNetworkManager.RESULT_RESCHEDULE;
         } catch (JSONException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException");

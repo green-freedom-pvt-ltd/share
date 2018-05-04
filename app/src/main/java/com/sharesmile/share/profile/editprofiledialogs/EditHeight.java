@@ -1,81 +1,68 @@
-package com.sharesmile.share.onboarding.fragments;
+package com.sharesmile.share.profile.editprofiledialogs;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
+import android.support.annotation.NonNull;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.onboarding.CommonActions;
-import com.sharesmile.share.onboarding.OnBoardingActivity;
+import com.sharesmile.share.profile.SaveData;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+public class EditHeight extends ParentDialog implements View.OnClickListener {
 
-public class FragmentHeight extends BaseFragment {
-    public static final String TAG = "FragmentHeight";
-    @BindView(R.id.height_picker)
-    NumberPicker heightPicker;
-
-    @BindView(R.id.height_unit_picker)
-    NumberPicker heightUnitPicker;
-
-    CommonActions commonActions;
-
+    NumberPicker heightPicker,heightUnitPicker;
+    Context context;
     ArrayList<String> cmsHeight;
     ArrayList<String> inchHeight;
     String cmsArray[];
     String inchArray[];
+    String height = "";
+    int heightUnit = 0; // 0=cms 1=inchs
+    SaveData saveData;
+    UserDetails userDetails;
+    public EditHeight(@NonNull Context context, String height, int heightUnit, SaveData saveData,UserDetails userDetails) {
+        super(context);
+        this.context = context;
+        this.height = height;
+        this.heightUnit = heightUnit;
+        this.saveData = saveData;
+        this.userDetails = userDetails;
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_onboarding_height, null);
-        ButterKnife.bind(this, v);
-        return v;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        commonActions = ((OnBoardingActivity) getActivity());
-        commonActions.setExplainText(getContext().getResources().getString(R.string.whats_your_current_height), "");
-        commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        View view = getLayoutInflater().inflate(R.layout.fragment_onboarding_height,null);
+        heightPicker = view.findViewById(R.id.height_picker);
+        heightUnitPicker = view.findViewById(R.id.height_unit_picker);
+        mainFrameLayout.addView(view);
         setPicker();
         setData();
+        continueTv.setOnClickListener(this);
+        setDialogTitle("Select your height.");
+
     }
 
     private void setData() {
-        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        int height = userDetails.getBodyHeight();
-        int heightUnit = userDetails.getBodyHeightUnit();
+            if(heightUnit==0)
+            {
+                heightPicker.setValue(cmsHeight.indexOf(height));
+            }else
+            {
+                heightPicker.setValue(inchHeight.indexOf(height));
+            }
 
-        if(height==0)
-        {
-            heightPicker.setValue(cmsHeight.size()/2);
-        }else
-        {
-        if(heightUnit==0)
-        {
-            heightPicker.setValue(cmsHeight.indexOf(height+""));
-        }else
-        {
-            heightPicker.setValue(inchHeight.indexOf(Utils.cmsToInches(height)));
-        }
-        }
         heightUnitPicker.setValue(heightUnit);
     }
-
     private void setPicker() {
-        String units[] = getResources().getStringArray(R.array.height_units);
+        String units[] = context.getResources().getStringArray(R.array.height_units);
         Utils.setNumberPicker(heightUnitPicker, units, 0);
         cmsHeight = new ArrayList<>();
         inchHeight = new ArrayList<>();
@@ -84,11 +71,11 @@ public class FragmentHeight extends BaseFragment {
             cmsHeight.add(i + "");
             String inchesString = Utils.cmsToInches(i);
             if(!inchHeight.contains(inchesString))
-            inchHeight.add(inchesString);
+                inchHeight.add(inchesString);
         }
         cmsArray = cmsHeight.toArray(new String[cmsHeight.size()]);
         inchArray = inchHeight.toArray(new String[inchHeight.size()]);
-        if(MainApplication.getInstance().getUserDetails().getBodyHeightUnit() == 0)
+        if(heightUnit == 0)
         {
             Utils.setNumberPicker(heightPicker, cmsArray, heightPicker.getValue());
         }else
@@ -98,7 +85,6 @@ public class FragmentHeight extends BaseFragment {
         heightPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
 
                 if(heightUnitPicker.getValue()==0)
                 {
@@ -114,7 +100,6 @@ public class FragmentHeight extends BaseFragment {
                     userDetails.setBodyHeight(cms_);
                 }
                 userDetails.setBodyHeightUnit(heightUnitPicker.getValue());
-                MainApplication.getInstance().setUserDetails(userDetails);
             }
         });
         heightUnitPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
@@ -138,11 +123,15 @@ public class FragmentHeight extends BaseFragment {
                     String inchesFeet = Utils.cmsToInches(Integer.parseInt(cms));
                     Utils.setNumberPicker(heightPicker, inchArray, inchHeight.indexOf(inchesFeet));
                 }
-                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
                 userDetails.setBodyHeight(cms_);
                 userDetails.setBodyHeightUnit(i1);
-                MainApplication.getInstance().setUserDetails(userDetails);
             }
         });
+    }
+
+    @Override
+    public void onClick(View view) {
+        saveData.saveDetails(userDetails);
+        dismiss();
     }
 }

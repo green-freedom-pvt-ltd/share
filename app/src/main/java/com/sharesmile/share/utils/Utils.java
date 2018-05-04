@@ -1344,4 +1344,21 @@ public class Utils {
         menuItem.setTitle(spannableString);
 
     }
+
+    public static String cmsToInches(int cms)
+    {
+        int feet = (int) (cms/30.48);
+        int inches = (int) Math.round((cms%30.48) * 0.393701);
+        inches = inches==12?11:inches;
+        return feet + "' "+inches+"\"";
+    }
+
+    public static String inchesTocms(String i)
+    {
+        String[] feetInches = i.split(" ");
+        int feet = Integer.parseInt(feetInches[0].substring(0,feetInches[0].length()-1));
+        int inches = Integer.parseInt(feetInches[1].substring(0,feetInches[1].length()-1));
+        int cms = (int) Math.round((feet*30.48) + (inches/0.393701));
+        return cms+"";
+    }
 }
