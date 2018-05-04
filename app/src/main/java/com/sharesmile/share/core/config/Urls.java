@@ -35,10 +35,10 @@ public class Urls {
     private static final String GOOGLE_CONVERT_TOKEN_URL = "/oauth2/v4/token";
     private static final String CAMPAIGN_URL = "/api/campaign/";
 
-    private static final String LEAGUE_REGISTRATION_URL = "/api/employeetoteam/";
-    private static final String LEAGUEBOARD_URL = "/api/teamboardv2/";
-    private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboardv2/";
-    private static final String SERVER_TIME_URL = "/api/servertime/";
+    private static final String LEAGUE_REGISTRATION_URL = "/employeetoteam/";
+    private static final String LEAGUEBOARD_URL = "/teamboard/";
+    private static final String TEAMLEADERBOARD_URL = "/teamleaderboard/";
+    private static final String SERVER_TIME_URL = "/servertime/";
 
     private static final String BLOG_BASE_URL = "http://blog.impactapp.in";
     private static final String BLOG_LATEST_ARTICLE_URL = "/articles/latest";
@@ -142,21 +142,21 @@ public class Urls {
     }
 
     public static String getLeagueRegistrationUrl() {
-        String url = getBaseUrl() + LEAGUE_REGISTRATION_URL;
+        String url = getNodeBaseUrl() + LEAGUE_REGISTRATION_URL;
         return url;
     }
 
     public static String getServerTimeUrl() {
-        String url = getBaseUrl() + SERVER_TIME_URL;
+        String url = getNodeBaseUrl() + SERVER_TIME_URL;
         return url;
     }
 
     public static String getLeagueBoardUrl() {
-        return getBaseUrl() + LEAGUEBOARD_URL;
+        return getNodeBaseUrl() + LEAGUEBOARD_URL;
     }
 
     public static String getTeamLeaderBoardUrl() {
-        return getBaseUrl() + TEAMLEADERBOARD_URL;
+        return getNodeBaseUrl() + TEAMLEADERBOARD_URL;
     }
 
     public static String getFeedLatestArticleUrl(){
