@@ -1,10 +1,12 @@
 package com.sharesmile.share.tracking.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -447,7 +449,7 @@ public class RealRunFragment extends RunFragment {
     private void showErrorDialog(String msg) {
         if (isAttachedToActivity() && !getActivity().isFinishing()){
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-            View view = getLayoutInflater(null).inflate(R.layout.alert_dialog_title, null);
+            View view = ((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.alert_dialog_title, null);
             view.setBackgroundColor(getResources().getColor(R.color.neon_red));
             TextView titleView = (TextView) view.findViewById(R.id.title);
             titleView.setText(getString(R.string.something_not_right));
@@ -458,7 +460,6 @@ public class RealRunFragment extends RunFragment {
                     if (isAttachedToActivity()){
                         resumeRun();
                     }
-
                 }
             });
             alertDialog.setPositiveButton(getString(R.string.finish), new DialogInterface.OnClickListener() {
@@ -468,7 +469,7 @@ public class RealRunFragment extends RunFragment {
                     }
                 }
             });
-
+            if(isVisible())
             alertDialog.show();
         }
     }

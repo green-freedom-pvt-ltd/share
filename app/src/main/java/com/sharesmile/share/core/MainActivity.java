@@ -617,7 +617,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     public void performOperation(int operationId, Object input) {
         switch (operationId) {
             case OPEN_DRAWER:
-                mDrawerLayout.openDrawer(Gravity.LEFT);
+                mDrawerLayout.openDrawer(Gravity.START);
                 break;
             default:
                 super.performOperation(operationId, input);

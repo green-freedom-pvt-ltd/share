@@ -26,7 +26,12 @@ repositories {
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.3'
-
+    if(project.hasProperty('devBuild'))
+    {
+        splits.abi.enable = false
+        splits.density.enable = false
+        aaptOptions.cruncherEnabled = false
+    }
     defaultConfig {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
@@ -70,6 +75,7 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
+            ext.alwaysUpdateBuildId = false
             debuggable true
             signingConfig signingConfigs.release
         }
