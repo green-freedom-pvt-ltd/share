@@ -26,18 +26,12 @@ repositories {
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.3'
-    if(project.hasProperty('devBuild'))
-    {
-        splits.abi.enable = false
-        splits.density.enable = false
-        aaptOptions.cruncherEnabled = false
-    }
     defaultConfig {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 236
-        versionName "2.7.9.9"
+        versionCode 238
+        versionName "2.8.1"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -75,17 +69,16 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
-            ext.alwaysUpdateBuildId = false
             debuggable true
             signingConfig signingConfigs.release
         }
     }
 
-    flavorDimensions("prod","beta")
+    flavorDimensions("main","beta")
     productFlavors {
-        prod {
+        main {
             minSdkVersion 16
-            dimension = "prod"
+            dimension = "main"
         }
         beta {
             minSdkVersion 21
