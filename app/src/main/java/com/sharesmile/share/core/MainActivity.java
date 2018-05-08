@@ -138,7 +138,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 EventBus.getDefault().post(new ResumeWorkoutEvent());
             }
             startTrackingActivity();
-        } else if(!Utils.checkUserLoggedInBefore(MainApplication.getInstance().getUserDetails().getUserId()))
+        } else if(!Utils.checkOnboardingShown())
         {
             startOnBoardingActivity();
         }else {

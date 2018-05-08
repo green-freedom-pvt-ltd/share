@@ -63,7 +63,7 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("streak_current_date")
     private String streakCurrentDate;
     @SerializedName("streak_goal_distance")
-    private double streakGoalDistance = 0.5;
+    private double streakGoalDistance;
     @SerializedName("streak_goal_id")
     private int streakGoalID;
     @SerializedName("streak_added")

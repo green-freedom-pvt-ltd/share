@@ -103,6 +103,7 @@ import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectangleProm
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
+import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
@@ -1304,17 +1305,14 @@ public class Utils {
         picker.setValue(setDefault);
     }
 
-    public static boolean checkUserLoggedInBefore(int userId) {
-        try {
-            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN,"{}"));
-            if(jsonObject.has(userId+""))
-            {
-                return true;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public static boolean checkOnboardingShown() {
+
+        return SharedPrefsManager.getInstance().getBoolean(PREF_SHOWN_ONBOARDING,false);
+    }
+
+    public static void setOnboardingShown() {
+
+        SharedPrefsManager.getInstance().setBoolean(PREF_SHOWN_ONBOARDING,true);
     }
 
     public static void setUserLoggedIn(UserDetails userDetails) {

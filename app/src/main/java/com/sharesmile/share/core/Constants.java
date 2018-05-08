@@ -236,6 +236,7 @@ public class Constants {
     public static final String PREF_SCREEN_LAUNCH_COUNT_PREFIX = "pref_screen_launch_count_";
     //TODO : actually done at the server end but temp doing it at client end
     public static final String PREF_USERS_LOGGED_IN = "pref_user_login_id";
+    public static final String PREF_SHOWN_ONBOARDING = "pref_onboarding";
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
     public static final String PROFILE_SCREEN = "profile_screen";

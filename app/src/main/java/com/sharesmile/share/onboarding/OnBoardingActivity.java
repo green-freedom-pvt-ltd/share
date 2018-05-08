@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
@@ -129,8 +128,8 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         switch (view.getId()) {
             case R.id.continue_tv:
                 int i = getSupportFragmentManager().getBackStackEntryCount();
-                if(i!=0)
-                continueAction(getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName()));
+                if (i != 0)
+                    continueAction(getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName()));
                 else
                     continueAction(null);
                 break;
@@ -148,9 +147,9 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
             public void run() {
                 int i = getSupportFragmentManager().getBackStackEntryCount();
 
-                if (i==0) {
+                if (i == 0) {
                     setBackAndContinue(FragmentWelcome.TAG, getResources().getString(R.string.start_my_journey_txt));
-                }else {
+                } else {
                     Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
                 }
             }
@@ -179,18 +178,18 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                     if (continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
                         replaceFragment(new FragmentSetReminder(), true);
                     } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
-                        Utils.setReminderTime("",this);
+                        Utils.setReminderTime("", this);
                         replaceFragment(new FragmentThankYou(), true);
                     }
                 } else if (fragment instanceof FragmentSetReminder) {
                     replaceFragment(new FragmentThankYou(), true);
-                }else if(fragment instanceof FragmentThankYou)
-                {
+                } else if (fragment instanceof FragmentThankYou) {
                     SyncHelper.oneTimeUploadUserData();
                     Utils.setUserLoggedIn(MainApplication.getInstance().getUserDetails());
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    Utils.setOnboardingShown();
                     finish();
                 }
             }
@@ -260,7 +259,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     public void setProgressLevel(float weight) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, weight/7);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, weight / 7);
         levelProgressBar.setLayoutParams(layoutParams);
     }
 }

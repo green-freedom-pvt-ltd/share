@@ -146,10 +146,10 @@ public class StreakFragment extends BaseFragment {
         double distanceDiff = (MainApplication.getInstance().getUserDetails().getStreakGoalDistance() - MainApplication.getInstance().getUserDetails().getStreakRunProgress());
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if(distanceDiff<=0 || userDetails.isStreakAdded()) {
-            streakDistance.setText(Utils.formatWithOneDecimal((float)userDetails.getStreakRunProgress())+"kms done today! Congrats");
+            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+"kms done today! Congrats");
         }else
         {
-            streakDistance.setText(Utils.formatWithOneDecimal((float) distanceDiff)+" kms left, Let's Go.");
+            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float) distanceDiff*1000)+" kms left, Let's Go.");
         }
 
         double progress;

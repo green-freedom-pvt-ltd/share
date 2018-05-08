@@ -158,6 +158,8 @@ public class ProfileFragment extends BaseFragment {
     LinearLayout noWorkoutLayout;
     @BindView(R.id.btn_lets_run)
     LinearLayout letsGo;
+    @BindView(R.id.overlay_layout)
+    LinearLayout overlayLayout;
 
     Rect scrollBounds;
 
@@ -384,13 +386,13 @@ public class ProfileFragment extends BaseFragment {
         scrollBounds = new Rect();
         workoutLayout.getHitRect(scrollBounds);
         workoutLayout.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            if(barChartDaily!=null)
+            if(runHistoryButton!=null)
             {
-                if(barChartDaily.getLocalVisibleRect(scrollBounds))
+                if(runHistoryButton.getLocalVisibleRect(scrollBounds))
                 {
                     int sh = scrollBounds.height();
-                    int bh = barChartDaily.getHeight();
-                    if(!barChartDaily.getLocalVisibleRect(scrollBounds) ||
+                    int bh = runHistoryButton.getHeight();
+                    if(!runHistoryButton.getLocalVisibleRect(scrollBounds) ||
                             sh < bh)
                     {
                         Logger.d(TAG,"PARTIALLY VISIBLE");
@@ -814,21 +816,11 @@ public class ProfileFragment extends BaseFragment {
         public void run() {
             if (!cancelled && isVisible()) {
                 // This is a hack to get hold of the anchor view for help center menu item
-                BarChart barChart = null;
-                if(barChartDaily.getVisibility() == View.VISIBLE)
-                {
-                    barChart = barChartDaily;
-                }else if(barChartWeekly.getVisibility() == View.VISIBLE)
-                {
-                    barChart = barChartWeekly;
-                }else if(barChartMonthly.getVisibility() == View.VISIBLE)
-                {
-                    barChart = barChartMonthly;
-                }
+
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.MY_STATS,
-                        barChart,
+                        overlayLayout,
                         getActivity(),
-                        true, true);
+                        true, false);
                 materialTapTargetPrompt.show();
             }
         }
