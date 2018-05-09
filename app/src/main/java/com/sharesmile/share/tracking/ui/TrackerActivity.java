@@ -443,7 +443,7 @@ public class TrackerActivity extends BaseActivity {
                                         errorMessage = getString(R.string.rfac_too_slow_message);
                                         break;
                                     case Constants.PROBELM_NOT_MOVING:
-                                        errorMessage = getString(R.string.rfac_lazy_ass_message);
+                                        errorMessage = getString(R.string.notification_standing_still_title);
                                         break;
                                     case Constants.PROBLEM_GPS_DISABLED:
                                         errorMessage = getString(R.string.rfac_gps_disabled_message);
