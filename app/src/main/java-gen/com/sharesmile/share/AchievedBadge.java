@@ -12,6 +12,7 @@ public class AchievedBadge {
     private Long id;
     private Integer userId;
     private Integer badgeId;
+    private String badgeType;
     private String causeId;
     private String category;
     private String categoryStatus;
@@ -27,10 +28,11 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public AchievedBadge(Long id, Integer userId, Integer badgeId, String causeId, String category, String categoryStatus, String paramDone) {
+    public AchievedBadge(Long id, Integer userId, Integer badgeId, String badgeType, String causeId, String category, String categoryStatus, String paramDone) {
         this.id = id;
         this.userId = userId;
         this.badgeId = badgeId;
+        this.badgeType = badgeType;
         this.causeId = causeId;
         this.category = category;
         this.categoryStatus = categoryStatus;
@@ -59,6 +61,14 @@ public class AchievedBadge {
 
     public void setBadgeId(Integer badgeId) {
         this.badgeId = badgeId;
+    }
+
+    public String getBadgeType() {
+        return badgeType;
+    }
+
+    public void setBadgeType(String badgeType) {
+        this.badgeType = badgeType;
     }
 
     public String getCauseId() {

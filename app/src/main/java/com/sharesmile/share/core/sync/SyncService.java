@@ -27,6 +27,7 @@ import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.profile.badges.model.Badge;
+import com.sharesmile.share.profile.badges.model.BadgeParent;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
@@ -144,23 +145,25 @@ public class SyncService extends GcmTaskService {
             in.close();
             JSONArray jsonArray = new JSONArray(buf.toString());
             Gson gson = new Gson();
-            Type listType = new TypeToken<List<Badge>>(){}.getType();
-            List<Badge> badges = gson.fromJson(buf.toString(), listType);
+            Type listType = new TypeToken<List<BadgeParent>>(){}.getType();
+            List<BadgeParent> badgeParents = gson.fromJson(buf.toString(), listType);
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-            for(Badge badge : badges)
+            for(BadgeParent badgeParent : badgeParents)
             {
-                com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
-                badgeDb.setBadgeId(badge.getBadgeId());
-                badgeDb.setName(badge.getName());
-                badgeDb.setType(badge.getType());
-                badgeDb.setCategory(badge.getCategory());
-                badgeDb.setNoOfStars(badge.getNoOfStars());
-                badgeDb.setImageUrl(badge.getImageUrl());
-                badgeDb.setDescription1(badge.getDescription1());
-                badgeDb.setDescription2(badge.getDescription2());
-                badgeDb.setDescription3(badge.getBadgeParameter());
-                badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
-                badgeDao.insertOrReplace(badgeDb);
+                for(Badge badge: badgeParent.getBadges()) {
+                    com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
+                    badgeDb.setBadgeId(badge.getBadgeId());
+                    badgeDb.setName(badge.getName());
+                    badgeDb.setType(badge.getType());
+                    badgeDb.setCategory(badge.getCategory());
+                    badgeDb.setNoOfStars(badge.getNoOfStars());
+                    badgeDb.setImageUrl(badge.getImageUrl());
+                    badgeDb.setDescription1(badge.getDescription1());
+                    badgeDb.setDescription2(badge.getDescription2());
+                    badgeDb.setDescription3(badge.getBadgeParameter());
+                    badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
+                    badgeDao.insertOrReplace(badgeDb);
+                }
             }
             EventBus.getDefault().post(new UpdateEvent.BadgeUpdated());
         }catch (Exception e)

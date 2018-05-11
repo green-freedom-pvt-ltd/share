@@ -26,10 +26,11 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property UserId = new Property(1, Integer.class, "userId", false, "USER_ID");
         public final static Property BadgeId = new Property(2, Integer.class, "badgeId", false, "BADGE_ID");
-        public final static Property CauseId = new Property(3, String.class, "causeId", false, "CAUSE_ID");
-        public final static Property Category = new Property(4, String.class, "category", false, "CATEGORY");
-        public final static Property CategoryStatus = new Property(5, String.class, "categoryStatus", false, "CATEGORY_STATUS");
-        public final static Property ParamDone = new Property(6, String.class, "paramDone", false, "PARAM_DONE");
+        public final static Property BadgeType = new Property(3, String.class, "badgeType", false, "BADGE_TYPE");
+        public final static Property CauseId = new Property(4, String.class, "causeId", false, "CAUSE_ID");
+        public final static Property Category = new Property(5, String.class, "category", false, "CATEGORY");
+        public final static Property CategoryStatus = new Property(6, String.class, "categoryStatus", false, "CATEGORY_STATUS");
+        public final static Property ParamDone = new Property(7, String.class, "paramDone", false, "PARAM_DONE");
     };
 
 
@@ -48,10 +49,11 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"USER_ID\" INTEGER," + // 1: userId
                 "\"BADGE_ID\" INTEGER," + // 2: badgeId
-                "\"CAUSE_ID\" TEXT," + // 3: causeId
-                "\"CATEGORY\" TEXT," + // 4: category
-                "\"CATEGORY_STATUS\" TEXT," + // 5: categoryStatus
-                "\"PARAM_DONE\" TEXT);"); // 6: paramDone
+                "\"BADGE_TYPE\" TEXT," + // 3: badgeType
+                "\"CAUSE_ID\" TEXT," + // 4: causeId
+                "\"CATEGORY\" TEXT," + // 5: category
+                "\"CATEGORY_STATUS\" TEXT," + // 6: categoryStatus
+                "\"PARAM_DONE\" TEXT);"); // 7: paramDone
     }
 
     /** Drops the underlying database table. */
@@ -80,24 +82,29 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
             stmt.bindLong(3, badgeId);
         }
  
+        String badgeType = entity.getBadgeType();
+        if (badgeType != null) {
+            stmt.bindString(4, badgeType);
+        }
+ 
         String causeId = entity.getCauseId();
         if (causeId != null) {
-            stmt.bindString(4, causeId);
+            stmt.bindString(5, causeId);
         }
  
         String category = entity.getCategory();
         if (category != null) {
-            stmt.bindString(5, category);
+            stmt.bindString(6, category);
         }
  
         String categoryStatus = entity.getCategoryStatus();
         if (categoryStatus != null) {
-            stmt.bindString(6, categoryStatus);
+            stmt.bindString(7, categoryStatus);
         }
  
         String paramDone = entity.getParamDone();
         if (paramDone != null) {
-            stmt.bindString(7, paramDone);
+            stmt.bindString(8, paramDone);
         }
     }
 
@@ -114,10 +121,11 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // userId
             cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // badgeId
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // causeId
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // category
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // categoryStatus
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // paramDone
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // badgeType
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // causeId
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // category
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // categoryStatus
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // paramDone
         );
         return entity;
     }
@@ -128,10 +136,11 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setUserId(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setBadgeId(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setCauseId(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setCategory(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCategoryStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setParamDone(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setBadgeType(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setCauseId(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setCategory(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setCategoryStatus(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setParamDone(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     /** @inheritdoc */

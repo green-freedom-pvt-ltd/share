@@ -195,6 +195,7 @@ public class Version16 extends SchemaVersion {
         achievedBadge.addIdProperty().autoincrement();
         achievedBadge.addIntProperty("userId");
         achievedBadge.addIntProperty("badgeId");
+        achievedBadge.addStringProperty("badgeType");
         achievedBadge.addStringProperty("causeId");
         achievedBadge.addStringProperty("category");
         achievedBadge.addStringProperty("categoryStatus");

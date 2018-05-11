@@ -253,8 +253,14 @@ public class Constants {
     public static int FROM_THANK_YOU_SCREEN_FOR_STREAK = 1;
     public static int FROM_PROFILE_FOR_STREAK = 2;
 
-    public static String BADGE_COMPLETED = "badge_completed";
-    public static String BADGE_IN_PROGRESS = "badge_in_progress";
+    //badges
+    public final static String BADGE_COMPLETED = "badge_completed";
+    public final static String BADGE_IN_PROGRESS = "badge_in_progress";
+
+    public final static String BADGE_TYPE_CAUSE = "badge_type_cause";
+    public final static String BADGE_TYPE_CHANGEMAKER = "badge_type_changemaker";
+    public final static String BADGE_TYPE_STREAK = "badge_type_streak";
+    public final static String BADGE_TYPE_MARATHON = "badge_type_marathon";
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{
