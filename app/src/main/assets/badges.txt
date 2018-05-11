@@ -1,0 +1,143 @@
+[{
+"id" : 1,
+"type":"Orphanage",
+"badges" : [
+    {
+        "badge_id": 1,
+        "badge_name": "OrphanageHero3",
+        "badge_type": "Cause",
+        "badge_category": "Orphanage",
+        "stars_count": "3",
+        "badge_image": null,
+        "description1": "Be a Orphanage Hero level 3",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "3"
+    },
+    {
+        "badge_id": 2,
+        "badge_name": "OrphanageHero2",
+        "badge_type": "Cause",
+        "badge_category": "Orphanage",
+        "stars_count": "2",
+        "badge_image": null,
+        "description1": "Be a Orphanage Hero level 2",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "2"
+    },
+    {
+        "badge_id": 3,
+        "badge_name": "Orphanage Hero1",
+        "badge_type": "Cause",
+        "badge_category": "Orphanage",
+        "stars_count": "1",
+        "badge_image": null,
+        "description1": "Be a Orphanage Hero level 1",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "1"
+    }
+]
+},{
+"id" : 2,
+"type":"Women Empowerment",
+"badges" : [
+    {
+        "badge_id": 6,
+        "badge_name": "Women Empowerment Hero3",
+        "badge_type": "Cause",
+        "badge_category": "Women Empowerment",
+        "stars_count": "3",
+        "badge_image": null,
+        "description1": "support Women Empowerment 3",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "3"
+    },
+    {
+        "badge_id": 5,
+        "badge_name": "Women Empowerment Hero 2",
+        "badge_type": "Cause",
+        "badge_category": "Women Empowerment",
+        "stars_count": "2",
+        "badge_image": null,
+        "description1": "support Women Empowerment 2",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "2"
+    },
+    {
+        "badge_id": 4,
+        "badge_name": "Women Empowerment Hero1",
+        "badge_type": "Cause",
+        "badge_category": "Women Empowerment",
+        "stars_count": "1",
+        "badge_image": null,
+        "description1": "support Women Empowerment 1",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "1"
+    }
+]
+},
+{
+"id" : 1,
+"type":"Streak",
+"badges" : [
+    {
+        "badge_id": 7,
+        "badge_name": "Streak 7",
+        "badge_type": "Streak",
+        "badge_category": "Streak",
+        "stars_count": "1",
+        "badge_image": null,
+        "description1": "7 days",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "1"
+    },
+    {
+        "badge_id": 8,
+        "badge_name": "Streak 14",
+        "badge_type": "Streak",
+        "badge_category": "Streak",
+        "stars_count": "2",
+        "badge_image": null,
+        "description1": "14 days",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "2"
+    },
+    {
+        "badge_id": 9,
+        "badge_name": "Streak 30",
+        "badge_type": "Streak",
+        "badge_category": "Streak",
+        "stars_count": "3",
+        "badge_image": null,
+        "description1": "30 days",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "3"
+    }
+]
+},
+{
+"id" : 1,
+"type":"ChangeMaker",
+"badges" : [
+    {
+        "badge_id": 10,
+        "badge_name": "Change Maker",
+        "badge_type": "ChangeMaker",
+        "badge_category": "ChangeMaker",
+        "stars_count": "1",
+        "badge_image": null,
+        "description1": "You are now a change maker",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "1"
+    }
+]
+}]

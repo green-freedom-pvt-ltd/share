@@ -19,4 +19,6 @@ public class TaskConstants {
 
     public static final String FEEDBACK_DATA_JSON = "feedback_data_json";
 
+    public static final String SYNC_BADGE_DATA = "sync_badge_data";
+
 }

@@ -62,4 +62,11 @@ public class UpdateEvent {
             return campaign;
         }
     }
+
+    public static class BadgeUpdated{
+        public BadgeUpdated()
+        {
+
+        }
+    }
 }

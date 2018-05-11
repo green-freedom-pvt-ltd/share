@@ -160,6 +160,19 @@ public class SyncHelper {
         mGcmNetworkManager.schedule(task);
     }
 
+    public static void syncBadgesData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_BADGE_DATA)
+                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
     public static void syncMessageCenterData() {
         AsyncTask.execute(new Runnable() {
             @Override

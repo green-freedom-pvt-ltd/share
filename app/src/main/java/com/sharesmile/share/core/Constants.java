@@ -253,6 +253,9 @@ public class Constants {
     public static int FROM_THANK_YOU_SCREEN_FOR_STREAK = 1;
     public static int FROM_PROFILE_FOR_STREAK = 2;
 
+    public static String BADGE_COMPLETED = "badge_completed";
+    public static String BADGE_IN_PROGRESS = "badge_in_progress";
+
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{
         add(FeedbackCategory.PAST_WORKOUT);

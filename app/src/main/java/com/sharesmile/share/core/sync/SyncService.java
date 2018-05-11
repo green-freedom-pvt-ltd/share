@@ -1,5 +1,6 @@
 package com.sharesmile.share.core.sync;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -8,6 +9,8 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
@@ -23,6 +26,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.profile.badges.model.Badge;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
@@ -48,9 +52,14 @@ import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Response;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -65,6 +74,7 @@ import Models.LeagueBoard;
 import Models.MessageList;
 import Models.TeamLeaderBoard;
 
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_BADGE_DATA;
 import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_PENDING_WORKOUT;
 import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_INTERVALS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
@@ -87,7 +97,7 @@ public class SyncService extends GcmTaskService {
                 case UPLOAD_USER_DATA:
                     return uploadUserData();
                 case SYNC_DATA:
-                    return syncData();
+                    return syncData(getAssets());
                 case PUSH_FRAUD_DATA:
                     Bundle fraudExtras = taskParams.getExtras();
                     String fraudDataString = fraudExtras.getString(TaskConstants.FRAUD_DATA_JSON);
@@ -98,6 +108,9 @@ public class SyncService extends GcmTaskService {
                     return pushUserFeedback(feedbackString);
                 case UPLOAD_PENDING_WORKOUT:
                     return uploadPendingWorkoutsData();
+
+                case SYNC_BADGE_DATA:
+                    return syncBadgeData(getAssets());
                 default:
                     return GcmNetworkManager.RESULT_SUCCESS;
             }
@@ -116,6 +129,47 @@ public class SyncService extends GcmTaskService {
         }
     }
 
+    private static int syncBadgeData(AssetManager assets) {
+        try {
+            StringBuilder buf = new StringBuilder();
+            InputStream json = assets.open("badges.txt");
+            BufferedReader in =
+                    new BufferedReader(new InputStreamReader(json, "UTF-8"));
+            String str;
+
+            while ((str = in.readLine()) != null) {
+                buf.append(str);
+            }
+
+            in.close();
+            JSONArray jsonArray = new JSONArray(buf.toString());
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<Badge>>(){}.getType();
+            List<Badge> badges = gson.fromJson(buf.toString(), listType);
+            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            for(Badge badge : badges)
+            {
+                com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
+                badgeDb.setBadgeId(badge.getBadgeId());
+                badgeDb.setName(badge.getName());
+                badgeDb.setType(badge.getType());
+                badgeDb.setCategory(badge.getCategory());
+                badgeDb.setNoOfStars(badge.getNoOfStars());
+                badgeDb.setImageUrl(badge.getImageUrl());
+                badgeDb.setDescription1(badge.getDescription1());
+                badgeDb.setDescription2(badge.getDescription2());
+                badgeDb.setDescription3(badge.getBadgeParameter());
+                badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
+                badgeDao.insertOrReplace(badgeDb);
+            }
+            EventBus.getDefault().post(new UpdateEvent.BadgeUpdated());
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return GcmNetworkManager.RESULT_SUCCESS;
+    }
+
     @Override
     public void onInitializeTasks() {
         Logger.d(TAG, "onInitializeTasks");
@@ -123,13 +177,15 @@ public class SyncService extends GcmTaskService {
         MainApplication.getInstance().startSyncTasks();
     }
 
-    public static int syncData() {
+    public static int syncData(AssetManager assets) {
         Logger.d(TAG, "syncData");
         ClientConfig.sync();
         syncServerTime();
         uploadUserData();
         syncGlobalLeaderBoardData();
         syncLeagueBoardData();
+        //TODO : temp getting data from assets file
+        syncBadgeData(assets);
         updateCauseData();
         updateFaqs();
         uploadPendingWorkoutsData();
@@ -613,7 +669,6 @@ public class SyncService extends GcmTaskService {
         };
         task.run();
     }
-
 
     private static int uploadPendingWorkoutsData() {
         synchronized (SyncService.class) {

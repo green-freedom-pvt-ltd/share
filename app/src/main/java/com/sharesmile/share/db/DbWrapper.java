@@ -2,6 +2,8 @@ package com.sharesmile.share.db;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
@@ -29,6 +31,9 @@ public class DbWrapper {
     private UpgradeHelper helper;
 
     private LeaderBoardDao mLeaderBoardDao;
+
+    private BadgeDao mBadgeDao;
+    private AchievedBadgeDao mAchievedBadgeDao;
 
     public DbWrapper(MainApplication app) {
         application = app;
@@ -70,6 +75,8 @@ public class DbWrapper {
         mUserdao = mDaoSession.getUserDao();
         mCauseDao = mDaoSession.getCauseDao();
         mLeaderBoardDao = mDaoSession.getLeaderBoardDao();
+        mBadgeDao = mDaoSession.getBadgeDao();
+        mAchievedBadgeDao = mDaoSession.getAchievedBadgeDao();
     }
 
     /*public DaoMaster.DevOpenHelper getDbHelper() {
@@ -95,6 +102,9 @@ public class DbWrapper {
     }
 
     public LeaderBoardDao getLeaderBoardDao(){ return mLeaderBoardDao;}
+
+    public BadgeDao getBadgeDao(){ return mBadgeDao;}
+    public AchievedBadgeDao getAchievedBadgeDao(){ return mAchievedBadgeDao;}
 
     public void clearAll() {
         getWorkoutDao().deleteAll();

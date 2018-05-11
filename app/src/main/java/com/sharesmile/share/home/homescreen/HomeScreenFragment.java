@@ -23,6 +23,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.Badge;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.application.MainApplication;
@@ -32,6 +36,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.login.UserDetails;
@@ -52,8 +57,11 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -162,12 +170,85 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onViewCreated");
         getFragmentController().hideToolbar();
         render();
+        checkBadgeData();
         prepareOnboardingOverlays();
         checkStreak();
-
-        DrawerLayout drawerLayout = ((DrawerLayout)getActivity().findViewById(R.id.drawerLayout));
+        DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
+
+    private void checkAchievedBadgeData() {
+        if(CauseDataStore.getInstance().getCausesToShow().isEmpty()) {
+         render();
+        }else
+        {
+            HashMap<String, ArrayList<CauseData>> arrayListHashMap = new HashMap<>();
+            List<CauseData> causeDataArrayList = CauseDataStore.getInstance().getCausesToShow();
+            for(CauseData causeData : causeDataArrayList)
+            {
+                ArrayList<CauseData> dataArrayList = arrayListHashMap.get(causeData.getCategory());
+                if(dataArrayList == null)
+                    dataArrayList = new ArrayList<>();
+                dataArrayList.add(causeData);
+                arrayListHashMap.put(causeData.getCategory(),dataArrayList);
+            }
+
+            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+
+            Iterator<String> iterator = arrayListHashMap.keySet().iterator();
+            while (iterator.hasNext())
+            {
+                String category = iterator.next();
+                ArrayList<CauseData> causeDataList = arrayListHashMap.get(category);
+                List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().where(AchievedBadgeDao.Properties.Category.eq(category),
+                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+                boolean categoryCompleted = true;
+                String causes = "";
+                for(CauseData causeData : causeDataList)
+                {
+                    if(!causeData.isCompleted())
+                        categoryCompleted = false;
+                    causes += causes.length()==0?causeData.getId():causeData.getId()+",";
+                }
+                AchievedBadge achievedBadge = null;
+                if(achievedBadges.size()>0) {
+                 achievedBadge=achievedBadges.get(0);
+                }else
+                {
+                    BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+                    List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Category.eq(category)).orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
+                    if(badges.size()>0) {
+                        Badge badge = badges.get(0);
+                        achievedBadge = new AchievedBadge();
+                        achievedBadge.setBadgeId(badge.getBadgeId());
+                        achievedBadge.setCategory(category);
+                        achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
+                        achievedBadge.setParamDone("0");
+                    }
+                }
+                if(achievedBadge!=null) {
+                    if(categoryCompleted)
+                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                    else
+                        achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+                }
+                achievedBadge.setCauseId(causes);
+                achievedBadgeDao.insertOrReplace(achievedBadge);
+            }
+        }
+    }
+
+    private void checkBadgeData() {
+        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+        List<Badge> badges = badgeDao.queryBuilder().list();
+        if(badges!=null && badges.size()>0)
+        {
+            checkAchievedBadgeData();
+        }else
+        {
+            SyncHelper.syncBadgesData();
+        }
     }
 
 
@@ -398,6 +479,13 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated) {
+        Logger.d(TAG, "onEvent: BadgeUpdated");
+        if (isVisible()){
+            checkBadgeData();
+        }
+    }
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
