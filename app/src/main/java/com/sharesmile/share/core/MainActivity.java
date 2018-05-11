@@ -605,7 +605,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         } catch (IOException e) {
             // handle exception
         }
-        Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
+        Utils.share(MainActivity.this, Utils.getLocalBitmapUri(bitmap, getContext()),
                 getString(R.string.share_msg));
     }
 
