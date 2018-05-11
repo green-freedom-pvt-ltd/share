@@ -27,6 +27,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -212,8 +214,6 @@ public class LoginImpl {
     }
 
     private void userLoginSuccess(JsonObject response, final boolean isFbLogin) {
-
-
         Gson gson = new Gson();
         UserDetails userDetails = gson.fromJson(response, UserDetails.class);
         MainApplication.getInstance().setUserDetails(userDetails);
@@ -232,9 +232,7 @@ public class LoginImpl {
 
         //Pull historical run data;
         SyncHelper.forceRefreshEntireWorkoutHistory();
-
         mListener.onLoginSuccess();
-
     }
 
 
