@@ -1294,9 +1294,10 @@ public class Utils {
     public static void setNumberPicker(NumberPicker picker,String s[],int setDefault) {
         picker.setValue(0);
         picker.setMinValue(0);
+        picker.setDisplayedValues(s);
         picker.setMaxValue(s.length-1);
         //implement array string to number picker
-        picker.setDisplayedValues(s);
+
         picker.setWrapSelectorWheel(false);
         //disable soft keyboard
         picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);

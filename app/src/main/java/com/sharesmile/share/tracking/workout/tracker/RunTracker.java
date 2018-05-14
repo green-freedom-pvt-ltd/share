@@ -39,6 +39,7 @@ public class RunTracker implements Tracker {
     private ScheduledExecutorService executorService;
     private CircularQueue<DistRecord> recordHistoryQueue;
 
+
     public RunTracker(ScheduledExecutorService executorService, UpdateListner listener){
         synchronized (RunTracker.class){
             this.executorService = executorService;

@@ -179,8 +179,9 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void updateTimeView(String newTime) {
+        if(time!=null)
         time.setText(newTime);
-        if (newTime.length() > 5) {
+        if (mTimerIndicator!=null && newTime.length() > 5) {
             mTimerIndicator.setText("HR:MIN:SEC");
         }
     }
@@ -381,7 +382,7 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showStopDialog() {
         float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
-        if (mCauseData.getMinDistance() > (totalDistance)) {
+        if (mCauseData!=null && mCauseData.getMinDistance() > (totalDistance)) {
             showMinDistanceDialog();
         } else {
             showRunEndDialog();
