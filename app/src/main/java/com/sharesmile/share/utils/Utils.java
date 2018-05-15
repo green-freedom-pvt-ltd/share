@@ -42,6 +42,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.Badge;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
@@ -102,6 +106,7 @@ import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.FullscreenPro
 import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectanglePromptBackground;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
+import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
@@ -1358,5 +1363,42 @@ public class Utils {
         int inches = Integer.parseInt(feetInches[1].substring(0,feetInches[1].length()-1));
         int cms = (int) Math.round((feet*30.48) + (inches/0.393701));
         return cms+"";
+    }
+
+    public static void setBadgeForCategory(String category, String causes, boolean categoryCompleted,String type,double paramDone) {
+        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                .where(AchievedBadgeDao.Properties.Category.eq(category),
+                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+        AchievedBadge achievedBadge = null;
+        if(achievedBadges.size()>0) {
+            achievedBadge=achievedBadges.get(0);
+            if(!type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE) || (type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE) && paramDone!=0))
+            achievedBadge.setParamDone(paramDone);
+        }else if(!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && paramDone!=0))
+        {
+            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            List<Badge> badges = badgeDao.queryBuilder()
+                    .where(BadgeDao.Properties.Category.eq(category)).orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
+            if(badges.size()>0) {
+                Badge badge = badges.get(0);
+                achievedBadge = new AchievedBadge();
+                achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
+                achievedBadge.setBadgeType(badge.getType());
+                achievedBadge.setCategory(category);
+                achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
+                achievedBadge.setParamDone(paramDone);
+            }
+        }
+        if(achievedBadge!=null) {
+            if(categoryCompleted)
+                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+            else
+                achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+
+            achievedBadge.setCauseIdJson(causes);
+
+            achievedBadgeDao.insertOrReplace(achievedBadge);
+        }
     }
 }

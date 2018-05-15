@@ -257,10 +257,10 @@ public class Constants {
     public final static String BADGE_COMPLETED = "badge_completed";
     public final static String BADGE_IN_PROGRESS = "badge_in_progress";
 
-    public final static String BADGE_TYPE_CAUSE = "badge_type_cause";
-    public final static String BADGE_TYPE_CHANGEMAKER = "badge_type_changemaker";
-    public final static String BADGE_TYPE_STREAK = "badge_type_streak";
-    public final static String BADGE_TYPE_MARATHON = "badge_type_marathon";
+    public final static String BADGE_TYPE_CAUSE = "Cause";
+    public final static String BADGE_TYPE_CHANGEMAKER = "ChangeMaker";
+    public final static String BADGE_TYPE_STREAK = "Streak";
+    public final static String BADGE_TYPE_MARATHON = "Marathon";
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{

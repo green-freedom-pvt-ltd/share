@@ -137,7 +137,7 @@
         "description1": "You are now a change maker",
         "description2": null,
         "description3": null,
-        "badge_parameter": "1"
+        "badge_parameter": "0.1"
     }
 ]
 }]

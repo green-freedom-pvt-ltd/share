@@ -10,16 +10,20 @@ package com.sharesmile.share;
 public class Badge {
 
     private Long id;
-    private Integer badgeId;
+    private int badgeId;
+    /** Not-null value. */
     private String type;
+    /** Not-null value. */
     private String category;
+    /** Not-null value. */
     private String name;
-    private Integer noOfStars;
+    private int noOfStars;
     private String imageUrl;
+    /** Not-null value. */
     private String description1;
     private String description2;
     private String description3;
-    private String badgeParameter;
+    private double badgeParameter;
     private String badgeParameterCheck;
 
     // KEEP FIELDS - put your custom fields here
@@ -32,7 +36,7 @@ public class Badge {
         this.id = id;
     }
 
-    public Badge(Long id, Integer badgeId, String type, String category, String name, Integer noOfStars, String imageUrl, String description1, String description2, String description3, String badgeParameter, String badgeParameterCheck) {
+    public Badge(Long id, int badgeId, String type, String category, String name, int noOfStars, String imageUrl, String description1, String description2, String description3, double badgeParameter, String badgeParameterCheck) {
         this.id = id;
         this.badgeId = badgeId;
         this.type = type;
@@ -55,43 +59,49 @@ public class Badge {
         this.id = id;
     }
 
-    public Integer getBadgeId() {
+    public int getBadgeId() {
         return badgeId;
     }
 
-    public void setBadgeId(Integer badgeId) {
+    public void setBadgeId(int badgeId) {
         this.badgeId = badgeId;
     }
 
+    /** Not-null value. */
     public String getType() {
         return type;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setType(String type) {
         this.type = type;
     }
 
+    /** Not-null value. */
     public String getCategory() {
         return category;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setCategory(String category) {
         this.category = category;
     }
 
+    /** Not-null value. */
     public String getName() {
         return name;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setName(String name) {
         this.name = name;
     }
 
-    public Integer getNoOfStars() {
+    public int getNoOfStars() {
         return noOfStars;
     }
 
-    public void setNoOfStars(Integer noOfStars) {
+    public void setNoOfStars(int noOfStars) {
         this.noOfStars = noOfStars;
     }
 
@@ -103,10 +113,12 @@ public class Badge {
         this.imageUrl = imageUrl;
     }
 
+    /** Not-null value. */
     public String getDescription1() {
         return description1;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setDescription1(String description1) {
         this.description1 = description1;
     }
@@ -127,11 +139,11 @@ public class Badge {
         this.description3 = description3;
     }
 
-    public String getBadgeParameter() {
+    public double getBadgeParameter() {
         return badgeParameter;
     }
 
-    public void setBadgeParameter(String badgeParameter) {
+    public void setBadgeParameter(double badgeParameter) {
         this.badgeParameter = badgeParameter;
     }
 

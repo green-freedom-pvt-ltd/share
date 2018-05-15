@@ -176,16 +176,16 @@ public class Version16 extends SchemaVersion {
 
         Entity badge = schema.addEntity("Badge");
         badge.addIdProperty().autoincrement();
-        badge.addIntProperty("badgeId");
-        badge.addStringProperty("type");
-        badge.addStringProperty("category");
-        badge.addStringProperty("name");
-        badge.addIntProperty("noOfStars");
+        badge.addIntProperty("badgeId").notNull();
+        badge.addStringProperty("type").notNull();
+        badge.addStringProperty("category").notNull();
+        badge.addStringProperty("name").notNull();
+        badge.addIntProperty("noOfStars").notNull();
         badge.addStringProperty("imageUrl");
-        badge.addStringProperty("description1");
+        badge.addStringProperty("description1").notNull();
         badge.addStringProperty("description2");
         badge.addStringProperty("description3");
-        badge.addStringProperty("badgeParameter");
+        badge.addDoubleProperty("badgeParameter").notNull();
         badge.addStringProperty("badgeParameterCheck");
     }
 
@@ -193,13 +193,14 @@ public class Version16 extends SchemaVersion {
 
         Entity achievedBadge = schema.addEntity("AchievedBadge");
         achievedBadge.addIdProperty().autoincrement();
-        achievedBadge.addIntProperty("userId");
-        achievedBadge.addIntProperty("badgeId");
-        achievedBadge.addStringProperty("badgeType");
-        achievedBadge.addStringProperty("causeId");
-        achievedBadge.addStringProperty("category");
-        achievedBadge.addStringProperty("categoryStatus");
-        achievedBadge.addStringProperty("paramDone");
+        achievedBadge.addIntProperty("userId").notNull();
+        achievedBadge.addIntProperty("badgeIdInProgress").notNull();
+        achievedBadge.addIntProperty("badgeIdAchieved").notNull();
+        achievedBadge.addStringProperty("badgeType").notNull();
+        achievedBadge.addStringProperty("causeIdJson");
+        achievedBadge.addStringProperty("category").notNull();
+        achievedBadge.addStringProperty("categoryStatus").notNull();
+        achievedBadge.addDoubleProperty("paramDone").notNull();
     }
 
 }

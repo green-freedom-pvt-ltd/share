@@ -10,13 +10,17 @@ package com.sharesmile.share;
 public class AchievedBadge {
 
     private Long id;
-    private Integer userId;
-    private Integer badgeId;
+    private int userId;
+    private int badgeIdInProgress;
+    private int badgeIdAchieved;
+    /** Not-null value. */
     private String badgeType;
-    private String causeId;
+    private String causeIdJson;
+    /** Not-null value. */
     private String category;
+    /** Not-null value. */
     private String categoryStatus;
-    private String paramDone;
+    private double paramDone;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -28,12 +32,13 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public AchievedBadge(Long id, Integer userId, Integer badgeId, String badgeType, String causeId, String category, String categoryStatus, String paramDone) {
+    public AchievedBadge(Long id, int userId, int badgeIdInProgress, int badgeIdAchieved, String badgeType, String causeIdJson, String category, String categoryStatus, double paramDone) {
         this.id = id;
         this.userId = userId;
-        this.badgeId = badgeId;
+        this.badgeIdInProgress = badgeIdInProgress;
+        this.badgeIdAchieved = badgeIdAchieved;
         this.badgeType = badgeType;
-        this.causeId = causeId;
+        this.causeIdJson = causeIdJson;
         this.category = category;
         this.categoryStatus = categoryStatus;
         this.paramDone = paramDone;
@@ -47,59 +52,73 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public Integer getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public Integer getBadgeId() {
-        return badgeId;
+    public int getBadgeIdInProgress() {
+        return badgeIdInProgress;
     }
 
-    public void setBadgeId(Integer badgeId) {
-        this.badgeId = badgeId;
+    public void setBadgeIdInProgress(int badgeIdInProgress) {
+        this.badgeIdInProgress = badgeIdInProgress;
     }
 
+    public int getBadgeIdAchieved() {
+        return badgeIdAchieved;
+    }
+
+    public void setBadgeIdAchieved(int badgeIdAchieved) {
+        this.badgeIdAchieved = badgeIdAchieved;
+    }
+
+    /** Not-null value. */
     public String getBadgeType() {
         return badgeType;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setBadgeType(String badgeType) {
         this.badgeType = badgeType;
     }
 
-    public String getCauseId() {
-        return causeId;
+    public String getCauseIdJson() {
+        return causeIdJson;
     }
 
-    public void setCauseId(String causeId) {
-        this.causeId = causeId;
+    public void setCauseIdJson(String causeIdJson) {
+        this.causeIdJson = causeIdJson;
     }
 
+    /** Not-null value. */
     public String getCategory() {
         return category;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setCategory(String category) {
         this.category = category;
     }
 
+    /** Not-null value. */
     public String getCategoryStatus() {
         return categoryStatus;
     }
 
+    /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setCategoryStatus(String categoryStatus) {
         this.categoryStatus = categoryStatus;
     }
 
-    public String getParamDone() {
+    public double getParamDone() {
         return paramDone;
     }
 
-    public void setParamDone(String paramDone) {
+    public void setParamDone(double paramDone) {
         this.paramDone = paramDone;
     }
 

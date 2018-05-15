@@ -2,7 +2,6 @@ package com.sharesmile.share.tracking.workout.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -20,9 +19,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.Badge;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.tracking.workout.tracker.RunTracker;
 import com.sharesmile.share.tracking.workout.tracker.Tracker;
@@ -48,7 +50,6 @@ import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.notifications.NotificationActionReceiver;
 import com.sharesmile.share.core.TTS;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.core.sync.SyncService;
@@ -75,8 +76,13 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -295,34 +301,105 @@ public class WorkoutService extends Service implements
                 e.printStackTrace();
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            if(distanceCovered>=0.1) {
+            if (distanceCovered >= 0.1) {
                 userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                 userDetails.addStreakRunProgress(distanceCovered);
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
             }
+            boolean changeMakerBadgeAchieved = checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER);
+            System.out.println("ChangeMaker badge Achieved : " + changeMakerBadgeAchieved);
+            WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
+            handleWorkoutResult(result);
 
-
-
-        WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
-        handleWorkoutResult(result);
-
-        stopTimer();
-        GoogleLocationTracker.getInstance().unregisterWorkout(this);
-        currentlyTracking = false;
-        WorkoutServiceRetainerAlarm.cancelAlarm(this);
-        if (stepCounter != null) {
-            stepCounter.stop();
+            stopTimer();
+            GoogleLocationTracker.getInstance().unregisterWorkout(this);
+            currentlyTracking = false;
+            WorkoutServiceRetainerAlarm.cancelAlarm(this);
+            if (stepCounter != null) {
+                stepCounter.stop();
+            }
+            currentlyProcessingSteps = false;
+            unBindFromActivityAndStop();
+            distanceInKmsOnLastUpdateEvent = 0f;
+            cancelAllWorkoutNotifications();
         }
-        currentlyProcessingSteps = false;
-        unBindFromActivityAndStop();
-        distanceInKmsOnLastUpdateEvent = 0f;
-        cancelAllWorkoutNotifications();
     }
-}
+
+    private boolean checkAchievedBadge(double distanceCovered,String badgeType) {
+        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+        List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType))
+                .orderAsc(BadgeDao.Properties.NoOfStars).list();
+
+        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                        AchievedBadgeDao.Properties.BadgeIdInProgress.eq(Constants.BADGE_IN_PROGRESS)).list();
+        AchievedBadge achievedBadge;
+        boolean badgeAchieved = false;
+        if (achievedBadges.size() == 0) {
+            achievedBadge = new AchievedBadge();
+            achievedBadge.setUserId(MainApplication.getInstance().getUserID());
+            achievedBadge.setCategory(badgeType);
+            achievedBadge.setBadgeType(badgeType);
+            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge);
+        } else {
+            achievedBadge = achievedBadges.get(0);
+            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge);
+        }
+        achievedBadgeDao.insertOrReplace(achievedBadge);
+        return badgeAchieved;
+    }
+
+    private boolean checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge) {
+        int indexAcheived = -1;
+        int indexInProgress = -1;
+        double totalParamDone = achievedBadge.getParamDone() + paramDone;
+        int badgeIdAchieved = achievedBadge.getBadgeIdAchieved();
+        int badgeIdInProgress = achievedBadge.getBadgeIdInProgress();
+        for (int i = 0; i < badges.size(); i++) {
+            Badge badge = badges.get(i);
+            if (totalParamDone <= badge.getBadgeParameter()) {
+                indexInProgress = i;
+                break;
+            }
+        }
+        if (indexInProgress != -1) {
+            if (indexInProgress > 0) {
+                indexAcheived = indexInProgress - 1;
+            }else
+            {
+                indexAcheived = indexInProgress;
+            }
+        } else {
+            indexInProgress = badges.size()-1;
+            indexAcheived = badges.size()-1;
+        }
+        Badge badge = badges.get(indexInProgress);
+        achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
+        Badge badgeAcheived = badges.get(indexAcheived);
+        achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
+        String causeIds = achievedBadge.getCauseIdJson();
+        JSONObject causeIdJsonObject = new JSONObject();
+        try {
+        if(causeIds != null)
+        {
+            causeIdJsonObject = new JSONObject(causeIds);
+        }
+        causeIdJsonObject.put(mCauseData.getId()+"",mCauseData.getId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        achievedBadge.setCauseIdJson(causeIdJsonObject.toString());
+        achievedBadge.setParamDone(totalParamDone);
+        if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
+            return true;
+        else
+            return false;
+    }
 
     private void handleWorkoutResult(final WorkoutData result) {
-
         if (result.isMockLocationDetected()) {
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
         } else if (result.hasConsecutiveUsainBolts()) {
@@ -506,18 +583,18 @@ public class WorkoutService extends Service implements
         }
     }
 
-/**
- * Class used for the client Binder.  Because we know this service always
- * runs in the same process as its clients, we don't need to deal with IPC.
- */
-public class MyBinder extends Binder {
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class MyBinder extends Binder {
 
-    public WorkoutService getService() {
-        // Return this instance of LocalService so clients can call public methods
-        return WorkoutService.this;
+        public WorkoutService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return WorkoutService.this;
+        }
+
     }
-
-}
 
     @Override
     public IBinder onBind(Intent intent) {

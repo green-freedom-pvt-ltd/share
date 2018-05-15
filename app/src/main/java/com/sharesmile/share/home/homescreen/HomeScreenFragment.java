@@ -49,6 +49,7 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -192,54 +193,26 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 String category = iterator.next();
                 ArrayList<CauseData> causeDataList = arrayListHashMap.get(category);
                 boolean categoryCompleted = true;
-                String causes = "";
-                for(CauseData causeData : causeDataList)
+                JSONObject causes = new JSONObject();
+                try {
+                    for (CauseData causeData : causeDataList) {
+                        if (!causeData.isCompleted())
+                            categoryCompleted = false;
+                        causes.put(causeData.getId() + "", causeData.getId());
+                    }
+                }catch (Exception e)
                 {
-                    if(!causeData.isCompleted())
-                        categoryCompleted = false;
-                    causes += causes.length()==0?causeData.getId():causeData.getId()+",";
+                    e.printStackTrace();
                 }
-               setBadgeForCategory(category,causes,categoryCompleted,Constants.BADGE_TYPE_CAUSE);
+               Utils.setBadgeForCategory(category,causes.toString(),categoryCompleted,Constants.BADGE_TYPE_CAUSE,0);
             }
             checkStreak();
         }
     }
 
-    private void setBadgeForCategory(String category, String causes, boolean categoryCompleted,String type) {
-        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
-                .where(AchievedBadgeDao.Properties.Category.eq(category),
-                AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
-        AchievedBadge achievedBadge = null;
-        if(achievedBadges.size()>0) {
-            achievedBadge=achievedBadges.get(0);
-        }else if(type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE))
-        {
-            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-            List<Badge> badges = badgeDao.queryBuilder()
-                    .where(BadgeDao.Properties.Category.eq(category)).orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
-            if(badges.size()>0) {
-                Badge badge = badges.get(0);
-                achievedBadge = new AchievedBadge();
-                achievedBadge.setBadgeId(badge.getBadgeId());
-                achievedBadge.setBadgeType(badge.getType());
-                achievedBadge.setCategory(category);
-                achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
-                achievedBadge.setParamDone("0");
-            }
-        }
-        if(achievedBadge!=null) {
-            if(categoryCompleted)
-                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-            else
-                achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
 
-            achievedBadge.setCauseId(causes);
-            achievedBadgeDao.insertOrReplace(achievedBadge);
-        }
-    }
 
-    private void checkBadgeData() {
+    private synchronized void checkBadgeData() {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges = badgeDao.queryBuilder().list();
         if(badges!=null && badges.size()>0)
@@ -287,18 +260,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-           /* AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
-                    .where(AchievedBadgeDao.Properties.Category.eq(Constants.BADGE_TYPE_STREAK),
-                    AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
-            if(achievedBadges!=null && achievedBadges.size()>0 && MainApplication.getInstance().getUserDetails().getStreakCount()==0)
-            {
-                AchievedBadge achievedBadge = achievedBadges.get(0);
-                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-                achievedBadgeDao.insertOrReplace(achievedBadge);
-            }*/
-           if(MainApplication.getInstance().getUserDetails().getStreakCount()==0)
-           setBadgeForCategory(Constants.BADGE_TYPE_STREAK,"",true,Constants.BADGE_TYPE_STREAK);
+               Utils.setBadgeForCategory(Constants.BADGE_TYPE_STREAK,"",true,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
         }
     }
 
