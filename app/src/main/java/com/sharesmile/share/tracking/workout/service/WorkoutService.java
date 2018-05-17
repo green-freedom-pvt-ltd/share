@@ -27,6 +27,7 @@ import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.workout.tracker.RunTracker;
 import com.sharesmile.share.tracking.workout.tracker.Tracker;
 import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
@@ -180,11 +181,12 @@ public class WorkoutService extends Service implements
                 .buildAndDispatch();
     }
 
-    private void sendWorkoutResultBroadcast(WorkoutData result) {
+    private void sendWorkoutResultBroadcast(WorkoutData result, AchievedBadgesData achievedBadgesData) {
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_WORKOUT_RESULT_CODE);
         bundle.putParcelable(Constants.KEY_WORKOUT_RESULT, result);
+        bundle.putParcelable(Constants.KEY_WORKOUT_ACHIEVED_RESULT, achievedBadgesData);
         Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
@@ -308,22 +310,14 @@ public class WorkoutService extends Service implements
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
             }
-
-            boolean changeMakerBadgeAchieved = Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER,mCauseData);
-            boolean causeBadgeAchieved = Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData);
-            boolean streakBadgeAchieved = Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData);
-            boolean marathonBadgeAchieved = Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_MARATHON,mCauseData);
-
-            List<AchievedBadge> achievedBadgeList = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao()
-                    .queryBuilder().list();
-            MainApplication.showToast("ChangeMaker badge Achieved : " + changeMakerBadgeAchieved+
-                    "\ncauseBadgeAchieved : " + causeBadgeAchieved+
-                    "\nstreakBadgeAchieved: " + streakBadgeAchieved+
-                    "\nmarathonBadgeAchieved: " + marathonBadgeAchieved
-                    +"\nsize : "+achievedBadgeList.size(), Toast.LENGTH_LONG);
+            AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
+            achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER,mCauseData));
+            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData));
+            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData));
+            achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_MARATHON,mCauseData));
 
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
-            handleWorkoutResult(result);
+            handleWorkoutResult(result,achievedBadgesData);
 
             stopTimer();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
@@ -339,7 +333,7 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void handleWorkoutResult(final WorkoutData result) {
+    private void handleWorkoutResult(final WorkoutData result, AchievedBadgesData achievedBadgesData) {
         if (result.isMockLocationDetected()) {
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
         } else if (result.hasConsecutiveUsainBolts()) {
@@ -353,7 +347,7 @@ public class WorkoutService extends Service implements
                     Math.round(result.getRecordedTime())));
         }
 
-        sendWorkoutResultBroadcast(result);
+        sendWorkoutResultBroadcast(result,achievedBadgesData);
         // Do not perform activity detection until the next 24 hours, unless user starts workout
         ActivityDetector.getInstance().stopActivityDetection();
 

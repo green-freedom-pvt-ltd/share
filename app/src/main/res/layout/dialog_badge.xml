@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/white">
     <ImageView
+        android:id="@+id/close_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_close_black_24dp"
@@ -22,6 +23,7 @@
         android:paddingLeft="50dp"
         android:paddingRight="50dp">
     <com.sharesmile.share.views.LBTextView
+        android:id="@+id/congratulation_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/congratulations"
@@ -30,6 +32,7 @@
         android:textSize="24dp"
         />
     <com.sharesmile.share.views.LRTextView
+        android:id="@+id/badge_earned_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/clr_5d"
@@ -54,6 +57,7 @@
             android:layout_marginTop="10dp"
             />
         <com.sharesmile.share.views.LBKTextView
+            android:id="@+id/badge_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
@@ -62,7 +66,8 @@
             android:layout_marginBottom="10dp"
             />
         <com.sharesmile.share.views.LRTextView
-            android:layout_width="wrap_content"
+            android:id="@+id/badge_amount_raised_tv"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="16sp"
@@ -71,6 +76,7 @@
             android:layout_marginBottom="10dp"
             />
         <com.sharesmile.share.views.LRTextView
+            android:id="@+id/badge_upgrade_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -94,6 +100,7 @@
         android:layout_marginBottom="20dp"
         />
     <com.sharesmile.share.views.LBTextView
+        android:id="@+id/continue_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/badge_continue"

@@ -22,6 +22,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.share.ShareFragment;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.models.Calorie;
@@ -186,7 +187,7 @@ public class RealRunFragment extends RunFragment {
     }
 
     @Override
-    public void onWorkoutResult(WorkoutData data) {
+    public void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData) {
         //Workout completed and results obtained, time to show the next Fragment
         Logger.d(TAG, "onWorkoutResult");
         if (isAttachedToActivity()) {
@@ -205,12 +206,12 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            exitRun(data);
+            exitRun(data,achievedBadgesData);
 
         }
     }
 
-    protected void exitRun(WorkoutData data){
+    protected void exitRun(WorkoutData data, AchievedBadgesData achievedBadgesData){
         Logger.d(TAG, "exit");
         if (mCauseData.getMinDistance() > (data.getDistance())
                 && !data.isMockLocationDetected()) {
@@ -218,7 +219,7 @@ public class RealRunFragment extends RunFragment {
             stopTimer();
             return;
         }
-        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData), false);
+        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData,achievedBadgesData), false);
     }
 
     @Override

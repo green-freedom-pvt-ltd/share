@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.event.GpsStateChangeEvent;
 import com.sharesmile.share.tracking.event.UpdateUiOnAutoFlagWorkout;
 import com.sharesmile.share.tracking.event.UpdateUiOnMockLocation;
@@ -91,7 +92,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public abstract void updateTimeView(String newTime);
 
-    public abstract void onWorkoutResult(WorkoutData data);
+    public abstract void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData);
 
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs){
         Logger.d(TAG, "showUpdate: distanceCovered = " + distanceCovered

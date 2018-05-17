@@ -78,7 +78,9 @@ public class Constants {
 
     public static final String KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE = "google_fit_resolution_parcelable";
 
-    public static final String KEY_WORKOUT_RESULT = "key_wourkout_result";
+    public static final String KEY_WORKOUT_RESULT = "key_workout_result";
+
+    public static final String KEY_WORKOUT_ACHIEVED_RESULT = "key_wourkout_achieved_result";
 
     public static final String KEY_WORKOUT_TEST_MODE_ON = "key_workout_test_mode_on";
 
@@ -261,6 +263,8 @@ public class Constants {
     public final static String BADGE_TYPE_CHANGEMAKER = "ChangeMaker";
     public final static String BADGE_TYPE_STREAK = "Streak";
     public final static String BADGE_TYPE_MARATHON = "Marathon";
+
+    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{

@@ -29,6 +29,7 @@ import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
 import com.sharesmile.share.tracking.workout.service.WorkoutService;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
@@ -385,8 +386,9 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
+                        AchievedBadgesData achievedBadgesData = bundle.getParcelable(Constants.KEY_WORKOUT_ACHIEVED_RESULT);
                         if (runFragment != null) {
-                            runFragment.onWorkoutResult(result);
+                            runFragment.onWorkoutResult(result,achievedBadgesData);
                         }
                         break;
 

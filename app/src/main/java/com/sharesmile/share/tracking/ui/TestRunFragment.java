@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.config.Config;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -87,7 +88,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
-    public void onWorkoutResult(WorkoutData data) {
+    public void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData) {
         workoutData = data;
         Logger.d(TAG, "onWorkoutResult:\n " + workoutData);
         liveDataContainer.setVisibility(View.GONE);
