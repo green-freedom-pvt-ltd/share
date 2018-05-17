@@ -22,9 +22,9 @@ public class Badge {
     private String description2;
     @SerializedName("description3")
     private String description3;
-    @SerializedName("badgeParameter")
-    private String badgeParameter;
-    @SerializedName("badgeParameterCheck")
+    @SerializedName("badge_parameter")
+    private double badgeParameter;
+    @SerializedName("badge_parameter_check")
     private String badgeParameterCheck;
 
     public Integer getBadgeId() {
@@ -91,11 +91,11 @@ public class Badge {
         this.description2 = description2;
     }
 
-    public String getBadgeParameter() {
+    public double getBadgeParameter() {
         return badgeParameter;
     }
 
-    public void setBadgeParameter(String badgeParameter) {
+    public void setBadgeParameter(double badgeParameter) {
         this.badgeParameter = badgeParameter;
     }
 

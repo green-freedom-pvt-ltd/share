@@ -145,12 +145,12 @@ public class SyncService extends GcmTaskService {
             in.close();
             JSONArray jsonArray = new JSONArray(buf.toString());
             Gson gson = new Gson();
-            Type listType = new TypeToken<List<BadgeParent>>(){}.getType();
+            Type listType = new TypeToken<List<BadgeParent>>() {
+            }.getType();
             List<BadgeParent> badgeParents = gson.fromJson(buf.toString(), listType);
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-            for(BadgeParent badgeParent : badgeParents)
-            {
-                for(Badge badge: badgeParent.getBadges()) {
+            for (BadgeParent badgeParent : badgeParents) {
+                for (Badge badge : badgeParent.getBadges()) {
                     com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
                     badgeDb.setBadgeId(badge.getBadgeId());
                     badgeDb.setName(badge.getName());
@@ -160,14 +160,20 @@ public class SyncService extends GcmTaskService {
                     badgeDb.setImageUrl(badge.getImageUrl());
                     badgeDb.setDescription1(badge.getDescription1());
                     badgeDb.setDescription2(badge.getDescription2());
-                    badgeDb.setDescription3(badge.getBadgeParameter());
+                    badgeDb.setDescription3(badge.getDescription3());
+                    badgeDb.setBadgeParameter(badge.getBadgeParameter());
                     badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
-                    badgeDao.insertOrReplace(badgeDb);
+                    List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(badge.getBadgeId())).list();
+                    if (badges.size() > 0) {
+                        badgeDb.setId(badges.get(0).getId());
+                        badgeDao.update(badgeDb);
+                    } else {
+                        badgeDao.insertOrReplace(badgeDb);
+                    }
                 }
             }
             EventBus.getDefault().post(new UpdateEvent.BadgeUpdated());
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return GcmNetworkManager.RESULT_SUCCESS;

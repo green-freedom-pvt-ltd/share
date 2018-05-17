@@ -50,6 +50,7 @@ import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.AlarmReceiver;
 import com.sharesmile.share.login.UserDetails;
@@ -1364,17 +1365,22 @@ public class Utils {
         int cms = (int) Math.round((feet*30.48) + (inches/0.393701));
         return cms+"";
     }
-
     public static void setBadgeForCategory(String category, String causes, boolean categoryCompleted,String type,double paramDone) {
         AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
         List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                 .where(AchievedBadgeDao.Properties.Category.eq(category),
+                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
                         AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
         AchievedBadge achievedBadge = null;
         if(achievedBadges.size()>0) {
             achievedBadge=achievedBadges.get(0);
-            if(!type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE) || (type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE) && paramDone!=0))
-            achievedBadge.setParamDone(paramDone);
+            if(categoryCompleted) {
+             if(((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone()!=0) ||
+                     (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))) && categoryCompleted)
+                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+            }
+            else
+                achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
         }else if(!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && paramDone!=0))
         {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
@@ -1388,17 +1394,191 @@ public class Utils {
                 achievedBadge.setCategory(category);
                 achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
                 achievedBadge.setParamDone(paramDone);
+                if(categoryCompleted)
+                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                else
+                    achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
             }
         }
         if(achievedBadge!=null) {
-            if(categoryCompleted)
-                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-            else
-                achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+
 
             achievedBadge.setCauseIdJson(causes);
 
             achievedBadgeDao.insertOrReplace(achievedBadge);
         }
+    }
+
+
+    public static boolean checkAchievedBadge(double distanceCovered, String badgeType, CauseData mCauseData) {
+        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+        List<Badge> badges;
+        String category = "";
+        if(badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+            badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType),
+                    BadgeDao.Properties.Category.eq(mCauseData.getCategory()))
+                    .orderAsc(BadgeDao.Properties.NoOfStars).list();
+            category = mCauseData.getCategory();
+        }
+        else
+        {
+            badges= badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType))
+                    .orderAsc(BadgeDao.Properties.NoOfStars).list();
+            category = badgeType;
+        }
+
+        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+        List<AchievedBadge> achievedBadges;
+        if(badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CHANGEMAKER)) {
+            achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED)).list();
+            if (achievedBadges.size() > 0) {
+                return false;
+            }
+        }
+//        }else {
+        achievedBadges = achievedBadgeDao.queryBuilder()
+                .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+//        }
+        AchievedBadge achievedBadge;
+        boolean badgeAchieved = false;
+
+
+        if (achievedBadges.size() == 0) {
+            achievedBadge = new AchievedBadge();
+            achievedBadge.setUserId(MainApplication.getInstance().getUserID());
+            achievedBadge.setCategory(category);
+            achievedBadge.setBadgeType(badgeType);
+            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge,mCauseData);
+        } else {
+            achievedBadge = achievedBadges.get(0);
+            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge,mCauseData);
+        }
+        if(!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved)) {
+            achievedBadgeDao.insertOrReplace(achievedBadge);
+        }
+        return badgeAchieved;
+    }
+
+    public static boolean checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge, CauseData mCauseData) {
+        int indexAcheived = -1;
+        int indexInProgress = -1;
+        double totalParamDone = 0;
+        if(achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))
+        {
+            totalParamDone = paramDone;
+        }else {
+            double x = achievedBadge.getParamDone();
+            totalParamDone = x + paramDone;
+        }
+        achievedBadge.setParamDone(totalParamDone);
+        int badgeIdAchieved = achievedBadge.getBadgeIdAchieved();
+        int badgeIdInProgress = achievedBadge.getBadgeIdInProgress();
+        if(!achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON)) {
+            for (int i = 0; i < badges.size(); i++) {
+                Badge badge = badges.get(i);
+                if (totalParamDone < badge.getBadgeParameter()) {
+                    indexInProgress = i;
+                    break;
+                }
+            }
+            if (indexInProgress != -1) {
+                if (indexInProgress > 0) {
+                    indexAcheived = indexInProgress - 1;
+                }else
+                {
+                    if(totalParamDone >= badges.get(indexInProgress).getBadgeParameter())
+                        indexAcheived = indexInProgress;
+                }
+            } else {
+                indexInProgress = badges.size()-1;
+                indexAcheived = badges.size()-1;
+            }
+        }else
+        {
+            for (int i = 0; i < badges.size(); i++) {
+                Badge badge = badges.get(i);
+                if (totalParamDone >= badge.getBadgeParameter()) {
+                    indexInProgress = i;
+                    indexAcheived = i;
+                }
+            }
+        }
+        if(indexInProgress == -1)
+        {
+            return false;
+        }
+        Badge badge = badges.get(indexInProgress);
+        achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
+        if(indexAcheived!=-1) {
+            Badge badgeAcheived = badges.get(indexAcheived);
+            achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
+        }else
+        {
+            achievedBadge.setBadgeIdAchieved(0);
+        }
+        String causeIds = achievedBadge.getCauseIdJson();
+        JSONObject causeIdJsonObject = new JSONObject();
+        try {
+            if(achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+                if (causeIds != null) {
+                    causeIdJsonObject = new JSONObject(causeIds);
+                }
+                causeIdJsonObject.put(mCauseData.getId() + "", mCauseData.getId());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String status = "";
+        switch (achievedBadge.getBadgeType())
+        {
+            case Constants.BADGE_TYPE_CAUSE :
+                if(mCauseData.isCompleted())
+                {
+                    status = Constants.BADGE_COMPLETED;
+                }else
+                {
+                    status = Constants.BADGE_IN_PROGRESS;
+                }
+                break;
+            case Constants.BADGE_TYPE_STREAK :
+                if(indexAcheived == indexInProgress)
+                {
+                    status = Constants.BADGE_COMPLETED;
+                }else
+                {
+                    status = Constants.BADGE_IN_PROGRESS;
+                }
+                break;
+            case Constants.BADGE_TYPE_CHANGEMAKER :
+                if(indexAcheived == indexInProgress)
+                {
+                    status = Constants.BADGE_COMPLETED;
+                }else
+                {
+                    status = Constants.BADGE_IN_PROGRESS;
+                }
+                break;
+            case Constants.BADGE_TYPE_MARATHON :
+                if(indexAcheived == indexInProgress)
+                {
+                    status = Constants.BADGE_COMPLETED;
+                }else
+                {
+                    status = Constants.BADGE_IN_PROGRESS;
+                }
+                break;
+        }
+        achievedBadge.setCategoryStatus(status);
+
+        achievedBadge.setCauseIdJson(causeIdJsonObject.toString());
+        if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
+            return true;
+        else
+            return false;
     }
 }

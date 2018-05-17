@@ -140,4 +140,33 @@
         "badge_parameter": "0.1"
     }
 ]
-}]
+},{
+  "id" : 1,
+  "type":"Marathon",
+  "badges" : [
+      {
+          "badge_id": 11,
+          "badge_name": "Half Marathon",
+          "badge_type": "Marathon",
+          "badge_category": "Marathon",
+          "stars_count": "1",
+          "badge_image": null,
+          "description1": "You are now a change maker",
+          "description2": null,
+          "description3": null,
+          "badge_parameter": "2"
+      },
+       {
+                "badge_id": 12,
+                "badge_name": "Full Marathon",
+                "badge_type": "Marathon",
+                "badge_category": "Marathon",
+                "stars_count": "2",
+                "badge_image": null,
+                "description1": "You are now a change maker",
+                "description2": null,
+                "description3": null,
+                "badge_parameter": "4"
+            }
+  ]
+  }]

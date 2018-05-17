@@ -173,7 +173,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     }
 
     private void checkAchievedBadgeData() {
-        if(CauseDataStore.getInstance().getCausesToShow().isEmpty() && isVisible()) {
+        if(CauseDataStore.getInstance().getCausesToShow().isEmpty() && isAdded()) {
          render();
         }else
         {
@@ -260,7 +260,15 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-               Utils.setBadgeForCategory(Constants.BADGE_TYPE_STREAK,"",true,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
+            boolean streakBagdeComplted = false;
+            if(MainApplication.getInstance().getUserDetails().getStreakCount() == 0)
+            {
+                streakBagdeComplted = true;
+            }else
+            {
+                streakBagdeComplted = false;
+            }
+               Utils.setBadgeForCategory(Constants.BADGE_TYPE_STREAK,new JSONObject().toString(),streakBagdeComplted,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
         }
     }
 

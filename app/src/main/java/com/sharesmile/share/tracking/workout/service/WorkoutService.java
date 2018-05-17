@@ -19,6 +19,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.AchievedBadge;
@@ -307,8 +308,20 @@ public class WorkoutService extends Service implements
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
             }
-            boolean changeMakerBadgeAchieved = checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER);
-            System.out.println("ChangeMaker badge Achieved : " + changeMakerBadgeAchieved);
+
+            boolean changeMakerBadgeAchieved = Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER,mCauseData);
+            boolean causeBadgeAchieved = Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData);
+            boolean streakBadgeAchieved = Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData);
+            boolean marathonBadgeAchieved = Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_MARATHON,mCauseData);
+
+            List<AchievedBadge> achievedBadgeList = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao()
+                    .queryBuilder().list();
+            MainApplication.showToast("ChangeMaker badge Achieved : " + changeMakerBadgeAchieved+
+                    "\ncauseBadgeAchieved : " + causeBadgeAchieved+
+                    "\nstreakBadgeAchieved: " + streakBadgeAchieved+
+                    "\nmarathonBadgeAchieved: " + marathonBadgeAchieved
+                    +"\nsize : "+achievedBadgeList.size(), Toast.LENGTH_LONG);
+
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
             handleWorkoutResult(result);
 
@@ -324,79 +337,6 @@ public class WorkoutService extends Service implements
             distanceInKmsOnLastUpdateEvent = 0f;
             cancelAllWorkoutNotifications();
         }
-    }
-
-    private boolean checkAchievedBadge(double distanceCovered,String badgeType) {
-        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-        List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType))
-                .orderAsc(BadgeDao.Properties.NoOfStars).list();
-
-        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
-                .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
-                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
-                        AchievedBadgeDao.Properties.BadgeIdInProgress.eq(Constants.BADGE_IN_PROGRESS)).list();
-        AchievedBadge achievedBadge;
-        boolean badgeAchieved = false;
-        if (achievedBadges.size() == 0) {
-            achievedBadge = new AchievedBadge();
-            achievedBadge.setUserId(MainApplication.getInstance().getUserID());
-            achievedBadge.setCategory(badgeType);
-            achievedBadge.setBadgeType(badgeType);
-            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge);
-        } else {
-            achievedBadge = achievedBadges.get(0);
-            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge);
-        }
-        achievedBadgeDao.insertOrReplace(achievedBadge);
-        return badgeAchieved;
-    }
-
-    private boolean checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge) {
-        int indexAcheived = -1;
-        int indexInProgress = -1;
-        double totalParamDone = achievedBadge.getParamDone() + paramDone;
-        int badgeIdAchieved = achievedBadge.getBadgeIdAchieved();
-        int badgeIdInProgress = achievedBadge.getBadgeIdInProgress();
-        for (int i = 0; i < badges.size(); i++) {
-            Badge badge = badges.get(i);
-            if (totalParamDone <= badge.getBadgeParameter()) {
-                indexInProgress = i;
-                break;
-            }
-        }
-        if (indexInProgress != -1) {
-            if (indexInProgress > 0) {
-                indexAcheived = indexInProgress - 1;
-            }else
-            {
-                indexAcheived = indexInProgress;
-            }
-        } else {
-            indexInProgress = badges.size()-1;
-            indexAcheived = badges.size()-1;
-        }
-        Badge badge = badges.get(indexInProgress);
-        achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
-        Badge badgeAcheived = badges.get(indexAcheived);
-        achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
-        String causeIds = achievedBadge.getCauseIdJson();
-        JSONObject causeIdJsonObject = new JSONObject();
-        try {
-        if(causeIds != null)
-        {
-            causeIdJsonObject = new JSONObject(causeIds);
-        }
-        causeIdJsonObject.put(mCauseData.getId()+"",mCauseData.getId());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        achievedBadge.setCauseIdJson(causeIdJsonObject.toString());
-        achievedBadge.setParamDone(totalParamDone);
-        if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
-            return true;
-        else
-            return false;
     }
 
     private void handleWorkoutResult(final WorkoutData result) {
