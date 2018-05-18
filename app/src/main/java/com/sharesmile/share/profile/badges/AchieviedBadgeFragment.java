@@ -1,5 +1,6 @@
 package com.sharesmile.share.profile.badges;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Rect;
@@ -37,6 +38,7 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
@@ -76,8 +78,22 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
 
 public class AchieviedBadgeFragment extends BaseFragment {
 
-    private static final String TAG = "AchieviedBadgeFragment";
+    @BindView(R.id.continue_tv)
+    TextView continueTv;
+
+    private String TAG = "AchieviedBadgeFragment";
     AchievedBadgesData achievedBadgesData;
+
+
+    public static AchieviedBadgeFragment newInstance(AchievedBadgesData achievedBadgesData, String TAG) {
+        AchieviedBadgeFragment fragment = new AchieviedBadgeFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.ACHIEVED_BADGE_DATA, achievedBadgesData);
+        args.putString("TAG", TAG);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,12 +113,69 @@ public class AchieviedBadgeFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
-        achievedBadgesData = bundle.getParcelable(Constants.BUNDLE_CAUSE_DATA);
+        achievedBadgesData = bundle.getParcelable(Constants.ACHIEVED_BADGE_DATA);
+        TAG = bundle.getString("TAG");
         initUi();
     }
 
     private void initUi() {
-
+        MainApplication.showToast("BADGE : " + TAG);
     }
 
+    @OnClick(R.id.continue_tv)
+    public void continueClick() {
+        switch (TAG) {
+            case Constants.BADGE_TYPE_CHANGEMAKER:
+                if(achievedBadgesData.getStreakBadgeAchieved()>0)
+                {
+                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_STREAK), true);
+                }else if(achievedBadgesData.getCauseBadgeAchieved()>0)
+                {
+                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CAUSE), true);
+                }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
+                {
+                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true);
+                }else
+                {
+                    openHomeActivityAndFinish();
+                }
+                break;
+            case Constants.BADGE_TYPE_STREAK:
+                if(achievedBadgesData.getCauseBadgeAchieved()>0)
+                {
+                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CAUSE), true);
+                }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
+                {
+                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true);
+                }else
+                {
+                    openHomeActivityAndFinish();
+                }
+                break;
+            case Constants.BADGE_TYPE_CAUSE:
+                if(achievedBadgesData.getMarathonBadgeAchieved()>0)
+                {
+                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true);
+                }else
+                {
+                    openHomeActivityAndFinish();
+                }
+                break;
+            case Constants.BADGE_TYPE_MARATHON:
+                openHomeActivityAndFinish();
+                break;
+        }
+    }
+
+    private void openHomeActivityAndFinish(){
+        if (getActivity() != null){
+
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra(Constants.BUNDLE_SHOW_RUN_STATS, true);
+            startActivity(intent);
+
+            getActivity().finish();
+        }
+    }
 }

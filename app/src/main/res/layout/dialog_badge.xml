@@ -106,7 +106,7 @@
         android:text="@string/badge_continue"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="20dp"
-        android:visibility="invisible"
+        android:visibility="visible"
         />
     </LinearLayout>
 </LinearLayout>

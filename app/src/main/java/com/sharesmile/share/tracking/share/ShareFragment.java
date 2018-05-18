@@ -59,7 +59,6 @@ import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_SPONSOR;
 public class ShareFragment extends FeedbackDialogHolderFragment implements View.OnClickListener, LoginImpl.LoginListener {
 
     public static final String WORKOUT_DATA = "workout_data";
-    public static final String ACHIEVED_BADGE_DATA = "achieved_badge_data";
 
     private static final String TAG = "ShareFragment";
     private CauseData mCauseData;
@@ -162,7 +161,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         ShareFragment fragment = new ShareFragment();
         Bundle args = new Bundle();
         args.putParcelable(WORKOUT_DATA, data);
-        args.putParcelable(ACHIEVED_BADGE_DATA, achievedBadgesData);
+        args.putParcelable(Constants.ACHIEVED_BADGE_DATA, achievedBadgesData);
         args.putSerializable(Constants.BUNDLE_CAUSE_DATA, causeData);
         fragment.setArguments(args);
         return fragment;
@@ -178,7 +177,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
         mCauseData = (CauseData) arg.getSerializable(Constants.BUNDLE_CAUSE_DATA);
         mWorkoutData = arg.getParcelable(WORKOUT_DATA);
-        achievedBadgesData = arg.getParcelable(ACHIEVED_BADGE_DATA);
+        achievedBadgesData = arg.getParcelable(Constants.ACHIEVED_BADGE_DATA);
 
         mShowLogin = !MainApplication.isLogin();
     }
@@ -388,7 +387,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
     }
 
     private void openStreakFragment() {
-        getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK), true);
+        getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK,achievedBadgesData), true);
     }
 
 

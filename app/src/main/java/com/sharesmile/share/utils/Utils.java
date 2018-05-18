@@ -1410,7 +1410,7 @@ public class Utils {
     }
 
 
-    public static boolean checkAchievedBadge(double distanceCovered, String badgeType, CauseData mCauseData) {
+    public static int checkAchievedBadge(double distanceCovered, String badgeType, CauseData mCauseData) {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges;
         String category = "";
@@ -1435,7 +1435,7 @@ public class Utils {
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
                             AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED)).list();
             if (achievedBadges.size() > 0) {
-                return false;
+                return -1;
             }
         }
 //        }else {
@@ -1445,7 +1445,7 @@ public class Utils {
                         AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
 //        }
         AchievedBadge achievedBadge;
-        boolean badgeAchieved = false;
+        int badgeAchieved = -1;
 
 
         if (achievedBadges.size() == 0) {
@@ -1458,13 +1458,13 @@ public class Utils {
             achievedBadge = achievedBadges.get(0);
             badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge,mCauseData);
         }
-        if(!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved)) {
+        if(!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved!=-1)) {
             achievedBadgeDao.insertOrReplace(achievedBadge);
         }
         return badgeAchieved;
     }
 
-    public static boolean checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge, CauseData mCauseData) {
+    public static int checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge, CauseData mCauseData) {
         int indexAcheived = -1;
         int indexInProgress = -1;
         double totalParamDone = 0;
@@ -1510,7 +1510,7 @@ public class Utils {
         }
         if(indexInProgress == -1)
         {
-            return false;
+            return -1;
         }
         Badge badge = badges.get(indexInProgress);
         achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
@@ -1577,8 +1577,8 @@ public class Utils {
 
         achievedBadge.setCauseIdJson(causeIdJsonObject.toString());
         if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
-            return true;
+            return achievedBadge.getBadgeIdAchieved();
         else
-            return false;
+            return -1;
     }
 }

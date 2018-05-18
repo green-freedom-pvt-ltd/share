@@ -25,6 +25,8 @@ import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.Utils;
 
@@ -76,6 +78,7 @@ public class StreakFragment extends BaseFragment {
 
     ArrayList<Goal> goals;
     int from;
+    AchievedBadgesData achievedBadgesData;
 
     public static StreakFragment newInstance(int from) {
         StreakFragment fragment = new StreakFragment();
@@ -85,11 +88,21 @@ public class StreakFragment extends BaseFragment {
         return fragment;
     }
 
+    public static StreakFragment newInstance(int from, AchievedBadgesData achievedBadgesData) {
+        StreakFragment fragment = new StreakFragment();
+        Bundle args = new Bundle();
+        args.putInt("FROM",from);
+        args.putParcelable(Constants.ACHIEVED_BADGE_DATA,achievedBadgesData);
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         from = bundle.getInt("FROM");
+        if(bundle.containsKey(Constants.ACHIEVED_BADGE_DATA))
+        achievedBadgesData = bundle.getParcelable(Constants.ACHIEVED_BADGE_DATA);
     }
 
     @Nullable
@@ -186,7 +199,24 @@ public class StreakFragment extends BaseFragment {
     {
         if(from == Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK)
         {
-            openHomeActivityAndFinish();
+            if(achievedBadgesData==null) {
+                openHomeActivityAndFinish();
+            }else if(achievedBadgesData.getChangeMakerBadgeAchieved()>0)
+            {
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CHANGEMAKER), true);
+            }else if(achievedBadgesData.getStreakBadgeAchieved()>0)
+            {
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_STREAK), true);
+            }else if(achievedBadgesData.getCauseBadgeAchieved()>0)
+            {
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CAUSE), true);
+            }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
+            {
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true);
+            }else
+            {
+                openHomeActivityAndFinish();
+            }
         }else if(from == Constants.FROM_PROFILE_FOR_STREAK)
         {
             getFragmentController().replaceFragment(new StreakGoalFragment(), true);

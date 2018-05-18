@@ -265,6 +265,7 @@ public class Constants {
     public final static String BADGE_TYPE_MARATHON = "Marathon";
 
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
+    public static final String ACHIEVED_BADGE_DATA = "achieved_badge_data";
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{
