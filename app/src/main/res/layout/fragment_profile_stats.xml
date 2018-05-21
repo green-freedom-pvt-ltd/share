@@ -383,6 +383,34 @@
                 </LinearLayout>
 
             </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_marginBottom="6dp"
+                >
+                <RelativeLayout
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="45dp"
+                    android:layout_marginRight="23dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <com.sharesmile.share.views.LBTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_stats_charity_overview"
+                        style="@style/profile_stats_header"
+                        />
+                </RelativeLayout>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_charity_overview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="34dp"
+                    android:layout_marginBottom="27dp"
+                    />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/bt_see_runs"

@@ -171,6 +171,9 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.rv_achievements)
     RecyclerView achievementsRecylerView;
 
+    @BindView(R.id.rv_charity_overview)
+    RecyclerView charityOverviewRecyclerView;
+
     AchievementsAdapter achievementsAdapter;
 
     Rect scrollBounds;
@@ -310,9 +313,6 @@ public class ProfileFragment extends BaseFragment {
                 }
                 //streak value
                 streakValue.setText(MainApplication.getInstance().getUserDetails().getStreakCount() + "");
-
-
-
                 setUpAllTimeStats();
                 int height = (int) getResources().getDimension(R.dimen.super_large_text);
                 Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
@@ -331,6 +331,7 @@ public class ProfileFragment extends BaseFragment {
                     .where(AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
             if(achievedBadges!=null && achievedBadges.size()>0) {
                 achievementsAdapter = new AchievementsAdapter(achievedBadges);
+                achievementsRecylerView.setAdapter(achievementsAdapter);
             }
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
@@ -347,6 +348,7 @@ public class ProfileFragment extends BaseFragment {
     {
         goBack();
     }
+
     @OnClick({R.id.tv_my_stats_daily, R.id.tv_my_stats_weekly, R.id.tv_my_stats_monthly})
     void onMyStatsClick(View view) {
         int type;
