@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,6 +50,7 @@ import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
 import com.sharesmile.share.profile.stats.BarChartEntry;
@@ -164,6 +167,11 @@ public class ProfileFragment extends BaseFragment {
     LinearLayout letsGo;
     @BindView(R.id.overlay_layout)
     LinearLayout overlayLayout;
+
+    @BindView(R.id.rv_achievements)
+    RecyclerView achievementsRecylerView;
+
+    AchievementsAdapter achievementsAdapter;
 
     Rect scrollBounds;
 
@@ -316,6 +324,13 @@ public class ProfileFragment extends BaseFragment {
                 setUpBarChartAsync = new SetUpBarChartAsync();
                 setUpBarChartAsync.execute();
                 prepareStreakOnboardingOverlays();
+            }
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+            achievementsRecylerView.setLayoutManager(linearLayoutManager);
+            List<AchievedBadge> achievedBadges =MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
+                    .where(AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
+            if(achievedBadges!=null && achievedBadges.size()>0) {
+                achievementsAdapter = new AchievementsAdapter(achievedBadges);
             }
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data

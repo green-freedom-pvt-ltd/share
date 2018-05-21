@@ -189,7 +189,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="50dp"
                         android:layout_marginBottom="19dp"
-                        tools:listitem="@layout/row_achievements"
+                        tools:listitem="@layout/rv_achievements_row_item"
                         android:orientation="horizontal"
                         />
                 </LinearLayout>

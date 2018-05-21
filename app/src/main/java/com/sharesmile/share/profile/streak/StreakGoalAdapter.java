@@ -12,16 +12,13 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
 import com.sharesmile.share.profile.streak.model.Goal;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 /**
@@ -44,7 +41,7 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.row_pick_goal, viewGroup, false);
+                .inflate(R.layout.rv_pick_goal_row_item, viewGroup, false);
         return new ViewHolder(view);
     }
 

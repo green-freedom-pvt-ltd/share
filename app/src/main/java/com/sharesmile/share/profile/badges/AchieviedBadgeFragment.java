@@ -99,13 +99,13 @@ public class AchieviedBadgeFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_badge, null);
         ButterKnife.bind(this, v);
-        EventBus.getDefault().register(this);
+//        EventBus.getDefault().register(this);
         return v;
     }
 
     @Override
     public void onDestroyView() {
-        EventBus.getDefault().unregister(this);
+//        EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 

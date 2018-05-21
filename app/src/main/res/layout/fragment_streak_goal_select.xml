@@ -10,6 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lv_streak_goal"
-        tools:listitem="@layout/row_pick_goal"
+        tools:listitem="@layout/rv_pick_goal_row_item"
         />
 </LinearLayout>
