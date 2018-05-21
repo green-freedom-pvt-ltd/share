@@ -31,7 +31,7 @@ android {
         applicationId "com.sharesmile.share"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 244
+        versionCode 245
         versionName "2.8.1.7"
 
         generatedDensities = []
