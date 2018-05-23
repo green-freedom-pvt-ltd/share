@@ -192,6 +192,8 @@
                             style="@style/profile_stats_header"
                             />
                         <com.sharesmile.share.views.LBTextView
+                            android:padding="5dp"
+                            android:id="@+id/see_all_badges"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/profile_stats_achievements_see_all"
@@ -384,6 +386,7 @@
 
             </LinearLayout>
             <LinearLayout
+                android:visibility="gone"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

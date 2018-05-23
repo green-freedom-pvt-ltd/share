@@ -50,6 +50,7 @@ import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.profile.badges.AchievedBadgeProgressFragment;
 import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
@@ -848,5 +849,11 @@ public class ProfileFragment extends BaseFragment {
         public void cancel() {
             cancelled = true;
         }
+    }
+
+    @OnClick(R.id.see_all_badges)
+    public void onClickSeeAll()
+    {
+        getFragmentController().replaceFragment(new AchievedBadgeProgressFragment(), true);
     }
 }

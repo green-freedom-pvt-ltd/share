@@ -1,6 +1,6 @@
 package com.sharesmile.share.profile.badges;
 
-import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Rect;
@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,12 +36,13 @@ import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
@@ -49,7 +53,10 @@ import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.EditProfileFragment;
-import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
+import com.sharesmile.share.profile.badges.adapter.AchievementBadgeProgressAdapter;
+import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
+import com.sharesmile.share.profile.badges.adapter.HallOfFameAdapter;
+import com.sharesmile.share.profile.badges.model.HallOfFameData;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
 import com.sharesmile.share.profile.stats.BarChartEntry;
@@ -61,10 +68,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.greenrobot.dao.query.WhereCondition;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
@@ -76,28 +87,23 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class AchieviedBadgeFragment extends BaseFragment {
+public class AchievedBadgeProgressFragment extends BaseFragment {
 
-    @BindView(R.id.continue_tv)
-    TextView continueTv;
+    private static final String TAG = "AchievedBadgeProgressFragment";
 
-    private String TAG = "AchieviedBadgeFragment";
-    AchievedBadgesData achievedBadgesData;
+    @BindView(R.id.rv_achievement_badges)
+    RecyclerView achievementBadgesRecyclerView;
 
+    AchievementBadgeProgressAdapter achievementBadgeProgressAdapter;
 
-    public static AchieviedBadgeFragment newInstance(AchievedBadgesData achievedBadgesData) {
-        AchieviedBadgeFragment fragment = new AchieviedBadgeFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(Constants.ACHIEVED_BADGE_DATA, achievedBadgesData);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
+    @BindView(R.id.rv_hall_of_fame)
+    RecyclerView hallOfFameRecyclerView;
+    HallOfFameAdapter hallOfFameAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.dialog_badge, null);
+        View v = inflater.inflate(R.layout.fragment_achievements, null);
         ButterKnife.bind(this, v);
 //        EventBus.getDefault().register(this);
         return v;
@@ -112,69 +118,54 @@ public class AchieviedBadgeFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle bundle = getArguments();
-        achievedBadgesData = bundle.getParcelable(Constants.ACHIEVED_BADGE_DATA);
         initUi();
     }
 
+
     private void initUi() {
-        MainApplication.showToast("BADGE : " + TAG);
-    }
+        setupToolbar();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
-    @OnClick(R.id.continue_tv)
-    public void continueClick() {
-        switch (TAG) {
-            case Constants.BADGE_TYPE_CHANGEMAKER:
-                if(achievedBadgesData.getStreakBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,TAG+"_"+Constants.BADGE_TYPE_STREAK);
-                }else if(achievedBadgesData.getCauseBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,TAG+"_"+Constants.BADGE_TYPE_CAUSE);
-                }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,TAG+"_"+Constants.BADGE_TYPE_MARATHON);
-                }else
-                {
-                    openHomeActivityAndFinish();
-                }
-                break;
-            case Constants.BADGE_TYPE_STREAK:
-                if(achievedBadgesData.getCauseBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,TAG+"_"+Constants.BADGE_TYPE_CAUSE);
-                }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,TAG+"_"+Constants.BADGE_TYPE_MARATHON);
-                }else
-                {
-                    openHomeActivityAndFinish();
-                }
-                break;
-            case Constants.BADGE_TYPE_CAUSE:
-                if(achievedBadgesData.getMarathonBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,TAG+"_"+Constants.BADGE_TYPE_MARATHON);
-                }else
-                {
-                    openHomeActivityAndFinish();
-                }
-                break;
-            case Constants.BADGE_TYPE_MARATHON:
-                openHomeActivityAndFinish();
-                break;
+        achievementBadgesRecyclerView.setLayoutManager(linearLayoutManager);
+        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
+                        AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
+        achievementBadgeProgressAdapter = new AchievementBadgeProgressAdapter(achievedBadges);
+        achievementBadgesRecyclerView.setAdapter(achievementBadgeProgressAdapter);
+
+        LinearLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3)
+        {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+        hallOfFameRecyclerView.setLayoutManager(gridLayoutManager);
+
+        Cursor cursor = achievedBadgeDao.getDatabase()
+                .rawQuery("SELECT "+AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+" , COUNT("+AchievedBadgeDao.Properties.Id.columnName+")" +
+                "  FROM " + AchievedBadgeDao.TABLENAME
+                        +" WHERE "+AchievedBadgeDao.Properties.UserId.columnName+"="+MainApplication.getInstance().getUserID()+" AND "+
+                        AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+">0"
+                        +" GROUP BY "+AchievedBadgeDao.Properties.BadgeIdAchieved.columnName, new String []{});
+        cursor.moveToFirst();
+        ArrayList<HallOfFameData> hallOfFameBadges = new ArrayList<>();
+        while (!cursor.isAfterLast())
+        {
+            String msg = cursor.getColumnName(0)+":"+cursor.getInt(0)+", "+cursor.getColumnName(1)+":"+cursor.getInt(1);
+            HallOfFameData hallOfFameData = new HallOfFameData(cursor.getInt(0),cursor.getInt(1));
+            hallOfFameBadges.add(hallOfFameData);
+            cursor.moveToNext();
         }
+
+        hallOfFameAdapter = new HallOfFameAdapter(hallOfFameBadges);
+        hallOfFameRecyclerView.setAdapter(hallOfFameAdapter);
     }
 
-    private void openHomeActivityAndFinish(){
-        if (getActivity() != null){
-
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra(Constants.BUNDLE_SHOW_RUN_STATS, true);
-            startActivity(intent);
-
-            getActivity().finish();
-        }
+    private void setupToolbar() {
+        setHasOptionsMenu(false);
+        setToolbarTitle(getResources().getString(R.string.achievements));
     }
+
 }

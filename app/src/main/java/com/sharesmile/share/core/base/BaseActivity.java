@@ -148,6 +148,32 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    @Override
+    public void replaceFragment(BaseFragment fragmentToBeLoaded, boolean addToBackStack,String tag) {
+        boolean allowStateLoss = true;
+
+        if (!getSupportFragmentManager().isDestroyed()) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            if(getSupportFragmentManager().findFragmentByTag(tag)==null) {
+                fragmentTransaction.replace(getFrameLayoutId(), fragmentToBeLoaded,
+                        tag);
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(tag);
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(tag,0);
+            }
+        } else {
+            Logger.e(tag, "replaceFragment: Actvity Destroyed, won't perform FT to load" +
+                    " Fragment " + tag);
+        }
+    }
     private GoogleLocationTracker.Listener googleLocationTrackerListener
             = new GoogleLocationTracker.Listener() {
         @Override

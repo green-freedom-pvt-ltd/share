@@ -1381,7 +1381,7 @@ public class Utils {
             }
             else
                 achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
-        }else if(!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && paramDone!=0))
+        }else
         {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
             List<Badge> badges = badgeDao.queryBuilder()
@@ -1398,14 +1398,21 @@ public class Utils {
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                 else
                     achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+                if(type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))
+                {
+                    if(categoryCompleted && paramDone==0)
+                    {
+                        achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+                    }
+                }
             }
         }
         if(achievedBadge!=null) {
-
-
             achievedBadge.setCauseIdJson(causes);
-
-            achievedBadgeDao.insertOrReplace(achievedBadge);
+            if(achievedBadge.getId()!=null && achievedBadge.getId()>0)
+            achievedBadgeDao.update(achievedBadge);
+            else
+                achievedBadgeDao.insertOrReplace(achievedBadge);
         }
     }
 
@@ -1441,6 +1448,7 @@ public class Utils {
 //        }else {
         achievedBadges = achievedBadgeDao.queryBuilder()
                 .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                        AchievedBadgeDao.Properties.Category.eq(category),
                         AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
                         AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
 //        }
@@ -1458,8 +1466,14 @@ public class Utils {
             achievedBadge = achievedBadges.get(0);
             badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge,mCauseData);
         }
+        if(badgeAchieved!=0)
         if(!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved!=-1)) {
-            achievedBadgeDao.insertOrReplace(achievedBadge);
+            if(achievedBadge.getId()!=null && achievedBadge.getId()>0) {
+                achievedBadgeDao.update(achievedBadge);
+            }else
+            {
+                achievedBadgeDao.insertOrReplace(achievedBadge);
+            }
         }
         return badgeAchieved;
     }
@@ -1510,7 +1524,7 @@ public class Utils {
         }
         if(indexInProgress == -1)
         {
-            return -1;
+            return 0;
         }
         Badge badge = badges.get(indexInProgress);
         achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
@@ -1533,7 +1547,7 @@ public class Utils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String status = "";
+        String status = Constants.BADGE_IN_PROGRESS;
         switch (achievedBadge.getBadgeType())
         {
             case Constants.BADGE_TYPE_CAUSE :
@@ -1573,6 +1587,7 @@ public class Utils {
                 }
                 break;
         }
+
         achievedBadge.setCategoryStatus(status);
 
         achievedBadge.setCauseIdJson(causeIdJsonObject.toString());

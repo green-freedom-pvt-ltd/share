@@ -12,7 +12,7 @@
         "description1": "Be a Orphanage Hero level 3",
         "description2": null,
         "description3": null,
-        "badge_parameter": "3"
+        "badge_parameter": "7"
     },
     {
         "badge_id": 2,
@@ -24,7 +24,7 @@
         "description1": "Be a Orphanage Hero level 2",
         "description2": null,
         "description3": null,
-        "badge_parameter": "2"
+        "badge_parameter": "3"
     },
     {
         "badge_id": 3,
@@ -41,52 +41,134 @@
 ]
 },{
 "id" : 2,
-"type":"Women Empowerment",
+"type":"Skill Development",
 "badges" : [
     {
         "badge_id": 6,
-        "badge_name": "Women Empowerment Hero3",
+        "badge_name": "Skill Development Hero3",
         "badge_type": "Cause",
-        "badge_category": "Women Empowerment",
+        "badge_category": "Skill Development",
         "stars_count": "3",
         "badge_image": null,
-        "description1": "support Women Empowerment 3",
+        "description1": "support Skill Development 3",
+        "description2": null,
+        "description3": null,
+        "badge_parameter": "7"
+    },
+    {
+        "badge_id": 5,
+        "badge_name": "Skill Development Hero 2",
+        "badge_type": "Cause",
+        "badge_category": "Skill Development",
+        "stars_count": "2",
+        "badge_image": null,
+        "description1": "support Skill Development 2",
         "description2": null,
         "description3": null,
         "badge_parameter": "3"
     },
     {
-        "badge_id": 5,
-        "badge_name": "Women Empowerment Hero 2",
-        "badge_type": "Cause",
-        "badge_category": "Women Empowerment",
-        "stars_count": "2",
-        "badge_image": null,
-        "description1": "support Women Empowerment 2",
-        "description2": null,
-        "description3": null,
-        "badge_parameter": "2"
-    },
-    {
         "badge_id": 4,
-        "badge_name": "Women Empowerment Hero1",
+        "badge_name": "Skill Development Hero1",
         "badge_type": "Cause",
-        "badge_category": "Women Empowerment",
+        "badge_category": "Skill Development",
         "stars_count": "1",
         "badge_image": null,
-        "description1": "support Women Empowerment 1",
+        "description1": "support Skill Development 1",
         "description2": null,
         "description3": null,
         "badge_parameter": "1"
     }
 ]
-},
+},{
+  "id" : 3,
+  "type":"Environment",
+  "badges" : [
+      {
+          "badge_id": 7,
+          "badge_name": "Environment Hero3",
+          "badge_type": "Cause",
+          "badge_category": "Environment",
+          "stars_count": "3",
+          "badge_image": null,
+          "description1": "support Environment 3",
+          "description2": null,
+          "description3": null,
+          "badge_parameter": "7"
+      },
+      {
+          "badge_id": 8,
+          "badge_name": "Environment Hero 2",
+          "badge_type": "Cause",
+          "badge_category": "Environment",
+          "stars_count": "2",
+          "badge_image": null,
+          "description1": "support Environment 2",
+          "description2": null,
+          "description3": null,
+          "badge_parameter": "3"
+      },
+      {
+          "badge_id": 9,
+          "badge_name": "Environment Hero1",
+          "badge_type": "Cause",
+          "badge_category": "Environment",
+          "stars_count": "1",
+          "badge_image": null,
+          "description1": "support Environment 1",
+          "description2": null,
+          "description3": null,
+          "badge_parameter": "1"
+      }
+  ]
+  },{
+    "id" : 4,
+    "type":"Women Empowerment",
+    "badges" : [
+        {
+            "badge_id": 10,
+            "badge_name": "Women Empowerment Hero3",
+            "badge_type": "Cause",
+            "badge_category": "Women Empowerment",
+            "stars_count": "3",
+            "badge_image": null,
+            "description1": "support Women Empowerment 3",
+            "description2": null,
+            "description3": null,
+            "badge_parameter": "7"
+        },
+        {
+            "badge_id": 11,
+            "badge_name": "Women Empowerment Hero 2",
+            "badge_type": "Cause",
+            "badge_category": "Women Empowerment",
+            "stars_count": "2",
+            "badge_image": null,
+            "description1": "support Women Empowerment 2",
+            "description2": null,
+            "description3": null,
+            "badge_parameter": "3"
+        },
+        {
+            "badge_id": 12,
+            "badge_name": "Women Empowerment Hero1",
+            "badge_type": "Cause",
+            "badge_category": "Women Empowerment",
+            "stars_count": "1",
+            "badge_image": null,
+            "description1": "support Women Empowerment 1",
+            "description2": null,
+            "description3": null,
+            "badge_parameter": "1"
+        }
+    ]
+    },
 {
-"id" : 1,
+"id" : 5,
 "type":"Streak",
 "badges" : [
     {
-        "badge_id": 7,
+        "badge_id": 13,
         "badge_name": "Streak 7",
         "badge_type": "Streak",
         "badge_category": "Streak",
@@ -98,7 +180,7 @@
         "badge_parameter": "1"
     },
     {
-        "badge_id": 8,
+        "badge_id": 14,
         "badge_name": "Streak 14",
         "badge_type": "Streak",
         "badge_category": "Streak",
@@ -107,10 +189,10 @@
         "description1": "14 days",
         "description2": null,
         "description3": null,
-        "badge_parameter": "2"
+        "badge_parameter": "3"
     },
     {
-        "badge_id": 9,
+        "badge_id": 15,
         "badge_name": "Streak 30",
         "badge_type": "Streak",
         "badge_category": "Streak",
@@ -119,16 +201,16 @@
         "description1": "30 days",
         "description2": null,
         "description3": null,
-        "badge_parameter": "3"
+        "badge_parameter": "5"
     }
 ]
 },
 {
-"id" : 1,
+"id" : 6,
 "type":"ChangeMaker",
 "badges" : [
     {
-        "badge_id": 10,
+        "badge_id": 16,
         "badge_name": "Change Maker",
         "badge_type": "ChangeMaker",
         "badge_category": "ChangeMaker",
@@ -141,11 +223,11 @@
     }
 ]
 },{
-  "id" : 1,
+  "id" : 7,
   "type":"Marathon",
   "badges" : [
       {
-          "badge_id": 11,
+          "badge_id": 17,
           "badge_name": "Half Marathon",
           "badge_type": "Marathon",
           "badge_category": "Marathon",
@@ -154,10 +236,10 @@
           "description1": "You are now a change maker",
           "description2": null,
           "description3": null,
-          "badge_parameter": "2"
+          "badge_parameter": "3"
       },
        {
-                "badge_id": 12,
+                "badge_id": 18,
                 "badge_name": "Full Marathon",
                 "badge_type": "Marathon",
                 "badge_category": "Marathon",
@@ -166,7 +248,7 @@
                 "description1": "You are now a change maker",
                 "description2": null,
                 "description3": null,
-                "badge_parameter": "4"
+                "badge_parameter": "6"
             }
   ]
   }]

@@ -42,6 +42,8 @@ public interface IFragmentController {
 
     void replaceFragment(BaseFragment fragment, boolean addToBackStack);
 
+    void replaceFragment(BaseFragment fragment, boolean addToBackStack,String tag);
+
     int getFrameLayoutId();
 
     String getName();
