@@ -20,7 +20,7 @@
         <ImageView
             android:layout_width="75dp"
             android:layout_height="87dp"
-            android:background="@color/black_64" />
+            android:src="@drawable/badge_image" />
     </LinearLayout>
 
     <LinearLayout

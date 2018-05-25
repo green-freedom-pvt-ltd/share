@@ -203,16 +203,16 @@ public class StreakFragment extends BaseFragment {
                 openHomeActivityAndFinish();
             }else if(achievedBadgesData.getChangeMakerBadgeAchieved()>0)
             {
-                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,Constants.BADGE_TYPE_CHANGEMAKER);
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CHANGEMAKER), true,Constants.BADGE_TYPE_CHANGEMAKER);
             }else if(achievedBadgesData.getStreakBadgeAchieved()>0)
             {
-                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,Constants.BADGE_TYPE_STREAK);
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_STREAK), true,Constants.BADGE_TYPE_STREAK);
             }else if(achievedBadgesData.getCauseBadgeAchieved()>0)
             {
-                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,Constants.BADGE_TYPE_CAUSE);
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CAUSE), true,Constants.BADGE_TYPE_CAUSE);
             }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
             {
-                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData), true,Constants.BADGE_TYPE_MARATHON);
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.BADGE_TYPE_MARATHON);
             }else
             {
                 openHomeActivityAndFinish();

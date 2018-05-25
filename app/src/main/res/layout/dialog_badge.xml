@@ -53,7 +53,7 @@
             android:layout_width="150dp"
             android:layout_height="180dp"
             android:id="@+id/iv_badge"
-            android:background="@color/color_primary"
+            android:src="@drawable/badge_image"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             />

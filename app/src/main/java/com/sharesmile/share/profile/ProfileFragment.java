@@ -790,7 +790,7 @@ public class ProfileFragment extends BaseFragment {
     OverlayStreakRunnable overlayStreakRunnable;
 
     private void prepareStreakOnboardingOverlays() {
-        if (OnboardingOverlay.STREAK_COUNT.isEligibleForDisplay(1, 0) && overlayStreakRunnable == null) {
+        if (OnboardingOverlay.STREAK_COUNT.isEligibleForDisplay(getProfileOpenCount(), 0) && overlayStreakRunnable == null) {
             overlayStreakRunnable = new OverlayStreakRunnable();
             MainApplication.getMainThreadHandler().postDelayed(overlayStreakRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
         }
@@ -823,7 +823,7 @@ public class ProfileFragment extends BaseFragment {
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
                         streakValue,
                         getActivity(),
-                        true, false);
+                        true, false,false);
                 materialTapTargetPrompt.show();
             }
         }
@@ -842,7 +842,7 @@ public class ProfileFragment extends BaseFragment {
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.MY_STATS,
                         overlayLayout,
                         getActivity(),
-                        true, false);
+                        true, false,true);
                 materialTapTargetPrompt.show();
             }
         }

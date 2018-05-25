@@ -105,6 +105,7 @@ import Models.Level;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.FullscreenPromptBackground;
 import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectanglePromptBackground;
+import uk.co.samuelwall.materialtaptargetprompt.extras.focals.CirclePromptFocal;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
 import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
@@ -1193,7 +1194,8 @@ public class Utils {
         return null;
     }
 
-    public static MaterialTapTargetPrompt setOverlay(final OnboardingOverlay overlay, View target, Activity activity, boolean isRectangular, boolean isDissmissEnable){
+    public static MaterialTapTargetPrompt setOverlay(final OnboardingOverlay overlay, View target,
+                                                     Activity activity, boolean isRectangular, boolean isDissmissEnable,boolean isRect){
         Logger.d(TAG, "showOverlay: " + overlay.name());
         MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
         builder.setTarget(target);
@@ -1203,7 +1205,10 @@ public class Utils {
         if (isRectangular){
             builder.setPromptBackground(new FullscreenPromptBackground());
 //            builder.setPromptBackground(new RectanglePromptBackground());
+            if(isRect)
             builder.setPromptFocal(new RectanglePromptFocal());
+            else
+                builder.setPromptFocal(new CirclePromptFocal());
         }
         builder.setAutoDismiss(isDissmissEnable);
         builder.setAutoFinish(isDissmissEnable);

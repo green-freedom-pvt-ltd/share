@@ -10,7 +10,7 @@
         "stars_count": "3",
         "badge_image": null,
         "description1": "Be a Orphanage Hero level 3",
-        "description2": null,
+        "description2": "",
         "description3": null,
         "badge_parameter": "7"
     },
@@ -22,7 +22,7 @@
         "stars_count": "2",
         "badge_image": null,
         "description1": "Be a Orphanage Hero level 2",
-        "description2": null,
+        "description2": "upgrade : 7",
         "description3": null,
         "badge_parameter": "3"
     },
@@ -34,7 +34,7 @@
         "stars_count": "1",
         "badge_image": null,
         "description1": "Be a Orphanage Hero level 1",
-        "description2": null,
+        "description2": "upgrade : 3",
         "description3": null,
         "badge_parameter": "1"
     }
@@ -92,7 +92,7 @@
           "stars_count": "3",
           "badge_image": null,
           "description1": "support Environment 3",
-          "description2": null,
+          "description2": "Top level",
           "description3": null,
           "badge_parameter": "7"
       },
@@ -104,7 +104,7 @@
           "stars_count": "2",
           "badge_image": null,
           "description1": "support Environment 2",
-          "description2": null,
+          "description2": "upgrade : 7",
           "description3": null,
           "badge_parameter": "3"
       },
@@ -116,7 +116,7 @@
           "stars_count": "1",
           "badge_image": null,
           "description1": "support Environment 1",
-          "description2": null,
+          "description2": "upgrade : 3",
           "description3": null,
           "badge_parameter": "1"
       }

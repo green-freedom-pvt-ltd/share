@@ -43,6 +43,8 @@ import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
 
@@ -416,6 +418,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_lets_run:
+
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
                 if (causeData.isCompleted()){
                     Utils.shareImageWithMessage(getContext(), causeData.getCauseCompletedImage(),

@@ -383,11 +383,11 @@ public class RealRunFragment extends RunFragment {
     public void showStopDialog() {
         float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
         //TODO : undo commenting, just for testing
-//        if (mCauseData.getMinDistance() > (totalDistance)) {
-//            showMinDistanceDialog();
-//        } else {
+        if (mCauseData.getMinDistance() > (totalDistance)) {
+            showMinDistanceDialog();
+        } else {
             showRunEndDialog();
-//        }
+        }
     }
 
     private void showRunEndDialog() {
