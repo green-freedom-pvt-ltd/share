@@ -58,4 +58,5 @@
     <dimen name="my_stats_bg_padding_stroke_width">1dp</dimen>
 
     <dimen name="onboarding_margin_top">25dp</dimen>
+    <dimen name="cardview_corner_radius">2dp</dimen>
 </resources>

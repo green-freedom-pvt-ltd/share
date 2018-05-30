@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -82,6 +83,8 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
 
 public class AchieviedBadgeFragment extends BaseFragment {
 
+    @BindView(R.id.close_iv)
+    ImageView closeIv;
     @BindView(R.id.continue_tv)
     TextView continueTv;
     @BindView(R.id.badge_earned_tv)
@@ -92,6 +95,7 @@ public class AchieviedBadgeFragment extends BaseFragment {
     TextView badgeAmountRaised;
     @BindView(R.id.badge_upgrade_tv)
     TextView badgeUpgrade;
+    int from = -1;
 
     private String TAG = "AchieviedBadgeFragment";
     AchievedBadgesData achievedBadgesData;
@@ -107,6 +111,16 @@ public class AchieviedBadgeFragment extends BaseFragment {
         return fragment;
     }
 
+    public static AchieviedBadgeFragment newInstance(AchievedBadgesData achievedBadgesData, String tag, int i) {
+        AchieviedBadgeFragment fragment = new AchieviedBadgeFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.ACHIEVED_BADGE_DATA, achievedBadgesData);
+        args.putString("TAG", tag);
+        args.putInt("FROM", i);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -125,9 +139,13 @@ public class AchieviedBadgeFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getFragmentController().hideToolbar();
         Bundle bundle = getArguments();
         achievedBadgesData = bundle.getParcelable(Constants.ACHIEVED_BADGE_DATA);
         TAG = bundle.getString("TAG");
+        if(bundle.containsKey("FROM"))
+        from = bundle.getInt("FROM",-1);
+
         initUi();
     }
 
@@ -157,55 +175,60 @@ public class AchieviedBadgeFragment extends BaseFragment {
             badgeAmountRaised.setText(badge.getDescription1());
             badgeUpgrade.setText(badge.getDescription2());
         }
+        if(from == 0)
+        {
+            closeIv.setVisibility(View.VISIBLE);
+            continueTv.setVisibility(View.INVISIBLE);
+        }else
+        {
+            closeIv.setVisibility(View.INVISIBLE);
+            continueTv.setVisibility(View.VISIBLE);
+        }
     }
 
-    @OnClick(R.id.continue_tv)
-    public void continueClick() {
-        switch (TAG) {
-            case Constants.BADGE_TYPE_CHANGEMAKER:
-                if(achievedBadgesData.getStreakBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_STREAK), true,Constants.BADGE_TYPE_STREAK);
-                }else if(achievedBadgesData.getCauseBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CAUSE), true,Constants.BADGE_TYPE_CAUSE);
-                }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.BADGE_TYPE_MARATHON);
-                }else
-                {
+    @OnClick({R.id.continue_tv,R.id.close_iv})
+    public void continueClick(View v) {
+        if(v.getId() == R.id.continue_tv) {
+            switch (TAG) {
+                case Constants.BADGE_TYPE_CHANGEMAKER:
+                    if (achievedBadgesData.getStreakBadgeAchieved() > 0) {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_STREAK), true, Constants.BADGE_TYPE_STREAK);
+                    } else if (achievedBadgesData.getCauseBadgeAchieved() > 0) {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_CAUSE), true, Constants.BADGE_TYPE_CAUSE);
+                    } else if (achievedBadgesData.getMarathonBadgeAchieved() > 0) {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
+                    } else {
+                        openHomeActivityAndFinish();
+                    }
+                    break;
+                case Constants.BADGE_TYPE_STREAK:
+                    if (achievedBadgesData.getCauseBadgeAchieved() > 0) {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_CAUSE), true, Constants.BADGE_TYPE_CAUSE);
+                    } else if (achievedBadgesData.getMarathonBadgeAchieved() > 0) {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
+                    } else {
+                        openHomeActivityAndFinish();
+                    }
+                    break;
+                case Constants.BADGE_TYPE_CAUSE:
+                    if (achievedBadgesData.getMarathonBadgeAchieved() > 0) {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
+                    } else {
+                        openHomeActivityAndFinish();
+                    }
+                    break;
+                case Constants.BADGE_TYPE_MARATHON:
                     openHomeActivityAndFinish();
-                }
-                break;
-            case Constants.BADGE_TYPE_STREAK:
-                if(achievedBadgesData.getCauseBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_CAUSE), true,Constants.BADGE_TYPE_CAUSE);
-                }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.BADGE_TYPE_MARATHON);
-                }else
-                {
-                    openHomeActivityAndFinish();
-                }
-                break;
-            case Constants.BADGE_TYPE_CAUSE:
-                if(achievedBadgesData.getMarathonBadgeAchieved()>0)
-                {
-                    getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.BADGE_TYPE_MARATHON);
-                }else
-                {
-                    openHomeActivityAndFinish();
-                }
-                break;
-            case Constants.BADGE_TYPE_MARATHON:
-                openHomeActivityAndFinish();
-                break;
+                    break;
+            }
+        }else
+        {
+            openHomeActivityAndFinish();
         }
     }
 
     private void openHomeActivityAndFinish(){
-        if (getActivity() != null){
+        if (from!=0 && getActivity() != null){
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -213,6 +236,10 @@ public class AchieviedBadgeFragment extends BaseFragment {
             startActivity(intent);
 
             getActivity().finish();
+        }else
+        {
+            getFragmentController().goBack();
         }
     }
+
 }

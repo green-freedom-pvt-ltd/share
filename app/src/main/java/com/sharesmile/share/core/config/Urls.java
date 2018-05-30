@@ -22,7 +22,7 @@ public class Urls {
 
     private static final String UPDATE_RUN_URL = "/updaterun/";
 
-    private static final String LOGIN_URL = "/api/users/";
+    private static final String LOGIN_URL = "/users/";
     private static final String FEEDBACK_URL = "/userFeedback/";
     private static final String FAQ_URL = "/faq";
     private static final String MESSAGE_URL = "/messageCenter";
@@ -93,12 +93,12 @@ public class Urls {
     }
 
     public static String getClientConfigUrl() {
-        String url = getBaseUrl() + CLIENT_CONFIG_URL;
+        String url = getNodeBaseUrl() + CLIENT_CONFIG_URL;
         return url;
     }
 
     public static String getLoginUrl() {
-        String url = getBaseUrl() + LOGIN_URL;
+        String url = getNodeBaseUrl() + LOGIN_URL;
         return url;
     }
 
@@ -108,7 +108,7 @@ public class Urls {
     }
 
     public static String getUserUrl(int user_id) {
-        String url = getBaseUrl() + LOGIN_URL + user_id + "/";
+        String url = getNodeBaseUrl() + LOGIN_URL + user_id + "/";
         return url;
     }
 

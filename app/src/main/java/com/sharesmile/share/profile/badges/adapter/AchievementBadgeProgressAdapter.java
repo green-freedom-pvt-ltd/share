@@ -14,6 +14,7 @@ import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class AchievementBadgeProgressAdapter extends RecyclerView.Adapter<Achiev
             if(badges!=null && badges.size()>0) {
                 Badge badge = badges.get(0);
                 achievementBadgeTitle.setText(badge.getName() + "");
-                achievementAmount.setText(achievedBadge.getParamDone() + " / "+badge.getBadgeParameter());
+                achievementAmount.setText(Utils.formatWithOneDecimal(achievedBadge.getParamDone()) + " / "+Utils.formatWithOneDecimal(badge.getBadgeParameter()));
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;
                 achievementBadgeDescription.setText(badge.getDescription1());

@@ -65,6 +65,7 @@
             android:textColor="@color/black_57"
             tools:text="CAPTAIN PLANET"
             android:layout_marginBottom="10dp"
+            android:gravity="center"
             />
         <com.sharesmile.share.views.LRTextView
             android:id="@+id/badge_amount_raised_tv"

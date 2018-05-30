@@ -1,5 +1,7 @@
 package com.sharesmile.share.profile;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Rect;
@@ -37,6 +39,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -49,9 +52,14 @@ import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.badges.AchievedBadgeProgressFragment;
+import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
+import com.sharesmile.share.profile.badges.SeeAchivedBadge;
 import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
+import com.sharesmile.share.profile.badges.adapter.CharityOverviewProfileAdapter;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
 import com.sharesmile.share.profile.stats.BarChartEntry;
@@ -81,7 +89,7 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileFragment extends BaseFragment {
+public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
 
     private static final String TAG = "ProfileFragment";
 
@@ -172,10 +180,12 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.rv_achievements)
     RecyclerView achievementsRecylerView;
 
+    AchievementsAdapter achievementsAdapter;
+
     @BindView(R.id.rv_charity_overview)
     RecyclerView charityOverviewRecyclerView;
 
-    AchievementsAdapter achievementsAdapter;
+    CharityOverviewProfileAdapter charityOverviewProfileAdapter;
 
     Rect scrollBounds;
 
@@ -273,7 +283,6 @@ public class ProfileFragment extends BaseFragment {
 
             // Level and Level's progress
             int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
-
             if(lifeTimeImpact==0)
             {
                 workoutLayout.setVisibility(View.GONE);
@@ -328,10 +337,10 @@ public class ProfileFragment extends BaseFragment {
             }
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
             achievementsRecylerView.setLayoutManager(linearLayoutManager);
-            List<AchievedBadge> achievedBadges =MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
+            List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
             if(achievedBadges!=null && achievedBadges.size()>0) {
-                achievementsAdapter = new AchievementsAdapter(achievedBadges);
+                achievementsAdapter = new AchievementsAdapter(achievedBadges,getContext(),this);
                 achievementsRecylerView.setAdapter(achievementsAdapter);
             }
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
@@ -442,6 +451,29 @@ public class ProfileFragment extends BaseFragment {
     private void displayStats() {
         impactInRupees.setText(UnitsManager.formatRupeeToMyCurrency(totalAmountRaised));
 
+    }
+
+    @Override
+    public void showBadgeDetails(int id,String badgeType) {
+        AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
+
+        switch (badgeType)
+        {
+            case Constants.BADGE_TYPE_CAUSE :
+                achievedBadgesData.setCauseBadgeAchieved(id);
+                break;
+            case Constants.BADGE_TYPE_CHANGEMAKER :
+                achievedBadgesData.setChangeMakerBadgeAchieved(id);
+                break;
+            case Constants.BADGE_TYPE_MARATHON :
+                achievedBadgesData.setMarathonBadgeAchieved(id);
+                break;
+            case Constants.BADGE_TYPE_STREAK :
+                achievedBadgesData.setStreakBadgeAchieved(id);
+                break;
+        }
+        AchieviedBadgeFragment achieviedBadgeFragment = AchieviedBadgeFragment.newInstance(achievedBadgesData,badgeType,0);
+        getFragmentController().replaceFragment(achieviedBadgeFragment,true,badgeType);
     }
 
     class SetUpBarChartAsync extends AsyncTask<Void, Void, Void> {

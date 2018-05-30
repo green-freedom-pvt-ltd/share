@@ -273,7 +273,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         state = State.NEEDS_PERMISSION;
         // Permission was denied or request was cancelled
         Logger.i(TAG, "Location Permission denied");
-        Toast.makeText(appContext, "We need location permission to track Runs", Toast.LENGTH_LONG).show();
+        Toast.makeText(appContext, "We need location permission to track your workouts", Toast.LENGTH_LONG).show();
         Iterator<WeakReference<Listener>> iterator = listeners.iterator();
         while (iterator.hasNext()){
             WeakReference<Listener> reference = iterator.next();

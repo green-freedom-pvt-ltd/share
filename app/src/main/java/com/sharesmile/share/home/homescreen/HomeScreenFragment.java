@@ -43,8 +43,6 @@ import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
-import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
 

@@ -2,20 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-
     >
     <LinearLayout
+        android:id="@+id/badge_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="32dp"
-        android:gravity="center"
         android:orientation="vertical"
         >
     <ImageView
         android:layout_width="64dp"
         android:layout_height="74dp"
         android:id="@+id/iv_acheivements"
+        android:src="@drawable/badge_image"
         />
     <com.sharesmile.share.views.LBTextView
         android:layout_width="64dp"
@@ -25,6 +24,7 @@
         android:textSize="11sp"
         android:textColor="@color/black_53"
         android:layout_marginTop="13dp"
+        android:text="Change Maker"
         />
     </LinearLayout>
 </LinearLayout>

@@ -56,6 +56,7 @@ import com.sharesmile.share.profile.EditProfileFragment;
 import com.sharesmile.share.profile.badges.adapter.AchievementBadgeProgressAdapter;
 import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
 import com.sharesmile.share.profile.badges.adapter.HallOfFameAdapter;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.badges.model.HallOfFameData;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
@@ -87,7 +88,7 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class AchievedBadgeProgressFragment extends BaseFragment {
+public class AchievedBadgeProgressFragment extends BaseFragment implements SeeAchivedBadge {
 
     private static final String TAG = "AchievedBadgeProgressFragment";
 
@@ -144,7 +145,9 @@ public class AchievedBadgeProgressFragment extends BaseFragment {
         hallOfFameRecyclerView.setLayoutManager(gridLayoutManager);
 
         Cursor cursor = achievedBadgeDao.getDatabase()
-                .rawQuery("SELECT "+AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+" , COUNT("+AchievedBadgeDao.Properties.Id.columnName+")" +
+                .rawQuery("SELECT "+AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+
+                        " , COUNT("+AchievedBadgeDao.Properties.Id.columnName+")" +
+                        " , "+AchievedBadgeDao.Properties.BadgeType.columnName +
                 "  FROM " + AchievedBadgeDao.TABLENAME
                         +" WHERE "+AchievedBadgeDao.Properties.UserId.columnName+"="+MainApplication.getInstance().getUserID()+" AND "+
                         AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+">0"
@@ -153,13 +156,12 @@ public class AchievedBadgeProgressFragment extends BaseFragment {
         ArrayList<HallOfFameData> hallOfFameBadges = new ArrayList<>();
         while (!cursor.isAfterLast())
         {
-            String msg = cursor.getColumnName(0)+":"+cursor.getInt(0)+", "+cursor.getColumnName(1)+":"+cursor.getInt(1);
-            HallOfFameData hallOfFameData = new HallOfFameData(cursor.getInt(0),cursor.getInt(1));
+            HallOfFameData hallOfFameData = new HallOfFameData(cursor.getInt(0),cursor.getInt(1),cursor.getString(2));
             hallOfFameBadges.add(hallOfFameData);
             cursor.moveToNext();
         }
 
-        hallOfFameAdapter = new HallOfFameAdapter(hallOfFameBadges);
+        hallOfFameAdapter = new HallOfFameAdapter(hallOfFameBadges,this);
         hallOfFameRecyclerView.setAdapter(hallOfFameAdapter);
     }
 
@@ -168,4 +170,26 @@ public class AchievedBadgeProgressFragment extends BaseFragment {
         setToolbarTitle(getResources().getString(R.string.achievements));
     }
 
+    @Override
+    public void showBadgeDetails(int id, String badgeType) {
+        AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
+
+        switch (badgeType)
+        {
+            case Constants.BADGE_TYPE_CAUSE :
+                achievedBadgesData.setCauseBadgeAchieved(id);
+                break;
+            case Constants.BADGE_TYPE_CHANGEMAKER :
+                achievedBadgesData.setChangeMakerBadgeAchieved(id);
+                break;
+            case Constants.BADGE_TYPE_MARATHON :
+                achievedBadgesData.setMarathonBadgeAchieved(id);
+                break;
+            case Constants.BADGE_TYPE_STREAK :
+                achievedBadgesData.setStreakBadgeAchieved(id);
+                break;
+        }
+        AchieviedBadgeFragment achieviedBadgeFragment = AchieviedBadgeFragment.newInstance(achievedBadgesData,badgeType,0);
+        getFragmentController().replaceFragment(achieviedBadgeFragment,true,badgeType);
+    }
 }
