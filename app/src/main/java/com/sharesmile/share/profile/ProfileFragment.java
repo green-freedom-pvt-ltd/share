@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -475,6 +476,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         AchieviedBadgeFragment achieviedBadgeFragment = AchieviedBadgeFragment.newInstance(achievedBadgesData,badgeType,0);
         getFragmentController().replaceFragment(achieviedBadgeFragment,true,badgeType);
     }
+
 
     class SetUpBarChartAsync extends AsyncTask<Void, Void, Void> {
 

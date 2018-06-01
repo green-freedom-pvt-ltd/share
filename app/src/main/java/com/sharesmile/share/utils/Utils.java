@@ -1386,7 +1386,7 @@ public class Utils {
             }
             else
                 achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
-        }else
+        }else if(!categoryCompleted)
         {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
             List<Badge> badges = badgeDao.queryBuilder()

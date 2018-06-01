@@ -1,5 +1,7 @@
 package com.sharesmile.share.core.base;
 
+import android.view.View;
+
 /**
  * Controller for fragments, it contains methods which invoked by fragments and implemented by Activity holding those fragments
  * Created by ankitmaheshwari1 on 11/01/16.

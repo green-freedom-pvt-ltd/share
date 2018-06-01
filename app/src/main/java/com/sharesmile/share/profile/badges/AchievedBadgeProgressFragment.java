@@ -6,6 +6,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Rect;
 import android.graphics.Shader;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -13,6 +14,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -169,7 +171,6 @@ public class AchievedBadgeProgressFragment extends BaseFragment implements SeeAc
         setHasOptionsMenu(false);
         setToolbarTitle(getResources().getString(R.string.achievements));
     }
-
     @Override
     public void showBadgeDetails(int id, String badgeType) {
         AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
@@ -190,6 +191,9 @@ public class AchievedBadgeProgressFragment extends BaseFragment implements SeeAc
                 break;
         }
         AchieviedBadgeFragment achieviedBadgeFragment = AchieviedBadgeFragment.newInstance(achievedBadgesData,badgeType,0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            achieviedBadgeFragment.setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+        }
         getFragmentController().replaceFragment(achieviedBadgeFragment,true,badgeType);
     }
 }

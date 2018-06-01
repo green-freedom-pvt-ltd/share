@@ -2,80 +2,34 @@ package com.sharesmile.share.profile.badges;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.LinearGradient;
-import android.graphics.Rect;
-import android.graphics.Shader;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.core.ShareImageLoader;
-import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.home.homescreen.OnboardingOverlay;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.profile.EditProfileFragment;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
-import com.sharesmile.share.profile.history.ProfileHistoryFragment;
-import com.sharesmile.share.profile.stats.BarChartDataSet;
-import com.sharesmile.share.profile.stats.BarChartEntry;
-import com.sharesmile.share.profile.streak.StreakFragment;
 import com.sharesmile.share.utils.Utils;
-import com.sharesmile.share.views.CircularImageView;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
-
-import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
-import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
-import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
-import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
 
 /**
  * Created by ankitmaheshwari on 4/28/17.
@@ -91,17 +45,27 @@ public class AchieviedBadgeFragment extends BaseFragment {
     TextView badgeEarnedTv;
     @BindView(R.id.badge_title_tv)
     TextView badgeTitle;
+    @BindView(R.id.iv_badge)
+    ImageView badgeIv;
     @BindView(R.id.badge_amount_raised_tv)
     TextView badgeAmountRaised;
     @BindView(R.id.badge_upgrade_tv)
     TextView badgeUpgrade;
+    @BindView(R.id.share_layout)
+    LinearLayout shareLayout;
+    int badgeId = 0;
     int from = -1;
 
     private String TAG = "AchieviedBadgeFragment";
     AchievedBadgesData achievedBadgesData;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    public static AchieviedBadgeFragment newInstance(AchievedBadgesData achievedBadgesData,String tag) {
+    }
+
+    public static AchieviedBadgeFragment newInstance(AchievedBadgesData achievedBadgesData, String tag) {
         AchieviedBadgeFragment fragment = new AchieviedBadgeFragment();
         Bundle args = new Bundle();
         args.putParcelable(Constants.ACHIEVED_BADGE_DATA, achievedBadgesData);
@@ -145,12 +109,13 @@ public class AchieviedBadgeFragment extends BaseFragment {
         TAG = bundle.getString("TAG");
         if(bundle.containsKey("FROM"))
         from = bundle.getInt("FROM",-1);
-
         initUi();
+        startPostponedEnterTransition();
+
     }
 
     private void initUi() {
-        int badgeId = 0;
+
         switch (TAG)
         {
             case Constants.BADGE_TYPE_CHANGEMAKER:
@@ -168,6 +133,7 @@ public class AchieviedBadgeFragment extends BaseFragment {
         }
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(badgeId)).list();
+
         if(badges!=null && badges.size()>0)
         {
             Badge badge = badges.get(0);
@@ -240,6 +206,16 @@ public class AchieviedBadgeFragment extends BaseFragment {
         {
             getFragmentController().goBack();
         }
+    }
+
+    @OnClick(R.id.btn_tell_your_friends)
+    public void tellYourFriends()
+    {
+        Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
+        Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
+                getString(R.string.share_streak));
+        AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId",badgeId)
+                .buildAndDispatch();
     }
 
 }

@@ -18,7 +18,7 @@ public class Urls {
 
     private static final String RUN_LOCATIONS_URL = "/runLocations";
 
-    private static final String CLIENT_CONFIG_URL = "/api/runconfig/";
+    private static final String CLIENT_CONFIG_URL = "/runconfig";
 
     private static final String UPDATE_RUN_URL = "/updaterun/";
 

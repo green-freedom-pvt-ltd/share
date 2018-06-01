@@ -159,10 +159,10 @@ public class StreakFragment extends BaseFragment {
         double distanceDiff = (MainApplication.getInstance().getUserDetails().getStreakGoalDistance() - MainApplication.getInstance().getUserDetails().getStreakRunProgress());
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if(distanceDiff<=0 || userDetails.isStreakAdded()) {
-            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+"kms done today! Congrats");
+            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+" km done today. Congrats!");
         }else
         {
-            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float) distanceDiff*1000)+" kms left, Let's Go.");
+            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float) distanceDiff*1000)+" km left. Let's Go!");
         }
 
         double progress;
@@ -176,6 +176,14 @@ public class StreakFragment extends BaseFragment {
         animation.setInterpolator(new DecelerateInterpolator());
         animation.start();
         streakBest.setText("BEST "+MainApplication.getInstance().getUserDetails().getStreakMaxCount());
+
+        if(achievedBadgesData.getStreakBadgeAchieved()>0)
+        {
+            tellYourFriends.setVisibility(View.VISIBLE);
+        }else
+        {
+            tellYourFriends.setVisibility(View.INVISIBLE);
+        }
     }
 
     @OnClick(R.id.iv_back)
@@ -190,7 +198,7 @@ public class StreakFragment extends BaseFragment {
         Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                 getString(R.string.share_streak));
-        AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
+        AnalyticsEvent.create(Event.ON_SELECT_SHARE_STREAK)
                 .buildAndDispatch();
     }
 

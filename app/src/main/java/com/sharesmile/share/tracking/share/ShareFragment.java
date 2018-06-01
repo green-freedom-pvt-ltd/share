@@ -383,13 +383,13 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     @OnClick(R.id.btn_share_continue)
     public void onContinueClick(){
-        openStreakFragment();
-    }
 
-    private void openStreakFragment() {
         getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK,achievedBadgesData), true);
+        AnalyticsEvent.create(Event.ON_CLICK_CONTINUE_SHARE_SCREEN)
+                .addBundle(mWorkoutData.getWorkoutBundle())
+                .put("user_id", MainApplication.getInstance().getUserID())
+                .buildAndDispatch();
     }
-
 
     private void showLoginSkipDialog() {
 
@@ -463,7 +463,6 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
                 mProgressContainer.setVisibility(View.GONE);
             }
         }
-
     }
 
     @Override
