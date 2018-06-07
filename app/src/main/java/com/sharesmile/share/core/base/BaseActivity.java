@@ -105,6 +105,33 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
         }
     }
 
+    @Override
+    public void addFragment(BaseFragment fragmentToBeLoaded, boolean addToBackStack,String tag) {
+        boolean allowStateLoss = true;
+
+        if (!getSupportFragmentManager().isDestroyed()) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {
+                fragmentTransaction
+                        .add(getFrameLayoutId(), fragmentToBeLoaded, tag);
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(fragmentToBeLoaded.getName(),0);
+            }
+        } else {
+            Logger.e(getName(), "addFragmen: Actvity Destroyed, won't perform FT to load" +
+                    " Fragment " + fragmentToBeLoaded.getName());
+        }
+    }
+
     private boolean isActivityVisible;
 
     @Override

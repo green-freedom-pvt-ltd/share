@@ -1,11 +1,9 @@
 package com.sharesmile.share.profile.badges.adapter;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,12 +16,12 @@ import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
 
-public class AchievementBadgeProgressAdapter extends RecyclerView.Adapter<AchievementBadgeProgressAdapter.AchievementsViewHolder> {
+public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadgeAdapter.AchievementsViewHolder> {
 
-    private static final String TAG = "AchievementBadgeProgressAdapter";
+    private static final String TAG = "InProgressBadgeAdapter";
     List<AchievedBadge> achievedBadges;
 
-    public AchievementBadgeProgressAdapter(List<AchievedBadge> achievedBadges)
+    public InProgressBadgeAdapter(List<AchievedBadge> achievedBadges)
     {
         this.achievedBadges = achievedBadges;
     }
@@ -63,10 +61,10 @@ public class AchievementBadgeProgressAdapter extends RecyclerView.Adapter<Achiev
 
         public void bindView(int position) {
             AchievedBadge achievedBadge = achievedBadges.get(position);
+            achievementBadgeTitle.setText(achievedBadge.getCauseName() + "");
             List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).limit(1).list();
             if(badges!=null && badges.size()>0) {
                 Badge badge = badges.get(0);
-                achievementBadgeTitle.setText(badge.getName() + "");
                 achievementAmount.setText(Utils.formatWithOneDecimal(achievedBadge.getParamDone()) + " / "+Utils.formatWithOneDecimal(badge.getBadgeParameter()));
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;

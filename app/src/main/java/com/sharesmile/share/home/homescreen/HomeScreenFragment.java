@@ -177,34 +177,39 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
          render();
         }else
         {
-            HashMap<String, ArrayList<CauseData>> arrayListHashMap = new HashMap<>();
+            long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+            if(workoutCount>0) {
+                AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+                List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                        .where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CHANGEMAKER),
+                                AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED),
+                                AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+                if(achievedBadges.size()==0) {
+                    BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+                    List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(Constants.BADGE_TYPE_CHANGEMAKER))
+                            .orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
+                    if(badges.size()>0)
+                    {
+                        Badge badge = badges.get(0);
+                    AchievedBadge achievedBadge = new AchievedBadge();
+                    achievedBadge.setCauseName("");
+                    achievedBadge.setCauseId(0);
+                    achievedBadge.setBadgeIdInProgress(badge.getId());
+                    achievedBadge.setBadgeIdAchieved(badge.getId());
+                    achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+                    achievedBadge.setCategory(Constants.BADGE_TYPE_CHANGEMAKER);
+                    achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
+                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                    achievedBadge.setParamDone(0.1);
+                    achievedBadge.setUserId(MainApplication.getInstance().getUserID());
+                    achievedBadgeDao.insertOrReplace(achievedBadge);
+                }
+                }
+            }
             List<CauseData> causeDataArrayList = CauseDataStore.getInstance().getCausesToShow();
             for(CauseData causeData : causeDataArrayList)
             {
-                ArrayList<CauseData> dataArrayList = arrayListHashMap.get(causeData.getCategory());
-                if(dataArrayList == null)
-                    dataArrayList = new ArrayList<>();
-                dataArrayList.add(causeData);
-                arrayListHashMap.put(causeData.getCategory(),dataArrayList);
-            }
-            Iterator<String> iterator = arrayListHashMap.keySet().iterator();
-            while (iterator.hasNext())
-            {
-                String category = iterator.next();
-                ArrayList<CauseData> causeDataList = arrayListHashMap.get(category);
-                boolean categoryCompleted = true;
-                JSONObject causes = new JSONObject();
-                try {
-                    for (CauseData causeData : causeDataList) {
-                        if (!causeData.isCompleted())
-                            categoryCompleted = false;
-                        causes.put(causeData.getId() + "", causeData.getId());
-                    }
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-               Utils.setBadgeForCategory(category,causes.toString(),categoryCompleted,Constants.BADGE_TYPE_CAUSE,0);
+                Utils.setBadgeForCategory(causeData,Constants.BADGE_TYPE_CAUSE,0);
             }
             checkStreak();
         }
@@ -227,6 +232,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     private void checkStreak() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_STREAK_CHECK);
         if(userDetails!=null) {
             try {
                 if (userDetails.getStreakCurrentDate() != null && userDetails.getStreakCurrentDate().length() > 0) {
@@ -236,6 +242,15 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
                     long diff = currentDate.getTime() - streakDate.getTime();
                     float dayCount = (float) diff / (24 * 60 * 60 * 1000);
+
+                    builder.put("streakDate",streakDate.getTime());
+                    builder.put("currentDate",currentDate.getTime());
+                    builder.put("diff",diff);
+                    builder.put("dayCount",dayCount);
+                    builder.put("goal_id",userDetails.getStreakGoalID());
+                    builder.put("goal_distance",userDetails.getStreakGoalDistance());
+                    builder.put("goal_run_progress",userDetails.getStreakRunProgress());
+                    builder.buildAndDispatch();
                     if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                         if ((dayCount > 1)) {
                             userDetails.setStreakRunProgress(0);
@@ -260,15 +275,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            boolean streakBagdeComplted = false;
-            if(MainApplication.getInstance().getUserDetails().getStreakCount() == 0)
-            {
-                streakBagdeComplted = true;
-            }else
-            {
-                streakBagdeComplted = false;
-            }
-               Utils.setBadgeForCategory(Constants.BADGE_TYPE_STREAK,new JSONObject().toString(),streakBagdeComplted,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
+               Utils.setBadgeForCategory(null,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
         }
     }
 
@@ -295,9 +302,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         } else {
             checkAndScheduleMaterialTapOverlays(screenLaunchCount, workoutCount);
         }
-
     }
-
     private void checkAndScheduleMaterialTapOverlays(int screenLaunchCount, long workoutCount){
         if (OnboardingOverlay.LETS_GO.isEligibleForDisplay(screenLaunchCount, workoutCount)){
             scheduleOverlay(OnboardingOverlay.LETS_GO, mRunButton, true);

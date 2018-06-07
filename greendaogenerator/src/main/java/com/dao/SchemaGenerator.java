@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.greenrobot.daogenerator.DaoGenerator;
-import sun.rmi.runtime.Log;
 
 public class SchemaGenerator {
 
@@ -87,7 +86,6 @@ public class SchemaGenerator {
 
     protected static File toFileForceExists(String filename) throws IOException {
         File file = new File(filename);
-        Log.getLog("path : ", file.getCanonicalPath(), 1);
         if (!file.exists()) {
             throw new IOException(filename
                     + " does not exist. This check is to prevent accidental file generation into a wrong path.");

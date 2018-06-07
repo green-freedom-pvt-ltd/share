@@ -10,12 +10,15 @@ package com.sharesmile.share;
 public class AchievedBadge {
 
     private Long id;
-    private int userId;
-    private int badgeIdInProgress;
-    private int badgeIdAchieved;
+    private long userId;
+    private long causeId;
+    /** Not-null value. */
+    private String causeName;
+    private long badgeIdInProgress;
+    private long badgeIdAchieved;
+    private java.util.Date badgeIdAchievedDate;
     /** Not-null value. */
     private String badgeType;
-    private String causeIdJson;
     /** Not-null value. */
     private String category;
     /** Not-null value. */
@@ -32,13 +35,15 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public AchievedBadge(Long id, int userId, int badgeIdInProgress, int badgeIdAchieved, String badgeType, String causeIdJson, String category, String categoryStatus, double paramDone) {
+    public AchievedBadge(Long id, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, String badgeType, String category, String categoryStatus, double paramDone) {
         this.id = id;
         this.userId = userId;
+        this.causeId = causeId;
+        this.causeName = causeName;
         this.badgeIdInProgress = badgeIdInProgress;
         this.badgeIdAchieved = badgeIdAchieved;
+        this.badgeIdAchievedDate = badgeIdAchievedDate;
         this.badgeType = badgeType;
-        this.causeIdJson = causeIdJson;
         this.category = category;
         this.categoryStatus = categoryStatus;
         this.paramDone = paramDone;
@@ -52,28 +57,54 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public int getBadgeIdInProgress() {
+    public long getCauseId() {
+        return causeId;
+    }
+
+    public void setCauseId(long causeId) {
+        this.causeId = causeId;
+    }
+
+    /** Not-null value. */
+    public String getCauseName() {
+        return causeName;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setCauseName(String causeName) {
+        this.causeName = causeName;
+    }
+
+    public long getBadgeIdInProgress() {
         return badgeIdInProgress;
     }
 
-    public void setBadgeIdInProgress(int badgeIdInProgress) {
+    public void setBadgeIdInProgress(long badgeIdInProgress) {
         this.badgeIdInProgress = badgeIdInProgress;
     }
 
-    public int getBadgeIdAchieved() {
+    public long getBadgeIdAchieved() {
         return badgeIdAchieved;
     }
 
-    public void setBadgeIdAchieved(int badgeIdAchieved) {
+    public void setBadgeIdAchieved(long badgeIdAchieved) {
         this.badgeIdAchieved = badgeIdAchieved;
+    }
+
+    public java.util.Date getBadgeIdAchievedDate() {
+        return badgeIdAchievedDate;
+    }
+
+    public void setBadgeIdAchievedDate(java.util.Date badgeIdAchievedDate) {
+        this.badgeIdAchievedDate = badgeIdAchievedDate;
     }
 
     /** Not-null value. */
@@ -84,14 +115,6 @@ public class AchievedBadge {
     /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setBadgeType(String badgeType) {
         this.badgeType = badgeType;
-    }
-
-    public String getCauseIdJson() {
-        return causeIdJson;
-    }
-
-    public void setCauseIdJson(String causeIdJson) {
-        this.causeIdJson = causeIdJson;
     }
 
     /** Not-null value. */

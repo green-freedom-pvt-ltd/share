@@ -1,22 +1,28 @@
 package com.sharesmile.share.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +38,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -104,11 +111,9 @@ import java.util.Map;
 import Models.Level;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.FullscreenPromptBackground;
-import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectanglePromptBackground;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.CirclePromptFocal;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
-import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
@@ -136,7 +141,7 @@ public class Utils {
         return PhoneNumberUtils.isGlobalPhoneNumber(number);
     }
 
-    public static boolean isValidIndianPhoneNumber(String number){
+    public static boolean isValidIndianPhoneNumber(String number) {
         if (!TextUtils.isEmpty(number)) {
             return number.matches("^0?(\\d{10})");
         }
@@ -163,47 +168,50 @@ public class Utils {
 
     /**
      * Format distance in meters to a two decimal KM value, RoundingMode is FLOOR
+     *
      * @param distanceInMeters
      * @return
      */
-    public static String formatToKmsWithTwoDecimal(float distanceInMeters){
+    public static String formatToKmsWithTwoDecimal(float distanceInMeters) {
         return getDecimalFormat("0.00").format(distanceInMeters / 1000);
     }
 
     /**
      * Format the input float to a one decimal String, RoundingMode is FLOOR
+     *
      * @param distance
      * @return
      */
-    public static String formatWithOneDecimal(float distance){
+    public static String formatWithOneDecimal(float distance) {
         return getDecimalFormat("0.0").format(distance);
     }
 
     /**
      * Format the input double to a one decimal String, RoundingMode is FLOOR
+     *
      * @param distance
      * @return
      */
-    public static String formatWithOneDecimal(double distance){
+    public static String formatWithOneDecimal(double distance) {
         return getDecimalFormat("0.0").format(distance);
     }
 
-    public static String formatCalories(double calories){
+    public static String formatCalories(double calories) {
         String caloriesString = "";
-        if (calories > 10){
+        if (calories > 10) {
             caloriesString = Math.round(calories) + " Cal";
-        }else {
+        } else {
             String cals = Utils.formatWithOneDecimal(calories);
-            if ("0.0".equals(cals)){
+            if ("0.0".equals(cals)) {
                 caloriesString = "--";
-            }else {
+            } else {
                 caloriesString = cals + " Cal";
             }
         }
         return caloriesString;
     }
 
-    public static DecimalFormat getDecimalFormat(String pattern){
+    public static DecimalFormat getDecimalFormat(String pattern) {
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat(pattern, dfs);
@@ -212,20 +220,20 @@ public class Utils {
         return df;
     }
 
-    public static String formatCommaSeparated(long value){
-        if (CurrencyCode.INR.equals(UnitsManager.getCurrencyCode())){
+    public static String formatCommaSeparated(long value) {
+        if (CurrencyCode.INR.equals(UnitsManager.getCurrencyCode())) {
 //            return formatIndianCommaSeparated(value);
             Locale locale = new Locale("EN", "IN");
-            NumberFormat format =  NumberFormat.getInstance(locale);
+            NumberFormat format = NumberFormat.getInstance(locale);
             return format.format(value);
-        }else {
+        } else {
             Locale locale = new Locale("EN", "US");
-            NumberFormat format =  NumberFormat.getInstance(locale);
+            NumberFormat format = NumberFormat.getInstance(locale);
             return format.format(value);
         }
     }
 
-    public static String formatIndianCommaSeparated(long value){
+    public static String formatIndianCommaSeparated(long value) {
         Logger.d(TAG, "formatIndianCommaSeparated: value = " + value);
         // remove sign if present
         String raw = String.valueOf(Math.abs(value));
@@ -235,10 +243,10 @@ public class Utils {
         sb = sb.reverse();
         // Counter to keep track of number of commas placed
         int commas = 0;
-        for (int i=0; i<numDigits; i++){
+        for (int i = 0; i < numDigits; i++) {
             // Insert a comma if i is in the range [3, 5, 7, 9, ...)
-            if (i % 2 == 1 && i != 1 ){
-                sb.insert(i+commas, ",");
+            if (i % 2 == 1 && i != 1) {
+                sb.insert(i + commas, ",");
                 commas++;
             }
         }
@@ -345,6 +353,7 @@ public class Utils {
 
     /**
      * Returns time in HH:MM:SS format
+     *
      * @param secs time interval in secs
      * @return
      */
@@ -356,9 +365,9 @@ public class Utils {
             int hour = totalMins / 60;
             int min = totalMins % 60;
             String formatted = String.format("%02d:%02d:%02d", hour, min, sec);
-            if (formatted.startsWith("0")){
+            if (formatted.startsWith("0")) {
                 return formatted.substring(1);
-            }else {
+            } else {
                 return formatted;
             }
         } else {
@@ -369,21 +378,21 @@ public class Utils {
     public static final long hhmmssToSecs(String hhmmss) {
         Long secs = 0L;
         String[] parts = hhmmss.split(":");
-        switch (parts.length){
+        switch (parts.length) {
             case 3:
                 String left = parts[0];
-                if (left.contains(" ")){
+                if (left.contains(" ")) {
                     String[] leftParts = left.split("\\s+");
-                    secs += 86400*Long.parseLong(leftParts[0]);
-                    secs += 3600*Long.parseLong(leftParts[1]);
-                }else{
-                    secs += 3600*Long.parseLong(left);
+                    secs += 86400 * Long.parseLong(leftParts[0]);
+                    secs += 3600 * Long.parseLong(leftParts[1]);
+                } else {
+                    secs += 3600 * Long.parseLong(left);
                 }
-                secs += 60*Long.parseLong(parts[1]);
+                secs += 60 * Long.parseLong(parts[1]);
                 secs += Long.parseLong(parts[2]);
                 break;
             case 2:
-                secs += 60*Long.parseLong(parts[0]);
+                secs += 60 * Long.parseLong(parts[0]);
                 secs += Long.parseLong(parts[1]);
                 break;
             case 1:
@@ -409,13 +418,13 @@ public class Utils {
             int totalMins = secs / 60;
             int hour = totalMins / 60;
             int min = totalMins % 60;
-            if (min == 0){
-                if (hour == 1){
+            if (min == 0) {
+                if (hour == 1) {
                     return String.format("1 hour");
-                }else {
+                } else {
                     return String.format("%d hours", hour);
                 }
-            }else {
+            } else {
                 return String.format("%d hours %d minutes", hour, min);
             }
         } else {
@@ -463,7 +472,7 @@ public class Utils {
         context.startActivity(Intent.createChooser(shareIntent, "send"));
     }
 
-    public static void shareImageWithMessage(final Context context, final String imageUrl, final String shareMessage){
+    public static void shareImageWithMessage(final Context context, final String imageUrl, final String shareMessage) {
         ShareImageLoader.getInstance().getImageLoader().load(imageUrl)
                 .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
             @Override
@@ -507,8 +516,8 @@ public class Utils {
             FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
             out.close();
-            bmpUri = FileProvider.getUriForFile(context,
-                    context.getApplicationContext().getPackageName() + ".core.my.provider", file);
+            bmpUri = FileProvider.getUriForFile(context, getFileProvider(context)
+                    , file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -517,11 +526,15 @@ public class Utils {
         return bmpUri;
     }
 
+    public static String getFileProvider(Context context) {
+        return context.getApplicationContext().getPackageName() + ".core.my.provider";
+    }
+
     public static Bitmap getBitmapFromLiveView(View view) {
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(returnedBitmap);
-        Drawable bgDrawable =view.getBackground();
-        if (bgDrawable!=null)
+        Drawable bgDrawable = view.getBackground();
+        if (bgDrawable != null)
             bgDrawable.draw(canvas);
         else
             canvas.drawColor(Color.WHITE);
@@ -538,7 +551,7 @@ public class Utils {
         }
     }
 
-    public static void launchUri(Context context, Uri uri){
+    public static void launchUri(Context context, Uri uri) {
         Logger.d(TAG, "Launching uri: " + uri.toString());
         try {
             context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
@@ -547,10 +560,10 @@ public class Utils {
         }
     }
 
-    public static String dedupName(String firstName, String lastName){
-        if (TextUtils.isEmpty(lastName)){
+    public static String dedupName(String firstName, String lastName) {
+        if (TextUtils.isEmpty(lastName)) {
             return firstName;
-        }else if (TextUtils.isEmpty(firstName)){
+        } else if (TextUtils.isEmpty(firstName)) {
             return lastName;
         }
         // If both the names are present
@@ -560,24 +573,24 @@ public class Utils {
 
         // De dup logic
         int len = parts.length;
-        if (len > 1){
+        if (len > 1) {
             sb.append(toCamelCase(parts[0]));
-            for (int i=1; i<len; i++){
-                if (!parts[i-1].equalsIgnoreCase(parts[i])){
+            for (int i = 1; i < len; i++) {
+                if (!parts[i - 1].equalsIgnoreCase(parts[i])) {
                     sb.append(" ");
                     sb.append(toCamelCase(parts[i]));
                 }
             }
             return sb.toString();
-        }else if (len == 1){
+        } else if (len == 1) {
             return toCamelCase(parts[0]);
-        }else {
+        } else {
             return "";
         }
     }
 
     public static String toCamelCase(final String init) {
-        if (init==null)
+        if (init == null)
             return null;
 
         final StringBuilder ret = new StringBuilder(init.length());
@@ -587,7 +600,7 @@ public class Utils {
                 ret.append(word.substring(0, 1).toUpperCase());
                 ret.append(word.substring(1).toLowerCase());
             }
-            if (!(ret.length()==init.length()))
+            if (!(ret.length() == init.length()))
                 ret.append(" ");
         }
 
@@ -607,19 +620,20 @@ public class Utils {
         }
     }
 
-    public static Run convertWorkoutToRun(Workout workout){
+    public static Run convertWorkoutToRun(Workout workout) {
         Logger.d(TAG, "convertWorkoutToRun");
 
         Run run = new Run();
         run.setId(workout.getId());
         run.setCauseName(workout.getCauseBrief());
         run.setCauseId(workout.getCauseId() != null ? workout.getCauseId() : 0);
+
         run.setDistance(workout.getDistance());
-        if (workout.getBeginTimeStamp() != null){
+        if (workout.getBeginTimeStamp() != null) {
             Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
             run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(workout.getBeginTimeStamp())));
         }
-        if (workout.getEndTimeStamp() != null){
+        if (workout.getEndTimeStamp() != null) {
             run.setEndTime(DateUtil.getDefaultFormattedDate(new Date(workout.getEndTimeStamp())));
         }
         run.setRunAmount(workout.getRunAmount() == null ? 0 : workout.getRunAmount());
@@ -627,16 +641,16 @@ public class Utils {
         run.setNumSteps(workout.getSteps() == null ? 0 : workout.getSteps());
         run.setAvgSpeed(workout.getAvgSpeed());
         run.setClientRunId(workout.getWorkoutId());
-        if (workout.getStartPointLatitude() != null){
+        if (workout.getStartPointLatitude() != null) {
             run.setStartLocationLat(workout.getStartPointLatitude());
         }
-        if (workout.getStartPointLongitude() != null){
+        if (workout.getStartPointLongitude() != null) {
             run.setStartLocationLong(workout.getStartPointLongitude());
         }
-        if (workout.getEndPointLatitude() != null){
+        if (workout.getEndPointLatitude() != null) {
             run.setEndLocationLat(workout.getEndPointLatitude());
         }
-        if (workout.getEndPointLongitude() != null){
+        if (workout.getEndPointLongitude() != null) {
             run.setEndLocationLong(workout.getEndPointLongitude());
         }
         run.setIsFlag(!workout.getIsValidRun());
@@ -651,12 +665,12 @@ public class Utils {
         return run;
     }
 
-    public static Run convertWorkoutDataToRun(WorkoutData data){
+    public static Run convertWorkoutDataToRun(WorkoutData data) {
         Logger.d(TAG, "convertWorkoutDataToRun");
 
         Run run = new Run();
         run.setDistance(data.getDistance() / 1000);
-        if (data.getBeginTimeStamp() > 0){
+        if (data.getBeginTimeStamp() > 0) {
             Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
             run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(data.getBeginTimeStamp())));
         }
@@ -664,16 +678,16 @@ public class Utils {
         run.setNumSteps(data.getTotalSteps());
         run.setAvgSpeed(data.getAvgSpeed());
         run.setClientRunId(data.getWorkoutId());
-        if (data.getStartPoint() != null){
+        if (data.getStartPoint() != null) {
             run.setStartLocationLat(data.getStartPoint().latitude);
         }
-        if (data.getStartPoint() != null){
+        if (data.getStartPoint() != null) {
             run.setStartLocationLong(data.getStartPoint().longitude);
         }
-        if (data.getLatestPoint()!= null){
+        if (data.getLatestPoint() != null) {
             run.setEndLocationLat(data.getLatestPoint().latitude);
         }
-        if (data.getLatestPoint() != null){
+        if (data.getLatestPoint() != null) {
             run.setEndLocationLong(data.getLatestPoint().longitude);
         }
         run.setTeamId(LeaderBoardDataStore.getInstance().getMyTeamId());
@@ -689,19 +703,20 @@ public class Utils {
 
     /**
      * Calculates DeltaCalories as per METS formula
+     *
      * @param deltaTimeMillis time interval in millis in which this distance is covered
-     * @param deltaSpeed speed in m/s during which the distance was covered
+     * @param deltaSpeed      speed in m/s during which the distance was covered
      * @return Kcal calculated using METS formula
      */
-    public static double getDeltaCaloriesMets(long deltaTimeMillis, float deltaSpeed){
+    public static double getDeltaCaloriesMets(long deltaTimeMillis, float deltaSpeed) {
         double mets = getMetsValue(deltaSpeed);
         float bodyWeightKgs = MainApplication.getInstance().getBodyWeight();
-        return mets * bodyWeightKgs * ( ((double)(deltaTimeMillis)) / (1000*60*60) );
+        return mets * bodyWeightKgs * (((double) (deltaTimeMillis)) / (1000 * 60 * 60));
     }
 
-    public static double getMetsValue(float deltaSpeed){
+    public static double getMetsValue(float deltaSpeed) {
         // deltaSpeed is in m/s
-        double mph = 2.23694*deltaSpeed;
+        double mph = 2.23694 * deltaSpeed;
 
         // Referring Compendium of Physical Activities over here
         // https://sites.google.com/site/compendiumofphysicalactivities/Activity-Categories/walking
@@ -710,94 +725,94 @@ public class Utils {
 
         if (mph <= 0.625) {
             return 0;
-        }else if (mph <= 1){
+        } else if (mph <= 1) {
             return 1.3;
-        }else if (mph <= 2){
-            return (1.3 + 1.5*(mph - 1)); // 2.8 at 2 mph
-        }else if (mph <= 2.5){
-            return 2.8 + 0.8*(mph - 2); // 3.2 at 2.5 mph
-        }else if (mph <= 3.5){
-            return 3.2 + 1.4*(mph - 2.5); // 4.6 at 3.5 mph
-        }else if (mph <= 4){
+        } else if (mph <= 2) {
+            return (1.3 + 1.5 * (mph - 1)); // 2.8 at 2 mph
+        } else if (mph <= 2.5) {
+            return 2.8 + 0.8 * (mph - 2); // 3.2 at 2.5 mph
+        } else if (mph <= 3.5) {
+            return 3.2 + 1.4 * (mph - 2.5); // 4.6 at 3.5 mph
+        } else if (mph <= 4) {
             if (ActivityDetector.getInstance().getRunningConfidence()
-                    >= ActivityDetector.getInstance().getWalkingConfidence()){
+                    >= ActivityDetector.getInstance().getWalkingConfidence()) {
                 // User is running
-                return 4.8 + 3.2*(mph - 3.5); // 6.4 at 4 mph
-            }else {
+                return 4.8 + 3.2 * (mph - 3.5); // 6.4 at 4 mph
+            } else {
                 // User is Walking
-                return 4.6 + 1.4*(mph - 3.5); // 5.3 at 4 mph
+                return 4.6 + 1.4 * (mph - 3.5); // 5.3 at 4 mph
             }
         }
         /// All walking values uptill here, range 4-5 mph is ambiguous range need to decide between running and walking
-        else if (mph <= 5){
+        else if (mph <= 5) {
             if (ActivityDetector.getInstance().getRunningConfidence()
-                    >= ActivityDetector.getInstance().getWalkingConfidence()){
+                    >= ActivityDetector.getInstance().getWalkingConfidence()) {
                 // User is running
-                return 6.4 + 2.3*(mph - 4); // 8.7 at 5 mph
-            }else {
+                return 6.4 + 2.3 * (mph - 4); // 8.7 at 5 mph
+            } else {
                 // User is Walking
-                if (mph <= 4.5){
+                if (mph <= 4.5) {
                     // 4 - 4.5 mph
-                    return 5.3 + 4.2*(mph - 4); // 7.4 at 4.5 mph
-                }else {
+                    return 5.3 + 4.2 * (mph - 4); // 7.4 at 4.5 mph
+                } else {
                     // 4.5 - 5 mph
-                    return 7.4 + 2.6*(mph - 4.5); // 8.7 at 5 mph
+                    return 7.4 + 2.6 * (mph - 4.5); // 8.7 at 5 mph
                 }
             }
-        }else if (mph <= 6){
-            return 8.7 + 1.6*(mph - 5); // 10.3 at 6 mph
-        }else if (mph <= 7){
-            return 10.3 + 1.3*(mph - 6); // 11.6 at 7mph
-        }else if (mph <= 7.7){
-            return 11.6 + 1.143*(mph - 7); // 12.4 at 7.7 mph
-        }else if (mph <= 9){
-            return 12.4 + 0.77*(mph - 7.7); // 13.4 at 9 mph
-        }else if (mph <= 10){
-            return 13.4 + 1.7*(mph - 9); // 15.1 at 10 mph
-        }else if (mph <= 11){
-            return 15.1 + 1.5*(mph - 10); // 16.6 at 11 mph
-        }else if (mph <= 12){
-            return 16.6 + 3*(mph - 11); // 19.6 at 12 mph
-        }else if (mph <= 14){
-            return 19.6 + 2*(mph - 12); // 23.6 at 14 mph
-        }else if (mph <= 15){
-            return 23.6 + 1*(mph - 14); // 24.6 at 15 mph
-        }else {
+        } else if (mph <= 6) {
+            return 8.7 + 1.6 * (mph - 5); // 10.3 at 6 mph
+        } else if (mph <= 7) {
+            return 10.3 + 1.3 * (mph - 6); // 11.6 at 7mph
+        } else if (mph <= 7.7) {
+            return 11.6 + 1.143 * (mph - 7); // 12.4 at 7.7 mph
+        } else if (mph <= 9) {
+            return 12.4 + 0.77 * (mph - 7.7); // 13.4 at 9 mph
+        } else if (mph <= 10) {
+            return 13.4 + 1.7 * (mph - 9); // 15.1 at 10 mph
+        } else if (mph <= 11) {
+            return 15.1 + 1.5 * (mph - 10); // 16.6 at 11 mph
+        } else if (mph <= 12) {
+            return 16.6 + 3 * (mph - 11); // 19.6 at 12 mph
+        } else if (mph <= 14) {
+            return 19.6 + 2 * (mph - 12); // 23.6 at 14 mph
+        } else if (mph <= 15) {
+            return 23.6 + 1 * (mph - 14); // 24.6 at 15 mph
+        } else {
             // For speeds greater than 15 mph (23 kmph) we assume that the person is driving so we don't add calories
             return 1.3;
         }
     }
 
-    public static double getDeltaCaloriesKarkanen(long deltaTimeMillis, float deltaSpeed){
-        double mph = 2.23694*deltaSpeed;
+    public static double getDeltaCaloriesKarkanen(long deltaTimeMillis, float deltaSpeed) {
+        double mph = 2.23694 * deltaSpeed;
         float bodyWeightKgs = MainApplication.getInstance().getBodyWeight();
-        if (bodyWeightKgs == 0){
+        if (bodyWeightKgs == 0) {
             return 0;
         }
-        double bodyWeightLbs = 2.205*bodyWeightKgs;
+        double bodyWeightLbs = 2.205 * bodyWeightKgs;
         double mins = ((double) deltaTimeMillis) / (1000 * 60);
 
-        if (mph <= 0){
+        if (mph <= 0) {
             return 0;
-        }else if (mph <= 1){
+        } else if (mph <= 1) {
             // METS formula for the case when speed is extremely low
             return 1.3 * bodyWeightKgs * (mins / 60);
-        }else if (mph <= 3){
+        } else if (mph <= 3) {
             return bodyWeightLbs * mins * karkanenCalorieRateForWalking(mph, bodyWeightLbs);
-        }else if (mph <= 5){
+        } else if (mph <= 5) {
             // Range 3-5 mph is ambiguous range need to decide between running and walking
             if (ActivityDetector.getInstance().getRunningConfidence()
-                    >= ActivityDetector.getInstance().getWalkingConfidence()){
+                    >= ActivityDetector.getInstance().getWalkingConfidence()) {
                 // User is Running
                 return bodyWeightLbs * mins * karkanenCalorieRateForRunning(mph, bodyWeightLbs);
-            }else {
+            } else {
                 // User is Walking
                 return bodyWeightLbs * mins * karkanenCalorieRateForWalking(mph, bodyWeightLbs);
             }
-        }else if (mph <= 14){
+        } else if (mph <= 14) {
             // User is assumed to be running
             return bodyWeightLbs * mins * karkanenCalorieRateForRunning(mph, bodyWeightLbs);
-        }else {
+        } else {
             // Too fast, user must be in a vehicle
             // Hence METS formula for calculating calories burned for a static user
             return 1.3 * bodyWeightKgs * (mins / 60);
@@ -807,39 +822,41 @@ public class Utils {
 
     /**
      * Calculates Karkanen rate of burning calories per lb per min for a Walking user
-     * @param speed in mph
+     *
+     * @param speed       in mph
      * @param weightInLbs in lbs
      * @return Returns Kcal/lb-min
      */
-    public static double karkanenCalorieRateForWalking(double speed, double weightInLbs){
+    public static double karkanenCalorieRateForWalking(double speed, double weightInLbs) {
         double a = 0.0195;
-        double b = (-1)*0.00436;
+        double b = (-1) * 0.00436;
         double c = 0.00245;
-        double d = ( 0.000801*Math.pow(weightInLbs/154, 0.425) ) / weightInLbs;
+        double d = (0.000801 * Math.pow(weightInLbs / 154, 0.425)) / weightInLbs;
         return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
     }
 
     /**
      * Calculates Karkanen rate of burning calories per lb per min for a Running user
-     * @param speed in mph
+     *
+     * @param speed       in mph
      * @param weightInLbs in lbs
      * @return Returns Kcal/lb-min
      */
-    public static double karkanenCalorieRateForRunning(double speed, double weightInLbs){
+    public static double karkanenCalorieRateForRunning(double speed, double weightInLbs) {
         double a = 0.0395;
         double b = 0.00327;
         double c = 0.000455;
-        double d = ( 0.00801*Math.pow(weightInLbs/154, 0.425) ) / weightInLbs;
+        double d = (0.00801 * Math.pow(weightInLbs / 154, 0.425)) / weightInLbs;
         return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
     }
 
-    public static final Level getLevel(int impactInRupees){
+    public static final Level getLevel(int impactInRupees) {
         Iterator<Map.Entry<Integer, Level>> iter = Constants.LEVELS_MAP.entrySet().iterator();
         Level result = null;
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             Map.Entry<Integer, Level> entry = iter.next();
             Level level = entry.getValue();
-            if (impactInRupees >= level.getMinImpact() && impactInRupees < level.getMaxImpact()){
+            if (impactInRupees >= level.getMinImpact() && impactInRupees < level.getMaxImpact()) {
                 result = level;
                 break;
             }
@@ -851,7 +868,7 @@ public class Utils {
      * Updates the overall metrics related to historical run data
      * For e.g. lifetime_impact, lifetime_distance, etc.
      */
-    public static void updateTrackRecordFromDb(){
+    public static void updateTrackRecordFromDb() {
 
         // SQL Fiddle to refer: http://sqlfiddle.com/#!7/f0aed/1
 
@@ -861,13 +878,13 @@ public class Utils {
         SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
         // Calculate total_amount_raised, total_distance, total_steps, total_recorded_time, and total_calories
         Cursor cursor = database.rawQuery("SELECT "
-                + "SUM(" +WorkoutDao.Properties.RunAmount.columnName + "), "
-                + "SUM("+ WorkoutDao.Properties.Distance.columnName +"), "
-                + "SUM("+ WorkoutDao.Properties.Steps.columnName +"), "
-                + "SUM("+ WorkoutDao.Properties.RecordedTime.columnName +"), "
-                + "SUM("+ WorkoutDao.Properties.Calories.columnName +") "
+                + "SUM(" + WorkoutDao.Properties.RunAmount.columnName + "), "
+                + "SUM(" + WorkoutDao.Properties.Distance.columnName + "), "
+                + "SUM(" + WorkoutDao.Properties.Steps.columnName + "), "
+                + "SUM(" + WorkoutDao.Properties.RecordedTime.columnName + "), "
+                + "SUM(" + WorkoutDao.Properties.Calories.columnName + ") "
                 + "FROM " + WorkoutDao.TABLENAME + " where "
-                + WorkoutDao.Properties.IsValidRun.columnName + " is 1", new String []{});
+                + WorkoutDao.Properties.IsValidRun.columnName + " is 1", new String[]{});
         cursor.moveToFirst();
         int totalAmountRaised = (int) Math.floor(cursor.getFloat(0));
         long totalDistance = Math.round(cursor.getDouble(1));
@@ -892,16 +909,16 @@ public class Utils {
 
     }
 
-    public static String getAppVersion(){
+    public static String getAppVersion() {
         String appVersion = SharedPrefsManager.getInstance().getString(Constants.PREF_APP_VERSION);
-        if (TextUtils.isEmpty(appVersion)){
+        if (TextUtils.isEmpty(appVersion)) {
             MainApplication.getInstance().updateAppVersionInPrefs();
         }
         return appVersion;
     }
 
 
-    private static void setTrackRecordForAnalytics(){
+    private static void setTrackRecordForAnalytics() {
         Analytics.getInstance().setUserProperty(USER_PROP_LIFETIME_DISTANCE,
                 SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE));
         Analytics.getInstance().setUserProperty(USER_PROP_LIFETIME_STEPS,
@@ -918,53 +935,53 @@ public class Utils {
                 SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_IMPACT));
     }
 
-    public static float getAverageStrideLength(){
+    public static float getAverageStrideLength() {
         long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE); // in Kms
         long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
 
-        if (lifetimeDistance == 0 || lifetimeSteps == 0){
+        if (lifetimeDistance == 0 || lifetimeSteps == 0) {
             return 0;
         }
-        return ((float) lifetimeDistance*1000 ) / ((float) lifetimeSteps); // in meter/step
+        return ((float) lifetimeDistance * 1000) / ((float) lifetimeSteps); // in meter/step
     }
 
-    public static float getNormalizedStrideLength(float inputStrideLength){
+    public static float getNormalizedStrideLength(float inputStrideLength) {
         // Calculate avgStrideLength (distance covered in one foot step) of the user
         float normalisedStrideLength = (inputStrideLength == 0)
                 ? (ClientConfig.getInstance().GLOBAL_AVERAGE_STRIDE_LENGTH) : inputStrideLength;
         // Normalising averageStrideLength obtained
-        if (normalisedStrideLength < ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT){
+        if (normalisedStrideLength < ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT) {
             normalisedStrideLength = ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_LOWER_LIMIT;
         }
-        if (normalisedStrideLength > ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_UPPER_LIMIT){
+        if (normalisedStrideLength > ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_UPPER_LIMIT) {
             normalisedStrideLength = ClientConfig.getInstance().GLOBAL_STRIDE_LENGTH_UPPER_LIMIT;
         }
         return normalisedStrideLength;
     }
 
-    public static float getLifetimeAverageSpeed(){
+    public static float getLifetimeAverageSpeed() {
         long lifetimeDistance = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_DISTANCE); // in Kms
         long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT); // in secs
 
-        if (lifetimeDistance <= 0 || lifetimeWorkingOut <= 0){
+        if (lifetimeDistance <= 0 || lifetimeWorkingOut <= 0) {
             return 0;
         }
         float lifeTimeHours = ((float) lifetimeWorkingOut) / 3600;
-        return ((float) lifetimeDistance ) / lifeTimeHours; // in Km/hr
+        return ((float) lifetimeDistance) / lifeTimeHours; // in Km/hr
     }
 
-    public static float getLifetimeAverageStepsPerSec(){
+    public static float getLifetimeAverageStepsPerSec() {
         long lifetimeSteps = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_STEPS);
         long lifetimeWorkingOut = SharedPrefsManager.getInstance().getLong(Constants.PREF_WORKOUT_LIFETIME_WORKING_OUT);
 
-        if (lifetimeSteps <= 0 || lifetimeWorkingOut <= 0){
+        if (lifetimeSteps <= 0 || lifetimeWorkingOut <= 0) {
             return 0;
         }
-        return ((float) lifetimeSteps ) / ((float) lifetimeWorkingOut);
+        return ((float) lifetimeSteps) / ((float) lifetimeWorkingOut);
     }
 
-    public static AlertDialog showWeightInputDialog(final Activity activity){
-        if (activity == null || activity.isFinishing()){
+    public static AlertDialog showWeightInputDialog(final Activity activity) {
+        if (activity == null || activity.isFinishing()) {
             return null;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -996,19 +1013,17 @@ public class Utils {
         AnalyticsEvent.create(Event.ON_LOAD_WEIGHT_INPUT_DIALOG)
                 .buildAndDispatch();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-        {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 String inputWeight = editText.getText().toString();
-                if (TextUtils.isEmpty(inputWeight)){
+                if (TextUtils.isEmpty(inputWeight)) {
                     MainApplication.showToast(R.string.enter_actual_weight);
-                }else {
+                } else {
                     float weight = Float.parseFloat(inputWeight);
-                    if (weight < 10 || weight > 200){
+                    if (weight < 10 || weight > 200) {
                         MainApplication.showToast(R.string.enter_actual_weight);
-                    }else {
+                    } else {
                         MainApplication.getInstance().setBodyWeight(weight);
                         EventBus.getDefault().post(new BodyWeightChangedEvent());
                         dialog.dismiss();
@@ -1021,8 +1036,8 @@ public class Utils {
         return dialog;
     }
 
-    public static AlertDialog showEnterEmailDialog(final Activity activity){
-        if (activity == null || activity.isFinishing()){
+    public static AlertDialog showEnterEmailDialog(final Activity activity) {
+        if (activity == null || activity.isFinishing()) {
             return null;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -1054,19 +1069,17 @@ public class Utils {
         AnalyticsEvent.create(Event.ON_LOAD_WEIGHT_INPUT_DIALOG)
                 .buildAndDispatch();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-        {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 String inputWeight = editText.getText().toString();
-                if (TextUtils.isEmpty(inputWeight)){
+                if (TextUtils.isEmpty(inputWeight)) {
                     MainApplication.showToast(R.string.enter_actual_weight);
-                }else {
+                } else {
                     float weight = Float.parseFloat(inputWeight);
-                    if (weight < 10 || weight > 200){
+                    if (weight < 10 || weight > 200) {
                         MainApplication.showToast(R.string.enter_actual_weight);
-                    }else {
+                    } else {
                         MainApplication.getInstance().setBodyWeight(weight);
                         EventBus.getDefault().post(new BodyWeightChangedEvent());
                         dialog.dismiss();
@@ -1079,11 +1092,11 @@ public class Utils {
         return dialog;
     }
 
-    public static String getLocationDataFileName(String workoutId, int batchNum){
+    public static String getLocationDataFileName(String workoutId, int batchNum) {
         return "location_data_" + workoutId + "_" + batchNum;
     }
 
-    public static double logBase2(double num){
+    public static double logBase2(double num) {
         return (Math.log(num) / Math.log(2));
     }
 
@@ -1091,11 +1104,12 @@ public class Utils {
 
     /**
      * Returns a unique ID of device that is ANDROID_ID
+     *
      * @param context
      * @return
      */
     public static String getUniqueId(Context context) {
-        if (!TextUtils.isEmpty(UNIQUE_ID)){
+        if (!TextUtils.isEmpty(UNIQUE_ID)) {
             return UNIQUE_ID;
         }
         if (null == context) {
@@ -1107,6 +1121,7 @@ public class Utils {
 
     /**
      * Returns device IMEI, requires READ_PHONE_STATE permission which belongs to Phone group
+     *
      * @param context
      * @return device IMEI
      */
@@ -1120,6 +1135,7 @@ public class Utils {
      * A 64-bit number (as a hex string) that is randomly generated when the user first sets up the
      * device and should remain constant for the lifetime of the user's device.
      * The value may change if a factory reset is performed on the device
+     *
      * @param context
      * @return
      */
@@ -1155,11 +1171,11 @@ public class Utils {
         }
     }
 
-    public static int convertDistanceToRupees(float conversionRate, float distanceInMeters){
-        return  Math.round(conversionRate * (distanceInMeters / 1000));
+    public static int convertDistanceToRupees(float conversionRate, float distanceInMeters) {
+        return Math.round(conversionRate * (distanceInMeters / 1000));
     }
 
-    public static String getWorkoutLocationDataPendingQueuePrefKey(String workoutId){
+    public static String getWorkoutLocationDataPendingQueuePrefKey(String workoutId) {
         return PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX + workoutId;
     }
 
@@ -1171,6 +1187,7 @@ public class Utils {
 
     /**
      * Get ISO 3166-1 alpha-2 country code for this device (or null if not available)
+     *
      * @param context Context reference to get the TelephonyManager instance from
      * @return country code or null
      */
@@ -1180,56 +1197,51 @@ public class Utils {
             final String simCountry = tm.getSimCountryIso();
             if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
                 return simCountry.toLowerCase(Locale.US);
-            }
-            else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+            } else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
                 String networkCountry = tm.getNetworkCountryIso();
                 if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
                     return networkCountry.toLowerCase(Locale.US);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
     public static MaterialTapTargetPrompt setOverlay(final OnboardingOverlay overlay, View target,
-                                                     Activity activity, boolean isRectangular, boolean isDissmissEnable,boolean isRect){
+                                                     Activity activity, boolean isRectangular, boolean isDissmissEnable, boolean isRect) {
         Logger.d(TAG, "showOverlay: " + overlay.name());
         MaterialTapTargetPrompt.Builder builder = new MaterialTapTargetPrompt.Builder(activity);
         builder.setTarget(target);
 
         builder.setPrimaryText(overlay.getTitle());
         builder.setSecondaryText(overlay.getDescription());
-        if (isRectangular){
+        if (isRectangular) {
             builder.setPromptBackground(new FullscreenPromptBackground());
 //            builder.setPromptBackground(new RectanglePromptBackground());
-            if(isRect)
-            builder.setPromptFocal(new RectanglePromptFocal());
+            if (isRect)
+                builder.setPromptFocal(new RectanglePromptFocal());
             else
                 builder.setPromptFocal(new CirclePromptFocal());
         }
         builder.setAutoDismiss(isDissmissEnable);
         builder.setAutoFinish(isDissmissEnable);
         builder.setCaptureTouchEventOutsidePrompt(isDissmissEnable);
-        builder.setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener()
-        {
+        builder.setPromptStateChangeListener(new MaterialTapTargetPrompt.PromptStateChangeListener() {
             @Override
-            public void onPromptStateChanged(MaterialTapTargetPrompt prompt, int state)
-            {
-                if (state == STATE_FOCAL_PRESSED)
-                {
-                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " +  STATE_FOCAL_PRESSED);
+            public void onPromptStateChanged(MaterialTapTargetPrompt prompt, int state) {
+                if (state == STATE_FOCAL_PRESSED) {
+                    Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FOCAL_PRESSED);
                     overlay.registerUseOfOverlay();
                     prompt.dismiss();
                 }
-                if (state == STATE_DISMISSED){
+                if (state == STATE_DISMISSED) {
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_DISMISSED);
                     overlay.registerUseOfOverlay();
                     prompt.dismiss();
                 }
-                if (state == STATE_FINISHED){
+                if (state == STATE_FINISHED) {
                     Logger.d(TAG, overlay.name() + " onPromptStateChanged: " + STATE_FINISHED);
                     prompt.dismiss();
                     overlay.registerUseOfOverlay();
@@ -1240,19 +1252,16 @@ public class Utils {
         return materialTapTargetPrompt;
     }
 
-    public static String getCurrentDateDDMMYYYY()
-    {
+    public static String getCurrentDateDDMMYYYY() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
-    public static void setReminderTime(String time,Context context)
-    {
-        if(time.length() == 0)
-        {
-            SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET,false);
-        }else {
+    public static void setReminderTime(String time, Context context) {
+        if (time.length() == 0) {
+            SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET, false);
+        } else {
             SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET, true);
             SharedPrefsManager.getInstance().setString(Constants.REMINDER_TIME, time);
             Calendar calendar = Calendar.getInstance();
@@ -1279,20 +1288,18 @@ public class Utils {
 
     }
 
-    public static void cancelReminderTime(Context context)
-    {
-        SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET,false);
+    public static void cancelReminderTime(Context context) {
+        SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET, false);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context,0,intent,0);
+        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         alarmManager.cancel(alarmPendingIntent);
     }
 
-    public static Calendar getReminderTime()
-    {
+    public static Calendar getReminderTime() {
         Calendar calendar = Calendar.getInstance();
-        String time = SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME,calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE));
+        String time = SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
         try {
             calendar.setTimeInMillis(simpleDateFormat.parse(time).getTime());
@@ -1302,96 +1309,106 @@ public class Utils {
         return calendar;
     }
 
-    public static void setNumberPicker(NumberPicker picker,String s[],int setDefault) {
+    public static void setNumberPicker(NumberPicker picker, String s[], int setDefault) {
         picker.setValue(0);
         picker.setMinValue(0);
-        picker.setMaxValue(s.length-1);
+        picker.setMaxValue(s.length - 1);
         //implement array string to number picker
         picker.setDisplayedValues(s);
         picker.setWrapSelectorWheel(false);
         //disable soft keyboard
         picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
-        if(setDefault!=-1)
-        picker.setValue(setDefault);
+        if (setDefault != -1)
+            picker.setValue(setDefault);
     }
 
     public static boolean checkOnboardingShown() {
 
-        return SharedPrefsManager.getInstance().getBoolean(PREF_SHOWN_ONBOARDING,false);
+        return SharedPrefsManager.getInstance().getBoolean(PREF_SHOWN_ONBOARDING, false);
     }
 
     public static void setOnboardingShown() {
 
-        SharedPrefsManager.getInstance().setBoolean(PREF_SHOWN_ONBOARDING,true);
+        SharedPrefsManager.getInstance().setBoolean(PREF_SHOWN_ONBOARDING, true);
     }
 
     public static void setUserLoggedIn(UserDetails userDetails) {
         try {
-            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN,"{}"));
+            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN, "{}"));
             JSONObject user = new JSONObject();
-            user.put("streak_goal_id",userDetails.getStreakGoalID());
-            user.put("streak_goal_distance",userDetails.getStreakGoalDistance());
-            user.put("streak_count",userDetails.getStreakCount());
-            user.put("streak_current_date",userDetails.getStreakCurrentDate());
-            user.put("streak_goal_id",userDetails.getStreakGoalID());
-            user.put("streak_goal_id",userDetails.getStreakGoalID());
-            user.put("reminder_time",SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME,""));
-            jsonObject.put(userDetails.getUserId()+"",user);
-            SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN,jsonObject.toString());
+            user.put("streak_goal_id", userDetails.getStreakGoalID());
+            user.put("streak_goal_distance", userDetails.getStreakGoalDistance());
+            user.put("streak_count", userDetails.getStreakCount());
+            user.put("streak_current_date", userDetails.getStreakCurrentDate());
+            user.put("streak_goal_id", userDetails.getStreakGoalID());
+            user.put("streak_goal_id", userDetails.getStreakGoalID());
+            user.put("reminder_time", SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME, ""));
+            jsonObject.put(userDetails.getUserId() + "", user);
+            SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN, jsonObject.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public static void setMenuText(MenuItem menuItem,Context context,String s,int color) {
+    public static void setMenuText(MenuItem menuItem, Context context, String s, int color) {
         SpannableString spannableString = new SpannableString(s);
-        spannableString.setSpan(new RelativeSizeSpan(0.8f), 0,spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); // set size
+        spannableString.setSpan(new RelativeSizeSpan(0.8f), 0, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); // set size
         Typeface font = Typeface.createFromAsset(context.getAssets(), "fonts/Lato-Bold.ttf");
         spannableString.setSpan(new CustomTypefaceSpan("", font), 0, spannableString.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        spannableString.setSpan(new ForegroundColorSpan(color),0,spannableString.length(),0);
+        spannableString.setSpan(new ForegroundColorSpan(color), 0, spannableString.length(), 0);
         menuItem.setTitle(spannableString);
 
     }
 
-    public static String cmsToInches(int cms)
-    {
-        int feet = (int) (cms/30.48);
-        int inches = (int) Math.round((cms%30.48) * 0.393701);
-        inches = inches==12?11:inches;
-        return feet + "' "+inches+"\"";
+    public static String cmsToInches(int cms) {
+        int feet = (int) (cms / 30.48);
+        int inches = (int) Math.round((cms % 30.48) * 0.393701);
+        inches = inches == 12 ? 11 : inches;
+        return feet + "' " + inches + "\"";
     }
 
-    public static String inchesTocms(String i)
-    {
+    public static String inchesTocms(String i) {
         String[] feetInches = i.split(" ");
-        int feet = Integer.parseInt(feetInches[0].substring(0,feetInches[0].length()-1));
-        int inches = Integer.parseInt(feetInches[1].substring(0,feetInches[1].length()-1));
-        int cms = (int) Math.round((feet*30.48) + (inches/0.393701));
-        return cms+"";
+        int feet = Integer.parseInt(feetInches[0].substring(0, feetInches[0].length() - 1));
+        int inches = Integer.parseInt(feetInches[1].substring(0, feetInches[1].length() - 1));
+        int cms = (int) Math.round((feet * 30.48) + (inches / 0.393701));
+        return cms + "";
     }
-    public static void setBadgeForCategory(String category, String causes, boolean categoryCompleted,String type,double paramDone) {
+
+    public static void setBadgeForCategory(CauseData causeData, String type, int paramDone) {
         AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
-                .where(AchievedBadgeDao.Properties.Category.eq(category),
-                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
-                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+        boolean categoryCompleted = true;
+        List<AchievedBadge> achievedBadges;
+        if (causeData != null) {
+            achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.CauseId.eq(causeData.getId()),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+            categoryCompleted = causeData.isCompleted();
+        } else {
+            achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.Category.eq(type),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+            categoryCompleted = paramDone == 0 ? true : false;
+        }
         AchievedBadge achievedBadge = null;
-        if(achievedBadges.size()>0) {
-            achievedBadge=achievedBadges.get(0);
-            if(categoryCompleted) {
-             if(((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone()!=0) ||
-                     (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))) && categoryCompleted)
-                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-            }
-            else
+        if (achievedBadges.size() > 0) {
+            achievedBadge = achievedBadges.get(0);
+            if (categoryCompleted) {
+                if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
+                        (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))) && categoryCompleted)
+                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+            } else
                 achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
-        }else if(!categoryCompleted)
-        {
+        } else if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || !categoryCompleted) {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            String category = causeData == null ? type : causeData.getCategory();
+
             List<Badge> badges = badgeDao.queryBuilder()
                     .where(BadgeDao.Properties.Category.eq(category)).orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
-            if(badges.size()>0) {
+            if (badges.size() > 0) {
                 Badge badge = badges.get(0);
                 achievedBadge = new AchievedBadge();
                 achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
@@ -1399,49 +1416,46 @@ public class Utils {
                 achievedBadge.setCategory(category);
                 achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
                 achievedBadge.setParamDone(paramDone);
-                if(categoryCompleted)
+                if (categoryCompleted)
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                 else
                     achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
-                if(type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))
-                {
-                    if(categoryCompleted && paramDone==0)
-                    {
+                if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)) {
+                    if (categoryCompleted && paramDone == 0) {
                         achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
                     }
                 }
             }
         }
-        if(achievedBadge!=null) {
-            achievedBadge.setCauseIdJson(causes);
-            if(achievedBadge.getId()!=null && achievedBadge.getId()>0)
-            achievedBadgeDao.update(achievedBadge);
+        if (achievedBadge != null) {
+            achievedBadge.setCauseId(causeData == null ? 0 : causeData.getId());
+            achievedBadge.setCauseName(causeData == null ? "" : causeData.getTitle());
+            if (achievedBadge.getId() != null && achievedBadge.getId() > 0)
+                achievedBadgeDao.update(achievedBadge);
             else
                 achievedBadgeDao.insertOrReplace(achievedBadge);
         }
     }
 
 
-    public static int checkAchievedBadge(double distanceCovered, String badgeType, CauseData mCauseData) {
+    public static long checkAchievedBadge(double distanceCovered, String badgeType, CauseData mCauseData) {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges;
         String category = "";
-        if(badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+        if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
             badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType),
                     BadgeDao.Properties.Category.eq(mCauseData.getCategory()))
                     .orderAsc(BadgeDao.Properties.NoOfStars).list();
             category = mCauseData.getCategory();
-        }
-        else
-        {
-            badges= badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType))
+        } else {
+            badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(badgeType))
                     .orderAsc(BadgeDao.Properties.NoOfStars).list();
             category = badgeType;
         }
 
         AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
         List<AchievedBadge> achievedBadges;
-        if(badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CHANGEMAKER)) {
+        if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CHANGEMAKER)) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
@@ -1450,54 +1464,61 @@ public class Utils {
                 return -1;
             }
         }
-//        }else {
-        achievedBadges = achievedBadgeDao.queryBuilder()
-                .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
-                        AchievedBadgeDao.Properties.Category.eq(category),
-                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
-                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
-//        }
+        if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+            achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                            AchievedBadgeDao.Properties.CauseId.eq(mCauseData.getId()),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+        } else {
+            achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+        }
         AchievedBadge achievedBadge;
-        int badgeAchieved = -1;
+        long badgeAchieved = -1;
 
 
         if (achievedBadges.size() == 0) {
             achievedBadge = new AchievedBadge();
             achievedBadge.setUserId(MainApplication.getInstance().getUserID());
             achievedBadge.setCategory(category);
+            achievedBadge.setCauseId(mCauseData.getId());
+            achievedBadge.setCauseName(mCauseData.getTitle());
             achievedBadge.setBadgeType(badgeType);
-            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge,mCauseData);
+            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge, mCauseData);
         } else {
             achievedBadge = achievedBadges.get(0);
-            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge,mCauseData);
+            badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge, mCauseData);
         }
-        if(badgeAchieved!=0)
-        if(!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved!=-1)) {
-            if(achievedBadge.getId()!=null && achievedBadge.getId()>0) {
-                achievedBadgeDao.update(achievedBadge);
-            }else
-            {
-                achievedBadgeDao.insertOrReplace(achievedBadge);
+        if (badgeAchieved != 0)
+            if (!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) ||
+                    (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved != -1)) {
+                if (achievedBadge.getId() != null && achievedBadge.getId() > 0) {
+                    achievedBadgeDao.update(achievedBadge);
+                } else {
+                    achievedBadgeDao.insertOrReplace(achievedBadge);
+                }
             }
-        }
         return badgeAchieved;
     }
 
-    public static int checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge, CauseData mCauseData) {
+    public static long checkBadgeList(List<Badge> badges, double paramDone, AchievedBadge achievedBadge, CauseData mCauseData) {
         int indexAcheived = -1;
         int indexInProgress = -1;
         double totalParamDone = 0;
-        if(achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) || achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))
-        {
+        if (achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) ||
+                achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)) {
             totalParamDone = paramDone;
-        }else {
+        } else {
             double x = achievedBadge.getParamDone();
             totalParamDone = x + paramDone;
         }
         achievedBadge.setParamDone(totalParamDone);
-        int badgeIdAchieved = achievedBadge.getBadgeIdAchieved();
-        int badgeIdInProgress = achievedBadge.getBadgeIdInProgress();
-        if(!achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON)) {
+        long badgeIdAchieved = achievedBadge.getBadgeIdAchieved();
+        long badgeIdInProgress = achievedBadge.getBadgeIdInProgress();
+        if (!achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON)) {
             for (int i = 0; i < badges.size(); i++) {
                 Badge badge = badges.get(i);
                 if (totalParamDone < badge.getBadgeParameter()) {
@@ -1508,17 +1529,15 @@ public class Utils {
             if (indexInProgress != -1) {
                 if (indexInProgress > 0) {
                     indexAcheived = indexInProgress - 1;
-                }else
-                {
-                    if(totalParamDone >= badges.get(indexInProgress).getBadgeParameter())
+                } else {
+                    if (totalParamDone >= badges.get(indexInProgress).getBadgeParameter())
                         indexAcheived = indexInProgress;
                 }
             } else {
-                indexInProgress = badges.size()-1;
-                indexAcheived = badges.size()-1;
+                indexInProgress = badges.size() - 1;
+                indexAcheived = badges.size() - 1;
             }
-        }else
-        {
+        } else {
             for (int i = 0; i < badges.size(); i++) {
                 Badge badge = badges.get(i);
                 if (totalParamDone >= badge.getBadgeParameter()) {
@@ -1527,78 +1546,135 @@ public class Utils {
                 }
             }
         }
-        if(indexInProgress == -1)
-        {
+        if (indexInProgress == -1) {
             return 0;
         }
         Badge badge = badges.get(indexInProgress);
         achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
-        if(indexAcheived!=-1) {
+        if (indexAcheived != -1) {
             Badge badgeAcheived = badges.get(indexAcheived);
             achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
-        }else
-        {
+            achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+        } else {
             achievedBadge.setBadgeIdAchieved(0);
         }
-        String causeIds = achievedBadge.getCauseIdJson();
-        JSONObject causeIdJsonObject = new JSONObject();
-        try {
-            if(achievedBadge.getBadgeType().equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
-                if (causeIds != null) {
-                    causeIdJsonObject = new JSONObject(causeIds);
-                }
-                causeIdJsonObject.put(mCauseData.getId() + "", mCauseData.getId());
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         String status = Constants.BADGE_IN_PROGRESS;
-        switch (achievedBadge.getBadgeType())
-        {
-            case Constants.BADGE_TYPE_CAUSE :
-                if(mCauseData.isCompleted())
-                {
+        switch (achievedBadge.getBadgeType()) {
+            case Constants.BADGE_TYPE_CAUSE:
+                if (mCauseData.isCompleted()) {
                     status = Constants.BADGE_COMPLETED;
-                }else
-                {
+                } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
                 break;
-            case Constants.BADGE_TYPE_STREAK :
-                if(indexAcheived == indexInProgress)
-                {
+            case Constants.BADGE_TYPE_STREAK:
+                if (indexAcheived == indexInProgress) {
                     status = Constants.BADGE_COMPLETED;
-                }else
-                {
+                } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
                 break;
-            case Constants.BADGE_TYPE_CHANGEMAKER :
-                if(indexAcheived == indexInProgress)
-                {
+            case Constants.BADGE_TYPE_CHANGEMAKER:
+                if (indexAcheived == indexInProgress) {
                     status = Constants.BADGE_COMPLETED;
-                }else
-                {
+                } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
                 break;
-            case Constants.BADGE_TYPE_MARATHON :
-                if(indexAcheived == indexInProgress)
-                {
+            case Constants.BADGE_TYPE_MARATHON:
+                if (indexAcheived == indexInProgress) {
                     status = Constants.BADGE_COMPLETED;
-                }else
-                {
+                } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
                 break;
         }
 
         achievedBadge.setCategoryStatus(status);
-
-        achievedBadge.setCauseIdJson(causeIdJsonObject.toString());
         if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
             return achievedBadge.getBadgeIdAchieved();
         else
             return -1;
+    }
+
+    public static File createImageFile(Context context) throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        return image;
+    }
+
+    @SuppressLint("NewApi")
+    public static String getRealPathFromURI_API19(Context context, Uri uri) {
+        String filePath = "";
+        String wholeID = DocumentsContract.getDocumentId(uri);
+
+        // Split at colon, use second item in the array
+        String id = wholeID.split(":")[1];
+
+        String[] column = {MediaStore.Images.Media.DATA};
+
+        // where id is equal to
+        String sel = MediaStore.Images.Media._ID + "=?";
+
+        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, new String[]{id}, null);
+
+        int columnIndex = cursor.getColumnIndex(column[0]);
+
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+        cursor.close();
+        return filePath;
+    }
+
+
+    @SuppressLint("NewApi")
+    public static String getRealPathFromURI_API11to18(Context context, Uri contentUri) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+        String result = null;
+
+        CursorLoader cursorLoader = new CursorLoader(
+                context,
+                contentUri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        if (cursor != null) {
+            int column_index =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            result = cursor.getString(column_index);
+        }
+        return result;
+    }
+
+    public static boolean isVisible(View view) {
+        if (view == null) {
+            return false;
+        }
+        if (!view.isShown()) {
+            return false;
+        }
+        final Rect actualPosition = new Rect();
+        view.getGlobalVisibleRect(actualPosition);
+        final Rect screen = new Rect(0, 0, getScreenWidth(), getScreenHeight());
+        return actualPosition.intersect(screen);
+    }
+
+    public static int getScreenWidth() {
+        return Resources.getSystem().getDisplayMetrics().widthPixels;
+    }
+
+    public static int getScreenHeight() {
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 }

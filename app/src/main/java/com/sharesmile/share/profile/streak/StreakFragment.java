@@ -177,7 +177,9 @@ public class StreakFragment extends BaseFragment {
         animation.start();
         streakBest.setText("BEST "+MainApplication.getInstance().getUserDetails().getStreakMaxCount());
 
-        if(achievedBadgesData.getStreakBadgeAchieved()>0)
+        if(achievedBadgesData==null) {
+            tellYourFriends.setVisibility(View.VISIBLE);
+        }else if(achievedBadgesData.getStreakBadgeAchieved()>0)
         {
             tellYourFriends.setVisibility(View.VISIBLE);
         }else

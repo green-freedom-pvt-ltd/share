@@ -1,5 +1,7 @@
 package com.sharesmile.share.core.event;
 
+import android.content.Intent;
+
 import com.sharesmile.share.core.cause.model.CauseList;
 
 import Models.CampaignList;
@@ -67,6 +69,61 @@ public class UpdateEvent {
         public BadgeUpdated()
         {
 
+        }
+    }
+
+    public static class EditImagePermissionGranted{
+        private int requestCode;
+
+        public int getRequestCode() {
+            return requestCode;
+        }
+
+        public void setRequestCode(int requestCode) {
+            this.requestCode = requestCode;
+        }
+
+        public EditImagePermissionGranted(int requestCode)
+        {
+            setRequestCode(requestCode);
+        }
+    }
+
+    public static class ImageCapture{
+        private int resultCode;
+        private int requestCode;
+
+        public int getRequestCode() {
+            return requestCode;
+        }
+
+        public void setRequestCode(int requestCode) {
+            this.requestCode = requestCode;
+        }
+
+        public Intent getData() {
+            return data;
+        }
+
+        public void setData(Intent data) {
+            this.data = data;
+        }
+
+        private Intent data;
+
+        public int getResultCode() {
+            return resultCode;
+        }
+
+        public void setResultCode(int resultCode) {
+            this.resultCode = resultCode;
+        }
+
+        public ImageCapture(int requestCode, int resultCode, Intent data)
+        {
+            setResultCode(resultCode);
+            setRequestCode(requestCode);
+            setData(data);
         }
     }
 }

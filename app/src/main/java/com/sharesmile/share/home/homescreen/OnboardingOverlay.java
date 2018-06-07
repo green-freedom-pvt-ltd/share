@@ -16,7 +16,7 @@ public enum OnboardingOverlay {
     FEED(7, 3000, 5, "pref_did_use_feed"),
     OVERALL_IMAPACT(10, 3000, 5, "pref_did_see_impact_so_far"),
     HELP_CENTER(8, 250, 5, "pref_did_use_help_center"),
-    STREAK_COUNT(2, 0, 0, "pref_did_open_profile"),
+    STREAK_COUNT(2, 0, 0, "pref_did_open_streak"),
     MY_STATS(3, 0, 1, "pref_did_see_my_stats");
 
     private int minLaunchCount;

@@ -8,60 +8,24 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.utils.Utils;
 
 public class AchievedBadgesData implements Parcelable{
-    private int changeMakerBadgeAchieved;
-    private int causeBadgeAchieved;
-    private int streakBadgeAchieved;
-    private int marathonBadgeAchieved;
+    private long changeMakerBadgeAchieved;
+    private long causeBadgeAchieved;
+    private long streakBadgeAchieved;
+    private long marathonBadgeAchieved;
 
-    public int getChangeMakerBadgeAchieved() {
-        return changeMakerBadgeAchieved;
-    }
-
-    public void setChangeMakerBadgeAchieved(int changeMakerBadgeAchieved) {
-        this.changeMakerBadgeAchieved = changeMakerBadgeAchieved;
-    }
-
-    public int getCauseBadgeAchieved() {
-        return causeBadgeAchieved;
-    }
-
-    public void setCauseBadgeAchieved(int causeBadgeAchieved) {
-        this.causeBadgeAchieved = causeBadgeAchieved;
-    }
-
-    public int getStreakBadgeAchieved() {
-        return streakBadgeAchieved;
-    }
-
-    public void setStreakBadgeAchieved(int streakBadgeAchieved) {
-        this.streakBadgeAchieved = streakBadgeAchieved;
-    }
-
-    public int getMarathonBadgeAchieved() {
-        return marathonBadgeAchieved;
-    }
-
-    public void setMarathonBadgeAchieved(int marathonBadgeAchieved) {
-        this.marathonBadgeAchieved = marathonBadgeAchieved;
-    }
-
-    public AchievedBadgesData()
-    {
-
-    }
     protected AchievedBadgesData(Parcel in) {
-        changeMakerBadgeAchieved = in.readInt();
-        causeBadgeAchieved = in.readInt();
-        streakBadgeAchieved = in.readInt();
-        marathonBadgeAchieved = in.readInt();
+        changeMakerBadgeAchieved = in.readLong();
+        causeBadgeAchieved = in.readLong();
+        streakBadgeAchieved = in.readLong();
+        marathonBadgeAchieved = in.readLong();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(changeMakerBadgeAchieved);
-        dest.writeInt(causeBadgeAchieved);
-        dest.writeInt(streakBadgeAchieved);
-        dest.writeInt(marathonBadgeAchieved);
+        dest.writeLong(changeMakerBadgeAchieved);
+        dest.writeLong(causeBadgeAchieved);
+        dest.writeLong(streakBadgeAchieved);
+        dest.writeLong(marathonBadgeAchieved);
     }
 
     @Override
@@ -80,4 +44,42 @@ public class AchievedBadgesData implements Parcelable{
             return new AchievedBadgesData[size];
         }
     };
+
+    public long getChangeMakerBadgeAchieved() {
+        return changeMakerBadgeAchieved;
+    }
+
+    public void setChangeMakerBadgeAchieved(long changeMakerBadgeAchieved) {
+        this.changeMakerBadgeAchieved = changeMakerBadgeAchieved;
+    }
+
+    public long getCauseBadgeAchieved() {
+        return causeBadgeAchieved;
+    }
+
+    public void setCauseBadgeAchieved(long causeBadgeAchieved) {
+        this.causeBadgeAchieved = causeBadgeAchieved;
+    }
+
+    public long getStreakBadgeAchieved() {
+        return streakBadgeAchieved;
+    }
+
+    public void setStreakBadgeAchieved(long streakBadgeAchieved) {
+        this.streakBadgeAchieved = streakBadgeAchieved;
+    }
+
+    public long getMarathonBadgeAchieved() {
+        return marathonBadgeAchieved;
+    }
+
+    public void setMarathonBadgeAchieved(long marathonBadgeAchieved) {
+        this.marathonBadgeAchieved = marathonBadgeAchieved;
+    }
+
+    public AchievedBadgesData()
+    {
+
+    }
+
 }

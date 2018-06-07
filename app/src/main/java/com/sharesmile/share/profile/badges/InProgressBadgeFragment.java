@@ -1,103 +1,46 @@
 package com.sharesmile.share.profile.badges;
 
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.LinearGradient;
-import android.graphics.Rect;
-import android.graphics.Shader;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.ShareImageLoader;
-import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.home.homescreen.OnboardingOverlay;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.profile.EditProfileFragment;
-import com.sharesmile.share.profile.badges.adapter.AchievementBadgeProgressAdapter;
-import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
+import com.sharesmile.share.profile.badges.adapter.InProgressBadgeAdapter;
 import com.sharesmile.share.profile.badges.adapter.HallOfFameAdapter;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.badges.model.HallOfFameData;
-import com.sharesmile.share.profile.history.ProfileHistoryFragment;
-import com.sharesmile.share.profile.stats.BarChartDataSet;
-import com.sharesmile.share.profile.stats.BarChartEntry;
-import com.sharesmile.share.profile.streak.StreakFragment;
-import com.sharesmile.share.utils.Utils;
-import com.sharesmile.share.views.CircularImageView;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import Models.Level;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import de.greenrobot.dao.query.WhereCondition;
-import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
-
-import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
-import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
-import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
-import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
 
 /**
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class AchievedBadgeProgressFragment extends BaseFragment implements SeeAchivedBadge {
+public class InProgressBadgeFragment extends BaseFragment implements SeeAchivedBadge {
 
-    private static final String TAG = "AchievedBadgeProgressFragment";
+    private static final String TAG = "InProgressBadgeFragment";
 
     @BindView(R.id.rv_achievement_badges)
     RecyclerView achievementBadgesRecyclerView;
 
-    AchievementBadgeProgressAdapter achievementBadgeProgressAdapter;
+    InProgressBadgeAdapter inProgressBadgeAdapter;
 
     @BindView(R.id.rv_hall_of_fame)
     RecyclerView hallOfFameRecyclerView;
@@ -134,8 +77,8 @@ public class AchievedBadgeProgressFragment extends BaseFragment implements SeeAc
         List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                 .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
                         AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
-        achievementBadgeProgressAdapter = new AchievementBadgeProgressAdapter(achievedBadges);
-        achievementBadgesRecyclerView.setAdapter(achievementBadgeProgressAdapter);
+        inProgressBadgeAdapter = new InProgressBadgeAdapter(achievedBadges);
+        achievementBadgesRecyclerView.setAdapter(inProgressBadgeAdapter);
 
         LinearLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3)
         {
@@ -172,7 +115,7 @@ public class AchievedBadgeProgressFragment extends BaseFragment implements SeeAc
         setToolbarTitle(getResources().getString(R.string.achievements));
     }
     @Override
-    public void showBadgeDetails(int id, String badgeType) {
+    public void showBadgeDetails(long id, String badgeType) {
         AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
 
         switch (badgeType)

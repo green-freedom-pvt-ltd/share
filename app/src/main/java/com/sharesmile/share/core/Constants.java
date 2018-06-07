@@ -36,6 +36,10 @@ public class Constants {
 
     public static final int CODE_GOOGLE_PLAY_SERVICES_RESOLUTION = 104;
 
+    public static final int CODE_REQUEST_IMAGE_CAPTURE_PERMISSION = 105;
+
+    public static final int CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION = 106;
+
     public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.tracking.location";
 
     public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.tracking.location.tracker";
@@ -200,6 +204,7 @@ public class Constants {
     public static final String PREFS_MY_EXCHANGE_RATE = "my_exchange_rate";
 
     public static final int REQUEST_CODE_LOGIN = 1001;
+    public static final int REQUEST_IMAGE_CAPTURE = 102;
 
     public static final String PAUSE_REASON_GPS_DISABLED = "gps_disabled";
     public static final String PAUSE_REASON_USAIN_BOLT = "usain_bolt";

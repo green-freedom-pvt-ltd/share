@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -87,9 +89,10 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
 import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
+import static com.sharesmile.share.core.Constants.REQUEST_IMAGE_CAPTURE;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
-import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_ID;
+
 
 
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -633,6 +636,9 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             if (resultCode == RESULT_OK) {
                 replaceFragment(LeagueBoardFragment.getInstance(), true);
             }
+        }else if(requestCode == REQUEST_IMAGE_CAPTURE)
+        {
+            EventBus.getDefault().post(new UpdateEvent.ImageCapture(requestCode,resultCode,data));
         }
     }
 
@@ -814,4 +820,28 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == Constants.CODE_REQUEST_IMAGE_CAPTURE_PERMISSION ||
+                requestCode == Constants.CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION)
+        {
+         boolean checkPermission = true;
+         for(int grantResult:grantResults)
+         {
+             if(grantResult != PackageManager.PERMISSION_GRANTED)
+             {
+                 checkPermission = false;
+                 break;
+             }
+         }
+         if(checkPermission)
+         {
+             EventBus.getDefault().post(new UpdateEvent.EditImagePermissionGranted(requestCode));
+         }else
+         {
+             MainApplication.showToast("Permission not Granted");
+         }
+        }
+    }
 }

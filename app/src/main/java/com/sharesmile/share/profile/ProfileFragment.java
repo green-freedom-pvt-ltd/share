@@ -1,7 +1,5 @@
 package com.sharesmile.share.profile;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Rect;
@@ -13,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +37,6 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
-import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -53,13 +49,13 @@ import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.profile.badges.AchievedBadgeProgressFragment;
+import com.sharesmile.share.profile.badges.InProgressBadgeFragment;
 import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
 import com.sharesmile.share.profile.badges.SeeAchivedBadge;
 import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
 import com.sharesmile.share.profile.badges.adapter.CharityOverviewProfileAdapter;
+import com.sharesmile.share.profile.badges.model.AchievedBadgeCount;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
@@ -71,7 +67,11 @@ import com.sharesmile.share.views.CircularImageView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import Models.Level;
@@ -80,7 +80,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 
-import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_RUN;
 import static com.sharesmile.share.core.Constants.PREF_WORKOUT_LIFETIME_DISTANCE;
@@ -339,9 +338,44 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
             achievementsRecylerView.setLayoutManager(linearLayoutManager);
             List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
-                    .where(AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
+                    .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0))
+                    .orderDesc(AchievedBadgeDao.Properties.BadgeIdAchievedDate).list();
+
             if(achievedBadges!=null && achievedBadges.size()>0) {
-                achievementsAdapter = new AchievementsAdapter(achievedBadges,getContext(),this);
+                JSONObject jsonObject = new JSONObject();
+                for (AchievedBadge achievedBadge :
+                        achievedBadges) {
+                    if(jsonObject.has(achievedBadge.getBadgeIdAchieved()+""))
+                    {
+                        try {
+                            long count  = jsonObject.getLong(achievedBadge.getBadgeIdAchieved()+"");
+                            jsonObject.put(achievedBadge.getBadgeIdAchieved()+"",count++);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }else
+                    {
+                        try {
+                            jsonObject.put(achievedBadge.getBadgeIdAchieved()+"",1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                Iterator<String> iterator = jsonObject.keys();
+                ArrayList<AchievedBadgeCount> achievedBadgeCounts = new ArrayList<>();
+                while (iterator.hasNext())
+                {
+                    AchievedBadgeCount achievedBadgeCount = new AchievedBadgeCount();
+                    achievedBadgeCount.setAchievedBadgeId(Long.parseLong(iterator.next()));
+                    try {
+                        achievedBadgeCount.setCount(jsonObject.getLong(achievedBadgeCount.getAchievedBadgeId()+""));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    achievedBadgeCounts.add(achievedBadgeCount);
+                }
+                achievementsAdapter = new AchievementsAdapter(achievedBadgeCounts,getContext(),this);
                 achievementsRecylerView.setAdapter(achievementsAdapter);
             }
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
@@ -424,6 +458,13 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 {
                     int sh = scrollBounds.height();
                     int bh = runHistoryButton.getHeight();
+                    if(!streakValue.getLocalVisibleRect(scrollBounds) || sh<bh)
+                    {
+
+                    }else
+                    {
+                        prepareStreakOnboardingOverlays();
+                    }
                     if(!runHistoryButton.getLocalVisibleRect(scrollBounds) ||
                             sh < bh)
                     {
@@ -455,7 +496,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
     }
 
     @Override
-    public void showBadgeDetails(int id,String badgeType) {
+    public void showBadgeDetails(long id,String badgeType) {
         AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
 
         switch (badgeType)
@@ -641,6 +682,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 BarChartEntry barChartEntry = barChartDataSetDaily.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats",true);
             }
 
             @Override
@@ -707,6 +749,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 BarChartEntry barChartEntry = barChartDataSetWeekly.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats",true);
             }
 
             @Override
@@ -773,6 +816,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 BarChartEntry barChartEntry = barChartDataSetMonthly.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats",true);
             }
 
             @Override
@@ -818,12 +862,14 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_PROFILE_FOR_STREAK), true);
         AnalyticsEvent.create(Event.ON_CLICK_STREAK_ICON)
                 .buildAndDispatch();
+        SharedPrefsManager.getInstance().setBoolean("pref_did_open_streak",true);
     }
 
     OverlayStatsRunnable overlayStatsRunnable;
     OverlayStreakRunnable overlayStreakRunnable;
 
     private void prepareStreakOnboardingOverlays() {
+
         if (OnboardingOverlay.STREAK_COUNT.isEligibleForDisplay(getProfileOpenCount(), 0) && overlayStreakRunnable == null) {
             overlayStreakRunnable = new OverlayStreakRunnable();
             MainApplication.getMainThreadHandler().postDelayed(overlayStreakRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
@@ -852,7 +898,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         private boolean cancelled;
         @Override
         public void run() {
-            if (!cancelled && isVisible()) {
+            boolean b=Utils.isVisible(streakValue);
+            if (!cancelled && isVisible() && b) {
                 // This is a hack to get hold of the anchor view for help center menu item
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
                         streakValue,
@@ -885,9 +932,9 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         }
     }
 
-    @OnClick(R.id.see_all_badges)
-    public void onClickSeeAll()
+    @OnClick(R.id.see_in_progress_badges)
+    public void onClickSeeInProgress()
     {
-        getFragmentController().replaceFragment(new AchievedBadgeProgressFragment(), true);
+        getFragmentController().replaceFragment(new InProgressBadgeFragment(), true);
     }
 }

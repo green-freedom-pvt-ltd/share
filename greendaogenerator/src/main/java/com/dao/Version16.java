@@ -190,14 +190,15 @@ public class Version16 extends SchemaVersion {
     }
 
     private static void addAchievedBadgeData(Schema schema){
-
         Entity achievedBadge = schema.addEntity("AchievedBadge");
         achievedBadge.addIdProperty().autoincrement();
-        achievedBadge.addIntProperty("userId").notNull();
-        achievedBadge.addIntProperty("badgeIdInProgress").notNull();
-        achievedBadge.addIntProperty("badgeIdAchieved").notNull();
+        achievedBadge.addLongProperty("userId").notNull();
+        achievedBadge.addLongProperty("causeId").notNull();
+        achievedBadge.addStringProperty("causeName").notNull();
+        achievedBadge.addLongProperty("badgeIdInProgress").notNull();
+        achievedBadge.addLongProperty("badgeIdAchieved").notNull();
+        achievedBadge.addDateProperty("badgeIdAchievedDate");
         achievedBadge.addStringProperty("badgeType").notNull();
-        achievedBadge.addStringProperty("causeIdJson");
         achievedBadge.addStringProperty("category").notNull();
         achievedBadge.addStringProperty("categoryStatus").notNull();
         achievedBadge.addDoubleProperty("paramDone").notNull();

@@ -1,14 +1,20 @@
 package com.sharesmile.share.profile.badges;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,7 +41,7 @@ import butterknife.OnClick;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class AchieviedBadgeFragment extends BaseFragment {
+public class AchieviedBadgeFragment extends BaseFragment implements View.OnClickListener {
 
     @BindView(R.id.close_iv)
     ImageView closeIv;
@@ -53,11 +59,14 @@ public class AchieviedBadgeFragment extends BaseFragment {
     TextView badgeUpgrade;
     @BindView(R.id.share_layout)
     LinearLayout shareLayout;
-    int badgeId = 0;
+    @BindView(R.id.btn_tell_your_friends)
+    Button tellYourFriends;
+    long badgeId = 0;
     int from = -1;
 
     private String TAG = "AchieviedBadgeFragment";
     AchievedBadgesData achievedBadgesData;
+    ObjectAnimator animation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -145,12 +154,42 @@ public class AchieviedBadgeFragment extends BaseFragment {
         {
             closeIv.setVisibility(View.VISIBLE);
             continueTv.setVisibility(View.INVISIBLE);
+            tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
         }else
         {
             closeIv.setVisibility(View.INVISIBLE);
             continueTv.setVisibility(View.VISIBLE);
+            animation = ObjectAnimator.ofFloat(badgeIv, "rotationY", 0.0f, 720f);
+            animation.setDuration(2200);
+            animation.setRepeatCount(0);
+            animation.setInterpolator(new DecelerateInterpolator());
+            animation.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+            animation.start();
         }
+
+
     }
+
 
     @OnClick({R.id.continue_tv,R.id.close_iv})
     public void continueClick(View v) {
@@ -193,6 +232,15 @@ public class AchieviedBadgeFragment extends BaseFragment {
         }
     }
 
+    public void tellYourFriends()
+    {
+        Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
+        Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
+                getString(R.string.share_streak));
+        AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId",badgeId)
+                .buildAndDispatch();
+    }
+
     private void openHomeActivityAndFinish(){
         if (from!=0 && getActivity() != null){
 
@@ -208,14 +256,8 @@ public class AchieviedBadgeFragment extends BaseFragment {
         }
     }
 
-    @OnClick(R.id.btn_tell_your_friends)
-    public void tellYourFriends()
-    {
-        Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
-        Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
-                getString(R.string.share_streak));
-        AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId",badgeId)
-                .buildAndDispatch();
+    @Override
+    public void onClick(View view) {
+        tellYourFriends();
     }
-
 }

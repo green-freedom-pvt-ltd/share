@@ -24,14 +24,16 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property UserId = new Property(1, int.class, "userId", false, "USER_ID");
-        public final static Property BadgeIdInProgress = new Property(2, int.class, "badgeIdInProgress", false, "BADGE_ID_IN_PROGRESS");
-        public final static Property BadgeIdAchieved = new Property(3, int.class, "badgeIdAchieved", false, "BADGE_ID_ACHIEVED");
-        public final static Property BadgeType = new Property(4, String.class, "badgeType", false, "BADGE_TYPE");
-        public final static Property CauseIdJson = new Property(5, String.class, "causeIdJson", false, "CAUSE_ID_JSON");
-        public final static Property Category = new Property(6, String.class, "category", false, "CATEGORY");
-        public final static Property CategoryStatus = new Property(7, String.class, "categoryStatus", false, "CATEGORY_STATUS");
-        public final static Property ParamDone = new Property(8, double.class, "paramDone", false, "PARAM_DONE");
+        public final static Property UserId = new Property(1, long.class, "userId", false, "USER_ID");
+        public final static Property CauseId = new Property(2, long.class, "causeId", false, "CAUSE_ID");
+        public final static Property CauseName = new Property(3, String.class, "causeName", false, "CAUSE_NAME");
+        public final static Property BadgeIdInProgress = new Property(4, long.class, "badgeIdInProgress", false, "BADGE_ID_IN_PROGRESS");
+        public final static Property BadgeIdAchieved = new Property(5, long.class, "badgeIdAchieved", false, "BADGE_ID_ACHIEVED");
+        public final static Property BadgeIdAchievedDate = new Property(6, java.util.Date.class, "badgeIdAchievedDate", false, "BADGE_ID_ACHIEVED_DATE");
+        public final static Property BadgeType = new Property(7, String.class, "badgeType", false, "BADGE_TYPE");
+        public final static Property Category = new Property(8, String.class, "category", false, "CATEGORY");
+        public final static Property CategoryStatus = new Property(9, String.class, "categoryStatus", false, "CATEGORY_STATUS");
+        public final static Property ParamDone = new Property(10, double.class, "paramDone", false, "PARAM_DONE");
     };
 
 
@@ -49,13 +51,15 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"ACHIEVED_BADGE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"USER_ID\" INTEGER NOT NULL ," + // 1: userId
-                "\"BADGE_ID_IN_PROGRESS\" INTEGER NOT NULL ," + // 2: badgeIdInProgress
-                "\"BADGE_ID_ACHIEVED\" INTEGER NOT NULL ," + // 3: badgeIdAchieved
-                "\"BADGE_TYPE\" TEXT NOT NULL ," + // 4: badgeType
-                "\"CAUSE_ID_JSON\" TEXT," + // 5: causeIdJson
-                "\"CATEGORY\" TEXT NOT NULL ," + // 6: category
-                "\"CATEGORY_STATUS\" TEXT NOT NULL ," + // 7: categoryStatus
-                "\"PARAM_DONE\" REAL NOT NULL );"); // 8: paramDone
+                "\"CAUSE_ID\" INTEGER NOT NULL ," + // 2: causeId
+                "\"CAUSE_NAME\" TEXT NOT NULL ," + // 3: causeName
+                "\"BADGE_ID_IN_PROGRESS\" INTEGER NOT NULL ," + // 4: badgeIdInProgress
+                "\"BADGE_ID_ACHIEVED\" INTEGER NOT NULL ," + // 5: badgeIdAchieved
+                "\"BADGE_ID_ACHIEVED_DATE\" INTEGER," + // 6: badgeIdAchievedDate
+                "\"BADGE_TYPE\" TEXT NOT NULL ," + // 7: badgeType
+                "\"CATEGORY\" TEXT NOT NULL ," + // 8: category
+                "\"CATEGORY_STATUS\" TEXT NOT NULL ," + // 9: categoryStatus
+                "\"PARAM_DONE\" REAL NOT NULL );"); // 10: paramDone
     }
 
     /** Drops the underlying database table. */
@@ -74,17 +78,19 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getUserId());
-        stmt.bindLong(3, entity.getBadgeIdInProgress());
-        stmt.bindLong(4, entity.getBadgeIdAchieved());
-        stmt.bindString(5, entity.getBadgeType());
+        stmt.bindLong(3, entity.getCauseId());
+        stmt.bindString(4, entity.getCauseName());
+        stmt.bindLong(5, entity.getBadgeIdInProgress());
+        stmt.bindLong(6, entity.getBadgeIdAchieved());
  
-        String causeIdJson = entity.getCauseIdJson();
-        if (causeIdJson != null) {
-            stmt.bindString(6, causeIdJson);
+        java.util.Date badgeIdAchievedDate = entity.getBadgeIdAchievedDate();
+        if (badgeIdAchievedDate != null) {
+            stmt.bindLong(7, badgeIdAchievedDate.getTime());
         }
-        stmt.bindString(7, entity.getCategory());
-        stmt.bindString(8, entity.getCategoryStatus());
-        stmt.bindDouble(9, entity.getParamDone());
+        stmt.bindString(8, entity.getBadgeType());
+        stmt.bindString(9, entity.getCategory());
+        stmt.bindString(10, entity.getCategoryStatus());
+        stmt.bindDouble(11, entity.getParamDone());
     }
 
     /** @inheritdoc */
@@ -98,14 +104,16 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
     public AchievedBadge readEntity(Cursor cursor, int offset) {
         AchievedBadge entity = new AchievedBadge( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getInt(offset + 1), // userId
-            cursor.getInt(offset + 2), // badgeIdInProgress
-            cursor.getInt(offset + 3), // badgeIdAchieved
-            cursor.getString(offset + 4), // badgeType
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // causeIdJson
-            cursor.getString(offset + 6), // category
-            cursor.getString(offset + 7), // categoryStatus
-            cursor.getDouble(offset + 8) // paramDone
+            cursor.getLong(offset + 1), // userId
+            cursor.getLong(offset + 2), // causeId
+            cursor.getString(offset + 3), // causeName
+            cursor.getLong(offset + 4), // badgeIdInProgress
+            cursor.getLong(offset + 5), // badgeIdAchieved
+            cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // badgeIdAchievedDate
+            cursor.getString(offset + 7), // badgeType
+            cursor.getString(offset + 8), // category
+            cursor.getString(offset + 9), // categoryStatus
+            cursor.getDouble(offset + 10) // paramDone
         );
         return entity;
     }
@@ -114,14 +122,16 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
     @Override
     public void readEntity(Cursor cursor, AchievedBadge entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setUserId(cursor.getInt(offset + 1));
-        entity.setBadgeIdInProgress(cursor.getInt(offset + 2));
-        entity.setBadgeIdAchieved(cursor.getInt(offset + 3));
-        entity.setBadgeType(cursor.getString(offset + 4));
-        entity.setCauseIdJson(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setCategory(cursor.getString(offset + 6));
-        entity.setCategoryStatus(cursor.getString(offset + 7));
-        entity.setParamDone(cursor.getDouble(offset + 8));
+        entity.setUserId(cursor.getLong(offset + 1));
+        entity.setCauseId(cursor.getLong(offset + 2));
+        entity.setCauseName(cursor.getString(offset + 3));
+        entity.setBadgeIdInProgress(cursor.getLong(offset + 4));
+        entity.setBadgeIdAchieved(cursor.getLong(offset + 5));
+        entity.setBadgeIdAchievedDate(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
+        entity.setBadgeType(cursor.getString(offset + 7));
+        entity.setCategory(cursor.getString(offset + 8));
+        entity.setCategoryStatus(cursor.getString(offset + 9));
+        entity.setParamDone(cursor.getDouble(offset + 10));
      }
     
     /** @inheritdoc */

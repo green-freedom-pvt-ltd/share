@@ -2,6 +2,8 @@ package com.sharesmile.share.core.base;
 
 import android.view.View;
 
+import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
+
 /**
  * Controller for fragments, it contains methods which invoked by fragments and implemented by Activity holding those fragments
  * Created by ankitmaheshwari1 on 11/01/16.
@@ -42,6 +44,8 @@ public interface IFragmentController {
 
     void addFragment(BaseFragment fragment, boolean addToBackStack);
 
+    void addFragment(BaseFragment baseFragment, boolean b, String badgeType);
+
     void replaceFragment(BaseFragment fragment, boolean addToBackStack);
 
     void replaceFragment(BaseFragment fragment, boolean addToBackStack,String tag);
@@ -73,6 +77,4 @@ public interface IFragmentController {
     boolean isDrawerOpened();
 
     boolean isDrawerVisible();
-
-
 }
