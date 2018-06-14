@@ -2,6 +2,7 @@ package com.sharesmile.share.profile;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -31,9 +33,12 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.gson.Gson;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
@@ -44,10 +49,12 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.editprofiledialogs.EditBirthday;
 import com.sharesmile.share.profile.editprofiledialogs.EditHeight;
 import com.sharesmile.share.profile.editprofiledialogs.EditWeight;
@@ -61,6 +68,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 
@@ -70,6 +78,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
+import com.amazonaws.mobileconnectors.s3.transferutility.*;
+
 
 /**
  * Created by apurvgandhwani on 3/29/2016.
@@ -147,13 +157,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @BindView(R.id.edit_profile_img)
     ImageView editProfileImg;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     File photoFile;
+    private String profilePicUrl;
 
     int gender = -1;
 
     private UserDetails userDetails;
     EditProfileImageDialog editProfileImageDialog;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -193,12 +207,23 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_save_profile:
-                if (!checkUser()) {
-                    if (validateUserDetails()) {
-                        saveUserDetails();
-                        isEdited = false;
-                        getActivity().onBackPressed();
+                if(progressBar.getVisibility() == View.VISIBLE)
+                {
+                    MainApplication.showToast("Upload in process, please wait.");
+                }else
+                if(NetworkUtils.isNetworkConnected(getContext())) {
+                    if (!checkUser()) {
+                        if (validateUserDetails()) {
+                            if (photoFile != null)
+                                uploadWithTransferUtility();
+                            else
+                                saveUserDetails();
+                            isEdited = false;
+                        }
                     }
+                }else
+                {
+                    MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
                 }
                 return true;
             default:
@@ -283,7 +308,8 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
         if(!TextUtils.isEmpty(userDetails.getProfilePicture()))
         {
-            imgProfile.setBackgroundColor(Color.BLACK);
+            ShareImageLoader.getInstance().loadImage(Urls.getImpactProfileS3BucketUrl()+userDetails.getProfilePicture(), imgProfile,
+                    ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         }else if(!TextUtils.isEmpty(userDetails.getSocialThumb()))
         {
             ShareImageLoader.getInstance().loadImage(userDetails.getSocialThumb(), imgProfile,
@@ -357,6 +383,10 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     private boolean checkUser() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         boolean b = true;
+        if(photoFile!=null)
+        {
+            b = false;
+        }
         if (!mFirstName.getText().toString().equals(userDetails.getFirstName())) {
             b = false;
         }
@@ -424,6 +454,13 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         }
 
         StringBuilder fullNameBuilder = new StringBuilder();
+        if(!TextUtils.isEmpty(profilePicUrl))
+        {
+            userDetails.setProfilePicture(profilePicUrl);
+            AnalyticsEvent.create(Event.ON_UPDATE_PROFILEPIC)
+                    .put("profile_pic_url", profilePicUrl)
+                    .buildAndDispatch();
+        }
 
         if (!TextUtils.isEmpty(mFirstName.getText())) {
             userDetails.setFirstName(mFirstName.getText().toString());
@@ -489,21 +526,13 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         MainApplication.getInstance().setUserDetails(userDetails);
         SyncHelper.oneTimeUploadUserData();
         MainApplication.showToast("Saved!");
+        getActivity().onBackPressed();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-    }
-
-    public void showDatePicker() {
-        Calendar calendar = Calendar.getInstance();
-        int calender_month = calendar.get(Calendar.MONTH);
-        int calender_year = calendar.get(Calendar.YEAR);
-        int calender_day = calendar.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog mDatePickerDialog = new DatePickerDialog(getActivity(), this, calender_year, calender_month, calender_day);
-        mDatePickerDialog.show();
     }
 
     @Override
@@ -712,16 +741,78 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.ImageCapture imageCapture)
     {
+
         if(imageCapture.getData() == null)
         {
-            if(imageCapture.getResultCode() == RESULT_OK)
-            Picasso.with(getContext()).load(photoFile).into(imgProfile);
+            if(imageCapture.getResultCode() == RESULT_OK) {
+                /*Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                ExifInterface ei = null;
+                try {
+                    ei = new ExifInterface(photoFile.getAbsolutePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED);
+
+                Bitmap rotatedBitmap = null;
+                switch(orientation) {
+
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotatedBitmap = rotateImage(bitmap, 90);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotatedBitmap = rotateImage(bitmap, 180);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotatedBitmap = rotateImage(bitmap, 270);
+                        break;
+
+                    case ExifInterface.ORIENTATION_NORMAL:
+                    default:
+                        rotatedBitmap = bitmap;
+                }
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(photoFile);
+                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }*/
+                Picasso.with(getContext()).load(photoFile).into(imgProfile);
+            }
+//                cropImage();
         }else
         {
             setImageFromGallery(imageCapture.getData());
         }
+        setMenuColor();
     }
 
+    private void cropImage() {
+        CropImageFragment cropImageFragment = new CropImageFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("image_path",photoFile.getAbsolutePath());
+        cropImageFragment.setArguments(bundle);
+        getFragmentController().replaceFragment(cropImageFragment,true);
+//        CropImage.activity(Uri.fromFile(photoFile)).start(getActivity());
+    }
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
+    }
     public void setImageFromGallery(Intent data)
     {
         Uri uri = data.getData();
@@ -735,6 +826,64 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         photoFile = new File(path);
         Picasso.with(getContext()).load(photoFile).into(imgProfile);
     }
+
+    public void uploadWithTransferUtility() {
+
+        TransferUtility transferUtility =
+                TransferUtility.builder()
+                        .context(getContext().getApplicationContext())
+                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
+                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
+                        .build();
+        profilePicUrl = "uploads/profile_pic/"+MainApplication.getInstance().getUserID()+"/profile_pic.jpg";
+        TransferObserver uploadObserver =
+                transferUtility.upload(profilePicUrl
+                        , photoFile);
+        progressBar.setVisibility(View.VISIBLE);
+        // Attach a listener to the observer to get state update and progress notifications
+        uploadObserver.setTransferListener(new TransferListener() {
+
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                System.out.println("TESTING : "+state.name());
+                if (TransferState.COMPLETED == state) {
+                    // Handle a completed upload.
+                    saveUserDetails();
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
+                int percentDone = (int)percentDonef;
+
+                Logger.d(TAG, "ID:" + id + " bytesCurrent: " + bytesCurrent
+                        + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
+            }
+
+            @Override
+            public void onError(int id, Exception ex) {
+                // Handle errors
+                ex.printStackTrace();
+                MainApplication.showToast("Some error occured while uploading image, Please try again after some time.");
+                progressBar.setVisibility(View.GONE);
+            }
+
+        });
+
+        // If you prefer to poll for the data, instead of attaching a
+        // listener, check for the state and progress in the observer.
+        if (TransferState.COMPLETED == uploadObserver.getState()) {
+            // Handle a completed upload.
+        }
+
+        Logger.d(TAG, "Bytes Transferrred: " + uploadObserver.getBytesTransferred());
+        Logger.d(TAG, "Bytes Total: " + uploadObserver.getBytesTotal());
+    }
+
+
+
 }
 
 

@@ -34,6 +34,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         public final static Property Category = new Property(8, String.class, "category", false, "CATEGORY");
         public final static Property CategoryStatus = new Property(9, String.class, "categoryStatus", false, "CATEGORY_STATUS");
         public final static Property ParamDone = new Property(10, double.class, "paramDone", false, "PARAM_DONE");
+        public final static Property IsSync = new Property(11, boolean.class, "isSync", false, "IS_SYNC");
     };
 
 
@@ -59,7 +60,8 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
                 "\"BADGE_TYPE\" TEXT NOT NULL ," + // 7: badgeType
                 "\"CATEGORY\" TEXT NOT NULL ," + // 8: category
                 "\"CATEGORY_STATUS\" TEXT NOT NULL ," + // 9: categoryStatus
-                "\"PARAM_DONE\" REAL NOT NULL );"); // 10: paramDone
+                "\"PARAM_DONE\" REAL NOT NULL ," + // 10: paramDone
+                "\"IS_SYNC\" INTEGER NOT NULL );"); // 11: isSync
     }
 
     /** Drops the underlying database table. */
@@ -91,6 +93,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         stmt.bindString(9, entity.getCategory());
         stmt.bindString(10, entity.getCategoryStatus());
         stmt.bindDouble(11, entity.getParamDone());
+        stmt.bindLong(12, entity.getIsSync() ? 1L: 0L);
     }
 
     /** @inheritdoc */
@@ -113,7 +116,8 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
             cursor.getString(offset + 7), // badgeType
             cursor.getString(offset + 8), // category
             cursor.getString(offset + 9), // categoryStatus
-            cursor.getDouble(offset + 10) // paramDone
+            cursor.getDouble(offset + 10), // paramDone
+            cursor.getShort(offset + 11) != 0 // isSync
         );
         return entity;
     }
@@ -132,6 +136,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         entity.setCategory(cursor.getString(offset + 8));
         entity.setCategoryStatus(cursor.getString(offset + 9));
         entity.setParamDone(cursor.getDouble(offset + 10));
+        entity.setIsSync(cursor.getShort(offset + 11) != 0);
      }
     
     /** @inheritdoc */

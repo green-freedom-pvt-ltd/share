@@ -47,7 +47,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater?.inflate(R.layout.fragment_secret_code, container, false);
         return view;
     }
@@ -139,13 +139,13 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
         CauseDataStore.getInstance().updateCauseData()
         
         // Pass success result to MainActivity and exit
-        activity.setResult(Activity.RESULT_OK)
-        activity.finish()
+        activity?.setResult(Activity.RESULT_OK)
+        activity?.finish()
 
     }
 
     private fun prepareTextView(){
-        val ss = SpannableString(context.getString(R.string.impact_league_description))
+        val ss = SpannableString(context?.getString(R.string.impact_league_description))
         setTextSpan(ss, 25, 38, "http://il.impactrun.com/")
         setTextSpan(ss, 226, 249, "mailto:contact@impactrun.com")
         val textView = view!!.tv_impact_league_description
@@ -155,7 +155,7 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
     }
 
     private fun setTextSpan(ss: SpannableString, startIndex: Int, endIndex: Int, url: String?){
-        val font = Typeface.createFromAsset(context.assets, "fonts/Lato-Bold.ttf")
+        val font = Typeface.createFromAsset(context?.assets, "fonts/Lato-Bold.ttf")
         ss.setSpan(CustomTypefaceSpan("", font), startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(textView: View) {
@@ -171,8 +171,8 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
 
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
-                val linkColor = ContextCompat.getColor(activity, R.color.bright_sky_blue)
-                ds.color = linkColor
+                val linkColor = context?.let { ContextCompat.getColor(it, R.color.bright_sky_blue) }
+                ds.color = linkColor!!
                 ds.isUnderlineText = false
             }
         }

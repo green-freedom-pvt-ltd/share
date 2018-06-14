@@ -1413,6 +1413,7 @@ public class Utils {
                 achievedBadge = new AchievedBadge();
                 achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
                 achievedBadge.setBadgeType(badge.getType());
+                achievedBadge.setCauseName(badge.getName());
                 achievedBadge.setCategory(category);
                 achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
                 achievedBadge.setParamDone(paramDone);
@@ -1429,7 +1430,8 @@ public class Utils {
         }
         if (achievedBadge != null) {
             achievedBadge.setCauseId(causeData == null ? 0 : causeData.getId());
-            achievedBadge.setCauseName(causeData == null ? "" : causeData.getTitle());
+            if(causeData!=null)
+            achievedBadge.setCauseName(causeData.getTitle());
             if (achievedBadge.getId() != null && achievedBadge.getId() > 0)
                 achievedBadgeDao.update(achievedBadge);
             else
@@ -1492,6 +1494,9 @@ public class Utils {
             achievedBadge = achievedBadges.get(0);
             badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge, mCauseData);
         }
+        if(achievedBadge!=null)
+        achievedBadge.setIsSync(false);
+
         if (badgeAchieved != 0)
             if (!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) ||
                     (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) && badgeAchieved != -1)) {

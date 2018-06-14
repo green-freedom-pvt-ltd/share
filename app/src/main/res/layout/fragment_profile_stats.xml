@@ -205,7 +205,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="19dp"
-                        android:layout_marginTop="50dp"
+                        android:layout_marginTop="40dp"
                         android:orientation="horizontal"
                         tools:listitem="@layout/rv_achievements_row_item" />
                 </LinearLayout>
@@ -395,7 +395,7 @@
                 android:layout_marginBottom="6dp"
                 android:background="@color/white"
                 android:orientation="vertical"
-                android:visibility="gone">
+                >
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -410,13 +410,25 @@
                         android:layout_height="wrap_content"
                         android:text="@string/profile_stats_charity_overview" />
                 </RelativeLayout>
-
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_charity_overview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="27dp"
                     android:layout_marginTop="34dp" />
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/charity_overview_progressbar"
+                        />
+                    <include layout="@layout/rv_charity_overview_profile_row"
+                        android:visibility="invisible"
+                        />
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout

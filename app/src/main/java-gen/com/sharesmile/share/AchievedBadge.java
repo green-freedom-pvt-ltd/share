@@ -24,6 +24,7 @@ public class AchievedBadge {
     /** Not-null value. */
     private String categoryStatus;
     private double paramDone;
+    private boolean isSync;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -35,7 +36,7 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public AchievedBadge(Long id, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, String badgeType, String category, String categoryStatus, double paramDone) {
+    public AchievedBadge(Long id, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, String badgeType, String category, String categoryStatus, double paramDone, boolean isSync) {
         this.id = id;
         this.userId = userId;
         this.causeId = causeId;
@@ -47,6 +48,7 @@ public class AchievedBadge {
         this.category = category;
         this.categoryStatus = categoryStatus;
         this.paramDone = paramDone;
+        this.isSync = isSync;
     }
 
     public Long getId() {
@@ -143,6 +145,14 @@ public class AchievedBadge {
 
     public void setParamDone(double paramDone) {
         this.paramDone = paramDone;
+    }
+
+    public boolean getIsSync() {
+        return isSync;
+    }
+
+    public void setIsSync(boolean isSync) {
+        this.isSync = isSync;
     }
 
     // KEEP METHODS - put your custom methods here

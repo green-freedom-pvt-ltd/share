@@ -202,6 +202,7 @@ public class Version16 extends SchemaVersion {
         achievedBadge.addStringProperty("category").notNull();
         achievedBadge.addStringProperty("categoryStatus").notNull();
         achievedBadge.addDoubleProperty("paramDone").notNull();
+        achievedBadge.addBooleanProperty("isSync").notNull();
     }
 
 }

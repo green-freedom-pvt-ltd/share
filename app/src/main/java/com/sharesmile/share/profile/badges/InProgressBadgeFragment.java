@@ -33,7 +33,7 @@ import butterknife.ButterKnife;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class InProgressBadgeFragment extends BaseFragment implements SeeAchivedBadge {
+public class InProgressBadgeFragment extends BaseFragment implements SeeAchievedBadge {
 
     private static final String TAG = "InProgressBadgeFragment";
 
@@ -80,6 +80,7 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchivedB
         inProgressBadgeAdapter = new InProgressBadgeAdapter(achievedBadges);
         achievementBadgesRecyclerView.setAdapter(inProgressBadgeAdapter);
 
+        /*
         LinearLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3)
         {
             @Override
@@ -107,12 +108,12 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchivedB
         }
 
         hallOfFameAdapter = new HallOfFameAdapter(hallOfFameBadges,this);
-        hallOfFameRecyclerView.setAdapter(hallOfFameAdapter);
+        hallOfFameRecyclerView.setAdapter(hallOfFameAdapter);*/
     }
 
     private void setupToolbar() {
         setHasOptionsMenu(false);
-        setToolbarTitle(getResources().getString(R.string.achievements));
+        setToolbarTitle(getResources().getString(R.string.in_progress));
     }
     @Override
     public void showBadgeDetails(long id, String badgeType) {

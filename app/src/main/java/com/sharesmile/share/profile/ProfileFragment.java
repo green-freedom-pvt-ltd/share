@@ -7,10 +7,14 @@ import android.graphics.Shader;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +49,7 @@ import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
@@ -52,12 +57,13 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.badges.InProgressBadgeFragment;
 import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
-import com.sharesmile.share.profile.badges.SeeAchivedBadge;
+import com.sharesmile.share.profile.badges.SeeAchievedBadge;
 import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
 import com.sharesmile.share.profile.badges.adapter.CharityOverviewProfileAdapter;
 import com.sharesmile.share.profile.badges.model.AchievedBadgeCount;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
+import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
 import com.sharesmile.share.profile.stats.BarChartEntry;
 import com.sharesmile.share.profile.streak.StreakFragment;
@@ -89,7 +95,7 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
+public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,OpenCharityOverview {
 
     private static final String TAG = "ProfileFragment";
 
@@ -197,6 +203,16 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
     private BarChartDataSet barChartDataSetMonthly;
     private SetUpBarChartAsync setUpBarChartAsync;
     public MaterialTapTargetPrompt materialTapTargetPrompt;
+    private CharityOverview charityOverview;
+    @BindView(R.id.charity_overview_progressbar)
+    ProgressBar charityOverviewProgressbar;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Nullable
     @Override
@@ -217,11 +233,37 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
-        if(workoutCount>0)
-        {
+        if (workoutCount > 0) {
             incrementProfileScreenVisitCount();
         }
+
+        boolean forward = getArguments().getBoolean(Constants.ARG_FORWARD_TOPROFILE, false);
+        getArguments().remove(Constants.ARG_FORWARD_TOPROFILE);
+        if (forward) {
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
+        }
         initUi();
+        getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, new LoaderManager.LoaderCallbacks<CharityOverview>() {
+            @Override
+            public Loader<CharityOverview> onCreateLoader(int id, Bundle args) {
+                charityOverviewProgressbar.setVisibility(View.VISIBLE);
+                charityOverviewRecyclerView.setVisibility(View.GONE);
+                return new CharityOverviewAsynTaskLoader(getContext());
+            }
+
+            @Override
+            public void onLoadFinished(Loader<CharityOverview> loader, CharityOverview data) {
+                charityOverview = data;
+                setCharityOverviewRecyclerview();
+                charityOverviewProgressbar.setVisibility(View.GONE);
+                charityOverviewRecyclerView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<CharityOverview> loader) {
+                Logger.d(TAG,"onLoaderReset");
+            }
+        });
     }
 
     @Override
@@ -234,14 +276,13 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_share_profile:
-                if(SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT)>0) {
+                if (SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT) > 0) {
                     Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
                     Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                             getString(R.string.share_stats));
                     AnalyticsEvent.create(Event.ON_CLICK_PROFILE_SHARE)
                             .buildAndDispatch();
-                }else
-                {
+                } else {
                     MainApplication.showToast(getResources().getString(R.string.no_workout_profile_txt_toast));
                 }
                 return true;
@@ -277,21 +318,25 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
 
         if (isWorkoutDataUpToDate) {
             hideProgressDialog();
-            String url = MainApplication.getInstance().getUserDetails().getSocialThumb();
+            String url;
+            if (TextUtils.isEmpty(MainApplication.getInstance().getUserDetails().getProfilePicture())) {
+                url = MainApplication.getInstance().getUserDetails().getSocialThumb();
+            } else {
+                url = Urls.getImpactProfileS3BucketUrl() + MainApplication.getInstance().getUserDetails().getProfilePicture();
+            }
 
             setupToolbar();
 
             // Level and Level's progress
             int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
-            if(lifeTimeImpact==0)
-            {
+            if (lifeTimeImpact == 0) {
                 workoutLayout.setVisibility(View.GONE);
                 noWorkoutLayout.setVisibility(View.VISIBLE);
                 ShareImageLoader.getInstance().loadImage(url, imageView2,
                         ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
                 // Name of user
                 name2.setText(MainApplication.getInstance().getUserDetails().getFullName());
-            }else {
+            } else {
 
                 workoutLayout.setVisibility(View.VISIBLE);
                 noWorkoutLayout.setVisibility(View.GONE);
@@ -334,49 +379,54 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 setUpBarChartAsync = new SetUpBarChartAsync();
                 setUpBarChartAsync.execute();
                 prepareStreakOnboardingOverlays();
-            }
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-            achievementsRecylerView.setLayoutManager(linearLayoutManager);
-            List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
-                    .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0))
-                    .orderDesc(AchievedBadgeDao.Properties.BadgeIdAchievedDate).list();
 
-            if(achievedBadges!=null && achievedBadges.size()>0) {
-                JSONObject jsonObject = new JSONObject();
-                for (AchievedBadge achievedBadge :
-                        achievedBadges) {
-                    if(jsonObject.has(achievedBadge.getBadgeIdAchieved()+""))
-                    {
-                        try {
-                            long count  = jsonObject.getLong(achievedBadge.getBadgeIdAchieved()+"");
-                            jsonObject.put(achievedBadge.getBadgeIdAchieved()+"",count++);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }else
-                    {
-                        try {
-                            jsonObject.put(achievedBadge.getBadgeIdAchieved()+"",1);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                Iterator<String> iterator = jsonObject.keys();
-                ArrayList<AchievedBadgeCount> achievedBadgeCounts = new ArrayList<>();
-                while (iterator.hasNext())
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4)
                 {
-                    AchievedBadgeCount achievedBadgeCount = new AchievedBadgeCount();
-                    achievedBadgeCount.setAchievedBadgeId(Long.parseLong(iterator.next()));
-                    try {
-                        achievedBadgeCount.setCount(jsonObject.getLong(achievedBadgeCount.getAchievedBadgeId()+""));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    @Override
+                    public boolean canScrollVertically() {
+                        return false;
                     }
-                    achievedBadgeCounts.add(achievedBadgeCount);
+                };
+                achievementsRecylerView.setLayoutManager(gridLayoutManager);
+                List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
+                        .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0))
+                        .orderDesc(AchievedBadgeDao.Properties.BadgeIdAchievedDate).list();
+
+                if (achievedBadges != null && achievedBadges.size() > 0) {
+                    JSONObject jsonObject = new JSONObject();
+                    for (AchievedBadge achievedBadge :
+                            achievedBadges) {
+                        if (jsonObject.has(achievedBadge.getBadgeIdAchieved() + "")) {
+                            try {
+                                long count = jsonObject.getLong(achievedBadge.getBadgeIdAchieved() + "");
+                                jsonObject.put(achievedBadge.getBadgeIdAchieved() + "", ++count);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                jsonObject.put(achievedBadge.getBadgeIdAchieved() + "", 1);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    Iterator<String> iterator = jsonObject.keys();
+                    ArrayList<AchievedBadgeCount> achievedBadgeCounts = new ArrayList<>();
+                    while (iterator.hasNext()) {
+                        AchievedBadgeCount achievedBadgeCount = new AchievedBadgeCount();
+                        achievedBadgeCount.setAchievedBadgeId(Long.parseLong(iterator.next()));
+                        try {
+                            achievedBadgeCount.setCount(jsonObject.getLong(achievedBadgeCount.getAchievedBadgeId() + ""));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        achievedBadgeCounts.add(achievedBadgeCount);
+                    }
+                    achievementsAdapter = new AchievementsAdapter(achievedBadgeCounts, getContext(), this);
+                    achievementsRecylerView.setAdapter(achievementsAdapter);
+
                 }
-                achievementsAdapter = new AchievementsAdapter(achievedBadgeCounts,getContext(),this);
-                achievementsRecylerView.setAdapter(achievementsAdapter);
             }
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
@@ -388,9 +438,9 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
             MainApplication.showToast("Please check your internet connection");
         }
     }
+
     @OnClick(R.id.btn_lets_run)
-    void letsGo()
-    {
+    void letsGo() {
         goBack();
     }
 
@@ -452,31 +502,24 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         scrollBounds = new Rect();
         workoutLayout.getHitRect(scrollBounds);
         workoutLayout.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            if(runHistoryButton!=null)
-            {
-                if(runHistoryButton.getLocalVisibleRect(scrollBounds))
-                {
+            if (runHistoryButton != null) {
+                if (runHistoryButton.getLocalVisibleRect(scrollBounds)) {
                     int sh = scrollBounds.height();
                     int bh = runHistoryButton.getHeight();
-                    if(!streakValue.getLocalVisibleRect(scrollBounds) || sh<bh)
-                    {
+                    if (!streakValue.getLocalVisibleRect(scrollBounds) || sh < bh) {
 
-                    }else
-                    {
+                    } else {
                         prepareStreakOnboardingOverlays();
                     }
-                    if(!runHistoryButton.getLocalVisibleRect(scrollBounds) ||
-                            sh < bh)
-                    {
-                        Logger.d(TAG,"PARTIALLY VISIBLE");
-                    }else
-                    {
-                        Logger.d(TAG,"VISIBLE");
+                    if (!runHistoryButton.getLocalVisibleRect(scrollBounds) ||
+                            sh < bh) {
+                        Logger.d(TAG, "PARTIALLY VISIBLE");
+                    } else {
+                        Logger.d(TAG, "VISIBLE");
                         prepareStatsOnboardingOverlays();
                     }
-                }else
-                {
-                    Logger.d(TAG,"NOT VISIBLE");
+                } else {
+                    Logger.d(TAG, "NOT VISIBLE");
                 }
             }
         });
@@ -496,26 +539,34 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
     }
 
     @Override
-    public void showBadgeDetails(long id,String badgeType) {
+    public void showBadgeDetails(long id, String badgeType) {
         AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
 
-        switch (badgeType)
-        {
-            case Constants.BADGE_TYPE_CAUSE :
+        switch (badgeType) {
+            case Constants.BADGE_TYPE_CAUSE:
                 achievedBadgesData.setCauseBadgeAchieved(id);
                 break;
-            case Constants.BADGE_TYPE_CHANGEMAKER :
+            case Constants.BADGE_TYPE_CHANGEMAKER:
                 achievedBadgesData.setChangeMakerBadgeAchieved(id);
                 break;
-            case Constants.BADGE_TYPE_MARATHON :
+            case Constants.BADGE_TYPE_MARATHON:
                 achievedBadgesData.setMarathonBadgeAchieved(id);
                 break;
-            case Constants.BADGE_TYPE_STREAK :
+            case Constants.BADGE_TYPE_STREAK:
                 achievedBadgesData.setStreakBadgeAchieved(id);
                 break;
         }
-        AchieviedBadgeFragment achieviedBadgeFragment = AchieviedBadgeFragment.newInstance(achievedBadgesData,badgeType,0);
-        getFragmentController().replaceFragment(achieviedBadgeFragment,true,badgeType);
+        AchieviedBadgeFragment achieviedBadgeFragment = AchieviedBadgeFragment.newInstance(achievedBadgesData, badgeType, 0);
+        getFragmentController().replaceFragment(achieviedBadgeFragment, true, badgeType);
+    }
+
+    @Override
+    public void openCharityOverviewFragment(int position) {
+        CharityOverviewFragment charityOverviewFragment = new CharityOverviewFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("position",position);
+        charityOverviewFragment.setArguments(bundle);
+        getFragmentController().replaceFragment(charityOverviewFragment, true);
     }
 
 
@@ -682,7 +733,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 BarChartEntry barChartEntry = barChartDataSetDaily.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
-                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats",true);
+                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
             }
 
             @Override
@@ -749,7 +800,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 BarChartEntry barChartEntry = barChartDataSetWeekly.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
-                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats",true);
+                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
             }
 
             @Override
@@ -816,7 +867,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 BarChartEntry barChartEntry = barChartDataSetMonthly.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
-                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats",true);
+                SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
             }
 
             @Override
@@ -862,7 +913,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_PROFILE_FOR_STREAK), true);
         AnalyticsEvent.create(Event.ON_CLICK_STREAK_ICON)
                 .buildAndDispatch();
-        SharedPrefsManager.getInstance().setBoolean("pref_did_open_streak",true);
+        SharedPrefsManager.getInstance().setBoolean("pref_did_open_streak", true);
     }
 
     OverlayStatsRunnable overlayStatsRunnable;
@@ -880,7 +931,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
         long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
         int profileScreenVisit = getProfileOpenCount();
 
-        if (OnboardingOverlay.MY_STATS.isEligibleForDisplay(profileScreenVisit, workoutCount>0?1:2) && overlayStatsRunnable==null) {
+        if (OnboardingOverlay.MY_STATS.isEligibleForDisplay(profileScreenVisit, workoutCount > 0 ? 1 : 2) && overlayStatsRunnable == null) {
             overlayStatsRunnable = new OverlayStatsRunnable();
             MainApplication.getMainThreadHandler().postDelayed(overlayStatsRunnable, OnboardingOverlay.STREAK_COUNT.getDelayInMillis());
         }
@@ -894,20 +945,23 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
     public int getProfileOpenCount() {
         return SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + PROFILE_SCREEN);
     }
+
     public class OverlayStreakRunnable implements Runnable {
         private boolean cancelled;
+
         @Override
         public void run() {
-            boolean b=Utils.isVisible(streakValue);
+            boolean b = Utils.isVisible(streakValue);
             if (!cancelled && isVisible() && b) {
                 // This is a hack to get hold of the anchor view for help center menu item
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
                         streakValue,
                         getActivity(),
-                        true, false,false);
+                        true, false, false);
                 materialTapTargetPrompt.show();
             }
         }
+
         public void cancel() {
             cancelled = true;
         }
@@ -915,6 +969,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
 
     public class OverlayStatsRunnable implements Runnable {
         private boolean cancelled;
+
         @Override
         public void run() {
             if (!cancelled && isVisible()) {
@@ -923,18 +978,26 @@ public class ProfileFragment extends BaseFragment implements SeeAchivedBadge{
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.MY_STATS,
                         overlayLayout,
                         getActivity(),
-                        true, false,true);
+                        true, false, true);
                 materialTapTargetPrompt.show();
             }
         }
+
         public void cancel() {
             cancelled = true;
         }
     }
 
     @OnClick(R.id.see_in_progress_badges)
-    public void onClickSeeInProgress()
-    {
+    public void onClickSeeInProgress() {
         getFragmentController().replaceFragment(new InProgressBadgeFragment(), true);
+    }
+
+    private void setCharityOverviewRecyclerview()
+    {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        charityOverviewRecyclerView.setLayoutManager(linearLayoutManager);
+        charityOverviewProfileAdapter = new CharityOverviewProfileAdapter(this,charityOverview,getContext());
+        charityOverviewRecyclerView.setAdapter(charityOverviewProfileAdapter);
     }
 }

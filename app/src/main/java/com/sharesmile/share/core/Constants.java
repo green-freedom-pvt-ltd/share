@@ -272,6 +272,12 @@ public class Constants {
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     public static final String ACHIEVED_BADGE_DATA = "achieved_badge_data";
 
+    public static final String PREF_CHARITY_OVERVIEW = "charity_overview";
+    public static final String PREF_ACHIEVED_BADGES_OPEN = "achieved_badge_open";
+    public static final String ARG_FORWARD_TOPROFILE = "forward";
+
+    public final static int LOADER_CHARITY_OVERVIEW = 100;
+
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{
         add(FeedbackCategory.PAST_WORKOUT);

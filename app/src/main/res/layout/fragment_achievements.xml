@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_f2"
     android:fillViewport="true"
     android:focusableInTouchMode="true"
-    >
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
-    <android.support.v7.widget.RecyclerView
+    android:orientation="vertical">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/rv_achievement_badges"
-        />
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_achievement_badges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <com.sharesmile.share.views.LBTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hall_of_fame"
             android:layout_marginTop="10dp"
-            android:textColor="@color/black_64"
-            android:textSize="20sp"
             android:background="@color/white"
             android:paddingLeft="25dp"
             android:paddingTop="36dp"
-
+            android:text="@string/hall_of_fame"
+            android:textColor="@color/black_64"
+            android:textSize="20sp"
+            android:visibility="gone"
             />
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/rv_hall_of_fame"
-        android:background="@color/white"
-        android:layout_marginBottom="7dp"
-        android:paddingBottom="30dp"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        />
-</LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_hall_of_fame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            android:background="@color/white"
+            android:paddingBottom="30dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:visibility="gone"
+            />
+    </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

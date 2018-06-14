@@ -7,6 +7,100 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:paddingLeft="23dp"
+        android:paddingRight="23dp"
+        android:paddingTop="33dp"
+        android:paddingBottom="36dp"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
+        <!--<ImageView
+            android:layout_width="75dp"
+            android:layout_height="87dp" />
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.sharesmile.share.views.LBTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/black_64"
+                android:id="@+id/tv_charity_title"/>
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_charity_detail"
+                android:textSize="10sp"
+                android:textColor="@color/black_57"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="13dp"
+                />
+
+            <com.sharesmile.share.views.LRTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/black_57"
+                android:layout_gravity="right"
+                android:layout_marginBottom="2dp"
+                />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="7dp"
+                android:layout_marginTop="2dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rounded_rectangle_grey">
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <View
+                        android:id="@+id/level_progress_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/rounded_rectangle_blue_green_gradient"
+                        android:layout_weight="0.1">
+                    </View>
+
+                </LinearLayout>
+
+            </FrameLayout>
+        </LinearLayout>-->
+
+        <com.sharesmile.share.views.LRTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:text="You are a"
+            android:gravity="center"
+            android:id="@+id/title_header_tv"
+            />
+        <com.sharesmile.share.views.LBTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:text="Women Empowerment Messiah"
+            android:gravity="center"
+            android:id="@+id/title_tv"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="center"
         android:padding="25dp"
@@ -61,81 +155,21 @@
 
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
-        android:paddingLeft="23dp"
-        android:paddingRight="23dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:background="@color/white"
-        >
-        <ImageView
-            android:layout_width="75dp"
-            android:layout_height="87dp" />
-        <LinearLayout
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <com.sharesmile.share.views.LBTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textColor="@color/black_64"
-                android:id="@+id/tv_charity_title"/>
-            <com.sharesmile.share.views.LRTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_charity_detail"
-                android:textSize="10sp"
-                android:textColor="@color/black_57"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="13dp"
-                />
-
-                <com.sharesmile.share.views.LRTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp"
-                    android:textColor="@color/black_57"
-                    android:layout_gravity="right"
-                    android:layout_marginBottom="2dp"
-                    />
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="7dp"
-                android:layout_marginTop="2dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rounded_rectangle_grey">
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
-
-                    <View
-                        android:id="@+id/level_progress_bar"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/rounded_rectangle_blue_green_gradient"
-                        android:layout_weight="0.1">
-                    </View>
-
-                </LinearLayout>
-
-            </FrameLayout>
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_height="match_parent">
     <android.support.v7.widget.RecyclerView
+        android:layout_marginTop="7dp"
+        android:background="@color/white"
+        android:id="@+id/charityoverview_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/charity_overview_progressbar"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            />
+    </RelativeLayout>
 </LinearLayout>

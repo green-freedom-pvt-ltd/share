@@ -7,12 +7,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.profile.badges.SeeAchivedBadge;
+import com.sharesmile.share.profile.badges.SeeAchievedBadge;
 import com.sharesmile.share.profile.badges.model.HallOfFameData;
 
 import java.util.ArrayList;
@@ -22,12 +21,12 @@ public class HallOfFameAdapter extends RecyclerView.Adapter<HallOfFameAdapter.Ac
 
     private static final String TAG = "HallOfFameAdapter";
     ArrayList<HallOfFameData> achievedBadges;
-    SeeAchivedBadge seeAchivedBadge;
+    SeeAchievedBadge seeAchievedBadge;
 
-    public HallOfFameAdapter(ArrayList<HallOfFameData> achievedBadges,SeeAchivedBadge seeAchivedBadge)
+    public HallOfFameAdapter(ArrayList<HallOfFameData> achievedBadges,SeeAchievedBadge seeAchievedBadge)
     {
         this.achievedBadges = achievedBadges;
-        this.seeAchivedBadge = seeAchivedBadge;
+        this.seeAchievedBadge = seeAchievedBadge;
     }
     @Override
     public AchievementsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -75,7 +74,7 @@ public class HallOfFameAdapter extends RecyclerView.Adapter<HallOfFameAdapter.Ac
         public void onClick(View view) {
             int position = (int) view.getTag();
             HallOfFameData hallOfFameData = achievedBadges.get(position);
-            seeAchivedBadge.showBadgeDetails(hallOfFameData.getBadgeId(),hallOfFameData.getBadgeType());
+            seeAchievedBadge.showBadgeDetails(hallOfFameData.getBadgeId(),hallOfFameData.getBadgeType());
         }
     }
 }

@@ -167,6 +167,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         render();
         checkBadgeData();
         prepareOnboardingOverlays();
+        SyncHelper.getCharityOverview();
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -192,7 +193,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     {
                         Badge badge = badges.get(0);
                     AchievedBadge achievedBadge = new AchievedBadge();
-                    achievedBadge.setCauseName("");
+                    achievedBadge.setCauseName(badge.getName());
                     achievedBadge.setCauseId(0);
                     achievedBadge.setBadgeIdInProgress(badge.getId());
                     achievedBadge.setBadgeIdAchieved(badge.getId());
@@ -242,7 +243,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
                     long diff = currentDate.getTime() - streakDate.getTime();
                     float dayCount = (float) diff / (24 * 60 * 60 * 1000);
-
+                    //set EVENT
                     builder.put("streakDate",streakDate.getTime());
                     builder.put("currentDate",currentDate.getTime());
                     builder.put("diff",diff);
@@ -251,6 +252,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     builder.put("goal_distance",userDetails.getStreakGoalDistance());
                     builder.put("goal_run_progress",userDetails.getStreakRunProgress());
                     builder.buildAndDispatch();
+                    //
                     if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                         if ((dayCount > 1)) {
                             userDetails.setStreakRunProgress(0);
@@ -261,6 +263,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);
 //                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+
                         }
                     }
                 } else {
@@ -272,6 +275,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     userDetails.setStreakMaxCount(userDetails.getStreakCount());
 
                 MainApplication.getInstance().setUserDetails(userDetails);
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }

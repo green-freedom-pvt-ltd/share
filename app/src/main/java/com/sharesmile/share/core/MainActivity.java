@@ -30,6 +30,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +43,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.client.AWSStartupHandler;
+import com.amazonaws.mobile.client.AWSStartupResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
@@ -78,10 +87,12 @@ import com.squareup.picasso.Target;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Models.CampaignList;
 import butterknife.ButterKnife;
@@ -200,7 +211,17 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             checkAppVersionAndShowUpdatePopupIfRequired();
             handleNotificationIntent();
             Analytics.getInstance().setUserProperties();
+            connectAWSS3();
         }
+    }
+
+    private void connectAWSS3() {
+        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
+            @Override
+            public void onComplete(AWSStartupResult awsStartupResult) {
+                Logger.d(TAG, "AWSMobileClient is instantiated and you are connected to AWS!");
+            }
+        }).execute();
     }
 
     private void checkForOverlayOnDrawer() {
@@ -279,7 +300,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     if (!MainApplication.isLogin()) {
                         showLoginActivity();
                     } else {
-                        replaceFragment(new ProfileFragment(), true);
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE,true);
+                        ProfileFragment profileFragment = new ProfileFragment();
+                        profileFragment.setArguments(bundle1);
+                        replaceFragment(profileFragment, true);
                     }
                 } else if (screen.equals(NotificationConsts.Screen.LEADERBOARD)) {
                     if (!MainApplication.isLogin()) {
@@ -381,7 +406,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         addFragment(new HomeScreenFragment(), false);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
-            replaceFragment(new ProfileFragment(), true);
+            Bundle bundle1 = new Bundle();
+            bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE,true);
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setArguments(bundle1);
+            replaceFragment(profileFragment, true);
         }
     }
 
@@ -521,7 +550,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         switch (menuItem.getItemId()) {
             case R.id.nav_item_profile:
-                replaceFragment(new ProfileFragment(), true);
+                Bundle bundle1 = new Bundle();
+                bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE,true);
+                ProfileFragment profileFragment = new ProfileFragment();
+                profileFragment.setArguments(bundle1);
+                replaceFragment(profileFragment, true);
                 AnalyticsEvent.create(Event.ON_SELECT_PROFILE_MENU)
                         .buildAndDispatch();
                 break;

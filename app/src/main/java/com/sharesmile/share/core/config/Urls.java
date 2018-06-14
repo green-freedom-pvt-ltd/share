@@ -29,6 +29,11 @@ public class Urls {
     private static final String LEADERBOARD_URL = "/leaderboard/";
     private static final String FRAUDSTERS_URL = "/fraudsters/";
 
+    private static final String STREAK_URL = "/streak/";
+    private static final String ACHIEVEMENTS_URL = "/achievements/";
+
+    private static final String IMPACTOVERVIEW_URL = "/impactOverview/";
+
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
     private static final String GOOGLE_BASE_URL = "https://www.googleapis.com";
@@ -45,6 +50,12 @@ public class Urls {
     private static final String BLOG_HOW_IT_WORKS_CONTENT_URL = "/articles/howitworks";
 
     private static final String IMPACT_ASSETS_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-image-assets";
+
+    public static String getImpactProfileS3BucketUrl() {
+        return IMPACT_PROFILE_S3_BUCKET_URL;
+    }
+
+    private static final String IMPACT_PROFILE_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-userfiles-mobilehub-361440758/";
 
     private static final String HOW_IT_WORKS_S3_FOLDER = "/howitworks/";
 
@@ -150,7 +161,18 @@ public class Urls {
         String url = getNodeBaseUrl() + SERVER_TIME_URL;
         return url;
     }
+    public static String getStreakUrl() {
+        String url = getNodeBaseUrl() + STREAK_URL;
+        return url;
+    }
 
+    public static String getAchievementUrl() {
+        String url = getNodeBaseUrl() + ACHIEVEMENTS_URL;
+        return url;
+    }
+    public static String getImpactOverviewUrl() {
+        return getNodeBaseUrl()+IMPACTOVERVIEW_URL;
+    }
     public static String getLeagueBoardUrl() {
         return getNodeBaseUrl() + LEAGUEBOARD_URL;
     }

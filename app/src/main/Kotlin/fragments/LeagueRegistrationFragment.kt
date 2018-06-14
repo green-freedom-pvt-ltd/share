@@ -59,24 +59,24 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mLocationArray = arguments.getStringArrayList(BUNDLE_LOCATION_ARRAY)
-        mDepartmentArray = arguments.getStringArrayList(BUNDLE_DEPARTMENT_ARRAY)
+        mLocationArray = arguments!!.getStringArrayList(BUNDLE_LOCATION_ARRAY)
+        mDepartmentArray = arguments!!.getStringArrayList(BUNDLE_DEPARTMENT_ARRAY)
         mDepartmentArray.add(0, getString(R.string.choose_your_department))
         mLocationArray.add(0, getString(R.string.choose_your_location))
 
-        mCode = arguments.getString(BUNDLE_LEAGUE_CODE)
-        mBanner = arguments.getString(BUNDLE_LEAGUE_BANNER)
+        mCode = arguments!!.getString(BUNDLE_LEAGUE_CODE)
+        mBanner = arguments!!.getString(BUNDLE_LEAGUE_BANNER)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater?.inflate(R.layout.fragment_league_registration, container, false);
         return view;
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mDepartmentAdapter = ArrayItemAdapter(context, R.layout.spinner_item, R.id.text1, mDepartmentArray)
-        mLocationAdapter = ArrayItemAdapter(context, R.layout.spinner_item, R.id.text1, mLocationArray)
+        mDepartmentAdapter = ArrayItemAdapter(this!!.context!!, R.layout.spinner_item, R.id.text1, mDepartmentArray)
+        mLocationAdapter = ArrayItemAdapter(this!!.context!!, R.layout.spinner_item, R.id.text1, mLocationArray)
         view!!.department.adapter = mDepartmentAdapter;
         view!!.location.adapter = mLocationAdapter;
 
@@ -87,10 +87,10 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position <= 0) {
-                    mSelectedDepartment = "";
+                    mSelectedDepartment = ""
                     return
                 }
-                mSelectedDepartment = mDepartmentArray[position];
+                mSelectedDepartment = mDepartmentArray[position]
             }
         }
 
@@ -110,8 +110,8 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
 
         view!!.findViewById<Button>(R.id.submit).setOnClickListener(this);
 
-        ShareImageLoader.getInstance().loadImage(mBanner, view!!.league_image,
-                ContextCompat.getDrawable(context, R.drawable.cause_image_placeholder))
+        ShareImageLoader.getInstance().loadImage(mBanner, view.league_image,
+                context?.let { ContextCompat.getDrawable(it, R.drawable.cause_image_placeholder) })
     }
 
     private fun onSubmit() {
@@ -142,8 +142,8 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
                 if (fragmentListener != null){
                     fragmentListener.showActivityContent()
-                    activity.setResult(Activity.RESULT_OK)
-                    activity.finish()
+                    activity?.setResult(Activity.RESULT_OK)
+                    activity?.finish()
                 }
             }
         })

@@ -1,5 +1,6 @@
 package com.sharesmile.share.core.sync;
 
+import android.content.AsyncTaskLoader;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,7 +10,10 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
@@ -28,6 +32,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.profile.badges.model.Badge;
 import com.sharesmile.share.profile.badges.model.BadgeParent;
+import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
@@ -76,6 +81,9 @@ import Models.MessageList;
 import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.core.sync.TaskConstants.SYNC_BADGE_DATA;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_CHARITY_OVERVIEW;
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_ACHIEVEMENT;
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_STREAK;
 import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_PENDING_WORKOUT;
 import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_INTERVALS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
@@ -95,8 +103,14 @@ public class SyncService extends GcmTaskService {
         Logger.d(TAG, "runtask started: " + taskParams.getTag());
         try {
             switch (taskParams.getTag()) {
+                case SYNC_CHARITY_OVERVIEW:
+                    return getCharityOverviewData();
                 case UPLOAD_USER_DATA:
                     return uploadUserData();
+                case UPLOAD_STREAK:
+                    return uploadStreak();
+                case UPLOAD_ACHIEVEMENT:
+                    return uploadAchievement();
                 case SYNC_DATA:
                     return syncData(getAssets());
                 case PUSH_FRAUD_DATA:
@@ -204,6 +218,8 @@ public class SyncService extends GcmTaskService {
         syncHowItWorksContent();
         fetchMessage();
         fetchCampaign();
+        uploadStreak();
+        uploadAchievement();
 
         // Returning success as result does not matter
         return GcmNetworkManager.RESULT_SUCCESS;
@@ -643,7 +659,10 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("body_height", prev.getBodyHeight());
             jsonObject.put("body_height_unit", prev.getBodyHeightUnit());
             jsonObject.put("birthday", prev.getBirthday());
+            jsonObject.put("profile_picture", prev.getProfilePicture());
             jsonObject.put("user_id", user_id);
+            jsonObject.put("goal", prev.getStreakGoalID());
+            jsonObject.put("reminder_time", Utils.getReminderTime().getTimeInMillis());
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
@@ -654,6 +673,101 @@ public class SyncService extends GcmTaskService {
 
             MainApplication.getInstance().setUserDetails(response);
 
+            return GcmNetworkManager.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+    }
+
+    private static int uploadStreak() {
+        if (!MainApplication.isLogin()) {
+            // Can't sync a non logged in User
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+        int user_id = MainApplication.getInstance().getUserID();
+        Logger.d(TAG, "uploadUserData for userId: " + user_id);
+        try {
+
+            UserDetails prev = MainApplication.getInstance().getUserDetails();
+            if (prev == null) {
+                // Ideally this condition should never happen
+                Logger.d(TAG, "Can't UPLOAD, MemberDetails not present");
+                return GcmNetworkManager.RESULT_FAILURE;
+            }
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("max_streak", prev.getStreakMaxCount());
+            jsonObject.put("current_streak_date", prev.getStreakCurrentDate());
+            jsonObject.put("streak_added", prev.isStreakAdded());
+            jsonObject.put("streak_added", prev.getStreakCount());
+
+            Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
+
+            Gson gson = new Gson();
+            JSONObject response = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
+                    JSONObject.class);
+            Logger.d(TAG, "Response for getUser:" + response);
+
+
+            return GcmNetworkManager.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+    }
+
+    private static int uploadAchievement() {
+        if (!MainApplication.isLogin()) {
+            // Can't sync a non logged in User
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+        int user_id = MainApplication.getInstance().getUserID();
+        Logger.d(TAG, "uploadUserData for userId: " + user_id);
+        try {
+
+            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().where(AchievedBadgeDao.Properties.IsSync.eq(false)).list();
+
+            if (achievedBadges.size() > 0) {
+                JSONArray jsonArray = new JSONArray();
+                int size = achievedBadges.size();
+                for (int i = 0; i < size; i++) {
+                    AchievedBadge achievedBadge = achievedBadges.get(i);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("user_id", user_id);
+                    jsonObject.put("cause_id", achievedBadge.getCauseId());
+                    jsonObject.put("badge_id_in_progress", achievedBadge.getBadgeIdInProgress());
+                    jsonObject.put("badge_id_achieved", achievedBadge.getBadgeIdAchieved());
+                    jsonObject.put("category_id", achievedBadge.getCategory());
+                    jsonObject.put("parameter_completed", achievedBadge.getParamDone());
+                    jsonArray.put(jsonObject);
+                }
+                Gson gson = new Gson();
+                JSONObject response = NetworkDataProvider.doPostCall(Urls.getAchievementUrl(), jsonArray.toString(),
+                        JSONObject.class);
+
+                Logger.d(TAG, "Response for getUser:" + response);
+                if (response.getInt("code") == 200) {
+                    for (int i = 0; i < size; i++) {
+                        AchievedBadge achievedBadge = achievedBadges.get(i);
+                        achievedBadge.setIsSync(true);
+                        achievedBadgeDao.update(achievedBadge);
+                    }
+                }
+            }
             return GcmNetworkManager.RESULT_SUCCESS;
 
         } catch (NetworkException e) {
@@ -1080,5 +1194,46 @@ public class SyncService extends GcmTaskService {
         }
 
     }
+
+    private static int getCharityOverviewData() {
+
+        try {
+            JsonObject response = NetworkDataProvider.doGetCall(Urls.getImpactOverviewUrl(), JsonObject.class);
+            String responseString = response.getAsJsonObject("result").toString();
+            Logger.d(TAG,"getCharityOverviewData response : "+responseString);
+            SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW,responseString);
+            return ExpoBackoffTask.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            Logger.d(TAG, "NetworkException in getCharityOverviewData: " + e);
+            e.printStackTrace();
+            Crashlytics.log("getCharityOverviewData networkException for user_id ("
+                    + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
+                    + ", while syncing runs at URL: " + Urls.getImpactOverviewUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
+                    .put("failure_type", e.getFailureType())
+                    .buildAndDispatch();
+
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
+        } catch (Exception e) {
+
+            Logger.d(TAG, "Exception in getCharityOverviewData: " + e.getMessage());
+            e.printStackTrace();
+            Crashlytics.log("getCharityOverviewData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
+                    "while syncing charity overview data at URL : " + Urls.getImpactOverviewUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .buildAndDispatch();
+
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
+        }
+
+    }
+
 
 }

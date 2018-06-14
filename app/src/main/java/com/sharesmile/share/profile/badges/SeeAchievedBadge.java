@@ -4,7 +4,7 @@ import android.view.View;
 
 import com.sharesmile.share.AchievedBadge;
 
-public interface SeeAchivedBadge {
+public interface SeeAchievedBadge {
 
     public void showBadgeDetails(long id,String badgeType);
 }
