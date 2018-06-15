@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.Utils;
@@ -109,6 +110,7 @@ public class StreakGoalFragment extends BaseFragment {
         userDetails.setStreakGoalDistance(goals.get(position).getValue());
         userDetails.addStreakCount();
         MainApplication.getInstance().setUserDetails(userDetails);
+        SyncHelper.oneTimeUploadUserData();
         MainApplication.showToast(getResources().getString(R.string.goal_saved));
         getFragmentController().goBack();
 

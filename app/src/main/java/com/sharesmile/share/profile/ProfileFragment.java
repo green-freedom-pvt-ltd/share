@@ -243,20 +243,30 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
         }
         initUi();
+        setCharityOverviewLoader();
+    }
+
+    private void setCharityOverviewLoader() {
         getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, new LoaderManager.LoaderCallbacks<CharityOverview>() {
             @Override
             public Loader<CharityOverview> onCreateLoader(int id, Bundle args) {
                 charityOverviewProgressbar.setVisibility(View.VISIBLE);
                 charityOverviewRecyclerView.setVisibility(View.GONE);
-                return new CharityOverviewAsynTaskLoader(getContext());
+                return new CharityOverviewAsyncTaskLoader(getContext());
             }
 
             @Override
             public void onLoadFinished(Loader<CharityOverview> loader, CharityOverview data) {
                 charityOverview = data;
-                setCharityOverviewRecyclerview();
-                charityOverviewProgressbar.setVisibility(View.GONE);
-                charityOverviewRecyclerView.setVisibility(View.VISIBLE);
+                if(charityOverview!=null) {
+                    setCharityOverviewRecyclerview();
+                    charityOverviewProgressbar.setVisibility(View.GONE);
+                    charityOverviewRecyclerView.setVisibility(View.VISIBLE);
+                }else
+                {
+                    if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
+                    SyncHelper.getCharityOverview();
+                }
             }
 
             @Override
@@ -310,6 +320,12 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         initUi();
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.CharityOverviewUpdated charityOverviewUpdated)
+    {
+        setCharityOverviewLoader();
+    }
     private void initUi() {
         // Setting Profile Picture
         boolean isWorkoutDataUpToDate =
@@ -978,7 +994,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.MY_STATS,
                         overlayLayout,
                         getActivity(),
-                        true, false, true);
+                        true, true, true);
                 materialTapTargetPrompt.show();
             }
         }

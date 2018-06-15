@@ -179,7 +179,7 @@ public class StreakFragment extends BaseFragment {
 
         if(achievedBadgesData==null) {
             tellYourFriends.setVisibility(View.VISIBLE);
-        }else if(achievedBadgesData.getStreakBadgeAchieved()>0)
+        }else if(userDetails.isStreakAdded())
         {
             tellYourFriends.setVisibility(View.VISIBLE);
         }else

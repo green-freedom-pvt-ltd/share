@@ -173,7 +173,6 @@ public class Version16 extends SchemaVersion {
     }
 
     private static void addBadgeData(Schema schema){
-
         Entity badge = schema.addEntity("Badge");
         badge.addIdProperty().autoincrement();
         badge.addIntProperty("badgeId").notNull();

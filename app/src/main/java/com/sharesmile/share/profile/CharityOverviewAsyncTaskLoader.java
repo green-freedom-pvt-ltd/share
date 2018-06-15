@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class CharityOverviewAsynTaskLoader extends AsyncTaskLoader<CharityOverview> {
+public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverview> {
 
     private CharityOverview charityOverview;
 
-    public CharityOverviewAsynTaskLoader(Context context) {
+    public CharityOverviewAsyncTaskLoader(Context context) {
         super(context);
     }
 

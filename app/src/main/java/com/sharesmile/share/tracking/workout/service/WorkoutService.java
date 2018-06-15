@@ -313,9 +313,9 @@ public class WorkoutService extends Service implements
             SyncHelper.uploadStreak();
             AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
             achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER,mCauseData));
-            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData));
-            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData));
             achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_MARATHON,mCauseData));
+            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData));
+            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData));
             SyncHelper.uploadAchievement();
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
             handleWorkoutResult(result,achievedBadgesData);

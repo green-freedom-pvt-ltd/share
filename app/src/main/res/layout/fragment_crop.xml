@@ -10,16 +10,21 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         >
-        <com.takusemba.cropme.CropView
+        <com.theartofdev.edmodo.cropper.CropImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cropme_background_alpha="80%"
-            app:cropme_max_scale="3"
-            app:cropme_result_height="80%"
-            app:cropme_result_width="80%"
-            app:cropme_with_border="true"
-            android:id="@+id/cropview"
-            />
+            android:id="@+id/crop_image_view"
+            app:cropGuidelines="on"
+            app:cropAspectRatioX="1"
+            app:cropAspectRatioY="1"
+            app:cropBackgroundColor="@color/black"
+            app:cropMaxCropResultWidthPX="500"
+            app:cropMaxCropResultHeightPX="500"
+            app:cropShape="rectangle"
+            app:cropShowCropOverlay="true"
+            app:cropMultiTouchEnabled="true"
+            app:cropAutoZoomEnabled="false"
+            />l
     </LinearLayout>
     <RelativeLayout
         android:layout_width="match_parent"

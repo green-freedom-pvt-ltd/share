@@ -3,8 +3,8 @@ package com.sharesmile.share.profile;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -12,16 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.google.gson.Gson;
 import com.sharesmile.share.R;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-import com.takusemba.cropme.CropView;
-
-import org.greenrobot.eventbus.EventBus;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +25,9 @@ import butterknife.ButterKnife;
 public class CropImageFragment extends BaseFragment {
 
     public final String TAG = "CropImageFragment";
+    @BindView(R.id.crop_image_view)
+    CropImageView cropImageView;
 
-    @BindView(R.id.cropview)
-    CropView cropView;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +48,10 @@ public class CropImageFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String imagePath = getArguments().getString("image_path");
+
+        cropImageView.setImageUriAsync(Uri.fromFile(new File(imagePath)));
+
+        /*
         Bitmap bitmap = getImage(imagePath);
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -68,9 +65,9 @@ public class CropImageFragment extends BaseFragment {
         if(height>500)
         {
             heightPer = (int) ((500.0/height)*100);
-        }
-        cropView.setBitmap(bitmap);
+        }*/
         setupToolbar();
+
     }
 
     private Bitmap getImage(String photoPath) {

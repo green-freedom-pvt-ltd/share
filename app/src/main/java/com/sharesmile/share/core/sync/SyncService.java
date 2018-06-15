@@ -218,6 +218,7 @@ public class SyncService extends GcmTaskService {
         syncHowItWorksContent();
         fetchMessage();
         fetchCampaign();
+        getCharityOverviewData();
         uploadStreak();
         uploadAchievement();
 
@@ -706,7 +707,8 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("max_streak", prev.getStreakMaxCount());
             jsonObject.put("current_streak_date", prev.getStreakCurrentDate());
             jsonObject.put("streak_added", prev.isStreakAdded());
-            jsonObject.put("streak_added", prev.getStreakCount());
+            jsonObject.put("streak_count", prev.getStreakCount());
+
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
@@ -837,6 +839,8 @@ public class SyncService extends GcmTaskService {
             }
 
             EventBus.getDefault().post(new UpdateEvent.PendingWorkoutUploaded());
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true);
+            getCharityOverviewData();
             return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
@@ -1202,6 +1206,8 @@ public class SyncService extends GcmTaskService {
             String responseString = response.getAsJsonObject("result").toString();
             Logger.d(TAG,"getCharityOverviewData response : "+responseString);
             SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW,responseString);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,false);
+
             return ExpoBackoffTask.RESULT_SUCCESS;
 
         } catch (NetworkException e) {
@@ -1224,6 +1230,55 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "Exception in getCharityOverviewData: " + e.getMessage());
             e.printStackTrace();
             Crashlytics.log("getCharityOverviewData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
+                    "while syncing charity overview data at URL : " + Urls.getImpactOverviewUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .buildAndDispatch();
+
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
+        }
+
+    }
+
+    private static int getAchievedBadgeData() {
+
+        try {
+            JsonObject response = NetworkDataProvider.doGetCall(Urls.getAchievementUrl(), JsonObject.class);
+            String responseString = response.getAsJsonObject("result").toString();
+            JSONArray jsonArray = new JSONArray(responseString);
+            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+
+            for(int i=0;i<jsonArray.length();i++)
+            {
+
+            }
+            Logger.d(TAG,"getCharityOverviewData response : "+responseString);
+            SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW,responseString);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,false);
+
+            return ExpoBackoffTask.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            Logger.d(TAG, "NetworkException in getAchievedBadgeData: " + e);
+            e.printStackTrace();
+            Crashlytics.log("getAchievedBadgeData networkException for user_id ("
+                    + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
+                    + ", while syncing runs at URL: " + Urls.getImpactOverviewUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
+                    .put("failure_type", e.getFailureType())
+                    .buildAndDispatch();
+
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
+        } catch (Exception e) {
+
+            Logger.d(TAG, "Exception in getAchievedBadgeData: " + e.getMessage());
+            e.printStackTrace();
+            Crashlytics.log("getAchievedBadgeData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
                     "while syncing charity overview data at URL : " + Urls.getImpactOverviewUrl());
             Crashlytics.logException(e);
             AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)

@@ -60,7 +60,7 @@ public class CharityOverviewFragment extends BaseFragment{
             public Loader<CharityOverview> onCreateLoader(int id, Bundle args) {
                 charityOverviewProgressbar.setVisibility(View.VISIBLE);
                 charityOverviewProgressbar.setVisibility(View.GONE);
-                return new CharityOverviewAsynTaskLoader(getContext());
+                return new CharityOverviewAsyncTaskLoader(getContext());
             }
 
             @Override

@@ -15,6 +15,8 @@ public class TaskConstants {
 
     public static final String SYNC_CHARITY_OVERVIEW = "sync_charity_overview";
 
+    public static final String SYNC_ACHIEVEMENT = "sync_achievement";
+
     public static final String UPLOAD_ACHIEVEMENT = "upload_achievement";
 
     public static final String UPLOAD_PENDING_WORKOUT = "upload_pending_workout";

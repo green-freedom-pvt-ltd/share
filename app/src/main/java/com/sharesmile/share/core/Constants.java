@@ -244,6 +244,8 @@ public class Constants {
     //TODO : actually done at the server end but temp doing it at client end
     public static final String PREF_USERS_LOGGED_IN = "pref_user_login_id";
     public static final String PREF_SHOWN_ONBOARDING = "pref_onboarding";
+    public static final String PREF_CHARITY_OVERVIEW_DATA_LOAD = "pref_charity_overview_data_load";
+    public static final String PREF_ACHIEVEMENT_LOAD = "pref_achievement_load";
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
     public static final String PROFILE_SCREEN = "profile_screen";

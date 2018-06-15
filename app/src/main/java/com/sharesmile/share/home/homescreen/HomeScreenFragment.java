@@ -167,7 +167,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         render();
         checkBadgeData();
         prepareOnboardingOverlays();
-        SyncHelper.getCharityOverview();
+        if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
+            SyncHelper.getCharityOverview();
+        if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVEMENT_LOAD,true))
+            SyncHelper.getCharityOverview();
+
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);

@@ -791,11 +791,12 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 }*/
                 Picasso.with(getContext()).load(photoFile).into(imgProfile);
             }
-//                cropImage();
+
         }else
         {
             setImageFromGallery(imageCapture.getData());
         }
+//                        cropImage();
         setMenuColor();
     }
 
@@ -813,6 +814,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
+
     public void setImageFromGallery(Intent data)
     {
         Uri uri = data.getData();

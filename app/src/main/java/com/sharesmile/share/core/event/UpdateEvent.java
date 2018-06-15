@@ -126,4 +126,9 @@ public class UpdateEvent {
             setData(data);
         }
     }
+
+    public static class CharityOverviewUpdated{
+        public CharityOverviewUpdated() {
+        }
+    }
 }
