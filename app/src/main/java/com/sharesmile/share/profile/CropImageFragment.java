@@ -1,5 +1,6 @@
 package com.sharesmile.share.profile;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -11,9 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
@@ -21,12 +27,23 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static android.app.Activity.RESULT_OK;
 
 public class CropImageFragment extends BaseFragment {
 
     public final String TAG = "CropImageFragment";
     @BindView(R.id.crop_image_view)
     CropImageView cropImageView;
+    @BindView(R.id.cancel)
+    TextView cancel;
+    @BindView(R.id.rotate)
+    ImageView rotate;
+    @BindView(R.id.done)
+    TextView done;
+    String imagePath = "";
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,25 +64,10 @@ public class CropImageFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String imagePath = getArguments().getString("image_path");
-
+        imagePath = getArguments().getString("image_path");
+        cropImageView.setAspectRatio(1, 1);
+        cropImageView.setFixedAspectRatio(true);
         cropImageView.setImageUriAsync(Uri.fromFile(new File(imagePath)));
-
-        /*
-        Bitmap bitmap = getImage(imagePath);
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        int widthPer = 100;
-        int heightPer = 100;
-
-        if(width>500)
-        {
-            widthPer = (int) ((500.0/width)*100);
-        }
-        if(height>500)
-        {
-            heightPer = (int) ((500.0/height)*100);
-        }*/
         setupToolbar();
 
     }
@@ -82,7 +84,7 @@ public class CropImageFragment extends BaseFragment {
                 ExifInterface.ORIENTATION_UNDEFINED);
 
         Bitmap rotatedBitmap = null;
-        switch(orientation) {
+        switch (orientation) {
 
             case ExifInterface.ORIENTATION_ROTATE_90:
                 rotatedBitmap = rotateImage(bitmap, 90);
@@ -112,5 +114,34 @@ public class CropImageFragment extends BaseFragment {
 
     private void setupToolbar() {
         getFragmentController().hideToolbar();
+    }
+
+    @OnClick({R.id.cancel, R.id.rotate, R.id.done})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.rotate:
+                cropImageView.rotateImage(90);
+                break;
+
+            case R.id.done:
+                Bitmap croppedImage = cropImageView.getCroppedImage();
+                ShareImageLoader.getInstance().setUseMemoryCache(false);
+                boolean imageSaved = Utils.storeImage(croppedImage, imagePath);
+                goBackWithImageData();
+                break;
+
+            case R.id.cancel:
+                imagePath = null;
+                goBackWithImageData();
+                break;
+        }
+    }
+
+    public void goBackWithImageData()
+    {
+        Intent intent = new Intent(getContext(), CropImageFragment.class);
+        intent.putExtra("imagePath", imagePath);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_OK, intent);
+        goBack();
     }
 }

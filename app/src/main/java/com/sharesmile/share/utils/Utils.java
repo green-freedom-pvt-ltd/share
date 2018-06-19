@@ -1675,11 +1675,28 @@ public class Utils {
         return actualPosition.intersect(screen);
     }
 
-    public static int getScreenWidth() {
+    private static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
-    public static int getScreenHeight() {
+    private static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
+    }
+
+    public static boolean storeImage(Bitmap image,String imagePath) {
+        File pictureFile = new File(imagePath);
+        try {
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            Logger.d(TAG, "File not found: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            Logger.d(TAG, "Error accessing file: " + e.getMessage());
+            return false;
+        }
+        return true;
     }
 }

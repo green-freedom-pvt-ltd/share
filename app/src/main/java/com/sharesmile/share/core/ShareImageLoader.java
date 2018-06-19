@@ -23,6 +23,7 @@ import com.squareup.picasso.RequestCreator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
@@ -32,7 +33,7 @@ public class ShareImageLoader {
     private static final String TAG = "ShareImageLoader";
 
     private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.RGB_565;
-    private static final boolean USE_MEMORY_CACHE = true;
+    private static boolean USE_MEMORY_CACHE = true;
     private static final float LOW_MEMORY_THRESHOLD_PERCENTAGE = 5;
     private final Picasso picasso;
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -51,6 +52,10 @@ public class ShareImageLoader {
         return instance;
     }
 
+    public void setUseMemoryCache(boolean useMemoryCache)
+    {
+        USE_MEMORY_CACHE = useMemoryCache;
+    }
     private static File createDefaultCacheDir(Context context) {
         File cache = new File(context.getApplicationContext().getCacheDir(), "picasso-cache");
         if (!cache.exists()) {
@@ -130,11 +135,16 @@ public class ShareImageLoader {
      * @param drawableWhileLoading displayed while image is downloading
      * @param drawableOnFailure    displayed if download fails
      */
-    public void loadImage(final String url, final ImageView imageView, final Drawable drawableWhileLoading,
+    public void loadImage(String url, final ImageView imageView, final Drawable drawableWhileLoading,
                           final Drawable drawableOnFailure) {
 
         if (isAdequateMemoryAvailable()) {
             if (imageView != null && !TextUtils.isEmpty(url)) {
+                if(!USE_MEMORY_CACHE)
+                {
+                    picasso.invalidate(url);
+                    url = url+"?version="+ Calendar.getInstance().getTimeInMillis();
+                }
                 RequestCreator request = picasso.load(url);
                 if (drawableWhileLoading != null) {
                     request.placeholder(drawableWhileLoading);
@@ -146,17 +156,20 @@ public class ShareImageLoader {
                 request.networkPolicy(NetworkPolicy.OFFLINE);
                 if (!USE_MEMORY_CACHE) {
                     request.memoryPolicy(MemoryPolicy.NO_CACHE);
+                    request.networkPolicy(NetworkPolicy.NO_CACHE);
+
                 }
+                String finalUrl = url;
                 request.into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
-                        Log.d(TAG, "Image loaded successfully from Disk, url = " + url);
+                        Log.d(TAG, "Image loaded successfully from Disk, url = " + finalUrl);
                     }
 
                     @Override
                     public void onError() {
-                        Log.d(TAG, "Image could not be loaded from Disk, lets try network. url = " + url);
-                        RequestCreator secondRequest = picasso.load(url);
+                        Log.d(TAG, "Image could not be loaded from Disk, lets try network. url = " + finalUrl);
+                        RequestCreator secondRequest = picasso.load(finalUrl);
                         if (drawableWhileLoading != null) {
                             secondRequest.placeholder(drawableWhileLoading);
                         }

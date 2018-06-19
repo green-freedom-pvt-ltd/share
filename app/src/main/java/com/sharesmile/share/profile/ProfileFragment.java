@@ -350,6 +350,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
             if (lifeTimeImpact == 0) {
                 workoutLayout.setVisibility(View.GONE);
                 noWorkoutLayout.setVisibility(View.VISIBLE);
+
                 ShareImageLoader.getInstance().loadImage(url, imageView2,
                         ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
                 // Name of user
@@ -446,6 +447,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
 
                 }
             }
+            ShareImageLoader.getInstance().setUseMemoryCache(true);
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
             // Need to force refresh Workout Data
             Logger.e(TAG, "Must fetch historical run data before");

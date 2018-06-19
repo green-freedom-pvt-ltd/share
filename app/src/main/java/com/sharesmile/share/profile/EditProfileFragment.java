@@ -78,6 +78,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
+
 import com.amazonaws.mobileconnectors.s3.transferutility.*;
 
 
@@ -167,6 +168,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     private UserDetails userDetails;
     EditProfileImageDialog editProfileImageDialog;
+    boolean isImageLoaded = false;
 
 
     @Override
@@ -185,11 +187,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         ButterKnife.bind(this, v);
         EventBus.getDefault().register(this);
-        init();
+
         return v;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = getArguments();
 
+        init();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -207,11 +215,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_save_profile:
-                if(progressBar.getVisibility() == View.VISIBLE)
-                {
+                if (progressBar.getVisibility() == View.VISIBLE) {
                     MainApplication.showToast("Upload in process, please wait.");
-                }else
-                if(NetworkUtils.isNetworkConnected(getContext())) {
+                } else if (NetworkUtils.isNetworkConnected(getContext())) {
                     if (!checkUser()) {
                         if (validateUserDetails()) {
                             if (photoFile != null)
@@ -221,8 +227,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                             isEdited = false;
                         }
                     }
-                }else
-                {
+                } else {
                     MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
                 }
                 return true;
@@ -306,12 +311,14 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         }
         setMenuColor();
 
-        if(!TextUtils.isEmpty(userDetails.getProfilePicture()))
+        if(isImageLoaded)
         {
-            ShareImageLoader.getInstance().loadImage(Urls.getImpactProfileS3BucketUrl()+userDetails.getProfilePicture(), imgProfile,
+            Picasso.with(getContext()).load(photoFile).into(imgProfile);
+            isImageLoaded = false;
+        }else if (!TextUtils.isEmpty(userDetails.getProfilePicture())) {
+            ShareImageLoader.getInstance().loadImage(Urls.getImpactProfileS3BucketUrl() + userDetails.getProfilePicture(), imgProfile,
                     ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
-        }else if(!TextUtils.isEmpty(userDetails.getSocialThumb()))
-        {
+        } else if (!TextUtils.isEmpty(userDetails.getSocialThumb())) {
             ShareImageLoader.getInstance().loadImage(userDetails.getSocialThumb(), imgProfile,
                     ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         }
@@ -334,45 +341,21 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             // Name not valid
             mFirstNameError.setText("*Please enter a valid name");
             validDetails = false;
-        }else
-        {
+        } else {
             mFirstNameError.setText("");
         }
         if (mLastName.getText().toString().isEmpty()) {
             // Name not valid
             MainApplication.showToast("*Please enter a valid name");
             validDetails = false;
-        }else
-        {
+        } else {
             mLastNameError.setText("");
         }
         if (!validatePhoneNumber(mNumber.getText().toString())) {
             validDetails = false;
-        }else
-        {
+        } else {
             mNumberError.setText("");
         }
-       /* try {
-            String inputWeight = bodyWeightKgs.getText().toString();
-            if (!TextUtils.isEmpty(inputWeight)) {
-                // Go for validation only when weight box is empty
-                float weight = Float.parseFloat(inputWeight);
-                if (weight < 10 || weight > 200) {
-                    bodyWeightKgsError.setText("*"+R.string.enter_actual_weight);
-                    validDetails = false;
-                }else
-                {
-                    bodyWeightKgsError.setText("");
-                }
-            }else {
-                bodyWeightKgsError.setText("*Please enter body weight");
-                validDetails = false;
-            }
-        } catch (Exception e) {
-            Logger.e(TAG, "Exception while parsing body weight: " + e.getMessage());
-            e.printStackTrace();
-            validDetails = false;
-        }*/
         return validDetails;
     }
 
@@ -383,8 +366,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     private boolean checkUser() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         boolean b = true;
-        if(photoFile!=null)
-        {
+        if (photoFile != null) {
             b = false;
         }
         if (!mFirstName.getText().toString().equals(userDetails.getFirstName())) {
@@ -454,8 +436,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         }
 
         StringBuilder fullNameBuilder = new StringBuilder();
-        if(!TextUtils.isEmpty(profilePicUrl))
-        {
+        if (!TextUtils.isEmpty(profilePicUrl)) {
             userDetails.setProfilePicture(profilePicUrl);
             AnalyticsEvent.create(Event.ON_UPDATE_PROFILEPIC)
                     .put("profile_pic_url", profilePicUrl)
@@ -643,9 +624,8 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     }
 
     @OnClick(R.id.edit_profile_img)
-    void editProfileImg()
-    {
-        if (editProfileImageDialog != null){
+    void editProfileImg() {
+        if (editProfileImageDialog != null) {
             editProfileImageDialog.dismiss();
         }
         editProfileImageDialog = new EditProfileImageDialog(getActivity(), R.style.BackgroundDimDialog);
@@ -661,62 +641,53 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             public void onSecondaryClick(BaseDialog dialog) {
                 // Choose existing photo
                 dialog.dismiss();
-               chooseExistingPhotoPermission();
+                chooseExistingPhotoPermission();
             }
         });
         editProfileImageDialog.show();
     }
-    
-    public void takePhotoPermission()
-    {
+
+    public void takePhotoPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) &&
                     (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             != PackageManager.PERMISSION_GRANTED)) {
                 getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.CODE_REQUEST_IMAGE_CAPTURE_PERMISSION);
-            }else
-            {
+            } else {
                 dispatchTakePictureIntent();
             }
-        }else
-        {
+        } else {
             dispatchTakePictureIntent();
         }
     }
 
-    public void chooseExistingPhotoPermission()
-    {
+    public void chooseExistingPhotoPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED) {
+                    != PackageManager.PERMISSION_GRANTED) {
                 getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION);
-            }else
-            {
+            } else {
                 dispatchGetPictureFromGalleryIntent();
             }
-        }else
-        {
+        } else {
             dispatchGetPictureFromGalleryIntent();
         }
     }
 
-    
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
 
-            try
-            {
+            try {
                 photoFile = Utils.createImageFile(getContext());
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(photoFile!=null)
-            {
-                Uri photoURI = FileProvider.getUriForFile(getContext(),Utils.getFileProvider(getContext()),photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoURI);
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(getContext(), Utils.getFileProvider(getContext()), photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 getActivity().startActivityForResult(takePictureIntent, Constants.REQUEST_IMAGE_CAPTURE);
             }
         }
@@ -731,99 +702,57 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.EditImagePermissionGranted editImagePermissionGranted) {
-        if(editImagePermissionGranted.getRequestCode() == Constants.CODE_REQUEST_IMAGE_CAPTURE_PERMISSION) {
+        if (editImagePermissionGranted.getRequestCode() == Constants.CODE_REQUEST_IMAGE_CAPTURE_PERMISSION) {
             dispatchTakePictureIntent();
-        }else if(editImagePermissionGranted.getRequestCode() == Constants.CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION) {
+        } else if (editImagePermissionGranted.getRequestCode() == Constants.CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION) {
             dispatchGetPictureFromGalleryIntent();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.ImageCapture imageCapture)
-    {
+    public void onEvent(UpdateEvent.ImageCapture imageCapture) {
 
-        if(imageCapture.getData() == null)
-        {
-            if(imageCapture.getResultCode() == RESULT_OK) {
-                /*Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                ExifInterface ei = null;
-                try {
-                    ei = new ExifInterface(photoFile.getAbsolutePath());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                        ExifInterface.ORIENTATION_UNDEFINED);
-
-                Bitmap rotatedBitmap = null;
-                switch(orientation) {
-
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        rotatedBitmap = rotateImage(bitmap, 90);
-                        break;
-
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        rotatedBitmap = rotateImage(bitmap, 180);
-                        break;
-
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        rotatedBitmap = rotateImage(bitmap, 270);
-                        break;
-
-                    case ExifInterface.ORIENTATION_NORMAL:
-                    default:
-                        rotatedBitmap = bitmap;
-                }
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(photoFile);
-                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }*/
+        if (imageCapture.getData() == null) {
+            if (imageCapture.getResultCode() == RESULT_OK) {
                 Picasso.with(getContext()).load(photoFile).into(imgProfile);
             }
 
-        }else
-        {
+        } else {
             setImageFromGallery(imageCapture.getData());
         }
-//                        cropImage();
+        cropImage();
         setMenuColor();
     }
 
     private void cropImage() {
         CropImageFragment cropImageFragment = new CropImageFragment();
+        cropImageFragment.setTargetFragment(EditProfileFragment.this, 100);
         Bundle bundle = new Bundle();
-        bundle.putString("image_path",photoFile.getAbsolutePath());
+        bundle.putString("image_path", photoFile.getAbsolutePath());
         cropImageFragment.setArguments(bundle);
-        getFragmentController().replaceFragment(cropImageFragment,true);
+        getFragmentController().replaceFragment(cropImageFragment, true);
 //        CropImage.activity(Uri.fromFile(photoFile)).start(getActivity());
     }
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100) {
+            if (data.hasExtra("imagePath")) {
+                String imagePath = data.getStringExtra("imagePath");
+                photoFile = new File(imagePath);
+                isImageLoaded = true;
+            }
+        }
     }
 
-    public void setImageFromGallery(Intent data)
-    {
+    public void setImageFromGallery(Intent data) {
         Uri uri = data.getData();
         String path = "";
-        if(android.os.Build.VERSION.SDK_INT<=18) {
-        path = Utils.getRealPathFromURI_API11to18(getContext(),uri);
-        }else
-        {
-            path = Utils.getRealPathFromURI_API19(getContext(),uri);
+        if (android.os.Build.VERSION.SDK_INT <= 18) {
+            path = Utils.getRealPathFromURI_API11to18(getContext(), uri);
+        } else {
+            path = Utils.getRealPathFromURI_API19(getContext(), uri);
         }
         photoFile = new File(path);
         Picasso.with(getContext()).load(photoFile).into(imgProfile);
@@ -837,7 +766,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                         .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
                         .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
                         .build();
-        profilePicUrl = "uploads/profile_pic/"+MainApplication.getInstance().getUserID()+"/profile_pic.jpg";
+        profilePicUrl = "uploads/profile_pic/" + MainApplication.getInstance().getUserID() + "/profile_pic.jpg";
         TransferObserver uploadObserver =
                 transferUtility.upload(profilePicUrl
                         , photoFile);
@@ -847,7 +776,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
             @Override
             public void onStateChanged(int id, TransferState state) {
-                System.out.println("TESTING : "+state.name());
+                System.out.println("TESTING : " + state.name());
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
                     saveUserDetails();
@@ -858,7 +787,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             @Override
             public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
                 float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
-                int percentDone = (int)percentDonef;
+                int percentDone = (int) percentDonef;
 
                 Logger.d(TAG, "ID:" + id + " bytesCurrent: " + bytesCurrent
                         + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
@@ -883,7 +812,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         Logger.d(TAG, "Bytes Transferrred: " + uploadObserver.getBytesTransferred());
         Logger.d(TAG, "Bytes Total: " + uploadObserver.getBytesTotal());
     }
-
 
 
 }

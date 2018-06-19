@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,11 +19,7 @@
             android:layout_height="match_parent"
             android:id="@+id/crop_image_view"
             app:cropGuidelines="on"
-            app:cropAspectRatioX="1"
-            app:cropAspectRatioY="1"
             app:cropBackgroundColor="@color/black"
-            app:cropMaxCropResultWidthPX="500"
-            app:cropMaxCropResultHeightPX="500"
             app:cropShape="rectangle"
             app:cropShowCropOverlay="true"
             app:cropMultiTouchEnabled="true"
@@ -43,6 +43,7 @@
             android:id="@+id/cancel"
             />
         <ImageView
+            android:id="@+id/rotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/male"
@@ -60,4 +61,11 @@
             android:id="@+id/done"
             />
     </RelativeLayout>
-</LinearLayout>
+    </LinearLayout>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/progress_bar"
+        />
+</RelativeLayout>
