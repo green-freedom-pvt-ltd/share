@@ -13,12 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.utils.ImageCompression;
 import com.sharesmile.share.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -42,7 +45,9 @@ public class CropImageFragment extends BaseFragment {
     ImageView rotate;
     @BindView(R.id.done)
     TextView done;
+
     String imagePath = "";
+    boolean cropStarted = false;
 
 
     @Override
@@ -68,10 +73,31 @@ public class CropImageFragment extends BaseFragment {
         cropImageView.setAspectRatio(1, 1);
         cropImageView.setFixedAspectRatio(true);
         cropImageView.setImageUriAsync(Uri.fromFile(new File(imagePath)));
+        cropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
+            @Override
+            public void onCropImageComplete(CropImageView cropImageView, CropImageView.CropResult cropResult) {
+
+                Bitmap croppedImage = cropResult.getBitmap();
+                ShareImageLoader.getInstance().setUseMemoryCache(false);
+                boolean imageSaved = Utils.storeImage(croppedImage, imagePath);
+                ImageCompression imageCompression = new ImageCompression(getContext())
+                {
+                    @Override
+                    protected void onPostExecute(String imagePath) {
+                        super.onPostExecute(imagePath);
+                        CropImageFragment.this.imagePath = imagePath;
+                        goBackWithImageData();
+                    }
+                };
+                imageCompression.execute(imagePath);
+
+            }
+        });
         setupToolbar();
 
     }
 
+/*
     private Bitmap getImage(String photoPath) {
         ExifInterface ei = null;
         Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
@@ -111,6 +137,7 @@ public class CropImageFragment extends BaseFragment {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
+*/
 
     private void setupToolbar() {
         getFragmentController().hideToolbar();
@@ -118,22 +145,27 @@ public class CropImageFragment extends BaseFragment {
 
     @OnClick({R.id.cancel, R.id.rotate, R.id.done})
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.rotate:
-                cropImageView.rotateImage(90);
-                break;
+        if(!cropStarted) {
+            switch (view.getId()) {
+                case R.id.rotate:
+                    cropImageView.rotateImage(90);
+                    break;
 
-            case R.id.done:
-                Bitmap croppedImage = cropImageView.getCroppedImage();
-                ShareImageLoader.getInstance().setUseMemoryCache(false);
-                boolean imageSaved = Utils.storeImage(croppedImage, imagePath);
-                goBackWithImageData();
-                break;
+                case R.id.done:
+                    cropImageView.getCroppedImageAsync();
+                    break;
 
-            case R.id.cancel:
-                imagePath = null;
-                goBackWithImageData();
-                break;
+                case R.id.cancel:
+
+//                    File file = new File(imagePath);
+//                    file.delete();
+                    imagePath = null;
+                    goBackWithImageData();
+                    break;
+            }
+        }else
+        {
+            MainApplication.showToast("Cropping in Progress");
         }
     }
 

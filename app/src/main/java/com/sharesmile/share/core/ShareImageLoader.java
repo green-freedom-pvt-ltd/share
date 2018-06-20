@@ -35,7 +35,7 @@ public class ShareImageLoader {
     private static final Bitmap.Config BITMAP_CONFIG = Bitmap.Config.RGB_565;
     private static boolean USE_MEMORY_CACHE = true;
     private static final float LOW_MEMORY_THRESHOLD_PERCENTAGE = 5;
-    private final Picasso picasso;
+    private Picasso picasso;
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
 
@@ -143,7 +143,7 @@ public class ShareImageLoader {
                 if(!USE_MEMORY_CACHE)
                 {
                     picasso.invalidate(url);
-                    url = url+"?version="+ Calendar.getInstance().getTimeInMillis();
+//                    url = url+"?version="+ Calendar.getInstance().getTimeInMillis();
                 }
                 RequestCreator request = picasso.load(url);
                 if (drawableWhileLoading != null) {
@@ -154,11 +154,10 @@ public class ShareImageLoader {
                 }
                 request.config(BITMAP_CONFIG);
                 request.networkPolicy(NetworkPolicy.OFFLINE);
-                if (!USE_MEMORY_CACHE) {
+               /* if (!USE_MEMORY_CACHE) {
                     request.memoryPolicy(MemoryPolicy.NO_CACHE);
-                    request.networkPolicy(NetworkPolicy.NO_CACHE);
-
-                }
+                    request.networkPolicy(NetworkPolicy.OFFLINE,NetworkPolicy.NO_CACHE);
+                }*/
                 String finalUrl = url;
                 request.into(imageView, new Callback() {
                     @Override

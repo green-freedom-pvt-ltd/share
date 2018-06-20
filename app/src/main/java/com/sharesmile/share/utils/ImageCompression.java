@@ -18,8 +18,8 @@ import java.io.IOException;
 public class ImageCompression extends AsyncTask<String, Void, String> {
 
     private Context context;
-    private static final float maxHeight = 1280.0f;
-    private static final float maxWidth = 1280.0f;
+    private static final float maxHeight = 480.0f;
+    private static final float maxWidth = 480.0f;
 
 
     public ImageCompression(Context context){
@@ -80,7 +80,6 @@ public class ImageCompression extends AsyncTask<String, Void, String> {
             bmp = BitmapFactory.decodeFile(imagePath, options);
         } catch (OutOfMemoryError exception) {
             exception.printStackTrace();
-
         }
         try {
             scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight, Bitmap.Config.RGB_565);
@@ -122,13 +121,13 @@ public class ImageCompression extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         FileOutputStream out = null;
-        String filepath = getFilename();
+        String filepath = imagePath;
         try {
             out = new FileOutputStream(filepath);
 
            //write the compressed bitmap at the destination specified by filename.
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
-
+            System.out.println();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

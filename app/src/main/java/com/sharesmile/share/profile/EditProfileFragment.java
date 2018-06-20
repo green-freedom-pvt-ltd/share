@@ -161,6 +161,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
 
+    File tempPhotoFile;
     File photoFile;
     private String profilePicUrl;
 
@@ -311,11 +312,10 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         }
         setMenuColor();
 
-        if(isImageLoaded)
-        {
+        if (isImageLoaded) {
             Picasso.with(getContext()).load(photoFile).into(imgProfile);
             isImageLoaded = false;
-        }else if (!TextUtils.isEmpty(userDetails.getProfilePicture())) {
+        } else if (!TextUtils.isEmpty(userDetails.getProfilePicture())) {
             ShareImageLoader.getInstance().loadImage(Urls.getImpactProfileS3BucketUrl() + userDetails.getProfilePicture(), imgProfile,
                     ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         } else if (!TextUtils.isEmpty(userDetails.getSocialThumb())) {
@@ -681,12 +681,12 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
 
             try {
-                photoFile = Utils.createImageFile(getContext());
+                tempPhotoFile = Utils.createImageFile(getContext());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getContext(), Utils.getFileProvider(getContext()), photoFile);
+            if (tempPhotoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(getContext(), Utils.getFileProvider(getContext()), tempPhotoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 getActivity().startActivityForResult(takePictureIntent, Constants.REQUEST_IMAGE_CAPTURE);
             }
@@ -711,24 +711,25 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.ImageCapture imageCapture) {
+        if(imageCapture.getResultCode() == RESULT_OK) {
+            if (imageCapture.getData() == null) {
 
-        if (imageCapture.getData() == null) {
-            if (imageCapture.getResultCode() == RESULT_OK) {
-                Picasso.with(getContext()).load(photoFile).into(imgProfile);
+//                Picasso.with(getContext()).load(tempPhotoFile).into(imgProfile);
+
+
+            } else {
+                setImageFromGallery(imageCapture.getData());
             }
-
-        } else {
-            setImageFromGallery(imageCapture.getData());
+            cropImage();
+            setMenuColor();
         }
-        cropImage();
-        setMenuColor();
     }
 
     private void cropImage() {
         CropImageFragment cropImageFragment = new CropImageFragment();
         cropImageFragment.setTargetFragment(EditProfileFragment.this, 100);
         Bundle bundle = new Bundle();
-        bundle.putString("image_path", photoFile.getAbsolutePath());
+        bundle.putString("image_path", tempPhotoFile.getAbsolutePath());
         cropImageFragment.setArguments(bundle);
         getFragmentController().replaceFragment(cropImageFragment, true);
 //        CropImage.activity(Uri.fromFile(photoFile)).start(getActivity());
@@ -740,8 +741,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (requestCode == 100) {
             if (data.hasExtra("imagePath")) {
                 String imagePath = data.getStringExtra("imagePath");
-                photoFile = new File(imagePath);
-                isImageLoaded = true;
+                if (imagePath != null) {
+                    photoFile = new File(imagePath);
+                    isImageLoaded = true;
+                } else {
+                    if (photoFile!=null && !photoFile.exists()) {
+                        photoFile = null;
+                    }else if(photoFile!=null)
+                    {
+                        isImageLoaded = true;
+                    }
+                }
             }
         }
     }
@@ -754,8 +764,8 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         } else {
             path = Utils.getRealPathFromURI_API19(getContext(), uri);
         }
-        photoFile = new File(path);
-        Picasso.with(getContext()).load(photoFile).into(imgProfile);
+        tempPhotoFile = new File(path);
+//        Picasso.with(getContext()).load(photoFile).into(imgProfile);
     }
 
     public void uploadWithTransferUtility() {
