@@ -157,6 +157,9 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     @BindView(R.id.tv_stats_kms)
     TextView statsKms;
 
+    @BindView(R.id.tv_stats_kms_unit)
+    TextView statsKmsUnit;
+
     @BindView(R.id.tv_stats_workout)
     TextView statsWorkout;
 
@@ -208,6 +211,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     private CharityOverview charityOverview;
     @BindView(R.id.charity_overview_progressbar)
     ProgressBar charityOverviewProgressbar;
+    int type = BarChartDataSet.TYPE_DAILY;
 
 
     @Override
@@ -246,6 +250,30 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         }
         initUi();
         setCharityOverviewLoader();
+    }
+
+    private void setStatsViewData(){
+        getActivity().getLoaderManager().initLoader(Constants.LOADER_MY_STATS_GRAPH, null, new LoaderManager.LoaderCallbacks<SetUpBarChartDataLoader.MyStatsBarChart>() {
+            @Override
+            public Loader<SetUpBarChartDataLoader.MyStatsBarChart> onCreateLoader(int id, Bundle args) {
+                progressBarStatsGraph.setVisibility(View.VISIBLE);
+                return new SetUpBarChartDataLoader(getContext());
+            }
+
+            @Override
+            public void onLoadFinished(Loader<SetUpBarChartDataLoader.MyStatsBarChart> loader, SetUpBarChartDataLoader.MyStatsBarChart data) {
+                barChartDataSetDaily = data.barChartDataSetDaily;
+                barChartDataSetWeekly = data.barChartDataSetWeekly;
+                barChartDataSetMonthly = data.barChartDataSetMonthly;
+                postMyStatsDataSet();
+                progressBarStatsGraph.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<SetUpBarChartDataLoader.MyStatsBarChart> loader) {
+
+            }
+        });
     }
 
     private void setCharityOverviewLoader() {
@@ -333,7 +361,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         boolean isWorkoutDataUpToDate =
                 SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB, false);
         Logger.d(TAG, "initUi: isWorkoutDataUpToDate = " + isWorkoutDataUpToDate);
-
+        statsKmsUnit.setText(UnitsManager.getDistanceLabel());
         if (isWorkoutDataUpToDate) {
             hideProgressDialog();
             String url;
@@ -395,8 +423,9 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
 
                 displayStats();
                 configBarChart();
-                setUpBarChartAsync = new SetUpBarChartAsync();
-                setUpBarChartAsync.execute();
+                setStatsViewData();
+                /*setUpBarChartAsync = new SetUpBarChartAsync();
+                setUpBarChartAsync.execute();*/
                 prepareStreakOnboardingOverlays();
 
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4)
@@ -485,13 +514,14 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
             default:
                 type = BarChartDataSet.TYPE_DAILY;
         }
-        AnalyticsEvent.create(Event.ON_SET_BIRTTHDAY)
+        AnalyticsEvent.create(Event.ON_SET_GRAPH_TYPE)
                 .put("stats_type", stats)
                 .buildAndDispatch();
-        if (setUpBarChartAsync.getStatus() != AsyncTask.Status.RUNNING) {
+
+        if (progressBarStatsGraph.getVisibility() != View.VISIBLE) {
             showChart(type);
         } else {
-            setUpBarChartAsync.setType(type);
+            setType(type);
             setBG(type);
         }
     }
@@ -592,7 +622,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
 
     class SetUpBarChartAsync extends AsyncTask<Void, Void, Void> {
 
-        int type = BarChartDataSet.TYPE_DAILY;
+
 
         @Override
         protected void onPreExecute() {
@@ -612,90 +642,95 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (isVisible()) {
-                BarDataSet dataSet;
-                dataSet = new BarDataSet(barChartDataSetDaily.getBarEntries(), "Stats");
-                dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-                dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-                IValueFormatter intValueFormatter = new IValueFormatter() {
-                    @Override
-                    public String getFormattedValue(float value, Entry entry, int dataSetIndex,
-                                                    ViewPortHandler viewPortHandler) {
-                        int val = Math.round(value);
-                        if (val > 0) {
-                            return UnitsManager.formatRupeeToMyCurrency(val);
-                        } else {
-                            return "";
-                        }
-                    }
-                };
-
-                dataSet.setValueFormatter(intValueFormatter);
-                BarData dataDaily = new BarData(dataSet);
-
-                barChartDaily.setData(dataDaily);
-                barChartDaily.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int width = layoutProfileStats.getWidth();
-                        int size = barChartDataSetDaily.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSetDaily.getNoOfValuesInXAxis();
-                        long scale = barChartDataSetDaily.getNoOfValuesInXAxis() / size;
-//                        barChartDaily.fitScreen();
-                        barChartDaily.zoom(scale, 1, width * scale, 0);
-//                        barChartDaily.highlightValue(barChartDataSetDaily.getBarEntries().size() - 1, 0);
-                        barChartDaily.invalidate();
-                    }
-                });
-                BarDataSet dataSetWeekly;
-                dataSetWeekly = new BarDataSet(barChartDataSetWeekly.getBarEntries(), "Stats");
-                dataSetWeekly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-                dataSetWeekly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-                dataSetWeekly.setValueFormatter(intValueFormatter);
-                BarData dataWeekly = new BarData(dataSetWeekly);
-                barChartWeekly.setData(dataWeekly);
-                barChartWeekly.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int width = layoutProfileStats.getWidth();
-                        float size = barChartDataSetWeekly.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSetWeekly.getNoOfValuesInXAxis();
-                        float scale = (barChartDataSetWeekly.getNoOfValuesInXAxis()) / size;
-//                        barChartWeekly.fitScreen();
-                        barChartWeekly.zoom(scale, 1, width * scale, 0);
-//                        barChartWeekly.highlightValue(barChartDataSetWeekly.getBarEntries().size() - 1, 0);
-                        barChartWeekly.invalidate();
-                    }
-                });
-
-                BarDataSet dataSetMonthly;
-                dataSetMonthly = new BarDataSet(barChartDataSetMonthly.getBarEntries(), "Stats");
-                dataSetMonthly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
-                dataSetMonthly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
-                dataSetMonthly.setValueFormatter(intValueFormatter);
-                BarData dataMonthly = new BarData(dataSetMonthly);
-
-                barChartMonthly.setData(dataMonthly);
-                barChartMonthly.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int width = layoutProfileStats.getWidth();
-                        int size = barChartDataSetMonthly.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSetMonthly.getNoOfValuesInXAxis();
-                        long scale = barChartDataSetMonthly.getNoOfValuesInXAxis() / size;
-//                        barChartMonthly.fitScreen();
-                        barChartMonthly.zoom(scale, 1, width * scale, 0);
-//                        barChartMonthly.highlightValue(barChartDataSetMonthly.getBarEntries().size() - 1, 0);
-                        barChartMonthly.invalidate();
-                    }
-                });
-                showChart(type);
-                progressBarStatsGraph.setVisibility(View.GONE);
-            }
+            postMyStatsDataSet();
         }
 
-        private void setType(int type) {
-            this.type = type;
+
+    }
+
+    private void postMyStatsDataSet() {
+        if (isVisible()) {
+            BarDataSet dataSet;
+            dataSet = new BarDataSet(barChartDataSetDaily.getBarEntries(), "Stats");
+            dataSet.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+            dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+            IValueFormatter intValueFormatter = new IValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, Entry entry, int dataSetIndex,
+                                                ViewPortHandler viewPortHandler) {
+                    int val = Math.round(value);
+                    if (val > 0) {
+                        return UnitsManager.formatRupeeToMyCurrency(val);
+                    } else {
+                        return "";
+                    }
+                }
+            };
+
+            dataSet.setValueFormatter(intValueFormatter);
+            BarData dataDaily = new BarData(dataSet);
+
+            barChartDaily.setData(dataDaily);
+            barChartDaily.post(new Runnable() {
+                @Override
+                public void run() {
+                    int width = layoutProfileStats.getWidth();
+                    int size = barChartDataSetDaily.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSetDaily.getNoOfValuesInXAxis();
+                    long scale = barChartDataSetDaily.getNoOfValuesInXAxis() / size;
+//                        barChartDaily.fitScreen();
+                    barChartDaily.zoom(scale, 1, width * scale, 0);
+//                        barChartDaily.highlightValue(barChartDataSetDaily.getBarEntries().size() - 1, 0);
+                    barChartDaily.invalidate();
+                }
+            });
+            BarDataSet dataSetWeekly;
+            dataSetWeekly = new BarDataSet(barChartDataSetWeekly.getBarEntries(), "Stats");
+            dataSetWeekly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+            dataSetWeekly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+            dataSetWeekly.setValueFormatter(intValueFormatter);
+            BarData dataWeekly = new BarData(dataSetWeekly);
+            barChartWeekly.setData(dataWeekly);
+            barChartWeekly.post(new Runnable() {
+                @Override
+                public void run() {
+                    int width = layoutProfileStats.getWidth();
+                    float size = barChartDataSetWeekly.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSetWeekly.getNoOfValuesInXAxis();
+                    float scale = (barChartDataSetWeekly.getNoOfValuesInXAxis()) / size;
+//                        barChartWeekly.fitScreen();
+                    barChartWeekly.zoom(scale, 1, width * scale, 0);
+//                        barChartWeekly.highlightValue(barChartDataSetWeekly.getBarEntries().size() - 1, 0);
+                    barChartWeekly.invalidate();
+                }
+            });
+
+            BarDataSet dataSetMonthly;
+            dataSetMonthly = new BarDataSet(barChartDataSetMonthly.getBarEntries(), "Stats");
+            dataSetMonthly.setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+            dataSetMonthly.setValueTextColor(ContextCompat.getColor(getContext(), R.color.greyish_brown));
+            dataSetMonthly.setValueFormatter(intValueFormatter);
+            BarData dataMonthly = new BarData(dataSetMonthly);
+
+            barChartMonthly.setData(dataMonthly);
+            barChartMonthly.post(new Runnable() {
+                @Override
+                public void run() {
+                    int width = layoutProfileStats.getWidth();
+                    int size = barChartDataSetMonthly.getNoOfValuesInXAxis() >= 7 ? 7 : (int) barChartDataSetMonthly.getNoOfValuesInXAxis();
+                    long scale = barChartDataSetMonthly.getNoOfValuesInXAxis() / size;
+//                        barChartMonthly.fitScreen();
+                    barChartMonthly.zoom(scale, 1, width * scale, 0);
+//                        barChartMonthly.highlightValue(barChartDataSetMonthly.getBarEntries().size() - 1, 0);
+                    barChartMonthly.invalidate();
+                }
+            });
+            showChart(type);
+//            progressBarStatsGraph.setVisibility(View.GONE);
         }
     }
 
+    private void setType(int type) {
+        this.type = type;
+    }
     private void configBarChart() {
         //daily
         barChartDaily.setDrawGridBackground(false);
@@ -749,10 +784,10 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         barChartDaily.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry entry, Highlight highlight) {
-                statsImpact.setText(getContext().getString(R.string.rupee_symbol) + " " + ((int) entry.getY()));
+                statsImpact.setText(UnitsManager.formatRupeeToMyCurrency((int) entry.getY()));
                 BarChartEntry barChartEntry = barChartDataSetDaily.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
-                statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+                statsKms.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
                 SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
             }
 
@@ -816,10 +851,10 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         barChartWeekly.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry entry, Highlight highlight) {
-                statsImpact.setText(getContext().getString(R.string.rupee_symbol) + " " + ((int) entry.getY()));
+                statsImpact.setText(UnitsManager.formatRupeeToMyCurrency((int) entry.getY()));
                 BarChartEntry barChartEntry = barChartDataSetWeekly.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
-                statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+                statsKms.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
                 SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
             }
 
@@ -883,10 +918,10 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         barChartMonthly.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry entry, Highlight highlight) {
-                statsImpact.setText(getContext().getString(R.string.rupee_symbol) + " " + ((int) entry.getY()));
+                statsImpact.setText(UnitsManager.formatRupeeToMyCurrency((int) entry.getY()));
                 BarChartEntry barChartEntry = barChartDataSetMonthly.getBarChartEntry((int) entry.getX());
                 statsWorkout.setText(barChartEntry.getCount() + "");
-                statsKms.setText(Utils.formatToKmsWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
+                statsKms.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
                 SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
             }
 

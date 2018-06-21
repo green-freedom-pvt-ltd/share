@@ -9,13 +9,12 @@
 
     <android.support.v7.widget.CardView
         android:id="@+id/charity_overview_card"
-        android:layout_width="128dp"
+        android:layout_width="130dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:cardBackgroundColor="#f27181"
-        app:cardCornerRadius="3dp"
         app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="true"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,20 +25,22 @@
 
             <com.sharesmile.share.views.LBTextView
                 android:id="@+id/tv_charity_category_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="9dp"
                 android:text="Women Empowerment"
                 android:textSize="14sp"
                 android:layout_weight="1"
+                android:textColor="@color/white"
 
                 />
 
             <ImageView
                 android:id="@+id/iv_charity_overview"
-                android:layout_width="128dp"
+                android:layout_width="130dp"
                 android:layout_height="126dp"
-                android:background="@color/colorPrimaryDark"
+                android:src="@drawable/placeholder_thankyou_image"
+                android:scaleType="centerCrop"
 
                 />
 

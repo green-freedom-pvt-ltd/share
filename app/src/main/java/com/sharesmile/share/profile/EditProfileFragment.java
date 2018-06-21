@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -159,7 +160,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @BindView(R.id.edit_profile_img)
     ImageView editProfileImg;
     @BindView(R.id.progress_bar)
-    ProgressBar progressBar;
+    RelativeLayout progressBar;
 
     File tempPhotoFile;
     File photoFile;
@@ -466,7 +467,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (!TextUtils.isEmpty(mBirthday.getText().toString())) {
             Logger.d(TAG, "Setting User Birthday as " + mBirthday.getText().toString());
             userDetails.setBirthday(mBirthday.getText().toString());
-            AnalyticsEvent.create(Event.ON_SET_BIRTTHDAY)
+            AnalyticsEvent.create(Event.ON_SET_BIRTHDAY)
                     .put("user_birthday", mBirthday.getText().toString())
                     .buildAndDispatch();
         }

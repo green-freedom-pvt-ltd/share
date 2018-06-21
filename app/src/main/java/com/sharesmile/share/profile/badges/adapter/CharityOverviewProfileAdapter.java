@@ -15,9 +15,11 @@ import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.OpenCharityOverview;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CharityOverview;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
 
@@ -68,9 +70,10 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
         public void bindView(int position) {
             CategoryStats categoryStats = charityOverview.getCategoryStats().get(position);
             charityCategoryTitle.setText(categoryStats.getCategoryName());
-            charityAmount.setText(context.getResources().getString(R.string.rupee_symbol)+categoryStats.getCategoryRaised()+"");
+            charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));
             charity_overview_card.setTag(position);
             charity_overview_card.setOnClickListener(this);
+            Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F27181"),charityCategoryTitle);
         }
 
         @Override

@@ -715,7 +715,7 @@ public class SyncService extends GcmTaskService {
             Gson gson = new Gson();
             JSONObject response = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
                     JSONObject.class);
-            Logger.d(TAG, "Response for getUser:" + response);
+            Logger.d(TAG, "Response for put Streak:" + response);
 
 
             return GcmNetworkManager.RESULT_SUCCESS;

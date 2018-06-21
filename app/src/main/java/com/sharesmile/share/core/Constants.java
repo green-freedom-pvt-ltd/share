@@ -279,6 +279,7 @@ public class Constants {
     public static final String ARG_FORWARD_TOPROFILE = "forward";
 
     public final static int LOADER_CHARITY_OVERVIEW = 100;
+    public final static int LOADER_MY_STATS_GRAPH = 101;
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{

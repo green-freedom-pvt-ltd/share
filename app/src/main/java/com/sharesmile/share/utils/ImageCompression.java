@@ -127,7 +127,6 @@ public class ImageCompression extends AsyncTask<String, Void, String> {
 
            //write the compressed bitmap at the destination specified by filename.
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
-            System.out.println();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

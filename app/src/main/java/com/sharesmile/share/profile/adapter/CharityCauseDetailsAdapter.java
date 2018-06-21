@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CauseStats;
 
@@ -60,8 +61,9 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
         public void bindView(int position) {
             CauseStats causeStats = categoryStats.getCauseStats().get(position);
             causeName.setText(causeStats.getCauseName());
-            charityAmount.setText(context.getResources().getString(R.string.rupee_symbol)+causeStats.getCause_raised()+"");
+            charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(causeStats.getCause_raised()));
             charityWorkout.setText(causeStats.getCause_workouts()+"");
+
 
         }
 

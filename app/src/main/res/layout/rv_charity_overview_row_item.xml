@@ -25,7 +25,10 @@
                 android:id="@+id/iv_cause"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:layout_weight="0.47" />
+                android:layout_weight="0.47"
+                android:src="@drawable/placeholder_thankyou_image"
+                android:scaleType="centerCrop"
+                />
 
             <LinearLayout
                 android:layout_width="0dip"

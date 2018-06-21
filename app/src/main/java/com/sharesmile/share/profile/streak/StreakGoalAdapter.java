@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.streak.model.Goal;
 
 import java.util.List;
@@ -95,7 +96,7 @@ public class StreakGoalAdapter extends RecyclerView.Adapter<StreakGoalAdapter.Vi
                 imageView.setLayoutParams(layoutParams);
                 goalStreakIcons.addView(imageView);
             }
-            goalStreakDistance.setText(item.getValue()+" km per day");
+            goalStreakDistance.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal(item.getValue()*1000)+" "+ UnitsManager.getDistanceLabel()+" per day");
         }
         @OnClick(R.id.goal_row)
         void onClicked()

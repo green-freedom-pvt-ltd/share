@@ -11,7 +11,9 @@ import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
@@ -65,7 +67,14 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
             List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).limit(1).list();
             if(badges!=null && badges.size()>0) {
                 Badge badge = badges.get(0);
-                achievementAmount.setText(Utils.formatWithOneDecimal(achievedBadge.getParamDone()) + " / "+Utils.formatWithOneDecimal(badge.getBadgeParameter()));
+                if(badge.getType().equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))
+                {
+                    achievementAmount.setText(((int)achievedBadge.getParamDone()) + " days/ "+((int)badge.getBadgeParameter())+" days");
+                }else
+                {
+                    achievementAmount.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (achievedBadge.getParamDone()*1000)) + " "+UnitsManager.getDistanceLabel()+"/ "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (badge.getBadgeParameter()*1000))+" "+UnitsManager.getDistanceLabel());
+                }
+
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;
                 achievementBadgeDescription.setText(badge.getDescription1());

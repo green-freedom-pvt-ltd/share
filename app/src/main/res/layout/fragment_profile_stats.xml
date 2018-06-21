@@ -337,7 +337,9 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/profile_stats_kms"
                                 android:textColor="@color/clr_a0"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:id="@+id/tv_stats_kms_unit"
+                                />
                         </LinearLayout>
                     </LinearLayout>
 

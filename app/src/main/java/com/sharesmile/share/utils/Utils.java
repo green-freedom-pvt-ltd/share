@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -26,6 +27,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Spannable;
@@ -1698,5 +1700,13 @@ public class Utils {
             return false;
         }
         return true;
+    }
+    public static void setGradientBackground(int color1,int color2,View view)
+    {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[] {color1,color2});
+//        gd.setCornerRadii(new float[]{10,10,0,0,10,10,0,0});
+        view.setBackground(gd);
     }
 }

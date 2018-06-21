@@ -16,6 +16,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.adapter.CharityCauseDetailsAdapter;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CharityOverview;
@@ -84,7 +85,7 @@ public class CharityOverviewFragment extends BaseFragment{
         charityOverviewRecyclerview.setLayoutManager(linearLayoutManager);
         CharityCauseDetailsAdapter charityCauseDetailsAdapter = new CharityCauseDetailsAdapter(getContext(),categoryStats);
         charityOverviewRecyclerview.setAdapter(charityCauseDetailsAdapter);
-        charityAmountRaised.setText(getResources().getString(R.string.rupee_symbol)+categoryStats.getCategoryRaised()+"");
+        charityAmountRaised.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));
     }
 
     private void setupToolbar() {

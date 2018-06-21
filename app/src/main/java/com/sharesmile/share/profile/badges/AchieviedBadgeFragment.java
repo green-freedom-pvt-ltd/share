@@ -37,9 +37,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-/**
- * Created by ankitmaheshwari on 4/28/17.
- */
 
 public class AchieviedBadgeFragment extends BaseFragment implements View.OnClickListener {
 

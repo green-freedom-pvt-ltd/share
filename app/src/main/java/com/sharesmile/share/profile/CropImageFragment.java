@@ -2,9 +2,6 @@ package com.sharesmile.share.profile;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,12 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.ShareImageLoader;
-import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.utils.ImageCompression;
@@ -26,7 +21,6 @@ import com.sharesmile.share.utils.Utils;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -152,6 +146,7 @@ public class CropImageFragment extends BaseFragment {
                     break;
 
                 case R.id.done:
+                    cropStarted = true;
                     cropImageView.getCroppedImageAsync();
                     break;
 

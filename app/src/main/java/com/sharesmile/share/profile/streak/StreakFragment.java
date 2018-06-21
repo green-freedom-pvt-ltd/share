@@ -24,6 +24,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
@@ -159,10 +160,10 @@ public class StreakFragment extends BaseFragment {
         double distanceDiff = (MainApplication.getInstance().getUserDetails().getStreakGoalDistance() - MainApplication.getInstance().getUserDetails().getStreakRunProgress());
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         if(distanceDiff<=0 || userDetails.isStreakAdded()) {
-            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+" km done today. Congrats!");
+            streakDistance.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float)userDetails.getStreakRunProgress()*1000)+" "+UnitsManager.getDistanceLabel()+" done today. Congrats!");
         }else
         {
-            streakDistance.setText(Utils.formatToKmsWithTwoDecimal((float) distanceDiff*1000)+" km left. Let's Go!");
+            streakDistance.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) distanceDiff*1000)+" "+UnitsManager.getDistanceLabel()+" left. Let's Go!");
         }
 
         double progress;
