@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.AchievedBadge;
@@ -58,12 +59,14 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
         TextView charityCategoryTitle;
         ImageView charityOverviewImageView;
         TextView charityAmount;
+        LinearLayout star_layout;
         public CharityOverviewViewHolder(View itemView) {
             super(itemView);
             charityCategoryTitle = itemView.findViewById(R.id.tv_charity_category_title);
             charityOverviewImageView = itemView.findViewById(R.id.iv_charity_overview);
             charityAmount = itemView.findViewById(R.id.tv_charity_amount);
             charity_overview_card = itemView.findViewById(R.id.charity_overview_card);
+            star_layout = itemView.findViewById(R.id.star_layout);
 
         }
 
@@ -74,6 +77,7 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
             charity_overview_card.setTag(position);
             charity_overview_card.setOnClickListener(this);
             Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F27181"),charityCategoryTitle);
+            Utils.addStars(star_layout,categoryStats.getCategoryNoOfStars(),context);
         }
 
         @Override

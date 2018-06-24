@@ -1052,6 +1052,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         charityOverviewRecyclerView.setLayoutManager(linearLayoutManager);
+
         charityOverviewProfileAdapter = new CharityOverviewProfileAdapter(this,charityOverview,getContext());
         charityOverviewRecyclerView.setAdapter(charityOverviewProfileAdapter);
     }

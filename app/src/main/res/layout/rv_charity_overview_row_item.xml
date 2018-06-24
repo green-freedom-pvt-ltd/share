@@ -42,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black_64"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/text_size_14sp"
                     android:id="@+id/tv_cause_name"
                     />
 
@@ -73,7 +73,7 @@
                         android:layout_height="wrap_content"
                         android:text="1230"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
                     <com.sharesmile.share.views.LBTextView
                         android:id="@+id/tv_charity_workout"
                         android:layout_width="wrap_content"

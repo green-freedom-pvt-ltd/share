@@ -5,6 +5,7 @@ public class CauseStats {
     private String causeName;
     private int cause_raised;
     private int cause_workouts;
+    private int cause_no_of_stars;
     private String cause_image_url;
 
     public String getCauseName() {
@@ -37,5 +38,13 @@ public class CauseStats {
 
     public void setCause_image_url(String cause_image_url) {
         this.cause_image_url = cause_image_url;
+    }
+
+    public int getCause_no_of_stars() {
+        return cause_no_of_stars;
+    }
+
+    public void setCause_no_of_stars(int cause_no_of_stars) {
+        this.cause_no_of_stars = cause_no_of_stars;
     }
 }

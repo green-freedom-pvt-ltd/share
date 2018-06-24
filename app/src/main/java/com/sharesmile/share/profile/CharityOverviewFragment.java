@@ -83,6 +83,12 @@ public class CharityOverviewFragment extends BaseFragment{
         setupToolbar();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         charityOverviewRecyclerview.setLayoutManager(linearLayoutManager);
+        int totalStars = 0;
+        for(int i=0;i<categoryStats.getCauseStats().size();i++)
+        {
+            totalStars+=categoryStats.getCauseStats().get(i).getCause_no_of_stars();
+        }
+        starEarned.setText(totalStars+"");
         CharityCauseDetailsAdapter charityCauseDetailsAdapter = new CharityCauseDetailsAdapter(getContext(),categoryStats);
         charityOverviewRecyclerview.setAdapter(charityCauseDetailsAdapter);
         charityAmountRaised.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));

@@ -13,6 +13,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CauseStats;
+import com.sharesmile.share.utils.Utils;
 
 public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCauseDetailsAdapter.CauseDetailViewHolder> {
 
@@ -63,8 +64,7 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
             causeName.setText(causeStats.getCauseName());
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(causeStats.getCause_raised()));
             charityWorkout.setText(causeStats.getCause_workouts()+"");
-
-
+            Utils.addStars(layoutStar,causeStats.getCause_no_of_stars(),context);
         }
 
     }

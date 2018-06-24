@@ -40,11 +40,13 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -81,6 +83,7 @@ import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.views.CustomTypefaceSpan;
+import com.sharesmile.share.views.LBTextView;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -118,6 +121,7 @@ import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFoc
 
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
+import static com.sharesmile.share.core.Constants.PREF_STREAK_UPLOADED_FIRST_TIME;
 import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
@@ -1331,8 +1335,15 @@ public class Utils {
     }
 
     public static void setOnboardingShown() {
-
         SharedPrefsManager.getInstance().setBoolean(PREF_SHOWN_ONBOARDING, true);
+    }
+    public static boolean checkStreakUploaded() {
+
+        return SharedPrefsManager.getInstance().getBoolean(PREF_STREAK_UPLOADED_FIRST_TIME, false);
+    }
+
+    public static void setStreakUploaded(boolean b) {
+        SharedPrefsManager.getInstance().setBoolean(PREF_STREAK_UPLOADED_FIRST_TIME, b);
     }
 
     public static void setUserLoggedIn(UserDetails userDetails) {
@@ -1708,5 +1719,70 @@ public class Utils {
                 new int[] {color1,color2});
 //        gd.setCornerRadii(new float[]{10,10,0,0,10,10,0,0});
         view.setBackground(gd);
+    }
+
+    public static long getMillisElapsedSinceBeginningOfDay(Calendar day) {
+        long hour = day.get(Calendar.HOUR_OF_DAY);
+        long minute = day.get(Calendar.MINUTE);
+        long secs = day.get(Calendar.SECOND);
+        long millis = day.get(Calendar.MILLISECOND);
+        return hour * 3600000 + minute * 60000 + secs * 1000 + millis;
+    }
+
+    public static long getMillisElapsedSinceBeginningOfWeek(Calendar day) {
+        long days = day.get(Calendar.DAY_OF_WEEK) - 1;
+        long hour = day.get(Calendar.HOUR_OF_DAY);
+        long minute = day.get(Calendar.MINUTE);
+        long secs = day.get(Calendar.SECOND);
+        long millis = day.get(Calendar.MILLISECOND);
+        return days * 86400000 + hour * 3600000 + minute * 60000 + secs * 1000 + millis;
+    }
+
+    public static long getMillisElapsedSinceBeginningOfMonth(Calendar day) {
+        long days = day.get(Calendar.DAY_OF_MONTH) - 1;
+        long hour = day.get(Calendar.HOUR_OF_DAY);
+        long minute = day.get(Calendar.MINUTE);
+        long secs = day.get(Calendar.SECOND);
+        long millis = day.get(Calendar.MILLISECOND);
+        return days * 86400000 + hour * 3600000 + minute * 60000 + secs * 1000 + millis;
+    }
+
+    public static long getEpochForBeginningOfDay(Calendar day) {
+        long currentTs = day.getTimeInMillis();
+        long millisElapsedSinceBeginning = getMillisElapsedSinceBeginningOfDay(day);
+        return currentTs - millisElapsedSinceBeginning;
+    }
+
+    public static long getEpochForBeginningOfWeek(Calendar day) {
+        long currentTs = day.getTimeInMillis();
+        long millisElapsedSinceBeginning = getMillisElapsedSinceBeginningOfWeek(day);
+        return currentTs - millisElapsedSinceBeginning;
+    }
+
+    public static long getEpochForBeginningOfMonth(Calendar day) {
+        long currentTs = day.getTimeInMillis();
+        long millisElapsedSinceBeginning = getMillisElapsedSinceBeginningOfMonth(day);
+        return currentTs - millisElapsedSinceBeginning;
+    }
+
+    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context) {
+        if(cause_no_of_stars>3)
+        {
+            LBTextView lbTextView = new LBTextView(context);
+            lbTextView.setText(cause_no_of_stars);
+            lbTextView.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.star_badges,0);
+            layoutStar.addView(layoutStar);
+        }else
+        {
+            for(int i=0;i<cause_no_of_stars;i++)
+            {
+                ImageView imageView = new ImageView(context);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(5,0,5,0);
+                imageView.setLayoutParams(layoutParams);
+                imageView.setImageResource(R.drawable.star_badges);
+                layoutStar.addView(imageView);
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
@@ -50,6 +51,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
     TextView badgeTitle;
     @BindView(R.id.iv_badge)
     ImageView badgeIv;
+    @BindView(R.id.badge_layout)
+    CoordinatorLayout badgeLayout;
     @BindView(R.id.badge_amount_raised_tv)
     TextView badgeAmountRaised;
     @BindView(R.id.badge_upgrade_tv)
@@ -156,7 +159,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
         {
             closeIv.setVisibility(View.INVISIBLE);
             continueTv.setVisibility(View.VISIBLE);
-            animation = ObjectAnimator.ofFloat(badgeIv, "rotationY", 0.0f, 720f);
+            animation = ObjectAnimator.ofFloat(badgeLayout, "rotationY", 0.0f, 720f);
             animation.setDuration(2200);
             animation.setRepeatCount(0);
             animation.setInterpolator(new DecelerateInterpolator());

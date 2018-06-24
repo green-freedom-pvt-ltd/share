@@ -129,18 +129,18 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
-        Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
+//        Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
         Boolean isReminderDisable = getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
         getIntent().removeExtra(Constants.PREF_IS_REMINDER_DISABLE);
         int intentNotificationRun = getIntent().getIntExtra(INTENT_NOTIFICATION_RUN, 0);
         getIntent().removeExtra(INTENT_NOTIFICATION_RUN);
         NotificationManager manager = (NotificationManager) MainApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(REMINDER_NOTIFICATION_ID);
-        Logger.d(TAG, "userLogin = " + userLogin + ", isLoginSkip = " + isLoginSkip + ", isReminderDisable = "
+        Logger.d(TAG, "userLogin = " + userLogin /*+ ", isLoginSkip = " + isLoginSkip*/ + ", isReminderDisable = "
                 + isReminderDisable + ", intentNotificationRun = " + intentNotificationRun);
         //TODO : temp
         MainApplication.getInstance().setGoalDetails(null);
-        if (!userLogin && !isLoginSkip) {
+        if (!userLogin /*&& !isLoginSkip*/) {
             startLoginActivity();
         } else if (WorkoutSingleton.getInstance().isWorkoutActive()) {
             if (intentNotificationRun == INTENT_STOP_RUN) {

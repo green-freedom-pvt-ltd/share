@@ -143,6 +143,8 @@
                 android:id="@+id/tv_star_earned"
                 android:textSize="24sp"
                 android:textColor="@color/black"
+                android:drawableRight="@drawable/star_badges"
+                android:gravity="center"
                 />
             <com.sharesmile.share.views.LBTextView
                 android:layout_width="wrap_content"

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:gravity="center"
+    android:gravity="top|center"
     >
     <LinearLayout
         android:id="@+id/badge_layout"
@@ -39,9 +39,16 @@
                 android:text="x99"
                 android:textColor="@color/white"
                 android:textSize="10sp" />
+            <ImageView
+                android:layout_width="58dp"
+                android:layout_height="24dp"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/star_1"
+
+                />
         </RelativeLayout>
 
-1
     <com.sharesmile.share.views.LBTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

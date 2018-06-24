@@ -2,6 +2,7 @@ package com.sharesmile.share.leaderboard.global.model;
 
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.base.UnObfuscable;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
 import com.sharesmile.share.utils.Utils;
 
@@ -24,6 +25,9 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
     @SerializedName("social_thumb")
     private String imageUrl;
 
+    @SerializedName("profile_picture")
+    private String profilePictureUrl;
+
     @SerializedName("distance")
     private float distance;
 
@@ -42,6 +46,9 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
     public String getLastName() { return lastName; }
 
     public String getImageUrl() {
+        if(profilePictureUrl!=null && profilePictureUrl.length()>0)
+            return Urls.getImpactProfileS3BucketUrl()+profilePictureUrl;
+        else
         return imageUrl;
     }
 
@@ -63,6 +70,14 @@ public class LeaderBoardData implements UnObfuscable, Serializable{
 
     public void setAmount(float amount) {
         this.amount = amount;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
     }
 
     public BaseLeaderBoardItem getLeaderBoardDbObject()

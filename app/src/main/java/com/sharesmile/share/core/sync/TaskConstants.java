@@ -29,4 +29,5 @@ public class TaskConstants {
 
     public static final String SYNC_BADGE_DATA = "sync_badge_data";
 
+    public static final String SYNC_STREAK = "sync_streak";
 }

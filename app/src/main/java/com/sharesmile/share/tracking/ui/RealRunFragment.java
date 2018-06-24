@@ -3,6 +3,7 @@ package com.sharesmile.share.tracking.ui;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
@@ -16,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -219,6 +221,12 @@ public class RealRunFragment extends RunFragment {
             stopTimer();
             return;
         }
+        Loader statsLoader= getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
+        if(statsLoader!=null)
+            statsLoader.onContentChanged();
+        Loader  loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_CHARITY_OVERVIEW);
+        if(loader!=null)
+            loader.onContentChanged();
         getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData,achievedBadgesData), false);
     }
 

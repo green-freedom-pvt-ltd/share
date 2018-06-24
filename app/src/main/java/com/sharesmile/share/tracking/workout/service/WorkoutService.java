@@ -317,6 +317,7 @@ public class WorkoutService extends Service implements
             achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData));
             achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData));
             SyncHelper.uploadAchievement();
+            SyncHelper.uploadStreak();
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
             handleWorkoutResult(result,achievedBadgesData);
 

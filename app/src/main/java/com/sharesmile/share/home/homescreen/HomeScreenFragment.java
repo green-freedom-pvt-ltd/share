@@ -6,6 +6,8 @@ package com.sharesmile.share.home.homescreen;
 
 
 import android.animation.ValueAnimator;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -44,6 +47,7 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -170,7 +174,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
             SyncHelper.getCharityOverview();
         if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVEMENT_LOAD,true))
-            SyncHelper.getCharityOverview();
+            SyncHelper.getAchievedBadged();
 
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
@@ -238,9 +242,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     private void checkStreak() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_STREAK_CHECK);
+        boolean sendStreak = false;
         if(userDetails!=null) {
             try {
-                if (userDetails.getStreakCurrentDate() != null && userDetails.getStreakCurrentDate().length() > 0) {
+                if (userDetails.getStreakCurrentDate() != null
+                        && userDetails.getStreakCurrentDate().length() > 0) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
                     Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
                     Date currentDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
@@ -257,15 +263,18 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     builder.put("goal_run_progress",userDetails.getStreakRunProgress());
                     builder.buildAndDispatch();
                     //
+
                     if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                         if ((dayCount > 1)) {
                             userDetails.setStreakRunProgress(0);
                             userDetails.setStreakCount(0);
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                            sendStreak = true;
                         } else if (dayCount == 1) {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);
+
 //                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
 
                         }
@@ -273,17 +282,44 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 } else {
                     userDetails.setStreakRunProgress(0);
                     userDetails.setStreakCount(0);
+                    userDetails.setStreakAdded(false);
                     userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                 }
                 if (userDetails.getStreakCount() > userDetails.getStreakMaxCount())
                     userDetails.setStreakMaxCount(userDetails.getStreakCount());
 
-                MainApplication.getInstance().setUserDetails(userDetails);
+                if(userDetails.getStreakRunProgress() == 0)
+                {
+                    long currentTimeStampMillis = DateUtil.getServerTimeInMillis();
+                    Calendar today = Calendar.getInstance();
+                    today.setTimeInMillis(currentTimeStampMillis);
+                    long begin = Utils.getEpochForBeginningOfDay(today);
+                    long end = currentTimeStampMillis;
+                    SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+                    // Calculate amount_raised in interval
+                    Cursor cursor = database.rawQuery("SELECT "
+                            + " SUM(" + WorkoutDao.Properties.Distance.columnName + ") AS total_distance"
+                            + " FROM " + WorkoutDao.TABLENAME + " where "
+                            + WorkoutDao.Properties.IsValidRun.columnName + " is 1" +
+                            " and " + WorkoutDao.Properties.BeginTimeStamp.columnName + " between "
+                            + begin + " and " + end, new String[]{});
+                    cursor.moveToFirst();
 
+                    float run_progress = cursor.getFloat(cursor.getColumnIndex("total_distance"));
+                    userDetails.setStreakRunProgress(run_progress);
+                }
+                MainApplication.getInstance().setUserDetails(userDetails);
+                if(sendStreak)
+                    SyncHelper.uploadStreak();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
                Utils.setBadgeForCategory(null,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
+        }
+        if(Utils.checkStreakUploaded())
+        {
+            Utils.setStreakUploaded(true);
+            SyncHelper.uploadStreak();
         }
     }
 
@@ -439,8 +475,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .put("cause_index", viewPager.getCurrentItem())
                             .buildAndDispatch();
                 } else {
-                    // If it is not completed then it must be an active on going cause
                     checkStreak();
+                    // If it is not completed then it must be an active on going cause
                     CauseDataStore.getInstance().registerCauseSelection(causeData);
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
                     OnboardingOverlay.LETS_GO.registerUseOfOverlay();

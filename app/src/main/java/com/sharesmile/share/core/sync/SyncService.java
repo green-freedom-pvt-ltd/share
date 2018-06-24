@@ -82,6 +82,7 @@ import Models.TeamLeaderBoard;
 
 import static com.sharesmile.share.core.sync.TaskConstants.SYNC_BADGE_DATA;
 import static com.sharesmile.share.core.sync.TaskConstants.SYNC_CHARITY_OVERVIEW;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_STREAK;
 import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_ACHIEVEMENT;
 import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_STREAK;
 import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_PENDING_WORKOUT;
@@ -109,6 +110,8 @@ public class SyncService extends GcmTaskService {
                     return uploadUserData();
                 case UPLOAD_STREAK:
                     return uploadStreak();
+                    case SYNC_STREAK:
+                    return getStreak();
                 case UPLOAD_ACHIEVEMENT:
                     return uploadAchievement();
                 case SYNC_DATA:
@@ -707,26 +710,31 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("max_streak", prev.getStreakMaxCount());
             jsonObject.put("current_streak_date", prev.getStreakCurrentDate());
             jsonObject.put("streak_added", prev.isStreakAdded());
-            jsonObject.put("streak_count", prev.getStreakCount());
+            jsonObject.put("current_streak", prev.getStreakCount());
 
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
-            Gson gson = new Gson();
             JSONObject response = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
                     JSONObject.class);
             Logger.d(TAG, "Response for put Streak:" + response);
+            if(response.getInt("code") == 200) {
 
-
-            return GcmNetworkManager.RESULT_SUCCESS;
-
+                return GcmNetworkManager.RESULT_SUCCESS;
+            }else
+            {
+                Utils.setStreakUploaded(false);
+                return GcmNetworkManager.RESULT_RESCHEDULE;
+            }
         } catch (NetworkException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException" + e);
+            Utils.setStreakUploaded(false);
             return GcmNetworkManager.RESULT_RESCHEDULE;
         } catch (JSONException e) {
             e.printStackTrace();
             Logger.d(TAG, "NetworkException");
+            Utils.setStreakUploaded(false);
             return GcmNetworkManager.RESULT_FAILURE;
         }
     }
@@ -1240,7 +1248,52 @@ public class SyncService extends GcmTaskService {
         }
 
     }
+    private static int getStreak() {
 
+        try {
+            JsonObject response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), JsonObject.class);
+            String responseString = response.getAsJsonObject("result").toString();
+            Logger.d(TAG,"getCharityOverviewData response : "+responseString);
+            JSONObject jsonObject = new JSONObject(responseString);
+            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+            userDetails.setStreakMaxCount(jsonObject.getInt("max_streak"));
+            userDetails.setStreakCount(jsonObject.getInt("current_streak"));
+            userDetails.setStreakCurrentDate(jsonObject.getString("current_streak_date"));
+            userDetails.setStreakAdded(jsonObject.getBoolean("streak_added"));
+            MainApplication.getInstance().setUserDetails(userDetails);
+
+            return ExpoBackoffTask.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            Logger.d(TAG, "NetworkException in getCharityOverviewData: " + e);
+            e.printStackTrace();
+            Crashlytics.log("getCharityOverviewData networkException for user_id ("
+                    + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
+                    + ", while syncing runs at URL: " + Urls.getImpactOverviewUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
+                    .put("failure_type", e.getFailureType())
+                    .buildAndDispatch();
+
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
+        } catch (Exception e) {
+
+            Logger.d(TAG, "Exception in getCharityOverviewData: " + e.getMessage());
+            e.printStackTrace();
+            Crashlytics.log("getCharityOverviewData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
+                    "while syncing charity overview data at URL : " + Urls.getImpactOverviewUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .buildAndDispatch();
+
+            return ExpoBackoffTask.RESULT_RESCHEDULE;
+        }
+
+    }
     private static int getAchievedBadgeData() {
 
         try {

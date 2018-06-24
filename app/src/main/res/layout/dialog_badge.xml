@@ -50,15 +50,32 @@
         android:gravity="center"
         android:orientation="vertical"
         >
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="180dp"
-            android:id="@+id/iv_badge"
-            android:src="@drawable/badge_image"
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-
+            android:id="@+id/badge_layout"
+            >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/iv_badge"
+            android:src="@drawable/badge_image"
             />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/star_1"
+
+                app:layout_anchor="@+id/iv_badge"
+                app:layout_anchorGravity="bottom|center"
+
+                />
+        </android.support.design.widget.CoordinatorLayout>
         <com.sharesmile.share.views.LBKTextView
             android:id="@+id/badge_title_tv"
             android:layout_width="wrap_content"

@@ -11,7 +11,6 @@ public class CharityOverview {
     private int totalRaised;
     @SerializedName("total_workouts")
     private int totalWorkouts;
-
     ArrayList<CategoryStats> categoryStats;
 
     public int getTotalRaised() {
@@ -37,5 +36,6 @@ public class CharityOverview {
     public void setCategoryStats(ArrayList<CategoryStats> categoryStats) {
         this.categoryStats = categoryStats;
     }
+
 }
 

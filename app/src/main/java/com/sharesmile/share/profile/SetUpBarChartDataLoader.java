@@ -19,7 +19,7 @@ public class SetUpBarChartDataLoader extends AsyncTaskLoader<SetUpBarChartDataLo
         super.onStartLoading();
         if(myStatsBarChart!=null)
             deliverResult(myStatsBarChart);
-        else
+        if(myStatsBarChart == null || takeContentChanged())
         {
             forceLoad();
         }

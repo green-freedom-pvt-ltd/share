@@ -222,11 +222,12 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 } else if (NetworkUtils.isNetworkConnected(getContext())) {
                     if (!checkUser()) {
                         if (validateUserDetails()) {
+                            isEdited = false;
                             if (photoFile != null)
                                 uploadWithTransferUtility();
                             else
                                 saveUserDetails();
-                            isEdited = false;
+
                         }
                     }
                 } else {
@@ -340,19 +341,20 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         boolean validDetails = true;
         if (mFirstName.getText().toString().isEmpty()) {
             // Name not valid
-            mFirstNameError.setText("*Please enter a valid name");
+            mFirstNameError.setText("*Please enter a valid first name");
             validDetails = false;
         } else {
             mFirstNameError.setText("");
         }
         if (mLastName.getText().toString().isEmpty()) {
             // Name not valid
-            MainApplication.showToast("*Please enter a valid name");
+            mLastNameError.setText("*Please enter a valid last name");
             validDetails = false;
         } else {
             mLastNameError.setText("");
         }
         if (!validatePhoneNumber(mNumber.getText().toString())) {
+            mNumberError.setText("*Please enter a valid number");
             validDetails = false;
         } else {
             mNumberError.setText("");

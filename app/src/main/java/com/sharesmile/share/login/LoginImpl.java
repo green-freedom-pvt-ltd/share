@@ -40,6 +40,7 @@ import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.network.NameValuePair;
 import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -217,7 +218,11 @@ public class LoginImpl {
         Gson gson = new Gson();
         UserDetails userDetails = gson.fromJson(response, UserDetails.class);
         MainApplication.getInstance().setUserDetails(userDetails);
-
+        if(userDetails.getBodyHeight()>0)
+        {
+            Utils.setOnboardingShown();
+        }
+        SyncHelper.getStreak();
         //show Toast confirmation
         Toast.makeText(MainApplication.getContext(), "Logged in as " + userDetails.getFirstName(), Toast.LENGTH_SHORT).show();
 

@@ -1,6 +1,7 @@
 package com.sharesmile.share.profile.badges.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +14,16 @@ import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.profile.badges.SeeAchievedBadge;
 import com.sharesmile.share.profile.badges.model.AchievedBadgeCount;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import static com.sharesmile.share.core.application.MainApplication.getContext;
 
 public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapter.AchievementsViewHolder> {
 
@@ -69,7 +74,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
         public void bindView(int position) {
             badgeLayout.setTag(position);
             badgeLayout.setOnClickListener(this);
-            if((position==3 && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN))) {
+            if((position==3 && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN) && achievedBadgeCounts.size()>4)) {
                 acheivementsTitle.setText(achievedBadgeCounts.size()-3+" More");
                 badgeCount.setVisibility(View.INVISIBLE);
             }else {

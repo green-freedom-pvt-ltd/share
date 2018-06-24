@@ -9,6 +9,7 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class BarChartDataSet {
         int index = (int) (days - 1);
         if(index<6)
             index=6;
-        long begin = getEpochForBeginningOfDay(today);
+        long begin = Utils.getEpochForBeginningOfDay(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
         entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
@@ -130,7 +131,7 @@ public class BarChartDataSet {
         int index = (int) (weeks - 1);
         if(index<6)
             index=6;
-        long begin = getEpochForBeginningOfWeek(today);
+        long begin = Utils.getEpochForBeginningOfWeek(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
         entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
@@ -141,7 +142,7 @@ public class BarChartDataSet {
             int prevDayOfWeek = (dayOfWeek - 1) == 0 ? 7 : (dayOfWeek - 1);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(prevInterval.getBeginTimeStamp());
-            begin = getEpochForBeginningOfWeek(calendar) - (86400000 * 7);
+            begin = Utils.getEpochForBeginningOfWeek(calendar) - (86400000 * 7);
             end = prevInterval.getBeginTimeStamp();
             impact = getImpactInInterval(begin, end);
             entries.put(index - 1, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
@@ -195,7 +196,7 @@ public class BarChartDataSet {
         int index = (int) (months - 1);
         if(index<6)
             index = 6;
-        long begin = getEpochForBeginningOfMonth(today);
+        long begin = Utils.getEpochForBeginningOfMonth(today);
         long end = currentTimeStampMillis;
         BarChartSetData impact = getImpactInInterval(begin, end);
         entries.put(index, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
@@ -208,7 +209,7 @@ public class BarChartDataSet {
             calendar.setTimeInMillis(prevInterval.getBeginTimeStamp());
             calendar.add(Calendar.MILLISECOND, -1);
             int days = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-            begin = getEpochForBeginningOfMonth(calendar);
+            begin = Utils.getEpochForBeginningOfMonth(calendar);
             end = calendar.getTimeInMillis();
             impact = getImpactInInterval(begin, end);
             entries.put(index - 1, new BarChartEntry(begin, end, impact, getDayLabel(begin)));
@@ -321,56 +322,6 @@ public class BarChartDataSet {
         long l = cursor.getLong(0);
         cursor.close();
         return l;
-    }
-
-    /**
-     * Get time elapsed, in millis, since the beginning of input day
-     *
-     * @param day Calendar instance
-     * @return
-     */
-    private long getMillisElapsedSinceBeginningOfDay(Calendar day) {
-        long hour = day.get(Calendar.HOUR_OF_DAY);
-        long minute = day.get(Calendar.MINUTE);
-        long secs = day.get(Calendar.SECOND);
-        long millis = day.get(Calendar.MILLISECOND);
-        return hour * 3600000 + minute * 60000 + secs * 1000 + millis;
-    }
-
-    private long getMillisElapsedSinceBeginningOfWeek(Calendar day) {
-        long days = day.get(Calendar.DAY_OF_WEEK) - 1;
-        long hour = day.get(Calendar.HOUR_OF_DAY);
-        long minute = day.get(Calendar.MINUTE);
-        long secs = day.get(Calendar.SECOND);
-        long millis = day.get(Calendar.MILLISECOND);
-        return days * 86400000 + hour * 3600000 + minute * 60000 + secs * 1000 + millis;
-    }
-
-    private long getMillisElapsedSinceBeginningOfMonth(Calendar day) {
-        long days = day.get(Calendar.DAY_OF_MONTH) - 1;
-        long hour = day.get(Calendar.HOUR_OF_DAY);
-        long minute = day.get(Calendar.MINUTE);
-        long secs = day.get(Calendar.SECOND);
-        long millis = day.get(Calendar.MILLISECOND);
-        return days * 86400000 + hour * 3600000 + minute * 60000 + secs * 1000 + millis;
-    }
-
-    private long getEpochForBeginningOfDay(Calendar day) {
-        long currentTs = day.getTimeInMillis();
-        long millisElapsedSinceBeginning = getMillisElapsedSinceBeginningOfDay(day);
-        return currentTs - millisElapsedSinceBeginning;
-    }
-
-    private long getEpochForBeginningOfWeek(Calendar day) {
-        long currentTs = day.getTimeInMillis();
-        long millisElapsedSinceBeginning = getMillisElapsedSinceBeginningOfWeek(day);
-        return currentTs - millisElapsedSinceBeginning;
-    }
-
-    private long getEpochForBeginningOfMonth(Calendar day) {
-        long currentTs = day.getTimeInMillis();
-        long millisElapsedSinceBeginning = getMillisElapsedSinceBeginningOfMonth(day);
-        return currentTs - millisElapsedSinceBeginning;
     }
 
     public final String getDayLabel(long dayOfWeek) {

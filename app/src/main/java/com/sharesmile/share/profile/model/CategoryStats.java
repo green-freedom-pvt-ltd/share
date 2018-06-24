@@ -7,6 +7,7 @@ public class CategoryStats {
     private String categoryName;
     private int categoryRaised;
     private int categoryWorkouts;
+    private int categoryNoOfStars;
     ArrayList<CauseStats> causeStats;
 
     public String getCategoryName() {
@@ -39,5 +40,13 @@ public class CategoryStats {
 
     public void setCauseStats(ArrayList<CauseStats> causeStats) {
         this.causeStats = causeStats;
+    }
+
+    public int getCategoryNoOfStars() {
+        return categoryNoOfStars;
+    }
+
+    public void setCategoryNoOfStars(int categoryNoOfStars) {
+        this.categoryNoOfStars += categoryNoOfStars;
     }
 }
