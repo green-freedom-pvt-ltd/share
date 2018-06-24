@@ -143,6 +143,7 @@ public class ShareImageLoader {
                 if(!USE_MEMORY_CACHE)
                 {
                     Picasso.with(MainApplication.getContext()).invalidate(url);
+
                     picasso.invalidate(url);
 //                    url = url+"?version="+ Calendar.getInstance().getTimeInMillis();
                 }

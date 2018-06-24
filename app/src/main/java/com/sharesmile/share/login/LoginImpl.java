@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -36,6 +37,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.network.NameValuePair;
@@ -51,6 +53,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -217,7 +220,28 @@ public class LoginImpl {
 
         Gson gson = new Gson();
         UserDetails userDetails = gson.fromJson(response, UserDetails.class);
-        MainApplication.getInstance().setUserDetails(userDetails);
+        if(userDetails.getStreakGoalID()>0 && !(userDetails.getStreakGoalDistance()>0))
+        {
+            ArrayList<Goal> goals = new Gson().fromJson(MainApplication.getInstance().getGoalDetails(), new TypeToken<List<Goal>>(){}.getType());
+            for(Goal goal:goals)
+            {
+                if(goal.getId() == userDetails.getStreakGoalID())
+                {
+                    userDetails.setStreakGoalDistance(goal.getValue());
+                    break;
+                }
+            }
+        }
+        if(response.get("reminder_time").getAsDouble()>0) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis((long) response.get("reminder_time").getAsDouble());
+            Utils.setReminderTime(calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE),getContext());
+        }else
+        {
+            Utils.setReminderTime("",getContext());
+        }
+            MainApplication.getInstance().setUserDetails(userDetails);
+
         if(userDetails.getBodyHeight()>0)
         {
             Utils.setOnboardingShown();

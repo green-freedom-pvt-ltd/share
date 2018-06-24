@@ -37,22 +37,6 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("social_thumb")
     private String socialThumb;
 
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public void setTotalAmount(TotalAmount totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public void setTotalDistance(TotalDistance totalDistance) {
-        this.totalDistance = totalDistance;
-    }
-
     @SerializedName("profile_picture")
     private String profilePicture;
     @SerializedName("birthday")
@@ -341,4 +325,21 @@ public class UserDetails implements UnObfuscable {
         @SerializedName("total_distance")
         public float totalDistance;
     }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setTotalAmount(TotalAmount totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setTotalDistance(TotalDistance totalDistance) {
+        this.totalDistance = totalDistance;
+    }
+
 }
