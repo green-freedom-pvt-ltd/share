@@ -42,14 +42,14 @@ public class SchemaGenerator {
         versions.add(new Version16(true));
 
         validateSchemas(versions);
-        toFileForceExists("../../Share/app/src/main/java-gen");
+        toFileForceExists("../share/app/src/main/java-gen");
 
         for (SchemaVersion version : versions) {
             // NB: Test output creates stubs, we have an established testing
             // standard which should be followed in preference to generating
             // these stubs.
             new DaoGenerator().generateAll(version.getSchema(),
-                    "../../Share/app/src/main/java-gen");
+                    "../share/app/src/main/java-gen");
         }
     }
 

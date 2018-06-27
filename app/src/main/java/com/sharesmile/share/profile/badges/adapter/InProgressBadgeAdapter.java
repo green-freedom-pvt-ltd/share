@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -51,8 +52,12 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
         TextView achievementAmount;
         View levelProgressBar;
         BadgeDao badgeDao;
+        ImageView badgeImageView;
+        ImageView starImageView;
         public AchievementsViewHolder(View itemView) {
             super(itemView);
+            badgeImageView = itemView.findViewById(R.id.iv_badge);
+            starImageView = itemView.findViewById(R.id.iv_star);
             achievementBadgeTitle = itemView.findViewById(R.id.tv_achievement_badge_title);
             achievementBadgeDescription = itemView.findViewById(R.id.tv_achievement_badge_description);
             achievementAmount = itemView.findViewById(R.id.tv_achievement_amount);
@@ -74,7 +79,7 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
                 {
                     achievementAmount.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (achievedBadge.getParamDone()*1000)) + " "+UnitsManager.getDistanceLabel()+"/ "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (badge.getBadgeParameter()*1000))+" "+UnitsManager.getDistanceLabel());
                 }
-
+                Utils.setStarImage(badge.getNoOfStars(),starImageView);
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;
                 achievementBadgeDescription.setText(badge.getDescription1());

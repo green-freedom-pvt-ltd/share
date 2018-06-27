@@ -30,6 +30,7 @@ public class Urls {
     private static final String LEADERBOARD_URL = "/leaderboard/";
     private static final String FRAUDSTERS_URL = "/fraudsters/";
 
+    private static final String BADGES_URL = "/badges/";
     private static final String STREAK_URL = "/streak/";
     private static final String ACHIEVEMENTS_URL = "/achievements/";
 
@@ -164,6 +165,11 @@ public class Urls {
     }
     public static String getStreakUrl() {
         String url = getNodeBaseUrl() + STREAK_URL;
+        return url;
+    }
+
+    public static String getBadgesUrl() {
+        String url = getNodeBaseUrl() + BADGES_URL;
         return url;
     }
 

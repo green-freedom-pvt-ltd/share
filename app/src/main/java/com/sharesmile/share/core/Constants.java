@@ -268,7 +268,7 @@ public class Constants {
     public final static String BADGE_IN_PROGRESS = "badge_in_progress";
 
     public final static String BADGE_TYPE_CAUSE = "Cause";
-    public final static String BADGE_TYPE_CHANGEMAKER = "ChangeMaker";
+    public final static String BADGE_TYPE_CHANGEMAKER = "Change_Maker";
     public final static String BADGE_TYPE_STREAK = "Streak";
     public final static String BADGE_TYPE_MARATHON = "Marathon";
 

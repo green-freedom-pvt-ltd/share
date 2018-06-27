@@ -7,8 +7,11 @@ import android.content.Context;
 
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
@@ -92,6 +95,7 @@ public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverv
                                 causeStats.setCause_no_of_stars(0);
                             }
                         }
+
                         causeStatsArrayList.add(causeStats);
                     }
                     categoryStats.setCauseStats(causeStatsArrayList);

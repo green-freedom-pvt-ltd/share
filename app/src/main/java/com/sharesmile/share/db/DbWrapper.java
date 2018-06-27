@@ -3,14 +3,19 @@ package com.sharesmile.share.db;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.BadgeDao;
+import com.sharesmile.share.CategoryDao;
 import com.sharesmile.share.CauseDao;
 import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
 import com.sharesmile.share.LeaderBoardDao;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.WorkoutDao;
+
+import io.smooch.core.c.m;
 
 /**
  * Created by Shine on 07/05/16.
@@ -32,8 +37,11 @@ public class DbWrapper {
 
     private LeaderBoardDao mLeaderBoardDao;
 
+    private CategoryDao mCategoryDao;
     private BadgeDao mBadgeDao;
     private AchievedBadgeDao mAchievedBadgeDao;
+    private TitleDao mTitleDao;
+    private AchievedTitleDao mAchievedTitleDao;
 
     public DbWrapper(MainApplication app) {
         application = app;
@@ -75,8 +83,12 @@ public class DbWrapper {
         mUserdao = mDaoSession.getUserDao();
         mCauseDao = mDaoSession.getCauseDao();
         mLeaderBoardDao = mDaoSession.getLeaderBoardDao();
+
         mBadgeDao = mDaoSession.getBadgeDao();
         mAchievedBadgeDao = mDaoSession.getAchievedBadgeDao();
+        mTitleDao = mDaoSession.getTitleDao();
+        mAchievedTitleDao = mDaoSession.getAchievedTitleDao();
+        mCategoryDao = mDaoSession.getCategoryDao();
     }
 
     /*public DaoMaster.DevOpenHelper getDbHelper() {
@@ -104,7 +116,10 @@ public class DbWrapper {
     public LeaderBoardDao getLeaderBoardDao(){ return mLeaderBoardDao;}
 
     public BadgeDao getBadgeDao(){ return mBadgeDao;}
+    public TitleDao getTitleDao(){ return mTitleDao;}
+    public AchievedTitleDao getAchievedTitleDao(){ return mAchievedTitleDao;}
     public AchievedBadgeDao getAchievedBadgeDao(){ return mAchievedBadgeDao;}
+    public CategoryDao getCategoryDao(){ return mCategoryDao;}
 
     public void clearAll() {
         getWorkoutDao().deleteAll();

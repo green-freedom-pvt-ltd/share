@@ -302,6 +302,7 @@ public class LoginImpl {
     }
 
     public void performGoogleLogin() {
+        mGoogleApiClient.clearDefaultAccountAndReconnect();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         if (activityWeakReference != null) {
             activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);

@@ -55,6 +55,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.BuildConfig;
@@ -62,6 +63,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.AlarmReceiver;
 import com.sharesmile.share.login.UserDetails;
@@ -81,6 +83,7 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.views.CustomTypefaceSpan;
 import com.sharesmile.share.views.LBTextView;
@@ -1424,6 +1427,7 @@ public class Utils {
             if (badges.size() > 0) {
                 Badge badge = badges.get(0);
                 achievedBadge = new AchievedBadge();
+                achievedBadge.setServerId(0);
                 achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
                 achievedBadge.setBadgeType(badge.getType());
                 achievedBadge.setCauseName(badge.getName());
@@ -1498,6 +1502,7 @@ public class Utils {
         if (achievedBadges.size() == 0) {
             achievedBadge = new AchievedBadge();
             achievedBadge.setUserId(MainApplication.getInstance().getUserID());
+            achievedBadge.setServerId(0);
             achievedBadge.setCategory(category);
             achievedBadge.setCauseId(mCauseData.getId());
             achievedBadge.setCauseName(mCauseData.getTitle());
@@ -1572,9 +1577,11 @@ public class Utils {
         if (indexAcheived != -1) {
             Badge badgeAcheived = badges.get(indexAcheived);
             achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
+            achievedBadge.setNoOfStarAchieved(badgeAcheived.getNoOfStars());
             achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
         } else {
             achievedBadge.setBadgeIdAchieved(0);
+            achievedBadge.setNoOfStarAchieved(0);
         }
         String status = Constants.BADGE_IN_PROGRESS;
         switch (achievedBadge.getBadgeType()) {
@@ -1783,6 +1790,116 @@ public class Utils {
                 imageView.setImageResource(R.drawable.star_badges);
                 layoutStar.addView(imageView);
             }
+        }
+    }
+
+    public static void checkStreak() {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_STREAK_CHECK);
+        boolean sendStreak = false;
+        if(userDetails!=null) {
+            try {
+                if (userDetails.getStreakCurrentDate() != null
+                        && userDetails.getStreakCurrentDate().length() > 0) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    Date currentDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
+                            .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+                    long diff = currentDate.getTime() - streakDate.getTime();
+                    float dayCount = (float) diff / (24 * 60 * 60 * 1000);
+                    //set EVENT
+                    builder.put("streakDate",streakDate.getTime());
+                    builder.put("currentDate",currentDate.getTime());
+                    builder.put("diff",diff);
+                    builder.put("dayCount",dayCount);
+                    builder.put("goal_id",userDetails.getStreakGoalID());
+                    builder.put("goal_distance",userDetails.getStreakGoalDistance());
+                    builder.put("goal_run_progress",userDetails.getStreakRunProgress());
+                    builder.buildAndDispatch();
+                    //
+
+                    if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
+                        if ((dayCount > 1)) {
+                            userDetails.setStreakRunProgress(0);
+                            userDetails.setStreakCount(0);
+                            userDetails.setStreakAdded(false);
+                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                            sendStreak = true;
+                        } else if (dayCount == 1) {
+                            userDetails.setStreakAdded(false);
+                            userDetails.setStreakRunProgress(0);
+
+//                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+
+                        }
+                    }
+                } else {
+                    userDetails.setStreakRunProgress(0);
+                    userDetails.setStreakCount(0);
+                    userDetails.setStreakAdded(false);
+                    userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                }
+                if (userDetails.getStreakCount() > userDetails.getStreakMaxCount())
+                    userDetails.setStreakMaxCount(userDetails.getStreakCount());
+
+                if(userDetails.getStreakRunProgress() == 0)
+                {
+                    long currentTimeStampMillis = DateUtil.getServerTimeInMillis();
+                    Calendar today = Calendar.getInstance();
+                    today.setTimeInMillis(currentTimeStampMillis);
+                    long begin = Utils.getEpochForBeginningOfDay(today);
+                    long end = currentTimeStampMillis;
+                    SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+                    // Calculate amount_raised in interval
+                    Cursor cursor = database.rawQuery("SELECT "
+                            + " SUM(" + WorkoutDao.Properties.Distance.columnName + ") AS total_distance"
+                            + " FROM " + WorkoutDao.TABLENAME + " where "
+                            + WorkoutDao.Properties.IsValidRun.columnName + " is 1" +
+                            " and " + WorkoutDao.Properties.BeginTimeStamp.columnName + " between "
+                            + begin + " and " + end, new String[]{});
+                    cursor.moveToFirst();
+
+                    float run_progress = cursor.getFloat(cursor.getColumnIndex("total_distance"));
+                    userDetails.setStreakRunProgress(run_progress);
+                }
+                MainApplication.getInstance().setUserDetails(userDetails);
+                if(sendStreak)
+                    SyncHelper.uploadStreak();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Utils.setBadgeForCategory(null,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
+        }
+        if(Utils.checkStreakUploaded())
+        {
+            Utils.setStreakUploaded(true);
+            SyncHelper.uploadStreak();
+        }
+    }
+
+    public static void saveTitleIdToUserDetails(AchievedTitle achievedTitle) {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        if(userDetails.getTitle1()>0)
+        {
+            userDetails.setTitle1(achievedTitle.getTitleId());
+        }else if(userDetails.getTitle2()>0)
+        {
+            userDetails.setTitle2(achievedTitle.getTitleId());
+        }
+        MainApplication.getInstance().setUserDetails(userDetails);
+    }
+
+    public static void setStarImage(int starCount, ImageView starImageView) {
+        switch (starCount) {
+            case 1 :
+                starImageView.setImageResource(R.drawable.star_1);
+                break;
+            case 2 :
+                starImageView.setImageResource(R.drawable.star_2);
+                break;
+            case 3 :
+                starImageView.setImageResource(R.drawable.star_3);
+                break;
         }
     }
 }

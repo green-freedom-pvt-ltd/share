@@ -10,6 +10,7 @@ package com.sharesmile.share;
 public class AchievedBadge {
 
     private Long id;
+    private long serverId;
     private long userId;
     private long causeId;
     /** Not-null value. */
@@ -17,6 +18,7 @@ public class AchievedBadge {
     private long badgeIdInProgress;
     private long badgeIdAchieved;
     private java.util.Date badgeIdAchievedDate;
+    private Integer noOfStarAchieved;
     /** Not-null value. */
     private String badgeType;
     /** Not-null value. */
@@ -36,14 +38,16 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public AchievedBadge(Long id, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, String badgeType, String category, String categoryStatus, double paramDone, boolean isSync) {
+    public AchievedBadge(Long id, long serverId, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, Integer noOfStarAchieved, String badgeType, String category, String categoryStatus, double paramDone, boolean isSync) {
         this.id = id;
+        this.serverId = serverId;
         this.userId = userId;
         this.causeId = causeId;
         this.causeName = causeName;
         this.badgeIdInProgress = badgeIdInProgress;
         this.badgeIdAchieved = badgeIdAchieved;
         this.badgeIdAchievedDate = badgeIdAchievedDate;
+        this.noOfStarAchieved = noOfStarAchieved;
         this.badgeType = badgeType;
         this.category = category;
         this.categoryStatus = categoryStatus;
@@ -57,6 +61,14 @@ public class AchievedBadge {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public long getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(long serverId) {
+        this.serverId = serverId;
     }
 
     public long getUserId() {
@@ -107,6 +119,14 @@ public class AchievedBadge {
 
     public void setBadgeIdAchievedDate(java.util.Date badgeIdAchievedDate) {
         this.badgeIdAchievedDate = badgeIdAchievedDate;
+    }
+
+    public Integer getNoOfStarAchieved() {
+        return noOfStarAchieved;
+    }
+
+    public void setNoOfStarAchieved(Integer noOfStarAchieved) {
+        this.noOfStarAchieved = noOfStarAchieved;
     }
 
     /** Not-null value. */

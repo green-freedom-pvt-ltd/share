@@ -2,20 +2,13 @@ package com.sharesmile.share.profile;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -29,37 +22,44 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.gson.Gson;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.ShareImageLoader;
-import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.editprofiledialogs.EditBirthday;
 import com.sharesmile.share.profile.editprofiledialogs.EditHeight;
 import com.sharesmile.share.profile.editprofiledialogs.EditWeight;
-import com.sharesmile.share.tracking.share.PostRunFeedbackDialog;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 import com.squareup.picasso.Picasso;
@@ -69,9 +69,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Calendar;
+import java.util.List;
 
 import base.BaseDialog;
 import butterknife.BindView;
@@ -79,8 +77,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
-
-import com.amazonaws.mobileconnectors.s3.transferutility.*;
 
 
 /**
@@ -172,6 +168,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     EditProfileImageDialog editProfileImageDialog;
     boolean isImageLoaded = false;
 
+    List<AchievedTitle> achievedTitles;
+    int pos1=-1,pos2=-1;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -196,7 +195,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle bundle = getArguments();
 
         init();
     }
@@ -247,9 +245,71 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         mMaleRadioBtn.setOnClickListener(this);
         mBirthday.setOnClickListener(this);
         bodyWeightKgs.setOnClickListener(this);
+        profileTitle1.setOnClickListener(this);
+        profileTitle2.setOnClickListener(this);
+        getTitleInList();
+        setSpinner();
         fillUserDetails();
         setupToolbar();
         setTextWatcher();
+    }
+
+    private void setSpinner() {
+        //TODO : Check for toString() method in AchievedTitle
+        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter1 = new ArrayAdapter<AchievedTitle>(getContext(),android.R.layout.simple_list_item_1,achievedTitles);
+        spinnerProfileTitle1.setAdapter(achievedTitleArrayAdapter1);
+        spinnerProfileTitle1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position == pos2)
+                {
+                    MainApplication.showToast("Title 1 & 2 cannot be same");
+                }else
+                {
+                    long titleId = achievedTitles.get(position).getId();
+                    pos1 = position;
+                    profileTitle1.setText(achievedTitles.get(position).getTitle());
+                }
+                setMenuColor();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter2 = new ArrayAdapter<AchievedTitle>(getContext(),android.R.layout.simple_list_item_1,achievedTitles);
+        spinnerProfileTitle2.setAdapter(achievedTitleArrayAdapter2);
+        spinnerProfileTitle2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position == pos1)
+                {
+                    MainApplication.showToast("Title 1 & 2 cannot be same");
+                }else
+                {
+                    long titleId = achievedTitles.get(position).getId();
+                    pos2 = position;
+                    profileTitle2.setText(achievedTitles.get(position).getTitle());
+                }
+                setMenuColor();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void getTitleInList() {
+        AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
+        achievedTitles = achievedTitleDao.queryBuilder()
+                .where(AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
     }
 
     private void setupToolbar() {
@@ -277,6 +337,31 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (!TextUtils.isEmpty(userDetails.getLastName())) {
             mLastName.setText(userDetails.getLastName());
         }
+
+        if(userDetails.getTitle1()>0 || userDetails.getTitle2()>0)
+        {
+            for(int i=0;i<achievedTitles.size();i++)
+            {
+                if(userDetails.getTitle1()>0)
+                {
+                    if(achievedTitles.get(i).getTitleId() == userDetails.getTitle1())
+                    {
+                        pos1 = i;
+                        profileTitle1.setText(achievedTitles.get(i).getTitle());
+                    }
+                }
+
+                if(userDetails.getTitle2()>0)
+                {
+                    if(achievedTitles.get(i).getTitleId() == userDetails.getTitle2())
+                    {
+                        pos2 = i;
+                        profileTitle2.setText(achievedTitles.get(i).getTitle());
+                    }
+                }
+            }
+        }
+
 
         if (!TextUtils.isEmpty(userDetails.getEmail())) {
             mEmail.setText(userDetails.getEmail());
@@ -408,6 +493,14 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         }
         if (!userDetails.getGenderUser().toLowerCase().startsWith(gender)) {
             b = false;
+        }
+        if(achievedTitles.size()>=3)
+        {
+            if(userDetails.getTitle1()!=achievedTitles.get(pos1).getTitleId() ||
+                    userDetails.getTitle2()!=achievedTitles.get(pos2).getTitleId())
+            {
+                b = false;
+            }
         }
         return b;
     }
@@ -551,6 +644,24 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             case R.id.et_body_weight_kg:
                 EditWeight editWeight = new EditWeight(getContext(), this, userDetails);
                 editWeight.show();
+                break;
+            case R.id.et_profile_title1 :
+                if(userDetails.getTitle1()>0)
+                {
+
+                }else
+                {
+                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+                }
+                break;
+            case R.id.et_profile_title2 :
+                if(userDetails.getTitle2()>0)
+                {
+
+                }else
+                {
+                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+                }
                 break;
         }
     }

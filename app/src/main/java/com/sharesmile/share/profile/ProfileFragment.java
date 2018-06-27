@@ -2,6 +2,8 @@ package com.sharesmile.share.profile;
 
 import android.app.LoaderManager;
 import android.content.Loader;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Rect;
@@ -43,6 +45,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -56,6 +59,7 @@ import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.badges.InProgressBadgeFragment;
 import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
@@ -106,6 +110,9 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
 
     @BindView(R.id.tv_profile_name)
     TextView name;
+
+    @BindView(R.id.tv_profile_title)
+    TextView profileTitle;
 
     @BindView(R.id.img_profile_stats_2)
     CircularImageView imageView2;
@@ -248,6 +255,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         if (forward) {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
         }
+        Utils.checkStreak();
         initUi();
         setCharityOverviewLoader();
     }
@@ -391,6 +399,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
                         ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
                 // Name of user
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
+                name.setText(MainApplication.getInstance().getUserDetails().getFullName());
                 Level level = Utils.getLevel(lifeTimeImpact);
                 levelDist.setText(UnitsManager.formatRupeeToMyCurrency(level.getMinImpact()) + "/" + UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
                 levelNum.setText("Level " + level.getLevel());
@@ -420,7 +429,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
                 Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
                         new float[]{0, 1}, Shader.TileMode.CLAMP);
                 impactInRupees.getPaint().setShader(textShader);
-
+                setUserTitle();
                 displayStats();
                 configBarChart();
                 setStatsViewData();
@@ -485,6 +494,40 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         } else {
             layoutProfileStats.setVisibility(View.GONE);
             MainApplication.showToast("Please check your internet connection");
+        }
+    }
+
+    private void setUserTitle() {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        String title = "";
+        if(userDetails.getTitle1()>0)
+        {
+            title+= getTitle(userDetails.getTitle1());
+        }
+
+        if(userDetails.getTitle2()>0)
+        {
+            if(title.length()>0)
+            {
+                title +=", "+ getTitle(userDetails.getTitle2());
+            }else {
+                title += getTitle(userDetails.getTitle2());
+            }
+        }
+        profileTitle.setText(title);
+    }
+
+    private String getTitle(int title1) {
+        SQLiteDatabase sqLiteDatabase = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM "
+                + TitleDao.TABLENAME+" where "+TitleDao.Properties.TitleId.columnName +" = "+title1,
+                new String[]{});
+        if(cursor.getCount()>0) {
+            cursor.moveToFirst();
+            return cursor.getString(cursor.getColumnIndex(TitleDao.Properties.Title.columnName));
+        }else
+        {
+            return "";
         }
     }
 

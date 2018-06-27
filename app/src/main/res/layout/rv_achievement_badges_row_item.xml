@@ -18,17 +18,19 @@
         android:gravity="center">
 
         <ImageView
+            android:id="@+id/iv_badge"
             android:layout_width="75dp"
             android:layout_height="87dp"
             android:src="@drawable/badge_image"
             android:layout_centerHorizontal="true"
             />
         <ImageView
+            android:id="@+id/iv_star"
             android:layout_width="58dp"
             android:layout_height="25dp"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
-            android:src="@drawable/star_1"
+            android:src="@drawable/star_3"
             android:layout_marginBottom="2dp"
 
             />

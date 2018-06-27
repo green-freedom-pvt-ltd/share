@@ -10,11 +10,15 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.BadgeDao;
+import com.sharesmile.share.Category;
+import com.sharesmile.share.CategoryDao;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
@@ -32,7 +36,9 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.profile.badges.model.Badge;
 import com.sharesmile.share.profile.badges.model.BadgeParent;
+import com.sharesmile.share.profile.badges.model.Title;
 import com.sharesmile.share.profile.model.CharityOverview;
+import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
@@ -66,6 +72,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -115,7 +122,7 @@ public class SyncService extends GcmTaskService {
                 case UPLOAD_ACHIEVEMENT:
                     return uploadAchievement();
                 case SYNC_DATA:
-                    return syncData(getAssets());
+                    return syncData();
                 case PUSH_FRAUD_DATA:
                     Bundle fraudExtras = taskParams.getExtras();
                     String fraudDataString = fraudExtras.getString(TaskConstants.FRAUD_DATA_JSON);
@@ -128,7 +135,7 @@ public class SyncService extends GcmTaskService {
                     return uploadPendingWorkoutsData();
 
                 case SYNC_BADGE_DATA:
-                    return syncBadgeData(getAssets());
+                    return syncBadgeData();
                 default:
                     return GcmNetworkManager.RESULT_SUCCESS;
             }
@@ -147,55 +154,6 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private static int syncBadgeData(AssetManager assets) {
-        try {
-            StringBuilder buf = new StringBuilder();
-            InputStream json = assets.open("badges.txt");
-            BufferedReader in =
-                    new BufferedReader(new InputStreamReader(json, "UTF-8"));
-            String str;
-
-            while ((str = in.readLine()) != null) {
-                buf.append(str);
-            }
-
-            in.close();
-            JSONArray jsonArray = new JSONArray(buf.toString());
-            Gson gson = new Gson();
-            Type listType = new TypeToken<List<BadgeParent>>() {
-            }.getType();
-            List<BadgeParent> badgeParents = gson.fromJson(buf.toString(), listType);
-            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-            for (BadgeParent badgeParent : badgeParents) {
-                for (Badge badge : badgeParent.getBadges()) {
-                    com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
-                    badgeDb.setBadgeId(badge.getBadgeId());
-                    badgeDb.setName(badge.getName());
-                    badgeDb.setType(badge.getType());
-                    badgeDb.setCategory(badge.getCategory());
-                    badgeDb.setNoOfStars(badge.getNoOfStars());
-                    badgeDb.setImageUrl(badge.getImageUrl());
-                    badgeDb.setDescription1(badge.getDescription1());
-                    badgeDb.setDescription2(badge.getDescription2());
-                    badgeDb.setDescription3(badge.getDescription3());
-                    badgeDb.setBadgeParameter(badge.getBadgeParameter());
-                    badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
-                    List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(badge.getBadgeId())).list();
-                    if (badges.size() > 0) {
-                        badgeDb.setId(badges.get(0).getId());
-                        badgeDao.update(badgeDb);
-                    } else {
-                        badgeDao.insertOrReplace(badgeDb);
-                    }
-                }
-            }
-            EventBus.getDefault().post(new UpdateEvent.BadgeUpdated());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return GcmNetworkManager.RESULT_SUCCESS;
-    }
-
     @Override
     public void onInitializeTasks() {
         Logger.d(TAG, "onInitializeTasks");
@@ -203,7 +161,7 @@ public class SyncService extends GcmTaskService {
         MainApplication.getInstance().startSyncTasks();
     }
 
-    public static int syncData(AssetManager assets) {
+    public static int syncData() {
         Logger.d(TAG, "syncData");
         ClientConfig.sync();
         syncServerTime();
@@ -211,7 +169,7 @@ public class SyncService extends GcmTaskService {
         syncGlobalLeaderBoardData();
         syncLeagueBoardData();
         //TODO : temp getting data from assets file
-        syncBadgeData(assets);
+        syncBadgeData();
         updateCauseData();
         updateFaqs();
         uploadPendingWorkoutsData();
@@ -368,6 +326,112 @@ public class SyncService extends GcmTaskService {
             }
         }
         return result;
+    }
+    private static int syncBadgeData() {
+        try {
+            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            JsonArray jsonArray = NetworkDataProvider.doGetCall(Urls.getBadgesUrl(), JsonArray.class);
+            JSONArray badgeParentsArray = new JSONArray(jsonArray.toString());
+            for(int i=0;i<badgeParentsArray.length();i++) {
+                JSONObject jsonObject = badgeParentsArray.getJSONObject(i);
+                String badge_type = jsonObject.getString("badge_type");
+                ArrayList<Badge> badgesArrayList;
+                if(badge_type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE))
+                {
+
+
+                    JSONArray badgesArray = jsonObject.getJSONArray("badges");
+                    for(int j=0;j<badgesArray.length();j++)
+                    {
+                        JSONObject jsonObject1 = badgesArray.getJSONObject(j);
+                        Category category = new Category();
+                        category.setCategoryId(jsonObject1.getInt("cause_category_id"));
+                        category.setCategoryName(jsonObject1.getString("cause_category_name"));
+                        addCategoryToDb(category);
+                        badgesArrayList =  new Gson().fromJson(jsonObject1.getJSONArray("badges").toString(), new TypeToken<List<Badge>>() {
+                        }.getType());
+                        setBadgeToDb(badgesArrayList,category.getCategoryName());
+
+                        ArrayList<Title> titles = new Gson().fromJson(jsonObject1.getJSONArray("titles").toString(),new TypeToken<List<Title>>(){}.getType());
+                        setTitleToDb(titles,category.getCategoryName());
+                    }
+                }else
+                {
+                    badgesArrayList =  new Gson().fromJson(jsonObject.getJSONArray("badges").toString(), new TypeToken<List<Badge>>() {
+                    }.getType());
+                    setBadgeToDb(badgesArrayList,jsonObject.getString("badge_type"));
+                }
+
+
+                }
+            EventBus.getDefault().post(new UpdateEvent.BadgeUpdated());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return GcmNetworkManager.RESULT_SUCCESS;
+    }
+
+    private static void addCategoryToDb(Category category) {
+        CategoryDao categoryDao = MainApplication.getInstance().getDbWrapper().getCategoryDao();
+        List<Category> categories = categoryDao.queryBuilder().where(CategoryDao.Properties.CategoryId.eq(category.getCategoryId())).list();
+        if(!(categories.size()>0))
+        {
+            categoryDao.insert(category);
+        }else
+        {
+            categoryDao.update(category);
+        }
+    }
+
+
+    private static void setBadgeToDb(ArrayList<Badge> badgesArrayList,String category) {
+        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+        for (Badge badge : badgesArrayList) {
+            com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
+            badgeDb.setBadgeId(badge.getBadgeId());
+            badgeDb.setName(badge.getName());
+            badgeDb.setType(badge.getType());
+            badgeDb.setCategory(category);
+            badgeDb.setNoOfStars(badge.getNoOfStars());
+            badgeDb.setImageUrl(badge.getImageUrl());
+            badgeDb.setDescription1(badge.getDescription1());
+            badgeDb.setDescription2(badge.getDescription2());
+            badgeDb.setDescription3(badge.getDescription3());
+            badgeDb.setBadgeParameter(badge.getBadgeParameter());
+            badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
+            List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder()
+                    .where(BadgeDao.Properties.BadgeId.eq(badge.getBadgeId())).list();
+            if (badges.size() > 0) {
+                badgeDb.setId(badges.get(0).getId());
+                badgeDao.update(badgeDb);
+            } else {
+                badgeDao.insertOrReplace(badgeDb);
+            }
+
+        }
+    }
+
+    private static void setTitleToDb(ArrayList<Title> titleArrayList, String categoryName) {
+        TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+        for (Title title : titleArrayList) {
+            com.sharesmile.share.Title titleDb = new com.sharesmile.share.Title();
+            titleDb.setTitleId(title.getTitleId());
+            titleDb.setTitle(title.getTitle());
+            titleDb.setCategoryId(title.getCategoryId());
+            titleDb.setCategory(categoryName);
+            titleDb.setGoalNStars(title.getGoalNStars());
+            titleDb.setImageUrl(title.getImage());
+            titleDb.setWinningMessage(title.getWinningMessage());
+            titleDb.setDesc(title.getDesc());
+            List<com.sharesmile.share.Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(title.getTitleId())).list();
+            if (titles.size() > 0) {
+                titleDb.setId(titles.get(0).getId());
+                titleDao.update(titleDb);
+            } else {
+                titleDao.insertOrReplace(titleDb);
+            }
+
+        }
     }
 
     public static int syncLeagueBoardData() {
@@ -1252,7 +1316,7 @@ public class SyncService extends GcmTaskService {
 
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("result").toString();
+            String responseString = response.getAsJsonArray("result").get(0).toString();
             Logger.d(TAG,"getCharityOverviewData response : "+responseString);
             JSONObject jsonObject = new JSONObject(responseString);
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
@@ -1271,7 +1335,7 @@ public class SyncService extends GcmTaskService {
                     + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
                     + ", while syncing runs at URL: " + Urls.getImpactOverviewUrl());
             Crashlytics.logException(e);
-            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+            AnalyticsEvent.create(Event.ON_GET_STREAK_FAILURE)
                     .put("exception_message", e.getMessage())
                     .put("message_from_server", e.getMessageFromServer())
                     .put("http_status", e.getHttpStatusCode())
@@ -1286,7 +1350,7 @@ public class SyncService extends GcmTaskService {
             Crashlytics.log("getCharityOverviewData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
                     "while syncing charity overview data at URL : " + Urls.getImpactOverviewUrl());
             Crashlytics.logException(e);
-            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+            AnalyticsEvent.create(Event.ON_GET_STREAK_FAILURE)
                     .put("exception_message", e.getMessage())
                     .buildAndDispatch();
 

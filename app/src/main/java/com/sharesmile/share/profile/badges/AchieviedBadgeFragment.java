@@ -51,6 +51,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
     TextView badgeTitle;
     @BindView(R.id.iv_badge)
     ImageView badgeIv;
+    @BindView(R.id.iv_star)
+    ImageView starIv;
     @BindView(R.id.badge_layout)
     CoordinatorLayout badgeLayout;
     @BindView(R.id.badge_amount_raised_tv)
@@ -149,6 +151,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
             badgeTitle.setText(badge.getName());
             badgeAmountRaised.setText(badge.getDescription1());
             badgeUpgrade.setText(badge.getDescription2());
+            Utils.setStarImage(badge.getNoOfStars(),starIv);
         }
         if(from == 0)
         {

@@ -20,6 +20,9 @@ public class Version16 extends SchemaVersion {
         addMessage(schema);
         addLeaderBoard(schema);
         addBadgeData(schema);
+        addTitleData(schema);
+        addCategoryData(schema);
+        addAchievedTitleData(schema);
         addAchievedBadgeData(schema);
 
     }
@@ -188,15 +191,46 @@ public class Version16 extends SchemaVersion {
         badge.addStringProperty("badgeParameterCheck");
     }
 
+    private static void addTitleData(Schema schema){
+        Entity title = schema.addEntity("Title");
+        title.addIdProperty().autoincrement();
+        title.addIntProperty("titleId").notNull();
+        title.addStringProperty("title").notNull();
+        title.addIntProperty("categoryId").notNull();
+        title.addStringProperty("category").notNull();
+        title.addIntProperty("goalNStars").notNull();
+        title.addStringProperty("imageUrl");
+        title.addStringProperty("winningMessage").notNull();
+        title.addStringProperty("desc");
+    }
+
+    private static void addAchievedTitleData(Schema schema){
+        Entity title = schema.addEntity("AchievedTitle");
+        title.addIdProperty().autoincrement();
+        title.addIntProperty("titleId").notNull();
+        title.addStringProperty("title").notNull();
+        title.addStringProperty("categoryName").notNull();
+        title.addIntProperty("userId").notNull();
+        title.addBooleanProperty("isSync").notNull();
+    }
+    private static void addCategoryData(Schema schema){
+        Entity category = schema.addEntity("Category");
+        category.addIdProperty().autoincrement();
+        category.addIntProperty("categoryId").notNull();
+        category.addStringProperty("categoryName").notNull();
+    }
+
     private static void addAchievedBadgeData(Schema schema){
         Entity achievedBadge = schema.addEntity("AchievedBadge");
         achievedBadge.addIdProperty().autoincrement();
+        achievedBadge.addLongProperty("serverId").notNull();
         achievedBadge.addLongProperty("userId").notNull();
         achievedBadge.addLongProperty("causeId").notNull();
         achievedBadge.addStringProperty("causeName").notNull();
         achievedBadge.addLongProperty("badgeIdInProgress").notNull();
         achievedBadge.addLongProperty("badgeIdAchieved").notNull();
         achievedBadge.addDateProperty("badgeIdAchievedDate");
+        achievedBadge.addIntProperty("noOfStarAchieved");
         achievedBadge.addStringProperty("badgeType").notNull();
         achievedBadge.addStringProperty("category").notNull();
         achievedBadge.addStringProperty("categoryStatus").notNull();

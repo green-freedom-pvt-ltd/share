@@ -95,6 +95,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         .buildAndDispatch();
                 break;
             case R.id.bt_google_login:
+
                 mLoginHandler.performGoogleLogin();
                 AnalyticsEvent.create(Event.ON_CLICK_LOGIN_BUTTON)
                         .put("medium", "gplus")

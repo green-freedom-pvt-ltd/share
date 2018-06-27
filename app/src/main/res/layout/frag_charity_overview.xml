@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:text="You are a"
+            android:text="@string/charity_overview_title_header_you_are_a"
             android:gravity="center"
             android:id="@+id/title_header_tv"
             />
@@ -145,6 +145,7 @@
                 android:textColor="@color/black"
                 android:drawableRight="@drawable/star_badges"
                 android:gravity="center"
+                android:drawablePadding="5dp"
                 />
             <com.sharesmile.share.views.LBTextView
                 android:layout_width="wrap_content"

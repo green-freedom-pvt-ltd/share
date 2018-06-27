@@ -40,11 +40,12 @@
                 android:textColor="@color/white"
                 android:textSize="10sp" />
             <ImageView
+                android:id="@+id/iv_star"
                 android:layout_width="58dp"
                 android:layout_height="24dp"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentBottom="true"
-                android:src="@drawable/star_1"
+                android:src="@drawable/star_2"
 
                 />
         </RelativeLayout>

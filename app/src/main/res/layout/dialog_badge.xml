@@ -69,11 +69,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerInParent="true"
-                android:src="@drawable/star_1"
+                android:src="@drawable/star_2"
 
                 app:layout_anchor="@+id/iv_badge"
                 app:layout_anchorGravity="bottom|center"
-
+                android:id="@+id/iv_star"
                 />
         </android.support.design.widget.CoordinatorLayout>
         <com.sharesmile.share.views.LBKTextView

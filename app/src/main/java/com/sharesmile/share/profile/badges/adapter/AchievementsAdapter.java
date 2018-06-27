@@ -19,6 +19,7 @@ import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.profile.badges.SeeAchievedBadge;
 import com.sharesmile.share.profile.badges.model.AchievedBadgeCount;
+import com.sharesmile.share.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -59,6 +60,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
 
     class AchievementsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView acheivementsImageView;
+        ImageView starImageView;
         TextView acheivementsTitle;
         LinearLayout badgeLayout;
         TextView badgeCount;
@@ -66,6 +68,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
         public AchievementsViewHolder(View itemView) {
             super(itemView);
             acheivementsImageView = itemView.findViewById(R.id.iv_acheivements);
+            starImageView = itemView.findViewById(R.id.iv_star);
             acheivementsTitle = itemView.findViewById(R.id.tv_acheivements_title);
             badgeLayout = itemView.findViewById(R.id.badge_layout);
             badgeCount = itemView.findViewById(R.id.tv_badge_count);
@@ -85,6 +88,8 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                     String s = badge.getName();
                     acheivementsTitle.setText(s);
                     acheivementsImageView.setImageResource(R.drawable.badge_image);
+                    int starCount = badge.getNoOfStars();
+                    Utils.setStarImage(starCount,starImageView);
                     if(achievedBadgeCounts.get(position).getCount()>1)
                     {
                         badgeCount.setVisibility(View.VISIBLE);

@@ -72,6 +72,12 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("streak_added")
     private boolean streakAdded;
 
+    @SerializedName("title1")
+    private int title1;
+    @SerializedName("title2")
+    private int title2;
+
+
     public boolean isStreakAdded() {
         return streakAdded;
     }
@@ -342,4 +348,19 @@ public class UserDetails implements UnObfuscable {
         this.totalDistance = totalDistance;
     }
 
+    public int getTitle1() {
+        return title1;
+    }
+
+    public void setTitle1(int title1) {
+        this.title1 = title1;
+    }
+
+    public int getTitle2() {
+        return title2;
+    }
+
+    public void setTitle2(int title2) {
+        this.title2 = title2;
+    }
 }

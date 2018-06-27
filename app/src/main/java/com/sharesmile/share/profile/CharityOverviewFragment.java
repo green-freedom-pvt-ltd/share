@@ -2,6 +2,8 @@ package com.sharesmile.share.profile;
 
 import android.app.LoaderManager;
 import android.content.Loader;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,14 +14,20 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.adapter.CharityCauseDetailsAdapter;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CharityOverview;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -92,6 +100,25 @@ public class CharityOverviewFragment extends BaseFragment{
         CharityCauseDetailsAdapter charityCauseDetailsAdapter = new CharityCauseDetailsAdapter(getContext(),categoryStats);
         charityOverviewRecyclerview.setAdapter(charityCauseDetailsAdapter);
         charityAmountRaised.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));
+
+        setTitle();
+    }
+
+    private void setTitle() {
+        AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
+        List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder()
+                .where(AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                        AchievedTitleDao.Properties.CategoryName.eq(categoryStats.getCategoryName())).list();
+        if(achievedTitles.size()>0)
+        {
+            titleHeader.setText(getResources().getString(R.string.charity_overview_title_header_you_are_a));
+            title.setText(achievedTitles.get(0).getTitle());
+
+        }else
+        {
+            title.setText(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+            titleHeader.setText("");
+        }
     }
 
     private void setupToolbar() {

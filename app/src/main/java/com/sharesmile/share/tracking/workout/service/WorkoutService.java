@@ -6,6 +6,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -24,8 +26,14 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
+import com.sharesmile.share.Category;
+import com.sharesmile.share.CategoryDao;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.workout.tracker.RunTracker;
@@ -312,14 +320,16 @@ public class WorkoutService extends Service implements
             }
             SyncHelper.uploadStreak();
             AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
-            achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CHANGEMAKER,mCauseData));
-            achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_MARATHON,mCauseData));
-            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(),Constants.BADGE_TYPE_STREAK,mCauseData));
-            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered,Constants.BADGE_TYPE_CAUSE,mCauseData));
+            achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CHANGEMAKER, mCauseData));
+
+            achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_MARATHON, mCauseData));
+            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(), Constants.BADGE_TYPE_STREAK, mCauseData));
+            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CAUSE, mCauseData));
             SyncHelper.uploadAchievement();
             SyncHelper.uploadStreak();
+            giveTitle();
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
-            handleWorkoutResult(result,achievedBadgesData);
+            handleWorkoutResult(result, achievedBadgesData);
 
             stopTimer();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
@@ -333,6 +343,91 @@ public class WorkoutService extends Service implements
             distanceInKmsOnLastUpdateEvent = 0f;
             cancelAllWorkoutNotifications();
         }
+    }
+
+    private void giveTitle() {
+
+        List<Category> categories = MainApplication.getInstance().getDbWrapper()
+                .getCategoryDao().queryBuilder()
+                .where(CategoryDao.Properties.CategoryName.eq(mCauseData.getCategory())).list();
+        if (categories.size() > 0) {
+            int categoryId = categories.get(0).getCategoryId();
+            List<Title> titles = MainApplication.getInstance().getDbWrapper().getTitleDao().queryBuilder()
+                    .where(TitleDao.Properties.CategoryId.eq(categoryId))
+                    .orderAsc(TitleDao.Properties.GoalNStars).list();
+
+            /*List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper()
+                    .getAchievedBadgeDao().queryBuilder()
+                    .where(AchievedTitleDao.Properties.CategoryName.eq(mCauseData.getCategory()),
+                            AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()))
+                    .list();
+            for(int i=0;i<achievedBadges.size();i++)
+            {
+                starCount += achievedBadges.get(i).getNoOfStarAchieved();
+            }*/
+            SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+            // Calculate amount_raised in interval
+            Cursor cursor = database.rawQuery("SELECT "
+                    + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved + ") AS no_of_stars"
+                    + " FROM " + AchievedBadgeDao.TABLENAME + " where "
+                    + AchievedBadgeDao.Properties.CauseName.columnName + " is " + mCauseData.getCategory() +
+                    " and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
+                    + MainApplication.getInstance().getUserID(), new String[]{});
+            cursor.moveToFirst();
+
+            int starCount = cursor.getInt(cursor.getColumnIndex("no_of_stars"));
+
+            AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper()
+                    .getAchievedTitleDao();
+            List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder()
+                    .where(AchievedTitleDao.Properties.CategoryName.eq(mCauseData.getCategory())
+                            , AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+            AchievedTitle achievedTitle = null;
+            if (achievedTitles.size() > 0) {
+                achievedTitle = achievedTitles.get(0);
+            }
+
+            int titlePos = -1;
+            int achievedTitlePos = -1;
+
+            for (int i = 0; i < titles.size(); i++) {
+                if (achievedTitle != null && achievedTitle.getTitleId() == titles.get(i).getTitleId()) {
+                    titlePos = i;
+                }
+                if (starCount >= titles.get(i).getGoalNStars()) {
+                    achievedTitlePos = i;
+                }
+            }
+            if (achievedTitle == null) {
+                if (achievedTitlePos > -1) {
+                    achievedTitle = getAchievedTitle(titles.get(achievedTitlePos));
+                }
+            } else if (achievedTitlePos > -1) {
+                if (titlePos < achievedTitlePos) {
+                    long id = achievedTitle.getId();
+                    achievedTitle = getAchievedTitle(titles.get(achievedTitlePos));
+                    achievedTitle.setId(id);
+                }
+            }
+            if (achievedTitle != null) {
+                if (achievedTitle.getId() > 0) {
+                    achievedTitleDao.update(achievedTitle);
+                } else {
+                    achievedTitleDao.insert(achievedTitle);
+                }
+                Utils.saveTitleIdToUserDetails(achievedTitle);
+            }
+        }
+    }
+
+    private AchievedTitle getAchievedTitle(Title title) {
+        AchievedTitle achievedTitle = new AchievedTitle();
+        achievedTitle.setUserId(MainApplication.getInstance().getUserID());
+        achievedTitle.setTitleId(title.getTitleId());
+        achievedTitle.setTitle(title.getTitle());
+        achievedTitle.setCategoryName(title.getCategory());
+        achievedTitle.setIsSync(false);
+        return achievedTitle;
     }
 
     private void handleWorkoutResult(final WorkoutData result, AchievedBadgesData achievedBadgesData) {
@@ -349,7 +444,7 @@ public class WorkoutService extends Service implements
                     Math.round(result.getRecordedTime())));
         }
 
-        sendWorkoutResultBroadcast(result,achievedBadgesData);
+        sendWorkoutResultBroadcast(result, achievedBadgesData);
         // Do not perform activity detection until the next 24 hours, unless user starts workout
         ActivityDetector.getInstance().stopActivityDetection();
 
