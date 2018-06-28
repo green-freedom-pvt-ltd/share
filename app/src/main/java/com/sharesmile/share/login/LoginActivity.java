@@ -175,21 +175,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mProgressContainer.setVisibility(View.GONE);
         }
     }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.OnGetStreak onGetStreak) {
-        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
-            SyncHelper.syncCauseData();
-        else
-        {
-            showHideProgress(false,null);
-            MainApplication.showToast(getResources().getString(R.string.login_error));
-        }
-    }
+
 
     @Subscribe(threadMode =  ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.OnGetCause onGetCause)
+    public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
     {
-        if(onGetCause.result == ExpoBackoffTask.RESULT_SUCCESS)
+        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
         {
             SyncHelper.syncBadgesData();
         }else
