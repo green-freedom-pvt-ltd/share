@@ -202,15 +202,20 @@ public class Version16 extends SchemaVersion {
         title.addStringProperty("imageUrl");
         title.addStringProperty("winningMessage").notNull();
         title.addStringProperty("desc");
+        title.addStringProperty("badgeType").notNull();
     }
 
     private static void addAchievedTitleData(Schema schema){
         Entity title = schema.addEntity("AchievedTitle");
         title.addIdProperty().autoincrement();
+        title.addLongProperty("serverId").notNull();
         title.addIntProperty("titleId").notNull();
         title.addStringProperty("title").notNull();
+        title.addLongProperty("categoryId").notNull();
         title.addStringProperty("categoryName").notNull();
-        title.addIntProperty("userId").notNull();
+        title.addDateProperty("achievedTime").notNull();
+        title.addStringProperty("badgeType").notNull();
+        title.addLongProperty("userId").notNull();
         title.addBooleanProperty("isSync").notNull();
     }
     private static void addCategoryData(Schema schema){
@@ -232,7 +237,7 @@ public class Version16 extends SchemaVersion {
         achievedBadge.addDateProperty("badgeIdAchievedDate");
         achievedBadge.addIntProperty("noOfStarAchieved");
         achievedBadge.addStringProperty("badgeType").notNull();
-        achievedBadge.addStringProperty("category").notNull();
+        achievedBadge.addLongProperty("category").notNull();
         achievedBadge.addStringProperty("categoryStatus").notNull();
         achievedBadge.addDoubleProperty("paramDone").notNull();
         achievedBadge.addBooleanProperty("isSync").notNull();

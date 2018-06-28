@@ -479,7 +479,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public String getGoalDetails(){
-        return SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        String s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        if(s.length()<=2)
+        {
+            setUserDetails(null);
+        }
+        s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        return s;
     }
 
     public float getBodyWeight(){

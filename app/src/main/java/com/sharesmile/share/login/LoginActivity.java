@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -17,6 +18,14 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.sync.SyncHelper;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,9 +66,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mLoginHandler = new LoginImpl(this, this);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         initUi();
+
     }
+
 
     private void initUi() {
 
@@ -106,6 +118,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void exitWithResult(boolean loginSuccess){
+        if(loginSuccess)
+            Toast.makeText(MainApplication.getContext(), "Logged in as " + MainApplication.getInstance().getUserDetails().getFirstName(), Toast.LENGTH_SHORT).show();
+
         if (getCallingActivity() != null){
             Logger.d(TAG, "Will return result loginSuccess = " + loginSuccess);
             // LoginActivity was started for result
@@ -130,6 +145,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
         if (mLoginHandler != null){
             mLoginHandler.disconnect();
         }
@@ -159,4 +175,68 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mProgressContainer.setVisibility(View.GONE);
         }
     }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetStreak onGetStreak) {
+        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
+            SyncHelper.syncCauseData();
+        else
+        {
+            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.login_error));
+        }
+    }
+
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetCause onGetCause)
+    {
+        if(onGetCause.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            SyncHelper.syncBadgesData();
+        }else
+        {
+            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.login_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated)
+    {
+        if(badgeUpdated.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            SyncHelper.getAchievedBadged();
+        }else
+        {
+            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.login_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetAchivement onGetAchivement)
+    {
+        if(onGetAchivement.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            //Pull historical run data;
+            SyncHelper.getAchievedTitle();
+
+        }else
+        {
+            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.login_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetTitle onGetTitle)
+    {
+        if(onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            //Pull historical run data;
+            SyncHelper.forceRefreshEntireWorkoutHistory();
+            onLoginSuccess();
+        }else
+        {
+            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.login_error));
+        }
+    }
+
 }

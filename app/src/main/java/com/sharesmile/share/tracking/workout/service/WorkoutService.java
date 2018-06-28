@@ -91,6 +91,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -368,10 +369,10 @@ public class WorkoutService extends Service implements
             SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
             // Calculate amount_raised in interval
             Cursor cursor = database.rawQuery("SELECT "
-                    + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved + ") AS no_of_stars"
+                    + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
                     + " FROM " + AchievedBadgeDao.TABLENAME + " where "
-                    + AchievedBadgeDao.Properties.CauseName.columnName + " is " + mCauseData.getCategory() +
-                    " and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
+                    + AchievedBadgeDao.Properties.CauseName + " is " + mCauseData.getCategory() +
+                    " and " + AchievedBadgeDao.Properties.UserId + " is "
                     + MainApplication.getInstance().getUserID(), new String[]{});
             cursor.moveToFirst();
 
@@ -416,6 +417,7 @@ public class WorkoutService extends Service implements
                     achievedTitleDao.insert(achievedTitle);
                 }
                 Utils.saveTitleIdToUserDetails(achievedTitle);
+                SyncHelper.uploadAchievementTitle();
             }
         }
     }
@@ -426,6 +428,9 @@ public class WorkoutService extends Service implements
         achievedTitle.setTitleId(title.getTitleId());
         achievedTitle.setTitle(title.getTitle());
         achievedTitle.setCategoryName(title.getCategory());
+        achievedTitle.setCategoryId(title.getCategoryId());
+        achievedTitle.setAchievedTime(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+        achievedTitle.setBadgeType(title.getBadgeType());
         achievedTitle.setIsSync(false);
         return achievedTitle;
     }

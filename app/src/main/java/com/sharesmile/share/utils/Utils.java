@@ -122,6 +122,7 @@ import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.FullscreenPro
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.CirclePromptFocal;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal;
 
+import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_STREAK_UPLOADED_FIRST_TIME;
@@ -1404,7 +1405,7 @@ public class Utils {
             categoryCompleted = causeData.isCompleted();
         } else {
             achievedBadges = achievedBadgeDao.queryBuilder()
-                    .where(AchievedBadgeDao.Properties.Category.eq(type),
+                    .where(AchievedBadgeDao.Properties.BadgeType.eq(type),
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
                             AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
             categoryCompleted = paramDone == 0 ? true : false;
@@ -1414,7 +1415,7 @@ public class Utils {
             achievedBadge = achievedBadges.get(0);
             if (categoryCompleted) {
                 if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
-                        (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))) && categoryCompleted)
+                        (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))))
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
             } else
                 achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
@@ -1431,7 +1432,9 @@ public class Utils {
                 achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
                 achievedBadge.setBadgeType(badge.getType());
                 achievedBadge.setCauseName(badge.getName());
-                achievedBadge.setCategory(category);
+                if(badge.getType().equalsIgnoreCase(BADGE_TYPE_CAUSE))
+                achievedBadge.setCategory(causeData.getCategoryId());
+
                 achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
                 achievedBadge.setParamDone(paramDone);
                 if (categoryCompleted)
@@ -1503,7 +1506,10 @@ public class Utils {
             achievedBadge = new AchievedBadge();
             achievedBadge.setUserId(MainApplication.getInstance().getUserID());
             achievedBadge.setServerId(0);
-            achievedBadge.setCategory(category);
+
+            if(badgeType.equalsIgnoreCase(BADGE_TYPE_CAUSE))
+            achievedBadge.setCategory(mCauseData.getCategoryId());
+
             achievedBadge.setCauseId(mCauseData.getId());
             achievedBadge.setCauseName(mCauseData.getTitle());
             achievedBadge.setBadgeType(badgeType);
@@ -1781,6 +1787,16 @@ public class Utils {
             layoutStar.addView(layoutStar);
         }else
         {
+            if(cause_no_of_stars==0)
+            {// to give the layout height of the star
+                ImageView imageView = new ImageView(context);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(5,0,5,0);
+                imageView.setLayoutParams(layoutParams);
+                imageView.setImageResource(R.drawable.star_badges);
+                imageView.setVisibility(View.INVISIBLE);
+                layoutStar.addView(imageView);
+            }else
             for(int i=0;i<cause_no_of_stars;i++)
             {
                 ImageView imageView = new ImageView(context);
@@ -1901,5 +1917,23 @@ public class Utils {
                 starImageView.setImageResource(R.drawable.star_3);
                 break;
         }
+    }
+
+    public static String dateToString(Date date) {
+        String dateString = "";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        dateString = simpleDateFormat.format(date);
+        return dateString;
+    }
+
+    public static Date stringToDate(String dateString) {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        try {
+            date = simpleDateFormat.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 }

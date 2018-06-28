@@ -246,7 +246,6 @@ public class Constants {
     public static final String PREF_SHOWN_ONBOARDING = "pref_onboarding";
     public static final String PREF_STREAK_UPLOADED_FIRST_TIME = "pref_streak_uploaded_first_time";
     public static final String PREF_CHARITY_OVERVIEW_DATA_LOAD = "pref_charity_overview_data_load";
-    public static final String PREF_ACHIEVEMENT_LOAD = "pref_achievement_load";
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
     public static final String PROFILE_SCREEN = "profile_screen";
@@ -267,10 +266,10 @@ public class Constants {
     public final static String BADGE_COMPLETED = "badge_completed";
     public final static String BADGE_IN_PROGRESS = "badge_in_progress";
 
-    public final static String BADGE_TYPE_CAUSE = "Cause";
-    public final static String BADGE_TYPE_CHANGEMAKER = "Change_Maker";
-    public final static String BADGE_TYPE_STREAK = "Streak";
-    public final static String BADGE_TYPE_MARATHON = "Marathon";
+    public final static String BADGE_TYPE_CAUSE = "cause";
+    public final static String BADGE_TYPE_CHANGEMAKER = "changemaker";
+    public final static String BADGE_TYPE_STREAK = "streak";
+    public final static String BADGE_TYPE_MARATHON = "marathon";
 
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     public static final String ACHIEVED_BADGE_DATA = "achieved_badge_data";

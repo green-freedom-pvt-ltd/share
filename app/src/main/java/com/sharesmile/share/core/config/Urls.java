@@ -33,6 +33,7 @@ public class Urls {
     private static final String BADGES_URL = "/badges/";
     private static final String STREAK_URL = "/streak/";
     private static final String ACHIEVEMENTS_URL = "/achievements/";
+    private static final String TITLES_URL = "/titles/";
 
     private static final String IMPACTOVERVIEW_URL = "/impactOverview/";
 
@@ -51,15 +52,11 @@ public class Urls {
     private static final String BLOG_LATEST_ARTICLE_URL = "/articles/latest";
     private static final String BLOG_HOW_IT_WORKS_CONTENT_URL = "/articles/howitworks";
 
-    private static final String IMPACT_ASSETS_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-image-assets";
-
-    public static String getImpactProfileS3BucketUrl() {
-        return IMPACT_PROFILE_S3_BUCKET_URL;
-    }
 
     private static final String IMPACT_PROFILE_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-userfiles-mobilehub-361440758/";
+    private static final String IMPACT_ASSETS_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-deployments-mobilehub-361440758/assets/";
 
-    private static final String HOW_IT_WORKS_S3_FOLDER = "/howitworks/";
+    private static final String HOW_IT_WORKS_S3_FOLDER = "/how_it_works/";
 
 
 
@@ -177,6 +174,10 @@ public class Urls {
         String url = getNodeBaseUrl() + ACHIEVEMENTS_URL;
         return url;
     }
+    public static String getTitlesUrl() {
+        String url = getNodeBaseUrl() + TITLES_URL;
+        return url;
+    }
     public static String getImpactOverviewUrl() {
         return getNodeBaseUrl()+IMPACTOVERVIEW_URL;
     }
@@ -226,10 +227,18 @@ public class Urls {
     }
 
     public static String getHowItWorksIllustration(int index){
-        return IMPACT_ASSETS_S3_BUCKET_URL + HOW_IT_WORKS_S3_FOLDER + index + ".png";
+        return getImpactAssetsS3BucketUrl() + HOW_IT_WORKS_S3_FOLDER + index + ".png";
     }
 
     public static String getHowItWorksContentUrl(){
         return BLOG_BASE_URL + BLOG_HOW_IT_WORKS_CONTENT_URL;
     }
+
+    public static String getImpactProfileS3BucketUrl() {
+        return IMPACT_PROFILE_S3_BUCKET_URL;
+    }
+    public static String getImpactAssetsS3BucketUrl() {
+        return IMPACT_ASSETS_S3_BUCKET_URL;
+    }
+
 }

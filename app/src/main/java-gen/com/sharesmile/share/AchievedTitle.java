@@ -10,12 +10,18 @@ package com.sharesmile.share;
 public class AchievedTitle {
 
     private Long id;
+    private long serverId;
     private int titleId;
     /** Not-null value. */
     private String title;
+    private long categoryId;
     /** Not-null value. */
     private String categoryName;
-    private int userId;
+    /** Not-null value. */
+    private java.util.Date achievedTime;
+    /** Not-null value. */
+    private String badgeType;
+    private long userId;
     private boolean isSync;
 
     // KEEP FIELDS - put your custom fields here
@@ -28,11 +34,15 @@ public class AchievedTitle {
         this.id = id;
     }
 
-    public AchievedTitle(Long id, int titleId, String title, String categoryName, int userId, boolean isSync) {
+    public AchievedTitle(Long id, long serverId, int titleId, String title, long categoryId, String categoryName, java.util.Date achievedTime, String badgeType, long userId, boolean isSync) {
         this.id = id;
+        this.serverId = serverId;
         this.titleId = titleId;
         this.title = title;
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
+        this.achievedTime = achievedTime;
+        this.badgeType = badgeType;
         this.userId = userId;
         this.isSync = isSync;
     }
@@ -43,6 +53,14 @@ public class AchievedTitle {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public long getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(long serverId) {
+        this.serverId = serverId;
     }
 
     public int getTitleId() {
@@ -63,6 +81,14 @@ public class AchievedTitle {
         this.title = title;
     }
 
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
     /** Not-null value. */
     public String getCategoryName() {
         return categoryName;
@@ -73,11 +99,31 @@ public class AchievedTitle {
         this.categoryName = categoryName;
     }
 
-    public int getUserId() {
+    /** Not-null value. */
+    public java.util.Date getAchievedTime() {
+        return achievedTime;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setAchievedTime(java.util.Date achievedTime) {
+        this.achievedTime = achievedTime;
+    }
+
+    /** Not-null value. */
+    public String getBadgeType() {
+        return badgeType;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setBadgeType(String badgeType) {
+        this.badgeType = badgeType;
+    }
+
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
@@ -95,6 +141,6 @@ public class AchievedTitle {
     public String toString() {
         return title;
     }
-
     // KEEP METHODS END
+
 }

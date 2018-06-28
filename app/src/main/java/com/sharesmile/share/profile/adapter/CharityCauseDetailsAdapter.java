@@ -1,6 +1,7 @@
 package com.sharesmile.share.profile.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +11,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CauseStats;
 import com.sharesmile.share.utils.Utils;
+
+import static com.sharesmile.share.core.application.MainApplication.getContext;
 
 public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCauseDetailsAdapter.CauseDetailViewHolder> {
 
@@ -65,6 +69,8 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(causeStats.getCause_raised()));
             charityWorkout.setText(causeStats.getCause_workouts()+"");
             Utils.addStars(layoutStar,causeStats.getCause_no_of_stars(),context);
+            ShareImageLoader.getInstance().loadImage(causeStats.getCause_image_url(),ivCause,
+                    ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
         }
 
     }

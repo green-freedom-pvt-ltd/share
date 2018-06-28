@@ -8,6 +8,7 @@ public class CategoryStats {
     private int categoryRaised;
     private int categoryWorkouts;
     private int categoryNoOfStars;
+    private String categoryImageUrl;
     ArrayList<CauseStats> causeStats;
 
     public String getCategoryName() {
@@ -48,5 +49,13 @@ public class CategoryStats {
 
     public void setCategoryNoOfStars(int categoryNoOfStars) {
         this.categoryNoOfStars += categoryNoOfStars;
+    }
+
+    public String getCategoryImageUrl() {
+        return categoryImageUrl;
+    }
+
+    public void setCategoryImageUrl(String categoryImageUrl) {
+        this.categoryImageUrl = categoryImageUrl;
     }
 }

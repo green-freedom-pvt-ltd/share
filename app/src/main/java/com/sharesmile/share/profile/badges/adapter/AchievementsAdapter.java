@@ -17,6 +17,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.profile.badges.SeeAchievedBadge;
 import com.sharesmile.share.profile.badges.model.AchievedBadgeCount;
 import com.sharesmile.share.utils.Utils;
@@ -87,7 +88,8 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                     Badge badge = badges.get(0);
                     String s = badge.getName();
                     acheivementsTitle.setText(s);
-                    acheivementsImageView.setImageResource(R.drawable.badge_image);
+                    ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl()+badge.getImageUrl(),acheivementsImageView,
+                            ContextCompat.getDrawable(context,R.drawable.badge_image));
                     int starCount = badge.getNoOfStars();
                     Utils.setStarImage(starCount,starImageView);
                     if(achievedBadgeCounts.get(position).getCount()>1)

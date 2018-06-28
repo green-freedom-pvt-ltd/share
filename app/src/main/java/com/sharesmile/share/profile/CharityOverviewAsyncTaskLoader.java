@@ -66,6 +66,7 @@ public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverv
                     categoryStats.setCategoryName(key);
                     categoryStats.setCategoryRaised(value.getInt("category_raised"));
                     categoryStats.setCategoryWorkouts(value.getInt("category_workouts"));
+                    categoryStats.setCategoryImageUrl(value.getString("category_image"));
                     ArrayList<CauseStats> causeStatsArrayList = new ArrayList<>();
                     JSONObject causeWiseStats = value.getJSONObject("cause_wise_stats");
                     Iterator<String> causeWiseStatsKeys = causeWiseStats.keys();
@@ -78,6 +79,7 @@ public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverv
                         causeStats.setCauseName(causeKey);
                         causeStats.setCause_raised(causeValue.getInt("cause_raised"));
                         causeStats.setCause_workouts(causeValue.getInt("cause_workouts"));
+                        causeStats.setCause_image_url(causeValue.getString("cause_image"));
                         List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                                 .where(AchievedBadgeDao.Properties.CauseName.eq(causeKey),
                                         AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();

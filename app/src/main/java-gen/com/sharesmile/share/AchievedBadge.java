@@ -21,8 +21,7 @@ public class AchievedBadge {
     private Integer noOfStarAchieved;
     /** Not-null value. */
     private String badgeType;
-    /** Not-null value. */
-    private String category;
+    private long category;
     /** Not-null value. */
     private String categoryStatus;
     private double paramDone;
@@ -38,7 +37,7 @@ public class AchievedBadge {
         this.id = id;
     }
 
-    public AchievedBadge(Long id, long serverId, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, Integer noOfStarAchieved, String badgeType, String category, String categoryStatus, double paramDone, boolean isSync) {
+    public AchievedBadge(Long id, long serverId, long userId, long causeId, String causeName, long badgeIdInProgress, long badgeIdAchieved, java.util.Date badgeIdAchievedDate, Integer noOfStarAchieved, String badgeType, long category, String categoryStatus, double paramDone, boolean isSync) {
         this.id = id;
         this.serverId = serverId;
         this.userId = userId;
@@ -139,13 +138,11 @@ public class AchievedBadge {
         this.badgeType = badgeType;
     }
 
-    /** Not-null value. */
-    public String getCategory() {
+    public long getCategory() {
         return category;
     }
 
-    /** Not-null value; ensure this value is available before it is saved to the database. */
-    public void setCategory(String category) {
+    public void setCategory(long category) {
         this.category = category;
     }
 

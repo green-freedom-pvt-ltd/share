@@ -33,7 +33,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         public final static Property BadgeIdAchievedDate = new Property(7, java.util.Date.class, "badgeIdAchievedDate", false, "BADGE_ID_ACHIEVED_DATE");
         public final static Property NoOfStarAchieved = new Property(8, Integer.class, "noOfStarAchieved", false, "NO_OF_STAR_ACHIEVED");
         public final static Property BadgeType = new Property(9, String.class, "badgeType", false, "BADGE_TYPE");
-        public final static Property Category = new Property(10, String.class, "category", false, "CATEGORY");
+        public final static Property Category = new Property(10, long.class, "category", false, "CATEGORY");
         public final static Property CategoryStatus = new Property(11, String.class, "categoryStatus", false, "CATEGORY_STATUS");
         public final static Property ParamDone = new Property(12, double.class, "paramDone", false, "PARAM_DONE");
         public final static Property IsSync = new Property(13, boolean.class, "isSync", false, "IS_SYNC");
@@ -62,7 +62,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
                 "\"BADGE_ID_ACHIEVED_DATE\" INTEGER," + // 7: badgeIdAchievedDate
                 "\"NO_OF_STAR_ACHIEVED\" INTEGER," + // 8: noOfStarAchieved
                 "\"BADGE_TYPE\" TEXT NOT NULL ," + // 9: badgeType
-                "\"CATEGORY\" TEXT NOT NULL ," + // 10: category
+                "\"CATEGORY\" INTEGER NOT NULL ," + // 10: category
                 "\"CATEGORY_STATUS\" TEXT NOT NULL ," + // 11: categoryStatus
                 "\"PARAM_DONE\" REAL NOT NULL ," + // 12: paramDone
                 "\"IS_SYNC\" INTEGER NOT NULL );"); // 13: isSync
@@ -100,7 +100,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
             stmt.bindLong(9, noOfStarAchieved);
         }
         stmt.bindString(10, entity.getBadgeType());
-        stmt.bindString(11, entity.getCategory());
+        stmt.bindLong(11, entity.getCategory());
         stmt.bindString(12, entity.getCategoryStatus());
         stmt.bindDouble(13, entity.getParamDone());
         stmt.bindLong(14, entity.getIsSync() ? 1L: 0L);
@@ -126,7 +126,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
             cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // badgeIdAchievedDate
             cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // noOfStarAchieved
             cursor.getString(offset + 9), // badgeType
-            cursor.getString(offset + 10), // category
+            cursor.getLong(offset + 10), // category
             cursor.getString(offset + 11), // categoryStatus
             cursor.getDouble(offset + 12), // paramDone
             cursor.getShort(offset + 13) != 0 // isSync
@@ -147,7 +147,7 @@ public class AchievedBadgeDao extends AbstractDao<AchievedBadge, Long> {
         entity.setBadgeIdAchievedDate(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
         entity.setNoOfStarAchieved(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
         entity.setBadgeType(cursor.getString(offset + 9));
-        entity.setCategory(cursor.getString(offset + 10));
+        entity.setCategory(cursor.getLong(offset + 10));
         entity.setCategoryStatus(cursor.getString(offset + 11));
         entity.setParamDone(cursor.getDouble(offset + 12));
         entity.setIsSync(cursor.getShort(offset + 13) != 0);

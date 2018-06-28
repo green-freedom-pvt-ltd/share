@@ -1,10 +1,8 @@
 package com.sharesmile.share.profile.badges;
 
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionInflater;
@@ -19,11 +17,8 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.profile.badges.adapter.InProgressBadgeAdapter;
-import com.sharesmile.share.profile.badges.adapter.HallOfFameAdapter;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
-import com.sharesmile.share.profile.badges.model.HallOfFameData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,10 +36,6 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchieved
     RecyclerView achievementBadgesRecyclerView;
 
     InProgressBadgeAdapter inProgressBadgeAdapter;
-
-    @BindView(R.id.rv_hall_of_fame)
-    RecyclerView hallOfFameRecyclerView;
-    HallOfFameAdapter hallOfFameAdapter;
 
     @Nullable
     @Override
@@ -77,7 +68,7 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchieved
         List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                 .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
                         AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
-        inProgressBadgeAdapter = new InProgressBadgeAdapter(achievedBadges);
+        inProgressBadgeAdapter = new InProgressBadgeAdapter(achievedBadges,getContext());
         achievementBadgesRecyclerView.setAdapter(inProgressBadgeAdapter);
 
         /*

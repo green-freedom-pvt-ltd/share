@@ -21,6 +21,8 @@ public class Title {
     /** Not-null value. */
     private String winningMessage;
     private String desc;
+    /** Not-null value. */
+    private String badgeType;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -32,7 +34,7 @@ public class Title {
         this.id = id;
     }
 
-    public Title(Long id, int titleId, String title, int categoryId, String category, int goalNStars, String imageUrl, String winningMessage, String desc) {
+    public Title(Long id, int titleId, String title, int categoryId, String category, int goalNStars, String imageUrl, String winningMessage, String desc, String badgeType) {
         this.id = id;
         this.titleId = titleId;
         this.title = title;
@@ -42,6 +44,7 @@ public class Title {
         this.imageUrl = imageUrl;
         this.winningMessage = winningMessage;
         this.desc = desc;
+        this.badgeType = badgeType;
     }
 
     public Long getId() {
@@ -122,7 +125,22 @@ public class Title {
         this.desc = desc;
     }
 
+    /** Not-null value. */
+    public String getBadgeType() {
+        return badgeType;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setBadgeType(String badgeType) {
+        this.badgeType = badgeType;
+    }
+
     // KEEP METHODS - put your custom methods here
+
+    @Override
+    public String toString() {
+        return title;
+    }
     // KEEP METHODS END
 
 }

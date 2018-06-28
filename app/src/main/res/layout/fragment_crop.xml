@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:id="@+id/crop_image_view"
             app:cropGuidelines="on"
-            app:cropBackgroundColor="@color/black"
+            app:cropBackgroundColor="@color/black_18"
             app:cropShape="rectangle"
             app:cropShowCropOverlay="true"
             app:cropMultiTouchEnabled="true"
@@ -41,13 +41,16 @@
             android:layout_marginLeft="10dp"
             android:layout_alignParentLeft="true"
             android:id="@+id/cancel"
+            android:layout_centerVertical="true"
             />
         <ImageView
             android:id="@+id/rotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/male"
+            android:src="@drawable/rotate_right"
             android:layout_centerInParent="true"
+            android:padding="5dp"
+            android:layout_centerVertical="true"
             />
         <com.sharesmile.share.views.LRTextView
             android:layout_width="wrap_content"
@@ -59,6 +62,7 @@
             android:textColor="@color/white"
             android:layout_alignParentRight="true"
             android:id="@+id/done"
+            android:layout_centerVertical="true"
             />
     </RelativeLayout>
     </LinearLayout>

@@ -69,6 +69,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.List;
 
 import base.BaseDialog;
@@ -533,9 +534,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
         StringBuilder fullNameBuilder = new StringBuilder();
         if (!TextUtils.isEmpty(profilePicUrl)) {
-            userDetails.setProfilePicture(profilePicUrl);
+            userDetails.setProfilePicture(profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis());
             AnalyticsEvent.create(Event.ON_UPDATE_PROFILEPIC)
-                    .put("profile_pic_url", profilePicUrl)
+                    .put("profile_pic_url", profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis())
                     .buildAndDispatch();
         }
 
@@ -903,6 +904,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 System.out.println("TESTING : " + state.name());
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
+
                     saveUserDetails();
                     progressBar.setVisibility(View.GONE);
                 }

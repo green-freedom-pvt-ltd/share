@@ -1,5 +1,7 @@
 package com.sharesmile.share.profile.badges.adapter;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,9 @@ import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.utils.Utils;
 
@@ -23,10 +27,11 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
 
     private static final String TAG = "InProgressBadgeAdapter";
     List<AchievedBadge> achievedBadges;
-
-    public InProgressBadgeAdapter(List<AchievedBadge> achievedBadges)
+    Context context;
+    public InProgressBadgeAdapter(List<AchievedBadge> achievedBadges,Context context)
     {
         this.achievedBadges = achievedBadges;
+        this.context = context;
     }
     @Override
     public AchievementsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -79,6 +84,8 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
                 {
                     achievementAmount.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (achievedBadge.getParamDone()*1000)) + " "+UnitsManager.getDistanceLabel()+"/ "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (badge.getBadgeParameter()*1000))+" "+UnitsManager.getDistanceLabel());
                 }
+                ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl()+badge.getImageUrl(),badgeImageView,
+                        ContextCompat.getDrawable(context,R.drawable.badge_image));
                 Utils.setStarImage(badge.getNoOfStars(),starImageView);
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;

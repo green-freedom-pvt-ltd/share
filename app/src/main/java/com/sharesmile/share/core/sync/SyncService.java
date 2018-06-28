@@ -1,7 +1,5 @@
 package com.sharesmile.share.core.sync;
 
-import android.content.AsyncTaskLoader;
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -15,51 +13,50 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.Category;
 import com.sharesmile.share.CategoryDao;
-import com.sharesmile.share.TitleDao;
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
-import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
-import com.sharesmile.share.leaderboard.impactleague.event.TeamLeaderBoardDataFetched;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.MessageDao;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.core.cause.CauseDataStore;
+import com.sharesmile.share.core.cause.model.CauseList;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.helpcenter.model.UserFeedback;
+import com.sharesmile.share.home.howitworks.model.HowItWorksResponse;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
+import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
+import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
+import com.sharesmile.share.leaderboard.impactleague.event.TeamLeaderBoardDataFetched;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.network.NetworkDataProvider;
+import com.sharesmile.share.network.NetworkException;
+import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.badges.model.Badge;
-import com.sharesmile.share.profile.badges.model.BadgeParent;
 import com.sharesmile.share.profile.badges.model.Title;
-import com.sharesmile.share.profile.model.CharityOverview;
-import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
 import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.tracking.models.WorkoutDataImpl;
-import com.sharesmile.share.network.NetworkDataProvider;
-import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.core.cause.model.CauseList;
 import com.sharesmile.share.tracking.workout.data.model.FraudData;
-import com.sharesmile.share.home.howitworks.model.HowItWorksResponse;
-import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
 import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.tracking.workout.data.model.RunList;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.helpcenter.model.UserFeedback;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.core.SharedPrefsManager;
-import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.utils.Utils;
 import com.squareup.okhttp.Response;
 
@@ -68,10 +65,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,18 +80,22 @@ import Models.LeagueBoard;
 import Models.MessageList;
 import Models.TeamLeaderBoard;
 
-import static com.sharesmile.share.core.sync.TaskConstants.SYNC_BADGE_DATA;
-import static com.sharesmile.share.core.sync.TaskConstants.SYNC_CHARITY_OVERVIEW;
-import static com.sharesmile.share.core.sync.TaskConstants.SYNC_STREAK;
-import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_ACHIEVEMENT;
-import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_STREAK;
-import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_PENDING_WORKOUT;
-import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_INTERVALS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_FRAUD_DATA;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_USER_FEEDBACK;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_ACHIEVEMENT_BADGE;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_ACHIEVEMENT_TITLE;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_BADGE_DATA;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_CAUSE_DATA;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_CHARITY_OVERVIEW;
 import static com.sharesmile.share.core.sync.TaskConstants.SYNC_DATA;
+import static com.sharesmile.share.core.sync.TaskConstants.SYNC_STREAK;
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_ACHIEVEMENT_BADGE;
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_ACHIEVEMENT_TITLE;
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_PENDING_WORKOUT;
+import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_STREAK;
 import static com.sharesmile.share.core.sync.TaskConstants.UPLOAD_USER_DATA;
+import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_INTERVALS;
 
 /**
  * Created by Shine on 15/05/16.
@@ -117,10 +114,18 @@ public class SyncService extends GcmTaskService {
                     return uploadUserData();
                 case UPLOAD_STREAK:
                     return uploadStreak();
-                    case SYNC_STREAK:
+                case SYNC_CAUSE_DATA:
+                    return updateCauseData();
+                case SYNC_STREAK:
                     return getStreak();
-                case UPLOAD_ACHIEVEMENT:
+                case UPLOAD_ACHIEVEMENT_BADGE:
                     return uploadAchievement();
+                case UPLOAD_ACHIEVEMENT_TITLE:
+                    return uploadAchievementTitle();
+                case SYNC_ACHIEVEMENT_BADGE:
+                    return getAchievedBadgeData();
+                case SYNC_ACHIEVEMENT_TITLE:
+                    return getAchievedTitleData();
                 case SYNC_DATA:
                     return syncData();
                 case PUSH_FRAUD_DATA:
@@ -166,13 +171,15 @@ public class SyncService extends GcmTaskService {
         ClientConfig.sync();
         syncServerTime();
         uploadUserData();
+        uploadStreak();
+        uploadAchievement();
+        uploadAchievementTitle();
+        uploadPendingWorkoutsData();
         syncGlobalLeaderBoardData();
         syncLeagueBoardData();
-        //TODO : temp getting data from assets file
-        syncBadgeData();
         updateCauseData();
         updateFaqs();
-        uploadPendingWorkoutsData();
+
         syncWorkoutData();
         // Rolling back to old feed
 //        syncFeed();
@@ -180,8 +187,9 @@ public class SyncService extends GcmTaskService {
         fetchMessage();
         fetchCampaign();
         getCharityOverviewData();
-        uploadStreak();
-        uploadAchievement();
+
+        syncBadgeData();
+
 
         // Returning success as result does not matter
         return GcmNetworkManager.RESULT_SUCCESS;
@@ -327,64 +335,64 @@ public class SyncService extends GcmTaskService {
         }
         return result;
     }
+
     private static int syncBadgeData() {
+        int result;
         try {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
             JsonArray jsonArray = NetworkDataProvider.doGetCall(Urls.getBadgesUrl(), JsonArray.class);
             JSONArray badgeParentsArray = new JSONArray(jsonArray.toString());
-            for(int i=0;i<badgeParentsArray.length();i++) {
+            for (int i = 0; i < badgeParentsArray.length(); i++) {
                 JSONObject jsonObject = badgeParentsArray.getJSONObject(i);
                 String badge_type = jsonObject.getString("badge_type");
                 ArrayList<Badge> badgesArrayList;
-                if(badge_type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE))
-                {
+                if (badge_type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
 
 
                     JSONArray badgesArray = jsonObject.getJSONArray("badges");
-                    for(int j=0;j<badgesArray.length();j++)
-                    {
+                    for (int j = 0; j < badgesArray.length(); j++) {
                         JSONObject jsonObject1 = badgesArray.getJSONObject(j);
                         Category category = new Category();
                         category.setCategoryId(jsonObject1.getInt("cause_category_id"));
                         category.setCategoryName(jsonObject1.getString("cause_category_name"));
                         addCategoryToDb(category);
-                        badgesArrayList =  new Gson().fromJson(jsonObject1.getJSONArray("badges").toString(), new TypeToken<List<Badge>>() {
+                        badgesArrayList = new Gson().fromJson(jsonObject1.getJSONArray("badges").toString(), new TypeToken<List<Badge>>() {
                         }.getType());
-                        setBadgeToDb(badgesArrayList,category.getCategoryName());
+                        setBadgeToDb(badgesArrayList, category.getCategoryName());
 
-                        ArrayList<Title> titles = new Gson().fromJson(jsonObject1.getJSONArray("titles").toString(),new TypeToken<List<Title>>(){}.getType());
-                        setTitleToDb(titles,category.getCategoryName());
+                        ArrayList<Title> titles = new Gson().fromJson(jsonObject1.getJSONArray("titles").toString(), new TypeToken<List<Title>>() {
+                        }.getType());
+                        setTitleToDb(titles, category.getCategoryName(), badge_type);
                     }
-                }else
-                {
-                    badgesArrayList =  new Gson().fromJson(jsonObject.getJSONArray("badges").toString(), new TypeToken<List<Badge>>() {
+                } else {
+                    badgesArrayList = new Gson().fromJson(jsonObject.getJSONArray("badges").toString(), new TypeToken<List<Badge>>() {
                     }.getType());
-                    setBadgeToDb(badgesArrayList,jsonObject.getString("badge_type"));
+                    setBadgeToDb(badgesArrayList, badge_type);
                 }
-
-
-                }
-            EventBus.getDefault().post(new UpdateEvent.BadgeUpdated());
+            }
+            result = GcmNetworkManager.RESULT_SUCCESS;
         } catch (Exception e) {
             e.printStackTrace();
+            result = GcmNetworkManager.RESULT_RESCHEDULE;
         }
-        return GcmNetworkManager.RESULT_SUCCESS;
+
+
+        EventBus.getDefault().post(new UpdateEvent.BadgeUpdated(result));
+        return result;
     }
 
     private static void addCategoryToDb(Category category) {
         CategoryDao categoryDao = MainApplication.getInstance().getDbWrapper().getCategoryDao();
         List<Category> categories = categoryDao.queryBuilder().where(CategoryDao.Properties.CategoryId.eq(category.getCategoryId())).list();
-        if(!(categories.size()>0))
-        {
+        if (!(categories.size() > 0)) {
             categoryDao.insert(category);
-        }else
-        {
+        } else {
             categoryDao.update(category);
         }
     }
 
 
-    private static void setBadgeToDb(ArrayList<Badge> badgesArrayList,String category) {
+    private static void setBadgeToDb(ArrayList<Badge> badgesArrayList, String category) {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         for (Badge badge : badgesArrayList) {
             com.sharesmile.share.Badge badgeDb = new com.sharesmile.share.Badge();
@@ -411,7 +419,7 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private static void setTitleToDb(ArrayList<Title> titleArrayList, String categoryName) {
+    private static void setTitleToDb(ArrayList<Title> titleArrayList, String categoryName, String badgeType) {
         TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
         for (Title title : titleArrayList) {
             com.sharesmile.share.Title titleDb = new com.sharesmile.share.Title();
@@ -423,6 +431,7 @@ public class SyncService extends GcmTaskService {
             titleDb.setImageUrl(title.getImage());
             titleDb.setWinningMessage(title.getWinningMessage());
             titleDb.setDesc(title.getDesc());
+            titleDb.setBadgeType(badgeType);
             List<com.sharesmile.share.Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(title.getTitleId())).list();
             if (titles.size() > 0) {
                 titleDb.setId(titles.get(0).getId());
@@ -498,15 +507,18 @@ public class SyncService extends GcmTaskService {
 
     public static int updateCauseData() {
         Logger.d(TAG, "updateCauseData");
+        int result;
         try {
             CauseList causeList = NetworkDataProvider.doGetCall(Urls.getCauseListUrl(), CauseList.class);
             CauseDataStore.getInstance().updateCauseList(causeList);
-            return GcmNetworkManager.RESULT_SUCCESS;
+            result = GcmNetworkManager.RESULT_SUCCESS;
         } catch (NetworkException e) {
             Logger.e(TAG, "Exception occurred while fetching updated cause list from network");
             e.printStackTrace();
-            return GcmNetworkManager.RESULT_RESCHEDULE;
+            result = GcmNetworkManager.RESULT_RESCHEDULE;
         }
+        EventBus.getDefault().post(new UpdateEvent.OnGetCause(result));
+        return result;
     }
 
     public static int updateFaqs() {
@@ -782,11 +794,10 @@ public class SyncService extends GcmTaskService {
             JSONObject response = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
                     JSONObject.class);
             Logger.d(TAG, "Response for put Streak:" + response);
-            if(response.getInt("code") == 200) {
+            if (response.getInt("code") == 200) {
 
                 return GcmNetworkManager.RESULT_SUCCESS;
-            }else
-            {
+            } else {
                 Utils.setStreakUploaded(false);
                 return GcmNetworkManager.RESULT_RESCHEDULE;
             }
@@ -809,35 +820,46 @@ public class SyncService extends GcmTaskService {
             return GcmNetworkManager.RESULT_FAILURE;
         }
         int user_id = MainApplication.getInstance().getUserID();
-        Logger.d(TAG, "uploadUserData for userId: " + user_id);
+        Logger.d(TAG, "uploadAchievement for userId: " + user_id);
         try {
 
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().where(AchievedBadgeDao.Properties.IsSync.eq(false)).list();
+            HashMap<Long, AchievedBadge> integerAchievedBadgeHashMap = new HashMap<>();
 
             if (achievedBadges.size() > 0) {
                 JSONArray jsonArray = new JSONArray();
                 int size = achievedBadges.size();
                 for (int i = 0; i < size; i++) {
                     AchievedBadge achievedBadge = achievedBadges.get(i);
+                    integerAchievedBadgeHashMap.put(achievedBadge.getId(), achievedBadge);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("user_id", user_id);
                     jsonObject.put("cause_id", achievedBadge.getCauseId());
                     jsonObject.put("badge_id_in_progress", achievedBadge.getBadgeIdInProgress());
                     jsonObject.put("badge_id_achieved", achievedBadge.getBadgeIdAchieved());
+                    jsonObject.put("achievement_time", Utils.dateToString(achievedBadge.getBadgeIdAchievedDate()));
                     jsonObject.put("category_id", achievedBadge.getCategory());
+                    jsonObject.put("badge_type", achievedBadge.getBadgeType());
                     jsonObject.put("parameter_completed", achievedBadge.getParamDone());
+                    jsonObject.put("client_achievement_id", achievedBadge.getId());
+                    if (achievedBadge.getServerId() > 0) {
+                        jsonObject.put("server_achievement_id", achievedBadge.getServerId());
+                    }
                     jsonArray.put(jsonObject);
                 }
-                Gson gson = new Gson();
                 JSONObject response = NetworkDataProvider.doPostCall(Urls.getAchievementUrl(), jsonArray.toString(),
                         JSONObject.class);
 
-                Logger.d(TAG, "Response for getUser:" + response);
+                Logger.d(TAG, "Response for uploadAchievement:" + response);
                 if (response.getInt("code") == 200) {
-                    for (int i = 0; i < size; i++) {
-                        AchievedBadge achievedBadge = achievedBadges.get(i);
-                        achievedBadge.setIsSync(true);
+                    JSONArray result = response.getJSONArray("result");
+                    for (int i = 0; i < result.length(); i++) {
+                        JSONObject jsonObject = result.getJSONObject(i);
+
+                        AchievedBadge achievedBadge = integerAchievedBadgeHashMap.get(jsonObject.getLong("client_id"));
+                        achievedBadge.setServerId(jsonObject.getLong("server_id"));
+                        achievedBadge.setIsSync(jsonObject.getBoolean("is_sync"));
                         achievedBadgeDao.update(achievedBadge);
                     }
                 }
@@ -855,6 +877,65 @@ public class SyncService extends GcmTaskService {
         }
     }
 
+    private static int uploadAchievementTitle() {
+        if (!MainApplication.isLogin()) {
+            // Can't sync a non logged in User
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+        int user_id = MainApplication.getInstance().getUserID();
+        Logger.d(TAG, "uploadAchievementTitle for userId: " + user_id);
+        try {
+
+            AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
+            List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder().where(AchievedTitleDao.Properties.IsSync.eq(false)).list();
+            HashMap<Long, AchievedTitle> longAchievedTitleHashMap = new HashMap<>();
+
+            if (achievedTitles.size() > 0) {
+                JSONArray jsonArray = new JSONArray();
+                int size = achievedTitles.size();
+                for (int i = 0; i < size; i++) {
+                    AchievedTitle achievedTitle = achievedTitles.get(i);
+                    longAchievedTitleHashMap.put(achievedTitle.getId(), achievedTitle);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("user_id", user_id);
+                    jsonObject.put("category_id", achievedTitle.getCategoryId());
+                    jsonObject.put("title_id", achievedTitle.getTitleId());
+                    jsonObject.put("title_achievement_time", Utils.dateToString(achievedTitle.getAchievedTime()));
+                    jsonObject.put("badge_type", achievedTitle.getBadgeType());
+                    jsonObject.put("client_title_id", achievedTitle.getBadgeType());
+                    if (achievedTitle.getServerId() > 0) {
+                        jsonObject.put("server_title_id", achievedTitle.getServerId());
+                    }
+                    jsonArray.put(jsonObject);
+                }
+                JSONObject response = NetworkDataProvider.doPostCall(Urls.getTitlesUrl(), jsonArray.toString(),
+                        JSONObject.class);
+
+                Logger.d(TAG, "Response for uploadAchievementTitle:" + response);
+                if (response.getInt("code") == 200) {
+                    JSONArray result = response.getJSONArray("result");
+                    for (int i = 0; i < result.length(); i++) {
+                        JSONObject jsonObject = result.getJSONObject(i);
+
+                        AchievedTitle achievedTitle = longAchievedTitleHashMap.get(jsonObject.getLong("client_id"));
+                        achievedTitle.setServerId(jsonObject.getLong("server_id"));
+                        achievedTitle.setIsSync(jsonObject.getBoolean("is_sync"));
+                        achievedTitleDao.update(achievedTitle);
+                    }
+                }
+            }
+            return GcmNetworkManager.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException" + e);
+            return GcmNetworkManager.RESULT_RESCHEDULE;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Logger.d(TAG, "NetworkException");
+            return GcmNetworkManager.RESULT_FAILURE;
+        }
+    }
 
     public static void pushWorkoutDataWithBackoff() {
         Logger.d(TAG, "pushWorkoutDataWithBackoff");
@@ -911,7 +992,7 @@ public class SyncService extends GcmTaskService {
             }
 
             EventBus.getDefault().post(new UpdateEvent.PendingWorkoutUploaded());
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, true);
             getCharityOverviewData();
             return isSuccess ? ExpoBackoffTask.RESULT_SUCCESS : ExpoBackoffTask.RESULT_RESCHEDULE;
         }
@@ -1276,9 +1357,9 @@ public class SyncService extends GcmTaskService {
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getImpactOverviewUrl(), JsonObject.class);
             String responseString = response.getAsJsonObject("result").toString();
-            Logger.d(TAG,"getCharityOverviewData response : "+responseString);
-            SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW,responseString);
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,false);
+            Logger.d(TAG, "getCharityOverviewData response : " + responseString);
+            SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW, responseString);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, false);
 
             return ExpoBackoffTask.RESULT_SUCCESS;
 
@@ -1312,12 +1393,13 @@ public class SyncService extends GcmTaskService {
         }
 
     }
-    private static int getStreak() {
 
+    private static int getStreak() {
+        int result;
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), JsonObject.class);
-            String responseString = response.getAsJsonArray("result").get(0).toString();
-            Logger.d(TAG,"getCharityOverviewData response : "+responseString);
+            String responseString = response.getAsJsonObject("result").toString();
+            Logger.d(TAG, "getStreak response : " + responseString);
             JSONObject jsonObject = new JSONObject(responseString);
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             userDetails.setStreakMaxCount(jsonObject.getInt("max_streak"));
@@ -1326,7 +1408,7 @@ public class SyncService extends GcmTaskService {
             userDetails.setStreakAdded(jsonObject.getBoolean("streak_added"));
             MainApplication.getInstance().setUserDetails(userDetails);
 
-            return ExpoBackoffTask.RESULT_SUCCESS;
+            result = ExpoBackoffTask.RESULT_SUCCESS;
 
         } catch (NetworkException e) {
             Logger.d(TAG, "NetworkException in getCharityOverviewData: " + e);
@@ -1342,7 +1424,7 @@ public class SyncService extends GcmTaskService {
                     .put("failure_type", e.getFailureType())
                     .buildAndDispatch();
 
-            return ExpoBackoffTask.RESULT_RESCHEDULE;
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
         } catch (Exception e) {
 
             Logger.d(TAG, "Exception in getCharityOverviewData: " + e.getMessage());
@@ -1354,58 +1436,155 @@ public class SyncService extends GcmTaskService {
                     .put("exception_message", e.getMessage())
                     .buildAndDispatch();
 
-            return ExpoBackoffTask.RESULT_RESCHEDULE;
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
 
-    }
-    private static int getAchievedBadgeData() {
+        EventBus.getDefault().post(new UpdateEvent.OnGetStreak(result));
+        return result;
 
+    }
+
+    private static int getAchievedBadgeData() {
+        int result;
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getAchievementUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("result").toString();
+            String responseString = response.getAsJsonArray("result").toString();
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
 
-            for(int i=0;i<jsonArray.length();i++)
-            {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
 
+                AchievedBadge achievedBadge = new AchievedBadge();
+                achievedBadge.setUserId(MainApplication.getInstance().getUserID());
+                achievedBadge.setCauseId(jsonObject.getInt("cause_id"));
+                achievedBadge.setBadgeIdInProgress(jsonObject.getInt("badge_id_in_progress"));
+                achievedBadge.setBadgeIdAchieved(jsonObject.getInt("badge_id_achieved"));
+                achievedBadge.setCategory(jsonObject.getInt("category_id"));
+                achievedBadge.setParamDone(jsonObject.getDouble("parameter_completed"));
+                achievedBadge.setBadgeIdAchievedDate(Utils.stringToDate(jsonObject.getString("achievement_time")));
+                achievedBadge.setBadgeType(jsonObject.getString("badge_type"));
+                achievedBadge.setServerId(jsonObject.getLong("server_achievement_id"));
+
+                achievedBadge.setIsSync(true);
+                List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
+                        .where(AchievedBadgeDao.Properties.ServerId.eq(achievedBadge.getServerId())).list();
+                if (achievedBadgeListFromDb.size() > 0) {
+                    achievedBadge.setId(achievedBadgeListFromDb.get(0).getId());
+                    achievedBadgeDao.update(achievedBadge);
+                } else {
+                    achievedBadgeDao.insert(achievedBadge);
+                }
             }
-            Logger.d(TAG,"getCharityOverviewData response : "+responseString);
-            SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW,responseString);
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,false);
 
-            return ExpoBackoffTask.RESULT_SUCCESS;
+            result = ExpoBackoffTask.RESULT_SUCCESS;
 
         } catch (NetworkException e) {
             Logger.d(TAG, "NetworkException in getAchievedBadgeData: " + e);
             e.printStackTrace();
             Crashlytics.log("getAchievedBadgeData networkException for user_id ("
                     + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
-                    + ", while syncing runs at URL: " + Urls.getImpactOverviewUrl());
+                    + ", while syncing runs at URL: " + Urls.getAchievementUrl());
             Crashlytics.logException(e);
-            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+            AnalyticsEvent.create(Event.ON_GET_ACHIEVED_BADGES_FAILURE)
                     .put("exception_message", e.getMessage())
                     .put("message_from_server", e.getMessageFromServer())
                     .put("http_status", e.getHttpStatusCode())
                     .put("failure_type", e.getFailureType())
                     .buildAndDispatch();
 
-            return ExpoBackoffTask.RESULT_RESCHEDULE;
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
         } catch (Exception e) {
 
             Logger.d(TAG, "Exception in getAchievedBadgeData: " + e.getMessage());
             e.printStackTrace();
             Crashlytics.log("getAchievedBadgeData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
-                    "while syncing charity overview data at URL : " + Urls.getImpactOverviewUrl());
+                    "while syncing charity overview data at URL : " + Urls.getAchievementUrl());
             Crashlytics.logException(e);
-            AnalyticsEvent.create(Event.ON_GET_CHARITY_OVERVIEW_FAILURE)
+            AnalyticsEvent.create(Event.ON_GET_ACHIEVED_BADGES_FAILURE)
                     .put("exception_message", e.getMessage())
                     .buildAndDispatch();
 
-            return ExpoBackoffTask.RESULT_RESCHEDULE;
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
+
+        EventBus.getDefault().post(new UpdateEvent.OnGetAchivement(result));
+        return result;
 
     }
 
+    private static int getAchievedTitleData() {
+        int result;
+        try {
+            JsonObject response = NetworkDataProvider.doGetCall(Urls.getTitlesUrl(), JsonObject.class);
+            String responseString = response.getAsJsonArray("result").toString();
+            JSONArray jsonArray = new JSONArray(responseString);
+            AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
+            CategoryDao categoryDao = MainApplication.getInstance().getDbWrapper().getCategoryDao();
+            TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                AchievedTitle achievedTitle = new AchievedTitle();
+                achievedTitle.setUserId(MainApplication.getInstance().getUserID());
+                achievedTitle.setServerId(jsonObject.getInt("server_title_id"));
+                achievedTitle.setCategoryId(jsonObject.getInt("category_id"));
+                achievedTitle.setTitleId(jsonObject.getInt("title_id"));
+                achievedTitle.setBadgeType(jsonObject.getString("badge_type"));
+                achievedTitle.setAchievedTime(Utils.stringToDate(jsonObject.getString("title_achievement_time")));
+                List<Category> categories = categoryDao.queryBuilder().where(CategoryDao.Properties.CategoryId.eq(achievedTitle.getCategoryId())).list();
+                if (categories.size() > 0) {
+                    achievedTitle.setCategoryName(categories.get(0).getCategoryName());
+                }
+                List<com.sharesmile.share.Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(achievedTitle.getTitleId())).list();
+                if (titles.size() > 0) {
+                    achievedTitle.setTitle(titles.get(0).getTitle());
+                }
+                achievedTitle.setIsSync(true);
+                List<AchievedTitle> achievedTitleListFromDb = achievedTitleDao.queryBuilder()
+                        .where(AchievedBadgeDao.Properties.ServerId.eq(achievedTitle.getServerId())).list();
+                if (achievedTitleListFromDb.size() > 0) {
+                    achievedTitle.setId(achievedTitleListFromDb.get(0).getId());
+                    achievedTitleDao.update(achievedTitle);
+                } else {
+                    achievedTitleDao.insert(achievedTitle);
+                }
+            }
+
+            result = ExpoBackoffTask.RESULT_SUCCESS;
+
+        } catch (NetworkException e) {
+            Logger.d(TAG, "NetworkException in getAchievedTitleData: " + e);
+            e.printStackTrace();
+            Crashlytics.log("getAchievedTitleData networkException for user_id ("
+                    + MainApplication.getInstance().getUserID() + "), messageFromServer: " + e
+                    + ", while syncing runs at URL: " + Urls.getTitlesUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_ACHIEVED_TITLES_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .put("message_from_server", e.getMessageFromServer())
+                    .put("http_status", e.getHttpStatusCode())
+                    .put("failure_type", e.getFailureType())
+                    .buildAndDispatch();
+
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
+        } catch (Exception e) {
+
+            Logger.d(TAG, "Exception in getAchievedTitleData: " + e.getMessage());
+            e.printStackTrace();
+            Crashlytics.log("getAchievedTitleData Exception for user_id (" + MainApplication.getInstance().getUserID() + ") ," +
+                    "while syncing charity overview data at URL : " + Urls.getTitlesUrl());
+            Crashlytics.logException(e);
+            AnalyticsEvent.create(Event.ON_GET_ACHIEVED_TITLES_FAILURE)
+                    .put("exception_message", e.getMessage())
+                    .buildAndDispatch();
+
+            result = ExpoBackoffTask.RESULT_RESCHEDULE;
+        }
+
+        EventBus.getDefault().post(new UpdateEvent.OnGetTitle(result));
+        return result;
+
+    }
 
 }

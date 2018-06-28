@@ -32,6 +32,7 @@ public class TitleDao extends AbstractDao<Title, Long> {
         public final static Property ImageUrl = new Property(6, String.class, "imageUrl", false, "IMAGE_URL");
         public final static Property WinningMessage = new Property(7, String.class, "winningMessage", false, "WINNING_MESSAGE");
         public final static Property Desc = new Property(8, String.class, "desc", false, "DESC");
+        public final static Property BadgeType = new Property(9, String.class, "badgeType", false, "BADGE_TYPE");
     };
 
 
@@ -55,7 +56,8 @@ public class TitleDao extends AbstractDao<Title, Long> {
                 "\"GOAL_NSTARS\" INTEGER NOT NULL ," + // 5: goalNStars
                 "\"IMAGE_URL\" TEXT," + // 6: imageUrl
                 "\"WINNING_MESSAGE\" TEXT NOT NULL ," + // 7: winningMessage
-                "\"DESC\" TEXT);"); // 8: desc
+                "\"DESC\" TEXT," + // 8: desc
+                "\"BADGE_TYPE\" TEXT NOT NULL );"); // 9: badgeType
     }
 
     /** Drops the underlying database table. */
@@ -89,6 +91,7 @@ public class TitleDao extends AbstractDao<Title, Long> {
         if (desc != null) {
             stmt.bindString(9, desc);
         }
+        stmt.bindString(10, entity.getBadgeType());
     }
 
     /** @inheritdoc */
@@ -109,7 +112,8 @@ public class TitleDao extends AbstractDao<Title, Long> {
             cursor.getInt(offset + 5), // goalNStars
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // imageUrl
             cursor.getString(offset + 7), // winningMessage
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // desc
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // desc
+            cursor.getString(offset + 9) // badgeType
         );
         return entity;
     }
@@ -126,6 +130,7 @@ public class TitleDao extends AbstractDao<Title, Long> {
         entity.setImageUrl(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setWinningMessage(cursor.getString(offset + 7));
         entity.setDesc(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setBadgeType(cursor.getString(offset + 9));
      }
     
     /** @inheritdoc */

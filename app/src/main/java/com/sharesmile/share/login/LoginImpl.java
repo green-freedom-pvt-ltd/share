@@ -248,8 +248,6 @@ public class LoginImpl {
         }
         SyncHelper.getStreak();
         //show Toast confirmation
-        Toast.makeText(MainApplication.getContext(), "Logged in as " + userDetails.getFirstName(), Toast.LENGTH_SHORT).show();
-
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)
                 .put("user_id", userDetails.getUserId())
@@ -258,12 +256,6 @@ public class LoginImpl {
                 .put("is_sign_up_user", userDetails.isSignUp())
                 .put("medium", medium)
                 .buildAndDispatch();
-
-        //Pull historical run data;
-        SyncHelper.forceRefreshEntireWorkoutHistory();
-
-        mListener.onLoginSuccess();
-
     }
 
 

@@ -66,9 +66,10 @@ public class UpdateEvent {
     }
 
     public static class BadgeUpdated{
-        public BadgeUpdated()
+        public int result;
+        public BadgeUpdated(int result)
         {
-
+            this.result = result;
         }
     }
 
@@ -129,6 +130,33 @@ public class UpdateEvent {
 
     public static class CharityOverviewUpdated{
         public CharityOverviewUpdated() {
+        }
+    }
+
+    public static class OnGetStreak{
+        public int result;
+        public OnGetStreak(int result) {
+            this.result = result;
+        }
+    }
+
+    public static class OnGetCause{
+        public int result;
+        public OnGetCause(int result) {
+            this.result = result;
+        }
+    }
+
+    public static class OnGetAchivement{
+        public int result;
+        public OnGetAchivement(int result) {
+            this.result = result;
+        }
+    }
+    public static class OnGetTitle{
+        public int result;
+        public OnGetTitle(int result) {
+            this.result = result;
         }
     }
 }

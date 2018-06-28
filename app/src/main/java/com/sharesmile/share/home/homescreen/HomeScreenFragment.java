@@ -173,8 +173,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         prepareOnboardingOverlays();
         if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
             SyncHelper.getCharityOverview();
-        if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVEMENT_LOAD,true))
-            SyncHelper.getAchievedBadged();
 
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
@@ -208,7 +206,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     achievedBadge.setBadgeIdInProgress(badge.getId());
                     achievedBadge.setBadgeIdAchieved(badge.getId());
                     achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
-                    achievedBadge.setCategory(Constants.BADGE_TYPE_CHANGEMAKER);
                     achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                     achievedBadge.setParamDone(0.1);
@@ -331,6 +328,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             // Data not fetched in DataStore
             Logger.d(TAG, "render: Data not fetched in CauseDataStore");
             showProgressDialog();
+
             if (!NetworkUtils.isNetworkConnected(getContext())){
                 Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE)
                         .setAction(getString(R.string.retry), new View.OnClickListener() {

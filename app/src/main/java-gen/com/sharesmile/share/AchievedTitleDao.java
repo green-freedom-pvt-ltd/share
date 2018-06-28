@@ -24,11 +24,15 @@ public class AchievedTitleDao extends AbstractDao<AchievedTitle, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property TitleId = new Property(1, int.class, "titleId", false, "TITLE_ID");
-        public final static Property Title = new Property(2, String.class, "title", false, "TITLE");
-        public final static Property CategoryName = new Property(3, String.class, "categoryName", false, "CATEGORY_NAME");
-        public final static Property UserId = new Property(4, int.class, "userId", false, "USER_ID");
-        public final static Property IsSync = new Property(5, boolean.class, "isSync", false, "IS_SYNC");
+        public final static Property ServerId = new Property(1, long.class, "serverId", false, "SERVER_ID");
+        public final static Property TitleId = new Property(2, int.class, "titleId", false, "TITLE_ID");
+        public final static Property Title = new Property(3, String.class, "title", false, "TITLE");
+        public final static Property CategoryId = new Property(4, long.class, "categoryId", false, "CATEGORY_ID");
+        public final static Property CategoryName = new Property(5, String.class, "categoryName", false, "CATEGORY_NAME");
+        public final static Property AchievedTime = new Property(6, java.util.Date.class, "achievedTime", false, "ACHIEVED_TIME");
+        public final static Property BadgeType = new Property(7, String.class, "badgeType", false, "BADGE_TYPE");
+        public final static Property UserId = new Property(8, long.class, "userId", false, "USER_ID");
+        public final static Property IsSync = new Property(9, boolean.class, "isSync", false, "IS_SYNC");
     };
 
 
@@ -45,11 +49,15 @@ public class AchievedTitleDao extends AbstractDao<AchievedTitle, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"ACHIEVED_TITLE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"TITLE_ID\" INTEGER NOT NULL ," + // 1: titleId
-                "\"TITLE\" TEXT NOT NULL ," + // 2: title
-                "\"CATEGORY_NAME\" TEXT NOT NULL ," + // 3: categoryName
-                "\"USER_ID\" INTEGER NOT NULL ," + // 4: userId
-                "\"IS_SYNC\" INTEGER NOT NULL );"); // 5: isSync
+                "\"SERVER_ID\" INTEGER NOT NULL ," + // 1: serverId
+                "\"TITLE_ID\" INTEGER NOT NULL ," + // 2: titleId
+                "\"TITLE\" TEXT NOT NULL ," + // 3: title
+                "\"CATEGORY_ID\" INTEGER NOT NULL ," + // 4: categoryId
+                "\"CATEGORY_NAME\" TEXT NOT NULL ," + // 5: categoryName
+                "\"ACHIEVED_TIME\" INTEGER NOT NULL ," + // 6: achievedTime
+                "\"BADGE_TYPE\" TEXT NOT NULL ," + // 7: badgeType
+                "\"USER_ID\" INTEGER NOT NULL ," + // 8: userId
+                "\"IS_SYNC\" INTEGER NOT NULL );"); // 9: isSync
     }
 
     /** Drops the underlying database table. */
@@ -67,11 +75,15 @@ public class AchievedTitleDao extends AbstractDao<AchievedTitle, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getTitleId());
-        stmt.bindString(3, entity.getTitle());
-        stmt.bindString(4, entity.getCategoryName());
-        stmt.bindLong(5, entity.getUserId());
-        stmt.bindLong(6, entity.getIsSync() ? 1L: 0L);
+        stmt.bindLong(2, entity.getServerId());
+        stmt.bindLong(3, entity.getTitleId());
+        stmt.bindString(4, entity.getTitle());
+        stmt.bindLong(5, entity.getCategoryId());
+        stmt.bindString(6, entity.getCategoryName());
+        stmt.bindLong(7, entity.getAchievedTime().getTime());
+        stmt.bindString(8, entity.getBadgeType());
+        stmt.bindLong(9, entity.getUserId());
+        stmt.bindLong(10, entity.getIsSync() ? 1L: 0L);
     }
 
     /** @inheritdoc */
@@ -85,11 +97,15 @@ public class AchievedTitleDao extends AbstractDao<AchievedTitle, Long> {
     public AchievedTitle readEntity(Cursor cursor, int offset) {
         AchievedTitle entity = new AchievedTitle( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getInt(offset + 1), // titleId
-            cursor.getString(offset + 2), // title
-            cursor.getString(offset + 3), // categoryName
-            cursor.getInt(offset + 4), // userId
-            cursor.getShort(offset + 5) != 0 // isSync
+            cursor.getLong(offset + 1), // serverId
+            cursor.getInt(offset + 2), // titleId
+            cursor.getString(offset + 3), // title
+            cursor.getLong(offset + 4), // categoryId
+            cursor.getString(offset + 5), // categoryName
+            new java.util.Date(cursor.getLong(offset + 6)), // achievedTime
+            cursor.getString(offset + 7), // badgeType
+            cursor.getLong(offset + 8), // userId
+            cursor.getShort(offset + 9) != 0 // isSync
         );
         return entity;
     }
@@ -98,11 +114,15 @@ public class AchievedTitleDao extends AbstractDao<AchievedTitle, Long> {
     @Override
     public void readEntity(Cursor cursor, AchievedTitle entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setTitleId(cursor.getInt(offset + 1));
-        entity.setTitle(cursor.getString(offset + 2));
-        entity.setCategoryName(cursor.getString(offset + 3));
-        entity.setUserId(cursor.getInt(offset + 4));
-        entity.setIsSync(cursor.getShort(offset + 5) != 0);
+        entity.setServerId(cursor.getLong(offset + 1));
+        entity.setTitleId(cursor.getInt(offset + 2));
+        entity.setTitle(cursor.getString(offset + 3));
+        entity.setCategoryId(cursor.getLong(offset + 4));
+        entity.setCategoryName(cursor.getString(offset + 5));
+        entity.setAchievedTime(new java.util.Date(cursor.getLong(offset + 6)));
+        entity.setBadgeType(cursor.getString(offset + 7));
+        entity.setUserId(cursor.getLong(offset + 8));
+        entity.setIsSync(cursor.getShort(offset + 9) != 0);
      }
     
     /** @inheritdoc */

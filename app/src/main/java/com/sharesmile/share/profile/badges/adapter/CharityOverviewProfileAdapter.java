@@ -2,6 +2,7 @@ package com.sharesmile.share.profile.badges.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.OpenCharityOverview;
@@ -23,6 +25,8 @@ import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.utils.Utils;
 
 import java.util.List;
+
+import static com.sharesmile.share.core.application.MainApplication.getContext;
 
 public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityOverviewProfileAdapter.CharityOverviewViewHolder> {
 
@@ -78,6 +82,9 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
             charity_overview_card.setOnClickListener(this);
             Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F27181"),charityCategoryTitle);
             Utils.addStars(star_layout,categoryStats.getCategoryNoOfStars(),context);
+
+            ShareImageLoader.getInstance().loadImage(categoryStats.getCategoryImageUrl(),charityOverviewImageView,
+                    ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
         }
 
         @Override

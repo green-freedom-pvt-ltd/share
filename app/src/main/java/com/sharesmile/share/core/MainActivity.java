@@ -138,7 +138,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         manager.cancel(REMINDER_NOTIFICATION_ID);
         Logger.d(TAG, "userLogin = " + userLogin /*+ ", isLoginSkip = " + isLoginSkip*/ + ", isReminderDisable = "
                 + isReminderDisable + ", intentNotificationRun = " + intentNotificationRun);
-        //TODO : temp
+        //TODO : tempchat ch
         MainApplication.getInstance().setGoalDetails(null);
         if (!userLogin /*&& !isLoginSkip*/) {
             startLoginActivity();

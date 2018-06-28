@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
@@ -27,8 +28,10 @@ import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.utils.Utils;
 
@@ -152,6 +155,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
             badgeAmountRaised.setText(badge.getDescription1());
             badgeUpgrade.setText(badge.getDescription2());
             Utils.setStarImage(badge.getNoOfStars(),starIv);
+            ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl()+badge.getImageUrl(),badgeIv,
+                    ContextCompat.getDrawable(getContext(),R.drawable.badge_image));
         }
         if(from == 0)
         {
