@@ -101,7 +101,7 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,OpenCharityOverview {
+public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, OpenCharityOverview {
 
     private static final String TAG = "ProfileFragment";
 
@@ -205,6 +205,9 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
 
     CharityOverviewProfileAdapter charityOverviewProfileAdapter;
 
+    @BindView(R.id.progress_bar)
+    ProgressBar achievementProgressBar;
+
     Rect scrollBounds;
 
     private int totalAmountRaised;
@@ -253,7 +256,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         setCharityOverviewLoader();
     }
 
-    private void setStatsViewData(){
+    private void setStatsViewData() {
         getActivity().getLoaderManager().initLoader(Constants.LOADER_MY_STATS_GRAPH, null, new LoaderManager.LoaderCallbacks<SetUpBarChartDataLoader.MyStatsBarChart>() {
             @Override
             public Loader<SetUpBarChartDataLoader.MyStatsBarChart> onCreateLoader(int id, Bundle args) {
@@ -289,20 +292,19 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
             @Override
             public void onLoadFinished(Loader<CharityOverview> loader, CharityOverview data) {
                 charityOverview = data;
-                if(charityOverview!=null) {
+                if (charityOverview != null) {
                     setCharityOverviewRecyclerview();
                     charityOverviewProgressbar.setVisibility(View.GONE);
                     charityOverviewRecyclerView.setVisibility(View.VISIBLE);
-                }else
-                {
-                    if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
-                    SyncHelper.getCharityOverview();
+                } else {
+                    if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, true))
+                        SyncHelper.getCharityOverview();
                 }
             }
 
             @Override
             public void onLoaderReset(Loader<CharityOverview> loader) {
-                Logger.d(TAG,"onLoaderReset");
+                Logger.d(TAG, "onLoaderReset");
             }
         });
     }
@@ -353,10 +355,10 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.CharityOverviewUpdated charityOverviewUpdated)
-    {
+    public void onEvent(UpdateEvent.CharityOverviewUpdated charityOverviewUpdated) {
         setCharityOverviewLoader();
     }
+
     private void initUi() {
         // Setting Profile Picture
         boolean isWorkoutDataUpToDate =
@@ -430,8 +432,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
                 setUpBarChartAsync.execute();*/
                 prepareStreakOnboardingOverlays();
 
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4)
-                {
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4) {
                     @Override
                     public boolean canScrollVertically() {
                         return false;
@@ -475,7 +476,12 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
                     }
                     achievementsAdapter = new AchievementsAdapter(achievedBadgeCounts, getContext(), this);
                     achievementsRecylerView.setAdapter(achievementsAdapter);
-
+                    achievementProgressBar.setVisibility(View.GONE);
+                    achievementsRecylerView.setVisibility(View.VISIBLE);
+                }else
+                {
+                    achievementProgressBar.setVisibility(View.VISIBLE);
+                    achievementsRecylerView.setVisibility(View.GONE);
                 }
             }
             ShareImageLoader.getInstance().setUseMemoryCache(true);
@@ -493,17 +499,14 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     private void setUserTitle() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         String title = "";
-        if(userDetails.getTitle1()>0)
-        {
-            title+= getTitle(userDetails.getTitle1());
+        if (userDetails.getTitle1() > 0) {
+            title += getTitle(userDetails.getTitle1());
         }
 
-        if(userDetails.getTitle2()>0)
-        {
-            if(title.length()>0)
-            {
-                title +=", "+ getTitle(userDetails.getTitle2());
-            }else {
+        if (userDetails.getTitle2() > 0) {
+            if (title.length() > 0) {
+                title += ", " + getTitle(userDetails.getTitle2());
+            } else {
                 title += getTitle(userDetails.getTitle2());
             }
         }
@@ -513,13 +516,12 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     private String getTitle(int title1) {
         SQLiteDatabase sqLiteDatabase = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM "
-                + TitleDao.TABLENAME+" where "+TitleDao.Properties.TitleId.columnName +" = "+title1,
+                        + TitleDao.TABLENAME + " where " + TitleDao.Properties.TitleId.columnName + " = " + title1,
                 new String[]{});
-        if(cursor.getCount()>0) {
+        if (cursor.getCount() > 0) {
             cursor.moveToFirst();
             return cursor.getString(cursor.getColumnIndex(TitleDao.Properties.Title.columnName));
-        }else
-        {
+        } else {
             return "";
         }
     }
@@ -650,14 +652,13 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     public void openCharityOverviewFragment(int position) {
         CharityOverviewFragment charityOverviewFragment = new CharityOverviewFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("position",position);
+        bundle.putInt("position", position);
         charityOverviewFragment.setArguments(bundle);
         getFragmentController().replaceFragment(charityOverviewFragment, true);
     }
 
 
     class SetUpBarChartAsync extends AsyncTask<Void, Void, Void> {
-
 
 
         @Override
@@ -767,6 +768,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
     private void setType(int type) {
         this.type = type;
     }
+
     private void configBarChart() {
         //daily
         barChartDaily.setDrawGridBackground(false);
@@ -1084,12 +1086,11 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,Op
         getFragmentController().replaceFragment(new InProgressBadgeFragment(), true);
     }
 
-    private void setCharityOverviewRecyclerview()
-    {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+    private void setCharityOverviewRecyclerview() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         charityOverviewRecyclerView.setLayoutManager(linearLayoutManager);
 
-        charityOverviewProfileAdapter = new CharityOverviewProfileAdapter(this,charityOverview,getContext());
+        charityOverviewProfileAdapter = new CharityOverviewProfileAdapter(this, charityOverview, getContext());
         charityOverviewRecyclerView.setAdapter(charityOverviewProfileAdapter);
     }
 }

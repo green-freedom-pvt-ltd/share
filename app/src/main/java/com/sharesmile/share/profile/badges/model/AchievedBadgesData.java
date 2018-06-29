@@ -7,30 +7,34 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.ArrayList;
+
 public class AchievedBadgesData implements Parcelable{
     private long changeMakerBadgeAchieved;
     private long causeBadgeAchieved;
     private long streakBadgeAchieved;
     private long marathonBadgeAchieved;
+    private ArrayList<Long> titleIds;
+
 
     protected AchievedBadgesData(Parcel in) {
         changeMakerBadgeAchieved = in.readLong();
         causeBadgeAchieved = in.readLong();
         streakBadgeAchieved = in.readLong();
         marathonBadgeAchieved = in.readLong();
+        int size = in.readInt();
+        long[] titleIds = new long[size];
+        in.readLongArray(titleIds);
+        this.titleIds = toObjects(titleIds);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(changeMakerBadgeAchieved);
-        dest.writeLong(causeBadgeAchieved);
-        dest.writeLong(streakBadgeAchieved);
-        dest.writeLong(marathonBadgeAchieved);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+    private ArrayList<Long> toObjects(long[] titleIds) {
+        ArrayList<Long> longs = new ArrayList<>();
+        for (long l:
+             titleIds) {
+            longs.add(l);
+        }
+        return longs;
     }
 
     public static final Creator<AchievedBadgesData> CREATOR = new Creator<AchievedBadgesData>() {
@@ -44,6 +48,33 @@ public class AchievedBadgesData implements Parcelable{
             return new AchievedBadgesData[size];
         }
     };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(changeMakerBadgeAchieved);
+        dest.writeLong(causeBadgeAchieved);
+        dest.writeLong(streakBadgeAchieved);
+        dest.writeLong(marathonBadgeAchieved);
+        dest.writeLong(titleIds.size());
+        dest.writeLongArray(getArray(titleIds));
+    }
+
+    private long[] getArray(ArrayList<Long> titleIds) {
+        long l[] = new long[titleIds.size()];
+        for (int i=0;i<titleIds.size();i++) {
+            l[i] = titleIds.get(i);
+        }
+        return l;
+    }
+
+    public AchievedBadgesData() {
+        this.titleIds = new ArrayList<>();
+    }
 
     public long getChangeMakerBadgeAchieved() {
         return changeMakerBadgeAchieved;
@@ -77,9 +108,11 @@ public class AchievedBadgesData implements Parcelable{
         this.marathonBadgeAchieved = marathonBadgeAchieved;
     }
 
-    public AchievedBadgesData()
-    {
-
+    public ArrayList<Long> getTitleIds() {
+        return titleIds;
     }
 
+    public void setTitleIds(ArrayList<Long> titleIds) {
+        this.titleIds = titleIds;
+    }
 }

@@ -328,7 +328,10 @@ public class WorkoutService extends Service implements
             achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CAUSE, mCauseData));
             SyncHelper.uploadAchievement();
             SyncHelper.uploadStreak();
-            giveTitle();
+            long titleId = giveTitle();
+            if(titleId>0) {
+                achievedBadgesData.getTitleIds().add(titleId);
+            }
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
             handleWorkoutResult(result, achievedBadgesData);
 
@@ -346,8 +349,8 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void giveTitle() {
-
+    private long giveTitle() {
+        long returnId = 0;
         List<Category> categories = MainApplication.getInstance().getDbWrapper()
                 .getCategoryDao().queryBuilder()
                 .where(CategoryDao.Properties.CategoryName.eq(mCauseData.getCategory())).list();
@@ -371,8 +374,8 @@ public class WorkoutService extends Service implements
             Cursor cursor = database.rawQuery("SELECT "
                     + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
                     + " FROM " + AchievedBadgeDao.TABLENAME + " where "
-                    + AchievedBadgeDao.Properties.CauseName + " is " + mCauseData.getCategory() +
-                    " and " + AchievedBadgeDao.Properties.UserId + " is "
+                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getCategory() +
+                    "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
                     + MainApplication.getInstance().getUserID(), new String[]{});
             cursor.moveToFirst();
 
@@ -411,6 +414,7 @@ public class WorkoutService extends Service implements
                 }
             }
             if (achievedTitle != null) {
+                returnId = achievedTitle.getTitleId();
                 if (achievedTitle.getId() > 0) {
                     achievedTitleDao.update(achievedTitle);
                 } else {
@@ -420,6 +424,7 @@ public class WorkoutService extends Service implements
                 SyncHelper.uploadAchievementTitle();
             }
         }
+        return returnId;
     }
 
     private AchievedTitle getAchievedTitle(Title title) {
@@ -1161,6 +1166,7 @@ public class WorkoutService extends Service implements
                         .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
                                 ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
+                                +" with "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal(getTotalDistanceCoveredInMeters())+" "+UnitsManager.getDistanceLabel()
                                 : "")
                         )
                         .setSmallIcon(getNotificationIcon())

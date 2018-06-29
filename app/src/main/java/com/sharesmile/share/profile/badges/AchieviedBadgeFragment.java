@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,6 +26,8 @@ import android.widget.TextView;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -35,6 +39,7 @@ import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -99,6 +104,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
         return fragment;
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -121,8 +127,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
         Bundle bundle = getArguments();
         achievedBadgesData = bundle.getParcelable(Constants.ACHIEVED_BADGE_DATA);
         TAG = bundle.getString("TAG");
-        if(bundle.containsKey("FROM"))
-        from = bundle.getInt("FROM",-1);
+        if (bundle.containsKey("FROM"))
+            from = bundle.getInt("FROM", -1);
         initUi();
         startPostponedEnterTransition();
 
@@ -130,8 +136,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
     private void initUi() {
 
-        switch (TAG)
-        {
+        switch (TAG) {
             case Constants.BADGE_TYPE_CHANGEMAKER:
                 badgeId = achievedBadgesData.getChangeMakerBadgeAchieved();
                 break;
@@ -144,64 +149,111 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
             case Constants.BADGE_TYPE_MARATHON:
                 badgeId = achievedBadgesData.getMarathonBadgeAchieved();
                 break;
-        }
-        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-        List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(badgeId)).list();
+            case Constants.TITLE_TYPE_CAUSE:
+                ArrayList<Long> titleIds = achievedBadgesData.getTitleIds();
 
-        if(badges!=null && badges.size()>0)
-        {
-            Badge badge = badges.get(0);
-            badgeTitle.setText(badge.getName());
-            badgeAmountRaised.setText(badge.getDescription1());
-            badgeUpgrade.setText(badge.getDescription2());
-            Utils.setStarImage(badge.getNoOfStars(),starIv);
-            ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl()+badge.getImageUrl(),badgeIv,
-                    ContextCompat.getDrawable(getContext(),R.drawable.badge_image));
+                badgeId = titleIds.get(0);
+                break;
         }
-        if(from == 0)
+        if(TAG.equalsIgnoreCase(Constants.TITLE_TYPE_CAUSE))
         {
+            TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+            List<Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(badgeId)).list();
+
+            if (titles != null && titles.size() > 0) {
+                Title title = titles.get(0);
+                badgeTitle.setText(title.getTitle());
+                badgeAmountRaised.setText(title.getDesc());
+                badgeEarnedTv.setText(title.getWinningMessage());
+//                Utils.setStarImage(title.getNoOfStars(), starIv);
+                ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl() + title.getImageUrl(), badgeIv,
+                        ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
+            }
+            achievedBadgesData.getTitleIds().remove(0);
+        }else {
+            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(badgeId)).list();
+
+            if (badges != null && badges.size() > 0) {
+                Badge badge = badges.get(0);
+                badgeTitle.setText(badge.getName());
+                badgeEarnedTv.setText(badge.getDescription1());
+                badgeAmountRaised.setText(badge.getDescription2());
+                badgeUpgrade.setText(badge.getDescription3());
+                Utils.setStarImage(badge.getNoOfStars(), starIv);
+                ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl() + badge.getImageUrl(), badgeIv,
+                        ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
+            }
+        }
+        if (from == 0) {
             closeIv.setVisibility(View.VISIBLE);
             continueTv.setVisibility(View.INVISIBLE);
             tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
-        }else
-        {
+        } else {
             closeIv.setVisibility(View.INVISIBLE);
             continueTv.setVisibility(View.VISIBLE);
-            animation = ObjectAnimator.ofFloat(badgeLayout, "rotationY", 0.0f, 720f);
-            animation.setDuration(2200);
-            animation.setRepeatCount(0);
-            animation.setInterpolator(new DecelerateInterpolator());
-            animation.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
+            if (TAG.equalsIgnoreCase(Constants.TITLE_TYPE_CAUSE)) {
+                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
 
-                }
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
-                }
+                    }
 
-                @Override
-                public void onAnimationCancel(Animator animator) {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
+                    }
 
-                }
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-                @Override
-                public void onAnimationRepeat(Animator animator) {
+                    }
+                });
+                starIv.setImageBitmap(null);
+                badgeLayout.setAnimation(animation);
 
-                }
-            });
-            animation.start();
+
+            } else {
+                animation = ObjectAnimator.ofFloat(badgeLayout, "rotationY", 0.0f, 720f);
+                animation.setDuration(2200);
+                animation.setRepeatCount(0);
+                animation.setInterpolator(new DecelerateInterpolator());
+                animation.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+                animation.start();
+            }
+
         }
+
 
 
     }
 
 
-    @OnClick({R.id.continue_tv,R.id.close_iv})
+    @OnClick({R.id.continue_tv, R.id.close_iv})
     public void continueClick(View v) {
-        if(v.getId() == R.id.continue_tv) {
+        if (v.getId() == R.id.continue_tv) {
             switch (TAG) {
                 case Constants.BADGE_TYPE_CHANGEMAKER:
                     if (achievedBadgesData.getStreakBadgeAchieved() > 0) {
@@ -210,7 +262,10 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_CAUSE), true, Constants.BADGE_TYPE_CAUSE);
                     } else if (achievedBadgesData.getMarathonBadgeAchieved() > 0) {
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
-                    } else {
+                    } else if(achievedBadgesData.getTitleIds().size()>0)
+                    {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                    }else{
                         openHomeActivityAndFinish();
                     }
                     break;
@@ -219,38 +274,48 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_CAUSE), true, Constants.BADGE_TYPE_CAUSE);
                     } else if (achievedBadgesData.getMarathonBadgeAchieved() > 0) {
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
-                    } else {
+                    } else if(achievedBadgesData.getTitleIds().size()>0)
+                    {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                    }else{
                         openHomeActivityAndFinish();
                     }
                     break;
                 case Constants.BADGE_TYPE_CAUSE:
                     if (achievedBadgesData.getMarathonBadgeAchieved() > 0) {
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
-                    } else {
+                    } else if(achievedBadgesData.getTitleIds().size()>0)
+                    {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                    }else{
                         openHomeActivityAndFinish();
                     }
                     break;
                 case Constants.BADGE_TYPE_MARATHON:
-                    openHomeActivityAndFinish();
+                case Constants.TITLE_TYPE_CAUSE:
+                    if(achievedBadgesData.getTitleIds().size()>0)
+                    {
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                    }else {
+                        openHomeActivityAndFinish();
+                    }
                     break;
             }
-        }else
-        {
+        } else {
             openHomeActivityAndFinish();
         }
     }
 
-    public void tellYourFriends()
-    {
+    public void tellYourFriends() {
         Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                 getString(R.string.share_streak));
-        AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId",badgeId)
+        AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId", badgeId)
                 .buildAndDispatch();
     }
 
-    private void openHomeActivityAndFinish(){
-        if (from!=0 && getActivity() != null){
+    private void openHomeActivityAndFinish() {
+        if (from != 0 && getActivity() != null) {
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -258,8 +323,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
             startActivity(intent);
 
             getActivity().finish();
-        }else
-        {
+        } else {
             getFragmentController().goBack();
         }
     }

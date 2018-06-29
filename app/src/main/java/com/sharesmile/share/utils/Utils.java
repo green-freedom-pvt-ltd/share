@@ -1921,14 +1921,20 @@ public class Utils {
 
     public static String dateToString(Date date) {
         String dateString = "";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        dateString = simpleDateFormat.format(date);
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            dateString = simpleDateFormat.format(date);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         return dateString;
     }
 
     public static Date stringToDate(String dateString) {
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        Date date = null;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
             date = simpleDateFormat.parse(dateString);
         } catch (ParseException e) {

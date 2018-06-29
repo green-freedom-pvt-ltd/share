@@ -80,6 +80,10 @@ import Models.LeagueBoard;
 import Models.MessageList;
 import Models.TeamLeaderBoard;
 
+import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
+import static com.sharesmile.share.core.Constants.BADGE_TYPE_CHANGEMAKER;
+import static com.sharesmile.share.core.Constants.BADGE_TYPE_MARATHON;
+import static com.sharesmile.share.core.Constants.BADGE_TYPE_STREAK;
 import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_FRAUD_DATA;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_USER_FEEDBACK;
@@ -405,7 +409,23 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription1(badge.getDescription1());
             badgeDb.setDescription2(badge.getDescription2());
             badgeDb.setDescription3(badge.getDescription3());
-            badgeDb.setBadgeParameter(badge.getBadgeParameter());
+            switch (badge.getType())
+            {
+                case BADGE_TYPE_CAUSE :
+                    badgeDb.setBadgeParameter(badge.getBadgeParameter()/10);
+                    break;
+                case BADGE_TYPE_CHANGEMAKER :
+                    badgeDb.setBadgeParameter(badge.getBadgeParameter());
+                    break;
+                case BADGE_TYPE_STREAK :
+                    badgeDb.setBadgeParameter(badge.getBadgeParameter()/7);
+                    break;
+                case BADGE_TYPE_MARATHON :
+                    badgeDb.setBadgeParameter(badge.getBadgeParameter()/10);
+                    break;
+            }
+
+
             badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
             List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder()
                     .where(BadgeDao.Properties.BadgeId.eq(badge.getBadgeId())).list();
@@ -835,14 +855,24 @@ public class SyncService extends GcmTaskService {
                     integerAchievedBadgeHashMap.put(achievedBadge.getId(), achievedBadge);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("user_id", user_id);
+                    if(achievedBadge.getCauseId()!=0)
                     jsonObject.put("cause_id", achievedBadge.getCauseId());
                     jsonObject.put("badge_id_in_progress", achievedBadge.getBadgeIdInProgress());
+                    if(achievedBadge.getBadgeIdAchieved()!=0)
                     jsonObject.put("badge_id_achieved", achievedBadge.getBadgeIdAchieved());
                     jsonObject.put("achievement_time", Utils.dateToString(achievedBadge.getBadgeIdAchievedDate()));
+                    if(achievedBadge.getCategory()!=0)
                     jsonObject.put("category_id", achievedBadge.getCategory());
                     jsonObject.put("badge_type", achievedBadge.getBadgeType());
                     jsonObject.put("parameter_completed", achievedBadge.getParamDone());
                     jsonObject.put("client_achievement_id", achievedBadge.getId());
+                    if(achievedBadge.getCategoryStatus().equalsIgnoreCase(Constants.BADGE_IN_PROGRESS))
+                    {
+                        jsonObject.put("badge_is_completed", false);
+                    }else if(achievedBadge.getCategoryStatus().equalsIgnoreCase(Constants.BADGE_COMPLETED))
+                    {
+                        jsonObject.put("badge_is_completed", true);
+                    }
                     if (achievedBadge.getServerId() > 0) {
                         jsonObject.put("server_achievement_id", achievedBadge.getServerId());
                     }
@@ -1451,21 +1481,32 @@ public class SyncService extends GcmTaskService {
             String responseString = response.getAsJsonArray("result").toString();
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                 AchievedBadge achievedBadge = new AchievedBadge();
                 achievedBadge.setUserId(MainApplication.getInstance().getUserID());
-                achievedBadge.setCauseId(jsonObject.getInt("cause_id"));
-                achievedBadge.setBadgeIdInProgress(jsonObject.getInt("badge_id_in_progress"));
-                achievedBadge.setBadgeIdAchieved(jsonObject.getInt("badge_id_achieved"));
-                achievedBadge.setCategory(jsonObject.getInt("category_id"));
+                achievedBadge.setCauseId(jsonObject.optInt("cause_id",0));
+                achievedBadge.setBadgeIdInProgress(jsonObject.optInt("badge_id_in_progress",0));
+                achievedBadge.setBadgeIdAchieved(jsonObject.optInt("badge_id_achieved",0));
+                achievedBadge.setCategory(jsonObject.optInt("category_id",0));
                 achievedBadge.setParamDone(jsonObject.getDouble("parameter_completed"));
                 achievedBadge.setBadgeIdAchievedDate(Utils.stringToDate(jsonObject.getString("achievement_time")));
                 achievedBadge.setBadgeType(jsonObject.getString("badge_type"));
                 achievedBadge.setServerId(jsonObject.getLong("server_achievement_id"));
+                if(jsonObject.has("cause_name"))
+                achievedBadge.setCauseName(jsonObject.getString("cause_name"));
+                if(jsonObject.has("badge_is_completed"))
+                achievedBadge.setCategoryStatus(jsonObject.getBoolean("badge_is_completed")?Constants.BADGE_COMPLETED:Constants.BADGE_IN_PROGRESS);
 
+                List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder()
+                        .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdAchieved())).list();
+                if(badges.size()>0)
+                {
+                    achievedBadge.setNoOfStarAchieved(badges.get(0).getNoOfStars());
+                }
                 achievedBadge.setIsSync(true);
                 List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
                         .where(AchievedBadgeDao.Properties.ServerId.eq(achievedBadge.getServerId())).list();

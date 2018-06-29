@@ -177,7 +177,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
     }
 
     private void checkAchievedBadgeData() {
@@ -203,10 +202,12 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     achievedBadge.setCauseName(badge.getName());
                     achievedBadge.setCauseId(0);
                     achievedBadge.setServerId(0);
-                    achievedBadge.setBadgeIdInProgress(badge.getId());
-                    achievedBadge.setBadgeIdAchieved(badge.getId());
+                    achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
+                    achievedBadge.setBadgeIdAchieved(badge.getBadgeId());
+                    achievedBadge.setNoOfStarAchieved(badge.getNoOfStars());
                     achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
                     achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
+                    achievedBadge.setCategory(0);
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                     achievedBadge.setParamDone(0.1);
                     achievedBadge.setUserId(MainApplication.getInstance().getUserID());

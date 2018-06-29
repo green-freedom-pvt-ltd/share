@@ -271,6 +271,8 @@ public class Constants {
     public final static String BADGE_TYPE_STREAK = "streak";
     public final static String BADGE_TYPE_MARATHON = "marathon";
 
+    public final static String TITLE_TYPE_CAUSE = "title_type_cause";
+
     public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
     public static final String ACHIEVED_BADGE_DATA = "achieved_badge_data";
 

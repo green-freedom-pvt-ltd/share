@@ -224,6 +224,9 @@ public class StreakFragment extends BaseFragment {
             }else if(achievedBadgesData.getMarathonBadgeAchieved()>0)
             {
                 getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.BADGE_TYPE_MARATHON);
+            }else if(achievedBadgesData.getTitleIds().size()>0)
+            {
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
             }else
             {
                 openHomeActivityAndFinish();
