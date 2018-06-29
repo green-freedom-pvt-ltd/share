@@ -1496,11 +1496,21 @@ public class SyncService extends GcmTaskService {
                 achievedBadge.setBadgeIdAchievedDate(Utils.stringToDate(jsonObject.getString("achievement_time")));
                 achievedBadge.setBadgeType(jsonObject.getString("badge_type"));
                 achievedBadge.setServerId(jsonObject.getLong("server_achievement_id"));
-                if(jsonObject.has("cause_name"))
-                achievedBadge.setCauseName(jsonObject.getString("cause_name"));
+                if(jsonObject.has("cause_name")) {
+                    String causeName = jsonObject.getString("cause_name");
+                    achievedBadge.setCauseName(causeName!=null?causeName:achievedBadge.getBadgeType());
+                }else
+                {
+                    achievedBadge.setCauseName(achievedBadge.getBadgeType());
+                }
+
                 if(jsonObject.has("badge_is_completed"))
                 achievedBadge.setCategoryStatus(jsonObject.getBoolean("badge_is_completed")?Constants.BADGE_COMPLETED:Constants.BADGE_IN_PROGRESS);
+                else {
 
+                    achievedBadge.setCategoryStatus(achievedBadge.getBadgeIdAchieved()==achievedBadge.getBadgeIdInProgress()
+                            ?Constants.BADGE_COMPLETED:Constants.BADGE_IN_PROGRESS);
+                }
                 List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder()
                         .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdAchieved())).list();
                 if(badges.size()>0)

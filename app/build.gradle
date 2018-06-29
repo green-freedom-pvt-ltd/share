@@ -32,7 +32,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 246
-        versionName "2.8.2.0"
+        versionName "2.8.2.1"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
