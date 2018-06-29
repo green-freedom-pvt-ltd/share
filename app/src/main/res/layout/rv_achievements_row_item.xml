@@ -13,9 +13,9 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
-
         >
         <RelativeLayout
+            android:id="@+id/badge_rl"
             android:layout_width="86dp"
             android:layout_height="74dp">
 
@@ -50,6 +50,29 @@
                 />
         </RelativeLayout>
 
+       <RelativeLayout
+
+           android:id="@+id/more_layout"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content">
+           <ImageView
+               android:layout_centerInParent="true"
+               android:layout_width="55dp"
+               android:layout_height="61dp"
+               android:src="@drawable/polygon"
+               />
+           <com.sharesmile.share.views.LBTextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:gravity="center"
+               android:id="@+id/tv_more"
+               android:textSize="8sp"
+               android:textColor="@color/black_53"
+               android:layout_marginTop="13dp"
+               android:text="+2 More"
+               android:layout_centerInParent="true"
+               />
+       </RelativeLayout>
     <com.sharesmile.share.views.LBTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +81,7 @@
         android:textSize="11sp"
         android:textColor="@color/black_53"
         android:layout_marginTop="13dp"
-        android:text="Change Maker"
+        tools:text="Change Maker"
         />
     </LinearLayout>
 

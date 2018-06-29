@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.Badge;
@@ -65,6 +66,9 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
         TextView acheivementsTitle;
         LinearLayout badgeLayout;
         TextView badgeCount;
+        RelativeLayout moreLayout;
+        RelativeLayout badgeRl;
+        TextView tvMore;
 
         public AchievementsViewHolder(View itemView) {
             super(itemView);
@@ -73,15 +77,23 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
             acheivementsTitle = itemView.findViewById(R.id.tv_acheivements_title);
             badgeLayout = itemView.findViewById(R.id.badge_layout);
             badgeCount = itemView.findViewById(R.id.tv_badge_count);
+            moreLayout = itemView.findViewById(R.id.more_layout);
+            tvMore = itemView.findViewById(R.id.tv_more);
+            badgeRl = itemView.findViewById(R.id.badge_rl);
+
         }
 
         public void bindView(int position) {
             badgeLayout.setTag(position);
             badgeLayout.setOnClickListener(this);
             if((position==3 && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN) && achievedBadgeCounts.size()>4)) {
-                acheivementsTitle.setText(achievedBadgeCounts.size()-3+" More");
-                badgeCount.setVisibility(View.INVISIBLE);
+                tvMore.setText(achievedBadgeCounts.size()-3+" More");
+                moreLayout.setVisibility(View.VISIBLE);
+                badgeRl.setVisibility(View.GONE);
+                acheivementsTitle.setText("");
             }else {
+                moreLayout.setVisibility(View.GONE);
+                badgeRl.setVisibility(View.VISIBLE);
                 List<Badge> badges = MainApplication.getInstance().getDbWrapper().getBadgeDao().queryBuilder()
                         .where(BadgeDao.Properties.BadgeId.eq(achievedBadgeCounts.get(position).getAchievedBadgeId())).list();
                 if (badges != null && badges.size() > 0) {
