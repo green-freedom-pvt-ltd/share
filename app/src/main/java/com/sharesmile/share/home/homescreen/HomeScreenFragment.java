@@ -26,9 +26,11 @@ import android.widget.TextView;
 
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Title;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -222,6 +224,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             }
             Utils.checkStreak();
         }
+        List<Title> titles = MainApplication.getInstance().getDbWrapper().getTitleDao().queryBuilder().list();
+        List<AchievedTitle> achievedTitles = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao().queryBuilder().list();
+        List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder().list();
+        System.out.println();
+
     }
 
 

@@ -482,7 +482,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         String s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
         if(s.length()<=2)
         {
-            setUserDetails(null);
+            setGoalDetails(null);
         }
         s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
         return s;

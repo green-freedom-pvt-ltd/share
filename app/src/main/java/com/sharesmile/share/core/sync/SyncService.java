@@ -409,10 +409,25 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription1(badge.getDescription1());
             badgeDb.setDescription2(badge.getDescription2());
             badgeDb.setDescription3(badge.getDescription3());
+            //TODO hack
             switch (badge.getType())
             {
                 case BADGE_TYPE_CAUSE :
-                    badgeDb.setBadgeParameter(badge.getBadgeParameter()/10);
+                    switch ((int) badge.getBadgeParameter())
+                    {
+                        case 10 :
+                            badgeDb.setBadgeParameter(1);
+
+                            break;
+                        case 50 :
+                            badgeDb.setBadgeParameter(3);
+                            break;
+                        case 250 :
+                            badgeDb.setBadgeParameter(7);
+                            break;
+
+                    }
+
                     break;
                 case BADGE_TYPE_CHANGEMAKER :
                     badgeDb.setBadgeParameter(badge.getBadgeParameter());
@@ -1496,14 +1511,7 @@ public class SyncService extends GcmTaskService {
                 achievedBadge.setBadgeIdAchievedDate(Utils.stringToDate(jsonObject.getString("achievement_time")));
                 achievedBadge.setBadgeType(jsonObject.getString("badge_type"));
                 achievedBadge.setServerId(jsonObject.getLong("server_achievement_id"));
-                if(jsonObject.has("cause_name")) {
-                    String causeName = jsonObject.getString("cause_name");
-                    achievedBadge.setCauseName(causeName!=null?causeName:achievedBadge.getBadgeType());
-                }else
-                {
-                    achievedBadge.setCauseName(achievedBadge.getBadgeType());
-                }
-
+                //TODO change this hack
                 if(jsonObject.has("badge_is_completed"))
                 achievedBadge.setCategoryStatus(jsonObject.getBoolean("badge_is_completed")?Constants.BADGE_COMPLETED:Constants.BADGE_IN_PROGRESS);
                 else {
@@ -1516,6 +1524,13 @@ public class SyncService extends GcmTaskService {
                 if(badges.size()>0)
                 {
                     achievedBadge.setNoOfStarAchieved(badges.get(0).getNoOfStars());
+                    if(jsonObject.has("cause_name")) {
+                        String causeName = jsonObject.getString("cause_name");
+                        achievedBadge.setCauseName(causeName!=null?causeName:badges.get(0).getName());
+                    }else
+                    {
+                        achievedBadge.setCauseName(badges.get(0).getName());
+                    }
                 }
                 achievedBadge.setIsSync(true);
                 List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
