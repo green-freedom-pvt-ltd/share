@@ -109,7 +109,7 @@ public class LoginImpl {
     private void initializeFbLogin() {
         Context context = getContext();
         if (context != null) {
-            FacebookSdk.sdkInitialize(context.getApplicationContext());
+//            FacebookSdk.sdkInitialize(context.getApplicationContext());
             callbackManager = CallbackManager.Factory.create();
             LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                 @Override
@@ -178,8 +178,33 @@ public class LoginImpl {
             public void onResponse(Response response) throws IOException {
                 String responseString = response.body().string();
                 Logger.d("LoginImpl", "onResponse: " + responseString);
-                JsonArray array = JsonHelper.StringToJsonArray(responseString);
-                if (array == null) {
+                try {
+                    JsonArray array = JsonHelper.StringToJsonArray(responseString);
+                    if (array == null) {
+                        Crashlytics.logException(new Throwable("Login Response error. Server response : " + responseString));
+                        MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mListener.showHideProgress(false, null);
+                            }
+                        });
+                        sendLoginFailureEvent(response.code(), responseString, isFbLogin);
+                        return;
+                    }
+
+                    final JsonObject element = array.get(0).getAsJsonObject();
+                    Log.i("LoginImpl", "element: " + element.toString());
+                    MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            userLoginSuccess(element, isFbLogin);
+                        }
+                    });
+
+                }catch (Exception e)
+                {
+                    JsonObject jsonObject = JsonHelper.StringToJsonObject(responseString);
+                    MainApplication.showToast(jsonObject.get("error").getAsString());
                     Crashlytics.logException(new Throwable("Login Response error. Server response : " + responseString));
                     MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                         @Override
@@ -188,18 +213,7 @@ public class LoginImpl {
                         }
                     });
                     sendLoginFailureEvent(response.code(), responseString, isFbLogin);
-                    return;
                 }
-
-                final JsonObject element = array.get(0).getAsJsonObject();
-                Log.i("LoginImpl", "element: " + element.toString());
-                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        userLoginSuccess(element, isFbLogin);
-                    }
-                });
-
             }
         });
 

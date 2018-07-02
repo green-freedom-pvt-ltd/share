@@ -32,7 +32,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 246
-        versionName "2.8.2.6"
+        versionName "2.8.2.7"
 
         generatedDensities = []
         vectorDrawables.useSupportLibrary = true
@@ -133,7 +133,7 @@ dependencies {
         transitive = true
     }
     implementation 'com.onesignal:OneSignal:3.6.1@aar'
-    implementation 'com.facebook.android:facebook-android-sdk:4.25.0'
+    implementation 'com.facebook.android:facebook-login:[4,5)'
     implementation 'com.jakewharton:butterknife:8.0.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.0.1'
     implementation 'de.greenrobot:greendao:2.1.0'
