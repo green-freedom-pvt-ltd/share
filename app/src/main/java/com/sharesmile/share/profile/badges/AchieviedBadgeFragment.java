@@ -264,7 +264,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
                     } else if(achievedBadgesData.getTitleIds().size()>0)
                     {
-                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.TITLE_TYPE_CAUSE), true,Constants.TITLE_TYPE_CAUSE+"_"+achievedBadgesData.getTitleIds().get(0));
                     }else{
                         openHomeActivityAndFinish();
                     }
@@ -276,7 +276,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
                     } else if(achievedBadgesData.getTitleIds().size()>0)
                     {
-                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.TITLE_TYPE_CAUSE), true,Constants.TITLE_TYPE_CAUSE+"_"+achievedBadgesData.getTitleIds().get(0));
                     }else{
                         openHomeActivityAndFinish();
                     }
@@ -286,7 +286,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                         getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.BADGE_TYPE_MARATHON), true, Constants.BADGE_TYPE_MARATHON);
                     } else if(achievedBadgesData.getTitleIds().size()>0)
                     {
-                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.TITLE_TYPE_CAUSE), true,Constants.TITLE_TYPE_CAUSE+"_"+achievedBadgesData.getTitleIds().get(0));
                     }else{
                         openHomeActivityAndFinish();
                     }
@@ -295,7 +295,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 case Constants.TITLE_TYPE_CAUSE:
                     if(achievedBadgesData.getTitleIds().size()>0)
                     {
-                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                        getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.TITLE_TYPE_CAUSE), true,Constants.TITLE_TYPE_CAUSE+"_"+achievedBadgesData.getTitleIds().get(0));
                     }else {
                         openHomeActivityAndFinish();
                     }

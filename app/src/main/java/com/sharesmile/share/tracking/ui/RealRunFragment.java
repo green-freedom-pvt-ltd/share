@@ -101,10 +101,10 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void populateViews(View baseView) {
         ButterKnife.bind(this, baseView);
-        time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
-        distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
-        distanceUnitTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance_unit);
-        impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
+        time = baseView.findViewById(R.id.tv_run_progress_timer);
+        distanceTextView = baseView.findViewById(R.id.tv_run_progress_distance);
+        distanceUnitTextView = baseView.findViewById(R.id.tv_run_progress_distance_unit);
+        impact = baseView.findViewById(R.id.tv_run_progress_impact);
         pauseButton = baseView.findViewById(R.id.btn_pause);
         stopButton = baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);

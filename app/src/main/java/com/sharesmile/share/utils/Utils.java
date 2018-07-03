@@ -1264,7 +1264,7 @@ public class Utils {
 
     public static String getCurrentDateDDMMYYYY() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
@@ -1817,7 +1817,7 @@ public class Utils {
             try {
                 if (userDetails.getStreakCurrentDate() != null
                         && userDetails.getStreakCurrentDate().length() > 0) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
                     Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
                     Date currentDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
                             .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));

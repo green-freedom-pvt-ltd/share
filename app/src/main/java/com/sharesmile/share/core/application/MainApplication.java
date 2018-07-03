@@ -582,8 +582,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             Analytics.getInstance().setUserEmail(details.getEmail());
         }
 
-        prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
-
         prefsManager.setInt(Constants.PREF_USER_ID, details.getUserId());
         Analytics.getInstance().setUserId(details.getUserId());
 

@@ -224,10 +224,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             }
             Utils.checkStreak();
         }
-        List<Title> titles = MainApplication.getInstance().getDbWrapper().getTitleDao().queryBuilder().list();
-        List<AchievedTitle> achievedTitles = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao().queryBuilder().list();
-        List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder().list();
-        System.out.println();
 
     }
 
@@ -445,6 +441,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             checkBadgeData();
         }
     }
+
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

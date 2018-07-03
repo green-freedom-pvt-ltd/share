@@ -67,39 +67,11 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchieved
         AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
         List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                 .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
-                        AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1)).list();
+                        AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1),
+                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
         inProgressBadgeAdapter = new InProgressBadgeAdapter(achievedBadges,getContext());
         achievementBadgesRecyclerView.setAdapter(inProgressBadgeAdapter);
 
-        /*
-        LinearLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3)
-        {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-        hallOfFameRecyclerView.setLayoutManager(gridLayoutManager);
-
-        Cursor cursor = achievedBadgeDao.getDatabase()
-                .rawQuery("SELECT "+AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+
-                        " , COUNT("+AchievedBadgeDao.Properties.Id.columnName+")" +
-                        " , "+AchievedBadgeDao.Properties.BadgeType.columnName +
-                "  FROM " + AchievedBadgeDao.TABLENAME
-                        +" WHERE "+AchievedBadgeDao.Properties.UserId.columnName+"="+MainApplication.getInstance().getUserID()+" AND "+
-                        AchievedBadgeDao.Properties.BadgeIdAchieved.columnName+">0"
-                        +" GROUP BY "+AchievedBadgeDao.Properties.BadgeIdAchieved.columnName, new String []{});
-        cursor.moveToFirst();
-        ArrayList<HallOfFameData> hallOfFameBadges = new ArrayList<>();
-        while (!cursor.isAfterLast())
-        {
-            HallOfFameData hallOfFameData = new HallOfFameData(cursor.getInt(0),cursor.getInt(1),cursor.getString(2));
-            hallOfFameBadges.add(hallOfFameData);
-            cursor.moveToNext();
-        }
-
-        hallOfFameAdapter = new HallOfFameAdapter(hallOfFameBadges,this);
-        hallOfFameRecyclerView.setAdapter(hallOfFameAdapter);*/
     }
 
     private void setupToolbar() {

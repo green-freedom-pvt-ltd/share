@@ -246,7 +246,8 @@ public class LoginImpl {
                 }
             }
         }
-        if(response.has("reminder_time") && response.get("reminder_time").getAsDouble()>0) {
+
+        if(response.has("reminder_time") && !response.get("reminder_time").isJsonNull() && response.get("reminder_time").getAsDouble()>0) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis((long) response.get("reminder_time").getAsDouble());
             Utils.setReminderTime(calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE),getContext());

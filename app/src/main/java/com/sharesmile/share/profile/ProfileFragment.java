@@ -101,7 +101,7 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, OpenCharityOverview {
+public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, OpenCharityOverview, LoaderManager.LoaderCallbacks<CharityOverview> {
 
     private static final String TAG = "ProfileFragment";
 
@@ -280,33 +280,21 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         });
     }
 
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnCharityLoad onCharityLoad)
+    {
+        Loader<CharityOverview> loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_CHARITY_OVERVIEW);
+        // If the Loader was null, initialize it. Else, restart it.
+        if(loader==null){
+            getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
+        }else{
+            loader.onContentChanged();
+        }
+
+    }
     private void setCharityOverviewLoader() {
-        getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, new LoaderManager.LoaderCallbacks<CharityOverview>() {
-            @Override
-            public Loader<CharityOverview> onCreateLoader(int id, Bundle args) {
-                charityOverviewProgressbar.setVisibility(View.VISIBLE);
-                charityOverviewRecyclerView.setVisibility(View.GONE);
-                return new CharityOverviewAsyncTaskLoader(getContext());
-            }
+        getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
 
-            @Override
-            public void onLoadFinished(Loader<CharityOverview> loader, CharityOverview data) {
-                charityOverview = data;
-                if (charityOverview != null) {
-                    setCharityOverviewRecyclerview();
-                    charityOverviewProgressbar.setVisibility(View.GONE);
-                    charityOverviewRecyclerView.setVisibility(View.VISIBLE);
-                } else {
-                    if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, true))
-                        SyncHelper.getCharityOverview();
-                }
-            }
-
-            @Override
-            public void onLoaderReset(Loader<CharityOverview> loader) {
-                Logger.d(TAG, "onLoaderReset");
-            }
-        });
     }
 
     @Override
@@ -353,11 +341,6 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         initUi();
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.CharityOverviewUpdated charityOverviewUpdated) {
-        setCharityOverviewLoader();
-    }
 
     private void initUi() {
         // Setting Profile Picture
@@ -440,7 +423,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
                 };
                 achievementsRecylerView.setLayoutManager(gridLayoutManager);
                 List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
-                        .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0))
+                        .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0),
+                                AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()))
                         .orderDesc(AchievedBadgeDao.Properties.BadgeIdAchievedDate).list();
 
                 if (achievedBadges != null && achievedBadges.size() > 0) {
@@ -655,6 +639,31 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         bundle.putInt("position", position);
         charityOverviewFragment.setArguments(bundle);
         getFragmentController().replaceFragment(charityOverviewFragment, true);
+    }
+
+    @Override
+    public Loader<CharityOverview> onCreateLoader(int id, Bundle args) {
+        charityOverviewProgressbar.setVisibility(View.VISIBLE);
+        charityOverviewRecyclerView.setVisibility(View.GONE);
+        return new CharityOverviewAsyncTaskLoader(getContext());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<CharityOverview> loader, CharityOverview data) {
+        charityOverview = data;
+        if (charityOverview != null) {
+            setCharityOverviewRecyclerview();
+            charityOverviewProgressbar.setVisibility(View.GONE);
+            charityOverviewRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, true))
+                SyncHelper.getCharityOverview();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<CharityOverview> loader) {
+        Logger.d(TAG, "onLoaderReset");
     }
 
 

@@ -391,6 +391,7 @@ public class SyncService extends GcmTaskService {
         if (!(categories.size() > 0)) {
             categoryDao.insert(category);
         } else {
+            category.setId(categories.get(0).getId());
             categoryDao.update(category);
         }
     }
@@ -433,7 +434,24 @@ public class SyncService extends GcmTaskService {
                     badgeDb.setBadgeParameter(badge.getBadgeParameter());
                     break;
                 case BADGE_TYPE_STREAK :
-                    badgeDb.setBadgeParameter(badge.getBadgeParameter()/7);
+                    switch ((int) badge.getBadgeParameter())
+                    {
+                        case 7 :
+                            badgeDb.setBadgeParameter(1);
+
+                            break;
+                        case 15 :
+                            badgeDb.setBadgeParameter(3);
+                            break;
+                        case 30 :
+                            badgeDb.setBadgeParameter(5);
+                            break;
+                            case 60 :
+                            badgeDb.setBadgeParameter(7);
+                            break;
+
+                    }
+
                     break;
                 case BADGE_TYPE_MARATHON :
                     badgeDb.setBadgeParameter(badge.getBadgeParameter()/10);
@@ -826,8 +844,9 @@ public class SyncService extends GcmTaskService {
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
-            JSONObject response = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
-                    JSONObject.class);
+            JsonObject responseObject = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
+                    JsonObject.class);
+            JSONObject response = new JSONObject(responseObject.toString());
             Logger.d(TAG, "Response for put Streak:" + response);
             if (response.getInt("code") == 200) {
 
@@ -859,7 +878,9 @@ public class SyncService extends GcmTaskService {
         try {
 
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().where(AchievedBadgeDao.Properties.IsSync.eq(false)).list();
+            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.IsSync.eq(false),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
             HashMap<Long, AchievedBadge> integerAchievedBadgeHashMap = new HashMap<>();
 
             if (achievedBadges.size() > 0) {
@@ -947,15 +968,15 @@ public class SyncService extends GcmTaskService {
                     jsonObject.put("title_id", achievedTitle.getTitleId());
                     jsonObject.put("title_achievement_time", Utils.dateToString(achievedTitle.getAchievedTime()));
                     jsonObject.put("badge_type", achievedTitle.getBadgeType());
-                    jsonObject.put("client_title_id", achievedTitle.getBadgeType());
+                    jsonObject.put("client_title_id", achievedTitle.getId());
                     if (achievedTitle.getServerId() > 0) {
                         jsonObject.put("server_title_id", achievedTitle.getServerId());
                     }
                     jsonArray.put(jsonObject);
                 }
-                JSONObject response = NetworkDataProvider.doPostCall(Urls.getTitlesUrl(), jsonArray.toString(),
-                        JSONObject.class);
-
+                JsonObject responseObject = NetworkDataProvider.doPostCall(Urls.getTitlesUrl(), jsonArray.toString(),
+                        JsonObject.class);
+                JSONObject response = new JSONObject(responseObject.toString());
                 Logger.d(TAG, "Response for uploadAchievementTitle:" + response);
                 if (response.getInt("code") == 200) {
                     JSONArray result = response.getJSONArray("result");
@@ -977,7 +998,7 @@ public class SyncService extends GcmTaskService {
             return GcmNetworkManager.RESULT_RESCHEDULE;
         } catch (JSONException e) {
             e.printStackTrace();
-            Logger.d(TAG, "NetworkException");
+            Logger.d(TAG, "JSONException");
             return GcmNetworkManager.RESULT_FAILURE;
         }
     }
@@ -1405,7 +1426,7 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "getCharityOverviewData response : " + responseString);
             SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW, responseString);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, false);
-
+            EventBus.getDefault().post(new UpdateEvent.OnCharityLoad());
             return ExpoBackoffTask.RESULT_SUCCESS;
 
         } catch (NetworkException e) {
@@ -1519,9 +1540,9 @@ public class SyncService extends GcmTaskService {
                 if(badges.size()>0)
                 {
                     achievedBadge.setNoOfStarAchieved(badges.get(0).getNoOfStars());
-                    if(jsonObject.has("cause_name")) {
-                        String causeName = jsonObject.getString("cause_name");
-                        if(causeName == null)
+                    if(jsonObject.has("cause_title")) {
+                        String causeName = jsonObject.optString("cause_title",null);
+                        if(causeName == null || causeName.equalsIgnoreCase("null"))
                         {
                             List<com.sharesmile.share.Badge> badgesInProgress = badgeDao.queryBuilder()
                                     .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).list();
@@ -1541,7 +1562,8 @@ public class SyncService extends GcmTaskService {
                 }
                 achievedBadge.setIsSync(true);
                 List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
-                        .where(AchievedBadgeDao.Properties.ServerId.eq(achievedBadge.getServerId())).list();
+                        .where(AchievedBadgeDao.Properties.ServerId.eq(achievedBadge.getServerId()),
+                                AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
                 if (achievedBadgeListFromDb.size() > 0) {
                     achievedBadge.setId(achievedBadgeListFromDb.get(0).getId());
                     achievedBadgeDao.update(achievedBadge);
@@ -1615,7 +1637,8 @@ public class SyncService extends GcmTaskService {
                 }
                 achievedTitle.setIsSync(true);
                 List<AchievedTitle> achievedTitleListFromDb = achievedTitleDao.queryBuilder()
-                        .where(AchievedBadgeDao.Properties.ServerId.eq(achievedTitle.getServerId())).list();
+                        .where(AchievedTitleDao.Properties.ServerId.eq(achievedTitle.getServerId()),
+                                AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
                 if (achievedTitleListFromDb.size() > 0) {
                     achievedTitle.setId(achievedTitleListFromDb.get(0).getId());
                     achievedTitleDao.update(achievedTitle);

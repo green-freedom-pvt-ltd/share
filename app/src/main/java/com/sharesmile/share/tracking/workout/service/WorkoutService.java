@@ -374,7 +374,7 @@ public class WorkoutService extends Service implements
             Cursor cursor = database.rawQuery("SELECT "
                     + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
                     + " FROM " + AchievedBadgeDao.TABLENAME + " where "
-                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getCategory() +
+                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle() +
                     "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
                     + MainApplication.getInstance().getUserID(), new String[]{});
             cursor.moveToFirst();
@@ -415,7 +415,7 @@ public class WorkoutService extends Service implements
             }
             if (achievedTitle != null) {
                 returnId = achievedTitle.getTitleId();
-                if (achievedTitle.getId() > 0) {
+                if (achievedTitle.getId()!=null && achievedTitle.getId() > 0) {
                     achievedTitleDao.update(achievedTitle);
                 } else {
                     achievedTitleDao.insert(achievedTitle);

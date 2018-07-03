@@ -221,6 +221,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS)
         {
             //Pull historical run data;
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
             SyncHelper.forceRefreshEntireWorkoutHistory();
             onLoginSuccess();
         }else
