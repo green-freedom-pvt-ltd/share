@@ -610,6 +610,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     public static boolean isLogin() {
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
     }
+    public static boolean isTokenAvailable() {
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_TOKEN, false);
+    }
 
     public void setModelShown() {
         isModelShown = true;

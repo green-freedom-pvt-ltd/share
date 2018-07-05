@@ -200,7 +200,7 @@ public class StreakFragment extends BaseFragment {
     {
         Bitmap toShare = Utils.getBitmapFromLiveView(sharableContainer);
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
-                getString(R.string.share_streak));
+                String.format(getString(R.string.share_streak),MainApplication.getInstance().getUserDetails().getStreakCount()));
         AnalyticsEvent.create(Event.ON_SELECT_SHARE_STREAK)
                 .buildAndDispatch();
     }

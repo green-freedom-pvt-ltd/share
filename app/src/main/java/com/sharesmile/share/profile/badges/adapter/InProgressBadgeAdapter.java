@@ -89,7 +89,7 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
                 Utils.setStarImage(badge.getNoOfStars(),starImageView);
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;
-                achievementBadgeDescription.setText(badge.getDescription1());
+                achievementBadgeDescription.setText(badge.getDescription_inprogress());
             }
         }
     }

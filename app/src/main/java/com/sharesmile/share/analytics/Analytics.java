@@ -22,6 +22,7 @@ import static com.sharesmile.share.core.Constants.USER_PROP_GENDER;
 import static com.sharesmile.share.core.Constants.USER_PROP_NAME;
 import static com.sharesmile.share.core.Constants.USER_PROP_PHONE;
 import static com.sharesmile.share.core.Constants.USER_PROP_TEAM_CODE;
+import static com.sharesmile.share.core.Constants.USER_PROP_TITLE1;
 import static com.sharesmile.share.core.Constants.USER_PROP_USER_ID;
 
 /**
@@ -150,6 +151,10 @@ public class Analytics {
     public void setUserGender(String gender){
         clevertapManager.setUserProperty(USER_PROP_GENDER, gender);
         OneSignal.sendTag(USER_PROP_GENDER, gender);
+    }
+    public void setUserTitle(String tag,String titleId){
+        clevertapManager.setUserProperty(tag, titleId);
+        OneSignal.sendTag(tag, titleId);
     }
 
     public void setUserImpactLeagueTeamCode(int teamCode){

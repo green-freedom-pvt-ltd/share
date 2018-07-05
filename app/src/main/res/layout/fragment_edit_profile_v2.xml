@@ -123,7 +123,12 @@
                 android:layout_height="wrap_content"
                 android:text="" />
         </LinearLayout>
-
+        <LinearLayout
+            android:paddingBottom="13dp"
+            android:id="@+id/profile_title1_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <com.sharesmile.share.views.LRTextView
             android:id="@+id/et_profile_title1"
             style="@style/edit_profile_text_style_value"
@@ -133,17 +138,19 @@
             android:cursorVisible="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:textColor="@color/black_38" />
+            />
 
         <Spinner
             android:id="@+id/spinner_profile_title1"
             android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
+            android:layout_height="0dp"
+            android:dropDownWidth="match_parent"
+            android:background="@null"/>
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="13dp"
+
             android:background="#c0c0c0" />
 
         <LinearLayout
@@ -164,7 +171,12 @@
                 android:layout_height="wrap_content"
                 android:text="" />
         </LinearLayout>
-
+    <LinearLayout
+        android:paddingBottom="13dp"
+        android:id="@+id/profile_title2_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <com.sharesmile.share.views.LRTextView
             android:id="@+id/et_profile_title2"
             style="@style/edit_profile_text_style_value"
@@ -174,17 +186,20 @@
             android:cursorVisible="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:textColor="@color/black_38" />
+            />
 
         <Spinner
             android:id="@+id/spinner_profile_title2"
             android:layout_width="match_parent"
-            android:layout_height="0dp" />
+            android:layout_height="0dp"
+            android:dropDownWidth="match_parent"
+            android:background="@null" />
+    </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="13dp"
+
             android:background="#c0c0c0" />
 
         <LinearLayout

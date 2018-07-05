@@ -23,6 +23,8 @@ public class Badge {
     private String description1;
     private String description2;
     private String description3;
+    private String description_inprogress;
+    private String share_badge_content;
     private double badgeParameter;
     private String badgeParameterCheck;
 
@@ -36,7 +38,7 @@ public class Badge {
         this.id = id;
     }
 
-    public Badge(Long id, int badgeId, String type, String category, String name, int noOfStars, String imageUrl, String description1, String description2, String description3, double badgeParameter, String badgeParameterCheck) {
+    public Badge(Long id, int badgeId, String type, String category, String name, int noOfStars, String imageUrl, String description1, String description2, String description3, String description_inprogress, String share_badge_content, double badgeParameter, String badgeParameterCheck) {
         this.id = id;
         this.badgeId = badgeId;
         this.type = type;
@@ -47,6 +49,8 @@ public class Badge {
         this.description1 = description1;
         this.description2 = description2;
         this.description3 = description3;
+        this.description_inprogress = description_inprogress;
+        this.share_badge_content = share_badge_content;
         this.badgeParameter = badgeParameter;
         this.badgeParameterCheck = badgeParameterCheck;
     }
@@ -137,6 +141,22 @@ public class Badge {
 
     public void setDescription3(String description3) {
         this.description3 = description3;
+    }
+
+    public String getDescription_inprogress() {
+        return description_inprogress;
+    }
+
+    public void setDescription_inprogress(String description_inprogress) {
+        this.description_inprogress = description_inprogress;
+    }
+
+    public String getShare_badge_content() {
+        return share_badge_content;
+    }
+
+    public void setShare_badge_content(String share_badge_content) {
+        this.share_badge_content = share_badge_content;
     }
 
     public double getBadgeParameter() {

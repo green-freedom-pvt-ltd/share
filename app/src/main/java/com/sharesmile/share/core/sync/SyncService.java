@@ -410,6 +410,8 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription1(badge.getDescription1());
             badgeDb.setDescription2(badge.getDescription2());
             badgeDb.setDescription3(badge.getDescription3());
+            badgeDb.setDescription_inprogress(badge.getDescriptionInProgress());
+            badgeDb.setShare_badge_content(badge.getShareBadgeContent());
             //TODO hack
             switch (badge.getType())
             {
@@ -483,7 +485,10 @@ public class SyncService extends GcmTaskService {
             titleDb.setGoalNStars(title.getGoalNStars());
             titleDb.setImageUrl(title.getImage());
             titleDb.setWinningMessage(title.getWinningMessage());
-            titleDb.setDesc(title.getDesc());
+            titleDb.setDescription_1(title.getDesc1());
+            titleDb.setDescription_2(title.getDesc2());
+            titleDb.setDescription_3(title.getDesc3());
+            titleDb.setShare_message(title.getShareMessage());
             titleDb.setBadgeType(badgeType);
             List<com.sharesmile.share.Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(title.getTitleId())).list();
             if (titles.size() > 0) {
@@ -796,6 +801,10 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("goal", prev.getStreakGoalID());
             jsonObject.put("reminder_time", Utils.getReminderTime().getTimeInMillis());
+            if(prev.getTitle1()>0)
+            jsonObject.put("achieved_title_1", prev.getTitle1());
+            if(prev.getTitle2()>0)
+            jsonObject.put("achieved_title_2", prev.getTitle2());
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
@@ -1468,10 +1477,10 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "getStreak response : " + responseString);
             JSONObject jsonObject = new JSONObject(responseString);
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            userDetails.setStreakMaxCount(jsonObject.getInt("max_streak"));
-            userDetails.setStreakCount(jsonObject.getInt("current_streak"));
-            userDetails.setStreakCurrentDate(jsonObject.getString("current_streak_date"));
-            userDetails.setStreakAdded(jsonObject.getBoolean("streak_added"));
+            userDetails.setStreakMaxCount(jsonObject.optInt("max_streak",0));
+            userDetails.setStreakCount(jsonObject.optInt("current_streak",0));
+            userDetails.setStreakCurrentDate(jsonObject.optString("current_streak_date",""));
+            userDetails.setStreakAdded(jsonObject.optBoolean("streak_added",false));
             MainApplication.getInstance().setUserDetails(userDetails);
 
             result = ExpoBackoffTask.RESULT_SUCCESS;
@@ -1490,7 +1499,7 @@ public class SyncService extends GcmTaskService {
                     .put("failure_type", e.getFailureType())
                     .buildAndDispatch();
 
-            result = ExpoBackoffTask.RESULT_RESCHEDULE;
+            result = ExpoBackoffTask.RESULT_FAILURE;
         } catch (Exception e) {
 
             Logger.d(TAG, "Exception in getCharityOverviewData: " + e.getMessage());
@@ -1502,7 +1511,7 @@ public class SyncService extends GcmTaskService {
                     .put("exception_message", e.getMessage())
                     .buildAndDispatch();
 
-            result = ExpoBackoffTask.RESULT_RESCHEDULE;
+            result = ExpoBackoffTask.RESULT_FAILURE;
         }
 
         EventBus.getDefault().post(new UpdateEvent.OnGetStreak(result));

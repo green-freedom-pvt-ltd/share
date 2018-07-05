@@ -20,7 +20,10 @@ public class Title {
     private String imageUrl;
     /** Not-null value. */
     private String winningMessage;
-    private String desc;
+    private String description_1;
+    private String description_2;
+    private String description_3;
+    private String share_message;
     /** Not-null value. */
     private String badgeType;
 
@@ -34,7 +37,7 @@ public class Title {
         this.id = id;
     }
 
-    public Title(Long id, int titleId, String title, int categoryId, String category, int goalNStars, String imageUrl, String winningMessage, String desc, String badgeType) {
+    public Title(Long id, int titleId, String title, int categoryId, String category, int goalNStars, String imageUrl, String winningMessage, String description_1, String description_2, String description_3, String share_message, String badgeType) {
         this.id = id;
         this.titleId = titleId;
         this.title = title;
@@ -43,7 +46,10 @@ public class Title {
         this.goalNStars = goalNStars;
         this.imageUrl = imageUrl;
         this.winningMessage = winningMessage;
-        this.desc = desc;
+        this.description_1 = description_1;
+        this.description_2 = description_2;
+        this.description_3 = description_3;
+        this.share_message = share_message;
         this.badgeType = badgeType;
     }
 
@@ -117,12 +123,36 @@ public class Title {
         this.winningMessage = winningMessage;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription_1() {
+        return description_1;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription_1(String description_1) {
+        this.description_1 = description_1;
+    }
+
+    public String getDescription_2() {
+        return description_2;
+    }
+
+    public void setDescription_2(String description_2) {
+        this.description_2 = description_2;
+    }
+
+    public String getDescription_3() {
+        return description_3;
+    }
+
+    public void setDescription_3(String description_3) {
+        this.description_3 = description_3;
+    }
+
+    public String getShare_message() {
+        return share_message;
+    }
+
+    public void setShare_message(String share_message) {
+        this.share_message = share_message;
     }
 
     /** Not-null value. */

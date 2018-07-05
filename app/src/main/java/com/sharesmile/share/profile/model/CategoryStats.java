@@ -9,7 +9,8 @@ public class CategoryStats {
     private int categoryWorkouts;
     private int categoryNoOfStars;
     private String categoryImageUrl;
-    ArrayList<CauseStats> causeStats;
+
+    private ArrayList<CauseStats> causeStats;
 
     public String getCategoryName() {
         return categoryName;
@@ -58,4 +59,5 @@ public class CategoryStats {
     public void setCategoryImageUrl(String categoryImageUrl) {
         this.categoryImageUrl = categoryImageUrl;
     }
+
 }

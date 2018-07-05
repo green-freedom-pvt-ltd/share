@@ -1268,6 +1268,13 @@ public class Utils {
         return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
+    public static String getDateDDMMYYYYFromTimeInMillis(long timeInMillis) {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(timeInMillis);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return simpleDateFormat.format(new Date(timeInMillis));
+    }
+
     public static void setReminderTime(String time, Context context) {
         if (time.length() == 0) {
             SharedPrefsManager.getInstance().setBoolean(Constants.REMINDER_SET, false);
@@ -1779,6 +1786,7 @@ public class Utils {
     }
 
     public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context) {
+        layoutStar.removeAllViews();
         if(cause_no_of_stars>3)
         {
             LBTextView lbTextView = new LBTextView(context);
@@ -1895,10 +1903,10 @@ public class Utils {
 
     public static void saveTitleIdToUserDetails(AchievedTitle achievedTitle) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if(userDetails.getTitle1()>0)
+        if(userDetails.getTitle1()==0)
         {
             userDetails.setTitle1(achievedTitle.getTitleId());
-        }else if(userDetails.getTitle2()>0)
+        }else if(userDetails.getTitle2()==0)
         {
             userDetails.setTitle2(achievedTitle.getTitleId());
         }

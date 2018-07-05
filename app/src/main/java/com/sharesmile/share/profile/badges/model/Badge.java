@@ -22,6 +22,10 @@ public class Badge {
     private String description2;
     @SerializedName("description3")
     private String description3;
+    @SerializedName("description_inprogress")
+    private String descriptionInProgress;
+    @SerializedName("share_badge_content")
+    private String shareBadgeContent;
     @SerializedName("badge_parameter")
     private double badgeParameter;
     @SerializedName("badge_parameter_check")
@@ -113,5 +117,21 @@ public class Badge {
 
     public void setDescription3(String description3) {
         this.description3 = description3;
+    }
+
+    public String getDescriptionInProgress() {
+        return descriptionInProgress;
+    }
+
+    public void setDescriptionInProgress(String descriptionInProgress) {
+        this.descriptionInProgress = descriptionInProgress;
+    }
+
+    public String getShareBadgeContent() {
+        return shareBadgeContent;
+    }
+
+    public void setShareBadgeContent(String shareBadgeContent) {
+        this.shareBadgeContent = shareBadgeContent;
     }
 }

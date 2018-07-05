@@ -28,6 +28,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -261,6 +263,7 @@ public class LoginImpl {
         {
             Utils.setOnboardingShown();
         }
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_TOKEN, true);
         SyncHelper.getStreak();
         //show Toast confirmation
         String medium = isFbLogin ? "fb" : "google";

@@ -1,5 +1,7 @@
 package com.sharesmile.share.profile.model;
 
+import java.util.ArrayList;
+
 public class CauseStats {
 
     private String causeName;
@@ -7,6 +9,8 @@ public class CauseStats {
     private int cause_workouts;
     private int cause_no_of_stars;
     private String cause_image_url;
+    private ArrayList<String> sponsors;
+    private ArrayList<String> partners;
 
     public String getCauseName() {
         return causeName;
@@ -46,5 +50,21 @@ public class CauseStats {
 
     public void setCause_no_of_stars(int cause_no_of_stars) {
         this.cause_no_of_stars = cause_no_of_stars;
+    }
+
+    public ArrayList<String> getSponsors() {
+        return sponsors;
+    }
+
+    public void setSponsors(ArrayList<String> sponsors) {
+        this.sponsors = sponsors;
+    }
+
+    public ArrayList<String> getPartners() {
+        return partners;
+    }
+
+    public void setPartners(ArrayList<String> partners) {
+        this.partners = partners;
     }
 }

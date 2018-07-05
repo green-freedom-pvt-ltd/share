@@ -67,6 +67,7 @@ public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverv
                     categoryStats.setCategoryRaised(value.getInt("category_raised"));
                     categoryStats.setCategoryWorkouts(value.getInt("category_workouts"));
                     categoryStats.setCategoryImageUrl(value.getString("category_image"));
+
                     ArrayList<CauseStats> causeStatsArrayList = new ArrayList<>();
                     JSONObject causeWiseStats = value.getJSONObject("cause_wise_stats");
                     Iterator<String> causeWiseStatsKeys = causeWiseStats.keys();

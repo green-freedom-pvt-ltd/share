@@ -72,9 +72,9 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("streak_added")
     private boolean streakAdded;
 
-    @SerializedName("title1")
+    @SerializedName("achieved_title_1")
     private int title1;
-    @SerializedName("title2")
+    @SerializedName("achieved_title_2")
     private int title2;
 
 

@@ -55,6 +55,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
     TextView continueTv;
     @BindView(R.id.badge_earned_tv)
     TextView badgeEarnedTv;
+    @BindView(R.id.badge_title_header_tv)
+    TextView badgeTitleHeaderTv;
     @BindView(R.id.badge_title_tv)
     TextView badgeTitle;
     @BindView(R.id.iv_badge)
@@ -77,6 +79,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
     private String TAG = "AchieviedBadgeFragment";
     AchievedBadgesData achievedBadgesData;
     ObjectAnimator animation;
+    String shareMessage = "";
+    String name = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -162,9 +166,14 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
             if (titles != null && titles.size() > 0) {
                 Title title = titles.get(0);
-                badgeTitle.setText(title.getTitle());
-                badgeAmountRaised.setText(title.getDesc());
                 badgeEarnedTv.setText(title.getWinningMessage());
+                badgeTitle.setText(title.getTitle());
+                badgeTitleHeaderTv.setVisibility(View.VISIBLE);
+                badgeTitleHeaderTv.setText(title.getDescription_1());
+                badgeAmountRaised.setText(title.getDescription_2());
+                badgeUpgrade.setText(title.getDescription_3());
+                shareMessage = title.getShare_message();
+                name = title.getTitle();
 //                Utils.setStarImage(title.getNoOfStars(), starIv);
                 ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl() + title.getImageUrl(), badgeIv,
                         ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
@@ -176,10 +185,13 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
             if (badges != null && badges.size() > 0) {
                 Badge badge = badges.get(0);
-                badgeTitle.setText(badge.getName());
                 badgeEarnedTv.setText(badge.getDescription1());
+                badgeTitle.setText(badge.getName());
+                badgeTitleHeaderTv.setVisibility(View.INVISIBLE);
                 badgeAmountRaised.setText(badge.getDescription2());
                 badgeUpgrade.setText(badge.getDescription3());
+                shareMessage = badge.getShare_badge_content();
+                name = badge.getName();
                 Utils.setStarImage(badge.getNoOfStars(), starIv);
                 ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl() + badge.getImageUrl(), badgeIv,
                         ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
@@ -308,8 +320,9 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
     public void tellYourFriends() {
         Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
+        shareMessage = "I have started my changemaker journey. Have you? Join onelink.to/impact";
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
-                getString(R.string.share_streak));
+                String.format(shareMessage,name));
         AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId", badgeId)
                 .buildAndDispatch();
     }

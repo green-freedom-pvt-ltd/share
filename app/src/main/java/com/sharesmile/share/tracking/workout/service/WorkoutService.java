@@ -305,6 +305,7 @@ public class WorkoutService extends Service implements
             if (tracker != null) {
                 tracker.endRun();
             }
+            WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
             //Calculate Streak
             double distanceCovered = 0;
             try {
@@ -314,7 +315,7 @@ public class WorkoutService extends Service implements
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             if (distanceCovered >= 0.1) {
-                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                userDetails.setStreakCurrentDate(Utils.getDateDDMMYYYYFromTimeInMillis(result.getBeginTimeStamp()));
                 userDetails.addStreakRunProgress(distanceCovered);
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
@@ -332,7 +333,7 @@ public class WorkoutService extends Service implements
             if(titleId>0) {
                 achievedBadgesData.getTitleIds().add(titleId);
             }
-            WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
+
             handleWorkoutResult(result, achievedBadgesData);
 
             stopTimer();
@@ -422,8 +423,10 @@ public class WorkoutService extends Service implements
                 }
                 Utils.saveTitleIdToUserDetails(achievedTitle);
                 SyncHelper.uploadAchievementTitle();
+                SyncHelper.oneTimeUploadUserData();
             }
         }
+
         return returnId;
     }
 

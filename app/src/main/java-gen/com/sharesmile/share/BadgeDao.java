@@ -33,8 +33,10 @@ public class BadgeDao extends AbstractDao<Badge, Long> {
         public final static Property Description1 = new Property(7, String.class, "description1", false, "DESCRIPTION1");
         public final static Property Description2 = new Property(8, String.class, "description2", false, "DESCRIPTION2");
         public final static Property Description3 = new Property(9, String.class, "description3", false, "DESCRIPTION3");
-        public final static Property BadgeParameter = new Property(10, double.class, "badgeParameter", false, "BADGE_PARAMETER");
-        public final static Property BadgeParameterCheck = new Property(11, String.class, "badgeParameterCheck", false, "BADGE_PARAMETER_CHECK");
+        public final static Property Description_inprogress = new Property(10, String.class, "description_inprogress", false, "DESCRIPTION_INPROGRESS");
+        public final static Property Share_badge_content = new Property(11, String.class, "share_badge_content", false, "SHARE_BADGE_CONTENT");
+        public final static Property BadgeParameter = new Property(12, double.class, "badgeParameter", false, "BADGE_PARAMETER");
+        public final static Property BadgeParameterCheck = new Property(13, String.class, "badgeParameterCheck", false, "BADGE_PARAMETER_CHECK");
     };
 
 
@@ -60,8 +62,10 @@ public class BadgeDao extends AbstractDao<Badge, Long> {
                 "\"DESCRIPTION1\" TEXT NOT NULL ," + // 7: description1
                 "\"DESCRIPTION2\" TEXT," + // 8: description2
                 "\"DESCRIPTION3\" TEXT," + // 9: description3
-                "\"BADGE_PARAMETER\" REAL NOT NULL ," + // 10: badgeParameter
-                "\"BADGE_PARAMETER_CHECK\" TEXT);"); // 11: badgeParameterCheck
+                "\"DESCRIPTION_INPROGRESS\" TEXT," + // 10: description_inprogress
+                "\"SHARE_BADGE_CONTENT\" TEXT," + // 11: share_badge_content
+                "\"BADGE_PARAMETER\" REAL NOT NULL ," + // 12: badgeParameter
+                "\"BADGE_PARAMETER_CHECK\" TEXT);"); // 13: badgeParameterCheck
     }
 
     /** Drops the underlying database table. */
@@ -100,11 +104,21 @@ public class BadgeDao extends AbstractDao<Badge, Long> {
         if (description3 != null) {
             stmt.bindString(10, description3);
         }
-        stmt.bindDouble(11, entity.getBadgeParameter());
+ 
+        String description_inprogress = entity.getDescription_inprogress();
+        if (description_inprogress != null) {
+            stmt.bindString(11, description_inprogress);
+        }
+ 
+        String share_badge_content = entity.getShare_badge_content();
+        if (share_badge_content != null) {
+            stmt.bindString(12, share_badge_content);
+        }
+        stmt.bindDouble(13, entity.getBadgeParameter());
  
         String badgeParameterCheck = entity.getBadgeParameterCheck();
         if (badgeParameterCheck != null) {
-            stmt.bindString(12, badgeParameterCheck);
+            stmt.bindString(14, badgeParameterCheck);
         }
     }
 
@@ -128,8 +142,10 @@ public class BadgeDao extends AbstractDao<Badge, Long> {
             cursor.getString(offset + 7), // description1
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // description2
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // description3
-            cursor.getDouble(offset + 10), // badgeParameter
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // badgeParameterCheck
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // description_inprogress
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // share_badge_content
+            cursor.getDouble(offset + 12), // badgeParameter
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // badgeParameterCheck
         );
         return entity;
     }
@@ -147,8 +163,10 @@ public class BadgeDao extends AbstractDao<Badge, Long> {
         entity.setDescription1(cursor.getString(offset + 7));
         entity.setDescription2(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setDescription3(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setBadgeParameter(cursor.getDouble(offset + 10));
-        entity.setBadgeParameterCheck(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setDescription_inprogress(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setShare_badge_content(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setBadgeParameter(cursor.getDouble(offset + 12));
+        entity.setBadgeParameterCheck(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
      }
     
     /** @inheritdoc */

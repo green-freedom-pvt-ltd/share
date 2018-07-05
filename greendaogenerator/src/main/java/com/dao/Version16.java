@@ -187,6 +187,8 @@ public class Version16 extends SchemaVersion {
         badge.addStringProperty("description1").notNull();
         badge.addStringProperty("description2");
         badge.addStringProperty("description3");
+        badge.addStringProperty("description_inprogress");
+        badge.addStringProperty("share_badge_content");
         badge.addDoubleProperty("badgeParameter").notNull();
         badge.addStringProperty("badgeParameterCheck");
     }
@@ -201,7 +203,10 @@ public class Version16 extends SchemaVersion {
         title.addIntProperty("goalNStars").notNull();
         title.addStringProperty("imageUrl");
         title.addStringProperty("winningMessage").notNull();
-        title.addStringProperty("desc");
+        title.addStringProperty("description_1");
+        title.addStringProperty("description_2");
+        title.addStringProperty("description_3");
+        title.addStringProperty("share_message");
         title.addStringProperty("badgeType").notNull();
     }
 

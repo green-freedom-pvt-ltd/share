@@ -174,7 +174,7 @@ public class SyncHelper {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.SYNC_STREAK)
-                .setExecutionWindow(0L, 5)
+                .setExecutionWindow(0L, 1)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
                 .build();

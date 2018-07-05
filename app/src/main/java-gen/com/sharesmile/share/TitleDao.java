@@ -31,8 +31,11 @@ public class TitleDao extends AbstractDao<Title, Long> {
         public final static Property GoalNStars = new Property(5, int.class, "goalNStars", false, "GOAL_NSTARS");
         public final static Property ImageUrl = new Property(6, String.class, "imageUrl", false, "IMAGE_URL");
         public final static Property WinningMessage = new Property(7, String.class, "winningMessage", false, "WINNING_MESSAGE");
-        public final static Property Desc = new Property(8, String.class, "desc", false, "DESC");
-        public final static Property BadgeType = new Property(9, String.class, "badgeType", false, "BADGE_TYPE");
+        public final static Property Description_1 = new Property(8, String.class, "description_1", false, "DESCRIPTION_1");
+        public final static Property Description_2 = new Property(9, String.class, "description_2", false, "DESCRIPTION_2");
+        public final static Property Description_3 = new Property(10, String.class, "description_3", false, "DESCRIPTION_3");
+        public final static Property Share_message = new Property(11, String.class, "share_message", false, "SHARE_MESSAGE");
+        public final static Property BadgeType = new Property(12, String.class, "badgeType", false, "BADGE_TYPE");
     };
 
 
@@ -56,8 +59,11 @@ public class TitleDao extends AbstractDao<Title, Long> {
                 "\"GOAL_NSTARS\" INTEGER NOT NULL ," + // 5: goalNStars
                 "\"IMAGE_URL\" TEXT," + // 6: imageUrl
                 "\"WINNING_MESSAGE\" TEXT NOT NULL ," + // 7: winningMessage
-                "\"DESC\" TEXT," + // 8: desc
-                "\"BADGE_TYPE\" TEXT NOT NULL );"); // 9: badgeType
+                "\"DESCRIPTION_1\" TEXT," + // 8: description_1
+                "\"DESCRIPTION_2\" TEXT," + // 9: description_2
+                "\"DESCRIPTION_3\" TEXT," + // 10: description_3
+                "\"SHARE_MESSAGE\" TEXT," + // 11: share_message
+                "\"BADGE_TYPE\" TEXT NOT NULL );"); // 12: badgeType
     }
 
     /** Drops the underlying database table. */
@@ -87,11 +93,26 @@ public class TitleDao extends AbstractDao<Title, Long> {
         }
         stmt.bindString(8, entity.getWinningMessage());
  
-        String desc = entity.getDesc();
-        if (desc != null) {
-            stmt.bindString(9, desc);
+        String description_1 = entity.getDescription_1();
+        if (description_1 != null) {
+            stmt.bindString(9, description_1);
         }
-        stmt.bindString(10, entity.getBadgeType());
+ 
+        String description_2 = entity.getDescription_2();
+        if (description_2 != null) {
+            stmt.bindString(10, description_2);
+        }
+ 
+        String description_3 = entity.getDescription_3();
+        if (description_3 != null) {
+            stmt.bindString(11, description_3);
+        }
+ 
+        String share_message = entity.getShare_message();
+        if (share_message != null) {
+            stmt.bindString(12, share_message);
+        }
+        stmt.bindString(13, entity.getBadgeType());
     }
 
     /** @inheritdoc */
@@ -112,8 +133,11 @@ public class TitleDao extends AbstractDao<Title, Long> {
             cursor.getInt(offset + 5), // goalNStars
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // imageUrl
             cursor.getString(offset + 7), // winningMessage
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // desc
-            cursor.getString(offset + 9) // badgeType
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // description_1
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // description_2
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // description_3
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // share_message
+            cursor.getString(offset + 12) // badgeType
         );
         return entity;
     }
@@ -129,8 +153,11 @@ public class TitleDao extends AbstractDao<Title, Long> {
         entity.setGoalNStars(cursor.getInt(offset + 5));
         entity.setImageUrl(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setWinningMessage(cursor.getString(offset + 7));
-        entity.setDesc(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setBadgeType(cursor.getString(offset + 9));
+        entity.setDescription_1(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setDescription_2(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setDescription_3(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setShare_message(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setBadgeType(cursor.getString(offset + 12));
      }
     
     /** @inheritdoc */

@@ -159,6 +159,11 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @BindView(R.id.progress_bar)
     RelativeLayout progressBar;
 
+    @BindView(R.id.profile_title2_layout)
+    LinearLayout layoutProfileTitle2;
+    @BindView(R.id.profile_title1_layout)
+    LinearLayout layoutProfileTitle1;
+
     File tempPhotoFile;
     File photoFile;
     private String profilePicUrl;
@@ -246,8 +251,8 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         mMaleRadioBtn.setOnClickListener(this);
         mBirthday.setOnClickListener(this);
         bodyWeightKgs.setOnClickListener(this);
-        profileTitle1.setOnClickListener(this);
-        profileTitle2.setOnClickListener(this);
+        layoutProfileTitle1.setOnClickListener(this);
+        layoutProfileTitle2.setOnClickListener(this);
         getTitleInList();
         setSpinner();
         fillUserDetails();
@@ -257,23 +262,21 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     private void setSpinner() {
         //TODO : Check for toString() method in AchievedTitle
-        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter1 = new ArrayAdapter<AchievedTitle>(getContext(),android.R.layout.simple_list_item_1,achievedTitles);
+        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter1 = new ArrayAdapter<AchievedTitle>(getContext(),R.layout.spinner_row_item,achievedTitles);
         spinnerProfileTitle1.setAdapter(achievedTitleArrayAdapter1);
         spinnerProfileTitle1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(position == pos2)
-                {
-                    MainApplication.showToast("Title 1 & 2 cannot be same");
-                }else
-                {
-                    long titleId = achievedTitles.get(position).getId();
-                    pos1 = position;
-                    profileTitle1.setText(achievedTitles.get(position).getTitle());
+                if(userDetails.getTitle1()>0) {
+                    if (position == pos2) {
+                        MainApplication.showToast("Title 1 & 2 cannot be same");
+                    } else {
+                        long titleId = achievedTitles.get(position).getId();
+                        pos1 = position;
+                        profileTitle1.setText(achievedTitles.get(position).getTitle());
+                    }
+                    setMenuColor();
                 }
-                setMenuColor();
-
             }
 
             @Override
@@ -281,23 +284,22 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
             }
         });
-        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter2 = new ArrayAdapter<AchievedTitle>(getContext(),android.R.layout.simple_list_item_1,achievedTitles);
+        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter2 = new ArrayAdapter<AchievedTitle>(getContext(),R.layout.spinner_row_item,achievedTitles);
         spinnerProfileTitle2.setAdapter(achievedTitleArrayAdapter2);
         spinnerProfileTitle2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position == pos1)
-                {
-                    MainApplication.showToast("Title 1 & 2 cannot be same");
-                }else
-                {
-                    long titleId = achievedTitles.get(position).getId();
-                    pos2 = position;
-                    profileTitle2.setText(achievedTitles.get(position).getTitle());
+                if(userDetails.getTitle2()>0) {
+                    if (position == pos1) {
+                        MainApplication.showToast("Title 1 & 2 cannot be same");
+                    } else {
+                        long titleId = achievedTitles.get(position).getId();
+                        pos2 = position;
+                        profileTitle2.setText(achievedTitles.get(position).getTitle());
+                    }
+                    setMenuColor();
                 }
-                setMenuColor();
-
             }
 
             @Override
@@ -305,6 +307,30 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
             }
         });
+        for(int i=0;i<achievedTitles.size();i++)
+        {
+            AchievedTitle achievedTitle = achievedTitles.get(i);
+
+            if(achievedTitle.getTitleId() == userDetails.getTitle1())
+            {
+                spinnerProfileTitle1.setSelection(i);
+                pos1 = i;
+            }else if(achievedTitle.getTitleId() == userDetails.getTitle2())
+            {
+                spinnerProfileTitle2.setSelection(i);
+                pos2 = i;
+            }
+
+        }
+        if(pos1==-1)
+        {
+            profileTitle1.setText("");
+        }
+
+        if(pos2==-1)
+        {
+            profileTitle2.setText("");
+        }
     }
 
     private void getTitleInList() {
@@ -601,6 +627,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             Analytics.getInstance().setUserGender("M");
         }
 
+        if(pos1!=-1)
+        {
+            userDetails.setTitle1(achievedTitles.get(pos1).getTitleId());
+            Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE1,achievedTitles.get(pos1).getTitleId()+"");
+        }
+        if(pos2!=-1)
+        {
+            userDetails.setTitle2(achievedTitles.get(pos2).getTitleId());
+            Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE2,achievedTitles.get(pos2).getTitleId()+"");
+        }
+
         MainApplication.getInstance().setUserDetails(userDetails);
         SyncHelper.oneTimeUploadUserData();
         MainApplication.showToast("Saved!");
@@ -646,19 +683,19 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 EditWeight editWeight = new EditWeight(getContext(), this, userDetails);
                 editWeight.show();
                 break;
-            case R.id.et_profile_title1 :
+            case R.id.profile_title1_layout :
                 if(userDetails.getTitle1()>0)
                 {
-
+                    spinnerProfileTitle1.performClick();
                 }else
                 {
                     MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
                 }
                 break;
-            case R.id.et_profile_title2 :
+            case R.id.profile_title2_layout :
                 if(userDetails.getTitle2()>0)
                 {
-
+                    spinnerProfileTitle2.performClick();
                 }else
                 {
                     MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
