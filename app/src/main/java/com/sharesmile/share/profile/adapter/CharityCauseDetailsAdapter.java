@@ -68,6 +68,34 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
             causeName.setText(causeStats.getCauseName());
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(causeStats.getCause_raised()));
             charityWorkout.setText(causeStats.getCause_workouts()+"");
+            String s = "";
+            String p = "";
+            for(int i=0;i<causeStats.getPartners().size();i++)
+            {
+                p+=causeStats.getPartners().get(i)+", ";
+            }
+            if(p.length()>0)
+                p = p.substring(0,p.length()-2);
+            for(int i=0;i<causeStats.getSponsors().size();i++)
+            {
+                s+=causeStats.getSponsors().get(i)+", ";
+            }
+            if(s.length()>0)
+                s = s.substring(0,s.length()-2);
+
+            if(p.length()>0 && s.length()>0)
+            {
+                causeDescription.setText("with "+p+" & "+s);
+            }else if(p.length()>0)
+            {
+                causeDescription.setText("with "+p);
+            }else if(s.length()>0)
+            {
+                causeDescription.setText("with "+s);
+            }else
+            {
+                causeDescription.setText("");
+            }
             Utils.addStars(layoutStar,causeStats.getCause_no_of_stars(),context);
             ShareImageLoader.getInstance().loadImage(causeStats.getCause_image_url(),ivCause,
                     ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
