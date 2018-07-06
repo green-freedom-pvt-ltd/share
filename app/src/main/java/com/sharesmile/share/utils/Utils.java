@@ -1537,6 +1537,16 @@ public class Utils {
                     achievedBadgeDao.insertOrReplace(achievedBadge);
                 }
             }
+            if(badgeAchieved>0) {
+                for (int i = 0; i < badges.size(); i++) {
+                    if (badges.get(i).getBadgeId() == badgeAchieved) {
+                        if ((achievedBadge.getParamDone() - distanceCovered) >= badges.get(i).getBadgeParameter()) {
+                            badgeAchieved = 0;
+                        }
+                        break;
+                    }
+                }
+            }
         return badgeAchieved;
     }
 
@@ -1906,7 +1916,7 @@ public class Utils {
         if(userDetails.getTitle1()==0)
         {
             userDetails.setTitle1(achievedTitle.getTitleId());
-        }else if(userDetails.getTitle2()==0)
+        }else if(userDetails.getTitle1()!=achievedTitle.getTitleId() && userDetails.getTitle2()==0)
         {
             userDetails.setTitle2(achievedTitle.getTitleId());
         }

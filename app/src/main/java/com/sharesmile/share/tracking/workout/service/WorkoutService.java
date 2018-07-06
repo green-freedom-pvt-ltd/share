@@ -309,13 +309,13 @@ public class WorkoutService extends Service implements
             //Calculate Streak
             double distanceCovered = 0;
             try {
-                distanceCovered = Double.parseDouble(Utils.formatToKmsWithTwoDecimal(WorkoutSingleton.getInstance().getDataStore().getTotalDistance()));
+                distanceCovered = Double.parseDouble(Utils.formatToKmsWithTwoDecimal(result.getDistance()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             if (distanceCovered >= 0.1) {
-                userDetails.setStreakCurrentDate(Utils.getDateDDMMYYYYFromTimeInMillis(result.getBeginTimeStamp()));
+                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                 userDetails.addStreakRunProgress(distanceCovered);
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
@@ -425,6 +425,8 @@ public class WorkoutService extends Service implements
                 SyncHelper.uploadAchievementTitle();
                 SyncHelper.oneTimeUploadUserData();
             }
+            if(titlePos==achievedTitlePos)
+                returnId = 0;
         }
 
         return returnId;
