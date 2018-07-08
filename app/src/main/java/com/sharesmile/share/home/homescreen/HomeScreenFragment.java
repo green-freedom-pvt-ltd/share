@@ -39,6 +39,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.cause.model.CauseData;
@@ -171,7 +172,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onViewCreated");
         getFragmentController().hideToolbar();
         render();
-        checkBadgeData();
+
         prepareOnboardingOverlays();
         if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
             SyncHelper.getCharityOverview();
@@ -329,7 +330,22 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
      */
     private boolean render() {
         Logger.d(TAG, "render");
-        if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
+        if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_STREAK,false))
+        {
+            showProgressDialog();
+            SyncHelper.getStreak();
+        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
+            showProgressDialog();
+            SyncHelper.syncBadgesData();
+        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,false))
+        {
+            showProgressDialog();
+            SyncHelper.getAchievedBadged();
+        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,false))
+        {
+            showProgressDialog();
+            SyncHelper.getAchievedTitle();
+        }else if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
             // Data not fetched in DataStore
             Logger.d(TAG, "render: Data not fetched in CauseDataStore");
             showProgressDialog();
@@ -372,6 +388,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             // But return true so that the client can invoke a call to fetch fresh data
             return true;
         }
+        return true;
     }
 
     private void showProgressDialog() {
@@ -435,13 +452,13 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         checkBadgeData();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    /*@Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated) {
         Logger.d(TAG, "onEvent: BadgeUpdated");
         if (isVisible()){
             checkBadgeData();
         }
-    }
+    }*/
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -494,7 +511,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
         mRunButton.setVisibility(View.VISIBLE);
         hideProgressDialog();
-
+        checkBadgeData();
     }
 
     public CauseData getCurrentCause(){
@@ -518,4 +535,60 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         });
         animator.start();
     }
+
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
+    {
+        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            render();
+        }else
+        {
+//            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated)
+    {
+        if(badgeUpdated.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            render();
+        }else
+        {
+//            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetAchivement onGetAchivement)
+    {
+        if(onGetAchivement.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            //Pull historical run data;
+            render();
+
+        }else
+        {
+//            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetTitle onGetTitle)
+    {
+        if(onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            //Pull historical run data;
+            render();
+//            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+//            SyncHelper.forceRefreshEntireWorkoutHistory();
+//            onLoginSuccess();
+        }else
+        {
+//            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+
 }

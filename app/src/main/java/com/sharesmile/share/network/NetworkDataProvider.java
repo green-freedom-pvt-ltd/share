@@ -241,7 +241,7 @@ public class NetworkDataProvider {
             throw new IllegalArgumentException("Empty URL " + url);
         }
         Request.Builder requestBuilder = new Request.Builder().url(url);
-        if (MainApplication.isTokenAvailable()) {
+        if (MainApplication.isTokenAvailable() || MainApplication.isLogin()) {
             requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
         }
         Request request = requestBuilder.build();

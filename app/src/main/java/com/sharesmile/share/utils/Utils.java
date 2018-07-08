@@ -1829,6 +1829,19 @@ public class Utils {
 
     public static void checkStreak() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        // just to change the format from dd/MM/yyyy to dd-MM-yyyy
+        if(userDetails.getStreakCurrentDate().length()>0)
+        {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
+                userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
         AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_STREAK_CHECK);
         boolean sendStreak = false;
         if(userDetails!=null) {

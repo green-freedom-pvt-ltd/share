@@ -380,7 +380,7 @@ public class SyncService extends GcmTaskService {
             result = GcmNetworkManager.RESULT_RESCHEDULE;
         }
 
-
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_BADGES,true);
         EventBus.getDefault().post(new UpdateEvent.BadgeUpdated(result));
         return result;
     }
@@ -1513,7 +1513,7 @@ public class SyncService extends GcmTaskService {
 
             result = ExpoBackoffTask.RESULT_FAILURE;
         }
-
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_STREAK,true);
         EventBus.getDefault().post(new UpdateEvent.OnGetStreak(result));
         return result;
 
@@ -1611,7 +1611,7 @@ public class SyncService extends GcmTaskService {
 
             result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
-
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,true);
         EventBus.getDefault().post(new UpdateEvent.OnGetAchivement(result));
         return result;
 
@@ -1686,7 +1686,7 @@ public class SyncService extends GcmTaskService {
 
             result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
-
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,true);
         EventBus.getDefault().post(new UpdateEvent.OnGetTitle(result));
         return result;
 

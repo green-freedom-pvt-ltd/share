@@ -264,7 +264,9 @@ public class LoginImpl {
             Utils.setOnboardingShown();
         }
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_TOKEN, true);
-        SyncHelper.getStreak();
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+        SyncHelper.forceRefreshEntireWorkoutHistory();
+        mListener.onLoginSuccess();
         //show Toast confirmation
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)
