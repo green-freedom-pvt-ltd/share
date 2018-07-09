@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:gravity="top|center"
+    android:gravity="center"
+    android:layout_gravity="center"
     >
     <LinearLayout
         android:id="@+id/badge_layout"
@@ -16,21 +17,21 @@
         >
         <RelativeLayout
             android:id="@+id/badge_rl"
-            android:layout_width="86dp"
+            android:layout_width="70dp"
             android:layout_height="74dp">
 
             <ImageView
                 android:id="@+id/iv_acheivements"
-                android:layout_width="75dp"
-                android:layout_height="87dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:scaleType="centerInside"
                 android:src="@drawable/badge_image" />
 
             <com.sharesmile.share.views.LBTextView
                 android:id="@+id/tv_badge_count"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginBottom="11dp"
@@ -38,11 +39,11 @@
                 android:gravity="center"
                 android:text="x99"
                 android:textColor="@color/white"
-                android:textSize="10sp" />
+                android:textSize="8sp" />
             <ImageView
                 android:id="@+id/iv_star"
-                android:layout_width="58dp"
-                android:layout_height="24dp"
+                android:layout_width="48dp"
+                android:layout_height="25dp"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentBottom="true"
                 android:src="@drawable/star_2"
@@ -57,8 +58,8 @@
            android:layout_height="wrap_content">
            <ImageView
                android:layout_centerInParent="true"
-               android:layout_width="55dp"
-               android:layout_height="61dp"
+               android:layout_width="60dp"
+               android:layout_height="65dp"
                android:src="@drawable/polygon"
                />
            <com.sharesmile.share.views.LBTextView
@@ -78,9 +79,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:id="@+id/tv_acheivements_title"
-        android:textSize="11sp"
+        android:textSize="9sp"
         android:textColor="@color/black_53"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="5dp"
         tools:text="Change Maker"
         />
     </LinearLayout>

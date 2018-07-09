@@ -87,6 +87,7 @@
             android:text="@string/charity_overview_title_header_you_are_a"
             android:gravity="center"
             android:id="@+id/title_header_tv"
+
             />
         <com.sharesmile.share.views.LBTextView
             android:layout_width="wrap_content"

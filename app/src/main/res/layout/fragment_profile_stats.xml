@@ -59,7 +59,9 @@
                         android:maxLines="2"
                         android:textColor="@color/black_64"
                         android:textSize="12sp"
-                        tools:text="EDUCATION MASTER, CAPTAIN PLANET" />
+                        tools:text="EDUCATION MASTER, CAPTAIN PLANET"
+
+                        />
 
                     <com.sharesmile.share.views.MSBTextView
                         android:id="@+id/tv_impact"
@@ -207,9 +209,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="19dp"
-                        android:layout_marginTop="40dp"
+                        android:layout_marginTop="30dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
                         android:orientation="horizontal"
-                        tools:listitem="@layout/rv_achievements_row_item" />
+                        tools:listitem="@layout/rv_achievements_row_item"
+
+                        />
                     <include layout="@layout/rv_achievements_row_item"
                         android:visibility="invisible"
                         />

@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mLoginHandler = new LoginImpl(this, this);
-        EventBus.getDefault().register(this);
+//        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         initUi();
 

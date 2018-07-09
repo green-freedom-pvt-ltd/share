@@ -80,7 +80,7 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));
             charity_overview_card.setTag(position);
             charity_overview_card.setOnClickListener(this);
-            Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F27181"),charityCategoryTitle);
+            Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F37181"),charityCategoryTitle);
             Utils.addStars(star_layout,categoryStats.getCategoryNoOfStars(),context);
             //TODO hack
 //            categoryStats.setCategoryImageUrl("https://s3.ap-south-1.amazonaws.com/impact-deployments-mobilehub-361440758/assets/category_images/22/category_image.jpg");

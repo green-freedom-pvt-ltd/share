@@ -173,7 +173,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         getFragmentController().hideToolbar();
         render();
 
-        prepareOnboardingOverlays();
+
         if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
             SyncHelper.getCharityOverview();
 
@@ -511,6 +511,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
         mRunButton.setVisibility(View.VISIBLE);
         hideProgressDialog();
+        prepareOnboardingOverlays();
         checkBadgeData();
     }
 

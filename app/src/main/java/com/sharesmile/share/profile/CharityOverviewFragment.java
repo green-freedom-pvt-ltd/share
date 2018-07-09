@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Title;
 import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
@@ -111,12 +112,17 @@ public class CharityOverviewFragment extends BaseFragment{
                         AchievedTitleDao.Properties.CategoryName.eq(categoryStats.getCategoryName())).list();
         if(achievedTitles.size()>0)
         {
-            titleHeader.setText(getResources().getString(R.string.charity_overview_title_header_you_are_a));
+            TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+            List<Title> titles = titleDao.queryBuilder()
+                    .where(TitleDao.Properties.TitleId.eq(achievedTitles.get(0).getTitleId())).list();
+            titleHeader.setText(titles.get(0).getDescription_1());
+            titleHeader.setVisibility(View.VISIBLE);
             title.setText(achievedTitles.get(0).getTitle());
 
         }else
         {
             title.setText(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+            titleHeader.setVisibility(View.GONE);
             titleHeader.setText("");
         }
     }
