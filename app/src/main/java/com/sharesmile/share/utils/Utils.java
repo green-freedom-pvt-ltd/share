@@ -1951,7 +1951,7 @@ public class Utils {
     }
 
     public static String dateToString(Date date) {
-        String dateString = "";
+        String dateString = null;
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             dateString = simpleDateFormat.format(date);
