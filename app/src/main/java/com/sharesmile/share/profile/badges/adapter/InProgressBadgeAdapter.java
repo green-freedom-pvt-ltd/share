@@ -84,7 +84,7 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
                 {
                     achievementAmount.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (achievedBadge.getParamDone()*1000)) + " "+UnitsManager.getDistanceLabel()+"/ "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (badge.getBadgeParameter()*1000))+" "+UnitsManager.getDistanceLabel());
                 }
-                ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl()+badge.getImageUrl(),badgeImageView,
+                ShareImageLoader.getInstance().loadImage(badge.getImageUrl(),badgeImageView,
                         ContextCompat.getDrawable(context,R.drawable.badge_image));
                 Utils.setStarImage(badge.getNoOfStars(),starImageView);
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));

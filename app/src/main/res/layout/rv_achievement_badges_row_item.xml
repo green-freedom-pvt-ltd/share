@@ -5,7 +5,7 @@
     android:layout_height="113dp"
     android:layout_marginBottom="6dp"
     android:background="@color/white"
-    android:paddingRight="20dp"
+
 
     android:weightSum="1">
 
@@ -40,7 +40,7 @@
     <LinearLayout
         android:layout_width="0dip"
         android:layout_height="match_parent"
-        android:layout_weight="0.7"
+        android:layout_weight="0.6"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:weightSum="1"

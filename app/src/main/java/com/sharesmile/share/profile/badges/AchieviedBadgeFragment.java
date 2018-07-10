@@ -193,7 +193,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 shareMessage = badge.getShare_badge_content();
                 name = badge.getName();
                 Utils.setStarImage(badge.getNoOfStars(), starIv);
-                ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl() + badge.getImageUrl(), badgeIv,
+                ShareImageLoader.getInstance().loadImage(badge.getImageUrl(), badgeIv,
                         ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
             }
         }

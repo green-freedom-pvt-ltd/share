@@ -330,11 +330,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
      */
     private boolean render() {
         Logger.d(TAG, "render");
-        if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_STREAK,false))
-        {
-            showProgressDialog();
-            SyncHelper.getStreak();
-        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
+        if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
             showProgressDialog();
             SyncHelper.syncBadgesData();
         }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,false))

@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/black"
+            android:textColor="@color/black_64"
             android:text="@string/charity_overview_title_header_you_are_a"
             android:gravity="center"
             android:id="@+id/title_header_tv"
@@ -92,8 +92,8 @@
         <com.sharesmile.share.views.LBTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textColor="@color/black_64"
             android:text="Women Empowerment Messiah"
             android:gravity="center"
             android:id="@+id/title_tv"
@@ -116,7 +116,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_charity_amount_raised"
             android:textSize="24sp"
-            android:textColor="@color/black"
+            android:textColor="@color/black_64"
             />
             <com.sharesmile.share.views.LBTextView
                 android:layout_width="wrap_content"
@@ -143,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_star_earned"
                 android:textSize="24sp"
-                android:textColor="@color/black"
+                android:textColor="@color/black_64"
                 android:drawableRight="@drawable/star_badges"
                 android:gravity="center"
                 android:drawablePadding="5dp"

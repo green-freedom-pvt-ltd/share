@@ -74,7 +74,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:text="1230"
-                        android:textColor="@color/black"
+                        android:textColor="@color/black_64"
                         android:textSize="20sp" />
 
                     <LinearLayout
@@ -92,7 +92,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="571"
-                            android:textColor="@color/black"
+                            android:textColor="@color/black_64"
                             android:textSize="14sp" />
 
                         <com.sharesmile.share.views.LBTextView

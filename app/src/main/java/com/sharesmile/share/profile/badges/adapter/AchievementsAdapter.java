@@ -100,7 +100,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                     Badge badge = badges.get(0);
                     String s = badge.getName();
                     acheivementsTitle.setText(s);
-                    ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl()+badge.getImageUrl(),acheivementsImageView,
+                    ShareImageLoader.getInstance().loadImage(badge.getImageUrl(),acheivementsImageView,
                             ContextCompat.getDrawable(context,R.drawable.badge_image));
                     int starCount = badge.getNoOfStars();
                     Utils.setStarImage(starCount,starImageView);

@@ -59,18 +59,20 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
     }
 
     class CharityOverviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        CardView charity_overview_card;
+        CardView charityOverviewCard;
         TextView charityCategoryTitle;
         ImageView charityOverviewImageView;
         TextView charityAmount;
-        LinearLayout star_layout;
+        LinearLayout starLayout;
+        LinearLayout charityOverviewLayout;
         public CharityOverviewViewHolder(View itemView) {
             super(itemView);
             charityCategoryTitle = itemView.findViewById(R.id.tv_charity_category_title);
             charityOverviewImageView = itemView.findViewById(R.id.iv_charity_overview);
             charityAmount = itemView.findViewById(R.id.tv_charity_amount);
-            charity_overview_card = itemView.findViewById(R.id.charity_overview_card);
-            star_layout = itemView.findViewById(R.id.star_layout);
+            charityOverviewCard = itemView.findViewById(R.id.charity_overview_card);
+            charityOverviewLayout = itemView.findViewById(R.id.charity_overview_layout);
+            starLayout = itemView.findViewById(R.id.star_layout);
 
         }
 
@@ -78,14 +80,24 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
             CategoryStats categoryStats = charityOverview.getCategoryStats().get(position);
             charityCategoryTitle.setText(categoryStats.getCategoryName());
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));
-            charity_overview_card.setTag(position);
-            charity_overview_card.setOnClickListener(this);
+            charityOverviewCard.setTag(position);
+            charityOverviewCard.setOnClickListener(this);
             Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F37181"),charityCategoryTitle);
-            Utils.addStars(star_layout,categoryStats.getCategoryNoOfStars(),context);
-            //TODO hack
-//            categoryStats.setCategoryImageUrl("https://s3.ap-south-1.amazonaws.com/impact-deployments-mobilehub-361440758/assets/category_images/22/category_image.jpg");
+            Utils.addStars(starLayout,categoryStats.getCategoryNoOfStars(),context);
             ShareImageLoader.getInstance().loadImage(categoryStats.getCategoryImageUrl(),charityOverviewImageView,
                     ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);;
+            if(position==0)
+            {
+                layoutParams.setMargins(Utils.dpToPx(24),0,Utils.dpToPx(12),0);
+            }else if(position==charityOverview.getCategoryStats().size()-1)
+            {
+                layoutParams.setMargins(Utils.dpToPx(12),0,Utils.dpToPx(24),0);
+            }else
+            {
+                layoutParams.setMargins(Utils.dpToPx(12),0,Utils.dpToPx(12),0);
+            }
+            charityOverviewLayout.setLayoutParams(layoutParams);
         }
 
         @Override

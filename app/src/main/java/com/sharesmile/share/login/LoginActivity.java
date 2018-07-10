@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mLoginHandler = new LoginImpl(this, this);
-//        EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         initUi();
 
@@ -173,6 +173,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else {
             mLoginContainer.setVisibility(View.VISIBLE);
             mProgressContainer.setVisibility(View.GONE);
+        }
+    }
+
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
+    {
+        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+            SyncHelper.forceRefreshEntireWorkoutHistory();
+            onLoginSuccess();
+        }else
+        {
+            MainApplication.showToast(getResources().getString(R.string.login_error));
         }
     }
 
