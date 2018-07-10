@@ -1546,9 +1546,9 @@ public class SyncService extends GcmTaskService {
 
                 List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder()
                         .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdAchieved())).list();
-                if(badges.size()>0)
-                {
+                if(badges.size()>0) {
                     achievedBadge.setNoOfStarAchieved(badges.get(0).getNoOfStars());
+                }
                     if(jsonObject.has("cause_title")) {
                         String causeName = jsonObject.optString("cause_title",null);
                         if(causeName == null || causeName.equalsIgnoreCase("null"))
@@ -1557,18 +1557,18 @@ public class SyncService extends GcmTaskService {
                                     .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).list();
                             if(badgesInProgress.size()>0)
                             achievedBadge.setCauseName(badgesInProgress.get(0).getName());
-                            else
+                            else if(badges.size()>0)
                             { // just for safety, should not enter this condition.
                                 achievedBadge.setCauseName(badges.get(0).getName());
                             }
                         }else {
                             achievedBadge.setCauseName(causeName);
                         }
-                    }else
+                    }else if(badges.size()>0)
                     {
                         achievedBadge.setCauseName(badges.get(0).getName());
                     }
-                }
+
                 achievedBadge.setIsSync(true);
                 List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
                         .where(AchievedBadgeDao.Properties.ServerId.eq(achievedBadge.getServerId()),

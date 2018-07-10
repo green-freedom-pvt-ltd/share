@@ -320,7 +320,6 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
     public void tellYourFriends() {
         Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
-        shareMessage = "I have started my changemaker journey. Have you? Join onelink.to/impact";
         Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                 String.format(shareMessage,name));
         AnalyticsEvent.create(Event.ON_SELECT_SHARE_BADGE).put("badgeId", badgeId)

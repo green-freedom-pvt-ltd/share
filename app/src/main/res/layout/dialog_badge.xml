@@ -65,8 +65,8 @@
 
                 <ImageView
                     android:id="@+id/iv_badge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="154dp"
+                    android:layout_height="184dp"
                     android:src="@drawable/badge_image" />
 
                 <ImageView
@@ -77,7 +77,9 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/star_2"
                     app:layout_anchor="@+id/iv_badge"
-                    app:layout_anchorGravity="bottom|center" />
+                    app:layout_anchorGravity="bottom|center"
+                    android:layout_marginBottom="15dp"
+                    />
             </android.support.design.widget.CoordinatorLayout>
 
             <com.sharesmile.share.views.LBTextView
