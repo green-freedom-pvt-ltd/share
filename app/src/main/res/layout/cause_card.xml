@@ -70,8 +70,8 @@
                     android:id="@+id/run_screen_title"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="22"
-                    android:text="Sponsor a Child, Foster a Future! askkmd"
+                    android:layout_weight="26"
+                    android:text="Sponsor a Child, Foster a Future! askkmdsdlkfj"
                     android:textColor="@color/greyish_brown_two"
                     android:textSize="@dimen/text_size_18sp"
                     />
@@ -80,18 +80,18 @@
                     android:id="@+id/run_screen_sponsor"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="15"
                     tools:text="by Shwas Foundation"
                     android:textColor="@color/warm_grey_three"
                     android:textSize="@dimen/text_size_10sp"
-                    android:gravity="center_vertical"
+
                     />
 
                 <com.sharesmile.share.views.LRTextView
                     android:id="@+id/run_screen_description"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="22"
+                    android:layout_weight="20"
                     android:paddingTop="2dp"
                     android:ellipsize="end"
                     android:maxLines="2"
@@ -102,7 +102,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="12"
+                    android:layout_weight="9"
                     android:paddingTop="2dp">
 
                     <com.sharesmile.share.views.LBTextView
@@ -112,7 +112,9 @@
                         android:text="54% Remaining"
                         android:textColor="@color/greyish_brown_two"
                         android:layout_alignParentRight="true"
-                        android:textSize="@dimen/text_size_8sp" />
+                        android:textSize="@dimen/text_size_8sp"
+                        android:layout_centerVertical="true"
+                        />
 
                 </RelativeLayout>
 
@@ -149,7 +151,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="24"
+                    android:layout_weight="20"
                     android:paddingTop="7dp"
                     android:clipChildren="false">
 

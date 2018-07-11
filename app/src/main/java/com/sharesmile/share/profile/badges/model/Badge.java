@@ -22,9 +22,10 @@ public class Badge {
     private String description2;
     @SerializedName("description3")
     private String description3;
-    @SerializedName("description_inprogress")
-    private String descriptionInProgress;
+    //todo hack
     @SerializedName("share_badge_content")
+    private String descriptionInProgress;
+    @SerializedName("description_inprogress")
     private String shareBadgeContent;
     @SerializedName("badge_parameter")
     private double badgeParameter;

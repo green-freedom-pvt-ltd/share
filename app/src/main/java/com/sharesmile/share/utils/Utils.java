@@ -1802,18 +1802,17 @@ public class Utils {
             LBTextView lbTextView = new LBTextView(context);
             lbTextView.setText(cause_no_of_stars);
             lbTextView.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.star_badges,0);
-            layoutStar.addView(layoutStar);
+            layoutStar.addView(lbTextView);
         }else
         {
             if(cause_no_of_stars==0)
             {// to give the layout height of the star
-                ImageView imageView = new ImageView(context);
+                LBTextView lbTextView = new LBTextView(context);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(5,0,5,0);
-                imageView.setLayoutParams(layoutParams);
-                imageView.setImageResource(R.drawable.star_badges);
-                imageView.setVisibility(View.INVISIBLE);
-                layoutStar.addView(imageView);
+                lbTextView.setLayoutParams(layoutParams);
+                lbTextView.setText("-");
+                layoutStar.addView(lbTextView);
             }else
             for(int i=0;i<cause_no_of_stars;i++)
             {
@@ -1967,6 +1966,7 @@ public class Utils {
         Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
+            if(dateString!=null)
             date = simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();

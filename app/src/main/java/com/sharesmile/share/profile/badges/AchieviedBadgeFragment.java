@@ -21,6 +21,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.Badge;
@@ -64,7 +65,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
     @BindView(R.id.iv_star)
     ImageView starIv;
     @BindView(R.id.badge_layout)
-    CoordinatorLayout badgeLayout;
+    RelativeLayout badgeLayout;
     @BindView(R.id.badge_amount_raised_tv)
     TextView badgeAmountRaised;
     @BindView(R.id.badge_upgrade_tv)
@@ -187,7 +188,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 Badge badge = badges.get(0);
                 badgeEarnedTv.setText(badge.getDescription1());
                 badgeTitle.setText(badge.getName());
-                badgeTitleHeaderTv.setVisibility(View.INVISIBLE);
+                badgeTitleHeaderTv.setVisibility(View.GONE);
                 badgeAmountRaised.setText(badge.getDescription2());
                 badgeUpgrade.setText(badge.getDescription3());
                 shareMessage = badge.getShare_badge_content();

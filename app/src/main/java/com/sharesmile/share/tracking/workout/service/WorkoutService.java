@@ -375,7 +375,7 @@ public class WorkoutService extends Service implements
             Cursor cursor = database.rawQuery("SELECT "
                     + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
                     + " FROM " + AchievedBadgeDao.TABLENAME + " where "
-                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle() +
+                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle().replace("'","''") +
                     "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
                     + MainApplication.getInstance().getUserID(), new String[]{});
             cursor.moveToFirst();

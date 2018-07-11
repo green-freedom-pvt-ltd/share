@@ -36,7 +36,11 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.53"
                 android:orientation="vertical"
-                android:padding="5dp">
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                >
 
                 <com.sharesmile.share.views.LBKTextView
                     android:id="@+id/tv_cause_name"

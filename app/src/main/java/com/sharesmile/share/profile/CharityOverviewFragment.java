@@ -116,14 +116,11 @@ public class CharityOverviewFragment extends BaseFragment{
             List<Title> titles = titleDao.queryBuilder()
                     .where(TitleDao.Properties.TitleId.eq(achievedTitles.get(0).getTitleId())).list();
             titleHeader.setText(titles.get(0).getDescription_1());
-            titleHeader.setVisibility(View.VISIBLE);
             title.setText(achievedTitles.get(0).getTitle());
-
         }else
         {
-            title.setText(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
-            titleHeader.setVisibility(View.GONE);
-            titleHeader.setText("");
+            titleHeader.setText(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+            title.setText("\"Titles\"");
         }
     }
 

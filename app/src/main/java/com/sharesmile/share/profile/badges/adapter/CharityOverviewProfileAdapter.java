@@ -22,8 +22,10 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.OpenCharityOverview;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CharityOverview;
+import com.sharesmile.share.profile.model.CharityOverviewColors;
 import com.sharesmile.share.utils.Utils;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static com.sharesmile.share.core.application.MainApplication.getContext;
@@ -35,11 +37,14 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
     OpenCharityOverview openCharityOverview;
     CharityOverview charityOverview;
     Context context;
+    CharityOverviewColors charityOverviewColors;
     public CharityOverviewProfileAdapter(OpenCharityOverview openCharityOverview, CharityOverview charityOverview,Context context)
     {
         this.context = context;
         this.openCharityOverview = openCharityOverview;
         this.charityOverview = charityOverview;
+        charityOverviewColors = new CharityOverviewColors();
+
     }
     @Override
     public CharityOverviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -82,11 +87,17 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(categoryStats.getCategoryRaised()));
             charityOverviewCard.setTag(position);
             charityOverviewCard.setOnClickListener(this);
-            Utils.setGradientBackground(Color.parseColor("#FAAFD0"),Color.parseColor("#F37181"),charityCategoryTitle);
+            try {
+                Utils.setGradientBackground(Color.parseColor("#" + charityOverviewColors.colorsHashMap.get(categoryStats.getCategoryName()).lightColor), Color.parseColor("#" + charityOverviewColors.colorsHashMap.get(categoryStats.getCategoryName()).darkColor), charityCategoryTitle);
+            }catch (Exception e)
+            {
+                Utils.setGradientBackground(Color.parseColor("#FEA38E"), Color.parseColor("#F3775B"), charityCategoryTitle);
+                e.printStackTrace();
+            }
             Utils.addStars(starLayout,categoryStats.getCategoryNoOfStars(),context);
             ShareImageLoader.getInstance().loadImage(categoryStats.getCategoryImageUrl(),charityOverviewImageView,
                     ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);;
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
             if(position==0)
             {
                 layoutParams.setMargins(Utils.dpToPx(24),0,Utils.dpToPx(12),0);

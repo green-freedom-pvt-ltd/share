@@ -2,9 +2,11 @@ package com.sharesmile.share.profile;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -840,15 +842,18 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             if (tempPhotoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(getContext(), Utils.getFileProvider(getContext()), tempPhotoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.setClipData(ClipData.newRawUri("", photoURI));
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 getActivity().startActivityForResult(takePictureIntent, Constants.REQUEST_IMAGE_CAPTURE);
             }
         }
     }
 
     private void dispatchGetPictureFromGalleryIntent() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        /*intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);*/
         getActivity().startActivityForResult(Intent.createChooser(intent, "Select Picture"), Constants.REQUEST_IMAGE_CAPTURE);
     }
 
@@ -911,11 +916,18 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public void setImageFromGallery(Intent data) {
         Uri uri = data.getData();
         String path = "";
-        if (android.os.Build.VERSION.SDK_INT <= 18) {
+        /*if (android.os.Build.VERSION.SDK_INT <= 18) {
             path = Utils.getRealPathFromURI_API11to18(getContext(), uri);
         } else {
             path = Utils.getRealPathFromURI_API19(getContext(), uri);
-        }
+        }*/
+        Uri selectedImage = data.getData();
+        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContext().getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+        cursor.moveToFirst();
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        path = cursor.getString(columnIndex);
+        cursor.close();
         tempPhotoFile = new File(path);
 //        Picasso.with(getContext()).load(photoFile).into(imgProfile);
     }
