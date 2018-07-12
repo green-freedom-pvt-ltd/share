@@ -1966,7 +1966,7 @@ public class Utils {
         Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
-            if(dateString!=null)
+            if(dateString!=null || !dateString.equals("null"))
             date = simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();

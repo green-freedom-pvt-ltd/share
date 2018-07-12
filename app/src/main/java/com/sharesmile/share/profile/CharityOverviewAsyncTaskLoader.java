@@ -24,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -80,6 +82,7 @@ public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverv
                         causeStats.setCauseName(causeKey);
                         causeStats.setCause_raised(causeValue.getInt("cause_raised"));
                         causeStats.setCause_workouts(causeValue.getInt("cause_workouts"));
+                        causeStats.setCause_create_time(causeValue.getString("cause_create_time"));
                         causeStats.setCause_image_url(causeValue.getString("cause_image"));
                         ArrayList<String> sponsorArrayList = new ArrayList<>();
                         if(causeValue.has("sponsor"))
@@ -121,6 +124,11 @@ public class CharityOverviewAsyncTaskLoader extends AsyncTaskLoader<CharityOverv
 
                         causeStatsArrayList.add(causeStats);
                     }
+                    Collections.sort(causeStatsArrayList, new Comparator<CauseStats>() {
+                        public int compare(CauseStats o1, CauseStats o2) {
+                            return o2.getCause_create_time().compareTo(o1.getCause_create_time());
+                        }
+                    });
                     categoryStats.setCauseStats(causeStatsArrayList);
                     categoryStatsArrayList.add(categoryStats);
                 }
