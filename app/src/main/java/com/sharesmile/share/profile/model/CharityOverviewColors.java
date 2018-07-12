@@ -16,7 +16,7 @@ public class CharityOverviewColors {
         colorsHashMap.put("Education",new Colors("182674","3366db"));
         colorsHashMap.put("Women Empowerment",new Colors("f37282","fdb2d3"));
         colorsHashMap.put("Child Rights",new Colors("d168fc","f39ff1"));
-        colorsHashMap.put("Animal Welfare",new Colors("",""));
+        colorsHashMap.put("Animal Welfare",new Colors("4d346c","664292"));
         colorsHashMap.put("Disaster Relief",new Colors("7c3422","be5e39"));
         colorsHashMap.put("Sports",new Colors("",""));
         colorsHashMap.put("Poverty",new Colors("f7b90c","fee214"));
