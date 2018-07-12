@@ -74,6 +74,7 @@ import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.profile.streak.StreakGoalFragment;
+import com.sharesmile.share.share_n_feed.ShareNFeedFragment;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
 import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
@@ -631,7 +632,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void share() {
-        AssetManager assetManager = getAssets();
+        replaceFragment(new ShareNFeedFragment(),true);
+        /*AssetManager assetManager = getAssets();
         InputStream istr;
         Bitmap bitmap = null;
         try {
@@ -641,7 +643,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             // handle exception
         }
         Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
-                getString(R.string.share_msg));
+                getString(R.string.share_msg));*/
     }
 
     public void showHome() {
@@ -810,7 +812,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             @Override
             public void onClick(View v) {
                 try {
-                    Intent intent = ShareUtils.shareOnWhatsAppIntent(MainActivity.this, message, pathUrl);
+                    Intent intent = ShareUtils.shareOnWhatsAppIntent( message, pathUrl);
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(MainActivity.this, "Whats app not installed ", Toast.LENGTH_LONG).show();

@@ -20,29 +20,47 @@ import com.sharesmile.share.R;
 
 public class ShareUtils {
 
-    public static Intent shareOnWhatsAppIntent(Context context, String message, Uri imageUrl) {
+    public static Intent shareOnWhatsAppIntent(String message, Uri imageUrl) {
 
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, message);
         sendIntent.setPackage("com.whatsapp");
-
         //
-        sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, imageUrl);
-        sendIntent.setType("image/*");
+        if(imageUrl!=null) {
+            sendIntent.putExtra(Intent.EXTRA_STREAM, imageUrl);
+            sendIntent.setType("image/*");
+        }else
+        {
+            sendIntent.setType("text/plain");
+        }
         return sendIntent;
 
     }
 
+    public static Intent shareOnTwitter(String message)
+    {
+        String tweetUrl = "https://twitter.com/intent/tweet?text="+message+"&url="
+                + "onelink.to/impact";
+        Uri uri = Uri.parse(tweetUrl);
+        Intent tweet = new Intent(Intent.ACTION_VIEW,uri);
+        return tweet;
+    }
+
+    public static Intent shareOnGmail(String message)
+    {
+        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Your Subject");
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+        return intent;
+    }
+
     public static void shareOnFb(Activity activity, String message, Uri imageUrl) {
 
-        FacebookSdk.sdkInitialize(activity.getApplicationContext());
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse(activity.getString(R.string.url_play_store_with_utm)))
-                .setContentTitle(activity.getString(R.string.app_name))
-                .setContentDescription(message)
+//                .setContentTitle(activity.getString(R.string.app_name))
+                .setQuote(message)
                 .setImageUrl(imageUrl)
                 .build();
 
@@ -51,20 +69,22 @@ public class ShareUtils {
         shareDialog.registerCallback(new CallbackManagerImpl(), new FacebookCallback<Sharer.Result>() {
             @Override
             public void onSuccess(Sharer.Result result) {
+                System.out.println();
                 //Toast.makeText(getActivity(),"Success",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancel() {
+                System.out.println();
                 //  Toast.makeText(getActivity(),"Failed",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-
+                System.out.println();
             }
         });
-        shareDialog.show(content);
+        shareDialog.show(content, ShareDialog.Mode.AUTOMATIC);
     }
 
 }
