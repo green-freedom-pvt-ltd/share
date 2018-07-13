@@ -57,7 +57,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
     public int getItemCount() {
         if(achievedBadgeCounts.size()>4)
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN)?achievedBadgeCounts.size():4;
-        else return achievedBadgeCounts.size();
+        else return 4;
     }
 
     class AchievementsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -86,6 +86,15 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
         public void bindView(int position) {
             badgeLayout.setTag(position);
             badgeLayout.setOnClickListener(this);
+            if(position>achievedBadgeCounts.size()-1)
+            {
+                tvMore.setText("");
+                moreLayout.setVisibility(View.VISIBLE);
+                badgeRl.setVisibility(View.GONE);
+                acheivementsTitle.setText("");
+
+            }else
+            {
             if((position==3 && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN) && achievedBadgeCounts.size()>4)) {
                 tvMore.setText(achievedBadgeCounts.size()-3+" More");
                 moreLayout.setVisibility(View.VISIBLE);
@@ -100,35 +109,39 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                     Badge badge = badges.get(0);
                     String s = badge.getName();
                     acheivementsTitle.setText(s);
-                    ShareImageLoader.getInstance().loadImage(badge.getImageUrl(),acheivementsImageView,
-                            ContextCompat.getDrawable(context,R.drawable.badge_image));
+                    ShareImageLoader.getInstance().loadImage(badge.getImageUrl(), acheivementsImageView,
+                            ContextCompat.getDrawable(context, R.drawable.badge_image));
                     int starCount = badge.getNoOfStars();
-                    Utils.setStarImage(starCount,starImageView);
-                    if(achievedBadgeCounts.get(position).getCount()>1)
-                    {
+                    Utils.setStarImage(starCount, starImageView);
+                    if (achievedBadgeCounts.get(position).getCount() > 1) {
                         badgeCount.setVisibility(View.VISIBLE);
-                        badgeCount.setText("x"+achievedBadgeCounts.get(position).getCount());
-                    }else
-                    {
+                        badgeCount.setText("x" + achievedBadgeCounts.get(position).getCount());
+                    } else {
                         badgeCount.setVisibility(View.INVISIBLE);
                     }
 
                 }
+            }
             }
         }
 
         @Override
         public void onClick(View view) {
             int position = (int) view.getTag();
-            if((position==3 && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN))) {
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN,true);
-                notifyItemRangeChanged(3,achievedBadgeCounts.size()-1);
+            if(position>achievedBadgeCounts.size()-1)
+            {
+
             }else {
-                AchievedBadgeCount achievedBadgeCount = achievedBadgeCounts.get(position);
-                List<Badge> badges = MainApplication.getInstance().getDbWrapper().getBadgeDao().queryBuilder()
-                        .where(BadgeDao.Properties.BadgeId.eq(achievedBadgeCounts.get(position).getAchievedBadgeId())).list();
-                if (badges != null && badges.size() > 0) {
-                    seeAchievedBadge.showBadgeDetails(achievedBadgeCount.getAchievedBadgeId(), badges.get(0).getType());
+                if ((position == 3 && !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN))) {
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, true);
+                    notifyItemRangeChanged(3, achievedBadgeCounts.size() - 1);
+                } else {
+                    AchievedBadgeCount achievedBadgeCount = achievedBadgeCounts.get(position);
+                    List<Badge> badges = MainApplication.getInstance().getDbWrapper().getBadgeDao().queryBuilder()
+                            .where(BadgeDao.Properties.BadgeId.eq(achievedBadgeCounts.get(position).getAchievedBadgeId())).list();
+                    if (badges != null && badges.size() > 0) {
+                        seeAchievedBadge.showBadgeDetails(achievedBadgeCount.getAchievedBadgeId(), badges.get(0).getType());
+                    }
                 }
             }
         }

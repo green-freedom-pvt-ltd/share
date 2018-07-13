@@ -37,9 +37,14 @@
                 android:textSize="14sp"
                 android:layout_weight="1"
                 android:textColor="@color/white"
+                android:minHeight="45dp"
 
                 />
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                />
             <ImageView
                 android:id="@+id/iv_charity_overview"
                 android:layout_width="140dp"

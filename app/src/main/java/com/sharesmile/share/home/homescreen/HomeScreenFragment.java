@@ -189,8 +189,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }else
         {
             long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             if(workoutCount>0) {
-                AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+
                 List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                         .where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CHANGEMAKER),
                                 AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED),
@@ -220,9 +221,22 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 }
             }
             List<CauseData> causeDataArrayList = CauseDataStore.getInstance().getCausesToShow();
+            ArrayList<Long> causeIds = new ArrayList<>();
             for(CauseData causeData : causeDataArrayList)
             {
                 Utils.setBadgeForCategory(causeData,Constants.BADGE_TYPE_CAUSE,0);
+                causeIds.add(causeData.getId());
+            }
+            List<AchievedBadge> achievedBadgesInProgress = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+            for(AchievedBadge achievedBadge : achievedBadgesInProgress)
+            {
+                if(!causeIds.contains(achievedBadge.getCauseId()))
+                {
+                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                    achievedBadgeDao.update(achievedBadge);
+                }
             }
             Utils.checkStreak();
         }

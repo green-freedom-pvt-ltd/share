@@ -377,7 +377,8 @@ public class WorkoutService extends Service implements
                     + " FROM " + AchievedBadgeDao.TABLENAME + " where "
                     + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle().replace("'","''") +
                     "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
-                    + MainApplication.getInstance().getUserID(), new String[]{});
+                    + MainApplication.getInstance().getUserID()+
+                    " and "+AchievedBadgeDao.Properties.BadgeType.columnName+" is '"+Constants.BADGE_TYPE_CAUSE+"'", new String[]{});
             cursor.moveToFirst();
 
             int starCount = cursor.getInt(cursor.getColumnIndex("no_of_stars"));

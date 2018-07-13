@@ -380,7 +380,7 @@ public class SyncService extends GcmTaskService {
             result = GcmNetworkManager.RESULT_RESCHEDULE;
         }
 
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_BADGES,true);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_BADGES, true);
         EventBus.getDefault().post(new UpdateEvent.BadgeUpdated(result));
         return result;
     }
@@ -413,50 +413,44 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription_inprogress(badge.getDescriptionInProgress());
             badgeDb.setShare_badge_content(badge.getShareBadgeContent());
             //TODO hack
-            switch (badge.getType())
-            {
-                case BADGE_TYPE_CAUSE :
-                    switch ((int) badge.getBadgeParameter())
-                    {
-                        case 10 :
+            switch (badge.getType()) {
+                case BADGE_TYPE_CAUSE:
+                    switch ((int) badge.getBadgeParameter()) {
+                        case 10:
                             badgeDb.setBadgeParameter(1);
 
                             break;
-                        case 50 :
+                        case 50:
                             badgeDb.setBadgeParameter(3);
                             break;
-                        case 250 :
+                        case 250:
                             badgeDb.setBadgeParameter(7);
                             break;
 
                     }
 
                     break;
-                case BADGE_TYPE_CHANGEMAKER :
+                case BADGE_TYPE_CHANGEMAKER:
                     badgeDb.setBadgeParameter(badge.getBadgeParameter());
                     break;
-                case BADGE_TYPE_STREAK :
-                    switch ((int) badge.getBadgeParameter())
-                    {
-                        case 7 :
+                case BADGE_TYPE_STREAK:
+                    switch ((int) badge.getBadgeParameter()) {
+                        case 7:
                             badgeDb.setBadgeParameter(1);
-
                             break;
-                        case 15 :
+                        case 15:
+                            badgeDb.setBadgeParameter(2);
+                            break;
+                        case 30:
                             badgeDb.setBadgeParameter(3);
                             break;
-                        case 30 :
-                            badgeDb.setBadgeParameter(5);
+                        case 60:
+                            badgeDb.setBadgeParameter(4);
                             break;
-                            case 60 :
-                            badgeDb.setBadgeParameter(7);
-                            break;
-
                     }
-
                     break;
-                case BADGE_TYPE_MARATHON :
-                    badgeDb.setBadgeParameter(badge.getBadgeParameter()/10);
+                case BADGE_TYPE_MARATHON:
+                    badgeDb.setBadgeParameter(badge.getBadgeParameter() / 10);
                     break;
             }
 
@@ -801,10 +795,10 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("goal", prev.getStreakGoalID());
             jsonObject.put("reminder_time", Utils.getReminderTime().getTimeInMillis());
-            if(prev.getTitle1()>0)
-            jsonObject.put("achieved_title_1", prev.getTitle1());
-            if(prev.getTitle2()>0)
-            jsonObject.put("achieved_title_2", prev.getTitle2());
+            if (prev.getTitle1() > 0)
+                jsonObject.put("achieved_title_1", prev.getTitle1());
+            if (prev.getTitle2() > 0)
+                jsonObject.put("achieved_title_2", prev.getTitle2());
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
@@ -900,22 +894,20 @@ public class SyncService extends GcmTaskService {
                     integerAchievedBadgeHashMap.put(achievedBadge.getId(), achievedBadge);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("user_id", user_id);
-                    if(achievedBadge.getCauseId()!=0)
-                    jsonObject.put("cause_id", achievedBadge.getCauseId());
+                    if (achievedBadge.getCauseId() != 0)
+                        jsonObject.put("cause_id", achievedBadge.getCauseId());
                     jsonObject.put("badge_id_in_progress", achievedBadge.getBadgeIdInProgress());
-                    if(achievedBadge.getBadgeIdAchieved()!=0)
-                    jsonObject.put("badge_id_achieved", achievedBadge.getBadgeIdAchieved());
+                    if (achievedBadge.getBadgeIdAchieved() != 0)
+                        jsonObject.put("badge_id_achieved", achievedBadge.getBadgeIdAchieved());
                     jsonObject.put("achievement_time", Utils.dateToString(achievedBadge.getBadgeIdAchievedDate()));
-                    if(achievedBadge.getCategory()!=0)
-                    jsonObject.put("category_id", achievedBadge.getCategory());
+                    if (achievedBadge.getCategory() != 0)
+                        jsonObject.put("category_id", achievedBadge.getCategory());
                     jsonObject.put("badge_type", achievedBadge.getBadgeType());
                     jsonObject.put("parameter_completed", achievedBadge.getParamDone());
                     jsonObject.put("client_achievement_id", achievedBadge.getId());
-                    if(achievedBadge.getCategoryStatus().equalsIgnoreCase(Constants.BADGE_IN_PROGRESS))
-                    {
+                    if (achievedBadge.getCategoryStatus().equalsIgnoreCase(Constants.BADGE_IN_PROGRESS)) {
                         jsonObject.put("badge_is_completed", false);
-                    }else if(achievedBadge.getCategoryStatus().equalsIgnoreCase(Constants.BADGE_COMPLETED))
-                    {
+                    } else if (achievedBadge.getCategoryStatus().equalsIgnoreCase(Constants.BADGE_COMPLETED)) {
                         jsonObject.put("badge_is_completed", true);
                     }
                     if (achievedBadge.getServerId() > 0) {
@@ -1477,10 +1469,10 @@ public class SyncService extends GcmTaskService {
             Logger.d(TAG, "getStreak response : " + responseString);
             JSONObject jsonObject = new JSONObject(responseString);
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            userDetails.setStreakMaxCount(jsonObject.optInt("max_streak",0));
-            userDetails.setStreakCount(jsonObject.optInt("current_streak",0));
-            userDetails.setStreakCurrentDate(jsonObject.optString("current_streak_date",""));
-            userDetails.setStreakAdded(jsonObject.optBoolean("streak_added",false));
+            userDetails.setStreakMaxCount(jsonObject.optInt("max_streak", 0));
+            userDetails.setStreakCount(jsonObject.optInt("current_streak", 0));
+            userDetails.setStreakCurrentDate(jsonObject.optString("current_streak_date", ""));
+            userDetails.setStreakAdded(jsonObject.optBoolean("streak_added", false));
             MainApplication.getInstance().setUserDetails(userDetails);
 
             result = ExpoBackoffTask.RESULT_SUCCESS;
@@ -1513,7 +1505,7 @@ public class SyncService extends GcmTaskService {
 
             result = ExpoBackoffTask.RESULT_FAILURE;
         }
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_STREAK,true);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_STREAK, true);
         EventBus.getDefault().post(new UpdateEvent.OnGetStreak(result));
         return result;
 
@@ -1533,41 +1525,38 @@ public class SyncService extends GcmTaskService {
 
                 AchievedBadge achievedBadge = new AchievedBadge();
                 achievedBadge.setUserId(MainApplication.getInstance().getUserID());
-                achievedBadge.setCauseId(jsonObject.optInt("cause_id",0));
-                achievedBadge.setBadgeIdInProgress(jsonObject.optInt("badge_id_in_progress",0));
-                achievedBadge.setBadgeIdAchieved(jsonObject.optInt("badge_id_achieved",0));
-                achievedBadge.setCategory(jsonObject.optInt("category_id",0));
+                achievedBadge.setCauseId(jsonObject.optInt("cause_id", 0));
+                achievedBadge.setBadgeIdInProgress(jsonObject.optInt("badge_id_in_progress", 0));
+                achievedBadge.setBadgeIdAchieved(jsonObject.optInt("badge_id_achieved", 0));
+                achievedBadge.setCategory(jsonObject.optInt("category_id", 0));
                 achievedBadge.setParamDone(jsonObject.getDouble("parameter_completed"));
                 achievedBadge.setBadgeIdAchievedDate(Utils.stringToDate(jsonObject.getString("achievement_time")));
                 achievedBadge.setBadgeType(jsonObject.getString("badge_type"));
                 achievedBadge.setServerId(jsonObject.getLong("server_achievement_id"));
 
-                achievedBadge.setCategoryStatus(jsonObject.getBoolean("badge_is_completed")?Constants.BADGE_COMPLETED:Constants.BADGE_IN_PROGRESS);
+                achievedBadge.setCategoryStatus(jsonObject.getBoolean("badge_is_completed") ? Constants.BADGE_COMPLETED : Constants.BADGE_IN_PROGRESS);
 
                 List<com.sharesmile.share.Badge> badges = badgeDao.queryBuilder()
                         .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdAchieved())).list();
-                if(badges.size()>0) {
+                if (badges.size() > 0) {
                     achievedBadge.setNoOfStarAchieved(badges.get(0).getNoOfStars());
                 }
-                    if(jsonObject.has("cause_title")) {
-                        String causeName = jsonObject.optString("cause_title",null);
-                        if(causeName == null || causeName.equalsIgnoreCase("null"))
-                        {
-                            List<com.sharesmile.share.Badge> badgesInProgress = badgeDao.queryBuilder()
-                                    .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).list();
-                            if(badgesInProgress.size()>0)
+                if (jsonObject.has("cause_title")) {
+                    String causeName = jsonObject.optString("cause_title", null);
+                    if (causeName == null || causeName.equalsIgnoreCase("null")) {
+                        List<com.sharesmile.share.Badge> badgesInProgress = badgeDao.queryBuilder()
+                                .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).list();
+                        if (badgesInProgress.size() > 0)
                             achievedBadge.setCauseName(badgesInProgress.get(0).getName());
-                            else if(badges.size()>0)
-                            { // just for safety, should not enter this condition.
-                                achievedBadge.setCauseName(badges.get(0).getName());
-                            }
-                        }else {
-                            achievedBadge.setCauseName(causeName);
+                        else if (badges.size() > 0) { // just for safety, should not enter this condition.
+                            achievedBadge.setCauseName(badges.get(0).getName());
                         }
-                    }else if(badges.size()>0)
-                    {
-                        achievedBadge.setCauseName(badges.get(0).getName());
+                    } else {
+                        achievedBadge.setCauseName(causeName);
                     }
+                } else if (badges.size() > 0) {
+                    achievedBadge.setCauseName(badges.get(0).getName());
+                }
 
                 achievedBadge.setIsSync(true);
                 List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
@@ -1611,7 +1600,7 @@ public class SyncService extends GcmTaskService {
 
             result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,true);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, true);
         EventBus.getDefault().post(new UpdateEvent.OnGetAchivement(result));
         return result;
 
@@ -1686,7 +1675,7 @@ public class SyncService extends GcmTaskService {
 
             result = ExpoBackoffTask.RESULT_RESCHEDULE;
         }
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,true);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_ACHIEVED_TITLE, true);
         EventBus.getDefault().post(new UpdateEvent.OnGetTitle(result));
         return result;
 

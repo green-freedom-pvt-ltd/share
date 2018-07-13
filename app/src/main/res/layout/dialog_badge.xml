@@ -53,7 +53,7 @@ android:layout_weight="1"
                 android:text="@string/upgraded_your_badge_txt"
                 android:textColor="@color/clr_5d"
                 android:textSize="14sp"
-                android:layout_weight="1"
+                android:layout_weight="0.5"
                 android:gravity="center|top"/>
 
             <RelativeLayout
@@ -128,7 +128,7 @@ android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center|top"
+                android:gravity="center"
                 android:textColor="@color/greyish_brown_two"
                 android:textSize="16sp"
                 tools:text="Badge Upgrade : Raise \u20B91500 more" />

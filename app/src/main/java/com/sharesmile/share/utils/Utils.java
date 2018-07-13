@@ -59,6 +59,8 @@ import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
@@ -1407,8 +1409,8 @@ public class Utils {
         if (causeData != null) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.CauseId.eq(causeData.getId()),
-                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
-                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())/*,
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)*/).list();
             categoryCompleted = causeData.isCompleted();
         } else {
             achievedBadges = achievedBadgeDao.queryBuilder()
@@ -1602,6 +1604,7 @@ public class Utils {
             achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
             achievedBadge.setNoOfStarAchieved(badgeAcheived.getNoOfStars());
             achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+
         } else {
             achievedBadge.setBadgeIdAchieved(0);
             achievedBadge.setNoOfStarAchieved(0);
@@ -1621,6 +1624,7 @@ public class Utils {
                 } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
+                achievedBadge.setCauseName(badge.getName());
                 break;
             case Constants.BADGE_TYPE_CHANGEMAKER:
                 if (indexAcheived == indexInProgress) {
@@ -1628,6 +1632,7 @@ public class Utils {
                 } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
+                achievedBadge.setCauseName(badge.getName());
                 break;
             case Constants.BADGE_TYPE_MARATHON:
                 if (indexAcheived == indexInProgress) {
@@ -1635,6 +1640,7 @@ public class Utils {
                 } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
+                achievedBadge.setCauseName(badge.getName());
                 break;
         }
 
@@ -1925,13 +1931,44 @@ public class Utils {
 
     public static void saveTitleIdToUserDetails(AchievedTitle achievedTitle) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+        List<Title> titles = titleDao.queryBuilder()
+                .where(TitleDao.Properties.CategoryId.eq(achievedTitle.getCategoryId()))
+                .orderAsc(TitleDao.Properties.GoalNStars).list();
+        int title1 = userDetails.getTitle1();
+        int title2 = userDetails.getTitle2();
+
         if(userDetails.getTitle1()==0)
         {
             userDetails.setTitle1(achievedTitle.getTitleId());
-        }else if(userDetails.getTitle1()!=achievedTitle.getTitleId() && userDetails.getTitle2()==0)
-        {
-            userDetails.setTitle2(achievedTitle.getTitleId());
+        }else {
+            boolean b = true;
+                for (int i = 0; i < titles.size(); i++) {
+                    if (titles.get(i).getTitleId() == title1) {
+                            userDetails.setTitle1(achievedTitle.getTitleId());
+                            b = false;
+                            break;
+                    }
+                }
+
+            if(b && title1!=achievedTitle.getTitleId())
+            {
+                if(userDetails.getTitle2() == 0)
+                {
+                    userDetails.setTitle2(achievedTitle.getTitleId());
+                }else
+                {
+                    for (int i = 0; i < titles.size(); i++) {
+                        if (titles.get(i).getTitleId() == title2) {
+                            userDetails.setTitle2(achievedTitle.getTitleId());
+                            break;
+                        }
+                    }
+                }
+            }
+
         }
+
         MainApplication.getInstance().setUserDetails(userDetails);
     }
 

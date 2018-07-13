@@ -494,7 +494,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
                 title += getTitle(userDetails.getTitle2());
             }
         }
-        profileTitle.setText(title.toUpperCase());
+        profileTitle.setText(title);
     }
 
     private String getTitle(int title1) {
