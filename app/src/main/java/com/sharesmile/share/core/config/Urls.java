@@ -30,6 +30,7 @@ public class Urls {
     private static final String MESSAGE_URL = "/messageCenter";
     private static final String LEADERBOARD_URL = "/leaderboard/";
     private static final String FRAUDSTERS_URL = "/fraudsters/";
+    private static final String REFERPROGRAMLEADERBOARDLIST_URL = "/fraudsters/";
 
     private static final String BADGES_URL = "/badges/";
     private static final String STREAK_URL = "/streak/";
@@ -144,6 +145,10 @@ public class Urls {
 
     public static String getLeaderboardUrl(String interval) {
         String url = getNodeBaseUrl() + LEADERBOARD_URL + "?interval=" + interval + "&orderby=amount";
+        return url;
+    }
+    public static String getReferprogramleaderboardlistUrl() {
+        String url = getNodeBaseUrl() + REFERPROGRAMLEADERBOARDLIST_URL;
         return url;
     }
 

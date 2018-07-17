@@ -19,11 +19,14 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
+import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardDataUpdated;
+import com.sharesmile.share.leaderboard.referprogram.model.ReferProgramBoard;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.refer_program.model.ReferProgramList;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.network.NameValuePair;
@@ -62,6 +65,7 @@ public class LeaderBoardDataStore {
     private LeagueBoard leagueBoard;
     private Map<String, LeaderBoardList> globalLeaderBoardMap;
     private TeamLeaderBoard myTeamLeaderBoard;
+    private ReferProgramList referProgramList;
 
     private Context context;
 
@@ -89,6 +93,8 @@ public class LeaderBoardDataStore {
                 .getObject(Constants.PREF_LEAGUEBOARD_CACHED_DATA, LeagueBoard.class);
         this.myTeamLeaderBoard = SharedPrefsManager.getInstance()
                 .getObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, TeamLeaderBoard.class);
+        this.referProgramList = SharedPrefsManager.getInstance()
+                .getObject(Constants.PREF_REFER_PROGRAM_LEADERBOARD_CACHED_DATA, ReferProgramList.class);
     }
 
     /**
@@ -138,6 +144,14 @@ public class LeaderBoardDataStore {
                     .getObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, TeamLeaderBoard.class);
         }
         return myTeamLeaderBoard;
+    }
+
+    public ReferProgramList getReferProgramList() {
+        if (referProgramList == null){
+            referProgramList = SharedPrefsManager.getInstance()
+                    .getObject(Constants.PREF_REFER_PROGRAM_LEADERBOARD_CACHED_DATA, ReferProgramList.class);
+        }
+        return referProgramList;
     }
 
     public int getMyTeamId() {
@@ -295,6 +309,13 @@ public class LeaderBoardDataStore {
         SharedPrefsManager.getInstance().setObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, board);
     }
 
+    public void setReferLeaderBoardData(ReferProgramList referProgramList){
+        LeaderBoardDataStore.this.referProgramList = referProgramList;
+
+        SharedPrefsManager.getInstance().setObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, referProgramList);
+
+    }
+
     public void updateLeagueBoardData() {
         NetworkDataProvider.doGetCallAsync(Urls.getLeagueBoardUrl(), new NetworkAsyncCallback<LeagueBoard>() {
             @Override
@@ -328,6 +349,23 @@ public class LeaderBoardDataStore {
                 Logger.d(TAG, "Successfully fetched LeaderBoard data for " + interval);
                 setGlobalLeaderBoard(interval, list);
                 EventBus.getDefault().post(new GlobalLeaderBoardDataUpdated(true, interval));
+            }
+        });
+    }
+
+    public void updateReferLeaderBoardData() {
+        NetworkDataProvider.doGetCallAsync(Urls.getReferprogramleaderboardlistUrl(), new NetworkAsyncCallback<ReferProgramList>() {
+            @Override
+            public void onNetworkFailure(NetworkException ne) {
+                Logger.e(TAG, "Couldn't fetch GlobalLeaderBoard data: " + ne);
+                ne.printStackTrace();
+                EventBus.getDefault().post(new ReferLeaderBoardDataUpdated(false));
+            }
+
+            @Override
+            public void onNetworkSuccess(ReferProgramList list) {
+                setReferLeaderBoardData(list);
+                EventBus.getDefault().post(new ReferLeaderBoardDataUpdated(true));
             }
         });
     }

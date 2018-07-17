@@ -243,6 +243,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     public abstract BOARD_TYPE getBoardType();
 
     public enum BOARD_TYPE {
+        REFER_LEADERBOARD,
         GLOBAL_LEADERBOARD,
         LEAGUEBOARD,
         TEAM_LEADERBAORD;

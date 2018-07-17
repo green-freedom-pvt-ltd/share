@@ -1,4 +1,4 @@
-package com.sharesmile.share.share_n_feed;
+package com.sharesmile.share.refer_program;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,15 +15,16 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
 import com.sharesmile.share.utils.ShareUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ShareNFeedFragment extends BaseFragment{
+public class ReferProgramFragment extends BaseFragment{
 
-    private static final String TAG = "ShareNFeedFragment";
+    private static final String TAG = "ReferProgramFragment";
 
     @BindView(R.id.share_code)
     TextView shareCode;
@@ -74,7 +75,7 @@ public class ShareNFeedFragment extends BaseFragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share_n_feed_leadearboard:
-
+                getFragmentController().replaceFragment(new ReferLeaderBoardFragment(),true);
                 return true;
 
             default:
