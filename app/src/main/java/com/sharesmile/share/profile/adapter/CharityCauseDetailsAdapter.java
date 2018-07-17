@@ -96,7 +96,7 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
             {
                 causeDescription.setText("");
             }
-            Utils.addStars(layoutStar,causeStats.getCause_no_of_stars(),context);
+            Utils.addStars(layoutStar,causeStats.getCause_no_of_stars(),context,false);
             ShareImageLoader.getInstance().loadImage(causeStats.getCause_image_url(),ivCause,
                     ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
         }

@@ -412,7 +412,8 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription3(badge.getDescription3());
             badgeDb.setDescription_inprogress(badge.getDescriptionInProgress());
             badgeDb.setShare_badge_content(badge.getShareBadgeContent());
-            //TODO hack
+            badgeDb.setBadgeParameter(badge.getBadgeParameter());
+            /*//TODO hack
             switch (badge.getType()) {
                 case BADGE_TYPE_CAUSE:
                     switch ((int) badge.getBadgeParameter()) {
@@ -452,7 +453,7 @@ public class SyncService extends GcmTaskService {
                 case BADGE_TYPE_MARATHON:
                     badgeDb.setBadgeParameter(badge.getBadgeParameter() / 10);
                     break;
-            }
+            }*/
 
 
             badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());

@@ -229,6 +229,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             }
             List<AchievedBadge> achievedBadgesInProgress = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
+                            AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CAUSE),
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
             for(AchievedBadge achievedBadge : achievedBadgesInProgress)
             {

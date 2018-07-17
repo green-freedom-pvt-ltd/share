@@ -128,7 +128,6 @@ import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_STREAK_UPLOADED_FIRST_TIME;
-import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_STRIDE_LENGTH;
@@ -1359,23 +1358,6 @@ public class Utils {
         SharedPrefsManager.getInstance().setBoolean(PREF_STREAK_UPLOADED_FIRST_TIME, b);
     }
 
-    public static void setUserLoggedIn(UserDetails userDetails) {
-        try {
-            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN, "{}"));
-            JSONObject user = new JSONObject();
-            user.put("streak_goal_id", userDetails.getStreakGoalID());
-            user.put("streak_goal_distance", userDetails.getStreakGoalDistance());
-            user.put("streak_count", userDetails.getStreakCount());
-            user.put("streak_current_date", userDetails.getStreakCurrentDate());
-            user.put("streak_goal_id", userDetails.getStreakGoalID());
-            user.put("streak_goal_id", userDetails.getStreakGoalID());
-            user.put("reminder_time", SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME, ""));
-            jsonObject.put(userDetails.getUserId() + "", user);
-            SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN, jsonObject.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void setMenuText(MenuItem menuItem, Context context, String s, int color) {
         SpannableString spannableString = new SpannableString(s);
@@ -1645,6 +1627,7 @@ public class Utils {
         }
 
         achievedBadge.setCategoryStatus(status);
+
         if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
             return achievedBadge.getBadgeIdAchieved();
         else
@@ -1801,7 +1784,7 @@ public class Utils {
         return currentTs - millisElapsedSinceBeginning;
     }
 
-    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context) {
+    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context,boolean showGreyStar) {
         layoutStar.removeAllViews();
         if(cause_no_of_stars>3)
         {
@@ -1817,7 +1800,14 @@ public class Utils {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(5,0,5,0);
                 lbTextView.setLayoutParams(layoutParams);
-                lbTextView.setText("-");
+                if(showGreyStar) {
+                    lbTextView.setText("");
+                    lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.star_badges_grey, 0);
+                }else
+                {
+                    lbTextView.setText("-");
+                    lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                }
                 layoutStar.addView(lbTextView);
             }else
             for(int i=0;i<cause_no_of_stars;i++)
@@ -1839,9 +1829,11 @@ public class Utils {
         {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
             try {
-                Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
-                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
-                userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
+                if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null")) {
+                    Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
+                    userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1854,7 +1846,16 @@ public class Utils {
                 if (userDetails.getStreakCurrentDate() != null
                         && userDetails.getStreakCurrentDate().length() > 0) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    Date streakDate;
+                    if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null"))
+                    {
+                         streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    }else
+                    {
+                        streakDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
+                                .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+                    }
+
                     Date currentDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
                             .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
                     long diff = currentDate.getTime() - streakDate.getTime();
@@ -1868,8 +1869,6 @@ public class Utils {
                     builder.put("goal_distance",userDetails.getStreakGoalDistance());
                     builder.put("goal_run_progress",userDetails.getStreakRunProgress());
                     builder.buildAndDispatch();
-                    //
-
                     if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                         if ((dayCount > 1)) {
                             userDetails.setStreakRunProgress(0);
@@ -1880,9 +1879,6 @@ public class Utils {
                         } else if (dayCount == 1) {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);
-
-//                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
-
                         }
                     }
                 } else {
@@ -1913,7 +1909,9 @@ public class Utils {
 
                     float run_progress = cursor.getFloat(cursor.getColumnIndex("total_distance"));
                     userDetails.setStreakRunProgress(run_progress);
+                    userDetails.addStreakCount();
                 }
+
                 MainApplication.getInstance().setUserDetails(userDetails);
                 if(sendStreak)
                     SyncHelper.uploadStreak();
@@ -2003,7 +2001,7 @@ public class Utils {
         Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
-            if(dateString!=null || !dateString.equals("null"))
+            if(dateString!=null && !dateString.equals("null"))
             date = simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();

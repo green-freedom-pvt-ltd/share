@@ -52,6 +52,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -613,7 +614,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     private void showImpactLeague() {
         Logger.d(TAG, "showImpactLeague");
-        if (LeaderBoardDataStore.getInstance().toShowLeague()) {
+        LeaderBoardDataStore leaderBoardDataStore = LeaderBoardDataStore.getInstance();
+        if (leaderBoardDataStore.toShowLeague()) {
             LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
             replaceFragment(leageBoardFragment, true);
         } else {

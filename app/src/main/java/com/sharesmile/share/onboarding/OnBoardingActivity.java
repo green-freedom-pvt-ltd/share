@@ -185,7 +185,6 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                     replaceFragment(new FragmentThankYou(), true);
                 } else if (fragment instanceof FragmentThankYou) {
                     SyncHelper.oneTimeUploadUserData();
-                    Utils.setUserLoggedIn(MainApplication.getInstance().getUserDetails());
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

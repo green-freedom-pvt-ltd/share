@@ -94,7 +94,7 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
                 Utils.setGradientBackground(Color.parseColor("#FEA38E"), Color.parseColor("#F3775B"), charityCategoryTitle);
                 e.printStackTrace();
             }
-            Utils.addStars(starLayout,categoryStats.getCategoryNoOfStars(),context);
+            Utils.addStars(starLayout,categoryStats.getCategoryNoOfStars(),context,true);
             ShareImageLoader.getInstance().loadImage(categoryStats.getCategoryImageUrl(),charityOverviewImageView,
                     ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);

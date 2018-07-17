@@ -1059,7 +1059,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
                 materialTapTargetPrompt = Utils.setOverlay(OnboardingOverlay.STREAK_COUNT,
                         streakValue,
                         getActivity(),
-                        true, false, false);
+                        true, true, false);
                 materialTapTargetPrompt.show();
             }
         }
