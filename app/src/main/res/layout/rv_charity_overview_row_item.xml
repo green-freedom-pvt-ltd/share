@@ -6,7 +6,11 @@
     android:orientation="vertical"
     android:paddingLeft="15dp"
     android:paddingRight="15dp">
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:id="@+id/empty_view_top"
+        />
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,32 +18,31 @@
         app:cardCornerRadius="3dp"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="12dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:minHeight="103dp"
-            android:layout_height="wrap_content"
+            android:layout_height="103dp"
             android:weightSum="1">
 
             <ImageView
                 android:id="@+id/iv_cause"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:layout_weight="0.47"
+                android:layout_weight="0.5"
                 android:scaleType="centerCrop"
                 android:src="@drawable/placeholder_thankyou_image" />
 
             <LinearLayout
                 android:layout_width="0dip"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="0.53"
+                android:layout_weight="0.5"
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 >
 
                 <com.sharesmile.share.views.LBKTextView
@@ -53,24 +56,28 @@
 
                 <com.sharesmile.share.views.LRTextView
                     android:id="@+id/tv_cause_description"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="with Impact Foundation"
                     android:textColor="@color/black_38"
-                    android:textSize="9sp" />
+                    android:textSize="9sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    />
 
                 <LinearLayout
+                    android:layout_weight="1"
                     android:id="@+id/layout_star"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp">
+                    android:layout_marginTop="3dp">
 
                 </LinearLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="11dp">
+                    >
 
                     <com.sharesmile.share.views.LBTextView
                         android:id="@+id/tv_charity_amount"
@@ -80,16 +87,19 @@
                         android:layout_centerVertical="true"
                         android:text="1230"
                         android:textColor="@color/black_64"
-                        android:textSize="20sp" />
+                        android:textSize="16sp"
+                        android:layout_gravity="bottom"
+                        android:layout_weight="1"
+                        />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_gravity="right"
                         android:gravity="right"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        >
 
                         <com.sharesmile.share.views.LBTextView
                             android:id="@+id/tv_charity_workout"
@@ -98,7 +108,7 @@
                             android:layout_weight="1"
                             android:text="571"
                             android:textColor="@color/black_64"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
 
                         <com.sharesmile.share.views.LBTextView
                             android:layout_width="wrap_content"
@@ -108,8 +118,13 @@
                             android:textSize="7sp" />
                     </LinearLayout>
 
-                </RelativeLayout>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:id="@+id/empty_view_bottom"
+        />
 </LinearLayout>

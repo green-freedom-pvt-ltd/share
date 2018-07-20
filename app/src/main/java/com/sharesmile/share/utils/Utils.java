@@ -1970,17 +1970,23 @@ public class Utils {
         MainApplication.getInstance().setUserDetails(userDetails);
     }
 
-    public static void setStarImage(int starCount, ImageView starImageView) {
-        switch (starCount) {
-            case 1 :
-                starImageView.setImageResource(R.drawable.star_1);
-                break;
-            case 2 :
-                starImageView.setImageResource(R.drawable.star_2);
-                break;
-            case 3 :
-                starImageView.setImageResource(R.drawable.star_3);
-                break;
+    public static void setStarImage(int starCount, ImageView starImageView,String badge_type) {
+        if(badge_type.equals(Constants.BADGE_TYPE_CHANGEMAKER) || badge_type.equals(Constants.BADGE_TYPE_MARATHON))
+        {
+            starImageView.setVisibility(View.GONE);
+        }else {
+            switch (starCount) {
+                case 1:
+                    starImageView.setImageResource(R.drawable.star_1);
+                    break;
+                case 2:
+                    starImageView.setImageResource(R.drawable.star_2);
+                    break;
+                case 3:
+                    starImageView.setImageResource(R.drawable.star_3);
+                    break;
+            }
+            starImageView.setVisibility(View.VISIBLE);
         }
     }
 

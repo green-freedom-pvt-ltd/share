@@ -79,14 +79,21 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
                 Badge badge = badges.get(0);
                 if(badge.getType().equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))
                 {
-                    achievementAmount.setText(((int)achievedBadge.getParamDone()) + " days/ "+((int)badge.getBadgeParameter())+" days");
+                    if(achievedBadge.getParamDone()==1)
+                    {
+                        achievementAmount.setText(((int)achievedBadge.getParamDone()) + " day/ "+((int)badge.getBadgeParameter())+" days");
+                    }else
+                    {
+                        achievementAmount.setText(((int)achievedBadge.getParamDone()) + " days/ "+((int)badge.getBadgeParameter())+" days");
+                    }
+
                 }else
                 {
                     achievementAmount.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (achievedBadge.getParamDone()*1000)) + " "+UnitsManager.getDistanceLabel()+"/ "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (badge.getBadgeParameter()*1000))+" "+UnitsManager.getDistanceLabel());
                 }
                 ShareImageLoader.getInstance().loadImage(badge.getImageUrl(),badgeImageView,
                         ContextCompat.getDrawable(context,R.drawable.badge_image));
-                Utils.setStarImage(badge.getNoOfStars(),starImageView);
+                Utils.setStarImage(badge.getNoOfStars(),starImageView,badge.getType());
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;
                 achievementBadgeDescription.setText(badge.getDescription_inprogress());

@@ -180,7 +180,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-        SyncHelper.oneTimeUploadUserData();
     }
 
     private void checkAchievedBadgeData() {
@@ -460,7 +459,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         if (isVisible()) {
             render();
         }
-        checkBadgeData();
     }
 
     /*@Subscribe(threadMode = ThreadMode.MAIN)

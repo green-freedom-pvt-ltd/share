@@ -37,7 +37,7 @@
                 android:textSize="14sp"
                 android:layout_weight="1"
                 android:textColor="@color/white"
-                android:minHeight="45dp"
+                android:minHeight="44dp"
 
                 />
             <View
@@ -47,8 +47,8 @@
                 />
             <ImageView
                 android:id="@+id/iv_charity_overview"
-                android:layout_width="140dp"
-                android:layout_height="95dp"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
                 android:src="@drawable/placeholder_thankyou_image"
                 android:scaleType="centerCrop"
                 />
@@ -57,7 +57,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bottom_corner_white_bg"
-                android:padding="10dp">
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
 
                 <com.sharesmile.share.views.LBTextView
                     android:id="@+id/tv_charity_amount"
@@ -65,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/profile"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
 
                     />
                 <LinearLayout

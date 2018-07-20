@@ -53,6 +53,8 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
         LinearLayout layoutStar;
         TextView charityAmount;
         TextView charityWorkout;
+        View emptyViewTop;
+        View emptyViewBottom;
         public CauseDetailViewHolder(View itemView) {
             super(itemView);
             ivCause = itemView.findViewById(R.id.iv_cause);
@@ -61,10 +63,26 @@ public class CharityCauseDetailsAdapter extends RecyclerView.Adapter<CharityCaus
             layoutStar = itemView.findViewById(R.id.layout_star);
             charityAmount = itemView.findViewById(R.id.tv_charity_amount);
             charityWorkout = itemView.findViewById(R.id.tv_charity_workout);
+            emptyViewTop = itemView.findViewById(R.id.empty_view_top);
+            emptyViewBottom = itemView.findViewById(R.id.empty_view_bottom);
         }
 
         public void bindView(int position) {
             CauseStats causeStats = categoryStats.getCauseStats().get(position);
+            if(position == categoryStats.getCauseStats().size()-1)
+            {
+                emptyViewBottom.setVisibility(View.VISIBLE);
+            }else
+            {
+                emptyViewBottom.setVisibility(View.GONE);
+            }
+            if(position == 0)
+            {
+                emptyViewTop.setVisibility(View.VISIBLE);
+            }else
+            {
+                emptyViewTop.setVisibility(View.GONE);
+            }
             causeName.setText(causeStats.getCauseName());
             charityAmount.setText(UnitsManager.formatRupeeToMyCurrency(causeStats.getCause_raised()));
             charityWorkout.setText(causeStats.getCause_workouts()+"");

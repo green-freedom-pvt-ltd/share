@@ -57,7 +57,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
     public int getItemCount() {
         if(achievedBadgeCounts.size()>4)
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN)?achievedBadgeCounts.size():4;
-        else return 4;
+        else return achievedBadgeCounts.size()/*4*/;
     }
 
     class AchievementsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -112,7 +112,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                     ShareImageLoader.getInstance().loadImage(badge.getImageUrl(), acheivementsImageView,
                             ContextCompat.getDrawable(context, R.drawable.badge_image));
                     int starCount = badge.getNoOfStars();
-                    Utils.setStarImage(starCount, starImageView);
+                    Utils.setStarImage(starCount, starImageView,badge.getType());
                     if (achievedBadgeCounts.get(position).getCount() > 1) {
                         badgeCount.setVisibility(View.VISIBLE);
                         badgeCount.setText("x" + achievedBadgeCounts.get(position).getCount());

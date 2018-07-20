@@ -33,7 +33,7 @@
             android:paddingLeft="40dp"
             android:paddingRight="40dp">
 
-            <com.sharesmile.share.views.LBTextView
+            <com.sharesmile.share.views.LBKTextView
                 android:id="@+id/congratulation_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                 android:text="@string/congratulations"
                 android:textColor="@color/clr_5d"
                 android:textSize="24dp"
-android:layout_weight="1"
+                android:layout_weight="0.5"
                 android:gravity="center"
                 />
 
@@ -52,8 +52,7 @@ android:layout_weight="1"
                 android:layout_gravity="center"
                 android:text="@string/upgraded_your_badge_txt"
                 android:textColor="@color/clr_5d"
-                android:textSize="14sp"
-                android:layout_weight="0.5"
+                android:textSize="18sp"
                 android:gravity="center|top"/>
 
             <RelativeLayout
@@ -61,7 +60,7 @@ android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-
+                android:layout_weight="1"
                 >
 
                 <ImageView
@@ -90,9 +89,8 @@ android:layout_weight="1"
                 android:layout_weight="1"
                 android:gravity="center|bottom"
                 android:textColor="@color/black_57"
-
-                android:textSize="18sp"
                 android:visibility="gone"
+                android:textSize="18sp"
                 tools:text="You are a"
 
 
@@ -107,11 +105,13 @@ android:layout_weight="1"
                 android:textColor="@color/black_57"
                 android:textSize="24sp"
                 tools:text="CAPTAIN PLANET"
-                android:layout_weight="1"
-
-
                 />
-
+            <LinearLayout
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             <com.sharesmile.share.views.LRTextView
                 android:id="@+id/badge_amount_raised_tv"
                 android:layout_width="match_parent"
@@ -120,19 +120,20 @@ android:layout_weight="1"
                 android:textColor="@color/greyish_brown_two"
                 android:textSize="16sp"
                 tools:text="Thanks for raising \u20B9 500 for our environment"
-                android:layout_weight="0.5"
+
                 />
 
             <com.sharesmile.share.views.LRTextView
                 android:id="@+id/badge_upgrade_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@color/greyish_brown_two"
                 android:textSize="16sp"
-                tools:text="Badge Upgrade : Raise \u20B91500 more" />
-
+                tools:text="Badge Upgrade : Raise \u20B91500 more"
+                android:layout_marginTop="5dp"
+                />
+            </LinearLayout>
         </LinearLayout>
 
         <com.sharesmile.share.views.MSBButton

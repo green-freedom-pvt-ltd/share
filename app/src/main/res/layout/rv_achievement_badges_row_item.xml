@@ -32,7 +32,6 @@
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:src="@drawable/star_3"
-            android:layout_marginBottom="2dp"
 
             />
     </RelativeLayout>
@@ -43,16 +42,14 @@
         android:layout_weight="0.6"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        android:weightSum="1"
-        android:paddingBottom="23dp"
-        android:paddingTop="17dp"
+        android:paddingBottom="26dp"
+        android:paddingTop="18dp"
         >
 
         <com.sharesmile.share.views.LBTextView
             android:id="@+id/tv_achievement_badge_title"
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="0.35"
+            android:layout_height="wrap_content"
             android:textColor="@color/black_64"
             android:textSize="18sp"
             tools:text="Education Master"
@@ -62,19 +59,18 @@
         <com.sharesmile.share.views.LRTextView
             android:id="@+id/tv_achievement_badge_description"
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="0.33"
+            android:layout_height="wrap_content"
             android:textColor="@color/black_57"
             android:textSize="10sp"
-            tools:text="Educationd"
+            tools:text="Education"
+            android:layout_weight="1"
 
             />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="0.32"
-            android:gravity="center|right"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|right"
             android:orientation="vertical">
 
             <com.sharesmile.share.views.LBTextView
