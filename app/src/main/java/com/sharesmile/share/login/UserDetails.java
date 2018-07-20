@@ -24,6 +24,11 @@ public class UserDetails implements UnObfuscable {
     private String email;
     @SerializedName("phone_number")
     private String phoneNumber;
+    @SerializedName("my_refer_code")
+    private String myReferCode;
+    @SerializedName("refer_code_used")
+    private String referCodeUsed;
+
     @SerializedName("address")
     private String address;
     @SerializedName("locality_user")
@@ -45,10 +50,10 @@ public class UserDetails implements UnObfuscable {
     private TotalAmount totalAmount;
     @SerializedName("total_distance")
     private TotalDistance totalDistance;
-    @SerializedName("sign_up")
-    private boolean signUp;
     @SerializedName("team_code")
     private int teamId;
+    @SerializedName("sign_up")
+    private boolean signUp;
     @SerializedName("body_weight")
     private float bodyWeight;
     @SerializedName("body_height")
@@ -76,6 +81,9 @@ public class UserDetails implements UnObfuscable {
     private int title1;
     @SerializedName("achieved_title_2")
     private int title2;
+
+    @SerializedName("meals_shared")
+    private int mealsShared;
 
 
     public boolean isStreakAdded() {
@@ -362,5 +370,29 @@ public class UserDetails implements UnObfuscable {
 
     public void setTitle2(int title2) {
         this.title2 = title2;
+    }
+
+    public String getMyReferCode() {
+        return myReferCode;
+    }
+
+    public void setMyReferCode(String myReferCode) {
+        this.myReferCode = myReferCode;
+    }
+
+    public String getReferCodeUsed() {
+        return referCodeUsed;
+    }
+
+    public void setReferCodeUsed(String referCodeUsed) {
+        this.referCodeUsed = referCodeUsed;
+    }
+
+    public int getMealsShared() {
+        return mealsShared;
+    }
+
+    public void setMealsShared(int mealsShared) {
+        this.mealsShared = mealsShared;
     }
 }

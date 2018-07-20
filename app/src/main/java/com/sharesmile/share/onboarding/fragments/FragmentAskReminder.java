@@ -62,13 +62,13 @@ public class FragmentAskReminder extends BaseFragment implements View.OnClickLis
             commonActions.setBackAndContinue(TAG,getResources().getString(R.string.set_reminder));
             commonActions.setContinueTextColor(R.color.white);
             yes.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
-            ((OnBoardingActivity)getActivity()).setProgressLevel(6.0f);
+            ((OnBoardingActivity)getActivity()).setProgressLevel(8.0f);
         }else if(actionSelected == 0)
         {
             commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
             commonActions.setContinueTextColor(R.color.white);
             no.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
-            ((OnBoardingActivity)getActivity()).setProgressLevel(7.0f);
+            ((OnBoardingActivity)getActivity()).setProgressLevel(9.0f);
         }
     }
     @OnClick({R.id.yes_layout,R.id.no_layout})

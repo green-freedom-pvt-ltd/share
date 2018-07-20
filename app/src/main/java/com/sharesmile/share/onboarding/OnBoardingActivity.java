@@ -17,8 +17,11 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.onboarding.fragments.FragmentAskReferCode;
 import com.sharesmile.share.onboarding.fragments.FragmentAskReminder;
 import com.sharesmile.share.onboarding.fragments.FragmentBirthday;
+import com.sharesmile.share.onboarding.fragments.FragmentEnterReferCode;
 import com.sharesmile.share.onboarding.fragments.FragmentGender;
 import com.sharesmile.share.onboarding.fragments.FragmentGoals;
 import com.sharesmile.share.onboarding.fragments.FragmentHeight;
@@ -158,12 +161,25 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
 
     private void continueAction(Fragment fragment) {
         if (fragment instanceof FragmentWelcome || fragment == null) {
-            replaceFragment(new FragmentGender(), true);
+            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+            //TODO : hack
+            if(true)
+            {
+                replaceFragment(new FragmentAskReferCode(), true);
+            }else {
+                replaceFragment(new FragmentGender(), true);
+            }
         } else {
             if (continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10)) {
                 MainApplication.showToast(getResources().getString(R.string.select_an_option));
             } else {
-                if (fragment instanceof FragmentGender) {
+                if(fragment instanceof FragmentAskReferCode)
+                {
+                    replaceFragment(new FragmentEnterReferCode(), true);
+                }else if(fragment instanceof FragmentEnterReferCode)
+                {
+                    replaceFragment(new FragmentGender(), true);
+                }else if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
                 } else if (fragment instanceof FragmentWeight) {
                     replaceFragment(new FragmentHeight(), true);
@@ -221,21 +237,29 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 onboardingQuestion.setVisibility(View.GONE);
                 progressLayout.setVisibility(View.GONE);
                 break;
+            case FragmentAskReferCode.TAG:
+//                setProgressLevel(1.0f);
+                setContinueTextColor(R.color.white_10);
+                break;
+            case FragmentEnterReferCode.TAG:
+                setProgressLevel(2.0f);
+                setContinueTextColor(R.color.white_10);
+                break;
             case FragmentGender.TAG:
-                setProgressLevel(1.0f);
+                setProgressLevel(3.0f);
                 setContinueTextColor(R.color.white_10);
                 break;
             case FragmentWeight.TAG:
-                setProgressLevel(2.0f);
-                break;
-            case FragmentHeight.TAG:
-                setProgressLevel(3.0f);
-                break;
-            case FragmentBirthday.TAG:
                 setProgressLevel(4.0f);
                 break;
-            case FragmentGoals.TAG:
+            case FragmentHeight.TAG:
                 setProgressLevel(5.0f);
+                break;
+            case FragmentBirthday.TAG:
+                setProgressLevel(6.0f);
+                break;
+            case FragmentGoals.TAG:
+                setProgressLevel(7.0f);
                 break;
             case FragmentAskReminder.TAG:
 //                setProgressLevel(6.0f);
@@ -243,7 +267,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 continueTv.setText(continueTextName);
                 break;
             case FragmentSetReminder.TAG:
-                setProgressLevel(7.0f);
+                setProgressLevel(9.0f);
                 break;
             case FragmentThankYou.TAG:
                 continueTv.setText(continueTextName);
@@ -259,7 +283,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     public void setProgressLevel(float weight) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, weight / 7);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, weight / 9);
         levelProgressBar.setLayoutParams(layoutParams);
     }
 }
