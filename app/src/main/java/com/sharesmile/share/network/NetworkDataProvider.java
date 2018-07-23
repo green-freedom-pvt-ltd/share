@@ -357,7 +357,7 @@ public class NetworkDataProvider {
         Request.Builder requestBuilder = new Request.Builder().url(url)
                 .post(body);
 
-        if (MainApplication.isLogin()) {
+        if (MainApplication.isTokenAvailable()) {
             requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
         }
         Request request = requestBuilder.build();

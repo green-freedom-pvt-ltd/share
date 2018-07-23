@@ -32,6 +32,7 @@ import com.sharesmile.share.login.UserDetails
 import com.sharesmile.share.utils.*
 import com.sharesmile.share.views.CustomTypefaceSpan
 import kotlinx.android.synthetic.main.fragment_secret_code.view.*
+import org.json.JSONObject
 import java.util.*
 
 
@@ -80,11 +81,13 @@ class LeagueCodeFragment : BaseFragment2(), View.OnClickListener {
 
     private fun verifySecretCode(code: String) {
         fragmentListener.showProgressBar()
-        val data = ArrayList<NameValuePair>()
-        data.add(BasicNameValuePair("user", MainApplication.getInstance().userID.toString()))
-        data.add(BasicNameValuePair("team", code))
-
-        NetworkDataProvider.doPostCallAsyncWithFormData(Urls.getLeagueRegistrationUrl(), data,
+//        val data = ArrayList<NameValuePair>()
+//        data.add(BasicNameValuePair("user", MainApplication.getInstance().userID.toString()))
+//        data.add(BasicNameValuePair("team", code))
+        val data = JSONObject()
+        data.put("user", MainApplication.getInstance().userID.toString())
+        data.put("team", code)
+        NetworkDataProvider.doPostCallAsync(Urls.getLeagueRegistrationUrl(), data,
                 object : NetworkAsyncCallback<LeagueTeam>() {
             override fun onNetworkFailure(ne: NetworkException?) {
                 if (fragmentListener != null){
