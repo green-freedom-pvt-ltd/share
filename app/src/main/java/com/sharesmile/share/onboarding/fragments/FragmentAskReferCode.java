@@ -37,7 +37,7 @@ public class FragmentAskReferCode extends BaseFragment implements View.OnClickLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         commonActions = ((OnBoardingActivity) getActivity());
-        commonActions.setExplainText(getContext().getResources().getString(R.string.do_you_have_referral_code), getContext().getResources().getString(R.string.reminder_explain_txt));
+        commonActions.setExplainText(getContext().getResources().getString(R.string.do_you_have_referral_code), getContext().getResources().getString(R.string.refer_code_explain_txt));
         commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
         commonActions.setContinueTextColor(R.color.white_10);
         setChecked();
@@ -49,16 +49,16 @@ public class FragmentAskReferCode extends BaseFragment implements View.OnClickLi
 
         if(actionSelected == 1)
         {
-//            commonActions.setBackAndContinue(TAG,getResources().getString(R.string.set_reminder));
+            commonActions.setBackAndContinue(TAG,getResources().getString(R.string.refer_code_continue_txt));
             commonActions.setContinueTextColor(R.color.white);
             yes.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
             ((OnBoardingActivity)getActivity()).setProgressLevel(1.0f);
         }else if(actionSelected == 0)
         {
-//            commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
+            commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
             commonActions.setContinueTextColor(R.color.white);
             no.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_selected,0,0,0);
-            ((OnBoardingActivity)getActivity()).setProgressLevel(3.0f);
+            ((OnBoardingActivity)getActivity()).setProgressLevel(2.0f);
         }
     }
     @OnClick({R.id.yes_layout,R.id.no_layout})

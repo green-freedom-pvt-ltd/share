@@ -37,7 +37,7 @@ public class FragmentEnterReferCode extends BaseFragment  {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         commonActions = ((OnBoardingActivity) getActivity());
-        commonActions.setExplainText(getContext().getResources().getString(R.string.enter_your_code), getContext().getResources().getString(R.string.reminder_explain_txt));
+        commonActions.setExplainText(getContext().getResources().getString(R.string.enter_your_code), getContext().getResources().getString(R.string.refer_code_explain_txt));
         commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
         commonActions.setContinueTextColor(R.color.white_10);
     }

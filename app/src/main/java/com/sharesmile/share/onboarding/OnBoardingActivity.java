@@ -165,6 +165,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
             //TODO : hack
             if(true)
             {
+                setProgressLevel(0);
                 replaceFragment(new FragmentAskReferCode(), true);
             }else {
                 replaceFragment(new FragmentGender(), true);
@@ -175,7 +176,13 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
             } else {
                 if(fragment instanceof FragmentAskReferCode)
                 {
-                    replaceFragment(new FragmentEnterReferCode(), true);
+                    String continueText = continueTv.getText().toString();
+                    if (continueText.equalsIgnoreCase(getResources().getString(R.string.refer_code_continue_txt))) {
+                        replaceFragment(new FragmentEnterReferCode(), true);
+                    } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
+                        replaceFragment(new FragmentGender(), true);
+                    }
+
                 }else if(fragment instanceof FragmentEnterReferCode)
                 {
                     replaceFragment(new FragmentGender(), true);
@@ -240,6 +247,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
             case FragmentAskReferCode.TAG:
 //                setProgressLevel(1.0f);
                 setContinueTextColor(R.color.white_10);
+                continueTv.setText(continueTextName);
                 break;
             case FragmentEnterReferCode.TAG:
                 setProgressLevel(2.0f);
