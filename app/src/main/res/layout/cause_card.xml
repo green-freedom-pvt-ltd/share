@@ -82,12 +82,10 @@
                     android:id="@+id/run_screen_sponsor"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="12"
+                    android:layout_weight="14"
                     tools:text="by Shwas Foundation"
                     android:textColor="@color/warm_grey_three"
                     android:textSize="10sp"
-
-
                     />
 
                 <com.sharesmile.share.views.LRTextView

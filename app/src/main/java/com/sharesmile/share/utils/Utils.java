@@ -465,12 +465,13 @@ public class Utils {
         return sec;
     }
 
-    public static void share(Context context, String shareTemplate) {
+    public static void share(Activity activity, String shareTemplate) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
         shareIntent.setType("text/plain");
-        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_via)));
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_via)));
     }
 
     public static void share(Context context, Uri bitmapUri, String shareTemplate) {
@@ -480,7 +481,9 @@ public class Utils {
         shareIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
         shareIntent.setType("image/*");
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, "send"));
+        Intent new_intent = Intent.createChooser(shareIntent, "Share via");
+        new_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(new_intent);
     }
 
     public static void shareImageWithMessage(final Context context, final String imageUrl, final String shareMessage) {
