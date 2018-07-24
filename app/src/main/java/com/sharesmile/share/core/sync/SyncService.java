@@ -58,7 +58,6 @@ import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.tracking.workout.data.model.RunList;
 import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.okhttp.Response;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
@@ -79,6 +78,7 @@ import Models.FeedLatestArticleResponse;
 import Models.LeagueBoard;
 import Models.MessageList;
 import Models.TeamLeaderBoard;
+import okhttp3.Response;
 
 import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.BADGE_TYPE_CHANGEMAKER;

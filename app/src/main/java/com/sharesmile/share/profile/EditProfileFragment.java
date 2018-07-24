@@ -429,7 +429,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         setMenuColor();
 
         if (isImageLoaded) {
-            Picasso.with(getContext()).load(photoFile).into(imgProfile);
+            Picasso.get().load(photoFile).into(imgProfile);
             isImageLoaded = false;
         } else if (!TextUtils.isEmpty(userDetails.getProfilePicture())) {
             ShareImageLoader.getInstance().loadImage(Urls.getImpactProfileS3BucketUrl() + userDetails.getProfilePicture(), imgProfile,
