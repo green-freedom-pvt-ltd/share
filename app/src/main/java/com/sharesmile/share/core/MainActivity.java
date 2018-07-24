@@ -71,6 +71,7 @@ import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.impactleague.LeagueBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.login.LoginActivity;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.home.homescreen.OnboardingOverlay;
@@ -615,7 +616,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     private void showImpactLeague() {
         Logger.d(TAG, "showImpactLeague");
         LeaderBoardDataStore leaderBoardDataStore = LeaderBoardDataStore.getInstance();
-        if (leaderBoardDataStore.toShowLeague()) {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        if (userDetails.getTeamId()>0) {
             LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
             replaceFragment(leageBoardFragment, true);
         } else {
