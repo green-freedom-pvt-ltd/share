@@ -1411,8 +1411,9 @@ public class Utils {
                 if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
                         (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))))
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-            } else
+            } else {
                 achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+            }
         } else if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || !categoryCompleted) {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
             String category = causeData == null ? type : causeData.getCategory();
@@ -1443,6 +1444,10 @@ public class Utils {
             }
         }
         if (achievedBadge != null) {
+            if(type.equals(Constants.BADGE_TYPE_STREAK))
+            {
+                achievedBadge.setParamDone(paramDone);
+            }
             achievedBadge.setCauseId(causeData == null ? 0 : causeData.getId());
             if(causeData!=null)
             achievedBadge.setCauseName(causeData.getTitle());
