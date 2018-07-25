@@ -1479,8 +1479,7 @@ public class Utils {
             if (achievedBadges.size() > 0) {
                 return -1;
             }
-        }
-        if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+        }else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.CauseId.eq(mCauseData.getId()),
