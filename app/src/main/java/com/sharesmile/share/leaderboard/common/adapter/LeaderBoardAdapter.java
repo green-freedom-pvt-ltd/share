@@ -47,10 +47,13 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     int headerOffSet = 0;
     int noOfUnsyncWorkout = 0;
     boolean showUnsync = false;
+    boolean showMeals = false;
 
-    public LeaderBoardAdapter(Context context, Parent parent, List<Workout> mWorkoutList) {
+    public LeaderBoardAdapter(Context context, Parent parent, List<Workout> mWorkoutList, boolean showMeals) {
+
         this.mContext = context;
         this.mParent = parent;
+        this.showMeals = showMeals;
         headerOffSet = (mParent != null && mParent.toShowBanner()) ? 1 : 0;
         Logger.d(TAG, "LeaderBoardAdapter, setting headeroffset as " + headerOffSet);
         noOfUnsyncWorkout = mWorkoutList!=null?mWorkoutList.size():0;
@@ -173,7 +176,12 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
             mProfileName.setText(leaderboard.getName());
-            mImpact.setText(UnitsManager.formatRupeeToMyCurrency(leaderboard.getAmount()));
+            if(showMeals)
+            {
+                mImpact.setText(leaderboard.getAmount()+"");
+            }else {
+                mImpact.setText(UnitsManager.formatRupeeToMyCurrency(leaderboard.getAmount()));
+            }
 
             final int id = mParent.getMyId();
 

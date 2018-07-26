@@ -3,6 +3,7 @@ package com.sharesmile.share.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 
 import com.facebook.FacebookCallback;
@@ -35,7 +36,6 @@ public class ShareUtils {
             sendIntent.setType("text/plain");
         }
         return sendIntent;
-
     }
 
     public static Intent shareOnTwitter(String message)
@@ -87,4 +87,16 @@ public class ShareUtils {
         shareDialog.show(content, ShareDialog.Mode.AUTOMATIC);
     }
 
+    public static boolean appInstalledOrNot(Context context,String uri) {
+        PackageManager pm = context.getPackageManager();
+        boolean app_installed;
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            app_installed = true;
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            app_installed = false;
+        }
+        return app_installed;
+    }
 }

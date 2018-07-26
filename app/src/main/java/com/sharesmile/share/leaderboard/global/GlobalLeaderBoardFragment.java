@@ -66,8 +66,8 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     }
 
     @Override
-    protected void init() {
-        super.init();
+    protected void init(boolean b) {
+        super.init(false);
         intervalSpinner.setOnItemSelectedListener(this);
         intervalSpinner.setVisibility(View.VISIBLE);
 

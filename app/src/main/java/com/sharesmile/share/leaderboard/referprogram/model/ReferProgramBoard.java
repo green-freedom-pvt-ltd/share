@@ -19,8 +19,11 @@ public class ReferProgramBoard implements UnObfuscable{
     @SerializedName("rank")
     private int rank;
 
-    @SerializedName("profile_pic")
-    private String profilePic;
+    @SerializedName("profile_picture")
+    private String profilePicture;
+
+    @SerializedName("social_thumb")
+    private String socialThumb;
 
     public int getUserId() {
         return userId;
@@ -54,18 +57,31 @@ public class ReferProgramBoard implements UnObfuscable{
         this.rank = rank;
     }
 
-    public String getProfilePic() {
-        return profilePic;
+    public String getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setProfilePic(String profilePic) {
-        this.profilePic = profilePic;
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public String getSocialThumb() {
+        return socialThumb;
+    }
+
+    public void setSocialThumb(String socialThumb) {
+        this.socialThumb = socialThumb;
     }
 
     public BaseLeaderBoardItem getLeaderBoardDbObject()
     {
+        String profilePicture = getProfilePicture();
+        if(profilePicture.length()==0)
+        {
+            profilePicture = getSocialThumb();
+        }
         BaseLeaderBoardItem lb = new BaseLeaderBoardItem(
-                getUserId(), getUserName() , getProfilePic(),
+                getUserId(), getUserName() , profilePicture,
                 0, getRank(), getMealsShared());
         return lb;
     }

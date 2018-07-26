@@ -16,6 +16,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.utils.ShareUtils;
 
 import butterknife.BindView;
@@ -59,6 +60,12 @@ public class ReferProgramFragment extends BaseFragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupToolbar();
+        init();
+    }
+
+    private void init() {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        shareCode.setText(userDetails.getMyReferCode().toUpperCase());
     }
 
     private void setupToolbar() {
@@ -92,7 +99,10 @@ public class ReferProgramFragment extends BaseFragment{
                 ShareUtils.shareOnFb(getActivity(),"Testing", Uri.parse("onelink.to/impact"));
                 break;
             case R.id.share_whatsapp :
+                if(ShareUtils.appInstalledOrNot(getContext(),"com.whatsapp"))
                 startActivity(ShareUtils.shareOnWhatsAppIntent("Testing", null));
+                else
+                    MainApplication.showToast("Whatsapp is not installed, cannot share");
                 break;
             case R.id.share_twitter :
                 startActivity(ShareUtils.shareOnTwitter("Testing"));

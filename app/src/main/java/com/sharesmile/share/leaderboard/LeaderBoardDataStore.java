@@ -354,7 +354,7 @@ public class LeaderBoardDataStore {
     }
 
     public void updateReferLeaderBoardData() {
-        NetworkDataProvider.doGetCallAsync(Urls.getReferprogramleaderboardlistUrl(), new NetworkAsyncCallback<ReferProgramList>() {
+        NetworkDataProvider.doGetCallAsync(Urls.getReferprogramleaderboardlistUrl()+"2", new NetworkAsyncCallback<ReferProgramList>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 Logger.e(TAG, "Couldn't fetch GlobalLeaderBoard data: " + ne);

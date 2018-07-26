@@ -29,6 +29,11 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("refer_code_used")
     private String referCodeUsed;
 
+    @SerializedName("referal_id")
+    private int referalId;
+    @SerializedName("referal_name")
+    private String referalName;
+
     @SerializedName("address")
     private String address;
     @SerializedName("locality_user")
@@ -394,5 +399,21 @@ public class UserDetails implements UnObfuscable {
 
     public void setMealsShared(int mealsShared) {
         this.mealsShared = mealsShared;
+    }
+
+    public int getReferalId() {
+        return referalId;
+    }
+
+    public void setReferalId(int referalId) {
+        this.referalId = referalId;
+    }
+
+    public String getReferalName() {
+        return referalName;
+    }
+
+    public void setReferalName(String referalName) {
+        this.referalName = referalName;
     }
 }

@@ -32,8 +32,8 @@ public class LeagueBoardFragment extends BaseLeagueFragment {
     }
 
     @Override
-    protected void init() {
-        super.init();
+    protected void init(boolean b) {
+        super.init(false);
     }
 
     @Override

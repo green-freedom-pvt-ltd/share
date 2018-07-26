@@ -30,7 +30,7 @@ public class Urls {
     private static final String MESSAGE_URL = "/messageCenter";
     private static final String LEADERBOARD_URL = "/leaderboard/";
     private static final String FRAUDSTERS_URL = "/fraudsters/";
-    private static final String REFERPROGRAMLEADERBOARDLIST_URL = "/fraudsters/";
+    private static final String REFERPROGRAMLEADERBOARDLIST_URL = "/referral-leaderboard?referral_program_id=";
 
     private static final String BADGES_URL = "/badges/";
     private static final String STREAK_URL = "/streak/";

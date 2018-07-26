@@ -70,14 +70,14 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View l = inflater.inflate(R.layout.fragment_drawer_leaderboard, null);
         ButterKnife.bind(this, l);
-        init();
+        init(false);
         return l;
     }
 
-    protected void init() {
+    protected void init(boolean b) {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.CauseId.eq(false)).list();
-        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this,mWorkoutList);
+        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this,mWorkoutList,b);
         mLayoutManager = new LinearLayoutManager(getContext());
         fetchData();
         mRecyclerView.setAdapter(mLeaderBoardAdapter);

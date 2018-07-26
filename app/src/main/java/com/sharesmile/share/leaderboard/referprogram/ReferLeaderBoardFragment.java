@@ -62,8 +62,8 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
     }
 
     @Override
-    protected void init() {
-        super.init();
+    protected void init(boolean b) {
+        super.init(true);
     }
 
     @Override
