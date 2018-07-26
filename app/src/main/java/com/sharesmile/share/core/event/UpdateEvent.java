@@ -164,4 +164,11 @@ public class UpdateEvent {
         public OnCharityLoad() {
         }
     }
+
+    public static class OnCodeVerify{
+        public boolean b;
+        public OnCodeVerify(boolean b) {
+            this.b = b;
+        }
+    }
 }

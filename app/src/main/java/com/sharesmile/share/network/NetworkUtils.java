@@ -11,6 +11,9 @@ import com.sharesmile.share.core.Logger;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
@@ -19,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  Contains static methods to make POST and GET requests to REST API endpoints
 
- @author ravikiransahajan parthg ankitmaheshwari */
+ @author ravikiransahajan parth ankitmaheshwari */
 
 public class NetworkUtils {
 
@@ -83,12 +86,23 @@ public class NetworkUtils {
         TelephonyManager tm = (TelephonyManager) context.getSystemService(
                 Context.TELEPHONY_SERVICE);
         return tm.getNetworkType();
-
     }
 
     private static String getStringResponse(Response response) throws NetworkException{
         try{
-            return response.body().string();
+            //TODO : hack
+            /*try {
+                JSONObject jsonObject = new JSONObject(response.body().string());
+                if (jsonObject.has("code")) {
+                    return jsonObject.getJSONObject("result").toString();
+                } else {
+                    return jsonObject.toString();
+                }
+            }catch (JSONException e)
+            {
+                return  response.body().string();
+            }*/
+            return  response.body().string();
         }catch (IOException ioe){
             String message = "IOException while converting response body to string: " + ioe.getMessage();
             Logger.e(TAG, message, ioe);

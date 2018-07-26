@@ -16,6 +16,7 @@ import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.fragments.FragmentAskReferCode;
@@ -30,6 +31,8 @@ import com.sharesmile.share.onboarding.fragments.FragmentThankYou;
 import com.sharesmile.share.onboarding.fragments.FragmentWeight;
 import com.sharesmile.share.onboarding.fragments.FragmentWelcome;
 import com.sharesmile.share.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -185,7 +188,12 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
 
                 }else if(fragment instanceof FragmentEnterReferCode)
                 {
-                    replaceFragment(new FragmentGender(), true);
+                    if(continueTv.getText().toString().equals(getResources().getString(R.string.verify_txt)))
+                    {
+                        EventBus.getDefault().post(new UpdateEvent.OnCodeVerify(false));
+                    }else if(continueTv.getText().toString().equals(getResources().getString(R.string.continue_txt))){
+                        replaceFragment(new FragmentGender(), true);
+                    }
                 }else if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
                 } else if (fragment instanceof FragmentWeight) {
@@ -250,8 +258,8 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 continueTv.setText(continueTextName);
                 break;
             case FragmentEnterReferCode.TAG:
-                setProgressLevel(2.0f);
-                setContinueTextColor(R.color.white_10);
+//                setProgressLevel(2.0f);
+                continueTv.setText(continueTextName);
                 break;
             case FragmentGender.TAG:
                 setProgressLevel(3.0f);

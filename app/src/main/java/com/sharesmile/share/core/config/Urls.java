@@ -50,6 +50,10 @@ public class Urls {
     private static final String TEAMLEADERBOARD_URL = "/teamleaderboard/";
     private static final String SERVER_TIME_URL = "/servertime/";
 
+    private static final String VERIFY_REFERRAL_CODE = "/verify-referral-code";
+    private static final String REFERRAL_LEADERBOARD = "/referral-leaderboard?";
+    private static final String REFER_PROGRAMS = "/referprograms";
+
     private static final String BLOG_BASE_URL = "http://blog.impactapp.in";
     private static final String BLOG_LATEST_ARTICLE_URL = "/articles/latest";
     private static final String BLOG_HOW_IT_WORKS_CONTENT_URL = "/articles/howitworks";
@@ -193,6 +197,21 @@ public class Urls {
 
     public static String getTeamLeaderBoardUrl() {
         return getNodeBaseUrl() + TEAMLEADERBOARD_URL;
+    }
+
+    public static String getReferProgramsUrl() {
+        String url = getNodeBaseUrl() +REFER_PROGRAMS;
+        return url;
+    }
+
+    public static String getReferralLeaderboardUrl() {
+        String url = getNodeBaseUrl() +REFERRAL_LEADERBOARD;
+        return url;
+    }
+
+    public static String getVerifyReferralCodeUrl() {
+        String url = getNodeBaseUrl() +VERIFY_REFERRAL_CODE;
+        return url;
     }
 
     public static String getFeedLatestArticleUrl(){
