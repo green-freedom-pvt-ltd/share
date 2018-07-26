@@ -14,7 +14,9 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
@@ -25,12 +27,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.sharesmile.share.tracking.event.MockLocationDetected;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.config.ClientConfig;
@@ -48,6 +54,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 import static com.sharesmile.share.core.config.Config.CURRENT_GPS_SPEED_VALIDITY_THRESHOLD_INTERVAL;
 import static com.sharesmile.share.core.config.Config.GOOGLE_LOCATION_TRACKER_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
@@ -76,6 +83,13 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     private int numSatellitesConnected;
     private CircularQueue<Location> locationQueue;
     private boolean shouldPromtUser = false;
+    LocationCallback locationCallback = new LocationCallback(){
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            onLocationChanged(locationResult.getLastLocation());
+        }
+    };
     private GoogleLocationTracker(Context appContext) {
         this.appContext = appContext;
         this.handler = new Handler();
@@ -88,6 +102,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
             state = State.PERMISSIONS_GRANTED;
             locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
             locationManager.addGpsStatusListener(this);
+
 //            locationManager.removeTestProvider(LocationManager.GPS_PROVIDER);
             connectToLocationServices();
         } else {
@@ -131,80 +146,80 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         }
     }
 
-    public void registerForWorkout(Listener listener){
+    public void registerForWorkout(Listener listener) {
         setWorkoutInProgress(true);
         register(listener);
     }
 
-    public void register(Listener listener){
+    public void register(Listener listener) {
         Logger.i(TAG, "register");
-        if (listener != null){
+        if (listener != null) {
             boolean toAdd = true;
             for (WeakReference<Listener> reference : listeners) {
-                if (listener.equals(reference.get())){
+                if (listener.equals(reference.get())) {
                     toAdd = false;
                 }
             }
-            if (toAdd){
+            if (toAdd) {
                 Logger.d(TAG, "Will register this listener for location updates");
                 WeakReference<Listener> reference = new WeakReference<>(listener);
                 listeners.add(reference);
-                if (state == State.FETCHING_LOCATION){
+                if (state == State.FETCHING_LOCATION) {
                     listener.onLocationTrackerReady();
                 }
             }
-            if (state != State.FETCHING_LOCATION){
+            if (state != State.FETCHING_LOCATION) {
                 startLocationTracking(true);
             }
         }
     }
 
-    public void silentRegister(SilentListener silentListener){
-        if (silentListener != null){
+    public void silentRegister(SilentListener silentListener) {
+        if (silentListener != null) {
             boolean toAdd = true;
-            for (WeakReference<SilentListener> reference : silentListeners){
-                if (silentListener.equals(reference.get())){
+            for (WeakReference<SilentListener> reference : silentListeners) {
+                if (silentListener.equals(reference.get())) {
                     toAdd = false;
                 }
             }
-            if (toAdd){
+            if (toAdd) {
                 WeakReference<SilentListener> reference = new WeakReference<>(silentListener);
                 this.silentListeners.add(reference);
             }
         }
     }
 
-    public void unregisterWorkout(Listener listener){
+    public void unregisterWorkout(Listener listener) {
         setWorkoutInProgress(false);
         unregister(listener);
     }
 
-    public void unregister(Listener listener){
+    public void unregister(Listener listener) {
         Logger.i(TAG, "unregister");
-        if (listener != null){
+        if (listener != null) {
             Iterator<WeakReference<Listener>> iterator = listeners.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 WeakReference<Listener> reference = iterator.next();
-                if (reference.get() != null){
-                    if (listener.equals(reference.get())){
+                if (reference.get() != null) {
+                    if (listener.equals(reference.get())) {
                         iterator.remove();
                     }
-                }else {
+                } else {
                     iterator.remove();
                 }
             }
         }
     }
 
-    public void stopLocationTracking(){
+    public void stopLocationTracking() {
         Logger.d(TAG, "stopLocationTracking");
-        if (workoutInProgess() == false){
+        if (workoutInProgess() == false) {
             // Will stop location updates only if Workout is not in progress
-            if (state == State.FETCHING_LOCATION){
-                LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+            if (state == State.FETCHING_LOCATION) {
+                getFusedLocationProviderClient(appContext).removeLocationUpdates(locationCallback);
                 state = State.LOCATION_ENABLED;
             }
-            synchronized (locationQueue){
+            synchronized (locationQueue) {
                 locationQueue.clear();
             }
             isActive = false;
@@ -212,22 +227,23 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         }
     }
 
+
     public void startLocationTracking(final boolean shouldPromptUser) {
         Logger.d(TAG, "startLocationTracking");
         this.shouldPromtUser = shouldPromptUser;
         isActive = true;
-        if (state == State.NEEDS_PERMISSION){
+        if (state == State.NEEDS_PERMISSION) {
             Logger.i(TAG, "Needs location permission to start workout");
-            if (shouldPromptUser){
+            if (shouldPromptUser) {
                 sendPermissionBroadcast();
             }
-        }else if (state == State.PERMISSIONS_GRANTED){
+        } else if (state == State.PERMISSIONS_GRANTED) {
             // Permissions granted, Google Api client not connected
             connectToLocationServices();
-        }else if (state == State.API_CLIENT_CONNECTED){
+        } else if (state == State.API_CLIENT_CONNECTED) {
             // Permissions granted, Google Api client connected, but Location not enabled
             checkForLocationSettings(shouldPromptUser);
-        }else if (state == State.LOCATION_ENABLED){
+        } else if (state == State.LOCATION_ENABLED) {
             // Permissions granted, Google Api client connected, but Location enabled but updates didn't start to flow in yet
             handler.post(new Runnable() {
                 @Override
@@ -239,9 +255,10 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         // In all other cases, do nothing
     }
 
-    private void requestLocationUpdates(){
+    private void requestLocationUpdates() {
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        getFusedLocationProviderClient(appContext).requestLocationUpdates(locationRequest, locationCallback,
+                Looper.myLooper());
         state = State.FETCHING_LOCATION;
         Iterator<WeakReference<Listener>> iterator = listeners.iterator();
         while (iterator.hasNext()){
@@ -322,11 +339,18 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
     private void fetchInitialLocation() {
         if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            currentLocation =
-                    LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (currentLocation == null) {
-                Logger.i(TAG, "Last Known Location couldn't be fetched");
-            }
+            getFusedLocationProviderClient(appContext).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    currentLocation = location;
+                }
+
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Logger.i(TAG, "Last Known Location couldn't be fetched : "+e.getMessage());
+                }
+            });
         } else {
             //No need to worry about permission unavailability, as it was already granted in constructor
         }
@@ -427,6 +451,7 @@ public class GoogleLocationTracker implements GoogleApiClient.ConnectionCallback
         locationRequest.setMaxWaitTime(interval);
         locationRequest.setFastestInterval(1000); // the fastest rate in milliseconds at which your app can handle location updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setSmallestDisplacement(50);
         if (isActive){
             checkForLocationSettings(shouldPromtUser);
         }

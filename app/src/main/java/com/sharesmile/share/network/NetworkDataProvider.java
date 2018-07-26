@@ -8,14 +8,7 @@ import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.MultipartBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+
 
 import org.json.JSONObject;
 
@@ -26,6 +19,15 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by ankitmaheshwari1 on 08/01/16.
@@ -198,13 +200,13 @@ public class NetworkDataProvider {
     private static RequestBody convertFormDataToBody(List<NameValuePair> formData) {
         RequestBody body = null;
         if (Utils.isCollectionFilled(formData)) {
-            MultipartBuilder bodyData = new MultipartBuilder().type(MultipartBuilder.FORM);
+            MultipartBody.Builder bodyData = new MultipartBody.Builder().setType(MultipartBody.FORM);
             for (NameValuePair pair : formData) {
                 bodyData.addFormDataPart(pair.getName(), pair.getValue());
             }
             body = bodyData.build();
         } else {
-            MultipartBuilder bodyData = new MultipartBuilder().type(MultipartBuilder.FORM);
+            MultipartBody.Builder bodyData = new MultipartBody.Builder().setType(MultipartBody.FORM);
             bodyData.addFormDataPart("", "");
             body = bodyData.build();
         }
@@ -447,10 +449,10 @@ public class NetworkDataProvider {
 
     public static synchronized OkHttpClient getSingleOkHttpClient() {
         if (myOkHttpClient == null) {
-            myOkHttpClient = new OkHttpClient();
-            myOkHttpClient.setConnectTimeout(CONNECTION_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
-            myOkHttpClient.setReadTimeout(READ_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
-            myOkHttpClient.setWriteTimeout(WRITE_TIMEOUT_POST_VALUE, TimeUnit.SECONDS);
+            myOkHttpClient = new OkHttpClient.Builder()
+                    .connectTimeout(CONNECTION_TIMEOUT_POST_VALUE, TimeUnit.SECONDS)
+                    .readTimeout(READ_TIMEOUT_POST_VALUE, TimeUnit.SECONDS)
+                    .writeTimeout(WRITE_TIMEOUT_POST_VALUE, TimeUnit.SECONDS).build();
         }
         return myOkHttpClient;
     }

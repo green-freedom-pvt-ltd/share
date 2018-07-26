@@ -33,6 +33,6 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 ext{
-    supportLibraryVersion = '26.1.0'
-    playServicesVersion = '11.6.0'
+    supportLibraryVersion = '27.1.1'
+    playServicesVersion = '15.0.1'
 }

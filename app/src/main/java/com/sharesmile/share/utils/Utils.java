@@ -495,16 +495,16 @@ public class Utils {
             }
 
             @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
+            public void onBitmapFailed(Exception e,Drawable errorDrawable) {
                 Logger.d(TAG, "shareImageWithMessage: Image could not be loaded from disk or memory, will try from network");
-                Picasso.with(context).load(imageUrl).into(new Target() {
+                Picasso.get().load(imageUrl).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), shareMessage);
                     }
 
                     @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
+                    public void onBitmapFailed(Exception e,Drawable errorDrawable) {
                         Utils.share(context, null, shareMessage);
                     }
 

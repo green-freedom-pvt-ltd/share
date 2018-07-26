@@ -765,16 +765,16 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             @Override
             public void onClick(final View v) {
                 progressView.setVisibility(View.VISIBLE);
-                Picasso.with(MainActivity.this).load(campaign.getImageUrl()).into(new Target() {
+
+                Picasso.get().load(campaign.getImageUrl()).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         progressView.setVisibility(View.GONE);
 
                         showBottomDialog(campaign.getShareTemplate(), Utils.getLocalBitmapUri(bitmap, MainActivity.this), Uri.parse(campaign.getImageUrl()));
                     }
-
                     @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
+                    public void onBitmapFailed(Exception e,Drawable errorDrawable) {
                         progressView.setVisibility(View.GONE);
                         showBottomDialog(campaign.getShareTemplate(), Uri.parse(campaign.getImageUrl()), Uri.parse(campaign.getImageUrl()));
 

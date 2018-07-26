@@ -6,12 +6,15 @@ import android.os.Looper;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  Used to make async network calls using OkHttp.
@@ -43,7 +46,7 @@ public abstract class NetworkAsyncCallback<Wrapper extends UnObfuscable> impleme
     }
 
     @Override
-    public final void onFailure(final Request request,final IOException e) {
+    public void onFailure(Call call, IOException e) {
         Logger.d(TAG, "onFailure");
         if (isCancelled()){
             // Callback was cancelled, do nothing with the request
@@ -52,13 +55,12 @@ public abstract class NetworkAsyncCallback<Wrapper extends UnObfuscable> impleme
         getMainThreadHandler().post(new Runnable() {
             @Override
             public void run() {
-                onNetworkFailure(NetworkUtils.wrapIOException(request, e));
+                onNetworkFailure(NetworkUtils.wrapIOException(call.request(), e));
             }
         });
     }
-
     @Override
-    public final void onResponse(final Response response) throws IOException {
+    public final void onResponse(Call call,final Response response) throws IOException {
         Logger.d(TAG, "onResponse");
         if (isCancelled()){
             // Callback was cancelled, do nothing with the response

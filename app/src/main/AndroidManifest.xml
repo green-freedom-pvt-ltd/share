@@ -32,6 +32,9 @@
     <uses-feature android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.location.network" />
+
     <application
         android:name=".core.application.MainApplication"
         android:allowBackup="true"
