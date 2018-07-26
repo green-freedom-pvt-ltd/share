@@ -894,7 +894,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.d(TAG,"onActivityResult : TESTING");
         super.onActivityResult(requestCode, resultCode, data);
+        Logger.d(TAG,"onActivityResult : "+requestCode+","+resultCode+","+data);
         if (requestCode == 100) {
             if (data.hasExtra("imagePath")) {
                 String imagePath = data.getStringExtra("imagePath");

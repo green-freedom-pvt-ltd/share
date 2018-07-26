@@ -256,11 +256,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 });
                 animation.start();
             }
-
         }
-
-
-
     }
 
 
