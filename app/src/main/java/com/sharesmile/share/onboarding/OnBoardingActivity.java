@@ -190,7 +190,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 {
                     if(continueTv.getText().toString().equals(getResources().getString(R.string.verify_txt)))
                     {
-                        EventBus.getDefault().post(new UpdateEvent.OnCodeVerify(false));
+                        EventBus.getDefault().post(new UpdateEvent.OnCodeVerify());
                     }else if(continueTv.getText().toString().equals(getResources().getString(R.string.continue_txt))){
                         replaceFragment(new FragmentGender(), true);
                     }

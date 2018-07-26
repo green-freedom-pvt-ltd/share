@@ -290,6 +290,9 @@ public class Constants {
     public final static int LOADER_CHARITY_OVERVIEW = 100;
     public final static int LOADER_MY_STATS_GRAPH = 101;
 
+    public final static int SUCCESS_GET = 200;
+    public final static int SUCCESS_POST = 201;
+
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{
         add(FeedbackCategory.PAST_WORKOUT);

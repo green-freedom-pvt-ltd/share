@@ -2,6 +2,7 @@ package com.sharesmile.share.core.event;
 
 import android.content.Intent;
 
+import com.google.gson.JsonObject;
 import com.sharesmile.share.core.cause.model.CauseList;
 
 import Models.CampaignList;
@@ -166,9 +167,15 @@ public class UpdateEvent {
     }
 
     public static class OnCodeVerify{
-        public boolean b;
-        public OnCodeVerify(boolean b) {
-            this.b = b;
+
+        public OnCodeVerify() {
+        }
+    }
+
+    public static class OnCodeVerified{
+        public JsonObject jsonObject;
+        public OnCodeVerified(JsonObject jsonObject) {
+            this.jsonObject = jsonObject;
         }
     }
 }

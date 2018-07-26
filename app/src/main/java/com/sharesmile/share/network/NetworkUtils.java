@@ -11,9 +11,6 @@ import com.sharesmile.share.core.Logger;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
@@ -91,20 +88,21 @@ public class NetworkUtils {
     private static String getStringResponse(Response response) throws NetworkException{
         try{
             //TODO : hack
-            /*try {
-                JSONObject jsonObject = new JSONObject(response.body().string());
-                if (jsonObject.has("code")) {
-                    return jsonObject.getJSONObject("result").toString();
+               /* Object obj = new JSONParser().parse(response.body().string());
+                if (obj instanceof JSONObject) {
+                    JSONObject jsonObject = (JSONObject) obj;
+                    if (jsonObject.containsKey("code")) {
+                        return jsonObject.get("result").toString();
+                    } else {
+                        return jsonObject.toString();
+                    }
                 } else {
-                    return jsonObject.toString();
-                }
-            }catch (JSONException e)
-            {
-                return  response.body().string();
-            }*/
+                    JSONArray ja = (JSONArray) obj;
+                    return ja.toString();
+                }*/
             return  response.body().string();
         }catch (IOException ioe){
-            String message = "IOException while converting response body to string: " + ioe.getMessage();
+            String message = "Exception while converting response body to string: " + ioe.getMessage();
             Logger.e(TAG, message, ioe);
             throw new NetworkException.Builder().cause(ioe).httpStatusCode(response.code())
                     .errorMessage(message).build();

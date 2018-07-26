@@ -29,6 +29,9 @@
             android:id="@+id/refer_code"
             android:textSize="@dimen/text_size_16sp"
             android:focusable="true"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:padding="5dp"
             />
     </android.support.v7.widget.CardView>
 </LinearLayout>
