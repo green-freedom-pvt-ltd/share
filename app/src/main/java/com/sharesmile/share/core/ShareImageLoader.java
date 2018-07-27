@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
+import okhttp3.Cache;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -73,8 +74,9 @@ public class ShareImageLoader {
                         .build();
                 return chain.proceed(newRequest);
             }
-        }).addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR).build();
-        httpClient.cache();
+        }).addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)
+                .cache(new Cache(MainApplication.getContext().getCacheDir(), MAX_DISK_CACHE_SIZE))
+                .build();
 
         Picasso.Builder builder =  new Picasso.Builder(MainApplication.getContext());
         builder.downloader(new OkHttp3Downloader(httpClient));

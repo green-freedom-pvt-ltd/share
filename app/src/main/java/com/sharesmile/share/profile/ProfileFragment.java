@@ -46,6 +46,7 @@ import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TitleDao;
+import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -241,6 +242,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        AnalyticsEvent.create(Event.ON_LOAD_PROFILE_SCREEN).build().dispatch();
         long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
         if (workoutCount > 0) {
             incrementProfileScreenVisitCount();
@@ -903,6 +905,10 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
                 statsWorkout.setText(barChartEntry.getCount() + "");
                 statsKms.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (barChartEntry.getDistance() * 1000)) + "");
                 SharedPrefsManager.getInstance().setBoolean("pref_did_see_my_stats", true);
+                AnalyticsEvent.create(Event.ON_CLICK_MY_STATS_GRAPH)
+                        .put("stats_workout",barChartEntry.getCount())
+                        .put("stats_kms",barChartEntry.getDistance() * 1000)
+                        .buildAndDispatch();
             }
 
             @Override
@@ -1093,6 +1099,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
     @OnClick(R.id.see_in_progress_badges)
     public void onClickSeeInProgress() {
         getFragmentController().replaceFragment(new InProgressBadgeFragment(), true);
+        AnalyticsEvent.create(Event.ON_CLICK_IN_PROGRESS).buildAndDispatch();
     }
 
     private void setCharityOverviewRecyclerview() {

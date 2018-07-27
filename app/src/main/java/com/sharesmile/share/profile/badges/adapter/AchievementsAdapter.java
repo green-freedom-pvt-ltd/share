@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
@@ -141,6 +143,12 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                             .where(BadgeDao.Properties.BadgeId.eq(achievedBadgeCounts.get(position).getAchievedBadgeId())).list();
                     if (badges != null && badges.size() > 0) {
                         seeAchievedBadge.showBadgeDetails(achievedBadgeCount.getAchievedBadgeId(), badges.get(0).getType());
+                        AnalyticsEvent.create(Event.ON_CLICK_BADGE)
+                                .put("badge_id",badges.get(0).getBadgeId())
+                                .put("badge_name",badges.get(0).getName())
+                                .put("badge_category",badges.get(0).getCategory())
+                                .put("badge_count",achievedBadgeCount.getCount())
+                        .buildAndDispatch();
                     }
                 }
             }

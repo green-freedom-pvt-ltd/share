@@ -423,6 +423,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     AnalyticsEvent.create(Event.ON_CLICK_CAUSE_COMPLETED_SHARE)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
+                            .put("cause_id",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
+                            .put("cause_name",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
                             .buildAndDispatch();
                 } else {
 //                    Utils.checkStreak();
@@ -433,6 +435,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
+                            .put("cause_id",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
+                            .put("cause_name",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
                             .buildAndDispatch();
                 }
                 break;
@@ -519,6 +523,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         mAdapter.setData(causes);
         setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
         mRunButton.setVisibility(View.VISIBLE);
+        AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
         hideProgressDialog();
         prepareOnboardingOverlays();
         checkBadgeData();
