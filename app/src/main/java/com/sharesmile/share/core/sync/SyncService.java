@@ -351,8 +351,6 @@ public class SyncService extends GcmTaskService {
                 String badge_type = jsonObject.getString("badge_type");
                 ArrayList<Badge> badgesArrayList;
                 if (badge_type.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
-
-
                     JSONArray badgesArray = jsonObject.getJSONArray("badges");
                     for (int j = 0; j < badgesArray.length(); j++) {
                         JSONObject jsonObject1 = badgesArray.getJSONObject(j);

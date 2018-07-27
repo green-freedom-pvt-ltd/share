@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
@@ -172,91 +173,10 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onViewCreated");
         getFragmentController().hideToolbar();
         render();
-
-
-        if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
-            SyncHelper.getCharityOverview();
-
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
-
-    private void checkAchievedBadgeData() {
-        if(CauseDataStore.getInstance().getCausesToShow().isEmpty() && isAdded()) {
-         render();
-        }else
-        {
-            long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
-            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-            if(workoutCount>0) {
-
-                List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
-                        .where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CHANGEMAKER),
-                                AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED),
-                                AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
-                if(achievedBadges.size()==0) {
-                    BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-                    List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(Constants.BADGE_TYPE_CHANGEMAKER))
-                            .orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
-                    if(badges.size()>0)
-                    {
-                        Badge badge = badges.get(0);
-                    AchievedBadge achievedBadge = new AchievedBadge();
-                    achievedBadge.setCauseName(badge.getName());
-                    achievedBadge.setCauseId(0);
-                    achievedBadge.setServerId(0);
-                    achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
-                    achievedBadge.setBadgeIdAchieved(badge.getBadgeId());
-                    achievedBadge.setNoOfStarAchieved(badge.getNoOfStars());
-                    achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
-                    achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
-                    achievedBadge.setCategory(0);
-                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-                    achievedBadge.setParamDone(0.1);
-                    achievedBadge.setUserId(MainApplication.getInstance().getUserID());
-                    achievedBadgeDao.insertOrReplace(achievedBadge);
-                }
-                }
-            }
-            List<CauseData> causeDataArrayList = CauseDataStore.getInstance().getCausesToShow();
-            ArrayList<Long> causeIds = new ArrayList<>();
-            for(CauseData causeData : causeDataArrayList)
-            {
-                Utils.setBadgeForCategory(causeData,Constants.BADGE_TYPE_CAUSE,0);
-                causeIds.add(causeData.getId());
-            }
-            List<AchievedBadge> achievedBadgesInProgress = achievedBadgeDao.queryBuilder()
-                    .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
-                            AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CAUSE),
-                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
-            for(AchievedBadge achievedBadge : achievedBadgesInProgress)
-            {
-                if(!causeIds.contains(achievedBadge.getCauseId()))
-                {
-                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-                    achievedBadgeDao.update(achievedBadge);
-                }
-            }
-            Utils.checkStreak();
-        }
-
-    }
-
-
-
-    private synchronized void checkBadgeData() {
-        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-        List<Badge> badges = badgeDao.queryBuilder().list();
-        if(badges!=null && badges.size()>0)
-        {
-            checkAchievedBadgeData();
-        }else
-        {
-            SyncHelper.syncBadgesData();
-        }
-    }
-
 
 
 
@@ -344,7 +264,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
      */
     private boolean render() {
         Logger.d(TAG, "render");
-        if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
+       /* if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
             showProgressDialog();
             SyncHelper.syncBadgesData();
         }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,false))
@@ -355,7 +275,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         {
             showProgressDialog();
             SyncHelper.getAchievedTitle();
-        }else if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
+        }else*/ if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
             // Data not fetched in DataStore
             Logger.d(TAG, "render: Data not fetched in CauseDataStore");
             showProgressDialog();
@@ -398,7 +318,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             // But return true so that the client can invoke a call to fetch fresh data
             return true;
         }
-        return true;
+//        return true;
     }
 
     private void showProgressDialog() {
@@ -526,7 +446,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
         hideProgressDialog();
         prepareOnboardingOverlays();
-        checkBadgeData();
+        Utils.checkBadgeData(false);
     }
 
     public CauseData getCurrentCause(){
@@ -557,48 +477,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
         {
             render();
-        }else
-        {
-//            showHideProgress(false,null);
-            MainApplication.showToast(getResources().getString(R.string.some_error));
-        }
-    }
-    @Subscribe(threadMode =  ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated)
-    {
-        if(badgeUpdated.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
-            render();
-        }else
-        {
-//            showHideProgress(false,null);
-            MainApplication.showToast(getResources().getString(R.string.some_error));
-        }
-    }
-    @Subscribe(threadMode =  ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.OnGetAchivement onGetAchivement)
-    {
-        if(onGetAchivement.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
-            //Pull historical run data;
-            render();
-
-        }else
-        {
-//            showHideProgress(false,null);
-            MainApplication.showToast(getResources().getString(R.string.some_error));
-        }
-    }
-    @Subscribe(threadMode =  ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.OnGetTitle onGetTitle)
-    {
-        if(onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
-            //Pull historical run data;
-            render();
-//            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
-//            SyncHelper.forceRefreshEntireWorkoutHistory();
-//            onLoginSuccess();
         }else
         {
 //            showHideProgress(false,null);

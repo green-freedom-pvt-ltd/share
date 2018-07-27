@@ -159,7 +159,10 @@ public class UpdateEvent {
             this.result = result;
         }
     }
-
+    public static class LoadAchivedBadges{
+        public LoadAchivedBadges() {
+        }
+    }
     public static class OnCharityLoad{
         public OnCharityLoad() {
         }

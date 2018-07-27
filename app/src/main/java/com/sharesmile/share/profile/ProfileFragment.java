@@ -55,6 +55,7 @@ import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
@@ -253,7 +254,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         if (forward) {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
         }
-        Utils.checkStreak();
+        if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE, false))
+        Utils.checkStreak(false);
         initUi();
         setCharityOverviewLoader();
     }
@@ -417,58 +419,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
                 setUpBarChartAsync.execute();*/
                 prepareStreakOnboardingOverlays();
 
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4) {
-                    @Override
-                    public boolean canScrollVertically() {
-                        return false;
-                    }
-                };
-                achievementsRecylerView.setLayoutManager(gridLayoutManager);
-                List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
-                        .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0),
-                                AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()))
-                        .orderDesc(AchievedBadgeDao.Properties.BadgeIdAchievedDate).list();
-
-                if (achievedBadges != null && achievedBadges.size() > 0) {
-                    JSONObject jsonObject = new JSONObject();
-                    for (AchievedBadge achievedBadge :
-                            achievedBadges) {
-                        if (jsonObject.has(achievedBadge.getBadgeIdAchieved() + "")) {
-                            try {
-                                long count = jsonObject.getLong(achievedBadge.getBadgeIdAchieved() + "");
-                                jsonObject.put(achievedBadge.getBadgeIdAchieved() + "", ++count);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            try {
-                                jsonObject.put(achievedBadge.getBadgeIdAchieved() + "", 1);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    Iterator<String> iterator = jsonObject.keys();
-                    ArrayList<AchievedBadgeCount> achievedBadgeCounts = new ArrayList<>();
-                    while (iterator.hasNext()) {
-                        AchievedBadgeCount achievedBadgeCount = new AchievedBadgeCount();
-                        achievedBadgeCount.setAchievedBadgeId(Long.parseLong(iterator.next()));
-                        try {
-                            achievedBadgeCount.setCount(jsonObject.getLong(achievedBadgeCount.getAchievedBadgeId() + ""));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        achievedBadgeCounts.add(achievedBadgeCount);
-                    }
-                    achievementsAdapter = new AchievementsAdapter(achievedBadgeCounts, getContext(), this);
-                    achievementsRecylerView.setAdapter(achievementsAdapter);
-                    achievementProgressBar.setVisibility(View.GONE);
-                    achievementsRecylerView.setVisibility(View.VISIBLE);
-                }else
-                {
-                    achievementProgressBar.setVisibility(View.VISIBLE);
-                    achievementsRecylerView.setVisibility(View.GONE);
-                }
+                setAchivements();
             }
             ShareImageLoader.getInstance().setUseMemoryCache(true);
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {
@@ -479,6 +430,62 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         } else {
             layoutProfileStats.setVisibility(View.GONE);
             MainApplication.showToast("Please check your internet connection");
+        }
+    }
+
+    private void setAchivements() {
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 4) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+        achievementsRecylerView.setLayoutManager(gridLayoutManager);
+        List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao().queryBuilder()
+                .where(AchievedBadgeDao.Properties.BadgeIdAchieved.gt(0),
+                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()))
+                .orderDesc(AchievedBadgeDao.Properties.BadgeIdAchievedDate).list();
+
+        if (achievedBadges != null && achievedBadges.size() > 0) {
+            JSONObject jsonObject = new JSONObject();
+            for (AchievedBadge achievedBadge :
+                    achievedBadges) {
+                if (jsonObject.has(achievedBadge.getBadgeIdAchieved() + "")) {
+                    try {
+                        long count = jsonObject.getLong(achievedBadge.getBadgeIdAchieved() + "");
+                        jsonObject.put(achievedBadge.getBadgeIdAchieved() + "", ++count);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        jsonObject.put(achievedBadge.getBadgeIdAchieved() + "", 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            Iterator<String> iterator = jsonObject.keys();
+            ArrayList<AchievedBadgeCount> achievedBadgeCounts = new ArrayList<>();
+            while (iterator.hasNext()) {
+                AchievedBadgeCount achievedBadgeCount = new AchievedBadgeCount();
+                achievedBadgeCount.setAchievedBadgeId(Long.parseLong(iterator.next()));
+                try {
+                    achievedBadgeCount.setCount(jsonObject.getLong(achievedBadgeCount.getAchievedBadgeId() + ""));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                achievedBadgeCounts.add(achievedBadgeCount);
+            }
+            achievementsAdapter = new AchievementsAdapter(achievedBadgeCounts, getContext(), this);
+            achievementsRecylerView.setAdapter(achievementsAdapter);
+            achievementProgressBar.setVisibility(View.GONE);
+            achievementsRecylerView.setVisibility(View.VISIBLE);
+        }else
+        {
+            achievementProgressBar.setVisibility(View.VISIBLE);
+            achievementsRecylerView.setVisibility(View.GONE);
         }
     }
 
@@ -1098,8 +1105,14 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
 
     @OnClick(R.id.see_in_progress_badges)
     public void onClickSeeInProgress() {
-        getFragmentController().replaceFragment(new InProgressBadgeFragment(), true);
-        AnalyticsEvent.create(Event.ON_CLICK_IN_PROGRESS).buildAndDispatch();
+        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().list();
+        if(achievedBadges.size()>0) {
+            getFragmentController().replaceFragment(new InProgressBadgeFragment(), true);
+            AnalyticsEvent.create(Event.ON_CLICK_IN_PROGRESS).buildAndDispatch();
+        }else {
+            MainApplication.showToast("Loading data, Please wait.");
+        }
     }
 
     private void setCharityOverviewRecyclerview() {
@@ -1108,5 +1121,11 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
 
         charityOverviewProfileAdapter = new CharityOverviewProfileAdapter(this, charityOverview, getContext());
         charityOverviewRecyclerView.setAdapter(charityOverviewProfileAdapter);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.LoadAchivedBadges loadAchivedBadges)
+    {
+        setAchivements();
     }
 }

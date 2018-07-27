@@ -139,6 +139,7 @@ public class Constants {
     public static final String PREF_GOT_STREAK = "pref_got_streak";
     public static final String PREF_GOT_BADGES = "pref_got_badged";
     public static final String PREF_GOT_ACHIEVED_BADGES = "pref_got_achieved_badged";
+    public static final String PREF_SET_ACHIEVED_BADGES = "pref_set_achieved_badged";
     public static final String PREF_GOT_ACHIEVED_TITLE = "pref_got_achieved_title";
     public static final String PREF_GOT_TOKEN = "pref_got_token";
     public static final String PREF_IS_LOGIN = "pref_user_login";

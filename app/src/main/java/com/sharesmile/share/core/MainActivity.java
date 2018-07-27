@@ -51,6 +51,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.BuildConfig;
 import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.R;
@@ -58,11 +62,13 @@ import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.base.ToolbarActivity;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.notifications.NotificationConsts;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.HomeScreenFragment;
 import com.sharesmile.share.home.howitworks.HowItWorksFragment;
 import com.sharesmile.share.home.settings.SettingsFragment;
@@ -95,6 +101,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import Models.CampaignList;
 import butterknife.ButterKnife;
@@ -879,6 +886,69 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
          {
              MainApplication.showToast("Permission not Granted");
          }
+        }
+    }
+
+    @Subscribe(threadMode =  ThreadMode.BACKGROUND)
+    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated)
+    {
+        if(badgeUpdated.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+//            showProgressDialog();
+            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().list();
+            if(achievedBadges.size()==0) {
+                SyncHelper.getAchievedBadged();
+            }else
+            {
+                EventBus.getDefault().post(new UpdateEvent.OnGetAchivement(ExpoBackoffTask.RESULT_SUCCESS));
+            }
+        }else
+        {
+//            showHideProgress(false,null);
+//            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.BACKGROUND)
+    public void onEvent(UpdateEvent.OnGetAchivement onGetAchivement)
+    {
+        if(onGetAchivement.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            //Pull historical run data;
+//            render();
+            AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
+            List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder().list();
+            if(achievedTitles.size()==0) {
+                SyncHelper.getAchievedTitle();
+            }else
+            {
+                EventBus.getDefault().post(new UpdateEvent.OnGetTitle(ExpoBackoffTask.RESULT_SUCCESS));
+            }
+        }else
+        {
+//            showHideProgress(false,null);
+//            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+    @Subscribe(threadMode =  ThreadMode.BACKGROUND)
+    public void onEvent(UpdateEvent.OnGetTitle onGetTitle)
+    {
+        if(onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            //Pull historical run data;
+            Utils.checkBadgeData(false);
+
+            if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
+                SyncHelper.getCharityOverview();
+
+//            render();
+//            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+//            SyncHelper.forceRefreshEntireWorkoutHistory();
+//            onLoginSuccess();
+        }else
+        {
+//            showHideProgress(false,null);
+//            MainApplication.showToast(getResources().getString(R.string.some_error));
         }
     }
 }
