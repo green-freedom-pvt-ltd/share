@@ -37,9 +37,7 @@ import com.sharesmile.share.onboarding.fragments.FragmentWeight;
 import com.sharesmile.share.onboarding.fragments.FragmentWelcome;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +45,9 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 
@@ -225,7 +226,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     private boolean getUserDetails() {
         NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(), new HashMap<String, String>(), new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 Log.i(TAG, "Login error, Api failed");
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                     @Override
@@ -239,8 +240,13 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
-                String responseString = response.body().string();
+            public void onResponse(Call call, Response response) {
+                String responseString = null;
+                try {
+                    responseString = response.body().string();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Logger.d("LoginImpl", "onResponse: " + responseString);
                 JsonArray array = JsonHelper.StringToJsonArray(responseString);
                 if (array == null) {
@@ -268,6 +274,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                     }
                 });
                 gettingUserData = false;
+
             }
         });
         return false;
