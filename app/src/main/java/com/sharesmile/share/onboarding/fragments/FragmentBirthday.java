@@ -72,7 +72,7 @@ public class FragmentBirthday extends BaseFragment implements NumberPicker.OnVal
     private void setPickers() {
         Utils.setNumberPicker(monthPicker,months,0);
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR,-10);
+        calendar.add(Calendar.YEAR,-13);
         yearPicker.setMinValue(1900);
         yearPicker.setMaxValue(calendar.get(Calendar.YEAR));
         //implement array string to number picker

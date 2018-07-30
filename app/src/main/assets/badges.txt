@@ -1,0 +1,350 @@
+[
+    {
+        "cause_category_id": 20,
+        "type":"Cause",
+        "cause_category_name": "Blood Donation",
+        "badges": [
+          {
+        "badge_id": 1,
+        "badge_name": "Blood Donation3",
+        "badge_type": "Cause",
+        "badge_category": "Blood Donation",
+        "stars_count": "3",
+        "badge_image": null,
+        "description1": "Be a Blood Donation Hero level 3",
+        "description2": "",
+        "description3": null,
+        "badge_parameter": "7"
+    },
+    {
+        "badge_id": 2,
+        "badge_name": "Blood Donation2",
+        "badge_type": "Cause",
+        "badge_category": "Blood Donation",
+        "stars_count": "2",
+        "badge_image": null,
+        "description1": "Be a Blood Donation Hero level 2",
+        "description2": "upgrade : 7",
+        "description3": null,
+        "badge_parameter": "3"
+    },
+    {
+        "badge_id": 3,
+        "badge_name": "Blood Donation1",
+        "badge_type": "Cause",
+        "badge_category": "Blood Donation",
+        "stars_count": "1",
+        "badge_image": null,
+        "description1": "Be a Blood Donation Hero level 1",
+        "description2": "upgrade : 3",
+        "description3": null,
+        "badge_parameter": "1"
+    }]
+    },
+    {
+        "cause_category_id": 25,
+        "type":"Cause",
+        "cause_category_name": "Sanitation and Hygiene",
+        "badges": []
+    },
+    {
+        "cause_category_id": 26,
+        "type":"Cause",
+        "cause_category_name": "Sanitation",
+        "badges": []
+    },
+    {
+        "cause_category_id": 27,
+        "type":"Cause",
+        "cause_category_name": "Water Conservation",
+        "badges": [
+        {
+                        "badge_id": 4,
+                        "badge_name": "Water Conservation1",
+                        "badge_type": "Cause",
+                        "badge_category": "Water Conservation",
+                        "stars_count": "3",
+                        "badge_image": null,
+                        "description1": "Be a Water Conservation Hero level 1",
+                        "description2": "",
+                        "description3": null,
+                        "badge_parameter": "7"
+                    },
+                    {
+                        "badge_id": 5,
+                        "badge_name": "Water Conservation2",
+                        "badge_type": "Cause",
+                        "badge_category": "Water Conservation",
+                        "stars_count": "2",
+                        "badge_image": null,
+                        "description1": "Be a Water Conservation Hero level 2",
+                        "description2": "upgrade : 7",
+                        "description3": null,
+                        "badge_parameter": "3"
+                    },
+                    {
+                        "badge_id": 6,
+                        "badge_name": "Water Conservation1",
+                        "badge_type": "Cause",
+                        "badge_category": "Water Conservation",
+                        "stars_count": "1",
+                        "badge_image": null,
+                        "description1": "Be a Water Conservation Hero level 1",
+                        "description2": "upgrade : 3",
+                        "description3": null,
+                        "badge_parameter": "1"
+                    }
+        ]
+    },
+    {
+        "cause_category_id": 11,
+        "type":"Cause",
+        "cause_category_name": "Specially Abled",
+        "badges": []
+    },
+    {
+        "cause_category_id": 17,
+        "type":"Cause",
+        "cause_category_name": "Women Empowerment",
+        "badges": []
+    },
+    {
+        "cause_category_id": 12,
+        "type":"Cause",
+        "cause_category_name": "OldAge Care",
+        "badges": []
+    },
+    {
+        "cause_category_id": 10,
+        "type":"Cause",
+        "cause_category_name": "Healthcare",
+        "badges": []
+    },
+    {
+        "cause_category_id": 13,
+        "type":"Cause",
+        "cause_category_name": "Orphanage",
+        "badges": []
+    },
+    {
+        "cause_category_id": 21,
+        "type":"Cause",
+        "cause_category_name": "Drought",
+        "badges": []
+    },
+    {
+        "cause_category_id": 5,
+        "type":"Cause",
+        "cause_category_name": "Education",
+        "badges": []
+    },
+    {
+        "cause_category_id": 19,
+        "type":"Cause",
+        "cause_category_name": "Poverty",
+        "badges": []
+    },
+    {
+        "cause_category_id": 24,
+        "type":"Cause",
+        "cause_category_name": "Skill Development",
+        "badges": [{
+                                           "badge_id": 7,
+                                           "badge_name": "Skill Development1",
+                                           "badge_type": "Cause",
+                                           "badge_category": "Skill Development",
+                                           "stars_count": "3",
+                                           "badge_image": null,
+                                           "description1": "Be a Skill Development Hero level 1",
+                                           "description2": "",
+                                           "description3": null,
+                                           "badge_parameter": "7"
+                                       },
+                                       {
+                                           "badge_id": 8,
+                                           "badge_name": "Skill Development2",
+                                           "badge_type": "Cause",
+                                           "badge_category": "Skill Development",
+                                           "stars_count": "2",
+                                           "badge_image": null,
+                                           "description1": "Be a Skill Development Hero level 2",
+                                           "description2": "upgrade : 7",
+                                           "description3": null,
+                                           "badge_parameter": "3"
+                                       },
+                                       {
+                                           "badge_id": 9,
+                                           "badge_name": "Skill Development3",
+                                           "badge_type": "Cause",
+                                           "badge_category": "Skill Development",
+                                           "stars_count": "1",
+                                           "badge_image": null,
+                                           "description1": "Be a Skill Development Hero level 3",
+                                           "description2": "upgrade : 3",
+                                           "description3": null,
+                                           "badge_parameter": "1"
+                                       }]
+    },
+    {
+        "cause_category_id": 6,
+        "type":"Cause",
+        "cause_category_name": "Cleanliness",
+        "badges": []
+    },
+    {
+        "cause_category_id": 23,
+        "type":"Cause",
+        "cause_category_name": "Health and Sanitation",
+        "badges": [
+        {
+                "badge_id": 10,
+                "badge_name": "Health and Sanitation1",
+                "badge_type": "Cause",
+                "badge_category": "Health and Sanitation",
+                "stars_count": "3",
+                "badge_image": null,
+                "description1": "Be a Health and Sanitation Hero level 1",
+                "description2": "",
+                "description3": null,
+                "badge_parameter": "7"
+            },
+            {
+                "badge_id": 11,
+                "badge_name": "Health and Sanitation2",
+                "badge_type": "Cause",
+                "badge_category": "Health and Sanitation",
+                "stars_count": "2",
+                "badge_image": null,
+                "description1": "Be a Health and Sanitation Hero level 2",
+                "description2": "upgrade : 7",
+                "description3": null,
+                "badge_parameter": "3"
+            },
+            {
+                "badge_id": 12,
+                "badge_name": "Health and Sanitation1",
+                "badge_type": "Cause",
+                "badge_category": "Health and Sanitation",
+                "stars_count": "1",
+                "badge_image": null,
+                "description1": "Be a Health and Sanitation Hero level 1",
+                "description2": "upgrade : 3",
+                "description3": null,
+                "badge_parameter": "1"
+            }]
+    },
+    {
+        "cause_category_id": 22,
+        "type":"Cause",
+        "cause_category_name": "Environment",
+        "badges": []
+    },
+    {
+        "cause_category_id": 14,
+        "type":"Cause",
+        "cause_category_name": "Disaster Recovery",
+        "badges": []
+    },
+    {
+        "cause_category_id": 9,
+        "type":"Cause",
+        "cause_category_name": "Rural Transformation",
+        "badges": []
+    },
+    {
+        "cause_category_id": 7,
+        "type":"Cause",
+        "cause_category_name": "Hunger",
+        "badges": []
+    },{
+      "cause_category_id" : 28,
+      "type":"Streak",
+      "cause_category_name": "Streak",
+      "badges" : [
+          {
+              "badge_id": 13,
+              "badge_name": "Streak 7",
+              "badge_type": "Streak",
+              "badge_category": "Streak",
+              "stars_count": "1",
+              "badge_image": null,
+              "description1": "7 days",
+              "description2": null,
+              "description3": null,
+              "badge_parameter": "1"
+          },
+          {
+              "badge_id": 14,
+              "badge_name": "Streak 14",
+              "badge_type": "Streak",
+              "badge_category": "Streak",
+              "stars_count": "2",
+              "badge_image": null,
+              "description1": "14 days",
+              "description2": null,
+              "description3": null,
+              "badge_parameter": "3"
+          },
+          {
+              "badge_id": 15,
+              "badge_name": "Streak 30",
+              "badge_type": "Streak",
+              "badge_category": "Streak",
+              "stars_count": "3",
+              "badge_image": null,
+              "description1": "30 days",
+              "description2": null,
+              "description3": null,
+              "badge_parameter": "5"
+          }
+      ]
+      },{
+        "cause_category_id" : 29,
+        "type":"ChangeMaker",
+        "cause_category_name": "ChangeMaker",
+        "badges" : [
+            {
+                "badge_id": 16,
+                "badge_name": "Change Maker",
+                "badge_type": "ChangeMaker",
+                "badge_category": "ChangeMaker",
+                "stars_count": "1",
+                "badge_image": null,
+                "description1": "You are now a change maker",
+                "description2": null,
+                "description3": null,
+                "badge_parameter": "0.1"
+            }
+        ]
+        },{
+          "cause_category_id" : 30,
+                  "cause_category_name": "Marathon",
+          "type":"Marathon",
+          "badges" : [
+              {
+                  "badge_id": 17,
+                  "badge_name": "Half Marathon",
+                  "badge_type": "Marathon",
+                  "badge_category": "Marathon",
+                  "stars_count": "1",
+                  "badge_image": null,
+                  "description1": "You are now a change maker",
+                  "description2": null,
+                  "description3": null,
+                  "badge_parameter": "3"
+              },
+               {
+                        "badge_id": 18,
+                        "badge_name": "Full Marathon",
+                        "badge_type": "Marathon",
+                        "badge_category": "Marathon",
+                        "stars_count": "2",
+                        "badge_image": null,
+                        "description1": "You are now a change maker",
+                        "description2": null,
+                        "description3": null,
+                        "badge_parameter": "6"
+                    }
+          ]
+          }
+]

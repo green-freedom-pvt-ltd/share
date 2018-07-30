@@ -140,7 +140,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
                         if (containerShowUnsync.getVisibility() == View.VISIBLE)
                             SyncHelper.uploadPendingWorkout();
                         else
-                            swipeRefreshLayout.setRefreshing(false);
+                            SyncHelper.forceRefreshEntireWorkoutHistory();
                     } else {
                         MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
                         swipeRefreshLayout.setRefreshing(false);
@@ -196,7 +196,8 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.RunDataUpdated runDataUpdated) {
-        fetchRunDataFromDb();
+        init();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     public void fetchRunDataFromDb() {
@@ -361,8 +362,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.PendingWorkoutUploaded pendingWorkoutUploaded) {
-        init();
-        swipeRefreshLayout.setRefreshing(false);
+        SyncHelper.forceRefreshEntireWorkoutHistory();
     }
 }
 

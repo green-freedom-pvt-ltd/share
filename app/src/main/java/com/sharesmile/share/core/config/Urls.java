@@ -11,22 +11,32 @@ import java.util.List;
 public class Urls {
 
     private static final String BASE_URL = "http://dev.impactrun.com";
+//    private static final String NODE_BASE_URL = "http://139.59.243.245:8000";//staging
+//    private static final String NODE_BASE_URL = "http://192.168.201.66:8000";//local
+    private static final String NODE_BASE_URL = "http://api.impactrun.com";//live
+    private static final String APP_VERSION = "/app/v0";
+    private static final String CAUSE_LIST_URL = "/causes";
+    private static final String RUN_URL = "/runs";
 
-    private static final String CAUSE_LIST_URL = "/api/causesv2.json";
-    private static final String RUN_URL = "/api/runs/";
+    private static final String RUN_LOCATIONS_URL = "/runLocations";
 
-    private static final String RUN_LOCATIONS_URL = "/api/runLocations/";
+    private static final String CLIENT_CONFIG_URL = "/runconfig";
 
-    private static final String CLIENT_CONFIG_URL = "/api/runconfig/";
+    private static final String UPDATE_RUN_URL = "/updaterun/";
 
-    private static final String UPDATE_RUN_URL = "/api/updaterun/";
+    private static final String LOGIN_URL = "/users/";
+    private static final String FEEDBACK_URL = "/userFeedback/";
+    private static final String FAQ_URL = "/faq";
+    private static final String MESSAGE_URL = "/messageCenter";
+    private static final String LEADERBOARD_URL = "/leaderboard/";
+    private static final String FRAUDSTERS_URL = "/fraudsters/";
 
-    private static final String LOGIN_URL = "/api/users/";
-    private static final String FEEDBACK_URL = "/api/userFeedback/";
-    private static final String FAQ_URL = "/api/faq/";
-    private static final String MESSAGE_URL = "/api/messageCenter/";
-    private static final String LEADERBOARD_URL = "/api/leaderboardv2/";
-    private static final String FRAUDSTERS_URL = "/api/fraudsters/";
+    private static final String BADGES_URL = "/badges/";
+    private static final String STREAK_URL = "/streak/";
+    private static final String ACHIEVEMENTS_URL = "/achievements/";
+    private static final String TITLES_URL = "/titles/";
+
+    private static final String IMPACTOVERVIEW_URL = "/impactOverview/";
 
     private static final String ABOUT_US_URL = "http://impactrun.com/#/AboutUs";
 
@@ -34,18 +44,20 @@ public class Urls {
     private static final String GOOGLE_CONVERT_TOKEN_URL = "/oauth2/v4/token";
     private static final String CAMPAIGN_URL = "/api/campaign/";
 
-    private static final String LEAGUE_REGISTRATION_URL = "/api/employeetoteam/";
-    private static final String LEAGUEBOARD_URL = "/api/teamboardv2/";
-    private static final String TEAMLEADERBOARD_URL = "/api/teamleaderboardv2/";
-    private static final String SERVER_TIME_URL = "/api/servertime/";
+    private static final String LEAGUE_REGISTRATION_URL = "/employeetoteam/";
+    private static final String LEAGUEBOARD_URL = "/teamboard/";
+    private static final String TEAMLEADERBOARD_URL = "/teamleaderboard/";
+    private static final String SERVER_TIME_URL = "/servertime/";
 
     private static final String BLOG_BASE_URL = "http://blog.impactapp.in";
     private static final String BLOG_LATEST_ARTICLE_URL = "/articles/latest";
     private static final String BLOG_HOW_IT_WORKS_CONTENT_URL = "/articles/howitworks";
 
-    private static final String IMPACT_ASSETS_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-image-assets";
 
-    private static final String HOW_IT_WORKS_S3_FOLDER = "/howitworks/";
+    private static final String IMPACT_PROFILE_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-userfiles-mobilehub-361440758/";
+    private static final String IMPACT_ASSETS_S3_BUCKET_URL = "https://s3.ap-south-1.amazonaws.com/impact-deployments-mobilehub-361440758/assets/";
+
+    private static final String HOW_IT_WORKS_S3_FOLDER = "/how_it_works/";
 
 
 
@@ -53,63 +65,66 @@ public class Urls {
     public static String getBaseUrl() {
         return BASE_URL;
     }
+    public static String getNodeBaseUrl() {
+        return NODE_BASE_URL + APP_VERSION;
+    }
 
     public static String getCauseListUrl() {
-        String url = getBaseUrl() + CAUSE_LIST_URL;
+        String url = getNodeBaseUrl() +CAUSE_LIST_URL;
         return url;
     }
 
     public static String getRunUrl() {
-        String url = getBaseUrl() + RUN_URL;
+        String url = getNodeBaseUrl() + RUN_URL;
         return url;
     }
 
     public static String getRunLocationsUrl() {
-        String url = getBaseUrl() + RUN_LOCATIONS_URL;
+        String url = getNodeBaseUrl() + RUN_LOCATIONS_URL;
         return url;
     }
 
     public static String getUpdateRunUrl() {
-        String url = getBaseUrl() + UPDATE_RUN_URL;
+        String url = getNodeBaseUrl() + UPDATE_RUN_URL;
         return url;
     }
 
     public static String getFraudstersUrl(){
-        return getBaseUrl() + FRAUDSTERS_URL;
+        return getNodeBaseUrl() + FRAUDSTERS_URL;
     }
 
     public static String getFlaggedRunUrl(boolean fetch_flagged_run) {
-        String url = getBaseUrl() + RUN_URL + "?is_flag=" + (fetch_flagged_run ? "true" : "all");
+        String url = getNodeBaseUrl() + RUN_URL + "?is_flag=" + (fetch_flagged_run ? "true" : "all");
         return url;
     }
 
     public static String getSyncRunUrl(long clientVersion) {
-        String url = getBaseUrl() + RUN_URL + "?client_version=" + clientVersion;
+        String url = getNodeBaseUrl() + RUN_URL + "?client_version=" + clientVersion;
         return url;
     }
 
     public static String getClientConfigUrl() {
-        String url = getBaseUrl() + CLIENT_CONFIG_URL;
+        String url = getNodeBaseUrl() + CLIENT_CONFIG_URL;
         return url;
     }
 
     public static String getLoginUrl() {
-        String url = getBaseUrl() + LOGIN_URL;
+        String url = getNodeBaseUrl() + LOGIN_URL;
         return url;
     }
 
     public static String getFeedBackUrl() {
-        String url = getBaseUrl() + FEEDBACK_URL;
+        String url = getNodeBaseUrl() + FEEDBACK_URL;
         return url;
     }
 
     public static String getUserUrl(int user_id) {
-        String url = getBaseUrl() + LOGIN_URL + user_id + "/";
+        String url = getNodeBaseUrl() + LOGIN_URL + user_id + "/";
         return url;
     }
 
     public static String getFaqUrl() {
-        String url = getBaseUrl() + FAQ_URL;
+        String url = getNodeBaseUrl() + FAQ_URL;
         return url;
     }
 
@@ -123,12 +138,12 @@ public class Urls {
     }
 
     public static String getMessageUrl() {
-        String url = getBaseUrl() + MESSAGE_URL;
+        String url = getNodeBaseUrl() + MESSAGE_URL;
         return url;
     }
 
     public static String getLeaderboardUrl(String interval) {
-        String url = getBaseUrl() + LEADERBOARD_URL + "?interval=" + interval + "&orderby=amount";
+        String url = getNodeBaseUrl() + LEADERBOARD_URL + "?interval=" + interval + "&orderby=amount";
         return url;
     }
 
@@ -138,21 +153,41 @@ public class Urls {
     }
 
     public static String getLeagueRegistrationUrl() {
-        String url = getBaseUrl() + LEAGUE_REGISTRATION_URL;
+        String url = getNodeBaseUrl() + LEAGUE_REGISTRATION_URL;
         return url;
     }
 
     public static String getServerTimeUrl() {
-        String url = getBaseUrl() + SERVER_TIME_URL;
+        String url = getNodeBaseUrl() + SERVER_TIME_URL;
+        return url;
+    }
+    public static String getStreakUrl() {
+        String url = getNodeBaseUrl() + STREAK_URL;
         return url;
     }
 
+    public static String getBadgesUrl() {
+        String url = getNodeBaseUrl() + BADGES_URL;
+        return url;
+    }
+
+    public static String getAchievementUrl() {
+        String url = getNodeBaseUrl() + ACHIEVEMENTS_URL;
+        return url;
+    }
+    public static String getTitlesUrl() {
+        String url = getNodeBaseUrl() + TITLES_URL;
+        return url;
+    }
+    public static String getImpactOverviewUrl() {
+        return getNodeBaseUrl()+IMPACTOVERVIEW_URL;
+    }
     public static String getLeagueBoardUrl() {
-        return getBaseUrl() + LEAGUEBOARD_URL;
+        return getNodeBaseUrl() + LEAGUEBOARD_URL;
     }
 
     public static String getTeamLeaderBoardUrl() {
-        return getBaseUrl() + TEAMLEADERBOARD_URL;
+        return getNodeBaseUrl() + TEAMLEADERBOARD_URL;
     }
 
     public static String getFeedLatestArticleUrl(){
@@ -193,10 +228,18 @@ public class Urls {
     }
 
     public static String getHowItWorksIllustration(int index){
-        return IMPACT_ASSETS_S3_BUCKET_URL + HOW_IT_WORKS_S3_FOLDER + index + ".png";
+        return getImpactAssetsS3BucketUrl() + HOW_IT_WORKS_S3_FOLDER + index + ".png";
     }
 
     public static String getHowItWorksContentUrl(){
         return BLOG_BASE_URL + BLOG_HOW_IT_WORKS_CONTENT_URL;
     }
+
+    public static String getImpactProfileS3BucketUrl() {
+        return IMPACT_PROFILE_S3_BUCKET_URL;
+    }
+    public static String getImpactAssetsS3BucketUrl() {
+        return IMPACT_ASSETS_S3_BUCKET_URL;
+    }
+
 }

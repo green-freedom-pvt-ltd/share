@@ -5,11 +5,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,10 +20,7 @@ import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.Utils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -66,7 +59,7 @@ public class FragmentGoals extends BaseFragment {
         for(int i=0;i<goals.size();i++)
         {
             Goal goal = goals.get(i);
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.row_onboarding,null,false);
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.rv_onboarding_row_item,null,false);
             TextView goalName = view.findViewById(R.id.goal_name);
             TextView goalStreakDistance = view.findViewById(R.id.goal_streak_distance);
             goalName.setText(goal.getName());

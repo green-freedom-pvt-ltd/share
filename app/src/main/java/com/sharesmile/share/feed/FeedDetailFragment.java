@@ -100,7 +100,7 @@ public class FeedDetailFragment extends BaseFragment implements View.OnClickList
     private void onShareMessageClick(final Message message) {
         if (!TextUtils.isEmpty(message.getVideoId())){
             // To share a video
-            Utils.share(getContext(), message.getShareTemplate());
+            Utils.share(getActivity(), message.getShareTemplate());
         }else{
             // To share an image
             Utils.shareImageWithMessage(getContext(), message.getMessage_image(), message.getShareTemplate());

@@ -36,6 +36,9 @@ public class UserDetails implements UnObfuscable {
     private String country;
     @SerializedName("social_thumb")
     private String socialThumb;
+
+    @SerializedName("profile_picture")
+    private String profilePicture;
     @SerializedName("birthday")
     private String birthday;
     @SerializedName("total_amount")
@@ -68,6 +71,12 @@ public class UserDetails implements UnObfuscable {
     private int streakGoalID;
     @SerializedName("streak_added")
     private boolean streakAdded;
+
+    @SerializedName("achieved_title_1")
+    private int title1;
+    @SerializedName("achieved_title_2")
+    private int title2;
+
 
     public boolean isStreakAdded() {
         return streakAdded;
@@ -109,6 +118,7 @@ public class UserDetails implements UnObfuscable {
         if (!isStreakAdded() && getStreakRunProgress() >= getStreakGoalDistance()) {
             this.streakCount += 1;
             setStreakAdded(true);
+            setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
         }
 
         if(streakMaxCount<streakCount)
@@ -321,5 +331,37 @@ public class UserDetails implements UnObfuscable {
     public static class TotalDistance {
         @SerializedName("total_distance")
         public float totalDistance;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setTotalAmount(TotalAmount totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setTotalDistance(TotalDistance totalDistance) {
+        this.totalDistance = totalDistance;
+    }
+
+    public int getTitle1() {
+        return title1;
+    }
+
+    public void setTitle1(int title1) {
+        this.title1 = title1;
+    }
+
+    public int getTitle2() {
+        return title2;
+    }
+
+    public void setTitle2(int title2) {
+        this.title2 = title2;
     }
 }

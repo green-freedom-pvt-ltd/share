@@ -16,7 +16,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
@@ -25,6 +27,7 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.login.LoginImpl;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.profile.streak.StreakFragment;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.models.WorkoutData;
@@ -37,6 +40,8 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,7 +59,7 @@ import static com.sharesmile.share.core.Constants.SHARE_PLACEHOLDER_SPONSOR;
 public class ShareFragment extends FeedbackDialogHolderFragment implements View.OnClickListener, LoginImpl.LoginListener {
 
     public static final String WORKOUT_DATA = "workout_data";
-    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
+
     private static final String TAG = "ShareFragment";
     private CauseData mCauseData;
 
@@ -147,15 +152,17 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
 
     private WorkoutData mWorkoutData;
+    private AchievedBadgesData achievedBadgesData;
     private boolean mShowLogin;
 
     private LoginImpl mLoginHandler;
 
-    public static ShareFragment newInstance(WorkoutData data, CauseData causeData) {
+    public static ShareFragment newInstance(WorkoutData data, CauseData causeData, AchievedBadgesData achievedBadgesData) {
         ShareFragment fragment = new ShareFragment();
         Bundle args = new Bundle();
         args.putParcelable(WORKOUT_DATA, data);
-        args.putSerializable(BUNDLE_CAUSE_DATA, causeData);
+        args.putParcelable(Constants.ACHIEVED_BADGE_DATA, achievedBadgesData);
+        args.putSerializable(Constants.BUNDLE_CAUSE_DATA, causeData);
         fragment.setArguments(args);
         return fragment;
     }
@@ -168,8 +175,9 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 //        mCauseData = MainApplication.getInstance().getCausesToShow().get(2);
 //        mWorkoutData = WorkoutDataImpl.getDummyWorkoutData();
 
-        mCauseData = (CauseData) arg.getSerializable(BUNDLE_CAUSE_DATA);
+        mCauseData = (CauseData) arg.getSerializable(Constants.BUNDLE_CAUSE_DATA);
         mWorkoutData = arg.getParcelable(WORKOUT_DATA);
+        achievedBadgesData = arg.getParcelable(Constants.ACHIEVED_BADGE_DATA);
 
         mShowLogin = !MainApplication.isLogin();
     }
@@ -241,7 +249,6 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
             // Need to show post run feedback dialog before
             showPostRunFeedbackDialog(mWorkoutData);
         }
-
     }
 
     private void setGradientOnImpactAmount(){
@@ -376,13 +383,13 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     @OnClick(R.id.btn_share_continue)
     public void onContinueClick(){
-        openStreakFragment();
-    }
 
-    private void openStreakFragment() {
-        getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK), true);
+        getFragmentController().replaceFragment(StreakFragment.newInstance(Constants.FROM_THANK_YOU_SCREEN_FOR_STREAK,achievedBadgesData), true);
+        AnalyticsEvent.create(Event.ON_CLICK_CONTINUE_SHARE_SCREEN)
+                .addBundle(mWorkoutData.getWorkoutBundle())
+                .put("user_id", MainApplication.getInstance().getUserID())
+                .buildAndDispatch();
     }
-
 
     private void showLoginSkipDialog() {
 
@@ -439,9 +446,10 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
 
     @Override
     public void onLoginSuccess() {
-        if (isAttachedToActivity()){
+       //will not get loginSuccess as login is compulsory now
+        /* if (isAttachedToActivity()){
             getFragmentController().replaceFragment(ShareFragment.newInstance(mWorkoutData, mCauseData), false);
-        }
+        }*/
     }
 
     @Override
@@ -455,7 +463,6 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
                 mProgressContainer.setVisibility(View.GONE);
             }
         }
-
     }
 
     @Override

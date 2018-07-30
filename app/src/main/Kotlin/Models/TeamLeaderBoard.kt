@@ -2,6 +2,7 @@ package Models
 
 import com.google.gson.annotations.SerializedName
 import com.sharesmile.share.core.base.UnObfuscable
+import com.sharesmile.share.core.config.Urls
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem
 import com.sharesmile.share.utils.Utils
 import java.io.Serializable
@@ -62,6 +63,9 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
         @SerializedName("social_thumb")
         var imageUrl: String? = null
 
+        @SerializedName("profile_picture")
+        var profilePictureUrl: String? = null
+
         @SerializedName("gender_user")
         var gender: String? = null
 
@@ -75,7 +79,12 @@ class TeamLeaderBoard : UnObfuscable, Serializable {
             var board = BaseLeaderBoardItem()
             board.id = id.toLong()
             board.name = Utils.dedupName(firstName, lastName)
-            board.image = imageUrl
+            if(profilePictureUrl!=null && profilePictureUrl!!.isNotEmpty())
+            {
+                board.image = Urls.getImpactProfileS3BucketUrl()+profilePictureUrl
+            }else {
+                board.image = imageUrl
+            }
             board.distance = distance
             board.ranking = ranking
             board.amount = amount

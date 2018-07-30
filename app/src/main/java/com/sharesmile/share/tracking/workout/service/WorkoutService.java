@@ -2,11 +2,12 @@ package com.sharesmile.share.tracking.workout.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -23,7 +24,18 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
+import com.sharesmile.share.Badge;
+import com.sharesmile.share.BadgeDao;
+import com.sharesmile.share.Category;
+import com.sharesmile.share.CategoryDao;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.workout.tracker.RunTracker;
 import com.sharesmile.share.tracking.workout.tracker.Tracker;
 import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
@@ -48,7 +60,6 @@ import com.sharesmile.share.analytics.events.Properties;
 import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.notifications.NotificationActionReceiver;
 import com.sharesmile.share.core.TTS;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.core.sync.SyncService;
@@ -75,8 +86,14 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -173,11 +190,12 @@ public class WorkoutService extends Service implements
                 .buildAndDispatch();
     }
 
-    private void sendWorkoutResultBroadcast(WorkoutData result) {
+    private void sendWorkoutResultBroadcast(WorkoutData result, AchievedBadgesData achievedBadgesData) {
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_WORKOUT_RESULT_CODE);
         bundle.putParcelable(Constants.KEY_WORKOUT_RESULT, result);
+        bundle.putParcelable(Constants.KEY_WORKOUT_ACHIEVED_RESULT, achievedBadgesData);
         Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
@@ -287,42 +305,148 @@ public class WorkoutService extends Service implements
             if (tracker != null) {
                 tracker.endRun();
             }
+            WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
             //Calculate Streak
             double distanceCovered = 0;
             try {
-                distanceCovered = Double.parseDouble(Utils.formatToKmsWithTwoDecimal(WorkoutSingleton.getInstance().getDataStore().getTotalDistance()));
+                distanceCovered = Double.parseDouble(Utils.formatToKmsWithTwoDecimal(result.getDistance()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            if(distanceCovered>=0.1) {
-                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+            if (distanceCovered >= 0.1) {
+//                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                 userDetails.addStreakRunProgress(distanceCovered);
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
             }
+            SyncHelper.uploadStreak();
+            AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
+            achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CHANGEMAKER, mCauseData));
 
+            achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_MARATHON, mCauseData));
+            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(), Constants.BADGE_TYPE_STREAK, mCauseData));
+            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CAUSE, mCauseData));
+            SyncHelper.uploadAchievement();
+            SyncHelper.uploadStreak();
+            long titleId = giveTitle();
+            if(titleId>0) {
+                achievedBadgesData.getTitleIds().add(titleId);
+            }
 
+            handleWorkoutResult(result, achievedBadgesData);
 
-        WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
-        handleWorkoutResult(result);
-
-        stopTimer();
-        GoogleLocationTracker.getInstance().unregisterWorkout(this);
-        currentlyTracking = false;
-        WorkoutServiceRetainerAlarm.cancelAlarm(this);
-        if (stepCounter != null) {
-            stepCounter.stop();
+            stopTimer();
+            GoogleLocationTracker.getInstance().unregisterWorkout(this);
+            currentlyTracking = false;
+            WorkoutServiceRetainerAlarm.cancelAlarm(this);
+            if (stepCounter != null) {
+                stepCounter.stop();
+            }
+            currentlyProcessingSteps = false;
+            unBindFromActivityAndStop();
+            distanceInKmsOnLastUpdateEvent = 0f;
+            cancelAllWorkoutNotifications();
         }
-        currentlyProcessingSteps = false;
-        unBindFromActivityAndStop();
-        distanceInKmsOnLastUpdateEvent = 0f;
-        cancelAllWorkoutNotifications();
     }
-}
 
-    private void handleWorkoutResult(final WorkoutData result) {
+    private long giveTitle() {
+        long returnId = 0;
+        List<Category> categories = MainApplication.getInstance().getDbWrapper()
+                .getCategoryDao().queryBuilder()
+                .where(CategoryDao.Properties.CategoryName.eq(mCauseData.getCategory())).list();
+        if (categories.size() > 0) {
+            int categoryId = categories.get(0).getCategoryId();
+            List<Title> titles = MainApplication.getInstance().getDbWrapper().getTitleDao().queryBuilder()
+                    .where(TitleDao.Properties.CategoryId.eq(categoryId))
+                    .orderAsc(TitleDao.Properties.GoalNStars).list();
 
+            /*List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper()
+                    .getAchievedBadgeDao().queryBuilder()
+                    .where(AchievedTitleDao.Properties.CategoryName.eq(mCauseData.getCategory()),
+                            AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()))
+                    .list();
+            for(int i=0;i<achievedBadges.size();i++)
+            {
+                starCount += achievedBadges.get(i).getNoOfStarAchieved();
+            }*/
+            SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+            // Calculate amount_raised in interval
+            Cursor cursor = database.rawQuery("SELECT "
+                    + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
+                    + " FROM " + AchievedBadgeDao.TABLENAME + " where "
+                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle().replace("'","''") +
+                    "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
+                    + MainApplication.getInstance().getUserID()+
+                    " and "+AchievedBadgeDao.Properties.BadgeType.columnName+" is '"+Constants.BADGE_TYPE_CAUSE+"'", new String[]{});
+            cursor.moveToFirst();
+
+            int starCount = cursor.getInt(cursor.getColumnIndex("no_of_stars"));
+
+            AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper()
+                    .getAchievedTitleDao();
+            List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder()
+                    .where(AchievedTitleDao.Properties.CategoryName.eq(mCauseData.getCategory())
+                            , AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+            AchievedTitle achievedTitle = null;
+            if (achievedTitles.size() > 0) {
+                achievedTitle = achievedTitles.get(0);
+            }
+
+            int titlePos = -1;
+            int achievedTitlePos = -1;
+
+            for (int i = 0; i < titles.size(); i++) {
+                if (achievedTitle != null && achievedTitle.getTitleId() == titles.get(i).getTitleId()) {
+                    titlePos = i;
+                }
+                if (starCount >= titles.get(i).getGoalNStars()) {
+                    achievedTitlePos = i;
+                }
+            }
+            if (achievedTitle == null) {
+                if (achievedTitlePos > -1) {
+                    achievedTitle = getAchievedTitle(titles.get(achievedTitlePos));
+                }
+            } else if (achievedTitlePos > -1) {
+                if (titlePos < achievedTitlePos) {
+                    long id = achievedTitle.getId();
+                    achievedTitle = getAchievedTitle(titles.get(achievedTitlePos));
+                    achievedTitle.setId(id);
+                }
+            }
+            if (achievedTitle != null) {
+                returnId = achievedTitle.getTitleId();
+                if (achievedTitle.getId()!=null && achievedTitle.getId() > 0) {
+                    achievedTitleDao.update(achievedTitle);
+                } else {
+                    achievedTitleDao.insert(achievedTitle);
+                }
+                Utils.saveTitleIdToUserDetails(achievedTitle);
+                SyncHelper.uploadAchievementTitle();
+                SyncHelper.oneTimeUploadUserData();
+            }
+            if(titlePos==achievedTitlePos)
+                returnId = 0;
+        }
+
+        return returnId;
+    }
+
+    private AchievedTitle getAchievedTitle(Title title) {
+        AchievedTitle achievedTitle = new AchievedTitle();
+        achievedTitle.setUserId(MainApplication.getInstance().getUserID());
+        achievedTitle.setTitleId(title.getTitleId());
+        achievedTitle.setTitle(title.getTitle());
+        achievedTitle.setCategoryName(title.getCategory());
+        achievedTitle.setCategoryId(title.getCategoryId());
+        achievedTitle.setAchievedTime(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+        achievedTitle.setBadgeType(title.getBadgeType());
+        achievedTitle.setIsSync(false);
+        return achievedTitle;
+    }
+
+    private void handleWorkoutResult(final WorkoutData result, AchievedBadgesData achievedBadgesData) {
         if (result.isMockLocationDetected()) {
             EventBus.getDefault().post(new UpdateUiOnMockLocation());
         } else if (result.hasConsecutiveUsainBolts()) {
@@ -336,7 +460,7 @@ public class WorkoutService extends Service implements
                     Math.round(result.getRecordedTime())));
         }
 
-        sendWorkoutResultBroadcast(result);
+        sendWorkoutResultBroadcast(result, achievedBadgesData);
         // Do not perform activity detection until the next 24 hours, unless user starts workout
         ActivityDetector.getInstance().stopActivityDetection();
 
@@ -506,18 +630,18 @@ public class WorkoutService extends Service implements
         }
     }
 
-/**
- * Class used for the client Binder.  Because we know this service always
- * runs in the same process as its clients, we don't need to deal with IPC.
- */
-public class MyBinder extends Binder {
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class MyBinder extends Binder {
 
-    public WorkoutService getService() {
-        // Return this instance of LocalService so clients can call public methods
-        return WorkoutService.this;
+        public WorkoutService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return WorkoutService.this;
+        }
+
     }
-
-}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -1048,6 +1172,7 @@ public class MyBinder extends Binder {
                         .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
                                 ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
+                                +" with "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal(getTotalDistanceCoveredInMeters())+" "+UnitsManager.getDistanceLabel()
                                 : "")
                         )
                         .setSmallIcon(getNotificationIcon())

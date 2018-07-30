@@ -95,7 +95,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                boolean scrollUp = false;
+                    boolean scrollUp = false;
                 if (dy > 0){
                     // Scroll Up (finger move up), Move down
                     scrollUp = true;

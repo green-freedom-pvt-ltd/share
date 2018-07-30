@@ -36,6 +36,10 @@ public class Constants {
 
     public static final int CODE_GOOGLE_PLAY_SERVICES_RESOLUTION = 104;
 
+    public static final int CODE_REQUEST_IMAGE_CAPTURE_PERMISSION = 105;
+
+    public static final int CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION = 106;
+
     public static final String WORKOUT_SERVICE_BROADCAST_ACTION = "com.sharesmile.share.tracking.location";
 
     public static final String LOCATION_TRACKER_BROADCAST_ACTION = "com.sharesmile.share.tracking.location.tracker";
@@ -78,7 +82,9 @@ public class Constants {
 
     public static final String KEY_GOOGLE_FIT_RESOLUTION_PARCELABLE = "google_fit_resolution_parcelable";
 
-    public static final String KEY_WORKOUT_RESULT = "key_wourkout_result";
+    public static final String KEY_WORKOUT_RESULT = "key_workout_result";
+
+    public static final String KEY_WORKOUT_ACHIEVED_RESULT = "key_wourkout_achieved_result";
 
     public static final String KEY_WORKOUT_TEST_MODE_ON = "key_workout_test_mode_on";
 
@@ -130,6 +136,12 @@ public class Constants {
 
     public static final String PREF_WORKOUT_DATA_SYNC_VERSION = "pref_workout_data_sync_version";
 
+    public static final String PREF_GOT_STREAK = "pref_got_streak";
+    public static final String PREF_GOT_BADGES = "pref_got_badged";
+    public static final String PREF_GOT_ACHIEVED_BADGES = "pref_got_achieved_badged";
+    public static final String PREF_SET_ACHIEVED_BADGES = "pref_set_achieved_badged";
+    public static final String PREF_GOT_ACHIEVED_TITLE = "pref_got_achieved_title";
+    public static final String PREF_GOT_TOKEN = "pref_got_token";
     public static final String PREF_IS_LOGIN = "pref_user_login";
     public static final String PREF_USER_ID = "pref_user_id";
     public static final String PREF_FIRST_TIME_USER = "pref_first_time_user";
@@ -198,6 +210,7 @@ public class Constants {
     public static final String PREFS_MY_EXCHANGE_RATE = "my_exchange_rate";
 
     public static final int REQUEST_CODE_LOGIN = 1001;
+    public static final int REQUEST_IMAGE_CAPTURE = 102;
 
     public static final String PAUSE_REASON_GPS_DISABLED = "gps_disabled";
     public static final String PAUSE_REASON_USAIN_BOLT = "usain_bolt";
@@ -214,6 +227,8 @@ public class Constants {
     public final static String USER_PROP_GENDER="Gender";
     public final static String USER_PROP_TEAM_CODE="TeamCode";
     public final static String USER_PROP_AGE="Age";
+    public final static String USER_PROP_TITLE1="Title1";
+    public final static String USER_PROP_TITLE2="Title2";
 
     public static final String USER_PROP_LIFETIME_DISTANCE = "LifeTimeDistance";
     public static final String USER_PROP_LIFETIME_STEPS = "LifeTimeSteps";
@@ -234,9 +249,10 @@ public class Constants {
     public static final String PREF_HOW_IT_WORKS_CONTENT = "pref_how_it_works_content";
 
     public static final String PREF_SCREEN_LAUNCH_COUNT_PREFIX = "pref_screen_launch_count_";
-    //TODO : actually done at the server end but temp doing it at client end
-    public static final String PREF_USERS_LOGGED_IN = "pref_user_login_id";
+
     public static final String PREF_SHOWN_ONBOARDING = "pref_onboarding";
+    public static final String PREF_STREAK_UPLOADED_FIRST_TIME = "pref_streak_uploaded_first_time";
+    public static final String PREF_CHARITY_OVERVIEW_DATA_LOAD = "pref_charity_overview_data_load";
 
     public static final String NAVIGATION_DRAWER = "navigation_drawer";
     public static final String PROFILE_SCREEN = "profile_screen";
@@ -252,6 +268,27 @@ public class Constants {
 
     public static int FROM_THANK_YOU_SCREEN_FOR_STREAK = 1;
     public static int FROM_PROFILE_FOR_STREAK = 2;
+
+    //badges
+    public final static String BADGE_COMPLETED = "badge_completed";
+    public final static String BADGE_IN_PROGRESS = "badge_in_progress";
+
+    public final static String BADGE_TYPE_CAUSE = "cause";
+    public final static String BADGE_TYPE_CHANGEMAKER = "changemaker";
+    public final static String BADGE_TYPE_STREAK = "streak";
+    public final static String BADGE_TYPE_MARATHON = "marathon";
+
+    public final static String TITLE_TYPE_CAUSE = "title_type_cause";
+
+    public static final String BUNDLE_CAUSE_DATA = "bundle_cause_data";
+    public static final String ACHIEVED_BADGE_DATA = "achieved_badge_data";
+
+    public static final String PREF_CHARITY_OVERVIEW = "charity_overview";
+    public static final String PREF_ACHIEVED_BADGES_OPEN = "achieved_badge_open";
+    public static final String ARG_FORWARD_TOPROFILE = "forward";
+
+    public final static int LOADER_CHARITY_OVERVIEW = 100;
+    public final static int LOADER_MY_STATS_GRAPH = 101;
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{

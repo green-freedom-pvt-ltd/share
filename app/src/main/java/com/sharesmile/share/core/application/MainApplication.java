@@ -479,7 +479,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     }
 
     public String getGoalDetails(){
-        return SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        String s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        if(s.length()<=2)
+        {
+            setGoalDetails(null);
+        }
+        s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        return s;
     }
 
     public float getBodyWeight(){
@@ -576,8 +582,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             Analytics.getInstance().setUserEmail(details.getEmail());
         }
 
-        prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
-
         prefsManager.setInt(Constants.PREF_USER_ID, details.getUserId());
         Analytics.getInstance().setUserId(details.getUserId());
 
@@ -605,6 +609,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     public static boolean isLogin() {
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
+    }
+    public static boolean isTokenAvailable() {
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_TOKEN, false);
     }
 
     public void setModelShown() {

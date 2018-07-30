@@ -33,7 +33,7 @@ class FeedListFragment : BaseFragment(), MessageCenterAdapter.MessageInterface {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var view = inflater?.inflate(R.layout.fragment_message_center, container, false);
         mAdapter = MessageCenterAdapter(this);
         EventBus.getDefault().register(this)
@@ -42,7 +42,7 @@ class FeedListFragment : BaseFragment(), MessageCenterAdapter.MessageInterface {
 
     private lateinit var mAdapter: MessageCenterAdapter;
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.layoutManager = LinearLayoutManager(context);
         recycler_view.adapter = mAdapter;
@@ -77,7 +77,7 @@ class FeedListFragment : BaseFragment(), MessageCenterAdapter.MessageInterface {
     override fun onShareMessageClick(message: Message) {
         if (!TextUtils.isEmpty(message.videoId!!)){
             // To share a video
-            Utils.share(context, message.shareTemplate)
+            Utils.share(activity, message.shareTemplate)
         }else{
             // To share an image
             Utils.shareImageWithMessage(context, message.message_image, message.shareTemplate)

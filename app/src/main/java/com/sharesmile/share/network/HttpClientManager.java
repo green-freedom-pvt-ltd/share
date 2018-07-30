@@ -1,7 +1,8 @@
 package com.sharesmile.share.network;
 
 
-import com.squareup.okhttp.OkHttpClient;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by ankitmaheshwari on 6/16/17.

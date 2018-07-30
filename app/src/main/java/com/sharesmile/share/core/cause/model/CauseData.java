@@ -23,6 +23,9 @@ public class CauseData implements UnObfuscable, Serializable {
     @SerializedName("cause_category")
     private String category;
 
+    @SerializedName("cause_category_id")
+    private long categoryId;
+
     @SerializedName("partners")
     private List<Partner> executors;
 
@@ -307,5 +310,13 @@ public class CauseData implements UnObfuscable, Serializable {
         p.put("cause_title", getTitle());
         p.put("sponsor_id", sponsorId);
         return p;
+    }
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
     }
 }

@@ -11,6 +11,18 @@ public class TaskConstants {
 
     public static final String UPLOAD_USER_DATA = "upload_user_data";
 
+    public static final String UPLOAD_STREAK = "upload_streak";
+
+    public static final String SYNC_CHARITY_OVERVIEW = "sync_charity_overview";
+
+    public static final String SYNC_ACHIEVEMENT_BADGE = "sync_achievement_badge";
+
+    public static final String SYNC_ACHIEVEMENT_TITLE = "sync_achievement_title";
+
+    public static final String UPLOAD_ACHIEVEMENT_BADGE = "upload_achievement_badge";
+
+    public static final String UPLOAD_ACHIEVEMENT_TITLE = "upload_achievement_title";
+
     public static final String UPLOAD_PENDING_WORKOUT = "upload_pending_workout";
 
     public static final String SYNC_DATA = "sync_data";
@@ -19,4 +31,9 @@ public class TaskConstants {
 
     public static final String FEEDBACK_DATA_JSON = "feedback_data_json";
 
+    public static final String SYNC_BADGE_DATA = "sync_badge_data";
+
+    public static final String SYNC_CAUSE_DATA = "sync_cause_data";
+
+    public static final String SYNC_STREAK = "sync_streak";
 }

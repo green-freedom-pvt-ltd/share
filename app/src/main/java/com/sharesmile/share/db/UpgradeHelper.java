@@ -12,6 +12,7 @@ import com.sharesmile.share.db.migration.history.MigrateV11ToV12;
 import com.sharesmile.share.db.migration.history.MigrateV12ToV13;
 import com.sharesmile.share.db.migration.history.MigrateV13ToV14;
 import com.sharesmile.share.db.migration.history.MigrateV14ToV15;
+import com.sharesmile.share.db.migration.history.MigrateV15ToV16;
 import com.sharesmile.share.db.migration.history.MigrateV1ToV2;
 import com.sharesmile.share.db.migration.history.MigrateV2ToV3;
 import com.sharesmile.share.db.migration.history.MigrateV3ToV4;
@@ -79,6 +80,9 @@ public class UpgradeHelper extends DaoMaster.OpenHelper {
                 break;
             case 15:
                 new MigrateV14ToV15().applyMigration(db, oldVersion);
+                break;
+            case 16:
+                new MigrateV15ToV16().applyMigration(db, oldVersion);
                 break;
             default:
                 return;

@@ -3,6 +3,7 @@ package com.sharesmile.share.tracking.ui;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
@@ -16,12 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.share.ShareFragment;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.models.Calorie;
@@ -98,10 +101,10 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void populateViews(View baseView) {
         ButterKnife.bind(this, baseView);
-        time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
-        distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
-        distanceUnitTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance_unit);
-        impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
+        time = baseView.findViewById(R.id.tv_run_progress_timer);
+        distanceTextView = baseView.findViewById(R.id.tv_run_progress_distance);
+        distanceUnitTextView = baseView.findViewById(R.id.tv_run_progress_distance_unit);
+        impact = baseView.findViewById(R.id.tv_run_progress_impact);
         pauseButton = baseView.findViewById(R.id.btn_pause);
         stopButton = baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
@@ -188,7 +191,7 @@ public class RealRunFragment extends RunFragment {
     }
 
     @Override
-    public void onWorkoutResult(WorkoutData data) {
+    public void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData) {
         //Workout completed and results obtained, time to show the next Fragment
         Logger.d(TAG, "onWorkoutResult");
         if (isAttachedToActivity()) {
@@ -207,12 +210,12 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            exitRun(data);
+            exitRun(data,achievedBadgesData);
 
         }
     }
 
-    protected void exitRun(WorkoutData data){
+    protected void exitRun(WorkoutData data, AchievedBadgesData achievedBadgesData){
         Logger.d(TAG, "exit");
         if (mCauseData.getMinDistance() > (data.getDistance())
                 && !data.isMockLocationDetected()) {
@@ -220,7 +223,13 @@ public class RealRunFragment extends RunFragment {
             stopTimer();
             return;
         }
-        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData), false);
+        Loader statsLoader= getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
+        if(statsLoader!=null)
+            statsLoader.onContentChanged();
+        Loader  loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_CHARITY_OVERVIEW);
+        if(loader!=null)
+            loader.onContentChanged();
+        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData,achievedBadgesData), false);
     }
 
     @Override
