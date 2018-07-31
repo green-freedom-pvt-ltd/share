@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Shine on 14/05/16.
@@ -25,21 +26,21 @@ public class DateUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(getServerTimeInMillis());
         Date date = calendar.getTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.ENGLISH);
         return simpleDateFormat.format(date);
 
     }
 
     public static String getDefaultFormattedDate(Date date) {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.ENGLISH);
         return simpleDateFormat.format(date);
 
     }
 
     public static String getMillisecFormattedDate(Date date) {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MILLISEC_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MILLISEC_DATE_FORMAT, Locale.ENGLISH);
         return simpleDateFormat.format(date);
 
     }
@@ -50,7 +51,7 @@ public class DateUtil {
     }
 
     public static String getCustomFormattedDate(Date date, String format) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.ENGLISH);
         return simpleDateFormat.format(date);
     }
 
@@ -73,7 +74,7 @@ public class DateUtil {
 
     public static Date getFormattedDate(String dateString, String format) {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.ENGLISH);
         try {
             return simpleDateFormat.parse(dateString);
         } catch (ParseException e) {

@@ -1169,7 +1169,7 @@ public class WorkoutService extends Service implements
                 PendingIntent.FLAG_UPDATE_CURRENT);*/
         NotificationCompat.Builder mBuilder =null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           mBuilder = createChannelForNotification();
+           mBuilder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_workout));
         }else
         {
             mBuilder = new NotificationCompat.Builder(this);
@@ -1201,19 +1201,6 @@ public class WorkoutService extends Service implements
 
         mBuilder.setContentIntent(MainApplication.getInstance().createAppIntent());
         return mBuilder;
-    }
-
-    private NotificationCompat.Builder createChannelForNotification() {
-        CharSequence name = getString(R.string.channel_name);
-        String description = getString(R.string.channel_description);
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel(getString(R.string.channel_name), name, importance);
-        channel.setDescription(description);
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
-        return new NotificationCompat.Builder(this,getString(R.string.channel_name));
     }
 
     private Bitmap largeIcon;

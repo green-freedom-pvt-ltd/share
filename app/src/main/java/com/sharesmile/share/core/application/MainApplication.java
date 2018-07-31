@@ -51,6 +51,7 @@ import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.workout.service.WorkoutService;
+import com.sharesmile.share.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -164,7 +165,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             }
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
+        NotificationCompat.Builder builder =null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_workout));
+        }else
+        {
+            builder = new NotificationCompat.Builder(getContext());
+        }
 
         long[] vibratePattern;
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){

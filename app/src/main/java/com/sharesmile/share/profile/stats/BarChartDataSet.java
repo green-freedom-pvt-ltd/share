@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -330,13 +331,13 @@ public class BarChartDataSet {
         {
             case TYPE_DAILY :
             case TYPE_WEEKLY :
-                simpleDateFormat = new SimpleDateFormat("dd/MM");
+                simpleDateFormat = new SimpleDateFormat("dd/MM", Locale.ENGLISH);
                 break;
             case TYPE_MONTHLY :
-                simpleDateFormat = new SimpleDateFormat("MMM");
+                simpleDateFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
                 break;
                 default:
-                    simpleDateFormat = new SimpleDateFormat("dd/MM");
+                    simpleDateFormat = new SimpleDateFormat("dd/MM", Locale.ENGLISH);
         }
         Date date = new Date(dayOfWeek);
         return simpleDateFormat.format(date).toUpperCase();

@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED;
 
@@ -197,7 +198,7 @@ public class TrackerActivity extends BaseActivity {
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
             Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM");
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM", Locale.ENGLISH);
             String month = sdf.format(cal.getTime());
 
             int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);

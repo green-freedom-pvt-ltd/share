@@ -18,6 +18,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.utils.Utils;
 
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
@@ -38,8 +39,15 @@ public class AlarmReceiver extends BroadcastReceiver {
         try {
 
 
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(context)
+            NotificationCompat.Builder mBuilder =null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mBuilder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_general));
+            }else
+            {
+                mBuilder = new NotificationCompat.Builder(getContext());
+            }
+
+            mBuilder
                             .setContentTitle("Let\'s Go \uD83C\uDFC3")
                             .setContentText("Time to create some Impact.")
                             .setSmallIcon(getNotificationIcon())
