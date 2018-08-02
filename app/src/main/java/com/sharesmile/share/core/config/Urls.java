@@ -202,7 +202,6 @@ public class Urls {
         return getNodeBaseUrl() + TEAMLEADERBOARD_URL;
     }
 
-    public static String getFeedLatestArticleUrl() {
     public static String getReferProgramsUrl() {
         String url = getNodeBaseUrl() +REFER_PROGRAMS;
         return url;

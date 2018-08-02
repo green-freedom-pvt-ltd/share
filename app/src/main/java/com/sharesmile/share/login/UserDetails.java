@@ -1,6 +1,8 @@
 package com.sharesmile.share.login;
 
 import com.google.gson.annotations.SerializedName;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.Utils;
 
@@ -97,6 +99,9 @@ public class UserDetails implements UnObfuscable {
 
     public void setStreakAdded(boolean streakAdded) {
         this.streakAdded = streakAdded;
+        if(streakAdded)
+            SharedPrefsManager.getInstance().setString(Constants.PREF_NOTIFICATION_STREAK_ADDED_DATE,
+                    streakCurrentDate);
     }
 
     public double getStreakGoalDistance() {
