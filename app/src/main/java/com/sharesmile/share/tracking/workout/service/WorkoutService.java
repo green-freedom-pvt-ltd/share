@@ -1,6 +1,7 @@
 package com.sharesmile.share.tracking.workout.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
@@ -315,7 +317,7 @@ public class WorkoutService extends Service implements
             }
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             if (distanceCovered >= 0.1) {
-                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+//                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                 userDetails.addStreakRunProgress(distanceCovered);
                 userDetails.addStreakCount();
                 MainApplication.getInstance().setUserDetails(userDetails);
@@ -377,7 +379,8 @@ public class WorkoutService extends Service implements
                     + " FROM " + AchievedBadgeDao.TABLENAME + " where "
                     + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle().replace("'","''") +
                     "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
-                    + MainApplication.getInstance().getUserID(), new String[]{});
+                    + MainApplication.getInstance().getUserID()+
+                    " and "+AchievedBadgeDao.Properties.BadgeType.columnName+" is '"+Constants.BADGE_TYPE_CAUSE+"'", new String[]{});
             cursor.moveToFirst();
 
             int starCount = cursor.getInt(cursor.getColumnIndex("no_of_stars"));
@@ -1164,10 +1167,16 @@ public class WorkoutService extends Service implements
         pauseResumeIntent.setAction(pauseResumeAction);
         PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);*/
+        NotificationCompat.Builder mBuilder =null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+           mBuilder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_workout));
+        }else
+        {
+            mBuilder = new NotificationCompat.Builder(this);
+        }
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setContentTitle(contentTitle)
+
+            mBuilder.setContentTitle(contentTitle)
                         .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
                                 ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())

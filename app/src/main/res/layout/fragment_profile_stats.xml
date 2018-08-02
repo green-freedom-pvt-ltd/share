@@ -210,11 +210,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="19dp"
                         android:layout_marginTop="30dp"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
+                        android:layout_marginLeft="23dp"
+                        android:layout_marginRight="23dp"
                         android:orientation="horizontal"
                         tools:listitem="@layout/rv_achievements_row_item"
-
                         />
                     <include layout="@layout/rv_achievements_row_item"
                         android:visibility="invisible"

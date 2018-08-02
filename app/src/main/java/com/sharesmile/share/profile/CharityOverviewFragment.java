@@ -90,7 +90,12 @@ public class CharityOverviewFragment extends BaseFragment{
 
     private void initUi() {
         setupToolbar();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext()){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
         charityOverviewRecyclerview.setLayoutManager(linearLayoutManager);
         int totalStars = 0;
         for(int i=0;i<categoryStats.getCauseStats().size();i++)

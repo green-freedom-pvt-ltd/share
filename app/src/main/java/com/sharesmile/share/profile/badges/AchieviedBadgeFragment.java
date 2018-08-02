@@ -177,7 +177,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 name = title.getTitle();
 //                Utils.setStarImage(title.getNoOfStars(), starIv);
                 ShareImageLoader.getInstance().loadImage(Urls.getImpactAssetsS3BucketUrl() + title.getImageUrl(), badgeIv,
-                        ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
+                        ContextCompat.getDrawable(getContext(), R.drawable.title));
             }
             achievedBadgesData.getTitleIds().remove(0);
         }else {
@@ -193,7 +193,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 badgeUpgrade.setText(badge.getDescription3());
                 shareMessage = badge.getShare_badge_content();
                 name = badge.getName();
-                Utils.setStarImage(badge.getNoOfStars(), starIv);
+                Utils.setStarImage(badge.getNoOfStars(), starIv,badge.getType());
                 ShareImageLoader.getInstance().loadImage(badge.getImageUrl(), badgeIv,
                         ContextCompat.getDrawable(getContext(), R.drawable.badge_image));
             }
@@ -256,11 +256,7 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
                 });
                 animation.start();
             }
-
         }
-
-
-
     }
 
 

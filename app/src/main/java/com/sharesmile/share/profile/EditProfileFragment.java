@@ -429,7 +429,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         setMenuColor();
 
         if (isImageLoaded) {
-            Picasso.with(getContext()).load(photoFile).into(imgProfile);
+            Picasso.get().load(photoFile).into(imgProfile);
             isImageLoaded = false;
         } else if (!TextUtils.isEmpty(userDetails.getProfilePicture())) {
             ShareImageLoader.getInstance().loadImage(Urls.getImpactProfileS3BucketUrl() + userDetails.getProfilePicture(), imgProfile,
@@ -559,13 +559,11 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (userDetails == null) {
             return;
         }
-
+        AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_PROFILE_DETAILS_EDIT);
         StringBuilder fullNameBuilder = new StringBuilder();
         if (!TextUtils.isEmpty(profilePicUrl)) {
             userDetails.setProfilePicture(profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis());
-            AnalyticsEvent.create(Event.ON_UPDATE_PROFILEPIC)
-                    .put("profile_pic_url", profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis())
-                    .buildAndDispatch();
+            builder.put("profile_pic_url", profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis());
         }
 
         if (!TextUtils.isEmpty(mFirstName.getText())) {
@@ -582,27 +580,27 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         String fullName = fullNameBuilder.toString();
         if (!TextUtils.isEmpty(fullName)) {
             Analytics.getInstance().setUserName(fullName);
-            AnalyticsEvent.create(Event.ON_SET_NAME)
-                    .put("user_name", fullName)
-                    .buildAndDispatch();
+            builder
+                    .put("user_name", fullName);
+
         }
 
 
         if (!TextUtils.isEmpty(mBirthday.getText().toString())) {
             Logger.d(TAG, "Setting User Birthday as " + mBirthday.getText().toString());
             userDetails.setBirthday(mBirthday.getText().toString());
-            AnalyticsEvent.create(Event.ON_SET_BIRTHDAY)
-                    .put("user_birthday", mBirthday.getText().toString())
-                    .buildAndDispatch();
+            builder
+                    .put("user_birthday", mBirthday.getText().toString());
+
         }
 
         if (!TextUtils.isEmpty(mNumber.getText())) {
             if (Utils.isValidInternationalPhoneNumber(mNumber.getText().toString())) {
                 userDetails.setPhoneNumber(mNumber.getText().toString());
                 Analytics.getInstance().setUserPhone(mNumber.getText().toString());
-                AnalyticsEvent.create(Event.ON_SET_PHONE_NUM)
-                        .put("user_phone_num", mNumber.getText().toString())
-                        .buildAndDispatch();
+                builder
+                        .put("user_phone_num", mNumber.getText().toString());
+
             }
         }
 
@@ -611,9 +609,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 float bodyWeightEntered = Float.parseFloat(bodyWeightKgs.getText().toString());
                 userDetails.setBodyWeight(bodyWeightEntered);
                 Analytics.getInstance().setUserProperty("body_weight", bodyWeightEntered);
-                AnalyticsEvent.create(Event.ON_SET_BODY_WEIGHT)
-                        .put("body_weight", bodyWeightEntered)
-                        .buildAndDispatch();
+                builder
+                        .put("body_weight", bodyWeightEntered);
+
             } catch (Exception e) {
                 Logger.e("EditProfileFragment", "Exception while parsing body weight: " + e.getMessage());
                 e.printStackTrace();
@@ -624,22 +622,29 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (gender == 0) {
             userDetails.setGenderUser("f");
             Analytics.getInstance().setUserGender("F");
+            builder.put("gender","f");
         } else if (gender == 1) {
             userDetails.setGenderUser("m");
             Analytics.getInstance().setUserGender("M");
+            builder.put("gender","m");
         }
+
 
         if(pos1!=-1)
         {
             userDetails.setTitle1(achievedTitles.get(pos1).getTitleId());
             Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE1,achievedTitles.get(pos1).getTitleId()+"");
+            builder.put("title_1_id",achievedTitles.get(pos1).getTitleId());
+            builder.put("title_1_name",achievedTitles.get(pos1).getTitle());
         }
         if(pos2!=-1)
         {
             userDetails.setTitle2(achievedTitles.get(pos2).getTitleId());
             Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE2,achievedTitles.get(pos2).getTitleId()+"");
+            builder.put("title_2_id",achievedTitles.get(pos2).getTitleId());
+            builder.put("title_2_name",achievedTitles.get(pos2).getTitle());
         }
-
+        builder.buildAndDispatch();
         MainApplication.getInstance().setUserDetails(userDetails);
         SyncHelper.oneTimeUploadUserData();
         MainApplication.showToast("Saved!");
@@ -870,10 +875,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public void onEvent(UpdateEvent.ImageCapture imageCapture) {
         if(imageCapture.getResultCode() == RESULT_OK) {
             if (imageCapture.getData() == null) {
-
 //                Picasso.with(getContext()).load(tempPhotoFile).into(imgProfile);
-
-
             } else {
                 setImageFromGallery(imageCapture.getData());
             }
@@ -894,7 +896,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.d(TAG,"onActivityResult : TESTING");
         super.onActivityResult(requestCode, resultCode, data);
+        Logger.d(TAG,"onActivityResult : "+requestCode+","+resultCode+","+data);
         if (requestCode == 100) {
             if (data.hasExtra("imagePath")) {
                 String imagePath = data.getStringExtra("imagePath");

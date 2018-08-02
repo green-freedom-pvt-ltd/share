@@ -77,7 +77,7 @@ class FeedListFragment : BaseFragment(), MessageCenterAdapter.MessageInterface {
     override fun onShareMessageClick(message: Message) {
         if (!TextUtils.isEmpty(message.videoId!!)){
             // To share a video
-            Utils.share(context, message.shareTemplate)
+            Utils.share(activity, message.shareTemplate)
         }else{
             // To share an image
             Utils.shareImageWithMessage(context, message.message_image, message.shareTemplate)

@@ -65,17 +65,16 @@ public class Urls {
     private static final String HOW_IT_WORKS_S3_FOLDER = "/how_it_works/";
 
 
-
-
     public static String getBaseUrl() {
         return BASE_URL;
     }
+
     public static String getNodeBaseUrl() {
         return NODE_BASE_URL + APP_VERSION;
     }
 
     public static String getCauseListUrl() {
-        String url = getNodeBaseUrl() +CAUSE_LIST_URL;
+        String url = getNodeBaseUrl() + CAUSE_LIST_URL;
         return url;
     }
 
@@ -94,7 +93,7 @@ public class Urls {
         return url;
     }
 
-    public static String getFraudstersUrl(){
+    public static String getFraudstersUrl() {
         return getNodeBaseUrl() + FRAUDSTERS_URL;
     }
 
@@ -170,6 +169,7 @@ public class Urls {
         String url = getNodeBaseUrl() + SERVER_TIME_URL;
         return url;
     }
+
     public static String getStreakUrl() {
         String url = getNodeBaseUrl() + STREAK_URL;
         return url;
@@ -184,13 +184,16 @@ public class Urls {
         String url = getNodeBaseUrl() + ACHIEVEMENTS_URL;
         return url;
     }
+
     public static String getTitlesUrl() {
         String url = getNodeBaseUrl() + TITLES_URL;
         return url;
     }
+
     public static String getImpactOverviewUrl() {
-        return getNodeBaseUrl()+IMPACTOVERVIEW_URL;
+        return getNodeBaseUrl() + IMPACTOVERVIEW_URL;
     }
+
     public static String getLeagueBoardUrl() {
         return getNodeBaseUrl() + LEAGUEBOARD_URL;
     }
@@ -199,6 +202,7 @@ public class Urls {
         return getNodeBaseUrl() + TEAMLEADERBOARD_URL;
     }
 
+    public static String getFeedLatestArticleUrl() {
     public static String getReferProgramsUrl() {
         String url = getNodeBaseUrl() +REFER_PROGRAMS;
         return url;
@@ -218,50 +222,51 @@ public class Urls {
         return BLOG_BASE_URL + BLOG_LATEST_ARTICLE_URL;
     }
 
-    public static String getFeedUrl(){
+    public static String getFeedUrl() {
         return BLOG_BASE_URL;
     }
 
-    public static boolean isFeedArticlesListUrl(String url){
-        if (TextUtils.isEmpty(url)){
+    public static boolean isFeedArticlesListUrl(String url) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
         final Uri uri = Uri.parse(url);
         String host = uri.getHost();
-        if (Uri.parse(BLOG_BASE_URL).getHost().equals(host)){
+        if (Uri.parse(BLOG_BASE_URL).getHost().equals(host)) {
             String lastpathSegment = uri.getLastPathSegment();
             return TextUtils.isEmpty(lastpathSegment) || "articles".equals(lastpathSegment);
         }
         return false;
     }
 
-    public static boolean isFeedArticleDetailUrl(String url){
-        if (TextUtils.isEmpty(url)){
+    public static boolean isFeedArticleDetailUrl(String url) {
+        if (TextUtils.isEmpty(url)) {
             return false;
         }
         final Uri uri = Uri.parse(url);
         String host = uri.getHost();
-        if (Uri.parse(BLOG_BASE_URL).getHost().equals(host)){
+        if (Uri.parse(BLOG_BASE_URL).getHost().equals(host)) {
             List<String> pathSegments = uri.getPathSegments();
             int size = pathSegments.size();
-            if (size > 1){
-                return "articles".equals(pathSegments.get(size-2));
+            if (size > 1) {
+                return "articles".equals(pathSegments.get(size - 2));
             }
         }
         return false;
     }
 
-    public static String getHowItWorksIllustration(int index){
+    public static String getHowItWorksIllustration(int index) {
         return getImpactAssetsS3BucketUrl() + HOW_IT_WORKS_S3_FOLDER + index + ".png";
     }
 
-    public static String getHowItWorksContentUrl(){
+    public static String getHowItWorksContentUrl() {
         return BLOG_BASE_URL + BLOG_HOW_IT_WORKS_CONTENT_URL;
     }
 
     public static String getImpactProfileS3BucketUrl() {
         return IMPACT_PROFILE_S3_BUCKET_URL;
     }
+
     public static String getImpactAssetsS3BucketUrl() {
         return IMPACT_ASSETS_S3_BUCKET_URL;
     }

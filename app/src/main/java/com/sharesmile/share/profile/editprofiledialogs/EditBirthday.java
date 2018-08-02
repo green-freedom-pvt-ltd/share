@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class EditBirthday extends ParentDialog implements View.OnClickListener, NumberPicker.OnValueChangeListener {
 
@@ -56,7 +57,7 @@ public class EditBirthday extends ParentDialog implements View.OnClickListener, 
         String birthday = userDetails.getBirthday();
         if(birthday !=null && birthday.length()>0) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(simpleDateFormat.parse(birthday).getTime());
                 datePicker.setValue(calendar.get(Calendar.DAY_OF_MONTH));

@@ -142,6 +142,7 @@ class LeagueRegistrationFragment : BaseFragment2(), View.OnClickListener {
             override fun onNetworkSuccess(leagueTeam: LeagueTeam?) {
                 if (fragmentListener != null){
                     fragmentListener.showActivityContent()
+                    MainApplication.getInstance().userDetails.teamId = 0
                     activity?.setResult(Activity.RESULT_OK)
                     activity?.finish()
                 }

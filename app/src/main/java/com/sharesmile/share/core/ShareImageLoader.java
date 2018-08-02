@@ -8,22 +8,22 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.network.HttpClientManager;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+
+import okhttp3.Cache;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by ankitmaheshwari1 on 30/12/15.
@@ -67,23 +67,19 @@ public class ShareImageLoader {
 
     private Picasso constructImageLoader() {
 
-        OkHttpClient httpClient = HttpClientManager.getDefaultHttpClient();
-
-        httpClient.interceptors().add(new Interceptor() {
+        okhttp3.OkHttpClient httpClient = new okhttp3.OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
-
                 Request newRequest = chain.request().newBuilder().addHeader("Accept", "image/webp")
                         .build();
                 return chain.proceed(newRequest);
             }
-        });
-
-        httpClient.networkInterceptors().add(REWRITE_CACHE_CONTROL_INTERCEPTOR);
-        httpClient.setCache(new Cache(createDefaultCacheDir(MainApplication.getContext()), MAX_DISK_CACHE_SIZE));
+        }).addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)
+                .cache(new Cache(MainApplication.getContext().getCacheDir(), MAX_DISK_CACHE_SIZE))
+                .build();
 
         Picasso.Builder builder =  new Picasso.Builder(MainApplication.getContext());
-        builder.downloader(new OkHttpDownloader(httpClient));
+        builder.downloader(new OkHttp3Downloader(httpClient));
         Picasso built = builder.build();
 //        built.setIndicatorsEnabled(true);
         built.setLoggingEnabled(true);
@@ -142,7 +138,7 @@ public class ShareImageLoader {
             if (imageView != null && !TextUtils.isEmpty(url)) {
                 if(!USE_MEMORY_CACHE)
                 {
-                    Picasso.with(MainApplication.getContext()).invalidate(url);
+                    Picasso.get().invalidate(url);
 
                     picasso.invalidate(url);
 //                    url = url+"?version="+ Calendar.getInstance().getTimeInMillis();
@@ -161,6 +157,7 @@ public class ShareImageLoader {
                     request.networkPolicy(NetworkPolicy.OFFLINE,NetworkPolicy.NO_CACHE);
                 }*/
                 String finalUrl = url;
+
                 request.into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -168,7 +165,7 @@ public class ShareImageLoader {
                     }
 
                     @Override
-                    public void onError() {
+                    public void onError(Exception e) {
                         Log.d(TAG, "Image could not be loaded from Disk, lets try network. url = " + finalUrl);
                         RequestCreator secondRequest = picasso.load(finalUrl);
                         if (drawableWhileLoading != null) {
@@ -220,7 +217,7 @@ public class ShareImageLoader {
                     }
 
                     @Override
-                    public void onError() {
+                    public void onError(Exception e) {
                         Log.d(TAG, "Image could not be loaded from Disk, lets try network. url = " + url);
                         RequestCreator secondRequest = picasso.load(url);
                         if (backupDrawable != null) {

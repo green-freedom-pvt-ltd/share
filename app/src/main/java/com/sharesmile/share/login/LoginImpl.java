@@ -45,9 +45,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.network.NameValuePair;
 import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.utils.Utils;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
 
 import org.json.JSONObject;
 
@@ -59,6 +57,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by Shine on 19/05/16.
@@ -165,7 +168,7 @@ public class LoginImpl {
 
         NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(), header, new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 Log.i(TAG, "Login error, Api failed");
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                     @Override
@@ -177,7 +180,7 @@ public class LoginImpl {
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call,Response response) throws IOException {
                 String responseString = response.body().string();
                 Logger.d("LoginImpl", "onResponse: " + responseString);
                 try {

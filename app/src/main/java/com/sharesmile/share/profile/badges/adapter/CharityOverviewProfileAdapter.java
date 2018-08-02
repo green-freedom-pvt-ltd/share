@@ -16,6 +16,8 @@ import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.home.settings.UnitsManager;
@@ -94,7 +96,7 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
                 Utils.setGradientBackground(Color.parseColor("#FEA38E"), Color.parseColor("#F3775B"), charityCategoryTitle);
                 e.printStackTrace();
             }
-            Utils.addStars(starLayout,categoryStats.getCategoryNoOfStars(),context);
+            Utils.addStars(starLayout,categoryStats.getCategoryNoOfStars(),context,true);
             ShareImageLoader.getInstance().loadImage(categoryStats.getCategoryImageUrl(),charityOverviewImageView,
                     ContextCompat.getDrawable(getContext(), R.drawable.cause_image_placeholder));
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -113,7 +115,12 @@ public class CharityOverviewProfileAdapter extends RecyclerView.Adapter<CharityO
 
         @Override
         public void onClick(View view) {
-            openCharityOverview.openCharityOverviewFragment((int)view.getTag());
+            int position = (int) view.getTag();
+            openCharityOverview.openCharityOverviewFragment(position);
+            CategoryStats categoryStats = charityOverview.getCategoryStats().get(position);
+            AnalyticsEvent.create(Event.ON_CLICK_CHARITY_OVERVIEW)
+                    .put("category_name",categoryStats.getCategoryName())
+                    .buildAndDispatch();
         }
     }
 }

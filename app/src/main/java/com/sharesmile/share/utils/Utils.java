@@ -3,6 +3,8 @@ package com.sharesmile.share.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -25,6 +27,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -59,10 +62,15 @@ import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.AlarmReceiver;
@@ -107,6 +115,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -126,7 +135,6 @@ import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_STREAK_UPLOADED_FIRST_TIME;
-import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_STRIDE_LENGTH;
@@ -464,12 +472,13 @@ public class Utils {
         return sec;
     }
 
-    public static void share(Context context, String shareTemplate) {
+    public static void share(Activity activity, String shareTemplate) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareTemplate);
         shareIntent.setType("text/plain");
-        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_via)));
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_via)));
     }
 
     public static void share(Context context, Uri bitmapUri, String shareTemplate) {
@@ -479,7 +488,9 @@ public class Utils {
         shareIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
         shareIntent.setType("image/*");
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, "send"));
+        Intent new_intent = Intent.createChooser(shareIntent, "Share via");
+        new_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(new_intent);
     }
 
     public static void shareImageWithMessage(final Context context, final String imageUrl, final String shareMessage) {
@@ -491,16 +502,16 @@ public class Utils {
             }
 
             @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
+            public void onBitmapFailed(Exception e,Drawable errorDrawable) {
                 Logger.d(TAG, "shareImageWithMessage: Image could not be loaded from disk or memory, will try from network");
-                Picasso.with(context).load(imageUrl).into(new Target() {
+                Picasso.get().load(imageUrl).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         Utils.share(context, Utils.getLocalBitmapUri(bitmap, context), shareMessage);
                     }
 
                     @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
+                    public void onBitmapFailed(Exception e,Drawable errorDrawable) {
                         Utils.share(context, null, shareMessage);
                     }
 
@@ -1264,14 +1275,14 @@ public class Utils {
 
     public static String getCurrentDateDDMMYYYY() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
     public static String getDateDDMMYYYYFromTimeInMillis(long timeInMillis) {
 //        Calendar calendar = Calendar.getInstance();
 //        calendar.setTimeInMillis(timeInMillis);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         return simpleDateFormat.format(new Date(timeInMillis));
     }
 
@@ -1317,7 +1328,7 @@ public class Utils {
     public static Calendar getReminderTime() {
         Calendar calendar = Calendar.getInstance();
         String time = SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         try {
             calendar.setTimeInMillis(simpleDateFormat.parse(time).getTime());
         } catch (ParseException e) {
@@ -1357,23 +1368,6 @@ public class Utils {
         SharedPrefsManager.getInstance().setBoolean(PREF_STREAK_UPLOADED_FIRST_TIME, b);
     }
 
-    public static void setUserLoggedIn(UserDetails userDetails) {
-        try {
-            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN, "{}"));
-            JSONObject user = new JSONObject();
-            user.put("streak_goal_id", userDetails.getStreakGoalID());
-            user.put("streak_goal_distance", userDetails.getStreakGoalDistance());
-            user.put("streak_count", userDetails.getStreakCount());
-            user.put("streak_current_date", userDetails.getStreakCurrentDate());
-            user.put("streak_goal_id", userDetails.getStreakGoalID());
-            user.put("streak_goal_id", userDetails.getStreakGoalID());
-            user.put("reminder_time", SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME, ""));
-            jsonObject.put(userDetails.getUserId() + "", user);
-            SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN, jsonObject.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void setMenuText(MenuItem menuItem, Context context, String s, int color) {
         SpannableString spannableString = new SpannableString(s);
@@ -1407,8 +1401,8 @@ public class Utils {
         if (causeData != null) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.CauseId.eq(causeData.getId()),
-                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
-                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())/*,
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)*/).list();
             categoryCompleted = causeData.isCompleted();
         } else {
             achievedBadges = achievedBadgeDao.queryBuilder()
@@ -1424,8 +1418,9 @@ public class Utils {
                 if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
                         (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))))
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-            } else
+            } else {
                 achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
+            }
         } else if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || !categoryCompleted) {
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
             String category = causeData == null ? type : causeData.getCategory();
@@ -1456,6 +1451,10 @@ public class Utils {
             }
         }
         if (achievedBadge != null) {
+            if(type.equals(Constants.BADGE_TYPE_STREAK))
+            {
+                achievedBadge.setParamDone(paramDone);
+            }
             achievedBadge.setCauseId(causeData == null ? 0 : causeData.getId());
             if(causeData!=null)
             achievedBadge.setCauseName(causeData.getTitle());
@@ -1492,8 +1491,7 @@ public class Utils {
             if (achievedBadges.size() > 0) {
                 return -1;
             }
-        }
-        if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+        }else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.CauseId.eq(mCauseData.getId()),
@@ -1602,6 +1600,7 @@ public class Utils {
             achievedBadge.setBadgeIdAchieved(badgeAcheived.getBadgeId());
             achievedBadge.setNoOfStarAchieved(badgeAcheived.getNoOfStars());
             achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+
         } else {
             achievedBadge.setBadgeIdAchieved(0);
             achievedBadge.setNoOfStarAchieved(0);
@@ -1621,6 +1620,7 @@ public class Utils {
                 } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
+                achievedBadge.setCauseName(badge.getName());
                 break;
             case Constants.BADGE_TYPE_CHANGEMAKER:
                 if (indexAcheived == indexInProgress) {
@@ -1628,6 +1628,7 @@ public class Utils {
                 } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
+                achievedBadge.setCauseName(badge.getName());
                 break;
             case Constants.BADGE_TYPE_MARATHON:
                 if (indexAcheived == indexInProgress) {
@@ -1635,10 +1636,12 @@ public class Utils {
                 } else {
                     status = Constants.BADGE_IN_PROGRESS;
                 }
+                achievedBadge.setCauseName(badge.getName());
                 break;
         }
 
         achievedBadge.setCategoryStatus(status);
+
         if (badgeIdAchieved != achievedBadge.getBadgeIdAchieved())
             return achievedBadge.getBadgeIdAchieved();
         else
@@ -1647,7 +1650,7 @@ public class Utils {
 
     public static File createImageFile(Context context) throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -1795,7 +1798,7 @@ public class Utils {
         return currentTs - millisElapsedSinceBeginning;
     }
 
-    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context) {
+    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context,boolean showGreyStar) {
         layoutStar.removeAllViews();
         if(cause_no_of_stars>3)
         {
@@ -1811,7 +1814,14 @@ public class Utils {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(5,0,5,0);
                 lbTextView.setLayoutParams(layoutParams);
-                lbTextView.setText("-");
+                if(showGreyStar) {
+                    lbTextView.setText("");
+                    lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.star_badges_grey, 0);
+                }else
+                {
+                    lbTextView.setText("-");
+                    lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                }
                 layoutStar.addView(lbTextView);
             }else
             for(int i=0;i<cause_no_of_stars;i++)
@@ -1826,16 +1836,90 @@ public class Utils {
         }
     }
 
-    public static void checkStreak() {
+    public static synchronized void checkBadgeData(boolean b) {
+        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+        List<Badge> badges = badgeDao.queryBuilder().list();
+        if(badges!=null && badges.size()>0)
+        {
+            checkAchievedBadgeData(b);
+        }else
+        {
+            SyncHelper.syncBadgesData();
+        }
+    }
+    public static void checkAchievedBadgeData(boolean b) {
+        /*if(CauseDataStore.getInstance().getCausesToShow().isEmpty() && isAdded()) {
+         render();
+        }else
+        {*/
+        long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
+        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+        if(workoutCount>0) {
+
+            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CHANGEMAKER),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+            if(achievedBadges.size()==0) {
+                BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+                List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(Constants.BADGE_TYPE_CHANGEMAKER))
+                        .orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
+                if(badges.size()>0)
+                {
+                    Badge badge = badges.get(0);
+                    AchievedBadge achievedBadge = new AchievedBadge();
+                    achievedBadge.setCauseName(badge.getName());
+                    achievedBadge.setCauseId(0);
+                    achievedBadge.setServerId(0);
+                    achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
+                    achievedBadge.setBadgeIdAchieved(badge.getBadgeId());
+                    achievedBadge.setNoOfStarAchieved(badge.getNoOfStars());
+                    achievedBadge.setBadgeIdAchievedDate(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+                    achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
+                    achievedBadge.setCategory(0);
+                    achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                    achievedBadge.setParamDone(0.1);
+                    achievedBadge.setUserId(MainApplication.getInstance().getUserID());
+                    achievedBadgeDao.insertOrReplace(achievedBadge);
+                }
+            }
+        }
+        List<CauseData> causeDataArrayList = CauseDataStore.getInstance().getCausesToShow();
+        ArrayList<Long> causeIds = new ArrayList<>();
+        for(CauseData causeData : causeDataArrayList)
+        {
+            Utils.setBadgeForCategory(causeData,Constants.BADGE_TYPE_CAUSE,0);
+            causeIds.add(causeData.getId());
+        }
+        List<AchievedBadge> achievedBadgesInProgress = achievedBadgeDao.queryBuilder()
+                .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
+                        AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CAUSE),
+                        AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+        for(AchievedBadge achievedBadge : achievedBadgesInProgress)
+        {
+            if(!causeIds.contains(achievedBadge.getCauseId()))
+            {
+                achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                achievedBadgeDao.update(achievedBadge);
+            }
+        }
+        Utils.checkStreak(b);
+        /*}*/
+
+    }
+
+    public static void checkStreak(boolean b) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         // just to change the format from dd/MM/yyyy to dd-MM-yyyy
         if(userDetails.getStreakCurrentDate().length()>0)
         {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
             try {
-                Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
-                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
-                userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
+                if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null")) {
+                    Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                    userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1847,8 +1931,17 @@ public class Utils {
             try {
                 if (userDetails.getStreakCurrentDate() != null
                         && userDetails.getStreakCurrentDate().length() > 0) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                    Date streakDate;
+                    if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null"))
+                    {
+                         streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    }else
+                    {
+                        streakDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
+                                .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+                    }
+
                     Date currentDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
                             .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
                     long diff = currentDate.getTime() - streakDate.getTime();
@@ -1862,8 +1955,6 @@ public class Utils {
                     builder.put("goal_distance",userDetails.getStreakGoalDistance());
                     builder.put("goal_run_progress",userDetails.getStreakRunProgress());
                     builder.buildAndDispatch();
-                    //
-
                     if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                         if ((dayCount > 1)) {
                             userDetails.setStreakRunProgress(0);
@@ -1874,9 +1965,6 @@ public class Utils {
                         } else if (dayCount == 1) {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);
-
-//                            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
-
                         }
                     }
                 } else {
@@ -1907,7 +1995,9 @@ public class Utils {
 
                     float run_progress = cursor.getFloat(cursor.getColumnIndex("total_distance"));
                     userDetails.setStreakRunProgress(run_progress);
+                    userDetails.addStreakCount();
                 }
+
                 MainApplication.getInstance().setUserDetails(userDetails);
                 if(sendStreak)
                     SyncHelper.uploadStreak();
@@ -1916,43 +2006,84 @@ public class Utils {
             }
             Utils.setBadgeForCategory(null,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
         }
+        if(b)
+            EventBus.getDefault().post(new UpdateEvent.LoadAchivedBadges());
+
         if(Utils.checkStreakUploaded())
         {
             Utils.setStreakUploaded(true);
             SyncHelper.uploadStreak();
         }
+
     }
 
     public static void saveTitleIdToUserDetails(AchievedTitle achievedTitle) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+        List<Title> titles = titleDao.queryBuilder()
+                .where(TitleDao.Properties.CategoryId.eq(achievedTitle.getCategoryId()))
+                .orderAsc(TitleDao.Properties.GoalNStars).list();
+        int title1 = userDetails.getTitle1();
+        int title2 = userDetails.getTitle2();
+
         if(userDetails.getTitle1()==0)
         {
             userDetails.setTitle1(achievedTitle.getTitleId());
-        }else if(userDetails.getTitle1()!=achievedTitle.getTitleId() && userDetails.getTitle2()==0)
-        {
-            userDetails.setTitle2(achievedTitle.getTitleId());
+        }else {
+            boolean b = true;
+                for (int i = 0; i < titles.size(); i++) {
+                    if (titles.get(i).getTitleId() == title1) {
+                            userDetails.setTitle1(achievedTitle.getTitleId());
+                            b = false;
+                            break;
+                    }
+                }
+
+            if(b && title1!=achievedTitle.getTitleId())
+            {
+                if(userDetails.getTitle2() == 0)
+                {
+                    userDetails.setTitle2(achievedTitle.getTitleId());
+                }else
+                {
+                    for (int i = 0; i < titles.size(); i++) {
+                        if (titles.get(i).getTitleId() == title2) {
+                            userDetails.setTitle2(achievedTitle.getTitleId());
+                            break;
+                        }
+                    }
+                }
+            }
+
         }
+
         MainApplication.getInstance().setUserDetails(userDetails);
     }
 
-    public static void setStarImage(int starCount, ImageView starImageView) {
-        switch (starCount) {
-            case 1 :
-                starImageView.setImageResource(R.drawable.star_1);
-                break;
-            case 2 :
-                starImageView.setImageResource(R.drawable.star_2);
-                break;
-            case 3 :
-                starImageView.setImageResource(R.drawable.star_3);
-                break;
+    public static void setStarImage(int starCount, ImageView starImageView,String badge_type) {
+        if(badge_type.equals(Constants.BADGE_TYPE_CHANGEMAKER) || badge_type.equals(Constants.BADGE_TYPE_MARATHON))
+        {
+            starImageView.setVisibility(View.GONE);
+        }else {
+            switch (starCount) {
+                case 1:
+                    starImageView.setImageResource(R.drawable.star_1);
+                    break;
+                case 2:
+                    starImageView.setImageResource(R.drawable.star_2);
+                    break;
+                case 3:
+                    starImageView.setImageResource(R.drawable.star_3);
+                    break;
+            }
+            starImageView.setVisibility(View.VISIBLE);
         }
     }
 
     public static String dateToString(Date date) {
         String dateString = null;
         try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
             dateString = simpleDateFormat.format(date);
         }catch (Exception e)
         {
@@ -1964,9 +2095,9 @@ public class Utils {
 
     public static Date stringToDate(String dateString) {
         Date date = null;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         try {
-            if(dateString!=null)
+            if(dateString!=null && !dateString.equals("null"))
             date = simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -1982,5 +2113,17 @@ public class Utils {
     public static int pxToDp(int px)
     {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static NotificationCompat.Builder createChannelForNotification(Context context,String description) {
+        CharSequence name = context.getString(R.string.channel_name);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel(context.getString(R.string.channel_name), name, importance);
+        channel.setDescription(description);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+        return new NotificationCompat.Builder(context,context.getString(R.string.channel_name));
     }
 }

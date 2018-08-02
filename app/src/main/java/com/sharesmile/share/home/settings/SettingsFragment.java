@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,7 +52,6 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
-import static com.sharesmile.share.core.Constants.PREF_USERS_LOGGED_IN;
 import static com.sharesmile.share.core.Constants.REMINDER_SET;
 
 
@@ -319,15 +319,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     private void performLogout(){
         Logger.i("SettingsFragment", "Clearing all preferences and DB");
         MainApplication.getInstance().getDbWrapper().clearAll();
-        //TODO : temp saving the values at client, till server is getting ready
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(PREF_USERS_LOGGED_IN,"{}"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         SharedPrefsManager.getInstance().clearPrefs();
-        SharedPrefsManager.getInstance().setString(PREF_USERS_LOGGED_IN,jsonObject.toString());
         mListener.updateNavigationMenu();
         updateSettingItems();
         Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
@@ -467,7 +459,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     private void setReminderTimeTv() {
         Calendar calendar1 = Utils.getReminderTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
         Date date = new Date();
         date.setTime(calendar1.getTimeInMillis());
         reminderTime.setText(simpleDateFormat.format(date));

@@ -16,7 +16,7 @@ class ImpactLeagueActivity : BaseActivity2() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_impact_league)
-        loadInitFragment(savedInstanceState);
+        loadInitFragment(savedInstanceState)
     }
 
     private fun loadInitFragment(savedInstanceState: Bundle?) {

@@ -1,6 +1,9 @@
 package com.sharesmile.share.profile.model;
 
+import com.sharesmile.share.utils.Utils;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 public class CauseStats {
 
@@ -8,6 +11,7 @@ public class CauseStats {
     private int cause_raised;
     private int cause_workouts;
     private int cause_no_of_stars;
+    private Date cause_create_time;
     private String cause_image_url;
     private ArrayList<String> sponsors;
     private ArrayList<String> partners;
@@ -66,5 +70,14 @@ public class CauseStats {
 
     public void setPartners(ArrayList<String> partners) {
         this.partners = partners;
+    }
+
+    public Date getCause_create_time() {
+        return cause_create_time;
+    }
+
+    public void setCause_create_time(String cause_create_time) {
+
+        this.cause_create_time = Utils.stringToDate(cause_create_time+" 00:00:00");
     }
 }

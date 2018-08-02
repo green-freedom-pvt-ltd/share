@@ -248,6 +248,9 @@ public class LeaderBoardDataStore {
      */
     public void updateMyTeamId(int teamId){
         Logger.d(TAG, "updateMyTeamId with " + teamId);
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        userDetails.setTeamId(teamId);
+        MainApplication.getInstance().setUserDetails(userDetails);
         // LeagueTeamId has changed, clear existing League data and immediately start the sync process
         clearLeagueData();
         if (teamId > 0){

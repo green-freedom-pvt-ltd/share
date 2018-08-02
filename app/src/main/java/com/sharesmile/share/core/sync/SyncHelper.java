@@ -140,6 +140,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 300) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -177,6 +178,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 1)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -191,6 +193,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 200)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -203,6 +206,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 300) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -215,6 +219,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 100)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -227,6 +232,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 300) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -264,6 +270,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 5)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());

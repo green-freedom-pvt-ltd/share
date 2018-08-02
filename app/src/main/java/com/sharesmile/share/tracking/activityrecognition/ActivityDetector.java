@@ -13,8 +13,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.tasks.Task;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -131,7 +133,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         PendingIntent pendingIntent = PendingIntent.getService( appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
         long detectionIntervalMillis = isWorkoutActive() ? ClientConfig.getInstance().DETECTED_INTERVAL_ACTIVE
                 : ClientConfig.getInstance().DETECTED_INTERVAL_IDLE;
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, detectionIntervalMillis, pendingIntent );
+        ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(appContext);
+        Task task = activityRecognitionClient.requestActivityUpdates(detectionIntervalMillis, pendingIntent);
+//        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, detectionIntervalMillis, pendingIntent );
         if (isWorkoutActive()){
             stopWalkEngagementDetectionCounter();
         }else {
@@ -175,7 +179,9 @@ public class ActivityDetector implements GoogleApiClient.ConnectionCallbacks,
         Intent intent = new Intent(appContext, ActivityRecognizedService.class);
         PendingIntent pendingIntent = PendingIntent.getService(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         if (googleApiClient != null && googleApiClient.isConnected()) {
-            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
+            ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(appContext);
+            Task task = activityRecognitionClient.removeActivityUpdates(pendingIntent);
+//            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates( googleApiClient, pendingIntent );
         }
     }
 
