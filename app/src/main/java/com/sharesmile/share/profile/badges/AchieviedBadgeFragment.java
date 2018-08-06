@@ -34,11 +34,15 @@ import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.utils.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,6 +163,13 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
                 badgeId = titleIds.get(0);
                 break;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(Constants.PREF_NOTIFICATION_BADGE_NOT_SEEN,"{}"));
+            jsonObject.put(TAG,0);
+            SharedPrefsManager.getInstance().setString(Constants.PREF_NOTIFICATION_BADGE_NOT_SEEN,jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         if(TAG.equalsIgnoreCase(Constants.TITLE_TYPE_CAUSE))
         {

@@ -153,6 +153,7 @@ public class Constants {
     public static final String PREF_NOTIFICATION_MAX_STREAK_SHOWN = "pref_notification_max_streak_shown";
     public static final String PREF_NOTIFICATION_STREAK_ADDED_DATE = "pref_notification_streak_added_date";
     public static final String PREF_NOTIFICATION_0_STREAK_SHOWN = "pref_notification_0_streak_shown";
+    public static final String PREF_NOTIFICATION_BADGE_NOT_SEEN = "pref_notification_badge_not_seen";
     //User Data
     public static final String PREF_USER_EMAIL = "pref_user_email";
     public static final String PREF_LOGIN_SKIP = "pref_login_skip";

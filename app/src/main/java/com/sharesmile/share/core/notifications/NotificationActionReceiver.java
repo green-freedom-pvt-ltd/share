@@ -36,6 +36,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public static final int WORKOUT_NOTIFICATION_ID = 101;
     public static final int WORKOUT_TRACK_NOTIFICATION_ID = 102;
     public static final int REMINDER_NOTIFICATION_ID = 103;
+    public static final int AUTO_NOTIFICATION_ID = 104;
 
     public static final String NOTIFICATION_ID = "notification_id";
 

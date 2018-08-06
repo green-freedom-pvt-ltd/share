@@ -1,7 +1,9 @@
 package com.sharesmile.share.core;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,11 +48,6 @@ import android.widget.Toast;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.AchievedTitle;
@@ -70,6 +67,8 @@ import com.sharesmile.share.core.notifications.NotificationConsts;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.HomeScreenFragment;
 import com.sharesmile.share.home.howitworks.HowItWorksFragment;
+import com.sharesmile.share.home.settings.AlarmReceiver;
+import com.sharesmile.share.home.settings.NotificationReceiver;
 import com.sharesmile.share.home.settings.SettingsFragment;
 import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
@@ -100,6 +99,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -112,7 +112,6 @@ import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 import static com.sharesmile.share.core.Constants.REQUEST_IMAGE_CAPTURE;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
-
 
 
 public class MainActivity extends ToolbarActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.FragmentInterface {
@@ -160,10 +159,9 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 EventBus.getDefault().post(new ResumeWorkoutEvent());
             }
             startTrackingActivity();
-        } else if(!Utils.checkOnboardingShown())
-        {
+        } else if (!Utils.checkOnboardingShown()) {
             startOnBoardingActivity();
-        }else {
+        } else {
             Logger.d(TAG, "render MainActivity UI");
             // Normal launch of MainActivity, render its layout
             EventBus.getDefault().register(this);
@@ -204,7 +202,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
                 @Override
                 public void onDrawerStateChanged(int state) {
-                    Logger.d(TAG,"State : "+state);
+                    Logger.d(TAG, "State : " + state);
                     if (state != DrawerLayout.STATE_IDLE) {
                         if (overlayRunnable != null) {
                             overlayRunnable.cancel();
@@ -221,7 +219,25 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             handleNotificationIntent();
             Analytics.getInstance().setUserProperties();
             connectAWSS3();
+            showAutoNotification();
         }
+    }
+
+    private void showAutoNotification() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 19);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        if (calendar.before(Calendar.getInstance())) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
+        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(MainActivity.this,
+                0, intent, 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
     }
 
     private void connectAWSS3() {
@@ -310,7 +326,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                         showLoginActivity();
                     } else {
                         Bundle bundle1 = new Bundle();
-                        bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE,true);
+                        bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE, true);
                         ProfileFragment profileFragment = new ProfileFragment();
                         profileFragment.setArguments(bundle1);
                         replaceFragment(profileFragment, true);
@@ -416,7 +432,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
             Bundle bundle1 = new Bundle();
-            bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE,true);
+            bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE, true);
             ProfileFragment profileFragment = new ProfileFragment();
             profileFragment.setArguments(bundle1);
             replaceFragment(profileFragment, true);
@@ -503,7 +519,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             ActivityCompat.finishAffinity(this);
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            if(fragmentManager.getBackStackEntryCount()>0) {
+            if (fragmentManager.getBackStackEntryCount() > 0) {
                 Fragment fragment = fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1).getName());
                 if (fragment instanceof StreakGoalFragment) {
                     StreakGoalFragment streakGoalFragment = (StreakGoalFragment) fragment;
@@ -527,25 +543,20 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     } else {
                         super.onBackPressed();
                     }
-                }else if(fragment instanceof ProfileFragment)
-                {
-                    if(((ProfileFragment)fragment).materialTapTargetPrompt ==null  || (((ProfileFragment)fragment).materialTapTargetPrompt !=null &&
-                            (((ProfileFragment)fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_DISMISSED ||
-                            ((ProfileFragment)fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_FINISHED)))
-                    {
+                } else if (fragment instanceof ProfileFragment) {
+                    if (((ProfileFragment) fragment).materialTapTargetPrompt == null || (((ProfileFragment) fragment).materialTapTargetPrompt != null &&
+                            (((ProfileFragment) fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_DISMISSED ||
+                                    ((ProfileFragment) fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_FINISHED))) {
                         getSupportFragmentManager().popBackStack();
                     }
-                }
-                else
-                {
+                } else {
                     super.onBackPressed();
                 }
-            }else {
+            } else {
                 super.onBackPressed();
             }
         }
     }
-
 
 
     @Override
@@ -560,7 +571,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         switch (menuItem.getItemId()) {
             case R.id.nav_item_profile:
                 Bundle bundle1 = new Bundle();
-                bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE,true);
+                bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE, true);
                 ProfileFragment profileFragment = new ProfileFragment();
                 profileFragment.setArguments(bundle1);
                 replaceFragment(profileFragment, true);
@@ -624,7 +635,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "showImpactLeague");
         LeaderBoardDataStore leaderBoardDataStore = LeaderBoardDataStore.getInstance();
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if (userDetails.getTeamId()>0) {
+        if (userDetails.getTeamId() > 0) {
             LeagueBoardFragment leageBoardFragment = LeagueBoardFragment.getInstance();
             replaceFragment(leageBoardFragment, true);
         } else {
@@ -642,7 +653,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void share() {
-        replaceFragment(new ReferProgramFragment(),true);
+        replaceFragment(new ReferProgramFragment(), true);
         /*AssetManager assetManager = getAssets();
         InputStream istr;
         Bitmap bitmap = null;
@@ -681,9 +692,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             if (resultCode == RESULT_OK) {
                 replaceFragment(LeagueBoardFragment.getInstance(), true);
             }
-        }else if(requestCode == REQUEST_IMAGE_CAPTURE)
-        {
-            EventBus.getDefault().post(new UpdateEvent.ImageCapture(requestCode,resultCode,data));
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            EventBus.getDefault().post(new UpdateEvent.ImageCapture(requestCode, resultCode, data));
         }
     }
 
@@ -781,8 +791,9 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
                         showBottomDialog(campaign.getShareTemplate(), Utils.getLocalBitmapUri(bitmap, MainActivity.this), Uri.parse(campaign.getImageUrl()));
                     }
+
                     @Override
-                    public void onBitmapFailed(Exception e,Drawable errorDrawable) {
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
                         progressView.setVisibility(View.GONE);
                         showBottomDialog(campaign.getShareTemplate(), Uri.parse(campaign.getImageUrl()), Uri.parse(campaign.getImageUrl()));
 
@@ -822,7 +833,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             @Override
             public void onClick(View v) {
                 try {
-                    Intent intent = ShareUtils.shareOnWhatsAppIntent( message, pathUrl);
+                    Intent intent = ShareUtils.shareOnWhatsAppIntent(message, pathUrl);
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(MainActivity.this, "Whats app not installed ", Toast.LENGTH_LONG).show();
@@ -854,7 +865,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                     Utils.setOverlay(OnboardingOverlay.HELP_CENTER,
                             views.get(0),
                             MainActivity.this,
-                            true,true,true).show();
+                            true, true, true).show();
                 }
             }
         }
@@ -868,86 +879,72 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == Constants.CODE_REQUEST_IMAGE_CAPTURE_PERMISSION ||
-                requestCode == Constants.CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION)
-        {
-         boolean checkPermission = true;
-         for(int grantResult:grantResults)
-         {
-             if(grantResult != PackageManager.PERMISSION_GRANTED)
-             {
-                 checkPermission = false;
-                 break;
-             }
-         }
-         if(checkPermission)
-         {
-             EventBus.getDefault().post(new UpdateEvent.EditImagePermissionGranted(requestCode));
-         }else
-         {
-             MainApplication.showToast("Permission not Granted");
-         }
+        if (requestCode == Constants.CODE_REQUEST_IMAGE_CAPTURE_PERMISSION ||
+                requestCode == Constants.CODE_REQUEST_IMAGE_FROM_GALLERY_PERMISSION) {
+            boolean checkPermission = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    checkPermission = false;
+                    break;
+                }
+            }
+            if (checkPermission) {
+                EventBus.getDefault().post(new UpdateEvent.EditImagePermissionGranted(requestCode));
+            } else {
+                MainApplication.showToast("Permission not Granted");
+            }
         }
     }
 
-    @Subscribe(threadMode =  ThreadMode.BACKGROUND)
-    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated)
-    {
-        if(badgeUpdated.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated) {
+        if (badgeUpdated.result == ExpoBackoffTask.RESULT_SUCCESS) {
 //            showProgressDialog();
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().list();
-            if(achievedBadges.size()==0) {
+            if (achievedBadges.size() == 0) {
                 SyncHelper.getAchievedBadged();
-            }else
-            {
+            } else {
                 EventBus.getDefault().post(new UpdateEvent.OnGetAchivement(ExpoBackoffTask.RESULT_SUCCESS));
             }
-        }else
-        {
+        } else {
 //            showHideProgress(false,null);
 //            MainApplication.showToast(getResources().getString(R.string.some_error));
         }
     }
-    @Subscribe(threadMode =  ThreadMode.BACKGROUND)
-    public void onEvent(UpdateEvent.OnGetAchivement onGetAchivement)
-    {
-        if(onGetAchivement.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(UpdateEvent.OnGetAchivement onGetAchivement) {
+        if (onGetAchivement.result == ExpoBackoffTask.RESULT_SUCCESS) {
             //Pull historical run data;
 //            render();
             AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
             List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder().list();
-            if(achievedTitles.size()==0) {
+            if (achievedTitles.size() == 0) {
                 SyncHelper.getAchievedTitle();
-            }else
-            {
+            } else {
                 EventBus.getDefault().post(new UpdateEvent.OnGetTitle(ExpoBackoffTask.RESULT_SUCCESS));
             }
-        }else
-        {
+        } else {
 //            showHideProgress(false,null);
 //            MainApplication.showToast(getResources().getString(R.string.some_error));
         }
     }
-    @Subscribe(threadMode =  ThreadMode.BACKGROUND)
-    public void onEvent(UpdateEvent.OnGetTitle onGetTitle)
-    {
-        if(onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(UpdateEvent.OnGetTitle onGetTitle) {
+        if (onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS) {
             //Pull historical run data;
             Utils.checkBadgeData(false);
 
-            if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD,true))
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, true))
                 SyncHelper.getCharityOverview();
 
 //            render();
 //            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
 //            SyncHelper.forceRefreshEntireWorkoutHistory();
 //            onLoginSuccess();
-        }else
-        {
+        } else {
 //            showHideProgress(false,null);
 //            MainApplication.showToast(getResources().getString(R.string.some_error));
         }

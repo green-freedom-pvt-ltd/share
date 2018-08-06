@@ -30,7 +30,6 @@ import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Spannable;
@@ -44,7 +43,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -62,35 +60,34 @@ import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.R;
 import com.sharesmile.share.Title;
 import com.sharesmile.share.TitleDao;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.ShareImageLoader;
-import com.sharesmile.share.core.SharedPrefsManager;
-import com.sharesmile.share.core.base.ExpoBackoffTask;
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.cause.model.CauseData;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.home.settings.AlarmReceiver;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.profile.BodyWeightChangedEvent;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.cause.CauseDataStore;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.homescreen.OnboardingOverlay;
+import com.sharesmile.share.home.settings.AlarmReceiver;
 import com.sharesmile.share.home.settings.CurrencyCode;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.profile.BodyWeightChangedEvent;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.views.CustomTypefaceSpan;
@@ -100,8 +97,6 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -502,7 +497,7 @@ public class Utils {
             }
 
             @Override
-            public void onBitmapFailed(Exception e,Drawable errorDrawable) {
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
                 Logger.d(TAG, "shareImageWithMessage: Image could not be loaded from disk or memory, will try from network");
                 Picasso.get().load(imageUrl).into(new Target() {
                     @Override
@@ -511,7 +506,7 @@ public class Utils {
                     }
 
                     @Override
-                    public void onBitmapFailed(Exception e,Drawable errorDrawable) {
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
                         Utils.share(context, null, shareMessage);
                     }
 
@@ -1359,6 +1354,7 @@ public class Utils {
     public static void setOnboardingShown() {
         SharedPrefsManager.getInstance().setBoolean(PREF_SHOWN_ONBOARDING, true);
     }
+
     public static boolean checkStreakUploaded() {
 
         return SharedPrefsManager.getInstance().getBoolean(PREF_STREAK_UPLOADED_FIRST_TIME, false);
@@ -1434,8 +1430,8 @@ public class Utils {
                 achievedBadge.setBadgeIdInProgress(badge.getBadgeId());
                 achievedBadge.setBadgeType(badge.getType());
                 achievedBadge.setCauseName(badge.getName());
-                if(badge.getType().equalsIgnoreCase(BADGE_TYPE_CAUSE))
-                achievedBadge.setCategory(causeData.getCategoryId());
+                if (badge.getType().equalsIgnoreCase(BADGE_TYPE_CAUSE))
+                    achievedBadge.setCategory(causeData.getCategoryId());
 
                 achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
                 achievedBadge.setParamDone(paramDone);
@@ -1451,13 +1447,12 @@ public class Utils {
             }
         }
         if (achievedBadge != null) {
-            if(type.equals(Constants.BADGE_TYPE_STREAK))
-            {
+            if (type.equals(Constants.BADGE_TYPE_STREAK)) {
                 achievedBadge.setParamDone(paramDone);
             }
             achievedBadge.setCauseId(causeData == null ? 0 : causeData.getId());
-            if(causeData!=null)
-            achievedBadge.setCauseName(causeData.getTitle());
+            if (causeData != null)
+                achievedBadge.setCauseName(causeData.getTitle());
             if (achievedBadge.getId() != null && achievedBadge.getId() > 0)
                 achievedBadgeDao.update(achievedBadge);
             else
@@ -1491,7 +1486,7 @@ public class Utils {
             if (achievedBadges.size() > 0) {
                 return -1;
             }
-        }else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+        } else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.CauseId.eq(mCauseData.getId()),
@@ -1512,8 +1507,8 @@ public class Utils {
             achievedBadge.setUserId(MainApplication.getInstance().getUserID());
             achievedBadge.setServerId(0);
 
-            if(badgeType.equalsIgnoreCase(BADGE_TYPE_CAUSE))
-            achievedBadge.setCategory(mCauseData.getCategoryId());
+            if (badgeType.equalsIgnoreCase(BADGE_TYPE_CAUSE))
+                achievedBadge.setCategory(mCauseData.getCategoryId());
 
             achievedBadge.setCauseId(mCauseData.getId());
             achievedBadge.setCauseName(mCauseData.getTitle());
@@ -1523,8 +1518,8 @@ public class Utils {
             achievedBadge = achievedBadges.get(0);
             badgeAchieved = checkBadgeList(badges, distanceCovered, achievedBadge, mCauseData);
         }
-        if(achievedBadge!=null)
-        achievedBadge.setIsSync(false);
+        if (achievedBadge != null)
+            achievedBadge.setIsSync(false);
 
         if (badgeAchieved != 0)
             if (!badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_MARATHON) ||
@@ -1535,16 +1530,16 @@ public class Utils {
                     achievedBadgeDao.insertOrReplace(achievedBadge);
                 }
             }
-            if(badgeAchieved>0) {
-                for (int i = 0; i < badges.size(); i++) {
-                    if (badges.get(i).getBadgeId() == badgeAchieved) {
-                        if ((achievedBadge.getParamDone() - distanceCovered) >= badges.get(i).getBadgeParameter()) {
-                            badgeAchieved = 0;
-                        }
-                        break;
+        if (badgeAchieved > 0) {
+            for (int i = 0; i < badges.size(); i++) {
+                if (badges.get(i).getBadgeId() == badgeAchieved) {
+                    if ((achievedBadge.getParamDone() - distanceCovered) >= badges.get(i).getBadgeParameter()) {
+                        badgeAchieved = 0;
                     }
+                    break;
                 }
             }
+        }
         return badgeAchieved;
     }
 
@@ -1729,7 +1724,7 @@ public class Utils {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
-    public static boolean storeImage(Bitmap image,String imagePath) {
+    public static boolean storeImage(Bitmap image, String imagePath) {
         File pictureFile = new File(imagePath);
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
@@ -1745,11 +1740,11 @@ public class Utils {
         }
         return true;
     }
-    public static void setGradientBackground(int color1,int color2,View view)
-    {
+
+    public static void setGradientBackground(int color1, int color2, View view) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[] {color1,color2});
+                new int[]{color1, color2});
 //        gd.setCornerRadii(new float[]{10,10,0,0,10,10,0,0});
         view.setBackground(gd);
     }
@@ -1798,55 +1793,49 @@ public class Utils {
         return currentTs - millisElapsedSinceBeginning;
     }
 
-    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context,boolean showGreyStar) {
+    public static void addStars(LinearLayout layoutStar, int cause_no_of_stars, Context context, boolean showGreyStar) {
         layoutStar.removeAllViews();
-        if(cause_no_of_stars>3)
-        {
+        if (cause_no_of_stars > 3) {
             LBTextView lbTextView = new LBTextView(context);
             lbTextView.setText(cause_no_of_stars);
-            lbTextView.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.star_badges,0);
+            lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.star_badges, 0);
             layoutStar.addView(lbTextView);
-        }else
-        {
-            if(cause_no_of_stars==0)
-            {// to give the layout height of the star
+        } else {
+            if (cause_no_of_stars == 0) {// to give the layout height of the star
                 LBTextView lbTextView = new LBTextView(context);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(5,0,5,0);
+                layoutParams.setMargins(5, 0, 5, 0);
                 lbTextView.setLayoutParams(layoutParams);
-                if(showGreyStar) {
+                if (showGreyStar) {
                     lbTextView.setText("");
                     lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.star_badges_grey, 0);
-                }else
-                {
+                } else {
                     lbTextView.setText("-");
                     lbTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 }
                 layoutStar.addView(lbTextView);
-            }else
-            for(int i=0;i<cause_no_of_stars;i++)
-            {
-                ImageView imageView = new ImageView(context);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(5,0,5,0);
-                imageView.setLayoutParams(layoutParams);
-                imageView.setImageResource(R.drawable.star_badges);
-                layoutStar.addView(imageView);
-            }
+            } else
+                for (int i = 0; i < cause_no_of_stars; i++) {
+                    ImageView imageView = new ImageView(context);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(5, 0, 5, 0);
+                    imageView.setLayoutParams(layoutParams);
+                    imageView.setImageResource(R.drawable.star_badges);
+                    layoutStar.addView(imageView);
+                }
         }
     }
 
     public static synchronized void checkBadgeData(boolean b) {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges = badgeDao.queryBuilder().list();
-        if(badges!=null && badges.size()>0)
-        {
+        if (badges != null && badges.size() > 0) {
             checkAchievedBadgeData(b);
-        }else
-        {
+        } else {
             SyncHelper.syncBadgesData();
         }
     }
+
     public static void checkAchievedBadgeData(boolean b) {
         /*if(CauseDataStore.getInstance().getCausesToShow().isEmpty() && isAdded()) {
          render();
@@ -1854,18 +1843,17 @@ public class Utils {
         {*/
         long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
         AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-        if(workoutCount>0) {
+        if (workoutCount > 0) {
 
             List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CHANGEMAKER),
                             AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED),
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
-            if(achievedBadges.size()==0) {
+            if (achievedBadges.size() == 0) {
                 BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
                 List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(Constants.BADGE_TYPE_CHANGEMAKER))
                         .orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
-                if(badges.size()>0)
-                {
+                if (badges.size() > 0) {
                     Badge badge = badges.get(0);
                     AchievedBadge achievedBadge = new AchievedBadge();
                     achievedBadge.setCauseName(badge.getName());
@@ -1886,19 +1874,16 @@ public class Utils {
         }
         List<CauseData> causeDataArrayList = CauseDataStore.getInstance().getCausesToShow();
         ArrayList<Long> causeIds = new ArrayList<>();
-        for(CauseData causeData : causeDataArrayList)
-        {
-            Utils.setBadgeForCategory(causeData,Constants.BADGE_TYPE_CAUSE,0);
+        for (CauseData causeData : causeDataArrayList) {
+            Utils.setBadgeForCategory(causeData, Constants.BADGE_TYPE_CAUSE, 0);
             causeIds.add(causeData.getId());
         }
         List<AchievedBadge> achievedBadgesInProgress = achievedBadgeDao.queryBuilder()
                 .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
                         AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CAUSE),
                         AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
-        for(AchievedBadge achievedBadge : achievedBadgesInProgress)
-        {
-            if(!causeIds.contains(achievedBadge.getCauseId()))
-            {
+        for (AchievedBadge achievedBadge : achievedBadgesInProgress) {
+            if (!causeIds.contains(achievedBadge.getCauseId())) {
                 achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                 achievedBadgeDao.update(achievedBadge);
             }
@@ -1911,11 +1896,10 @@ public class Utils {
     public static void checkStreak(boolean b) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         // just to change the format from dd/MM/yyyy to dd-MM-yyyy
-        if(userDetails.getStreakCurrentDate().length()>0)
-        {
+        if (userDetails.getStreakCurrentDate().length() > 0) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
             try {
-                if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null")) {
+                if (userDetails.getStreakCurrentDate() != null && !userDetails.getStreakCurrentDate().equals("null")) {
                     Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
                     SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                     userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
@@ -1927,17 +1911,15 @@ public class Utils {
         }
         AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_STREAK_CHECK);
         boolean sendStreak = false;
-        if(userDetails!=null) {
+        if (userDetails != null) {
             try {
                 if (userDetails.getStreakCurrentDate() != null
                         && userDetails.getStreakCurrentDate().length() > 0) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                     Date streakDate;
-                    if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null"))
-                    {
-                         streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
-                    }else
-                    {
+                    if (userDetails.getStreakCurrentDate() != null && !userDetails.getStreakCurrentDate().equals("null")) {
+                        streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
+                    } else {
                         streakDate = simpleDateFormat.parse(simpleDateFormat.format(ServerTimeKeeper.getInstance()
                                 .getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
                     }
@@ -1947,13 +1929,13 @@ public class Utils {
                     long diff = currentDate.getTime() - streakDate.getTime();
                     float dayCount = (float) diff / (24 * 60 * 60 * 1000);
                     //set EVENT
-                    builder.put("streakDate",streakDate.getTime());
-                    builder.put("currentDate",currentDate.getTime());
-                    builder.put("diff",diff);
-                    builder.put("dayCount",dayCount);
-                    builder.put("goal_id",userDetails.getStreakGoalID());
-                    builder.put("goal_distance",userDetails.getStreakGoalDistance());
-                    builder.put("goal_run_progress",userDetails.getStreakRunProgress());
+                    builder.put("streakDate", streakDate.getTime());
+                    builder.put("currentDate", currentDate.getTime());
+                    builder.put("diff", diff);
+                    builder.put("dayCount", dayCount);
+                    builder.put("goal_id", userDetails.getStreakGoalID());
+                    builder.put("goal_distance", userDetails.getStreakGoalDistance());
+                    builder.put("goal_run_progress", userDetails.getStreakRunProgress());
                     builder.buildAndDispatch();
                     if (!WorkoutSingleton.getInstance().isWorkoutActive()) {
                         if ((dayCount > 1)) {
@@ -1976,8 +1958,7 @@ public class Utils {
                 if (userDetails.getStreakCount() > userDetails.getStreakMaxCount())
                     userDetails.setStreakMaxCount(userDetails.getStreakCount());
 
-                if(userDetails.getStreakRunProgress() == 0)
-                {
+                if (userDetails.getStreakRunProgress() == 0) {
                     long currentTimeStampMillis = DateUtil.getServerTimeInMillis();
                     Calendar today = Calendar.getInstance();
                     today.setTimeInMillis(currentTimeStampMillis);
@@ -1999,18 +1980,17 @@ public class Utils {
                 }
 
                 MainApplication.getInstance().setUserDetails(userDetails);
-                if(sendStreak)
+                if (sendStreak)
                     SyncHelper.uploadStreak();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            Utils.setBadgeForCategory(null,Constants.BADGE_TYPE_STREAK,MainApplication.getInstance().getUserDetails().getStreakCount());
+            Utils.setBadgeForCategory(null, Constants.BADGE_TYPE_STREAK, MainApplication.getInstance().getUserDetails().getStreakCount());
         }
-        if(b)
+        if (b)
             EventBus.getDefault().post(new UpdateEvent.LoadAchivedBadges());
 
-        if(Utils.checkStreakUploaded())
-        {
+        if (Utils.checkStreakUploaded()) {
             Utils.setStreakUploaded(true);
             SyncHelper.uploadStreak();
         }
@@ -2026,26 +2006,22 @@ public class Utils {
         int title1 = userDetails.getTitle1();
         int title2 = userDetails.getTitle2();
 
-        if(userDetails.getTitle1()==0)
-        {
+        if (userDetails.getTitle1() == 0) {
             userDetails.setTitle1(achievedTitle.getTitleId());
-        }else {
+        } else {
             boolean b = true;
-                for (int i = 0; i < titles.size(); i++) {
-                    if (titles.get(i).getTitleId() == title1) {
-                            userDetails.setTitle1(achievedTitle.getTitleId());
-                            b = false;
-                            break;
-                    }
+            for (int i = 0; i < titles.size(); i++) {
+                if (titles.get(i).getTitleId() == title1) {
+                    userDetails.setTitle1(achievedTitle.getTitleId());
+                    b = false;
+                    break;
                 }
+            }
 
-            if(b && title1!=achievedTitle.getTitleId())
-            {
-                if(userDetails.getTitle2() == 0)
-                {
+            if (b && title1 != achievedTitle.getTitleId()) {
+                if (userDetails.getTitle2() == 0) {
                     userDetails.setTitle2(achievedTitle.getTitleId());
-                }else
-                {
+                } else {
                     for (int i = 0; i < titles.size(); i++) {
                         if (titles.get(i).getTitleId() == title2) {
                             userDetails.setTitle2(achievedTitle.getTitleId());
@@ -2060,11 +2036,10 @@ public class Utils {
         MainApplication.getInstance().setUserDetails(userDetails);
     }
 
-    public static void setStarImage(int starCount, ImageView starImageView,String badge_type) {
-        if(badge_type.equals(Constants.BADGE_TYPE_CHANGEMAKER) || badge_type.equals(Constants.BADGE_TYPE_MARATHON))
-        {
+    public static void setStarImage(int starCount, ImageView starImageView, String badge_type) {
+        if (badge_type.equals(Constants.BADGE_TYPE_CHANGEMAKER) || badge_type.equals(Constants.BADGE_TYPE_MARATHON)) {
             starImageView.setVisibility(View.GONE);
-        }else {
+        } else {
             switch (starCount) {
                 case 1:
                     starImageView.setImageResource(R.drawable.star_1);
@@ -2085,8 +2060,7 @@ public class Utils {
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
             dateString = simpleDateFormat.format(date);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -2097,25 +2071,23 @@ public class Utils {
         Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         try {
-            if(dateString!=null && !dateString.equals("null"))
-            date = simpleDateFormat.parse(dateString);
+            if (dateString != null && !dateString.equals("null"))
+                date = simpleDateFormat.parse(dateString);
         } catch (ParseException e) {
             e.printStackTrace();
         }
         return date;
     }
 
-    public static int dpToPx(int dp)
-    {
+    public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public static int pxToDp(int px)
-    {
+    public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public static NotificationCompat.Builder createChannelForNotification(Context context,String description) {
+    public static NotificationCompat.Builder createChannelForNotification(Context context, String description) {
         CharSequence name = context.getString(R.string.channel_name);
         int importance = NotificationManager.IMPORTANCE_DEFAULT;
         NotificationChannel channel = new NotificationChannel(context.getString(R.string.channel_name), name, importance);
@@ -2124,6 +2096,6 @@ public class Utils {
         // or other notification behaviors after this
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
-        return new NotificationCompat.Builder(context,context.getString(R.string.channel_name));
+        return new NotificationCompat.Builder(context, context.getString(R.string.channel_name));
     }
 }
