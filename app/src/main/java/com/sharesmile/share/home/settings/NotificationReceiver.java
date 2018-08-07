@@ -138,10 +138,15 @@ public class NotificationReceiver extends BroadcastReceiver {
                         .setSound(Uri.parse("android.resource://"
                                 + context.getPackageName() + "/" + R.raw.slow_spring_board))
                         .setVibrate(new long[]{0, 100, 200, 300});
-//            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
-//                mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel, MainApplication.getInstance().createNotificationActionIntent(pauseResumeIntent, pauseResumeAction))
-//                        .addAction(R.drawable.ic_stop_black_24px, "Stop", MainApplication.getInstance().createNotificationActionIntent(MainActivity.INTENT_STOP_RUN, getString(R.string.notification_action_stop)));
-//            }
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH && buttonText.length()!=0) {
+                if(title.equals(context.getString(R.string.auto_notification_new_badge_title)) ||
+                        title.equals(context.getString(R.string.auto_notification_new_badge_title)))
+                {
+                    mBuilder.addAction(/*R.drawable.ic_stop_black_24px*/0, buttonText, MainApplication.getInstance().createNotificationActionIntent(MainActivity.INTENT_BADGE, context.getString(R.string.notification_action_badge)));
+                }else {
+                    mBuilder.addAction(/*R.drawable.ic_stop_black_24px*/0, buttonText, MainApplication.getInstance().createNotificationActionIntent(MainActivity.INTENT_HOME, context.getString(R.string.notification_action_home)));
+                }
+            }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -187,7 +192,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 List<Title> titles = titleDao.queryBuilder()
                         .where(TitleDao.Properties.CategoryId.eq(category))
                         .orderAsc(TitleDao.Properties.GoalNStars).list();
-                double distancePending = 0;
+                double distancePending = -1;
                 for (int i = 0; i < titles.size(); i++) {
                     if (no_of_stars == titles.get(i).getGoalNStars() - 1) {
                         List<AchievedBadge> achievedBadgesForTitle = achievedBadgeDao.queryBuilder()

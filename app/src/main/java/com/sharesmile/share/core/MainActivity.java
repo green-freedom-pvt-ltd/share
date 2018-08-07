@@ -111,6 +111,7 @@ import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 import static com.sharesmile.share.core.Constants.REQUEST_IMAGE_CAPTURE;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
+import static com.sharesmile.share.core.notifications.NotificationActionReceiver.AUTO_NOTIFICATION_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
 
 
@@ -121,6 +122,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     public static final int INTENT_STOP_RUN = 1;
     public static final int INTENT_PAUSE_RUN = 2;
     public static final int INTENT_RESUME_RUN = 3;
+    public static final int INTENT_HOME = 4;
+    public static final int INTENT_BADGE = 5;
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
@@ -144,6 +147,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         getIntent().removeExtra(INTENT_NOTIFICATION_RUN);
         NotificationManager manager = (NotificationManager) MainApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(REMINDER_NOTIFICATION_ID);
+        manager.cancel(AUTO_NOTIFICATION_ID);
         Logger.d(TAG, "userLogin = " + userLogin /*+ ", isLoginSkip = " + isLoginSkip*/ + ", isReminderDisable = "
                 + isReminderDisable + ", intentNotificationRun = " + intentNotificationRun);
         //TODO : tempchat ch

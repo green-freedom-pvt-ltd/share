@@ -135,8 +135,8 @@ public class UserDetails implements UnObfuscable {
     public void addStreakCount() {
         if (!isStreakAdded() && getStreakRunProgress() >= getStreakGoalDistance()) {
             this.streakCount += 1;
-            setStreakAdded(true);
             setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+            setStreakAdded(true);
         }
 
         if(streakMaxCount<streakCount)
