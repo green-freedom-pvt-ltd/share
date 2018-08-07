@@ -375,15 +375,15 @@ public class Utils {
      * @param secs time interval in secs
      * @return
      */
-    public static final String secondsToHHMMSS(int secs) {
+    public static final String secondsToHHMMSS(int secs, boolean sendToServer) {
 
-        if (secs >= 3600) {
+        if (secs >= 3600 || sendToServer) {
             int sec = secs % 60;
             int totalMins = secs / 60;
             int hour = totalMins / 60;
             int min = totalMins % 60;
             String formatted = String.format("%02d:%02d:%02d", hour, min, sec);
-            if (formatted.startsWith("0")) {
+            if (hour<=9) {
                 return formatted.substring(1);
             } else {
                 return formatted;
@@ -695,7 +695,7 @@ public class Utils {
             Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
             run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(data.getBeginTimeStamp())));
         }
-        run.setRunDuration(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        run.setRunDuration(Utils.secondsToHHMMSS((int) data.getElapsedTime(),true));
         run.setNumSteps(data.getTotalSteps());
         run.setAvgSpeed(data.getAvgSpeed());
         run.setClientRunId(data.getWorkoutId());

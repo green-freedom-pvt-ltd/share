@@ -224,7 +224,7 @@ public class WorkoutService extends Service implements
         workout.setIsValidRun(!data.isAutoFlagged());
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
-        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime(),true));
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), data.getDistance());
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
