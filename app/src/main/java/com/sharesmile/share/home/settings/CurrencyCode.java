@@ -23,7 +23,7 @@ public enum CurrencyCode {
     KRW("₩"),
     TRY("₺"),
     RUB("\u20BD"),
-    INR("₹"),
+    INR("\u20B9"),
     BRL("R$"),
     ZAR("R");
 
