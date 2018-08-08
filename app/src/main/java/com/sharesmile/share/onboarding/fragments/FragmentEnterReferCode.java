@@ -10,25 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.core.cause.model.CauseList;
 import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
-import com.sharesmile.share.refer_program.model.ReferCode;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,7 +32,6 @@ import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class FragmentEnterReferCode extends BaseFragment {
     public static final String TAG = "FragmentEnterReferCode";
@@ -155,7 +148,7 @@ public class FragmentEnterReferCode extends BaseFragment {
             JSONObject jsonObject = new JSONObject(onCodeVerified.jsonObject.toString());
             if (jsonObject.getInt("code") == Constants.SUCCESS_POST) {
                 referCode.setFocusable(false);
-                JSONObject result = jsonObject.getJSONObject("result");
+                JSONObject result = jsonObject.getJSONObject("results");
                 MainApplication.showToast("You were refered by : "+result.getString("referrer_name"));
                 UserDetails userDetails = MainApplication.getInstance().getUserDetails();
                 userDetails.setReferalId(result.getInt("referrer_user_id"));
@@ -165,7 +158,7 @@ public class FragmentEnterReferCode extends BaseFragment {
                 commonActions.setBackAndContinue(TAG, getContext().getResources().getString(R.string.continue_txt));
             }else
             {
-                MainApplication.showToast(jsonObject.getString("result"));
+                MainApplication.showToast(jsonObject.getString("results"));
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -1,5 +1,8 @@
 package com.sharesmile.share.refer_program;
 
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +21,10 @@ import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.utils.ShareUtils;
+import com.sharesmile.share.utils.Utils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,7 +72,7 @@ public class ReferProgramFragment extends BaseFragment{
 
     private void init() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        shareCode.setText(userDetails.getMyReferCode().toUpperCase());
+        shareCode.setText(userDetails.getMyReferCode());
     }
 
     private void setupToolbar() {
@@ -90,7 +97,7 @@ public class ReferProgramFragment extends BaseFragment{
         }
     }
 
-    @OnClick({R.id.share_facebook,R.id.share_whatsapp,R.id.share_twitter,R.id.share_gmail})
+    @OnClick({R.id.share_facebook, R.id.share_whatsapp, R.id.share_twitter, R.id.share_gmail, R.id.share_code_layout})
     public void onShare(View view)
     {
         switch (view.getId())
@@ -105,16 +112,29 @@ public class ReferProgramFragment extends BaseFragment{
                     MainApplication.showToast("Whatsapp is not installed, cannot share");
                 break;
             case R.id.share_twitter :
-                startActivity(ShareUtils.shareOnTwitter("Testing"));
+                startActivity(ShareUtils.shareOnTwitter("Testing Use this code : " + shareCode.getText().toString()));
                 break;
             case R.id.share_gmail :
                 try {
-                    startActivity(ShareUtils.shareOnGmail("Testing"));
+                    startActivity(ShareUtils.shareOnGmail("Testing Use this code : " + shareCode.getText().toString()));
                 }catch (Exception e)
                 {
                     MainApplication.showToast("Some error occurred, Please try after some time.");
                     e.printStackTrace();
                 }
+                break;
+            case R.id.share_code_layout:
+                AssetManager assetManager = getContext().getAssets();
+                InputStream istr;
+                Bitmap bitmap = null;
+                try {
+                    istr = assetManager.open("images/share_image_2.jpg");
+                    bitmap = BitmapFactory.decodeStream(istr);
+                } catch (IOException e) {
+                    // handle exception
+                }
+                Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
+                        getString(R.string.share_msg) + " Use this code : " + shareCode.getText().toString());
                 break;
         }
     }

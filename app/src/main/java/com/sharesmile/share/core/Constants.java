@@ -1,9 +1,9 @@
 package com.sharesmile.share.core;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.helpcenter.category.FeedbackCategory;
 import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
-import com.sharesmile.share.core.config.Urls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -297,6 +297,15 @@ public class Constants {
 
     public final static int SUCCESS_GET = 200;
     public final static int SUCCESS_POST = 201;
+
+    //auto_notification emoji
+    final public static int CROWN_EMOJI = 128081;
+    final public static int FLAG_EMOJI = 127937;
+    final public static int SMILE_WITH_OPEN_MOUTH_EMOJI = 128515;
+    final public static int SMILE_WITH_SUNGLASSES_EMOJI = 128526;
+    final public static int FIRE_EMOJI = 128293;
+    final public static int BADGE_EMOJI = 127894;
+    final public static int RUN_EMOJI = 127939;
 
 
     public static final List<FeedbackCategory>  HELP_CENTER_CATEGORIES = new ArrayList<FeedbackCategory>(){{

@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.AchievedBadge;
@@ -30,8 +29,6 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
@@ -40,15 +37,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.AUTO_NOTIFICATION_ID;
-import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
 
 public class NotificationReceiver extends BroadcastReceiver {
     final String TAG = "NotificationReceiver";
@@ -83,8 +76,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                 switch (notificationSubClass.id) {
                     case BADGE_ACHIEVE_ID:
                         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-                        title = context.getString(R.string.auto_notification_badge_title);
-                        buttonText = context.getString(R.string.auto_notification_badge_button_text);
+                        title = context.getString(R.string.auto_notification_badge_title) + Utils.getEmoji(Constants.FLAG_EMOJI);
+                        buttonText = context.getString(R.string.auto_notification_badge_button_text) + Utils.getEmoji(Constants.BADGE_EMOJI);
                         if (notificationSubClass.badgeId != -1) {
                             List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(notificationSubClass.badgeId)).list();
                             if (badges.size() > 0) {
@@ -96,8 +89,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                         break;
                     case TITLE_ACHIEVE_ID:
                         TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
-                        title = context.getString(R.string.auto_notification_badge_title);
-                        buttonText = context.getString(R.string.auto_notification_title_button_text);
+                        title = context.getString(R.string.auto_notification_badge_title) + Utils.getEmoji(Constants.FLAG_EMOJI);
+                        buttonText = context.getString(R.string.auto_notification_title_button_text) + Utils.getEmoji(Constants.CROWN_EMOJI);
                         if (notificationSubClass.badgeId != -1) {
                             List<Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(notificationSubClass.badgeId)).list();
                             if (titles.size() > 0) {
@@ -110,16 +103,16 @@ public class NotificationReceiver extends BroadcastReceiver {
                     case MAX_STREAK_ID:
                         title = context.getString(R.string.auto_notification_max_streak_title);
                         message = String.format(context.getString(R.string.auto_notification_max_streak_message), notificationSubClass.distance);
-                        buttonText = context.getString(R.string.auto_notification_max_streak_button_text);
+                        buttonText = context.getString(R.string.auto_notification_max_streak_button_text) + Utils.getEmoji(Constants.FIRE_EMOJI);
                         break;
                     case DAILY_GOAL_ID:
                         title = context.getString(R.string.auto_notification_daily_goal_title);
-                        message = String.format(context.getString(R.string.auto_notification_daily_goal_message), notificationSubClass.distance);
+                        message = String.format(context.getString(R.string.auto_notification_daily_goal_message), notificationSubClass.distance) + Utils.getEmoji(Constants.RUN_EMOJI);
                         buttonText = "";
                         break;
                     case STREAK_0_ID:
-                        title = context.getString(R.string.auto_notification_start_streak_title);
-                        message = context.getString(R.string.auto_notification_start_streak_message);
+                        title = context.getString(R.string.auto_notification_start_streak_title) + Utils.getEmoji(Constants.FIRE_EMOJI);
+                        message = context.getString(R.string.auto_notification_start_streak_message) + Utils.getEmoji(Constants.RUN_EMOJI);
                         buttonText = "";
                         break;
 
@@ -167,118 +160,120 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     private NotificationSubClass checkForNotification() {
         boolean checkCondition = false;
+        NotificationSubClass notificationSubClass = null;
         int lifeTimeImpact = SharedPrefsManager.getInstance().getInt(PREF_TOTAL_IMPACT);
         //todo write condition
-        NotificationSubClass notificationSubClass = null;
-        /*****************************/
-        AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
-        //less than 1km for title
-        BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-        TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
-        SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
-        Cursor cursor = database.rawQuery("SELECT " + AchievedBadgeDao.Properties.Category.columnName
-                + ", SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
-                + " FROM " + AchievedBadgeDao.TABLENAME +
-                " GROUP BY " + AchievedBadgeDao.Properties.Category.columnName + " having " +
-                AchievedBadgeDao.Properties.UserId.columnName + " is "
-                + MainApplication.getInstance().getUserID() +
-                " and " + AchievedBadgeDao.Properties.BadgeType.columnName + " is '" + Constants.BADGE_TYPE_CAUSE + "" + "'", new String[]{});
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                int category = cursor.getInt(0);
-                int no_of_stars = cursor.getInt(1);
-                int id = -1;
-                List<Title> titles = titleDao.queryBuilder()
-                        .where(TitleDao.Properties.CategoryId.eq(category))
-                        .orderAsc(TitleDao.Properties.GoalNStars).list();
-                double distancePending = -1;
-                for (int i = 0; i < titles.size(); i++) {
-                    if (no_of_stars == titles.get(i).getGoalNStars() - 1) {
-                        List<AchievedBadge> achievedBadgesForTitle = achievedBadgeDao.queryBuilder()
-                                .where(AchievedBadgeDao.Properties.Category.eq(category),
-                                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
-                        distancePending = -1;
-                        for (AchievedBadge achievedBadge :
-                                achievedBadgesForTitle) {
-                            if (achievedBadge.getBadgeIdInProgress() != achievedBadge.getBadgeIdAchieved()) {
-                                List<Badge> badges = badgeDao.queryBuilder()
-                                        .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress()))
-                                        .list();
-                                if (badges.size() > 0 &&
-                                        achievedBadge.getParamDone() >= badges.get(0).getBadgeParameter() - 1 &&
-                                        achievedBadge.getParamDone() < badges.get(0).getBadgeParameter()) {
-                                    double distanceDiff = badges.get(0).getBadgeParameter() - achievedBadge.getParamDone();
-                                    if (distancePending == -1 ||
-                                            distanceDiff < distancePending) {
-                                        distancePending = distanceDiff;
-                                        id = titles.get(i).getTitleId();
+        if (lifeTimeImpact != 0) {
+            /*****************************/
+            AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+            //less than 1km for title
+            BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
+            SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+            Cursor cursor = database.rawQuery("SELECT " + AchievedBadgeDao.Properties.Category.columnName
+                    + ", SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
+                    + " FROM " + AchievedBadgeDao.TABLENAME +
+                    " GROUP BY " + AchievedBadgeDao.Properties.Category.columnName + " having " +
+                    AchievedBadgeDao.Properties.UserId.columnName + " is "
+                    + MainApplication.getInstance().getUserID() +
+                    " and " + AchievedBadgeDao.Properties.BadgeType.columnName + " is '" + Constants.BADGE_TYPE_CAUSE + "" + "'", new String[]{});
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    int category = cursor.getInt(0);
+                    int no_of_stars = cursor.getInt(1);
+                    int id = -1;
+                    List<Title> titles = titleDao.queryBuilder()
+                            .where(TitleDao.Properties.CategoryId.eq(category))
+                            .orderAsc(TitleDao.Properties.GoalNStars).list();
+                    double distancePending = -1;
+                    for (int i = 0; i < titles.size(); i++) {
+                        if (no_of_stars == titles.get(i).getGoalNStars() - 1) {
+                            List<AchievedBadge> achievedBadgesForTitle = achievedBadgeDao.queryBuilder()
+                                    .where(AchievedBadgeDao.Properties.Category.eq(category),
+                                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+                            distancePending = -1;
+                            for (AchievedBadge achievedBadge :
+                                    achievedBadgesForTitle) {
+                                if (achievedBadge.getBadgeIdInProgress() != achievedBadge.getBadgeIdAchieved()) {
+                                    List<Badge> badges = badgeDao.queryBuilder()
+                                            .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress()))
+                                            .list();
+                                    if (badges.size() > 0 &&
+                                            achievedBadge.getParamDone() >= badges.get(0).getBadgeParameter() - 1 &&
+                                            achievedBadge.getParamDone() < badges.get(0).getBadgeParameter()) {
+                                        double distanceDiff = badges.get(0).getBadgeParameter() - achievedBadge.getParamDone();
+                                        if (distancePending == -1 ||
+                                                distanceDiff < distancePending) {
+                                            distancePending = distanceDiff;
+                                            id = titles.get(i).getTitleId();
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                if (distancePending != -1) {
-                    if (notificationSubClass == null)
-                        notificationSubClass = new NotificationSubClass(id, TITLE_ACHIEVE_ID, distancePending);
-                    else {
-                        notificationSubClass.badgeId = -1;
-                    }
-                    checkCondition = true;
-                }
-                cursor.moveToNext();
-            }
-        }
-        if(checkCondition)
-            return notificationSubClass;
-        // if any badge contains less than 1 km left for
-        List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
-                .where(AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
-                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
-        if (achievedBadges.size() > 0) {
-            for (AchievedBadge achievedBadge :
-                    achievedBadges) {
-                List<Badge> badges = badgeDao.queryBuilder()
-                        .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).list();
-                if (badges.size() > 0) {
-                    if (achievedBadge.getParamDone() >= badges.get(0).getBadgeParameter() - 1 &&
-                            achievedBadge.getParamDone() < badges.get(0).getBadgeParameter()) {
-                        if (notificationSubClass == null) {
-                            notificationSubClass = new NotificationSubClass(BADGE_ACHIEVE_ID,
-                                    achievedBadge.getBadgeIdInProgress(),
-                                    badges.get(0).getBadgeParameter() - achievedBadge.getParamDone());
-                        } else {
+                    if (distancePending != -1) {
+                        if (notificationSubClass == null)
+                            notificationSubClass = new NotificationSubClass(id, TITLE_ACHIEVE_ID, distancePending);
+                        else {
                             notificationSubClass.badgeId = -1;
                         }
                         checkCondition = true;
                     }
+                    cursor.moveToNext();
                 }
             }
-        }
-
-        if (checkCondition)
-            return notificationSubClass;
-
-        /*****************************/
-        //less than 1km from achieving max streak
-        //less than 1km from achieving daily goal
-        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if (!userDetails.isStreakAdded()) {
-            if (userDetails.getStreakRunProgress() >= userDetails.getStreakGoalDistance() - 1 &&
-                    userDetails.getStreakRunProgress() < userDetails.getStreakGoalDistance()) {
-                double kmsLeft = userDetails.getStreakGoalDistance() - userDetails.getStreakRunProgress();
-                if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_NOTIFICATION_MAX_STREAK_SHOWN, false) &&
-                        userDetails.getStreakCount() == userDetails.getStreakMaxCount()) {
-                    notificationSubClass = new NotificationSubClass(MAX_STREAK_ID, 0, kmsLeft);
-                } else {
-                    notificationSubClass = new NotificationSubClass(DAILY_GOAL_ID, 0, kmsLeft);
+            if (checkCondition)
+                return notificationSubClass;
+            // if any badge contains less than 1 km left for
+            List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+            if (achievedBadges.size() > 0) {
+                for (AchievedBadge achievedBadge :
+                        achievedBadges) {
+                    List<Badge> badges = badgeDao.queryBuilder()
+                            .where(BadgeDao.Properties.BadgeId.eq(achievedBadge.getBadgeIdInProgress())).list();
+                    if (badges.size() > 0) {
+                        if (achievedBadge.getParamDone() >= badges.get(0).getBadgeParameter() - 1 &&
+                                achievedBadge.getParamDone() < badges.get(0).getBadgeParameter()) {
+                            if (notificationSubClass == null) {
+                                notificationSubClass = new NotificationSubClass(BADGE_ACHIEVE_ID,
+                                        achievedBadge.getBadgeIdInProgress(),
+                                        badges.get(0).getBadgeParameter() - achievedBadge.getParamDone());
+                            } else {
+                                notificationSubClass.badgeId = -1;
+                            }
+                            checkCondition = true;
+                        }
+                    }
                 }
-                checkCondition = true;
             }
+
+            if (checkCondition)
+                return notificationSubClass;
+
+            /*****************************/
+            //less than 1km from achieving max streak
+            //less than 1km from achieving daily goal
+            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+            if (!userDetails.isStreakAdded()) {
+                if (userDetails.getStreakRunProgress() >= userDetails.getStreakGoalDistance() - 1 &&
+                        userDetails.getStreakRunProgress() < userDetails.getStreakGoalDistance()) {
+                    double kmsLeft = userDetails.getStreakGoalDistance() - userDetails.getStreakRunProgress();
+                    if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_NOTIFICATION_MAX_STREAK_SHOWN, false) &&
+                            userDetails.getStreakCount() == userDetails.getStreakMaxCount()) {
+                        notificationSubClass = new NotificationSubClass(MAX_STREAK_ID, 0, kmsLeft);
+                    } else {
+                        notificationSubClass = new NotificationSubClass(DAILY_GOAL_ID, 0, kmsLeft);
+                    }
+                    checkCondition = true;
+                }
+            }
+            if (checkCondition)
+                return notificationSubClass;
         }
-        if (checkCondition)
-            return notificationSubClass;
         /********************/
         //if streak is 0 for past 3 days
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");

@@ -2098,4 +2098,8 @@ public class Utils {
         notificationManager.createNotificationChannel(channel);
         return new NotificationCompat.Builder(context, context.getString(R.string.channel_name));
     }
+
+    public static String getEmoji(int i) {
+        return " " + new String(Character.toChars(i));
+    }
 }

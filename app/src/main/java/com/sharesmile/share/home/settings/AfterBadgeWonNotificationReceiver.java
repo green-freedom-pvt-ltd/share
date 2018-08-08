@@ -13,40 +13,29 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.crashlytics.android.Crashlytics;
-import com.sharesmile.share.AchievedBadge;
-import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Title;
 import com.sharesmile.share.TitleDao;
-import com.sharesmile.share.Workout;
-import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.sharesmile.share.core.Constants.PREF_TOTAL_IMPACT;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.AUTO_NOTIFICATION_ID;
 
 public class AfterBadgeWonNotificationReceiver extends BroadcastReceiver {
     final String TAG = "AfterBadgeWonNotificationReceiver";
-
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -126,18 +115,18 @@ public class AfterBadgeWonNotificationReceiver extends BroadcastReceiver {
                 TitleDao titleDao = MainApplication.getInstance().getDbWrapper().getTitleDao();
                 List<Title> titles = titleDao.queryBuilder().where(TitleDao.Properties.TitleId.eq(id)).list();
                 if (titles.size() > 0) {
-                    message = getContext().getResources().getString(R.string.auto_notification_new_title_title);
+                    message = getContext().getResources().getString(R.string.auto_notification_new_title_title) + Utils.getEmoji(Constants.CROWN_EMOJI);
                     title = String.format(getContext().getResources().getString(R.string.auto_notification_new_title_message), titles.get(0).getTitle());
-                    buttonText = getContext().getResources().getString(R.string.auto_notification_new_title_button_text);
+                    buttonText = getContext().getResources().getString(R.string.auto_notification_new_title_button_text) + Utils.getEmoji(Constants.SMILE_WITH_OPEN_MOUTH_EMOJI);
                 }
             } else {
                 int id = jsonObject.getInt(keyUsed);
                 BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
                 List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.BadgeId.eq(id)).list();
                 if (badges.size() > 0) {
-                    message = getContext().getResources().getString(R.string.auto_notification_new_badge_title);
+                    message = getContext().getResources().getString(R.string.auto_notification_new_badge_title) + Utils.getEmoji(Constants.BADGE_EMOJI);
                     title = String.format(getContext().getResources().getString(R.string.auto_notification_new_badge_message), badges.get(0).getName());
-                    buttonText = getContext().getResources().getString(R.string.auto_notification_new_badge_button_text);
+                    buttonText = getContext().getResources().getString(R.string.auto_notification_new_badge_button_text) + Utils.getEmoji(Constants.SMILE_WITH_SUNGLASSES_EMOJI);
                 }
             }
 

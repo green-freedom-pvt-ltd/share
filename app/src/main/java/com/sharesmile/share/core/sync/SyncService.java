@@ -410,8 +410,8 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription3(badge.getDescription3());
             badgeDb.setDescription_inprogress(badge.getDescriptionInProgress());
             badgeDb.setShare_badge_content(badge.getShareBadgeContent());
-            badgeDb.setBadgeParameter(badge.getBadgeParameter());
-            /*//TODO hack
+//            badgeDb.setBadgeParameter(badge.getBadgeParameter());
+            //TODO hack
             switch (badge.getType()) {
                 case BADGE_TYPE_CAUSE:
                     switch ((int) badge.getBadgeParameter()) {
@@ -451,7 +451,7 @@ public class SyncService extends GcmTaskService {
                 case BADGE_TYPE_MARATHON:
                     badgeDb.setBadgeParameter(badge.getBadgeParameter() / 10);
                     break;
-            }*/
+            }
 
 
             badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());
@@ -919,7 +919,7 @@ public class SyncService extends GcmTaskService {
                 JSONObject response = new JSONObject(responseObject.toString());
                 Logger.d(TAG, "Response for uploadAchievement:" + response);
                 if (response.getInt("code") == 200) {
-                    JSONArray result = response.getJSONArray("result");
+                    JSONArray result = response.getJSONArray("results");
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
 
@@ -979,7 +979,7 @@ public class SyncService extends GcmTaskService {
                 JSONObject response = new JSONObject(responseObject.toString());
                 Logger.d(TAG, "Response for uploadAchievementTitle:" + response);
                 if (response.getInt("code") == 200) {
-                    JSONArray result = response.getJSONArray("result");
+                    JSONArray result = response.getJSONArray("results");
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
 
@@ -1422,7 +1422,7 @@ public class SyncService extends GcmTaskService {
 
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getImpactOverviewUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("result").toString();
+            String responseString = response.getAsJsonObject("results").toString();
             Logger.d(TAG, "getCharityOverviewData response : " + responseString);
             SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW, responseString);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, false);
@@ -1464,7 +1464,7 @@ public class SyncService extends GcmTaskService {
         int result;
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("result").toString();
+            String responseString = response.getAsJsonObject("results").toString();
             Logger.d(TAG, "getStreak response : " + responseString);
             JSONObject jsonObject = new JSONObject(responseString);
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
@@ -1514,7 +1514,7 @@ public class SyncService extends GcmTaskService {
         int result;
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getAchievementUrl(), JsonObject.class);
-            String responseString = response.getAsJsonArray("result").toString();
+            String responseString = response.getAsJsonArray("results").toString();
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
@@ -1609,7 +1609,7 @@ public class SyncService extends GcmTaskService {
         int result;
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getTitlesUrl(), JsonObject.class);
-            String responseString = response.getAsJsonArray("result").toString();
+            String responseString = response.getAsJsonArray("results").toString();
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
             CategoryDao categoryDao = MainApplication.getInstance().getDbWrapper().getCategoryDao();
