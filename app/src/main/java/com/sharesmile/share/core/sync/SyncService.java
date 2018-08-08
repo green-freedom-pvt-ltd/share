@@ -416,14 +416,14 @@ public class SyncService extends GcmTaskService {
                 case BADGE_TYPE_CAUSE:
                     switch ((int) badge.getBadgeParameter()) {
                         case 10:
-                            badgeDb.setBadgeParameter(1);
+                            badgeDb.setBadgeParameter(2);
 
                             break;
                         case 50:
-                            badgeDb.setBadgeParameter(3);
+                            badgeDb.setBadgeParameter(5);
                             break;
                         case 250:
-                            badgeDb.setBadgeParameter(7);
+                            badgeDb.setBadgeParameter(10);
                             break;
 
                     }
