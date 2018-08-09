@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -458,7 +459,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     private void setReminderTimeTv() {
         Calendar calendar1 = Utils.getReminderTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
         Date date = new Date();
         date.setTime(calendar1.getTimeInMillis());
         reminderTime.setText(simpleDateFormat.format(date));

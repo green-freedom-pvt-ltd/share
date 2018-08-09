@@ -96,7 +96,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
         String distance = String.format("%1$,.2f", (workoutData.getDistance() / 1000)) + " km";
         String avgSpeed = String.format("%1$,.2f", workoutData.getAvgSpeed() * 3.6) + " km/hr";
-        String time = Utils.secondsToHHMMSS((int) workoutData.getElapsedTime());
+        String time = Utils.secondsToHHMMSS((int) workoutData.getElapsedTime(),false);
         totalDistanceView.setText(distance);
         avgSpeedView.setText(avgSpeed);
         totalTimeView.setText(time);

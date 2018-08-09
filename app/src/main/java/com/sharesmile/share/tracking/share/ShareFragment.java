@@ -232,7 +232,7 @@ public class ShareFragment extends FeedbackDialogHolderFragment implements View.
         distance.setText(distanceCovered);
         distanceUnit.setText(" " + UnitsManager.getDistanceLabel());
         distanceLabel.setText(getString(R.string.distance));
-        durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs)));
+        durationInHHMMSS.setText(Utils.secondsToHHMMSS(Math.round(elapsedTimeInSecs),false));
         durationLabel.setText(getString(R.string.duration));
         initImageData();
 

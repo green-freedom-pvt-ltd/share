@@ -1,6 +1,7 @@
 package com.sharesmile.share.tracking.workout.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
@@ -222,7 +224,7 @@ public class WorkoutService extends Service implements
         workout.setIsValidRun(!data.isAutoFlagged());
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
-        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime(),true));
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), data.getDistance());
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
@@ -1165,10 +1167,16 @@ public class WorkoutService extends Service implements
         pauseResumeIntent.setAction(pauseResumeAction);
         PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);*/
+        NotificationCompat.Builder mBuilder =null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+           mBuilder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_workout));
+        }else
+        {
+            mBuilder = new NotificationCompat.Builder(this);
+        }
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setContentTitle(contentTitle)
+
+            mBuilder.setContentTitle(contentTitle)
                         .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
                                 ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())

@@ -18,6 +18,7 @@ import com.sharesmile.share.utils.Utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +58,7 @@ public class FragmentBirthday extends BaseFragment implements NumberPicker.OnVal
         String birthday = userDetails.getBirthday();
         if(birthday !=null && birthday.length()>0) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(simpleDateFormat.parse(birthday).getTime());
                 datePicker.setValue(calendar.get(Calendar.DAY_OF_MONTH));

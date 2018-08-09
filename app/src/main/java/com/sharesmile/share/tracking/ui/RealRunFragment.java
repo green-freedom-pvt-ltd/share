@@ -289,7 +289,7 @@ public class RealRunFragment extends RunFragment {
         }
         Logger.d(TAG, "refreshWorkoutData");
         if (isAttachedToActivity()){
-            updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs()));
+            updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs(),false));
             float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
             String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(totalDistance);
             distanceTextView.setText(distanceString);

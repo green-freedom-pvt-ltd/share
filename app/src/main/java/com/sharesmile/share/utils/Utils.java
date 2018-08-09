@@ -3,6 +3,8 @@ package com.sharesmile.share.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -25,6 +27,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -372,15 +375,15 @@ public class Utils {
      * @param secs time interval in secs
      * @return
      */
-    public static final String secondsToHHMMSS(int secs) {
+    public static final String secondsToHHMMSS(int secs, boolean sendToServer) {
 
-        if (secs >= 3600) {
+        if (secs >= 3600 || sendToServer) {
             int sec = secs % 60;
             int totalMins = secs / 60;
             int hour = totalMins / 60;
             int min = totalMins % 60;
             String formatted = String.format("%02d:%02d:%02d", hour, min, sec);
-            if (formatted.startsWith("0")) {
+            if (hour<=9) {
                 return formatted.substring(1);
             } else {
                 return formatted;
@@ -692,7 +695,7 @@ public class Utils {
             Logger.d(TAG, "BeginTimeStamp is present, will set start_time of run");
             run.setStartTime(DateUtil.getDefaultFormattedDate(new Date(data.getBeginTimeStamp())));
         }
-        run.setRunDuration(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        run.setRunDuration(Utils.secondsToHHMMSS((int) data.getElapsedTime(),true));
         run.setNumSteps(data.getTotalSteps());
         run.setAvgSpeed(data.getAvgSpeed());
         run.setClientRunId(data.getWorkoutId());
@@ -1272,14 +1275,14 @@ public class Utils {
 
     public static String getCurrentDateDDMMYYYY() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         return simpleDateFormat.format(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(calendar.getTimeInMillis())));
     }
 
     public static String getDateDDMMYYYYFromTimeInMillis(long timeInMillis) {
 //        Calendar calendar = Calendar.getInstance();
 //        calendar.setTimeInMillis(timeInMillis);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         return simpleDateFormat.format(new Date(timeInMillis));
     }
 
@@ -1325,7 +1328,7 @@ public class Utils {
     public static Calendar getReminderTime() {
         Calendar calendar = Calendar.getInstance();
         String time = SharedPrefsManager.getInstance().getString(Constants.REMINDER_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         try {
             calendar.setTimeInMillis(simpleDateFormat.parse(time).getTime());
         } catch (ParseException e) {
@@ -1647,7 +1650,7 @@ public class Utils {
 
     public static File createImageFile(Context context) throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -1910,11 +1913,11 @@ public class Utils {
         // just to change the format from dd/MM/yyyy to dd-MM-yyyy
         if(userDetails.getStreakCurrentDate().length()>0)
         {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
             try {
                 if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null")) {
                     Date streakDate = simpleDateFormat.parse(userDetails.getStreakCurrentDate());
-                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                     userDetails.setStreakCurrentDate(simpleDateFormat2.format(streakDate));
                 }
             } catch (Exception e) {
@@ -1928,7 +1931,7 @@ public class Utils {
             try {
                 if (userDetails.getStreakCurrentDate() != null
                         && userDetails.getStreakCurrentDate().length() > 0) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                     Date streakDate;
                     if(userDetails.getStreakCurrentDate()!=null && !userDetails.getStreakCurrentDate().equals("null"))
                     {
@@ -2080,7 +2083,7 @@ public class Utils {
     public static String dateToString(Date date) {
         String dateString = null;
         try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
             dateString = simpleDateFormat.format(date);
         }catch (Exception e)
         {
@@ -2092,7 +2095,7 @@ public class Utils {
 
     public static Date stringToDate(String dateString) {
         Date date = null;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         try {
             if(dateString!=null && !dateString.equals("null"))
             date = simpleDateFormat.parse(dateString);
@@ -2110,5 +2113,17 @@ public class Utils {
     public static int pxToDp(int px)
     {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static NotificationCompat.Builder createChannelForNotification(Context context,String description) {
+        CharSequence name = context.getString(R.string.channel_name);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel(context.getString(R.string.channel_name), name, importance);
+        channel.setDescription(description);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+        return new NotificationCompat.Builder(context,context.getString(R.string.channel_name));
     }
 }
