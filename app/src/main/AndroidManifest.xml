@@ -225,12 +225,12 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".tracking.workout.service.WorkoutServiceRetainerAlarm" android:exported="true">
-            <intent-filter>
-                <action android:name="com.sharesmile.share.gps.START_ALARM" >
-                </action>
-            </intent-filter>
-        </receiver>
+        <!-- <receiver android:name=".tracking.workout.service.WorkoutServiceRetainerAlarm" android:exported="true">
+             <intent-filter>
+                 <action android:name="com.sharesmile.share.gps.START_ALARM" >
+                 </action>
+             </intent-filter>
+         </receiver>-->
 
         <receiver android:name=".tracking.activityrecognition.InvokeActivityDetectionAlarm" android:exported="true">
             <intent-filter>

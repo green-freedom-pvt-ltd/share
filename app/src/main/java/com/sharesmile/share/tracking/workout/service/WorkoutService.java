@@ -13,39 +13,51 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.AchievedTitleDao;
-import com.sharesmile.share.Badge;
-import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.Category;
 import com.sharesmile.share.CategoryDao;
+import com.sharesmile.share.R;
 import com.sharesmile.share.Title;
 import com.sharesmile.share.TitleDao;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.home.settings.AfterBadgeWonNotificationReceiver;
-import com.sharesmile.share.home.settings.NotificationReceiver;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.TTS;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.sync.SyncService;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
-import com.sharesmile.share.tracking.workout.tracker.RunTracker;
-import com.sharesmile.share.tracking.workout.tracker.Tracker;
-import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.event.GpsStateChangeEvent;
 import com.sharesmile.share.tracking.event.MockLocationDetected;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
@@ -55,60 +67,39 @@ import com.sharesmile.share.tracking.event.UpdateUiOnMockLocation;
 import com.sharesmile.share.tracking.event.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.tracking.event.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.tracking.event.UsainBoltForceExit;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.R;
-import com.sharesmile.share.Workout;
-import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.config.ClientConfig;
-import com.sharesmile.share.core.config.Config;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.TTS;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.core.sync.SyncService;
-import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
 import com.sharesmile.share.tracking.google.tracker.GoogleFitTracker;
-import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.cause.model.CauseData;
-import com.sharesmile.share.tracking.workout.data.model.FraudData;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.tracking.stepcount.AndroidStepCounter;
+import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
 import com.sharesmile.share.tracking.stepcount.StepCounter;
 import com.sharesmile.share.tracking.vigilance.VigilanceTimer;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
+import com.sharesmile.share.tracking.workout.data.model.FraudData;
+import com.sharesmile.share.tracking.workout.tracker.RunTracker;
+import com.sharesmile.share.tracking.workout.tracker.Tracker;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.sharesmile.share.core.application.MainApplication.getContext;
-import static com.sharesmile.share.core.config.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_GPS_DISABLED;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USAIN_BOLT;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED_NOTIFICATION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
+import static com.sharesmile.share.core.application.MainApplication.getContext;
+import static com.sharesmile.share.core.config.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
@@ -116,10 +107,10 @@ import static com.sharesmile.share.core.notifications.NotificationActionReceiver
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
+import static com.sharesmile.share.tracking.ui.RunFragment.NOTIFICATION_TIMER_TICK;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_BAD;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_INACTIVE;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_OK;
-import static com.sharesmile.share.tracking.ui.RunFragment.NOTIFICATION_TIMER_TICK;
 
 //import com.squareup.leakcanary.RefWatcher;
 
@@ -228,7 +219,7 @@ public class WorkoutService extends Service implements
         workout.setIsValidRun(!data.isAutoFlagged());
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
-        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime(),true));
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), data.getDistance());
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
@@ -274,7 +265,7 @@ public class WorkoutService extends Service implements
         if (!currentlyTracking) {
             currentlyTracking = true;
             Logger.d(TAG, "startWorkout");
-            WorkoutServiceRetainerAlarm.setRepeatingAlarm(this);
+//            WorkoutServiceRetainerAlarm.setRepeatingAlarm(this);
             GoogleLocationTracker.getInstance().registerForWorkout(this);
             handler.removeCallbacks(handleGpsInactivityRunnable);
             handler.postDelayed(handleGpsInactivityRunnable, ClientConfig.getInstance().GPS_INACTIVITY_NOTIFICATION_DELAY);
@@ -357,7 +348,7 @@ public class WorkoutService extends Service implements
             stopTimer();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
-            WorkoutServiceRetainerAlarm.cancelAlarm(this);
+//            WorkoutServiceRetainerAlarm.cancelAlarm(this);
             if (stepCounter != null) {
                 stepCounter.stop();
             }
@@ -873,6 +864,14 @@ public class WorkoutService extends Service implements
         float totalDistanceKmsTwoDecimal = Float.parseFloat(Utils.formatToKmsWithTwoDecimal(totalDistance));
         if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= ClientConfig.getInstance().MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT) {
             // Send event only when the distance counter increment by 100 meters
+            int batLevel = -1;
+            boolean batterySaver = false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+                batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                batterySaver = powerManager.isPowerSaveMode();
+            }
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(getWorkoutBundle())
                     .put("delta_distance", deltaDistance) // in meters
@@ -880,6 +879,9 @@ public class WorkoutService extends Service implements
                     .put("delta_speed", deltaSpeed) // in km/hrs
                     .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                     .put("recent_speed", getCurrentSpeed())
+                    .put("bat_level", batLevel)
+                    .put("battery_saver_on", batterySaver)
+                    .put("android_os", Build.VERSION.SDK_INT)
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
@@ -1186,7 +1188,8 @@ public class WorkoutService extends Service implements
                 PendingIntent.FLAG_UPDATE_CURRENT);*/
         NotificationCompat.Builder mBuilder =null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           mBuilder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_workout));
+            mBuilder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.channel_description_workout),
+                    getContext().getString(R.string.channel_name_workout), false);
         }else
         {
             mBuilder = new NotificationCompat.Builder(this);

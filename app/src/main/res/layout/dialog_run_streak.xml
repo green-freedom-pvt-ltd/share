@@ -73,6 +73,7 @@
                         android:textSize="58sp" />
 
                     <com.sharesmile.share.views.LBITextView
+                        android:id="@+id/tv_streak_count_days"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"

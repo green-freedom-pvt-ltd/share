@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.R;
@@ -41,7 +40,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             NotificationCompat.Builder mBuilder =null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mBuilder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_general));
+                mBuilder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.channel_description_general),
+                        context.getString(R.string.channel_name_general), true);
             }else
             {
                 mBuilder = new NotificationCompat.Builder(getContext());

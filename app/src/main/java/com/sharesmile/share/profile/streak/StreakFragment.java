@@ -67,6 +67,8 @@ public class StreakFragment extends BaseFragment {
 
     @BindView(R.id.tv_streak_count)
     TextView streakCount;
+    @BindView(R.id.tv_streak_count_days)
+    TextView streakCountText;
 
     @BindView(R.id.iv_back)
     ImageView back;
@@ -140,6 +142,13 @@ public class StreakFragment extends BaseFragment {
             editGoal.setText("EDIT GOAL");
         }
         streakCount.setText(MainApplication.getInstance().getUserDetails().getStreakCount()+"");
+        if(MainApplication.getInstance().getUserDetails().getStreakCount()==1)
+        {
+            streakCountText.setText("Day Streak");
+        }else
+        {
+            streakCountText.setText("Days Streak");
+        }
         streakGoalIconsLayout.removeAllViews();
         for (Goal goal :
                 goals) {
