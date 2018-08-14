@@ -20,7 +20,6 @@ import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.R;
@@ -167,7 +166,8 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
         NotificationCompat.Builder builder =null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder = Utils.createChannelForNotification(getContext(),getContext().getString(R.string.channel_description_workout));
+            builder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.channel_description_workout)
+                    , getContext().getString(R.string.channel_name_workout), true);
         }else
         {
             builder = new NotificationCompat.Builder(getContext());

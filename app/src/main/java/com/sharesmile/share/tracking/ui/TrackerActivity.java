@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -25,18 +26,18 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.base.PermissionCallback;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
-import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
-import com.sharesmile.share.tracking.workout.service.WorkoutService;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.base.BaseActivity;
+import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
+import com.sharesmile.share.tracking.models.WorkoutData;
+import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.workout.service.WorkoutService;
 import com.sharesmile.share.utils.Utils;
 
 import java.io.File;
@@ -329,7 +330,12 @@ public class TrackerActivity extends BaseActivity {
     public void invokeWorkoutService() {
         Log.d(TAG, "invokeWorkoutService");
         Intent intent = new Intent(this, WorkoutService.class);
-        startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
+
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE
                 | Context.BIND_IMPORTANT);
     }
