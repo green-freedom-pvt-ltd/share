@@ -2,7 +2,6 @@ package com.sharesmile.share.tracking.workout.service;
 
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -53,6 +52,7 @@ import com.sharesmile.share.core.config.Config;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.settings.AfterBadgeWonNotificationReceiver;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
@@ -87,6 +87,8 @@ import com.sharesmile.share.utils.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.Date;

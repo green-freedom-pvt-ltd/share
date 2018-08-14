@@ -67,7 +67,8 @@ public class NotificationReceiver extends BroadcastReceiver {
             try {
                 NotificationCompat.Builder mBuilder;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mBuilder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.auto_notification_channel_description));
+                    mBuilder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.auto_notification_channel_description),
+                            context.getString(R.string.channel_name_general), true);
                 } else {
                     mBuilder = new NotificationCompat.Builder(context);
                 }
