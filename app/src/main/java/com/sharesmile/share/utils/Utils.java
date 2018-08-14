@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -30,7 +31,6 @@ import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.Spannable;
@@ -44,7 +44,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -62,35 +61,34 @@ import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.Badge;
 import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.BuildConfig;
+import com.sharesmile.share.R;
 import com.sharesmile.share.Title;
 import com.sharesmile.share.TitleDao;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.ShareImageLoader;
-import com.sharesmile.share.core.SharedPrefsManager;
-import com.sharesmile.share.core.base.ExpoBackoffTask;
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.cause.model.CauseData;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.home.settings.AlarmReceiver;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.profile.BodyWeightChangedEvent;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.cause.CauseDataStore;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.homescreen.OnboardingOverlay;
+import com.sharesmile.share.home.settings.AlarmReceiver;
 import com.sharesmile.share.home.settings.CurrencyCode;
 import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.profile.BodyWeightChangedEvent;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.views.CustomTypefaceSpan;
@@ -100,8 +98,6 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -575,7 +571,9 @@ public class Utils {
     public static void launchUri(Context context, Uri uri) {
         Logger.d(TAG, "Launching uri: " + uri.toString());
         try {
-            context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         } catch (android.content.ActivityNotFoundException e) {
             Logger.d(TAG, "Couldn't launchUri: " + uri.toString());
         }
@@ -2115,15 +2113,35 @@ public class Utils {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public static NotificationCompat.Builder createChannelForNotification(Context context,String description) {
-        CharSequence name = context.getString(R.string.channel_name);
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel(context.getString(R.string.channel_name), name, importance);
+    public static NotificationCompat.Builder createChannelForNotification(Context context, String description, String channelName, boolean soundNVibrate) {
+
+        int importance;
+//        if(soundNVibrate)
+        importance = NotificationManager.IMPORTANCE_DEFAULT;
+//        else
+//            importance = NotificationManager.IMPORTANCE_LOW;
+
+        NotificationChannel channel = new NotificationChannel(channelName,
+                channelName, importance);
         channel.setDescription(description);
+        if (soundNVibrate) {
+
+            Uri uri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.slow_spring_board);
+
+            AudioAttributes att = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build();
+            channel.setSound(uri, att);
+            channel.enableVibration(true);
+        } else {
+            channel.setSound(null, null);
+            channel.enableVibration(false);
+        }
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
-        return new NotificationCompat.Builder(context,context.getString(R.string.channel_name));
+        return new NotificationCompat.Builder(context, channelName);
     }
 }

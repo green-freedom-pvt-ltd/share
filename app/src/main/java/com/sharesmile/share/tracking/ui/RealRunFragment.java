@@ -17,21 +17,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.IFragmentController;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
-import com.sharesmile.share.tracking.share.ShareFragment;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.tracking.models.Calorie;
-import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
+import com.sharesmile.share.tracking.models.Calorie;
+import com.sharesmile.share.tracking.models.WorkoutData;
+import com.sharesmile.share.tracking.share.ShareFragment;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
@@ -182,9 +182,11 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void updateTimeView(String newTime) {
-        time.setText(newTime);
-        if (newTime.length() > 5) {
-            mTimerIndicator.setText("HR:MIN:SEC");
+        if (isVisible()) {
+            time.setText(newTime);
+            if (newTime.length() > 5) {
+                mTimerIndicator.setText("HR:MIN:SEC");
+            }
         }
     }
 
