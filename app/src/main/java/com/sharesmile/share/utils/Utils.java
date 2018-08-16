@@ -1837,10 +1837,11 @@ public class Utils {
     public static synchronized void checkBadgeData(boolean b) {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges = badgeDao.queryBuilder().list();
-        if(badges!=null && badges.size()>0)
+        if (badges != null && badges.size() > 0 &&
+                SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
         {
             checkAchievedBadgeData(b);
-        }else
+        } else if (badges == null || badges.size() == 0)
         {
             SyncHelper.syncBadgesData();
         }
