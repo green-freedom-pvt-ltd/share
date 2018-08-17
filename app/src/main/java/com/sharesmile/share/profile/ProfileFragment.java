@@ -250,10 +250,12 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         if (forward) {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
         }
-        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
-        Utils.checkStreak(false);
+        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
+            Utils.checkStreak(false);
+            setCharityOverviewLoader();
+        }
         initUi();
-        setCharityOverviewLoader();
+
     }
 
     private void setStatsViewData() {
@@ -294,7 +296,6 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
     }
     private void setCharityOverviewLoader() {
         getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
-
     }
 
     @Override
