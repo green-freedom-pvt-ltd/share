@@ -250,8 +250,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         if (forward) {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
         }
+        Utils.checkStreak(false);
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
-            Utils.checkStreak(false);
             setCharityOverviewLoader();
         }
         initUi();

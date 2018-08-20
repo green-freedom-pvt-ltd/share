@@ -175,7 +175,7 @@ public class StreakFragment extends BaseFragment {
             streakDistance.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) distanceDiff*1000)+" "+UnitsManager.getDistanceLabel()+" left. Let's Go!");
         }
 
-        double progress;
+        double progress = 0;
         if(distanceDiff<=0 || userDetails.isStreakAdded())
             progress = 360;
         else
