@@ -5,11 +5,11 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.NumberPicker;
-import android.widget.RadioButton;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
@@ -84,6 +84,9 @@ public class FragmentSetReminder extends BaseFragment implements NumberPicker.On
         }
 
         String hour_s = hour<10?"0"+hour:hour+"";
+        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_SET_REMINDER_TIME)
+                .put("time", hour_s + ":" + minute)
+                .buildAndDispatch();
         Utils.setReminderTime(hour_s+":"+minute,getContext());
     }
 }

@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
@@ -164,6 +166,8 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
 
     private void continueAction(Fragment fragment) {
         if (fragment instanceof FragmentWelcome || fragment == null) {
+            replaceFragment(new FragmentGender(), true);
+            AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_WELCOME_CONTINUE).buildAndDispatch();
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             //TODO : hack
             if(true)
@@ -196,26 +200,37 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                     }
                 }else if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_GENDER_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentWeight) {
                     replaceFragment(new FragmentHeight(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_WEIGHT_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentHeight) {
                     replaceFragment(new FragmentBirthday(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_HEIGHT_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentBirthday) {
                     replaceFragment(new FragmentGoals(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_BIRTHDAY_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentGoals) {
                     replaceFragment(new FragmentAskReminder(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_GOAL_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentAskReminder) {
                     String continueText = continueTv.getText().toString();
                     if (continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
                         replaceFragment(new FragmentSetReminder(), true);
+                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_YES_ASK_REMINDER_VALUE_SELECT_CONTINUE).buildAndDispatch();
+                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_ASK_REMINDER_CONTINUE).buildAndDispatch();
                     } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
                         Utils.setReminderTime("", this);
                         replaceFragment(new FragmentThankYou(), true);
+                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_NO_ASK_REMINDER_VALUE_SELECT_CONTINUE).buildAndDispatch();
+                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_ASK_REMINDER_CONTINUE).buildAndDispatch();
                     }
                 } else if (fragment instanceof FragmentSetReminder) {
                     replaceFragment(new FragmentThankYou(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_SET_REMINDER_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentThankYou) {
                     SyncHelper.oneTimeUploadUserData();
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_THANK_YOU_CONTINUE).buildAndDispatch();
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

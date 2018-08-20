@@ -11,9 +11,7 @@ import android.graphics.Shader;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-
 import android.support.v4.content.ContextCompat;
-
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,7 +44,6 @@ import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.TitleDao;
-import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -55,7 +52,6 @@ import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
-import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
@@ -63,8 +59,8 @@ import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.profile.badges.InProgressBadgeFragment;
 import com.sharesmile.share.profile.badges.AchieviedBadgeFragment;
+import com.sharesmile.share.profile.badges.InProgressBadgeFragment;
 import com.sharesmile.share.profile.badges.SeeAchievedBadge;
 import com.sharesmile.share.profile.badges.adapter.AchievementsAdapter;
 import com.sharesmile.share.profile.badges.adapter.CharityOverviewProfileAdapter;
@@ -254,10 +250,12 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
         if (forward) {
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_ACHIEVED_BADGES_OPEN, false);
         }
-        if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE, false))
         Utils.checkStreak(false);
+        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
+            setCharityOverviewLoader();
+        }
         initUi();
-        setCharityOverviewLoader();
+
     }
 
     private void setStatsViewData() {
@@ -298,7 +296,6 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
     }
     private void setCharityOverviewLoader() {
         getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
-
     }
 
     @Override
@@ -418,7 +415,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, O
                 /*setUpBarChartAsync = new SetUpBarChartAsync();
                 setUpBarChartAsync.execute();*/
                 prepareStreakOnboardingOverlays();
-
+                if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
                 setAchivements();
             }
             ShareImageLoader.getInstance().setUseMemoryCache(true);

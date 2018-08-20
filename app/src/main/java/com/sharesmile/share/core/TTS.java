@@ -118,11 +118,11 @@ public final class TTS extends UtteranceProgressListener {
      */
     public boolean queueSpeech(String text){
         // Media-Player should lower volume:
-        int focus_res = am.requestAudioFocus(
-                afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
-        );
+//        int focus_res = am.requestAudioFocus(
+//                afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
+//        );
         // Talk:
-        if (focus_res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+//        if (focus_res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
             // Add the text to the queue:
             int queue_res = tts.speak(text, TextToSpeech.QUEUE_ADD, this.tts_params);
             if (queue_res == TextToSpeech.SUCCESS){
@@ -130,7 +130,7 @@ public final class TTS extends UtteranceProgressListener {
                 this.speech_count++;
                 return true;
             }
-        }
+//        }
         return false;
     }
 
