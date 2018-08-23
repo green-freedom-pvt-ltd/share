@@ -148,6 +148,8 @@ public class Constants {
     public static final String PREF_IS_REMINDER_DISABLE = "pref_is_reminder_disable";
     public static final String PREF_TOTAL_RUN = "pref_total_run_count";
     public static final String PREF_TOTAL_IMPACT = "pref_total_impact";
+    public static final String PREF_REFERRAL_CODE = "pref_referral_code";
+    public static final String PREF_SHOW_CONFETTI = "pref_show_confetti";
 
     //notification
     public static final String PREF_NOTIFICATION_MAX_STREAK_SHOWN = "pref_notification_max_streak_shown";

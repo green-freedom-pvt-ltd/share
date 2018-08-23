@@ -1464,7 +1464,7 @@ public class SyncService extends GcmTaskService {
         int result;
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("results").toString();
+            String responseString = response.getAsJsonObject("result").toString();
             Logger.d(TAG, "getStreak response : " + responseString);
             JSONObject jsonObject = new JSONObject(responseString);
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();

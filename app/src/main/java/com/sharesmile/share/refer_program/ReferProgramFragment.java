@@ -135,7 +135,9 @@ public class ReferProgramFragment extends BaseFragment{
                 }
                 Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
                         getString(R.string.share_msg) + " Use this code : " + shareCode.getText().toString());
+
                 break;
         }
     }
+
 }

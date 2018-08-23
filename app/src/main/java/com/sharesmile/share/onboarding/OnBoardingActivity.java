@@ -4,14 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
@@ -20,7 +24,6 @@ import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.base.PermissionCallback;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.fragments.FragmentAskReferCode;
 import com.sharesmile.share.onboarding.fragments.FragmentAskReminder;
 import com.sharesmile.share.onboarding.fragments.FragmentBirthday;
@@ -29,16 +32,22 @@ import com.sharesmile.share.onboarding.fragments.FragmentGender;
 import com.sharesmile.share.onboarding.fragments.FragmentGoals;
 import com.sharesmile.share.onboarding.fragments.FragmentHeight;
 import com.sharesmile.share.onboarding.fragments.FragmentSetReminder;
+import com.sharesmile.share.onboarding.fragments.FragmentSomethingIsCooking;
 import com.sharesmile.share.onboarding.fragments.FragmentThankYou;
 import com.sharesmile.share.onboarding.fragments.FragmentWeight;
 import com.sharesmile.share.onboarding.fragments.FragmentWelcome;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 
@@ -63,6 +72,18 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     @BindView(R.id.level_progress_bar)
     View levelProgressBar;
 
+    @BindView(R.id.view_konfetti)
+    KonfettiView viewKonfetti;
+
+    @BindView(R.id.onboarding_rl)
+    RelativeLayout onboardingRL;
+
+    @BindView(R.id.main_frame_layout_onboarding)
+    FrameLayout mainFrameLayoutOnboarding;
+
+    @BindView(R.id.onboarding_activity_layout)
+    LinearLayout onboardingActivityLayout;
+
     private static final String TAG = "OnBoardingActivity";
 
     @Override
@@ -74,6 +95,13 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         ButterKnife.bind(this);
         MainApplication.getInstance().setGoalDetails(null);
         loadInitialFragment();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -156,7 +184,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 int i = getSupportFragmentManager().getBackStackEntryCount();
 
                 if (i == 0) {
-                    setBackAndContinue(FragmentWelcome.TAG, getResources().getString(R.string.start_my_journey_txt));
+                    setBackAndContinue(FragmentWelcome.TAG, getResources().getString(R.string.continue_without_code_txt));
                 } else {
                     Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
                 }
@@ -168,21 +196,13 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         if (fragment instanceof FragmentWelcome || fragment == null) {
             replaceFragment(new FragmentGender(), true);
             AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_WELCOME_CONTINUE).buildAndDispatch();
-            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            //TODO : hack
-            if(true)
-            {
-                setProgressLevel(0);
-                replaceFragment(new FragmentAskReferCode(), true);
-            }else {
-                replaceFragment(new FragmentGender(), true);
-            }
+            replaceFragment(new FragmentGender(), true);
+
         } else {
             if (continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10)) {
                 MainApplication.showToast(getResources().getString(R.string.select_an_option));
             } else {
-                if(fragment instanceof FragmentAskReferCode)
-                {
+                /*if (fragment instanceof FragmentAskReferCode) {
                     String continueText = continueTv.getText().toString();
                     if (continueText.equalsIgnoreCase(getResources().getString(R.string.refer_code_continue_txt))) {
                         replaceFragment(new FragmentEnterReferCode(), true);
@@ -190,15 +210,14 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                         replaceFragment(new FragmentGender(), true);
                     }
 
-                }else if(fragment instanceof FragmentEnterReferCode)
-                {
-                    if(continueTv.getText().toString().equals(getResources().getString(R.string.verify_txt)))
-                    {
+                } else if (fragment instanceof FragmentEnterReferCode) {
+                    if (continueTv.getText().toString().equals(getResources().getString(R.string.verify_txt))) {
                         EventBus.getDefault().post(new UpdateEvent.OnCodeVerify());
-                    }else if(continueTv.getText().toString().equals(getResources().getString(R.string.continue_txt))){
+                    } else if (continueTv.getText().toString().equals(getResources().getString(R.string.continue_txt))) {
                         replaceFragment(new FragmentGender(), true);
                     }
-                }else if (fragment instanceof FragmentGender) {
+                } else */
+                if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
                     AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_GENDER_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentWeight) {
@@ -258,6 +277,8 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         backTv.setVisibility(View.VISIBLE);
         continueTv.setVisibility(View.VISIBLE);
         setContinueTextColor(R.color.white);
+        setBg(true);
+        setWeights(false);
         switch (name) {
             case FragmentWelcome.TAG:
                 backTv.setVisibility(View.INVISIBLE);
@@ -265,6 +286,16 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                 continueTv.setText(continueTextName);
                 onboardingQuestion.setVisibility(View.GONE);
                 progressLayout.setVisibility(View.GONE);
+                setBg(false);
+                break;
+
+            case FragmentSomethingIsCooking.TAG:
+                setWeights(true);
+                backTv.setVisibility(View.INVISIBLE);
+                continueTv.setVisibility(View.INVISIBLE);
+                onboardingQuestion.setVisibility(View.INVISIBLE);
+                progressLayout.setVisibility(View.GONE);
+
                 break;
             case FragmentAskReferCode.TAG:
 //                setProgressLevel(1.0f);
@@ -307,6 +338,24 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         }
     }
 
+    private void setWeights(boolean b) {
+        if (b) {
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 0);
+            onboardingQuestion.setLayoutParams(layoutParams);
+            progressLayout.setLayoutParams(layoutParams);
+            LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1);
+            mainFrameLayoutOnboarding.setLayoutParams(layoutParams2);
+            onboardingActivityLayout.setGravity(Gravity.CENTER);
+        } else {
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 0.1f);
+            onboardingQuestion.setLayoutParams(layoutParams);
+            progressLayout.setLayoutParams(layoutParams);
+            LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 0.8f);
+            mainFrameLayoutOnboarding.setLayoutParams(layoutParams2);
+            onboardingActivityLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        }
+    }
+
     @Override
     public void setContinueTextColor(int color) {
         continueTv.setTextColor(getResources().getColor(color));
@@ -315,5 +364,35 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     public void setProgressLevel(float weight) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, weight / 9);
         levelProgressBar.setLayoutParams(layoutParams);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnCodeVerified onCodeVerified) {
+        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_CONFETTI, true)) {
+            viewKonfetti.setVisibility(View.VISIBLE);
+            viewKonfetti.build()
+                    .addColors(getResources().getColor(R.color.bright_blue),
+                            getResources().getColor(R.color.light_blue),
+                            getResources().getColor(R.color.light_green),
+                            getResources().getColor(R.color.medium_bright_blue),
+                            getResources().getColor(R.color.pale_bright_blue))
+                    .setDirection(0.0, 359.0)
+                    .setSpeed(1f, 5f)
+                    .setFadeOutEnabled(true)
+                    .setTimeToLive(2000L)
+                    .addShapes(Shape.RECT, Shape.CIRCLE)
+                    .addSizes(new Size(12, 5))
+                    .setPosition(-50f, 1000f, -50f, -50f)
+                    .streamFor(300, 5000L);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_CONFETTI, false);
+        }
+    }
+
+    public void setBg(boolean b) {
+        if (b) {
+            onboardingRL.setBackgroundResource(R.drawable.onboarding_bg);
+        } else {
+            onboardingRL.setBackgroundResource(R.drawable.welcome_bg);
+        }
     }
 }

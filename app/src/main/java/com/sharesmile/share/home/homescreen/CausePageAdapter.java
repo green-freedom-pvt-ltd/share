@@ -5,8 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.cause.model.CauseData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,17 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int i) {
         Logger.d(TAG, "getItem #" + i);
-        Fragment frag = CauseSwipeFragment.getInstance(mData.get(i));
+        CauseData causeData = mData.get(i);
+
+        Fragment frag;
+        frag = CauseSwipeFragment.getInstance(causeData); // temp
+        /*if(causeData.getId()!=-1)
+        {
+         frag = CauseSwipeFragment.getInstance(causeData);
+        }else
+        {
+            frag = new ReferProgramFragment();
+        }*/
         return frag;
     }
 

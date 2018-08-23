@@ -6,8 +6,6 @@ package com.sharesmile.share.home.homescreen;
 
 
 import android.animation.ValueAnimator;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
@@ -24,15 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.sharesmile.share.AchievedBadge;
-import com.sharesmile.share.AchievedBadgeDao;
-import com.sharesmile.share.AchievedTitle;
-import com.sharesmile.share.AchievedTitleDao;
-import com.sharesmile.share.Badge;
-import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
-import com.sharesmile.share.Title;
-import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
@@ -45,27 +35,14 @@ import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -434,11 +411,14 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
         CauseDataStore.getInstance().sortCauses(causes);
 
-        StringBuilder sb = new StringBuilder("Cause cards: ");
-        for (CauseData cause : causes){
-            sb.append(cause.getTitle() + ", ");
+        for (int i = 0; i < causes.size(); i++) {
+            if (causes.get(i).isCompleted()) {
+                CauseData causeData = new CauseData();
+                causeData.setId(-1);
+                causes.add(i, causeData);
+                break;
+            }
         }
-        Logger.d(TAG, "setCausedata: " + sb.toString());
 
         mAdapter.setData(causes);
         setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());

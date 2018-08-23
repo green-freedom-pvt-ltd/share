@@ -1,12 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:background="@drawable/onboarding_bg"
-    >
+    android:id="@+id/onboarding_rl">
 
     <RelativeLayout
         android:visibility="visible"
@@ -22,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:weightSum="1"
+            android:id="@+id/onboarding_activity_layout"
             >
         <com.sharesmile.share.views.LBTextView
             android:layout_width="wrap_content"
@@ -38,6 +38,7 @@
                 android:layout_height="0dip"
                 android:layout_weight="0.1"
                 android:gravity="center"
+
                 >
         <FrameLayout
             android:layout_below="@+id/onboarding_question_tv"
@@ -112,4 +113,10 @@
             android:paddingTop="5dp"
             />
     </RelativeLayout>
+
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/view_konfetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -52,7 +52,9 @@ public class AfterBadgeWonNotificationReceiver extends BroadcastReceiver {
             try {
                 NotificationCompat.Builder mBuilder;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mBuilder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.auto_notification_channel_description));
+                    mBuilder = Utils.createChannelForNotification(getContext(),
+                            getContext().getString(R.string.channel_name_general)
+                            , getContext().getString(R.string.auto_notification_channel_description), true);
                 } else {
                     mBuilder = new NotificationCompat.Builder(context);
                 }

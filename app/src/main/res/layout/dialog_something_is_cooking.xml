@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="3dp"
+        android:paddingBottom="24dp"
+        android:background="@drawable/something_is_cooking_bg"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/lato_regular"
+            android:text="X"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:paddingTop="3dp"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            android:id="@+id/close"
+            android:layout_gravity="right"
+            android:layout_marginRight="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/something_is_cooking"
+            android:textSize="28sp"
+            android:textColor="@color/white"
+            android:layout_marginRight="11dp"
+            android:layout_marginLeft="11dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:fontFamily="@font/austhina_brush_calligraphy_scratch"
+            android:letterSpacing="0.01"
+            android:lineSpacingExtra="10sp"
+
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/each_shared_a_meal"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:fontFamily="@font/lato_regular"
+            android:letterSpacing="0.01"
+            android:layout_marginBottom="21dp"
+            android:layout_marginRight="21dp"
+            android:layout_marginLeft="21dp"
+
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="20dp">
+
+            <com.sharesmile.share.views.CircularImageView
+                android:id="@+id/profile_pic_1"
+                android:layout_width="89.1dp"
+                android:layout_height="89.1dp"
+                android:src="@drawable/placeholder_profile"
+                android:layout_marginRight="41dp"
+
+                />
+
+            <com.sharesmile.share.views.CircularImageView
+                android:id="@+id/profile_pic_2"
+                android:layout_width="89.1dp"
+                android:layout_height="89.1dp"
+                android:src="@drawable/placeholder_profile" />
+        </LinearLayout>
+
+        <TextView
+            android:fontFamily="@font/lato_regular"
+            android:layout_marginRight="19dp"
+            android:layout_marginLeft="19dp"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/something_is_cooking_description_new_user"
+            android:gravity="center"
+            android:letterSpacing="0.01"
+            android:lineSpacingExtra="5sp"
+            android:layout_marginBottom="23dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/continue_txt"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:id="@+id/continue_tv" />
+    </LinearLayout>
+</LinearLayout>
