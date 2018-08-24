@@ -1,24 +1,12 @@
 package com.sharesmile.share.leaderboard.referprogram;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.common.BaseLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
-import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
-import com.sharesmile.share.leaderboard.global.model.LeaderBoardData;
-import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
 import com.sharesmile.share.leaderboard.referprogram.model.ReferProgramBoard;
 import com.sharesmile.share.refer_program.model.ReferProgramList;
 
@@ -28,12 +16,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-
-import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.ALL_TIME_INTERVAL;
-import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.LAST_MONTH_INTERVAL;
-import static com.sharesmile.share.leaderboard.LeaderBoardDataStore.LAST_WEEK_INTERVAL;
 
 /**
  * Created by parth on 17/6/18.
@@ -75,7 +57,7 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
     @Override
     protected void setupToolbar() {
 //        setHasOptionsMenu(true);
-        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge));
+        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge_title));
         getFragmentController().setToolbarElevation(0);
     }
 

@@ -106,4 +106,6 @@
     <color name="Smooch_userMessageBorder">@color/Smooch_accentDark</color>
     <color name="Smooch_userMessageFailedBackground">@color/Smooch_accentLight</color>
     <color name="Smooch_userMessageText">#ffffff</color>
+
+    <color name="clr_12916c">#12916c</color>
 </resources>

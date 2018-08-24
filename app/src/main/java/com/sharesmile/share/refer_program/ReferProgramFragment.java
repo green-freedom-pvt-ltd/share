@@ -77,7 +77,7 @@ public class ReferProgramFragment extends BaseFragment{
 
     private void setupToolbar() {
         setHasOptionsMenu(true);
-        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge));
+        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge_title));
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
