@@ -5,112 +5,94 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:background="@drawable/greenboard"
     >
-    <com.sharesmile.share.views.LBTextView
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/share_a_meal_challenge_header"
+        android:text="@string/share_a_meal_challenge_title"
         android:gravity="center"
-        android:textColor="@color/black_64"
-        android:textSize="28sp"
-        android:layout_weight="2"
+        android:textColor="@color/white"
+        android:textSize="32sp"
+        android:fontFamily="@font/chalkduster"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         />
-    <ImageView
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/badge_image"
-        />
-    <com.sharesmile.share.views.LBTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/share_a_meal_challenge_text"
+        android:text="@string/powered_by"
         android:gravity="center"
-        android:textColor="@color/black_50"
-        android:textSize="@dimen/text_size_16sp"
-        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:fontFamily="@font/chalkduster"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="8dp"
         />
+
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="1"
+        android:layout_marginBottom="16dp">
+
+        <View
+            android:layout_width="0dip"
+            android:layout_height="1dp"
+            android:background="@color/white"
+            android:layout_weight="0.35" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_your_referral_code"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:fontFamily="@font/lato_regular" />
+
+        <View
+            android:layout_width="0dip"
+            android:layout_height="1dp"
+            android:background="@color/white"
+            android:layout_weight="0.35" />
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/share_code_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/refer_code_bg"
+        android:layout_marginBottom="22dp"
         >
         <com.sharesmile.share.views.LBTextView
             android:id="@+id/share_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="NIKHI98564"
-            android:textSize="18dp"
+            android:textSize="16dp"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
             android:paddingRight="30dp"
             android:paddingLeft="30dp"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/white"
             />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_share_white_24px"
+            app:srcCompat="@drawable/ic_share_green_24px"
             android:background="@drawable/refer_code_share_bg"
             android:padding="15dp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:gravity="center"
-        android:layout_marginRight="50dp"
-        android:layout_marginLeft="50dp"
-        android:weightSum="4"
-        >
-        <com.sharesmile.share.views.LRTextView
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:text="@string/facebook"
-            android:drawableTop="@drawable/facebook"
-            android:textColor="@color/black_38"
-            android:textSize="12sp"
-            android:drawablePadding="15dp"
-            android:id="@+id/share_facebook"
-            android:layout_weight="1"
-            android:gravity="center"
-            />
-        <com.sharesmile.share.views.LRTextView
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:text="@string/whatsapp"
-            android:drawableTop="@drawable/facebook"
-            android:textColor="@color/black_38"
-            android:textSize="12sp"
-            android:drawablePadding="15dp"
-            android:id="@+id/share_whatsapp"
-            android:layout_weight="1"
-            android:gravity="center"
-            />
-        <com.sharesmile.share.views.LRTextView
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:text="@string/twitter"
-            android:drawableTop="@drawable/facebook"
-            android:textColor="@color/black_38"
-            android:textSize="12sp"
-            android:drawablePadding="15dp"
-            android:id="@+id/share_twitter"
-            android:layout_weight="1"
-            android:gravity="center"
-            />
-        <com.sharesmile.share.views.LRTextView
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:text="@string/gmail"
-            android:drawableTop="@drawable/facebook"
-            android:textColor="@color/black_38"
-            android:textSize="12sp"
-            android:drawablePadding="15dp"
-            android:id="@+id/share_gmail"
-            android:layout_weight="1"
-            android:gravity="center"
             />
     </LinearLayout>
 </LinearLayout>

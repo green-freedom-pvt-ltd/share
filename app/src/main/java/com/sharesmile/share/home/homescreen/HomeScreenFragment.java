@@ -410,14 +410,20 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             Snackbar.make(mContentView, getString(R.string.some_error_occurred), Snackbar.LENGTH_INDEFINITE).show();
         }
         CauseDataStore.getInstance().sortCauses(causes);
-
+        boolean b = false;
         for (int i = 0; i < causes.size(); i++) {
             if (causes.get(i).isCompleted()) {
                 CauseData causeData = new CauseData();
                 causeData.setId(-1);
                 causes.add(i, causeData);
+                b = true;
                 break;
             }
+        }
+        if (!b) {
+            CauseData causeData = new CauseData();
+            causeData.setId(-1);
+            causes.add(causeData);
         }
 
         mAdapter.setData(causes);

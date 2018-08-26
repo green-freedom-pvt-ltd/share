@@ -48,6 +48,7 @@ import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.badges.model.Badge;
 import com.sharesmile.share.profile.badges.model.Title;
+import com.sharesmile.share.profile.streak.model.Streak;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
@@ -1422,7 +1423,7 @@ public class SyncService extends GcmTaskService {
 
         try {
             JsonObject response = NetworkDataProvider.doGetCall(Urls.getImpactOverviewUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("results").toString();
+            String responseString = response./*getAsJsonObject("results").*/toString();
             Logger.d(TAG, "getCharityOverviewData response : " + responseString);
             SharedPrefsManager.getInstance().setString(Constants.PREF_CHARITY_OVERVIEW, responseString);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, false);
@@ -1463,15 +1464,19 @@ public class SyncService extends GcmTaskService {
     private static int getStreak() {
         int result;
         try {
-            JsonObject response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), JsonObject.class);
-            String responseString = response.getAsJsonObject("result").toString();
-            Logger.d(TAG, "getStreak response : " + responseString);
-            JSONObject jsonObject = new JSONObject(responseString);
+            Streak response = NetworkDataProvider.doGetCall(Urls.getStreakUrl(), Streak.class);
+//            String responseString = response.getAsJsonObject("result").toString();
+            Logger.d(TAG, "getStreak response : " + response);
+//            JSONObject jsonObject = new JSONObject(response.getResponse().toString());
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            userDetails.setStreakMaxCount(jsonObject.optInt("max_streak", 0));
+            userDetails.setStreakMaxCount(response.getMaxStreak());
+            userDetails.setStreakCount(response.getCurrentStreak());
+            userDetails.setStreakCurrentDate(response.getCurrentStreakDate());
+            userDetails.setStreakAdded(response.isStreakAdded());
+            /*userDetails.setStreakMaxCount(jsonObject.optInt("max_streak", 0));
             userDetails.setStreakCount(jsonObject.optInt("current_streak", 0));
             userDetails.setStreakCurrentDate(jsonObject.optString("current_streak_date", ""));
-            userDetails.setStreakAdded(jsonObject.optBoolean("streak_added", false));
+            userDetails.setStreakAdded(jsonObject.optBoolean("streak_added", false));*/
             MainApplication.getInstance().setUserDetails(userDetails);
 
             result = ExpoBackoffTask.RESULT_SUCCESS;
@@ -1513,8 +1518,8 @@ public class SyncService extends GcmTaskService {
     private static int getAchievedBadgeData() {
         int result;
         try {
-            JsonObject response = NetworkDataProvider.doGetCall(Urls.getAchievementUrl(), JsonObject.class);
-            String responseString = response.getAsJsonArray("results").toString();
+            JsonArray response = NetworkDataProvider.doGetCall(Urls.getAchievementUrl(), JsonArray.class);
+            String responseString = response.toString();
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
@@ -1608,8 +1613,8 @@ public class SyncService extends GcmTaskService {
     private static int getAchievedTitleData() {
         int result;
         try {
-            JsonObject response = NetworkDataProvider.doGetCall(Urls.getTitlesUrl(), JsonObject.class);
-            String responseString = response.getAsJsonArray("results").toString();
+            JsonArray response = NetworkDataProvider.doGetCall(Urls.getTitlesUrl(), JsonArray.class);
+            String responseString = response/*.getAsJsonArray("results")*/.toString();
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper().getAchievedTitleDao();
             CategoryDao categoryDao = MainApplication.getInstance().getDbWrapper().getCategoryDao();

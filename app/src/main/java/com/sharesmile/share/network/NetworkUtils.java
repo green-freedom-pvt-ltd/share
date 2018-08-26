@@ -7,6 +7,7 @@ import android.telephony.TelephonyManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 
 import java.io.IOException;
@@ -114,6 +115,15 @@ public class NetworkUtils {
 
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
+        com.sharesmile.share.core.Response serverResponse = gson.fromJson(responseString, com.sharesmile.share.core.Response.class);
+        switch (serverResponse.getCode()) {
+            case Constants.SUCCESS_GET:
+                return gson.fromJson(serverResponse.getResponse().toString(), tClass);
+            case Constants.SUCCESS_POST:
+
+                break;
+
+        }
         try{
             return gson.fromJson(responseString, tClass);
         }catch(JsonSyntaxException jse){
@@ -130,7 +140,15 @@ public class NetworkUtils {
 
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
+        com.sharesmile.share.core.Response serverResponse = gson.fromJson(responseString, com.sharesmile.share.core.Response.class);
+        switch (serverResponse.getCode()) {
+            case Constants.SUCCESS_GET:
+                return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
+            case Constants.SUCCESS_POST:
 
+                break;
+
+        }
         try{
             return gson.fromJson(responseString, typeOfT);
         }catch(JsonSyntaxException jse){

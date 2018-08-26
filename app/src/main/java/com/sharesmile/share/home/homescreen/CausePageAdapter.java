@@ -30,14 +30,13 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
         CauseData causeData = mData.get(i);
 
         Fragment frag;
-        frag = CauseSwipeFragment.getInstance(causeData); // temp
-        /*if(causeData.getId()!=-1)
+        if (causeData.getId() != -1)
         {
          frag = CauseSwipeFragment.getInstance(causeData);
         }else
         {
-            frag = new ReferProgramFragment();
-        }*/
+            frag = SMCSwipeFragment.getInstance();
+        }
         return frag;
     }
 

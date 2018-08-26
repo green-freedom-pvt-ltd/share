@@ -1,9 +1,5 @@
 package com.sharesmile.share.refer_program;
 
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -20,15 +16,9 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
 import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.utils.ShareUtils;
-import com.sharesmile.share.utils.Utils;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class ReferProgramFragment extends BaseFragment{
 
@@ -38,14 +28,7 @@ public class ReferProgramFragment extends BaseFragment{
     TextView shareCode;
     @BindView(R.id.share_code_layout)
     LinearLayout shareCodeLayout;
-    @BindView(R.id.share_facebook)
-    TextView shareFacebook;
-    @BindView(R.id.share_whatsapp)
-    TextView shareWhatsapp;
-    @BindView(R.id.share_twitter)
-    TextView shareTwitter;
-    @BindView(R.id.share_gmail)
-    TextView shareGmail;
+
 
 
     @Nullable
@@ -97,7 +80,7 @@ public class ReferProgramFragment extends BaseFragment{
         }
     }
 
-    @OnClick({R.id.share_facebook, R.id.share_whatsapp, R.id.share_twitter, R.id.share_gmail, R.id.share_code_layout})
+   /* @OnClick({R.id.share_facebook, R.id.share_whatsapp, R.id.share_twitter, R.id.share_gmail, R.id.share_code_layout})
     public void onShare(View view)
     {
         switch (view.getId())
@@ -138,6 +121,6 @@ public class ReferProgramFragment extends BaseFragment{
 
                 break;
         }
-    }
+    }*/
 
 }

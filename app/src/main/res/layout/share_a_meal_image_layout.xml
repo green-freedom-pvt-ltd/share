@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:id="@+id/smc_swipe_layout">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/lato_regular"
+            android:text="x"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            android:id="@+id/close"
+            android:layout_marginRight="12dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_a_meal_challenge"
+            android:textSize="24sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:fontFamily="@font/chalkduster"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="10dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/powered_by"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:fontFamily="@font/chalkduster"
+        android:letterSpacing="0.01"
+        android:layout_marginRight="21dp"
+        android:layout_marginLeft="21dp"
+        android:id="@+id/powered_by_tv" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/bacha_plate" />
+
+    <TextView
+        android:fontFamily="@font/lato_regular"
+        android:layout_marginRight="19dp"
+        android:layout_marginLeft="19dp"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/share_a_meal_challenge_description"
+        android:gravity="center"
+        android:id="@+id/share_a_meal_desc" />
+
+    <TextView
+        android:id="@+id/share_a_meal_total_meals"
+        android:fontFamily="@font/lato_bold"
+        android:layout_marginRight="19dp"
+        android:layout_marginLeft="19dp"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/total_meals_by_you"
+        android:gravity="center"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
