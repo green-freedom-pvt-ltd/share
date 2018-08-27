@@ -3,7 +3,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/greenboard"
     android:paddingRight="21dp">
 
     <LinearLayout
@@ -14,7 +13,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:layout_marginLeft="46dp">
 
@@ -34,8 +33,10 @@
                     android:textSize="48sp"
                     android:textColor="#32ffffff"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginTop="-20dp"
-                    android:fontFamily="@font/lato_bold" />
+                    android:fontFamily="@font/lato_bold"
+
+                    />
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -59,11 +60,6 @@
         android:layout_weight="1"
         android:gravity="center_vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -84,7 +80,6 @@
                 android:textSize="48sp"
                 android:textColor="#32ffffff"
                 android:layout_toLeftOf="@id/smc_icon_2"
-                android:layout_marginTop="-13dp"
                 android:layout_marginRight="5dp" />
 
             <ImageView
@@ -94,7 +89,6 @@
                 android:src="@drawable/smc_icon_2"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true" />
-        </RelativeLayout>
     </RelativeLayout>
 
     <LinearLayout
@@ -105,7 +99,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:layout_marginLeft="28dp">
 
@@ -116,7 +110,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
                 <com.sharesmile.share.views.LBKTextView
                     android:layout_width="wrap_content"
@@ -124,7 +118,6 @@
                     android:text="3"
                     android:textSize="48sp"
                     android:textColor="#32ffffff"
-                    android:layout_marginTop="-23dp"
                     android:fontFamily="@font/lato_bold" />
 
                 <TextView

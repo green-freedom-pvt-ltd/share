@@ -2,16 +2,21 @@ package com.sharesmile.share.refer_program;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
@@ -19,6 +24,7 @@ import com.sharesmile.share.login.UserDetails;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ReferProgramFragment extends BaseFragment{
 
@@ -28,7 +34,15 @@ public class ReferProgramFragment extends BaseFragment{
     TextView shareCode;
     @BindView(R.id.share_code_layout)
     LinearLayout shareCodeLayout;
-
+    @BindView(R.id.smc_leaderboard)
+    RelativeLayout smcLeaderboard;
+    @BindView(R.id.back)
+    ImageView back;
+    @BindView(R.id.smc_leaderboard_noti)
+    ImageView smcLeaderboardNoti;
+    @BindView(R.id.smc_viewpager)
+    ViewPager smcViewpager;
+    SMCPageAdapter smcPageAdapter;
 
 
     @Nullable
@@ -49,19 +63,22 @@ public class ReferProgramFragment extends BaseFragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupToolbar();
+        getFragmentController().hideToolbar();
         init();
     }
 
     private void init() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         shareCode.setText(userDetails.getMyReferCode());
+        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_SMC_LEADERBOARD_NOTI, true)) {
+            smcLeaderboardNoti.setVisibility(View.VISIBLE);
+        } else {
+            smcLeaderboardNoti.setVisibility(View.GONE);
+        }
+        smcPageAdapter = new SMCPageAdapter(getChildFragmentManager());
+        smcViewpager.setAdapter(smcPageAdapter);
     }
 
-    private void setupToolbar() {
-        setHasOptionsMenu(true);
-        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge_title));
-    }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_share_n_feed, menu);
@@ -77,6 +94,19 @@ public class ReferProgramFragment extends BaseFragment{
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @OnClick({R.id.back, R.id.smc_leaderboard})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.back:
+                getFragmentController().goBack();
+                break;
+            case R.id.smc_leaderboard:
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_LEADERBOARD_NOTI, false);
+                getFragmentController().replaceFragment(ReferLeaderBoardFragment.getInstance(), true);
+                break;
         }
     }
 

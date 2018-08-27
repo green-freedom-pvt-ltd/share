@@ -1,98 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:background="@drawable/greenboard"
-    >
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="15dp">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            app:srcCompat="@drawable/ic_arrow_back_white" />
+
+        <RelativeLayout
+            android:id="@+id/smc_leaderboard"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_arrow_back_white"
+
+                />
+
+            <ImageView
+                android:id="@+id/smc_leaderboard_noti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/reminder_circle" />
+        </RelativeLayout>
+    </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/chalkduster"
+        android:gravity="center"
         android:text="@string/share_a_meal_challenge_title"
-        android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="32sp"
-        android:fontFamily="@font/chalkduster"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        />
+        android:textSize="32sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/powered_by"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:fontFamily="@font/chalkduster"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="8dp"
-        />
+        android:fontFamily="@font/chalkduster"
+        android:gravity="center"
+        android:text="@string/powered_by"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
 
     <android.support.v4.view.ViewPager
+        android:id="@+id/smc_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
-        android:weightSum="1"
-        android:layout_marginBottom="16dp">
+        android:weightSum="1">
 
         <View
             android:layout_width="0dip"
             android:layout_height="1dp"
-            android:background="@color/white"
-            android:layout_weight="0.35" />
+            android:layout_weight="0.35"
+            android:background="@color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/share_your_referral_code"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/lato_regular" />
+            android:fontFamily="@font/lato_regular"
+            android:gravity="center"
+            android:text="@string/share_your_referral_code"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
 
         <View
             android:layout_width="0dip"
             android:layout_height="1dp"
-            android:background="@color/white"
-            android:layout_weight="0.35" />
+            android:layout_weight="0.35"
+            android:background="@color/white" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/share_code_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/refer_code_bg"
         android:layout_marginBottom="22dp"
-        >
+        android:background="@drawable/refer_code_bg">
+
         <com.sharesmile.share.views.LBTextView
             android:id="@+id/share_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NIKHI98564"
-            android:textSize="16dp"
-            android:paddingTop="15dp"
             android:paddingBottom="15dp"
-            android:paddingRight="30dp"
             android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:paddingTop="15dp"
+            android:text="NIKHI98564"
             android:textColor="@color/white"
-            />
+            android:textSize="16dp" />
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_share_green_24px"
             android:background="@drawable/refer_code_share_bg"
             android:padding="15dp"
-            />
+            app:srcCompat="@drawable/ic_share_green_24px" />
     </LinearLayout>
 </LinearLayout>
