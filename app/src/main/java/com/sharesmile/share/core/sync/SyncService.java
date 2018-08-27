@@ -847,11 +847,11 @@ public class SyncService extends GcmTaskService {
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 
-            JsonObject responseObject = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
-                    JsonObject.class);
-            JSONObject response = new JSONObject(responseObject.toString());
-            Logger.d(TAG, "Response for put Streak:" + response);
-            if (response.getInt("code") == 200) {
+            JsonArray responseObject = NetworkDataProvider.doPutCall(Urls.getStreakUrl(), jsonObject,
+                    JsonArray.class);
+            /*JSONObject response = new JSONObject(responseObject.toString());
+            Logger.d(TAG, "Response for put Streak:" + response);*/
+            if (responseObject.size() >= 1) {
 
                 return GcmNetworkManager.RESULT_SUCCESS;
             } else {
@@ -915,12 +915,12 @@ public class SyncService extends GcmTaskService {
                     }
                     jsonArray.put(jsonObject);
                 }
-                JsonObject responseObject = NetworkDataProvider.doPostCall(Urls.getAchievementUrl(), jsonArray.toString(),
-                        JsonObject.class);
-                JSONObject response = new JSONObject(responseObject.toString());
+                JsonArray responseObject = NetworkDataProvider.doPostCall(Urls.getAchievementUrl(), jsonArray.toString(),
+                        JsonArray.class);
+                /*JSONObject response = new JSONObject(responseObject.toString());
                 Logger.d(TAG, "Response for uploadAchievement:" + response);
-                if (response.getInt("code") == 200) {
-                    JSONArray result = response.getJSONArray("results");
+                if (response.getInt("code") == 200) {*/
+                JSONArray result = new JSONArray(responseObject.toString())/*response.getJSONArray("results")*/;
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
 
@@ -929,7 +929,7 @@ public class SyncService extends GcmTaskService {
                         achievedBadge.setIsSync(jsonObject.getBoolean("is_sync"));
                         achievedBadgeDao.update(achievedBadge);
                     }
-                }
+                /*}*/
             }
             return GcmNetworkManager.RESULT_SUCCESS;
 
@@ -975,12 +975,12 @@ public class SyncService extends GcmTaskService {
                     }
                     jsonArray.put(jsonObject);
                 }
-                JsonObject responseObject = NetworkDataProvider.doPostCall(Urls.getTitlesUrl(), jsonArray.toString(),
-                        JsonObject.class);
-                JSONObject response = new JSONObject(responseObject.toString());
+                JsonArray responseObject = NetworkDataProvider.doPostCall(Urls.getTitlesUrl(), jsonArray.toString(),
+                        JsonArray.class);
+                /*JSONObject response = new JSONObject(responseObject.toString());
                 Logger.d(TAG, "Response for uploadAchievementTitle:" + response);
-                if (response.getInt("code") == 200) {
-                    JSONArray result = response.getJSONArray("results");
+                if (response.getInt("code") == 200) {*/
+                JSONArray result = new JSONArray(responseObject.toString())/*response.getJSONArray("results")*/;
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
 
@@ -989,7 +989,7 @@ public class SyncService extends GcmTaskService {
                         achievedTitle.setIsSync(jsonObject.getBoolean("is_sync"));
                         achievedTitleDao.update(achievedTitle);
                     }
-                }
+                /*}*/
             }
             return GcmNetworkManager.RESULT_SUCCESS;
 
