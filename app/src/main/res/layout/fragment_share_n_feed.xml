@@ -55,19 +55,24 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:fontFamily="@font/chalkduster"
         android:gravity="center"
         android:text="@string/powered_by"
         android:textColor="@color/white"
         android:textSize="14sp" />
-
     <android.support.v4.view.ViewPager
         android:id="@+id/smc_viewpager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/dot_indicator">
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

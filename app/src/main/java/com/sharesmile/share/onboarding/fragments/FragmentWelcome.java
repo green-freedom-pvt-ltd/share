@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.config.Urls;
@@ -140,7 +141,7 @@ public class FragmentWelcome extends BaseFragment {
                 userDetails.setReferCodeUsed(referralCode.getText().toString());
                 MainApplication.getInstance().setUserDetails(userDetails);
 //                commonActions.setBackAndContinue(TAG, getContext().getResources().getString(R.string.continue_txt));
-
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
                 getFragmentController().replaceFragment(new FragmentSomethingIsCooking(), true);
 //                showSomethingCookingDialog();
             } else {

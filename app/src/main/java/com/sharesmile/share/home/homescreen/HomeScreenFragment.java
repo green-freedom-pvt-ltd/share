@@ -6,6 +6,9 @@ package com.sharesmile.share.home.homescreen;
 
 
 import android.animation.ValueAnimator;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
@@ -37,12 +40,16 @@ import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.refer_program.SMCDialog;
+import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import butterknife.BindView;
@@ -56,6 +63,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     @BindView(R.id.btn_lets_run)
     View mRunButton;
+
+    @BindView(R.id.share_code_layout)
+    LinearLayout shareCodeLayout;
 
     @BindView(R.id.tv_lets_run)
     TextView mRunButtonText;
@@ -83,6 +93,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     @BindView(R.id.overlay_swipe_to_pick)
     LinearLayout swipeToPickOverlay;
+
+    @BindView(R.id.share_code)
+    TextView shareCode;
 
     private CausePageAdapter mAdapter;
 
@@ -153,6 +166,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
         if(drawerLayout!=null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
+        shareCode.setText(MainApplication.getInstance().getUserDetails().getMyReferCode());
     }
 
 
@@ -337,7 +352,19 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                             .buildAndDispatch();
                 }
                 break;
-
+            case R.id.share_code_layout:
+                AssetManager assetManager = getContext().getAssets();
+                InputStream istr;
+                Bitmap bitmap = null;
+                try {
+                    istr = assetManager.open("images/share_image_2.jpg");
+                    bitmap = BitmapFactory.decodeStream(istr);
+                } catch (IOException e) {
+                    // handle exception
+                }
+                Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
+                        getString(R.string.share_msg) + " Use this code : " + MainApplication.getInstance().getUserDetails().getMyReferCode());
+                break;
             case R.id.bt_home_feed:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);
                 OnboardingOverlay.FEED.registerUseOfOverlay();
@@ -378,8 +405,15 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Override
     public void onPageSelected(int position) {
         CauseData causeData = mAdapter.getItemAtPosition(position);
-        setLetsRunButton(causeData.isCompleted());
-        OnboardingOverlay.SWIPE_CAUSE.registerUseOfOverlay();
+        if (causeData.getId() != -1) {
+            mRunButton.setVisibility(View.VISIBLE);
+            shareCodeLayout.setVisibility(View.GONE);
+            setLetsRunButton(causeData.isCompleted());
+            OnboardingOverlay.SWIPE_CAUSE.registerUseOfOverlay();
+        } else {
+            mRunButton.setVisibility(View.GONE);
+            shareCodeLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -433,6 +467,16 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         hideProgressDialog();
         prepareOnboardingOverlays();
         Utils.checkBadgeData(false);
+        showSMCDialog();
+    }
+
+    private void showSMCDialog() {
+        if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, false)) {
+            SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext());
+            somethingIsCookingDialog.show();
+        }
+        SMCDialog smcDialog = new SMCDialog(getContext());
+        smcDialog.show();
     }
 
     public CauseData getCurrentCause(){

@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.home.homescreen.CauseSwipeFragment;
 
 /**
  * Created by Shine on 01/05/16.
@@ -29,17 +28,6 @@ public class SMCPageAdapter extends FragmentStatePagerAdapter {
             frag = SMC1Fragment.getInstance();
         }
         return frag;
-    }
-
-    @Override
-    public int getItemPosition(Object object) {
-        CauseSwipeFragment fragment = (CauseSwipeFragment) object;
-        if (fragment.isCompleted()) {
-            // Figure out the position of fragment
-            return super.getItemPosition(object);
-        } else {
-            return POSITION_NONE;
-        }
     }
 
     @Override

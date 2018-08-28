@@ -16,9 +16,6 @@ import com.sharesmile.share.core.base.BaseFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by apurvgandhwani on 3/22/2016.
- */
 public class SMC0Fragment extends BaseFragment {
     public static final String ARG_OBJECT = "object";
     private static final String TAG = "SMC0Fragment";

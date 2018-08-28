@@ -152,6 +152,8 @@ public class Constants {
     public static final String PREF_SHOW_CONFETTI = "pref_show_confetti";
     public static final String PREF_SHOW_SMC_NAV_DRAWER_NOTI = "pref_show_smc_nav_drawer_noti";
     public static final String PREF_SHOW_SMC_LEADERBOARD_NOTI = "pref_show_smc_leaderboard_noti";
+    public static final String PREF_SHOW_SMC_MATCH_DIALOG = "pref_show_smc_match_dialog";
+
 
     //notification
     public static final String PREF_NOTIFICATION_MAX_STREAK_SHOWN = "pref_notification_max_streak_shown";

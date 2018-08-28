@@ -1,5 +1,6 @@
 package com.sharesmile.share.home.homescreen;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,17 +13,24 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.refer_program.ReferProgramFragment;
+import com.sharesmile.share.views.FontCache;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class SMCSwipeFragment extends BaseFragment implements View.OnClickListener {
+public class SMCSwipeFragment extends BaseFragment {
     public static final String ARG_OBJECT = "object";
     private static final String TAG = "SMCSwipeFragment";
     @BindView(R.id.smc_swipe_layout)
     LinearLayout smcSwipeLayout;
     @BindView(R.id.close)
     TextView close;
+    @BindView(R.id.share_a_meal_desc)
+    TextView shareAMealDesc;
+    @BindView(R.id.share_a_meal_total_meals)
+    TextView shareATotalMeals;
 
     public static Fragment getInstance() {
         Fragment fragment = new SMCSwipeFragment();
@@ -43,7 +51,7 @@ public class SMCSwipeFragment extends BaseFragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(
-                R.layout.share_a_meal_image_layout, container, false);
+                R.layout.smc_card, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -53,6 +61,13 @@ public class SMCSwipeFragment extends BaseFragment implements View.OnClickListen
         super.onViewCreated(view, savedInstanceState);
         close.setVisibility(View.GONE);
         smcSwipeLayout.setBackgroundResource(R.drawable.greenboard);
+        shareAMealDesc.setLineSpacing(10, 1);
+        Typeface myTypeface = FontCache.get("fonts/Lato-Bold.ttf", getContext());
+        shareAMealDesc.setTypeface(myTypeface);
+        shareAMealDesc.setTextSize(12);
+        shareATotalMeals.setTypeface(myTypeface);
+        shareATotalMeals.setTextSize(12);
+        shareAMealDesc.setText("Invite a friend and feed hungry kids.\nYes! It’s that simple!");
     }
 
     @Override
@@ -62,19 +77,12 @@ public class SMCSwipeFragment extends BaseFragment implements View.OnClickListen
     }
 
 
-    @Override
+    @OnClick(R.id.card_view)
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.card_view:
-             /*   showCauseInfoFragment();
-                AnalyticsEvent.create(Event.ON_CLICK_CAUSE_CARD)
-                        .put("cause_title", cause.getTitle())
-                        .put("cause_id", cause.getId())
-                        .buildAndDispatch();*/
-                break;
-            case R.id.iv_cause_completed:
-                /*showCauseInfoFragment();
-                AnalyticsEvent.create(Event.ON_CLICK_CAUSE_COMPLETED_CARD)
+                showShareScreenFragment();
+                /*AnalyticsEvent.create(Event.ON_CLICK_CAUSE_CARD)
                         .put("cause_title", cause.getTitle())
                         .put("cause_id", cause.getId())
                         .buildAndDispatch();*/
@@ -83,7 +91,7 @@ public class SMCSwipeFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
-    /*private void showCauseInfoFragment() {
-        getFragmentController().replaceFragment(CauseInfoFragment.getInstance(cause), true);
-    }*/
+    private void showShareScreenFragment() {
+        getFragmentController().replaceFragment(ReferProgramFragment.getInstance(1), true);
+    }
 }

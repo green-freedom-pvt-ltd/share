@@ -43,7 +43,17 @@ public class ReferProgramFragment extends BaseFragment{
     @BindView(R.id.smc_viewpager)
     ViewPager smcViewpager;
     SMCPageAdapter smcPageAdapter;
+    @BindView(R.id.dot_indicator)
+    LinearLayout dotIndicator;
 
+
+    public static ReferProgramFragment getInstance(int position) {
+        ReferProgramFragment referProgramFragment = new ReferProgramFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("position", position);
+        referProgramFragment.setArguments(bundle);
+        return referProgramFragment;
+    }
 
     @Nullable
     @Override
@@ -65,6 +75,10 @@ public class ReferProgramFragment extends BaseFragment{
         super.onViewCreated(view, savedInstanceState);
         getFragmentController().hideToolbar();
         init();
+        Bundle bundle = getArguments();
+        if (bundle != null && bundle.containsKey("position")) {
+            smcViewpager.setCurrentItem(1);
+        }
     }
 
     private void init() {
@@ -77,6 +91,37 @@ public class ReferProgramFragment extends BaseFragment{
         }
         smcPageAdapter = new SMCPageAdapter(getChildFragmentManager());
         smcViewpager.setAdapter(smcPageAdapter);
+        smcViewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setIndicator(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        setIndicator(0);
+    }
+
+    private void setIndicator(int position) {
+        dotIndicator.removeAllViews();
+        for (int i = 0; i <= 1; i++) {
+            ImageView imageView = new ImageView(getContext());
+            imageView.setPadding(8, 16, 8, 16);
+            if (i == position) {
+                imageView.setImageResource(R.drawable.carousel_indicator_circle_selected_white);
+            } else {
+                imageView.setImageResource(R.drawable.carousel_indicator_circle_not_selected_white);
+            }
+            dotIndicator.addView(imageView);
+        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
@@ -34,6 +35,8 @@ public class FragmentSomethingIsCooking extends BaseFragment {
     TextView close;
     @BindView(R.id.continue_tv)
     TextView continueTv;
+    @BindView(R.id.smc_buttons_layout)
+    LinearLayout smcButtonsLayout;
 
     @BindView(R.id.profile_pic_1)
     CircularImageView profilePic1;
@@ -67,6 +70,9 @@ public class FragmentSomethingIsCooking extends BaseFragment {
         ShareImageLoader.getInstance().loadImage(imageUrl, profilePic1,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         EventBus.getDefault().post(new UpdateEvent.OnCodeVerified(new JsonObject()));
+
+        smcButtonsLayout.setVisibility(View.GONE);
+        continueTv.setVisibility(View.VISIBLE);
     }
 
     @OnClick({R.id.continue_tv, R.id.close})
