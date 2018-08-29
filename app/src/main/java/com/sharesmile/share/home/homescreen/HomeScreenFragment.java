@@ -40,7 +40,6 @@ import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.refer_program.SMCDialog;
 import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
 import com.sharesmile.share.utils.Utils;
 
@@ -109,6 +108,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         EventBus.getDefault().register(this);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.bind(this, view);
+        shareCodeLayout.setOnClickListener(this);
         mRunButton.setOnClickListener(this);
         viewPager.setClipToPadding(false);
         viewPager.setClipChildren(false);
@@ -376,6 +376,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                 getFragmentController().performOperation(IFragmentController.OPEN_DRAWER, null);
                 OnboardingOverlay.DRAWER.registerUseOfOverlay();
                 break;
+
             default:
 
         }
@@ -467,16 +468,15 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         hideProgressDialog();
         prepareOnboardingOverlays();
         Utils.checkBadgeData(false);
-        showSMCDialog();
+        showSMCMatchDialog();
     }
 
-    private void showSMCDialog() {
+    private void showSMCMatchDialog() {
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, false)) {
-            SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext());
+            SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(), Constants.USER_NEW);
             somethingIsCookingDialog.show();
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, false);
         }
-        SMCDialog smcDialog = new SMCDialog(getContext());
-        smcDialog.show();
     }
 
     public CauseData getCurrentCause(){

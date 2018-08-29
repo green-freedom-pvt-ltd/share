@@ -156,7 +156,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     private void loadInitialFragment() {
-        addFragment(new FragmentWelcome(), false);
+        addFragment(new FragmentWelcome(), true);
     }
 
     @OnClick({R.id.continue_tv, R.id.back_tv})
@@ -176,47 +176,45 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     }
 
     private void backAction(Fragment fragmentByTag) {
-        getSupportFragmentManager().popBackStack();
-        Handler postPopBackStack = new Handler();
-        postPopBackStack.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int i = getSupportFragmentManager().getBackStackEntryCount();
+        if (fragmentByTag instanceof FragmentGender) {
+            onBackPressed();
+        } else {
+            getSupportFragmentManager().popBackStack();
+            Handler postPopBackStack = new Handler();
+            postPopBackStack.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    int i = getSupportFragmentManager().getBackStackEntryCount();
 
-                if (i == 0) {
-                    setBackAndContinue(FragmentWelcome.TAG, getResources().getString(R.string.continue_without_code_txt));
-                } else {
-                    Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
+                    if (i == 0) {
+                        setBackAndContinue(FragmentWelcome.TAG, getResources().getString(R.string.continue_without_code_txt));
+                    } else {
+                        Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
+                    }
                 }
-            }
-        }, 100);
+            }, 100);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
+        if (fragment instanceof FragmentGender) {
+            replaceFragment(new FragmentWelcome(), true);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void continueAction(Fragment fragment) {
         if (fragment instanceof FragmentWelcome || fragment == null) {
             replaceFragment(new FragmentGender(), true);
             AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_WELCOME_CONTINUE).buildAndDispatch();
-            replaceFragment(new FragmentGender(), true);
 
         } else {
             if (continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10)) {
                 MainApplication.showToast(getResources().getString(R.string.select_an_option));
             } else {
-                /*if (fragment instanceof FragmentAskReferCode) {
-                    String continueText = continueTv.getText().toString();
-                    if (continueText.equalsIgnoreCase(getResources().getString(R.string.refer_code_continue_txt))) {
-                        replaceFragment(new FragmentEnterReferCode(), true);
-                    } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
-                        replaceFragment(new FragmentGender(), true);
-                    }
-
-                } else if (fragment instanceof FragmentEnterReferCode) {
-                    if (continueTv.getText().toString().equals(getResources().getString(R.string.verify_txt))) {
-                        EventBus.getDefault().post(new UpdateEvent.OnCodeVerify());
-                    } else if (continueTv.getText().toString().equals(getResources().getString(R.string.continue_txt))) {
-                        replaceFragment(new FragmentGender(), true);
-                    }
-                } else */
                 if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
                     AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_GENDER_CONTINUE).buildAndDispatch();

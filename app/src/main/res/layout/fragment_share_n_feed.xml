@@ -21,26 +21,15 @@
             android:padding="5dp"
             app:srcCompat="@drawable/ic_arrow_back_white" />
 
-        <RelativeLayout
-            android:id="@+id/smc_leaderboard"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true">
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_arrow_back_white"
-
-                />
-
-            <ImageView
-                android:id="@+id/smc_leaderboard_noti"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/smc_leaderboard_icon2"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/reminder_circle" />
-        </RelativeLayout>
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_centerVertical="true"
+                android:id="@+id/smc_leaderboard" />
     </RelativeLayout>
 
     <TextView
@@ -50,7 +39,9 @@
         android:gravity="center"
         android:text="@string/share_a_meal_challenge_title"
         android:textColor="@color/white"
-        android:textSize="32sp" />
+        android:textSize="32sp"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="2sp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -70,7 +61,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:id="@+id/dot_indicator">
+        android:id="@+id/dot_indicator"
+        android:layout_marginTop="17dp"
+        android:layout_marginBottom="17dp">
 
     </LinearLayout>
 

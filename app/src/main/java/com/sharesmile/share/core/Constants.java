@@ -304,6 +304,9 @@ public class Constants {
     public final static int SUCCESS_GET = 200;
     public final static int SUCCESS_POST = 201;
 
+    public final static int USER_NEW = 1;
+    public final static int USER_OLD = 2;
+
     //auto_notification emoji
     final public static int CROWN_EMOJI = 128081;
     final public static int FLAG_EMOJI = 127937;

@@ -120,8 +120,7 @@ public class NetworkUtils {
             case Constants.SUCCESS_GET:
                 return gson.fromJson(serverResponse.getResponse().toString(), tClass);
             case Constants.SUCCESS_POST:
-
-                break;
+                return gson.fromJson(serverResponse.getResponse().toString(), tClass);
 
         }
         try{

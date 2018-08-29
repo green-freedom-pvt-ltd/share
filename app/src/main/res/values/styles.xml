@@ -165,7 +165,7 @@
         <item name="android:windowExitAnimation">@anim/dialog_slide_out</item>
     </style>
 
-    <style name="EditTextHint" parent="TextAppearance.AppCompat">
+    <style name="EditTextHint">
         <item name="android:textColorHint">@color/light_blue</item>
     </style>
 </resources>

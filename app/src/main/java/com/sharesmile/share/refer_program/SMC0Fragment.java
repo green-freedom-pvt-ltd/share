@@ -1,17 +1,22 @@
 package com.sharesmile.share.refer_program;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.views.FontCache;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +32,9 @@ public class SMC0Fragment extends BaseFragment {
     TextView shareAMealDesc;
     @BindView(R.id.share_a_meal_total_meals)
     TextView shareAMealTotalMeals;
+    @BindView(R.id.bacha_plate)
+    ImageView bachaPlate;
+
 
     public static Fragment getInstance() {
         Fragment fragment = new SMC0Fragment();
@@ -58,6 +66,16 @@ public class SMC0Fragment extends BaseFragment {
         titleLayout.setVisibility(View.GONE);
         poweredByTv.setVisibility(View.GONE);
         shareAMealTotalMeals.setVisibility(View.GONE);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1);
+        bachaPlate.setLayoutParams(layoutParams);
+        Typeface myTypeface = FontCache.get("fonts/Lato-Bold.ttf", getContext());
+        shareAMealDesc.setTypeface(myTypeface);
+        shareAMealDesc.setTextSize(16);
+        shareAMealDesc.setLineSpacing(6, 1);
+        shareAMealDesc.setText(getResources().getString(R.string.smc_0_desc));
+        shareAMealDesc.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams layoutParamsText = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 0.3f);
+        shareAMealDesc.setLayoutParams(layoutParamsText);
     }
 
     @Override

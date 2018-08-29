@@ -1,5 +1,6 @@
 package com.sharesmile.share.onboarding.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
@@ -46,6 +50,14 @@ public class FragmentWelcome extends BaseFragment {
     EditText referralCode;
     @BindView(R.id.submit_referral_tv)
     TextView submitReferral;
+    @BindView(R.id.referral_progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.referral_code_layout)
+    RelativeLayout referralCodeLayout;
+    @BindView(R.id.invite_layout)
+    LinearLayout inviteLayout;
+    @BindView(R.id.invited_by_name)
+    TextView invitedByName;
 
 
     @Nullable
@@ -66,9 +78,29 @@ public class FragmentWelcome extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        commonActions = ((OnBoardingActivity)getActivity());
-        commonActions.setExplainText("","");
+        commonActions = ((OnBoardingActivity) getActivity());
+        commonActions.setExplainText("", "");
         commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_without_code_txt));
+        init();
+    }
+
+    private void init() {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        boolean b = userDetails.getReferCodeUsed().length() > 0;
+        if (b) {
+            referralCodeLayout.setVisibility(View.GONE);
+            inviteLayout.setVisibility(View.VISIBLE);
+            invitedByName.setText(userDetails.getReferalName() + "");
+            commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt));
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
+        } else {
+            inviteLayout.setVisibility(View.GONE);
+            referralCodeLayout.setVisibility(View.VISIBLE);
+            submitReferral.setVisibility(View.GONE);
+            referralCode.setText("");
+            referralCode.setHint(getResources().getString(R.string.have_a_referral_code));
+            referralCodeTil.setHint("");
+        }
     }
 
     @OnFocusChange(R.id.referral_code_et)
@@ -87,7 +119,14 @@ public class FragmentWelcome extends BaseFragment {
 
     @OnClick(R.id.submit_referral_tv)
     public void onClickSubmit() {
+        /*if(MainApplication.getInstance().getUserDetails().getReferCodeUsed().length()>0)
+        {
+         getFragmentController().replaceFragment(new FragmentGender(),true);
+        }else {*/
+        progressBar.setVisibility(View.VISIBLE);
+        submitReferral.setVisibility(View.GONE);
         EventBus.getDefault().post(new UpdateEvent.OnCodeVerify());
+        /*}*/
     }
 
     private void verifyCode() {
@@ -135,23 +174,24 @@ public class FragmentWelcome extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnCodeVerified onCodeVerified) {
         try {
-            JSONObject jsonObject = new JSONObject(onCodeVerified.jsonObject.toString());
-            if (jsonObject.getInt("code") == Constants.SUCCESS_POST) {
-                referralCode.setFocusable(false);
-                JSONObject result = jsonObject.getJSONObject("result");
-//                MainApplication.showToast("You were refered by : "+result.getString("referrer_name"));
-                UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-                userDetails.setReferalId(result.getInt("referrer_user_id"));
-                userDetails.setReferalName(result.getString("referrer_name"));
-                userDetails.setReferCodeUsed(referralCode.getText().toString());
-                MainApplication.getInstance().setUserDetails(userDetails);
-//                commonActions.setBackAndContinue(TAG, getContext().getResources().getString(R.string.continue_txt));
-                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
-                getFragmentController().replaceFragment(new FragmentSomethingIsCooking(), true);
-//                showSomethingCookingDialog();
-            } else {
-                MainApplication.showToast(jsonObject.getString("result"));
+            progressBar.setVisibility(View.GONE);
+            JSONObject result = new JSONObject(onCodeVerified.jsonObject.toString());
+            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+            userDetails.setReferalId(result.getInt("referrer_user_id"));
+            userDetails.setReferalName(result.getString("referrer_name"));
+            userDetails.setReferCodeUsed(referralCode.getText().toString());
+            MainApplication.getInstance().setUserDetails(userDetails);
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            //Find the currently focused view, so we can grab the correct window token from it.
+            View view = getActivity().getCurrentFocus();
+            //If no view currently has focus, create a new one, just so we can grab a window token from it
+            if (view == null) {
+                view = new View(getContext());
             }
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            getFragmentController().replaceFragment(new FragmentSomethingIsCooking(), true);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

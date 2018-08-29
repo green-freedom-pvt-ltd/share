@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
@@ -21,6 +20,7 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
 import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,14 +35,14 @@ public class ReferProgramFragment extends BaseFragment{
     @BindView(R.id.share_code_layout)
     LinearLayout shareCodeLayout;
     @BindView(R.id.smc_leaderboard)
-    RelativeLayout smcLeaderboard;
+    ImageView smcLeaderboard;
     @BindView(R.id.back)
     ImageView back;
-    @BindView(R.id.smc_leaderboard_noti)
-    ImageView smcLeaderboardNoti;
     @BindView(R.id.smc_viewpager)
     ViewPager smcViewpager;
+
     SMCPageAdapter smcPageAdapter;
+
     @BindView(R.id.dot_indicator)
     LinearLayout dotIndicator;
 
@@ -85,9 +85,9 @@ public class ReferProgramFragment extends BaseFragment{
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         shareCode.setText(userDetails.getMyReferCode());
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_SMC_LEADERBOARD_NOTI, true)) {
-            smcLeaderboardNoti.setVisibility(View.VISIBLE);
+            smcLeaderboard.setImageResource(R.drawable.smc_leaderboard_icon2);
         } else {
-            smcLeaderboardNoti.setVisibility(View.GONE);
+            smcLeaderboard.setImageResource(R.drawable.smc_leaderboard_icon);
         }
         smcPageAdapter = new SMCPageAdapter(getChildFragmentManager());
         smcViewpager.setAdapter(smcPageAdapter);
@@ -114,7 +114,7 @@ public class ReferProgramFragment extends BaseFragment{
         dotIndicator.removeAllViews();
         for (int i = 0; i <= 1; i++) {
             ImageView imageView = new ImageView(getContext());
-            imageView.setPadding(8, 16, 8, 16);
+            imageView.setPadding(8, 0, 8, 0);
             if (i == position) {
                 imageView.setImageResource(R.drawable.carousel_indicator_circle_selected_white);
             } else {
@@ -155,12 +155,12 @@ public class ReferProgramFragment extends BaseFragment{
         }
     }
 
-   /* @OnClick({R.id.share_facebook, R.id.share_whatsapp, R.id.share_twitter, R.id.share_gmail, R.id.share_code_layout})
+    @OnClick({/*R.id.share_facebook, R.id.share_whatsapp, R.id.share_twitter, R.id.share_gmail,*/ R.id.share_code_layout})
     public void onShare(View view)
     {
         switch (view.getId())
         {
-            case R.id.share_facebook :
+            /*case R.id.share_facebook :
                 ShareUtils.shareOnFb(getActivity(),"Testing", Uri.parse("onelink.to/impact"));
                 break;
             case R.id.share_whatsapp :
@@ -180,9 +180,9 @@ public class ReferProgramFragment extends BaseFragment{
                     MainApplication.showToast("Some error occurred, Please try after some time.");
                     e.printStackTrace();
                 }
-                break;
+                break;*/
             case R.id.share_code_layout:
-                AssetManager assetManager = getContext().getAssets();
+                /*AssetManager assetManager = getContext().getAssets();
                 InputStream istr;
                 Bitmap bitmap = null;
                 try {
@@ -190,12 +190,14 @@ public class ReferProgramFragment extends BaseFragment{
                     bitmap = BitmapFactory.decodeStream(istr);
                 } catch (IOException e) {
                     // handle exception
-                }
-                Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
-                        getString(R.string.share_msg) + " Use this code : " + shareCode.getText().toString());
+                }*/
+
+                Utils.share(getActivity(),
+                        String.format(getString(R.string.smc_share_more_meals),
+                                MainApplication.getInstance().getUserDetails().getMyReferCode()));
 
                 break;
         }
-    }*/
+    }
 
 }

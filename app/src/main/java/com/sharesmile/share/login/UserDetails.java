@@ -33,7 +33,7 @@ public class UserDetails implements UnObfuscable {
 
     @SerializedName("referal_id")
     private int referalId;
-    @SerializedName("referal_name")
+    @SerializedName("Tha")
     private String referalName;
 
     @SerializedName("address")

@@ -2,6 +2,9 @@ package com.sharesmile.share.refer_program;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,9 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,13 +45,16 @@ public class SomethingIsCookingDialog extends Dialog {
     CircularImageView profilePic1;
     @BindView(R.id.profile_pic_2)
     CircularImageView profilePic2;
+    int userType = 0;//1=new & 2=old
 
-    public SomethingIsCookingDialog(@NonNull Context context) {
+    @BindView(R.id.something_is_cooking_desc)
+    TextView somethingIsCookingDesc;
+    @BindView(R.id.share_layout)
+    LinearLayout shareLayout;
+
+    public SomethingIsCookingDialog(@NonNull Context context, int userType) {
         super(context);
-    }
-
-    public SomethingIsCookingDialog(@NonNull Context context, int themeResId) {
-        super(context, themeResId);
+        this.userType = userType;
     }
 
     protected SomethingIsCookingDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
@@ -70,19 +81,46 @@ public class SomethingIsCookingDialog extends Dialog {
         }
         ShareImageLoader.getInstance().loadImage(profilePic1Url, profilePic1,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+
+        if (userType == Constants.USER_NEW)//new user
+        {
+            somethingIsCookingDesc.setText
+                    (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_new_user)
+                            , MainApplication.getInstance().getUserDetails().getReferalName()));
+        } else //old user
+        {
+            somethingIsCookingDesc.setText
+                    (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_old_user)
+                            , MainApplication.getInstance().getUserDetails().getReferalName()));
+        }
     }
 
     @OnClick({R.id.close, R.id.btn_share_more_meals, R.id.btn_tell_your_friends})
     public void onCLick(View view) {
         switch (view.getId()) {
             case R.id.close:
-
+                dismiss();
                 break;
             case R.id.btn_share_more_meals:
-
+                AssetManager assetManager = getContext().getAssets();
+                InputStream istr;
+                Bitmap bitmap = null;
+                try {
+                    istr = assetManager.open("images/share_image_2.jpg");
+                    bitmap = BitmapFactory.decodeStream(istr);
+                } catch (IOException e) {
+                    // handle exception
+                }
+                Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
+                        String.format(getContext().getString(R.string.smc_share_more_meals),
+                                MainApplication.getInstance().getUserDetails().getMyReferCode()));
                 break;
             case R.id.btn_tell_your_friends:
-
+                Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
+                Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
+                        String.format(getContext().getString(R.string.smc_tell_your_friends),
+                                MainApplication.getInstance().getUserDetails().getReferalName()
+                                , MainApplication.getInstance().getUserDetails().getMyReferCode()));
                 break;
         }
     }

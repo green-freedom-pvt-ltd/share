@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
@@ -24,6 +25,8 @@ public class FragmentThankYou extends BaseFragment {
     TextView changeMaker;
     @BindView(R.id.change_maker_tv_2)
     TextView changeMaker2;
+    @BindView(R.id.referral_code_layout)
+    RelativeLayout referralCodeLayout;
 
     CommonActions commonActions;
 
@@ -44,5 +47,6 @@ public class FragmentThankYou extends BaseFragment {
         welcome.setText(getResources().getString(R.string.thank_you));
         changeMaker.setText(getResources().getString(R.string.life_as_change_maker2));
         changeMaker2.setText(getResources().getString(R.string.every_step2));
+        referralCodeLayout.setVisibility(View.GONE);
     }
 }

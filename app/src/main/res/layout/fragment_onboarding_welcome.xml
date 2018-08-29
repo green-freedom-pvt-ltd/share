@@ -63,10 +63,11 @@
         />
 
     <RelativeLayout
+        android:id="@+id/referral_code_layout"
+        android:layout_below="@+id/change_maker_tv_2"
         android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/change_maker_tv_2"
         android:gravity="center_vertical">
 
         <android.support.design.widget.TextInputLayout
@@ -87,6 +88,7 @@
                 app:backgroundTint="@color/light_blue"
                 android:textColorHint="@color/light_blue"
                 android:textSize="14sp"
+                android:textColor="@color/clr_cb050505"
 
                 />
         </android.support.design.widget.TextInputLayout>
@@ -103,6 +105,13 @@
             android:paddingTop="5dp"
             android:layout_centerVertical="true"
             android:visibility="gone" />
-    </RelativeLayout>
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/referral_progress_bar"
+            android:visibility="gone" />
+    </RelativeLayout>
 </RelativeLayout>
