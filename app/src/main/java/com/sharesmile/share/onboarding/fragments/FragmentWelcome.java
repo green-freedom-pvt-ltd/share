@@ -1,11 +1,13 @@
 package com.sharesmile.share.onboarding.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -74,6 +76,9 @@ public class FragmentWelcome extends BaseFragment {
         if (hasFocus) {
             referralCodeTil.setHint(getResources().getString(R.string.enter_referral_code));
             referralCode.setHint("");
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(referralCode, InputMethodManager.SHOW_IMPLICIT);
+            submitReferral.setVisibility(View.VISIBLE);
         } else {
             referralCodeTil.setHint("");
             referralCode.setHint(getResources().getString(R.string.have_a_referral_code));
