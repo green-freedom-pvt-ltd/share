@@ -153,6 +153,9 @@ public class Constants {
     public static final String PREF_SHOW_SMC_NAV_DRAWER_NOTI = "pref_show_smc_nav_drawer_noti";
     public static final String PREF_SHOW_SMC_LEADERBOARD_NOTI = "pref_show_smc_leaderboard_noti";
     public static final String PREF_SHOW_SMC_MATCH_DIALOG = "pref_show_smc_match_dialog";
+    public static final String PREF_SMC_PROGRAMS = "pref_smc_programs";
+    public static final String PREF_SMC_NAV_NOTI = "pref_smc_nav_noti";
+    public static final String PREF_SMC_PERIODIC_POP_UP_SHOWN = "pref_smc_periodic_pop_up_shown";
 
 
     //notification

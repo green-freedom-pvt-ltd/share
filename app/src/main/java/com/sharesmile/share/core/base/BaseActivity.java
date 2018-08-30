@@ -16,28 +16,26 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
-import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.tracking.location.GoogleLocationTracker;
-import com.sharesmile.share.helpcenter.FeedbackActivity;
-import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.core.cause.model.CauseData;
-import com.sharesmile.share.helpcenter.category.FeedbackCategory;
-import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.cause.CauseDataStore;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.helpcenter.FeedbackActivity;
+import com.sharesmile.share.helpcenter.category.FeedbackCategory;
+import com.sharesmile.share.tracking.location.GoogleLocationTracker;
+import com.sharesmile.share.tracking.ui.TrackerActivity;
+import com.sharesmile.share.tracking.workout.data.model.Run;
 
 import activities.ImpactLeagueActivity;
 import fragments.FeedListFragment;
@@ -153,7 +151,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     @Override
     public void replaceFragment(BaseFragment fragmentToBeLoaded, boolean addToBackStack) {
         boolean allowStateLoss = true;
-
         if (!getSupportFragmentManager().isDestroyed()) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {

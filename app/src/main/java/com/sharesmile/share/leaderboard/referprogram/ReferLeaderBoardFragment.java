@@ -9,6 +9,7 @@ import com.sharesmile.share.leaderboard.common.BaseLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
 import com.sharesmile.share.leaderboard.referprogram.model.ReferProgramBoard;
 import com.sharesmile.share.refer_program.model.ReferProgramList;
+import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,6 +47,7 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
     @Override
     protected void init(boolean b) {
         super.init(true);
+        Utils.setStausBarColor(getActivity().getWindow(), R.color.clr_328f6c);
     }
 
     @Override

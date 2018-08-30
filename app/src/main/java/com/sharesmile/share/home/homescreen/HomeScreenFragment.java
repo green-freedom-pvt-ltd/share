@@ -6,6 +6,7 @@ package com.sharesmile.share.home.homescreen;
 
 
 import android.animation.ValueAnimator;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,7 +41,9 @@ import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.refer_program.SMCDialog;
 import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,49 +60,36 @@ import butterknife.ButterKnife;
 public class HomeScreenFragment extends BaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private static final String TAG = "HomeScreenFragment";
+    private static final long NUMBER_ANIMATION_DURATION = 2500;
     @BindView(R.id.viewpager)
     ViewPager viewPager;
-
     @BindView(R.id.btn_lets_run)
     View mRunButton;
-
     @BindView(R.id.share_code_layout)
     LinearLayout shareCodeLayout;
-
     @BindView(R.id.tv_lets_run)
     TextView mRunButtonText;
-
     @BindView(R.id.iv_lets_run)
     View mRunButtonImage;
-
     @BindView(R.id.content_view)
     LinearLayout mContentView;
-
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
-
     @BindView(R.id.tv_impact_so_far)
     TextView overallImpactTextView;
-
     @BindView(R.id.bt_home_drawer)
     View drawerButton;
-
     @BindView(R.id.bt_home_feed)
     RelativeLayout badge;
-
     @BindView(R.id.badge_indicator)
     View badgeIndictor;
-
     @BindView(R.id.overlay_swipe_to_pick)
     LinearLayout swipeToPickOverlay;
-
     @BindView(R.id.share_code)
     TextView shareCode;
-
+    SomethingIsCookingDialog somethingIsCookingDialog;
     private CausePageAdapter mAdapter;
-
-    private static final long NUMBER_ANIMATION_DURATION = 2500;
-
+    private ShowOverlayRunnable showOverlayRunnable;
 
     @Nullable
     @Override
@@ -125,7 +115,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         refreshFeedBadgeIndicator();
 
         int height = (int) getResources().getDimension(R.dimen.super_large_text);
-        Shader textShader=new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd,0xff33f373},
+        Shader textShader = new LinearGradient(0, 0, 0, height, new int[]{0xff04cbfd, 0xff33f373},
                 new float[]{0, 1}, Shader.TileMode.CLAMP);
         overallImpactTextView.getPaint().setShader(textShader);
 
@@ -145,7 +135,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     }
 
-    private void refreshFeedBadgeIndicator(){
+    private void refreshFeedBadgeIndicator() {
 
         // Rolling back to old feed
         boolean hasUnreadMessage = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_UNREAD_MESSAGE, false);
@@ -164,29 +154,27 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         getFragmentController().hideToolbar();
         render();
         DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
-        if(drawerLayout!=null)
+        if (drawerLayout != null)
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
         shareCode.setText(MainApplication.getInstance().getUserDetails().getMyReferCode());
     }
 
-
-
-    private void prepareOnboardingOverlays(){
+    private void prepareOnboardingOverlays() {
 
         int screenLaunchCount = getScreenLaunchCount();
         long workoutCount = MainApplication.getInstance().getUsersWorkoutCount();
         Logger.d(TAG, "prepareOnboardingOverlays, screenLaunchCount = " + screenLaunchCount
                 + ", workoutCount = " + workoutCount);
 
-        if (OnboardingOverlay.SWIPE_CAUSE.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+        if (OnboardingOverlay.SWIPE_CAUSE.isEligibleForDisplay(screenLaunchCount, workoutCount)) {
             MainApplication.getMainThreadHandler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if (isAttachedToActivity()
                             && isResumed()
                             && !getFragmentController().isDrawerVisible()
-                            && !CauseDataStore.getInstance().getCausesToShow().isEmpty()){
+                            && !CauseDataStore.getInstance().getCausesToShow().isEmpty()) {
                         // Show swipe screen overlay
                         swipeToPickOverlay.setVisibility(View.VISIBLE);
                     }
@@ -196,24 +184,23 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             checkAndScheduleMaterialTapOverlays(screenLaunchCount, workoutCount);
         }
     }
-    private void checkAndScheduleMaterialTapOverlays(int screenLaunchCount, long workoutCount){
-        if (OnboardingOverlay.LETS_GO.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+
+    private void checkAndScheduleMaterialTapOverlays(int screenLaunchCount, long workoutCount) {
+        if (OnboardingOverlay.LETS_GO.isEligibleForDisplay(screenLaunchCount, workoutCount)) {
             scheduleOverlay(OnboardingOverlay.LETS_GO, mRunButton, true);
-        }else if (OnboardingOverlay.DRAWER.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+        } else if (OnboardingOverlay.DRAWER.isEligibleForDisplay(screenLaunchCount, workoutCount)) {
             scheduleOverlay(OnboardingOverlay.DRAWER, drawerButton, false);
-        }else if (OnboardingOverlay.FEED.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+        } else if (OnboardingOverlay.FEED.isEligibleForDisplay(screenLaunchCount, workoutCount)) {
             scheduleOverlay(OnboardingOverlay.FEED, badge, false);
-        }else if (OnboardingOverlay.OVERALL_IMAPACT.isEligibleForDisplay(screenLaunchCount, workoutCount)){
+        } else if (OnboardingOverlay.OVERALL_IMAPACT.isEligibleForDisplay(screenLaunchCount, workoutCount)) {
             scheduleOverlay(OnboardingOverlay.OVERALL_IMAPACT, overallImpactTextView, true);
         }
     }
 
-    private ShowOverlayRunnable showOverlayRunnable;
-
     private void scheduleOverlay(final OnboardingOverlay overlay, final View target,
-                                 final boolean isRectangular){
+                                 final boolean isRectangular) {
         Logger.d(TAG, "scheduleOverlay: " + overlay.name());
-        if (showOverlayRunnable != null){
+        if (showOverlayRunnable != null) {
             showOverlayRunnable.cancel();
         }
         showOverlayRunnable = new ShowOverlayRunnable(this, overlay, target, isRectangular);
@@ -223,7 +210,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Override
     public void onPause() {
         super.onPause();
-        if (showOverlayRunnable != null){
+        if (showOverlayRunnable != null) {
             showOverlayRunnable.cancel();
         }
     }
@@ -232,7 +219,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     public void onStart() {
         super.onStart();
         Logger.d(TAG, "onStart");
-        if (render()){
+        if (render()) {
             Logger.d(TAG, "onStart: Triggering updateCauseData because render returned true");
             // Trigger an update call
             CauseDataStore.getInstance().updateCauseData();
@@ -252,41 +239,31 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     /**
      * Fetches (if required) the cause data and then displays it
+     *
      * @return true if an update for fresh data needs to be triggered, false if not
      */
     private boolean render() {
         Logger.d(TAG, "render");
-       /* if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
-            showProgressDialog();
-            SyncHelper.syncBadgesData();
-        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,false))
-        {
-            showProgressDialog();
-            SyncHelper.getAchievedBadged();
-        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,false))
-        {
-            showProgressDialog();
-            SyncHelper.getAchievedTitle();
-        }else*/ if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
+        if (CauseDataStore.getInstance().getCausesToShow().isEmpty()) {
             // Data not fetched in DataStore
             Logger.d(TAG, "render: Data not fetched in CauseDataStore");
             showProgressDialog();
 
-            if (!NetworkUtils.isNetworkConnected(getContext())){
+            if (!NetworkUtils.isNetworkConnected(getContext())) {
                 Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE)
                         .setAction(getString(R.string.retry), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if ( NetworkUtils.isNetworkConnected(getContext()) ){
-                            render();
-                        }
-                    }
-                }).show();
-            }else {
+                            @Override
+                            public void onClick(View v) {
+                                if (NetworkUtils.isNetworkConnected(getContext())) {
+                                    render();
+                                }
+                            }
+                        }).show();
+            } else {
                 CauseDataStore.getInstance().updateCauseData();
             }
             return false;
-        } else if (mAdapter.getCount() <= 0){
+        } else if (mAdapter.getCount() <= 0) {
             // Data not being shown on screen
             Logger.d(TAG, "render: Data not being shown on screen");
             showProgressDialog();
@@ -294,18 +271,18 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             setCausedata(CauseDataStore.getInstance().getCausesToShow());
             CauseDataStore.getInstance().registerVisibleCauses();
             return true;
-        } else if (CauseDataStore.getInstance().isNewUpdateAvailable()){
+        } else if (CauseDataStore.getInstance().isNewUpdateAvailable()) {
             // Old Data on display
             Logger.d(TAG, "render: Old data on display, need to refresh it");
             int lastSeenImpact = CauseDataStore.getInstance().getLastSeenOverallImpact();
             int updatedImpact = CauseDataStore.getInstance().getOverallImpact();
-            if (updatedImpact > lastSeenImpact){
+            if (updatedImpact > lastSeenImpact) {
                 startCountAnimation(lastSeenImpact, updatedImpact);
             }
             setCausedata(CauseDataStore.getInstance().getCausesToShow());
             CauseDataStore.getInstance().registerVisibleCauses();
             return false;
-        }else {
+        } else {
             // Don't update UI as there is no update available to display
             // But return true so that the client can invoke a call to fetch fresh data
             return true;
@@ -329,14 +306,14 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             case R.id.btn_lets_run:
 
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
-                if (causeData.isCompleted()){
+                if (causeData.isCompleted()) {
                     Utils.shareImageWithMessage(getContext(), causeData.getCauseCompletedImage(),
                             causeData.getCauseCompletedShareMessageTemplate());
                     AnalyticsEvent.create(Event.ON_CLICK_CAUSE_COMPLETED_SHARE)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
-                            .put("cause_id",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
-                            .put("cause_name",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
+                            .put("cause_id", mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
+                            .put("cause_name", mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
                             .buildAndDispatch();
                 } else {
 //                    Utils.checkStreak();
@@ -347,8 +324,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
-                            .put("cause_id",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
-                            .put("cause_name",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
+                            .put("cause_id", mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
+                            .put("cause_name", mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
                             .buildAndDispatch();
                 }
                 break;
@@ -390,14 +367,6 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
-    /*@Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated) {
-        Logger.d(TAG, "onEvent: BadgeUpdated");
-        if (isVisible()){
-            checkBadgeData();
-        }
-    }*/
-
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -422,11 +391,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     }
 
-    private void setLetsRunButton(boolean isCauseCompleted){
-        if (isCauseCompleted){
+    private void setLetsRunButton(boolean isCauseCompleted) {
+        if (isCauseCompleted) {
             mRunButtonText.setText(getString(R.string.tell_your_friends));
             mRunButtonImage.setVisibility(View.GONE);
-        }else {
+        } else {
             mRunButtonText.setText(getString(R.string.let_go));
             mRunButtonImage.setVisibility(View.VISIBLE);
         }
@@ -440,25 +409,35 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     public void setCausedata(List<CauseData> causes) {
         Logger.d(TAG, "setCausedata: number of cause cards = " + causes.size());
-        if (causes == null || causes.isEmpty()){
+        if (causes == null || causes.isEmpty()) {
             // No cause data to show
             Snackbar.make(mContentView, getString(R.string.some_error_occurred), Snackbar.LENGTH_INDEFINITE).show();
         }
         CauseDataStore.getInstance().sortCauses(causes);
-        boolean b = false;
-        for (int i = 0; i < causes.size(); i++) {
-            if (causes.get(i).isCompleted()) {
+        if (ReferProgram.isReferProgramActive()) {
+            boolean b = false;
+            for (int i = 0; i < causes.size(); i++) {
+                if (causes.get(i).isCompleted()) {
+                    CauseData causeData = new CauseData();
+                    causeData.setId(-1);
+                    causes.add(i, causeData);
+                    b = true;
+                    break;
+                }
+            }
+            if (!b) {
                 CauseData causeData = new CauseData();
                 causeData.setId(-1);
-                causes.add(i, causeData);
-                b = true;
-                break;
+                causes.add(causeData);
             }
-        }
-        if (!b) {
-            CauseData causeData = new CauseData();
-            causeData.setId(-1);
-            causes.add(causeData);
+        } else {
+            for (CauseData causeData :
+                    causes) {
+                if (causeData.getId() == -1) {
+                    causes.remove(causeData);
+                    break;
+                }
+            }
         }
 
         mAdapter.setData(causes);
@@ -466,27 +445,54 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         mRunButton.setVisibility(View.VISIBLE);
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
         hideProgressDialog();
-        prepareOnboardingOverlays();
         Utils.checkBadgeData(false);
-        showSMCMatchDialog();
+        showSMCDialog();
     }
 
-    private void showSMCMatchDialog() {
+    private void showSMCDialog() {
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, false)) {
-            SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(), Constants.USER_NEW);
+            somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(), Constants.USER_NEW);
             somethingIsCookingDialog.show();
+            somethingIsCookingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    prepareOnboardingOverlays();
+                }
+            });
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, false);
+        } else if (somethingIsCookingDialog == null) {
+            long noOfDaysPassed = ReferProgram.noOfDaysPassed();
+            if ((noOfDaysPassed == 1 ||
+                    noOfDaysPassed % 5 == 0) &&
+                    !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false)) {
+                SMCDialog smcDialog = new SMCDialog(getContext());
+                smcDialog.show();
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, true);
+                smcDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        prepareOnboardingOverlays();
+                    }
+                });
+            } else {
+                if (!(noOfDaysPassed == 1 || noOfDaysPassed % 5 == 0)) {
+                    SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false);
+                }
+                prepareOnboardingOverlays();
+            }
+        } else {
+            prepareOnboardingOverlays();
         }
     }
 
-    public CauseData getCurrentCause(){
-        if (viewPager != null){
+    public CauseData getCurrentCause() {
+        if (viewPager != null) {
             return mAdapter.getItemAtPosition(viewPager.getCurrentItem());
         }
         return null;
     }
 
-    private void setOverallImpactTextView(int overallImpact){
+    private void setOverallImpactTextView(int overallImpact) {
         overallImpactTextView.setText(UnitsManager.formatRupeeToMyCurrency(overallImpact));
     }
 
@@ -495,20 +501,17 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         animator.setDuration(NUMBER_ANIMATION_DURATION);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                setOverallImpactTextView((int)animation.getAnimatedValue());
+                setOverallImpactTextView((int) animation.getAnimatedValue());
             }
         });
         animator.start();
     }
 
-    @Subscribe(threadMode =  ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
-    {
-        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
-        {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetStreak onGetStreak) {
+        if (onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS) {
             render();
-        }else
-        {
+        } else {
 //            showHideProgress(false,null);
             MainApplication.showToast(getResources().getString(R.string.some_error));
         }

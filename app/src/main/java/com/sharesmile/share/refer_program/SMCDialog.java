@@ -11,9 +11,11 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SMCDialog extends Dialog {
 
@@ -46,6 +48,18 @@ public class SMCDialog extends Dialog {
 
     private void init() {
         shareCode.setText(MainApplication.getInstance().getUserDetails().getMyReferCode());
+    }
+
+    @OnClick(R.id.share_code)
+    public void onShareClick() {
+        Utils.share(getOwnerActivity(),
+                String.format(getContext().getString(R.string.smc_share_more_meals),
+                        MainApplication.getInstance().getUserDetails().getMyReferCode()));
+    }
+
+    @OnClick(R.id.close)
+    public void onCloseClick() {
+        dismiss();
     }
 
 }

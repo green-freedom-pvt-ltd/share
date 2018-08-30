@@ -168,4 +168,9 @@
     <style name="EditTextHint">
         <item name="android:textColorHint">@color/light_blue</item>
     </style>
+
+    <style name="NavigationViewStyle">
+        <item name="android:textSize">13sp</item> <!-- menu item text size-->
+        <!--<item name="android:listPreferredItemHeightSmall">40dp</item>&lt;!&ndash; menu item height&ndash;&gt;-->
+    </style>
 </resources>

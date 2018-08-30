@@ -79,6 +79,7 @@ public class ReferProgramFragment extends BaseFragment{
         if (bundle != null && bundle.containsKey("position")) {
             smcViewpager.setCurrentItem(1);
         }
+        Utils.setStausBarColor(getActivity().getWindow(), R.color.clr_328f6c);
     }
 
     private void init() {

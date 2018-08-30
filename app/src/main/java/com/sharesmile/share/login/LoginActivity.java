@@ -22,6 +22,7 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -181,9 +182,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
         {
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
-            SyncHelper.forceRefreshEntireWorkoutHistory();
-            onLoginSuccess();
+            if (ReferProgram.getReferProgramDetails() == null) {
+                ReferProgram.syncDetails();
+            } else {
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+                SyncHelper.forceRefreshEntireWorkoutHistory();
+                onLoginSuccess();
+            }
+
         }else
         {
             MainApplication.showToast(getResources().getString(R.string.login_error));

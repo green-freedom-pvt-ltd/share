@@ -19,5 +19,6 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             app:itemTextColor="@color/black"
-            app:menu="@menu/menu_main" />
+            app:menu="@menu/menu_main"
+            app:theme="@style/NavigationViewStyle" />
 </android.support.v4.widget.DrawerLayout>

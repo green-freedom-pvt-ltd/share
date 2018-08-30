@@ -31,6 +31,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.telephony.PhoneNumberUtils;
@@ -46,6 +47,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -142,6 +144,7 @@ import static com.sharesmile.share.core.Constants.USER_PROP_LIFETIME_STEPS;
 import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_AMT_RAISED;
 import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_CALORIES;
 import static com.sharesmile.share.core.Constants.USER_PROP_TOTAL_RUNS;
+import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_DISMISSED;
 import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_FINISHED;
 import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_FOCAL_PRESSED;
@@ -2185,5 +2188,19 @@ public class Utils {
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
+    }
+
+    public static void setStausBarColor(Window window, int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // clear FLAG_TRANSLUCENT_STATUS flag:
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+// add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+// finally change the color
+            window.setStatusBarColor(ContextCompat.getColor(getContext(), color));
+
+        }
     }
 }

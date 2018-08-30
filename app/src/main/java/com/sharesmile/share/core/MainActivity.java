@@ -73,6 +73,7 @@ import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.profile.streak.StreakGoalFragment;
 import com.sharesmile.share.refer_program.ReferProgramFragment;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
 import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
@@ -388,6 +389,19 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             impactLeagueMenu.setVisible(false);
         }
 
+        MenuItem shareMenu = menu.findItem(R.id.nav_item_share);
+        if (ReferProgram.isReferProgramActive()) {
+            shareMenu.setTitle(getResources().getString(R.string.share_a_meal_challenge_nav_text));
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_NAV_NOTI, true)) {
+                shareMenu.setIcon(R.drawable.smc_bowl);
+            } else {
+                shareMenu.setIcon(R.drawable.smc_bowl);
+            }
+        } else {
+            shareMenu.setTitle(getResources().getString(R.string.share_camel_case));
+            shareMenu.setIcon(R.drawable.ic_share_black_24dp);
+        }
+
         for (int i = 0; i < menu.size(); i++) {
             MenuItem mi = menu.getItem(i);
             applyFontToMenuItem(mi);
@@ -488,6 +502,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             mDrawerLayout.closeDrawer(Gravity.START);
             return;
         }
+        Utils.setStausBarColor(getWindow(), R.color.bright_sky_blue);
         hideKeyboard(null);
         if (getFragmentManager().getBackStackEntryCount() == 1) {
             ActivityCompat.finishAffinity(this);
@@ -578,6 +593,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                 break;
             case R.id.nav_item_share:
 //            replaceFragment(ShareFragment.newInstance(WorkoutDataImpl.getDummyWorkoutData(), CauseDataStore.getInstance().getCausesToShow().get(0)), true);
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SMC_NAV_NOTI, false);
                 share();
                 AnalyticsEvent.create(Event.ON_SELECT_SHARE_MENU)
                         .buildAndDispatch();

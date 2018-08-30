@@ -45,6 +45,7 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.streak.model.Goal;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
@@ -453,6 +454,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     public void startSyncTasks() {
         Logger.d(TAG, "startSyncTasks");
+        ReferProgram.syncDetails();
         SyncHelper.syncUserFromDB();
         ClientConfig.sync();
         SyncHelper.scheduleDataSync(this);

@@ -49,6 +49,7 @@ import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.badges.model.Badge;
 import com.sharesmile.share.profile.badges.model.Title;
 import com.sharesmile.share.profile.streak.model.Streak;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationData;
 import com.sharesmile.share.tracking.models.WorkoutBatchLocationDataResponse;
@@ -174,6 +175,7 @@ public class SyncService extends GcmTaskService {
     public static int syncData() {
         Logger.d(TAG, "syncData");
         ClientConfig.sync();
+        ReferProgram.syncDetails();
         syncServerTime();
         uploadUserData();
         uploadStreak();

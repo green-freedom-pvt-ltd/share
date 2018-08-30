@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -59,4 +59,6 @@
 
     <dimen name="onboarding_margin_top">25dp</dimen>
     <dimen name="cardview_corner_radius">2dp</dimen>
+
+    <dimen tools:override="true" name="design_navigation_icon_padding">20dp</dimen>
 </resources>
