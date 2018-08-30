@@ -87,6 +87,8 @@ import com.squareup.picasso.Target;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -938,5 +940,18 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 //            showHideProgress(false,null);
 //            MainApplication.showToast(getResources().getString(R.string.some_error));
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnErrorResponse onErrorResponse) {
+        try {
+            JSONObject error = new JSONObject(onErrorResponse.response.getErrors().toString());
+            if (error.has("msg")) {
+                MainApplication.showToast(error.getString("msg"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }

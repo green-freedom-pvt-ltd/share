@@ -3,12 +3,11 @@ package com.sharesmile.share.network;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.UnObfuscable;
-import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
 import com.sharesmile.share.utils.Utils;
-
 
 import org.json.JSONObject;
 
@@ -244,7 +243,7 @@ public class NetworkDataProvider {
         }
         Request.Builder requestBuilder = new Request.Builder().url(url);
         if (MainApplication.isTokenAvailable() || MainApplication.isLogin()) {
-            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken() + "1");
         }
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);

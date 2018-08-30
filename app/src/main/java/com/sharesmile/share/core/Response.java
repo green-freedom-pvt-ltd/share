@@ -11,6 +11,8 @@ public class Response implements UnObfuscable {
     private String status;
     @SerializedName("response")
     private JsonElement response;
+    @SerializedName("errors")
+    private JsonElement errors;
 
     public int getCode() {
         return code;
@@ -34,5 +36,13 @@ public class Response implements UnObfuscable {
 
     public void setResponse(JsonElement response) {
         this.response = response;
+    }
+
+    public JsonElement getErrors() {
+        return errors;
+    }
+
+    public void setErrors(JsonElement errors) {
+        this.errors = errors;
     }
 }

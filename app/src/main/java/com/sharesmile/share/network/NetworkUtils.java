@@ -9,6 +9,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.event.UpdateEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -111,11 +116,9 @@ public class NetworkUtils {
         }
     }
 
-    public static <T> T parseSuccessResponse(Response response, Class<T> tClass) throws NetworkException{
+    public static <T> T parseSuccessResponse(com.sharesmile.share.core.Response serverResponse, Class<T> tClass) throws NetworkException {
 
         Gson gson = new Gson();
-        String responseString = getStringResponse(response);
-        com.sharesmile.share.core.Response serverResponse = gson.fromJson(responseString, com.sharesmile.share.core.Response.class);
         switch (serverResponse.getCode()) {
             case Constants.SUCCESS_GET:
                 return gson.fromJson(serverResponse.getResponse().toString(), tClass);
@@ -124,22 +127,19 @@ public class NetworkUtils {
 
         }
         try{
-            return gson.fromJson(responseString, tClass);
+            return gson.fromJson(serverResponse.getResponse().toString(), tClass);
         }catch(JsonSyntaxException jse){
             String message = "JsonSyntaxException while parsing response string to " + tClass.getSimpleName()
-                    + ", responseString: " + responseString;
+                    + ", responseString: " + serverResponse.getResponse().toString();
             Logger.e(TAG, message, jse);
             throw new NetworkException.Builder().cause(jse)
-                    .httpStatusCode(response.code())
+                    .httpStatusCode(serverResponse.getCode())
                     .errorMessage(message).build();
         }
     }
 
-    public static <T> T parseSuccessResponse(Response response, Type typeOfT) throws NetworkException{
-
+    public static <T> T parseSuccessResponse(com.sharesmile.share.core.Response serverResponse, Type typeOfT) throws NetworkException {
         Gson gson = new Gson();
-        String responseString = getStringResponse(response);
-        com.sharesmile.share.core.Response serverResponse = gson.fromJson(responseString, com.sharesmile.share.core.Response.class);
         switch (serverResponse.getCode()) {
             case Constants.SUCCESS_GET:
                 return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
@@ -149,25 +149,25 @@ public class NetworkUtils {
 
         }
         try{
-            return gson.fromJson(responseString, typeOfT);
+            return gson.fromJson(serverResponse.getResponse(), typeOfT);
         }catch(JsonSyntaxException jse){
             String message = "JsonSyntaxException while parsing response string to " + typeOfT.toString()
-                    + ", responseString: " + responseString;
+                    + ", responseString: " + serverResponse.getResponse();
             Logger.e(TAG, message, jse);
-            throw new NetworkException.Builder().cause(jse).httpStatusCode(response.code()).errorMessage(message).build();
+            throw new NetworkException.Builder().cause(jse).httpStatusCode(serverResponse.getCode()).errorMessage(message).build();
         }
     }
 
-    private static NetworkException convertResponseToException(Response response) {
+    private static NetworkException convertResponseToException(Response response, com.sharesmile.share.core.Response serverResponse) {
         String requestUrl = response.request().url().toString();
         String method = response.request().method();
         int responseCode = response.code();
         String messageFromServer = response.message();
-        try {
+        /*try {
             messageFromServer = response.body().string();
         }catch (IOException ioe){
             Logger.e(TAG, "Can't fetch response body");
-        }
+        }*/
 
         String why = null;
         int failureType;
@@ -179,21 +179,32 @@ public class NetworkUtils {
             why = method + " response not successful for URL: " + requestUrl;
             failureType = FailureType.RESPONSE_FAILURE;
         }
+        String errorResponse = "";
+        try {
+            JSONObject jsonObject = new JSONObject(serverResponse.getErrors().toString());
+            if (jsonObject.has("msg")) {
+                errorResponse = jsonObject.getString("msg");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return new NetworkException.Builder().errorMessage(why).failureType(failureType)
                 .httpStatusCode(response.code())
-                .messageFromServer(messageFromServer)
+                .messageFromServer(messageFromServer).errorResponse(errorResponse)
                 .build();
     }
 
     public static <T> T handleResponse(Response response, Class<T> mWrapperClass) throws NetworkException {
         T wrapperObj = null;
         if (null != response) {
+            com.sharesmile.share.core.Response serverResponse = getResponseFromServerResponse(response);
             if (response.isSuccessful()) {
-                wrapperObj = parseSuccessResponse(response, mWrapperClass);
+                wrapperObj = parseSuccessResponse(serverResponse, mWrapperClass);
                 return wrapperObj;
             } else {
                 //Failure Scenarios
-                throw convertResponseToException(response);
+                EventBus.getDefault().post(new UpdateEvent.OnErrorResponse(serverResponse));
+                throw convertResponseToException(response, serverResponse);
             }
         } else {
             //response obtained from OkHttp is null
@@ -206,12 +217,15 @@ public class NetworkUtils {
     public static <T> T handleResponse(Response response, Type typeOfT) throws NetworkException {
         T wrapperObj = null;
         if (null != response) {
+            com.sharesmile.share.core.Response serverResponse = getResponseFromServerResponse(response);
+
             if (response.isSuccessful()) {
-                wrapperObj = parseSuccessResponse(response, typeOfT);
+                wrapperObj = parseSuccessResponse(serverResponse, typeOfT);
                 return wrapperObj;
             } else {
                 //Failure Scenarios
-                throw convertResponseToException(response);
+                EventBus.getDefault().post(new UpdateEvent.OnErrorResponse(serverResponse));
+                throw convertResponseToException(response, serverResponse);
             }
         } else {
             //response obtained from OkHttp is null
@@ -219,6 +233,14 @@ public class NetworkUtils {
             throw new NetworkException.Builder().errorMessage(why).failureType(FailureType.RESPONSE_FAILURE)
                     .build();
         }
+    }
+
+    private static com.sharesmile.share.core.Response getResponseFromServerResponse(Response response) throws NetworkException {
+
+        Gson gson = new Gson();
+        String responseString = getStringResponse(response);
+        return gson.fromJson(responseString, com.sharesmile.share.core.Response.class);
+
     }
 
     public static NetworkException wrapIOException(Request request, IOException ioe){

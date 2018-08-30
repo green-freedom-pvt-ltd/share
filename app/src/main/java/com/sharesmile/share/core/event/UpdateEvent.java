@@ -3,6 +3,7 @@ package com.sharesmile.share.core.event;
 import android.content.Intent;
 
 import com.google.gson.JsonObject;
+import com.sharesmile.share.core.Response;
 import com.sharesmile.share.core.cause.model.CauseList;
 
 import Models.CampaignList;
@@ -181,4 +182,13 @@ public class UpdateEvent {
             this.jsonObject = jsonObject;
         }
     }
+
+    public static class OnErrorResponse {
+        public Response response;
+
+        public OnErrorResponse(Response response) {
+            this.response = response;
+        }
+    }
+
 }
