@@ -7,7 +7,10 @@ import com.sharesmile.share.leaderboard.referprogram.model.ReferProgramBoard;
 import java.util.List;
 
 public class ReferProgramList implements UnObfuscable{
-    @SerializedName("results")
+    @SerializedName("total_meals_shared")
+    int totalMealsShared;
+
+    @SerializedName("leaderboard_data")
     List<ReferProgramBoard> referProgramBoardList;
 
     public List<ReferProgramBoard> getReferProgramBoardList() {
@@ -16,5 +19,13 @@ public class ReferProgramList implements UnObfuscable{
 
     public void setReferProgramBoardList(List<ReferProgramBoard> referProgramBoardList) {
         this.referProgramBoardList = referProgramBoardList;
+    }
+
+    public int getTotalMealsShared() {
+        return totalMealsShared;
+    }
+
+    public void setTotalMealsShared(int totalMealsShared) {
+        this.totalMealsShared = totalMealsShared;
     }
 }

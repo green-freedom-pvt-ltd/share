@@ -2,14 +2,14 @@ package com.sharesmile.share.leaderboard.impactleague;
 
 import android.text.TextUtils;
 
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueDataEvent;
-import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,8 +135,8 @@ public class LeagueBoardFragment extends BaseLeagueFragment {
     }
 
     @Override
-    public boolean toShowBanner() {
-        return true;
+    public int toShowBanner() {
+        return 1;
     }
 
     @Override

@@ -184,6 +184,8 @@ public class Constants {
     public static final String PREF_IS_WORKOUT_DATA_UP_TO_DATE_IN_DB="pref_is_workout_data_up_to_date_in_db";
     public static final String PREF_REFER_PROGRAM_LEADERBOARD_CACHED_DATA="pref_refer_leaderboard_cached_data_new";
 
+    public static final String PREF_SMC_LEADERBOARD_CACHED_DATA = "pref_smc_leaderboard_cached_data_new";
+    public static final String PREF_SMC_LEADERBOARD_CACHED_TOTAL = "pref_smc_leaderboard_cached_total";
     //app Update
     public static final String PREF_LATEST_APP_VERSION = "pref_latest_app_version";
     public static final String PREF_FORCE_UPDATE = "pref_force_update";

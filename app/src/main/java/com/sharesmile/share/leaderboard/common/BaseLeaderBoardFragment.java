@@ -77,7 +77,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     protected void init(boolean b) {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.CauseId.eq(false)).list();
-        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this,mWorkoutList,b);
+        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this, mWorkoutList, b, getActivity());
         mLayoutManager = new LinearLayoutManager(getContext());
         fetchData();
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
@@ -227,8 +227,8 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     @Override
-    public boolean toShowBanner() {
-        return false;
+    public int toShowBanner() {
+        return 0;
     }
 
     @Override

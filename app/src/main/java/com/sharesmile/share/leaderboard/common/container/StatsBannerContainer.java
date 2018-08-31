@@ -6,8 +6,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.utils.Utils;
 
 import Models.LeagueBoard;
@@ -19,6 +19,7 @@ import butterknife.ButterKnife;
  */
 
 public class StatsBannerContainer {
+
 
     @BindView(R.id.iv_banner_logo)
     ImageView bannerLogo;
@@ -51,6 +52,7 @@ public class StatsBannerContainer {
         bannerTotalImpact.setText(UnitsManager.formatRupeeToMyCurrency(board.getTotalImpact()));
         bannerNumRuns.setText(Utils.formatCommaSeparated((long) board.getTotalRuns()));
         bannerNumMembers.setText(String.valueOf(board.getTotalMembers()));
+
     }
 
 }

@@ -2,8 +2,8 @@ package com.sharesmile.share.leaderboard.referprogram.model;
 
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.base.UnObfuscable;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
-import com.sharesmile.share.utils.Utils;
 
 public class ReferProgramBoard implements UnObfuscable{
 
@@ -76,9 +76,10 @@ public class ReferProgramBoard implements UnObfuscable{
     public BaseLeaderBoardItem getLeaderBoardDbObject()
     {
         String profilePicture = getProfilePicture();
-        if(profilePicture.length()==0)
-        {
+        if(profilePicture.length()==0) {
             profilePicture = getSocialThumb();
+        } else {
+            profilePicture = Urls.getImpactProfileS3BucketUrl() + profilePicture;
         }
         BaseLeaderBoardItem lb = new BaseLeaderBoardItem(
                 getUserId(), getUserName() , profilePicture,

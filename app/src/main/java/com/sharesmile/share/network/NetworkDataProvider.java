@@ -243,7 +243,7 @@ public class NetworkDataProvider {
         }
         Request.Builder requestBuilder = new Request.Builder().url(url);
         if (MainApplication.isTokenAvailable() || MainApplication.isLogin()) {
-            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken() + "1");
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
         }
         Request request = requestBuilder.build();
         Call call = getSingleOkHttpClient().newCall(request);
@@ -402,8 +402,7 @@ public class NetworkDataProvider {
     public static <R extends UnObfuscable> void doGetCallAsync(String url, NetworkAsyncCallback<R> cb) {
         Request.Builder requestBuilder = new Request.Builder().url(url);
         if (MainApplication.isLogin()) {
-//            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
-            requestBuilder.addHeader("Authorization", "Bearer 271c0a26ce3f8a1ba32c4343f3836d5bb0544a93");
+            requestBuilder.addHeader("Authorization", "Bearer " + MainApplication.getInstance().getToken());
         }
         Request request = requestBuilder.build();
 

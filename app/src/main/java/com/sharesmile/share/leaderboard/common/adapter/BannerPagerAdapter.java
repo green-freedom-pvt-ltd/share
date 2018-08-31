@@ -14,7 +14,7 @@ public abstract class BannerPagerAdapter extends PagerAdapter {
 
     private static final String TAG = "BannerPagerAdapter";
 
-    abstract int getNumPages();
+    public abstract int getNumPages();
 
     protected abstract View getItemView(int position, ViewGroup container);
 

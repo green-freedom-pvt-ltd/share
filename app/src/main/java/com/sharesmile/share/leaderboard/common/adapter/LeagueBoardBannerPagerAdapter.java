@@ -36,7 +36,7 @@ public class LeagueBoardBannerPagerAdapter extends BannerPagerAdapter {
     }
 
     @Override
-    int getNumPages() {
+    public int getNumPages() {
         return 2;
     }
 

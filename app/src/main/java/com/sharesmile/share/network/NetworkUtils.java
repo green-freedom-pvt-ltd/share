@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -138,18 +139,31 @@ public class NetworkUtils {
         }
     }
 
+    public static <T> T parseSuccessResponse(Response serverResponse, Class<T> tClass) throws NetworkException {
+
+        Gson gson = new Gson();
+        try {
+            return gson.fromJson(getStringResponse(serverResponse), tClass);
+        } catch (JsonSyntaxException jse) {
+            String message = "JsonSyntaxException while parsing response string to " + tClass.getSimpleName();
+            Logger.e(TAG, message, jse);
+            throw new NetworkException.Builder().cause(jse)
+                    .httpStatusCode(serverResponse.code())
+                    .errorMessage(message).build();
+        }
+    }
+
     public static <T> T parseSuccessResponse(com.sharesmile.share.core.Response serverResponse, Type typeOfT) throws NetworkException {
         Gson gson = new Gson();
         switch (serverResponse.getCode()) {
             case Constants.SUCCESS_GET:
                 return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
             case Constants.SUCCESS_POST:
-
-                break;
+                return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
 
         }
         try{
-            return gson.fromJson(serverResponse.getResponse(), typeOfT);
+            return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
         }catch(JsonSyntaxException jse){
             String message = "JsonSyntaxException while parsing response string to " + typeOfT.toString()
                     + ", responseString: " + serverResponse.getResponse();
@@ -180,13 +194,15 @@ public class NetworkUtils {
             failureType = FailureType.RESPONSE_FAILURE;
         }
         String errorResponse = "";
-        try {
-            JSONObject jsonObject = new JSONObject(serverResponse.getErrors().toString());
-            if (jsonObject.has("msg")) {
-                errorResponse = jsonObject.getString("msg");
+        if (serverResponse != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(serverResponse.getErrors().toString());
+                if (jsonObject.has("msg")) {
+                    errorResponse = jsonObject.getString("msg");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
         return new NetworkException.Builder().errorMessage(why).failureType(failureType)
                 .httpStatusCode(response.code())
@@ -197,14 +213,25 @@ public class NetworkUtils {
     public static <T> T handleResponse(Response response, Class<T> mWrapperClass) throws NetworkException {
         T wrapperObj = null;
         if (null != response) {
-            com.sharesmile.share.core.Response serverResponse = getResponseFromServerResponse(response);
-            if (response.isSuccessful()) {
-                wrapperObj = parseSuccessResponse(serverResponse, mWrapperClass);
-                return wrapperObj;
+            String requestUrl = response.request().url().toString();
+            if (requestUrl.startsWith(Urls.getGoogleConvertTokenUrl())) {
+                if (response.isSuccessful()) {
+                    wrapperObj = parseSuccessResponse(response, mWrapperClass);
+                    return wrapperObj;
+                } else {
+                    //Failure Scenarios
+                    throw convertResponseToException(response, null);
+                }
             } else {
-                //Failure Scenarios
-                EventBus.getDefault().post(new UpdateEvent.OnErrorResponse(serverResponse));
-                throw convertResponseToException(response, serverResponse);
+                com.sharesmile.share.core.Response serverResponse = getResponseFromServerResponse(response);
+                if (response.isSuccessful()) {
+                    wrapperObj = parseSuccessResponse(serverResponse, mWrapperClass);
+                    return wrapperObj;
+                } else {
+                    //Failure Scenarios
+                    EventBus.getDefault().post(new UpdateEvent.OnErrorResponse(serverResponse));
+                    throw convertResponseToException(response, serverResponse);
+                }
             }
         } else {
             //response obtained from OkHttp is null

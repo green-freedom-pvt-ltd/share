@@ -1,6 +1,9 @@
 package com.sharesmile.share.leaderboard.referprogram;
 
 import android.content.Context;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
@@ -8,6 +11,7 @@ import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.common.BaseLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
 import com.sharesmile.share.leaderboard.referprogram.model.ReferProgramBoard;
+import com.sharesmile.share.refer_program.ReferProgramFragment;
 import com.sharesmile.share.refer_program.model.ReferProgramList;
 import com.sharesmile.share.utils.Utils;
 
@@ -61,6 +65,7 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
 //        setHasOptionsMenu(true);
         setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge_title));
         getFragmentController().setToolbarElevation(0);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -132,6 +137,23 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
 
     @Override
     public boolean toShowLogo() {
+        return true;
+    }
+
+    @Override
+    public int toShowBanner() {
+        return 2;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_share_n_feed, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        getFragmentController().replaceFragment(new ReferProgramFragment(), true);
         return true;
     }
 }

@@ -8,6 +8,7 @@ public interface LeaderBoardItem {
 
     int BANNER_HEADER = 0;
     int ROW_ITEM = 1;
+    int BANNER_HEADER_SMC = 2;
 
     int getType();
 }

@@ -5,33 +5,33 @@ import android.content.Context;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.core.sync.SyncService;
+import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.leaderboard.global.model.LeaderBoardData;
 import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
 import com.sharesmile.share.leaderboard.impactleague.event.ExitLeague;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.leaderboard.impactleague.event.TeamLeaderBoardDataFetched;
-import com.sharesmile.share.analytics.Analytics;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.base.ExpoBackoffTask;
-import com.sharesmile.share.core.sync.SyncService;
-import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardDataUpdated;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardDataUpdated;
-import com.sharesmile.share.leaderboard.referprogram.model.ReferProgramBoard;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.network.NameValuePair;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.refer_program.model.ReferProgramList;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.network.NameValuePair;
-import com.sharesmile.share.core.SharedPrefsManager;
-import com.sharesmile.share.core.config.Urls;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -315,7 +315,8 @@ public class LeaderBoardDataStore {
     public void setReferLeaderBoardData(ReferProgramList referProgramList){
         LeaderBoardDataStore.this.referProgramList = referProgramList;
 
-        SharedPrefsManager.getInstance().setObject(Constants.PREF_MY_TEAM_LEADERBOARD_CACHED_DATA, referProgramList);
+        SharedPrefsManager.getInstance().setLong(Constants.PREF_SMC_LEADERBOARD_CACHED_TOTAL, referProgramList.getTotalMealsShared());
+        SharedPrefsManager.getInstance().setObject(Constants.PREF_SMC_LEADERBOARD_CACHED_DATA, referProgramList);
 
     }
 
@@ -357,7 +358,7 @@ public class LeaderBoardDataStore {
     }
 
     public void updateReferLeaderBoardData() {
-        NetworkDataProvider.doGetCallAsync(Urls.getReferprogramleaderboardlistUrl()+"2", new NetworkAsyncCallback<ReferProgramList>() {
+        NetworkDataProvider.doGetCallAsync(Urls.getReferprogramleaderboardlistUrl() + ReferProgram.getReferProgramDetails().getId(), new NetworkAsyncCallback<ReferProgramList>() {
             @Override
             public void onNetworkFailure(NetworkException ne) {
                 Logger.e(TAG, "Couldn't fetch GlobalLeaderBoard data: " + ne);
