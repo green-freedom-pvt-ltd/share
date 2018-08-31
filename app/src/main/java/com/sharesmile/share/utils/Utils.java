@@ -1842,7 +1842,7 @@ public class Utils {
                 SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
         {
             checkAchievedBadgeData(b);
-        } else if (badges == null || badges.size() == 0)
+        } else if (!(badges != null && badges.size() != 0))
         {
             SyncHelper.syncBadgesData();
         }
@@ -1878,7 +1878,7 @@ public class Utils {
                     achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
                     achievedBadge.setCategory(0);
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-                    achievedBadge.setParamDone(0.1);
+                    achievedBadge.setParamDone(badge.getBadgeParameter());
                     achievedBadge.setUserId(MainApplication.getInstance().getUserID());
                     achievedBadgeDao.insertOrReplace(achievedBadge);
                 }
