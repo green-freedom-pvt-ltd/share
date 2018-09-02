@@ -17,6 +17,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 
@@ -75,11 +76,13 @@ public class SomethingIsCookingDialog extends Dialog {
         String profilePic1Url = "";
         if (MainApplication.getInstance().getUserDetails().getProfilePicture() != null &&
                 MainApplication.getInstance().getUserDetails().getProfilePicture().length() > 0) {
-            profilePic1Url = MainApplication.getInstance().getUserDetails().getProfilePicture();
+            profilePic1Url = Urls.getImpactProfileS3BucketUrl() + MainApplication.getInstance().getUserDetails().getProfilePicture();
         } else {
             profilePic1Url = MainApplication.getInstance().getUserDetails().getSocialThumb();
         }
         ShareImageLoader.getInstance().loadImage(profilePic1Url, profilePic1,
+                ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePicture(), profilePic2,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
 
         if (userType == Constants.USER_NEW)//new user

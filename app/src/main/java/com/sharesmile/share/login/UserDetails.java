@@ -31,10 +31,12 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("refer_code_used")
     private String referCodeUsed;
 
-    @SerializedName("referal_id")
+    @SerializedName("referrer_user_id")
     private int referalId;
-    @SerializedName("Tha")
+    @SerializedName("referrer_name")
     private String referalName;
+    @SerializedName("referrer_profile_picture")
+    private String referrerProfilePicture;
 
     @SerializedName("address")
     private String address;
@@ -421,5 +423,13 @@ public class UserDetails implements UnObfuscable {
 
     public void setReferalName(String referalName) {
         this.referalName = referalName;
+    }
+
+    public String getReferrerProfilePicture() {
+        return referrerProfilePicture;
+    }
+
+    public void setReferrerProfilePicture(String referrerProfilePicture) {
+        this.referrerProfilePicture = referrerProfilePicture;
     }
 }

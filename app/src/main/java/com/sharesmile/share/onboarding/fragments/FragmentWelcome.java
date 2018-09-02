@@ -86,7 +86,9 @@ public class FragmentWelcome extends BaseFragment {
 
     private void init() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        boolean b = userDetails.getReferCodeUsed().length() > 0;
+        boolean b = userDetails.getReferCodeUsed() != null &&
+                userDetails.getReferCodeUsed().length() > 0;
+        b = false;
         if (b) {
             referralCodeLayout.setVisibility(View.GONE);
             inviteLayout.setVisibility(View.VISIBLE);
@@ -131,7 +133,9 @@ public class FragmentWelcome extends BaseFragment {
 
     private void verifyCode() {
         String referCodeString = referralCode.getText().toString();
-        if (referCodeString.length() != 10) {
+        if (referCodeString.length() != 5) {
+            progressBar.setVisibility(View.GONE);
+            submitReferral.setVisibility(View.VISIBLE);
             MainApplication.showToast("Invalid code, please enter valid code.");
         } else {
             JSONObject requestObject = new JSONObject();
@@ -179,6 +183,11 @@ public class FragmentWelcome extends BaseFragment {
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
             userDetails.setReferalId(result.getInt("referrer_user_id"));
             userDetails.setReferalName(result.getString("referrer_name"));
+            if (result.getString("referrer_profile_picture").length() > 0) {
+                userDetails.setReferrerProfilePicture(Urls.getImpactProfileS3BucketUrl() + result.getString("referrer_profile_picture"));
+            } else {
+                userDetails.setReferrerProfilePicture(result.getString("referrer_social_thumb"));
+            }
             userDetails.setReferCodeUsed(referralCode.getText().toString());
             MainApplication.getInstance().setUserDetails(userDetails);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
@@ -195,8 +204,6 @@ public class FragmentWelcome extends BaseFragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
 

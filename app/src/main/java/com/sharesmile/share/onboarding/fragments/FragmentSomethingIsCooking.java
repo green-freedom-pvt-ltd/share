@@ -14,6 +14,7 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.CommonActions;
@@ -42,6 +43,8 @@ public class FragmentSomethingIsCooking extends BaseFragment {
     CircularImageView profilePic1;
     @BindView(R.id.profile_pic_2)
     CircularImageView profilePic2;
+    @BindView(R.id.something_is_cooking_desc)
+    TextView somethingIsCookingDesc;
 
 
     @Nullable
@@ -63,12 +66,16 @@ public class FragmentSomethingIsCooking extends BaseFragment {
         String imageUrl = "";
         if (userDetails.getProfilePicture() != null &&
                 userDetails.getProfilePicture().length() > 0) {
-            imageUrl = userDetails.getProfilePicture();
+            imageUrl = Urls.getImpactProfileS3BucketUrl() + userDetails.getProfilePicture();
         } else {
             imageUrl = userDetails.getSocialThumb();
         }
         ShareImageLoader.getInstance().loadImage(imageUrl, profilePic1,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+
+        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePicture(), profilePic2,
+                ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+        somethingIsCookingDesc.setText(getResources().getString(R.string.such_a_noble_beginning));
         EventBus.getDefault().post(new UpdateEvent.OnCodeVerified(new JsonObject()));
 
         smcButtonsLayout.setVisibility(View.GONE);
