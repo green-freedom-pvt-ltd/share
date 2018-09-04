@@ -1,6 +1,7 @@
 package com.sharesmile.share.profile.history;
 
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -28,6 +29,7 @@ import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.helpcenter.category.leveltwo.PastWorkoutIssueFragment;
 import com.sharesmile.share.helpcenter.category.FeedbackCategory;
 import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.tracking.workout.data.model.Run;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.Logger;
@@ -198,6 +200,13 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
     public void onEvent(UpdateEvent.RunDataUpdated runDataUpdated) {
         init();
         swipeRefreshLayout.setRefreshing(false);
+        Loader<CharityOverview> loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
+        // If the Loader was null, initialize it. Else, restart it.
+        if(loader==null){
+//            getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
+        }else{
+            loader.onContentChanged();
+        }
     }
 
     public void fetchRunDataFromDb() {

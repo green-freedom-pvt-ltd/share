@@ -99,7 +99,8 @@ import static com.sharesmile.share.core.Constants.PROFILE_SCREEN;
  * Created by ankitmaheshwari on 4/28/17.
  */
 
-public class ProfileFragment extends BaseFragment implements SeeAchievedBadge, OpenCharityOverview, LoaderManager.LoaderCallbacks<CharityOverview> {
+public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
+        OpenCharityOverview, LoaderManager.LoaderCallbacks<CharityOverview> {
 
     private static final String TAG = "ProfileFragment";
 

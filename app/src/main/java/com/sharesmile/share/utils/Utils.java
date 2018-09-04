@@ -1310,6 +1310,7 @@ public class Utils {
                         .put("reminder_time", time)
                         .buildAndDispatch();
             }
+            SyncHelper.oneTimeUploadUserData();
         }
 
     }
