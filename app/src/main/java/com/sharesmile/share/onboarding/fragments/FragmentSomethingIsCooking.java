@@ -73,7 +73,7 @@ public class FragmentSomethingIsCooking extends BaseFragment {
         ShareImageLoader.getInstance().loadImage(imageUrl, profilePic1,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
 
-        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePicture(), profilePic2,
+        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePic(), profilePic2,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         somethingIsCookingDesc.setText(getResources().getString(R.string.such_a_noble_beginning));
         EventBus.getDefault().post(new UpdateEvent.OnCodeVerified(new JsonObject()));
@@ -85,6 +85,7 @@ public class FragmentSomethingIsCooking extends BaseFragment {
     @OnClick({R.id.continue_tv, R.id.close})
     public void onClick(View v) {
         getFragmentController().replaceFragment(new FragmentGender(), true);
+
     }
 
 }

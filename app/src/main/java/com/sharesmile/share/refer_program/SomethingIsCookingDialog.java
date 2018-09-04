@@ -82,19 +82,19 @@ public class SomethingIsCookingDialog extends Dialog {
         }
         ShareImageLoader.getInstance().loadImage(profilePic1Url, profilePic1,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
-        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePicture(), profilePic2,
+        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePic(), profilePic2,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
 
         if (userType == Constants.USER_NEW)//new user
         {
             somethingIsCookingDesc.setText
                     (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_new_user)
-                            , MainApplication.getInstance().getUserDetails().getReferalName()));
+                            , MainApplication.getInstance().getUserDetails().getReferrerDetails().getReferalName()));
         } else //old user
         {
             somethingIsCookingDesc.setText
                     (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_old_user)
-                            , MainApplication.getInstance().getUserDetails().getReferalName()));
+                            , MainApplication.getInstance().getUserDetails().getReferrerDetails().getReferalName()));
         }
     }
 
@@ -122,7 +122,7 @@ public class SomethingIsCookingDialog extends Dialog {
                 Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
                 Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                         String.format(getContext().getString(R.string.smc_tell_your_friends),
-                                MainApplication.getInstance().getUserDetails().getReferalName()
+                                MainApplication.getInstance().getUserDetails().getReferrerDetails().getReferalName()
                                 , MainApplication.getInstance().getUserDetails().getMyReferCode()));
                 break;
         }

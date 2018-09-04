@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.base.UnObfuscable;
+import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.utils.Utils;
 
 /**
@@ -31,12 +32,11 @@ public class UserDetails implements UnObfuscable {
     @SerializedName("refer_code_used")
     private String referCodeUsed;
 
-    @SerializedName("referrer_user_id")
-    private int referalId;
-    @SerializedName("referrer_name")
-    private String referalName;
-    @SerializedName("referrer_profile_picture")
-    private String referrerProfilePicture;
+    @SerializedName("referrer_details")
+    private ReferrerDetails referrerDetails;
+
+    @SerializedName("user_joined_after_smc_start")
+    private boolean newUser;
 
     @SerializedName("address")
     private String address;
@@ -409,27 +409,78 @@ public class UserDetails implements UnObfuscable {
         this.mealsShared = mealsShared;
     }
 
-    public int getReferalId() {
-        return referalId;
+    public ReferrerDetails getReferrerDetails() {
+        return referrerDetails;
     }
 
-    public void setReferalId(int referalId) {
-        this.referalId = referalId;
+    public void setReferrerDetails(ReferrerDetails referrerDetails) {
+        this.referrerDetails = referrerDetails;
     }
 
-    public String getReferalName() {
-        return referalName;
+    public void initReferrerDetails() {
+        this.referrerDetails = new ReferrerDetails();
     }
 
-    public void setReferalName(String referalName) {
-        this.referalName = referalName;
+    public boolean isNewUser() {
+        return newUser;
     }
 
-    public String getReferrerProfilePicture() {
-        return referrerProfilePicture;
+    public void setNewUser(boolean newUser) {
+        this.newUser = newUser;
     }
 
-    public void setReferrerProfilePicture(String referrerProfilePicture) {
-        this.referrerProfilePicture = referrerProfilePicture;
+    public String getReferrerProfilePic() {
+        if (referrerDetails != null) {
+            if (referrerDetails.getReferrerProfilePicture().length() > 0) {
+                return Urls.getImpactProfileS3BucketUrl() + referrerDetails.getReferrerProfilePicture();
+            } else {
+                return referrerDetails.getReferrerSocialThumb();
+            }
+        } else {
+            return "";
+        }
+    }
+
+    public class ReferrerDetails {
+        @SerializedName("referrer_user_id")
+        private int referalId;
+        @SerializedName("referrer_name")
+        private String referalName;
+        @SerializedName("referrer_social_thumb")
+        private String referrerSocialThumb;
+        @SerializedName("referrer_profile_picture")
+        private String referrerProfilePicture;
+
+        public int getReferalId() {
+            return referalId;
+        }
+
+        public void setReferalId(int referalId) {
+            this.referalId = referalId;
+        }
+
+        public String getReferalName() {
+            return referalName;
+        }
+
+        public void setReferalName(String referalName) {
+            this.referalName = referalName;
+        }
+
+        public String getReferrerSocialThumb() {
+            return referrerSocialThumb;
+        }
+
+        public void setReferrerSocialThumb(String referrerSocialThumb) {
+            this.referrerSocialThumb = referrerSocialThumb;
+        }
+
+        public String getReferrerProfilePicture() {
+            return referrerProfilePicture;
+        }
+
+        public void setReferrerProfilePicture(String referrerProfilePicture) {
+            this.referrerProfilePicture = referrerProfilePicture;
+        }
     }
 }

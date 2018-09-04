@@ -191,4 +191,9 @@ public class UpdateEvent {
         }
     }
 
+    public static class OnKonfettiFinish {
+        public OnKonfettiFinish() {
+        }
+    }
+
 }

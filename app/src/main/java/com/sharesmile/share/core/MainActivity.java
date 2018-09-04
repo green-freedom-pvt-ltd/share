@@ -374,6 +374,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     public void updateNavigationMenu() {
+//        mNavigationView.setItemIconTintList(null);
         Menu menu = mNavigationView.getMenu();
         MenuItem loginMenu = menu.findItem(R.id.nav_item_login);
         MenuItem profileMenu = menu.findItem(R.id.nav_item_profile);

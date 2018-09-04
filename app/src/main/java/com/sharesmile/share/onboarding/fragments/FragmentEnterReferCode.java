@@ -67,7 +67,7 @@ public class FragmentEnterReferCode extends BaseFragment {
 
     private void init() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if(userDetails.getReferalId()==0) {
+        if (userDetails.getReferrerDetails().getReferalId() == 0) {
             referCode.requestFocus();
             InputMethodManager imm = (InputMethodManager) getContext().getSystemService(
                     Context.INPUT_METHOD_SERVICE);
@@ -151,8 +151,11 @@ public class FragmentEnterReferCode extends BaseFragment {
                 JSONObject result = jsonObject.getJSONObject("results");
                 MainApplication.showToast("You were refered by : "+result.getString("referrer_name"));
                 UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-                userDetails.setReferalId(result.getInt("referrer_user_id"));
-                userDetails.setReferalName(result.getString("referrer_name"));
+                userDetails.initReferrerDetails();
+                userDetails.getReferrerDetails().setReferalId(result.getInt("referrer_user_id"));
+                userDetails.getReferrerDetails().setReferalName(result.getString("referrer_name"));
+                userDetails.getReferrerDetails().setReferrerProfilePicture(result.getString("referrer_profile_picture"));
+                userDetails.getReferrerDetails().setReferrerSocialThumb(result.getString("referrer_social_thumb"));
                 userDetails.setReferCodeUsed(referCode.getText().toString());
                 MainApplication.getInstance().setUserDetails(userDetails);
                 commonActions.setBackAndContinue(TAG, getContext().getResources().getString(R.string.continue_txt));

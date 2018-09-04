@@ -366,6 +366,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnCodeVerified onCodeVerified) {
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_CONFETTI, true);
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_CONFETTI, true)) {
             viewKonfetti.setVisibility(View.VISIBLE);
             viewKonfetti.build()
@@ -381,9 +382,14 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                     .addShapes(Shape.RECT, Shape.CIRCLE)
                     .addSizes(new Size(12, 5))
                     .setPosition(-50f, 1000f, -50f, -50f)
-                    .streamFor(300, 5000L);
+                    .streamFor(300, 1000L);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_CONFETTI, false);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnKonfettiFinish onKonfettiFinish) {
+        viewKonfetti.setVisibility(View.GONE);
     }
 
     public void setBg(boolean b) {

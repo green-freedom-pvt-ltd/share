@@ -12,9 +12,12 @@ import android.widget.TextView;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +51,7 @@ public class FragmentGender extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().post(new UpdateEvent.OnKonfettiFinish());
         commonActions = ((OnBoardingActivity)getActivity());
         commonActions.setExplainText(getContext().getResources().getString(R.string.choose_your_gender),"");
         commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));

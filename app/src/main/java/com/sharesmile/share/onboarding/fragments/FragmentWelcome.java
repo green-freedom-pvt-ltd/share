@@ -86,22 +86,26 @@ public class FragmentWelcome extends BaseFragment {
 
     private void init() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        boolean b = userDetails.getReferCodeUsed() != null &&
-                userDetails.getReferCodeUsed().length() > 0;
-        b = false;
-        if (b) {
-            referralCodeLayout.setVisibility(View.GONE);
-            inviteLayout.setVisibility(View.VISIBLE);
-            invitedByName.setText(userDetails.getReferalName() + "");
-            commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt));
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
+        if (userDetails.isNewUser()) {
+            boolean b = userDetails.getReferCodeUsed() != null &&
+                    userDetails.getReferCodeUsed().length() > 0;
+            if (b) {
+                referralCodeLayout.setVisibility(View.GONE);
+                inviteLayout.setVisibility(View.VISIBLE);
+                invitedByName.setText(userDetails.getReferrerDetails().getReferalName() + "");
+                commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt));
+                SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
+            } else {
+                inviteLayout.setVisibility(View.GONE);
+                referralCodeLayout.setVisibility(View.VISIBLE);
+                submitReferral.setVisibility(View.GONE);
+                referralCode.setText("");
+                referralCode.setHint(getResources().getString(R.string.have_a_referral_code));
+                referralCodeTil.setHint("");
+            }
         } else {
-            inviteLayout.setVisibility(View.GONE);
-            referralCodeLayout.setVisibility(View.VISIBLE);
-            submitReferral.setVisibility(View.GONE);
-            referralCode.setText("");
-            referralCode.setHint(getResources().getString(R.string.have_a_referral_code));
-            referralCodeTil.setHint("");
+            referralCodeLayout.setVisibility(View.GONE);
+            commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt));
         }
     }
 
@@ -181,13 +185,11 @@ public class FragmentWelcome extends BaseFragment {
             progressBar.setVisibility(View.GONE);
             JSONObject result = new JSONObject(onCodeVerified.jsonObject.toString());
             UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-            userDetails.setReferalId(result.getInt("referrer_user_id"));
-            userDetails.setReferalName(result.getString("referrer_name"));
-            if (result.getString("referrer_profile_picture").length() > 0) {
-                userDetails.setReferrerProfilePicture(Urls.getImpactProfileS3BucketUrl() + result.getString("referrer_profile_picture"));
-            } else {
-                userDetails.setReferrerProfilePicture(result.getString("referrer_social_thumb"));
-            }
+            userDetails.initReferrerDetails();
+            userDetails.getReferrerDetails().setReferalId(result.getInt("referrer_user_id"));
+            userDetails.getReferrerDetails().setReferalName(result.getString("referrer_name"));
+            userDetails.getReferrerDetails().setReferrerProfilePicture(result.getString("referrer_profile_picture"));
+            userDetails.getReferrerDetails().setReferrerSocialThumb(result.getString("referrer_social_thumb"));
             userDetails.setReferCodeUsed(referralCode.getText().toString());
             MainApplication.getInstance().setUserDetails(userDetails);
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_MATCH_DIALOG, true);
