@@ -17,6 +17,7 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
 import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
@@ -37,6 +38,8 @@ public class ReferProgramFragment extends BaseFragment{
     ImageView back;
     @BindView(R.id.smc_viewpager)
     ViewPager smcViewpager;
+    @BindView(R.id.powered_by_tv)
+    TextView poweredByTv;
 
     SMCPageAdapter smcPageAdapter;
 
@@ -106,6 +109,7 @@ public class ReferProgramFragment extends BaseFragment{
             }
         });
         setIndicator(0);
+        poweredByTv.setText(getResources().getString(R.string.powered_by) + " " + ReferProgram.getReferProgramDetails().getSponsoredBy());
     }
 
     private void setIndicator(int position) {

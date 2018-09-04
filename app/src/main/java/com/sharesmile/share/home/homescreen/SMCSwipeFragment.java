@@ -7,13 +7,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.refer_program.ReferProgramFragment;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.views.FontCache;
 
 import butterknife.BindView;
@@ -31,6 +34,12 @@ public class SMCSwipeFragment extends BaseFragment {
     TextView shareAMealDesc;
     @BindView(R.id.share_a_meal_total_meals)
     TextView shareATotalMeals;
+    @BindView(R.id.smc_title)
+    TextView smcTitle;
+    @BindView(R.id.powered_by_tv)
+    TextView poweredByTv;
+    @BindView(R.id.bacha_plate)
+    ImageView bachaPlate;
 
     public static Fragment getInstance() {
         Fragment fragment = new SMCSwipeFragment();
@@ -61,13 +70,20 @@ public class SMCSwipeFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         close.setVisibility(View.GONE);
         smcSwipeLayout.setBackgroundResource(R.drawable.greenboard);
+        smcTitle.setTextSize(20.4f);
         shareAMealDesc.setLineSpacing(10, 1);
         Typeface myTypeface = FontCache.get("fonts/Lato-Bold.ttf", getContext());
         shareAMealDesc.setTypeface(myTypeface);
         shareAMealDesc.setTextSize(12);
         shareATotalMeals.setTypeface(myTypeface);
         shareATotalMeals.setTextSize(12);
+        shareATotalMeals.setText(getResources().getString(R.string.total_meals_by_you) + " " + MainApplication.getInstance().getUserDetails().getMealsShared());
+
         shareAMealDesc.setText("Invite a friend and feed hungry kids.\nYes! It’s that simple!");
+        poweredByTv.setTextSize(11);
+        poweredByTv.setText(getResources().getString(R.string.powered_by) + " " + ReferProgram.getReferProgramDetails().getSponsoredBy());
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        bachaPlate.setLayoutParams(layoutParams);
     }
 
     @Override

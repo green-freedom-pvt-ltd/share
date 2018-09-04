@@ -28,6 +28,7 @@
             android:gravity="center" />
 
         <TextView
+            android:id="@+id/smc_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/share_a_meal_challenge"
@@ -78,5 +79,6 @@
         android:layout_height="wrap_content"
         android:text="@string/total_meals_by_you"
         android:gravity="center"
-        android:layout_marginTop="14dp" />
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="19dp" />
 </LinearLayout>
