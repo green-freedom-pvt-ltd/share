@@ -203,7 +203,7 @@ public class SyncHelper {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPLOAD_ACHIEVEMENT_BADGE)
-                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setExecutionWindow(0L, 5) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
                 .setUpdateCurrent(true)

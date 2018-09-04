@@ -1,6 +1,5 @@
 package com.sharesmile.share.onboarding.fragments;
 
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.User;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
@@ -17,7 +15,6 @@ import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.utils.Utils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -57,12 +54,23 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
     private void setData() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         float userWeight = userDetails.getBodyWeight();
-        if(weightStrings.contains(((int)userWeight)+""))
-        {
-            weightPicker.setValue(weightStrings.indexOf(((int)userWeight)+""));
+        if (userWeight > 0) {
+            if (weightStrings.contains(((int) userWeight) + "")) {
+                weightPicker.setValue(weightStrings.indexOf(((int) userWeight) + ""));
+            }
+            int decimal = (int) ((userWeight * 10) % ((int) userWeight));
+            weightDecimalPicker.setValue(decimal);
+        } else {
+            setUserWeight(userDetails);
         }
-        int decimal = (int) ((userWeight*10)%((int)userWeight));
-        weightDecimalPicker.setValue(decimal);
+    }
+
+    private void setUserWeight(UserDetails userDetails) {
+        float w = weightPicker.getValue() + 40;
+        float wd = weightDecimalPicker.getValue() / 10.0f;
+
+        userDetails.setBodyWeight(w + wd);
+        MainApplication.getInstance().setUserDetails(userDetails);
     }
 
     private void setWeights() {
@@ -86,23 +94,9 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
         weightDecimalPicker.setOnValueChangedListener(this);
     }
 
-    private void changeDividerColor(NumberPicker picker, int color) {
-        try {
-            Field mField = NumberPicker.class.getDeclaredField("mSelectionDivider");
-            mField.setAccessible(true);
-            ColorDrawable colorDrawable = new ColorDrawable(color);
-            mField.set(picker, colorDrawable);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        float w = weightPicker.getValue()+40;
-        float wd = weightDecimalPicker.getValue()/10.0f;
-
-        userDetails.setBodyWeight(w+wd);
-        MainApplication.getInstance().setUserDetails(userDetails);
+        setUserWeight(userDetails);
     }
 }
