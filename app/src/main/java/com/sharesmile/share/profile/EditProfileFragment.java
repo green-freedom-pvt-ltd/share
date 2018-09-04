@@ -44,8 +44,6 @@ import com.google.gson.Gson;
 import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.R;
-import com.sharesmile.share.Title;
-import com.sharesmile.share.TitleDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
@@ -696,7 +694,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                     spinnerProfileTitle1.performClick();
                 }else
                 {
-                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title) + " title");
                 }
                 break;
             case R.id.profile_title2_layout :
@@ -705,7 +703,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                     spinnerProfileTitle2.performClick();
                 }else
                 {
-                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title));
+                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title) + " title");
                 }
                 break;
         }

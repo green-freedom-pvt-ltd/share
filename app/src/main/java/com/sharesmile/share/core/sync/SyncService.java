@@ -1514,7 +1514,9 @@ public class SyncService extends GcmTaskService {
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
-            AnalyticsEvent.create(Event.RESPONSE_OF_ACHIEVEMENTS).put("response", response.toString());
+            AnalyticsEvent.create(Event.RESPONSE_OF_ACHIEVEMENTS)
+                    .put("response", response.toString())
+                    .buildAndDispatch();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
