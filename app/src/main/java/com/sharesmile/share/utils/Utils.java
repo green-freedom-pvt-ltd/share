@@ -1932,6 +1932,7 @@ public class Utils {
             if(!causeIds.contains(achievedBadge.getCauseId()))
             {
                 achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                achievedBadge.setIsSync(false);
                 achievedBadgeDao.update(achievedBadge);
             }
         }
