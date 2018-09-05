@@ -63,8 +63,7 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
     @Override
     protected void setupToolbar() {
 //        setHasOptionsMenu(true);
-        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge_title));
-        getFragmentController().setToolbarElevation(0);
+        setToolbarTitle(getResources().getString(R.string.share_a_meal_challenge_toolbar_title));
         setHasOptionsMenu(true);
     }
 

@@ -42,12 +42,16 @@ public class CausePageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
-        CauseSwipeFragment fragment = (CauseSwipeFragment) object;
-        if (fragment.isCompleted()) {
-            // Figure out the position of fragment
-            return super.getItemPosition(object);
+        if (object instanceof CauseSwipeFragment) {
+            CauseSwipeFragment fragment = (CauseSwipeFragment) object;
+            if (fragment.isCompleted()) {
+                // Figure out the position of fragment
+                return super.getItemPosition(object);
+            } else {
+                return POSITION_NONE;
+            }
         } else {
-            return POSITION_NONE;
+            return super.getItemPosition(object);
         }
     }
 

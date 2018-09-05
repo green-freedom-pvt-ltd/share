@@ -178,6 +178,8 @@ public class ReferProgram implements UnObfuscable {
 
     public static boolean isReferProgramActive() {
         ReferProgram referProgram = getReferProgramDetails();
+        if (referProgram == null)
+            return false;
         Calendar currentCalendar = Calendar.getInstance();
         currentCalendar.setTimeInMillis(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis()));
         Calendar startCalendar = Calendar.getInstance();
