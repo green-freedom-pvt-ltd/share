@@ -58,6 +58,8 @@ public class ReferProgramBoard implements UnObfuscable{
     }
 
     public String getProfilePicture() {
+        if (profilePicture == null)
+            return "";
         return profilePicture;
     }
 

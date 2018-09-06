@@ -808,7 +808,8 @@ public class SyncService extends GcmTaskService {
             UserDetails response = NetworkDataProvider.doPutCall(Urls.getUserUrl(user_id), jsonObject,
                     UserDetails.class);
             Logger.d(TAG, "Response for getUser:" + gson.toJson(response));
-
+            UserDetails oldDetails = MainApplication.getInstance().getUserDetails();
+            response.setReferrerDetails(oldDetails.getReferrerDetails());
             MainApplication.getInstance().setUserDetails(response);
 
             return GcmNetworkManager.RESULT_SUCCESS;

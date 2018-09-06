@@ -162,6 +162,8 @@ public class UserDetails implements UnObfuscable {
     }
 
     public String getStreakCurrentDate() {
+        if (streakCurrentDate == null)
+            return "";
         return streakCurrentDate;
     }
 

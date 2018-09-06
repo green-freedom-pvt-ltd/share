@@ -441,8 +441,14 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
 
         mAdapter.setData(causes);
-        setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
-        mRunButton.setVisibility(View.VISIBLE);
+        if (causes.get(viewPager.getCurrentItem()).getId() == -1) {
+            mRunButton.setVisibility(View.GONE);
+            shareCodeLayout.setVisibility(View.VISIBLE);
+        } else {
+            setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
+            mRunButton.setVisibility(View.VISIBLE);
+            shareCodeLayout.setVisibility(View.GONE);
+        }
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
         hideProgressDialog();
         Utils.checkBadgeData(false);

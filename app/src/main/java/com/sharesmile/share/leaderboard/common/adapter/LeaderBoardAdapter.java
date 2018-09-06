@@ -3,6 +3,7 @@ package com.sharesmile.share.leaderboard.common.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
@@ -29,6 +30,8 @@ import com.sharesmile.share.views.CircularImageView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Models.LeagueBoard;
 import butterknife.BindView;
@@ -255,7 +258,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         private int currentPageIndex;
         private List<ImageView> indicators = new ArrayList<>();
-
+        Timer timer;
         public SMCBannerHeaderViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -296,6 +299,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     mParent.enableDisableSwipeRefresh(state == ViewPager.SCROLL_STATE_IDLE);
                 }
             });
+            autoSroll();
             addIndicators(2, currentPageIndex);
         }
 
@@ -332,6 +336,29 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         public void bindData() {
 
+        }
+
+        public void autoSroll() {
+            Handler handler = new Handler();
+            Runnable update = new Runnable() {
+                @Override
+                public void run() {
+                    int position = 0;
+                    if (currentPageIndex == 1) {
+                        position = 0;
+                    } else {
+                        position = 1;
+                    }
+                    bannerViewPager.setCurrentItem(position, true);
+                }
+            };
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    handler.post(update);
+                }
+            }, 5000, 7500);
         }
     }
     public class BannerHeaderViewHolder extends RecyclerView.ViewHolder{

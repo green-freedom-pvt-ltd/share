@@ -119,7 +119,9 @@ public class SomethingIsCookingDialog extends Dialog {
                                 MainApplication.getInstance().getUserDetails().getMyReferCode()));
                 break;
             case R.id.btn_tell_your_friends:
+                shareLayout.setBackgroundResource(R.drawable.something_is_cooking_bg);
                 Bitmap toShare = Utils.getBitmapFromLiveView(shareLayout);
+                shareLayout.setBackgroundResource(0);
                 Utils.share(getContext(), Utils.getLocalBitmapUri(toShare, getContext()),
                         String.format(getContext().getString(R.string.smc_tell_your_friends),
                                 MainApplication.getInstance().getUserDetails().getReferrerDetails().getReferalName()

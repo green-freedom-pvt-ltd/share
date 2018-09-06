@@ -266,10 +266,10 @@ public class LoginImpl {
         }
             MainApplication.getInstance().setUserDetails(userDetails);
 
-        /*if(userDetails.getBodyHeight()>0)
+        if (userDetails.getBodyHeight() > 0)
         {
             Utils.setOnboardingShown();
-        }*/
+        }
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_TOKEN, true);
         SyncHelper.getStreak();
         //show Toast confirmation
