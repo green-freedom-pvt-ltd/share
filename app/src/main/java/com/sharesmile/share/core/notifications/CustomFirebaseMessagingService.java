@@ -49,4 +49,9 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
+    @Override
+    public void onNewToken(String s) {
+        super.onNewToken(s);
+
+    }
 }

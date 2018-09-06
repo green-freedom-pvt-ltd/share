@@ -17,18 +17,18 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.core.sync.SyncService;
 import com.sharesmile.share.helpcenter.BaseFeedbackFragment;
 import com.sharesmile.share.helpcenter.FeedbackNode;
-import com.sharesmile.share.helpcenter.model.UserFeedback;
 import com.sharesmile.share.helpcenter.levelthree.chat.FeedbackChatContainer;
+import com.sharesmile.share.helpcenter.model.UserFeedback;
 import com.sharesmile.share.login.LoginActivity;
-import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
 
 import base.BaseDialog;
@@ -235,7 +235,7 @@ public abstract class FeedbackLevelThreeFragment extends BaseFeedbackFragment
         String fcmToken = FirebaseInstanceId.getInstance().getToken();
         if (!TextUtils.isEmpty(fcmToken)){
             Logger.d(TAG, "Will send FCM Token to Smooch: " + fcmToken);
-            Smooch.setFirebaseCloudMessagingToken(FirebaseInstanceId.getInstance().getToken());
+            Smooch.setFirebaseCloudMessagingToken(fcmToken);
         }
         ConversationActivity.show(getContext());
     }
