@@ -68,6 +68,8 @@ public class FragmentBirthday extends BaseFragment implements NumberPicker.OnVal
                 e.printStackTrace();
             }
         }
+        saveData();
+
     }
 
     private void setPickers() {
@@ -105,10 +107,13 @@ public class FragmentBirthday extends BaseFragment implements NumberPicker.OnVal
 
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        if(numberPicker.getId() == monthPicker.getId())
-        {
+        if(numberPicker.getId() == monthPicker.getId()) {
             setDatePicker();
         }
+        saveData();
+    }
+
+    private void saveData() {
         String mm = monthPicker.getValue()<10?"0"+(monthPicker.getValue()+1):(monthPicker.getValue()+1)+"";
         String dd = datePicker.getValue()<10?"0"+datePicker.getValue():datePicker.getValue()+"";
 

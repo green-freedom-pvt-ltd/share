@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.Badge;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.application.MainApplication;
@@ -19,6 +21,8 @@ import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.profile.badges.adapter.InProgressBadgeAdapter;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -69,6 +73,33 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchieved
                 .where(AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
                         AchievedBadgeDao.Properties.BadgeIdAchieved.notEq(-1),
                         AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+
+        Collections.sort(achievedBadges, new Comparator<AchievedBadge>() {
+            @Override
+            public int compare(AchievedBadge o1, AchievedBadge o2) {
+                BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+                List<Badge> badges1 = badgeDao.queryBuilder()
+                        .where(BadgeDao.Properties.BadgeId.eq(o1.getBadgeIdInProgress())).limit(1).list();
+                List<Badge> badges2 = badgeDao.queryBuilder()
+                        .where(BadgeDao.Properties.BadgeId.eq(o2.getBadgeIdInProgress())).limit(1).list();
+                if (badges1 != null && badges1.size() > 0 && badges2 != null && badges2.size() > 0) {
+                    if (badges1.get(0).getType().equals(Constants.BADGE_TYPE_STREAK)) {
+                        return 1;
+                    } else if (badges2.get(0).getType().equals(Constants.BADGE_TYPE_STREAK)) {
+                        return -1;
+                    } else {
+                        double badge1Total = badges1.get(0).getBadgeParameter();
+                        double badge2Total = badges2.get(0).getBadgeParameter();
+                        double badge1Diff = badge1Total - o1.getParamDone();
+                        double badge2Diff = badge2Total - o2.getParamDone();
+                        return badge1Diff < badge2Diff ? -1 : 1;
+                    }
+                } else {
+                    return 0;
+                }
+
+            }
+        });
         inProgressBadgeAdapter = new InProgressBadgeAdapter(achievedBadges,getContext());
         achievementBadgesRecyclerView.setAdapter(inProgressBadgeAdapter);
 

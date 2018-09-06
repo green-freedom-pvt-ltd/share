@@ -33,6 +33,7 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
 
     ArrayList<String> weightStrings;
     ArrayList<String> weightDecimalStrings;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,9 +45,9 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        commonActions = ((OnBoardingActivity)getActivity());
-        commonActions.setExplainText(getContext().getResources().getString(R.string.whats_your_current_weight),getContext().getResources().getString(R.string.weight_required_for));
-        commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
+        commonActions = ((OnBoardingActivity) getActivity());
+        commonActions.setExplainText(getContext().getResources().getString(R.string.whats_your_current_weight), getContext().getResources().getString(R.string.weight_required_for));
+        commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt));
         setWeights();
         setData();
     }
@@ -60,9 +61,9 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
             }
             int decimal = (int) ((userWeight * 10) % ((int) userWeight));
             weightDecimalPicker.setValue(decimal);
-        } else {
-            setUserWeight(userDetails);
         }
+        setUserWeight(userDetails);
+
     }
 
     private void setUserWeight(UserDetails userDetails) {
@@ -75,20 +76,18 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
 
     private void setWeights() {
         weightStrings = new ArrayList<>();
-        for(int i=40;i<=150;i++)
-        {
-            weightStrings.add(i+"");
+        for (int i = 40; i <= 150; i++) {
+            weightStrings.add(i + "");
         }
-        String s[] = weightStrings.toArray(new String[weightStrings.size()-1]);
-        Utils.setNumberPicker(weightPicker,s,s.length/2);
+        String s[] = weightStrings.toArray(new String[weightStrings.size() - 1]);
+        Utils.setNumberPicker(weightPicker, s, s.length / 2);
 
         weightDecimalStrings = new ArrayList<>();
-        for(int i=0;i<=9;i++)
-        {
-            weightDecimalStrings.add(i+"");
+        for (int i = 0; i <= 9; i++) {
+            weightDecimalStrings.add(i + "");
         }
-        String sd[] = weightDecimalStrings.toArray(new String[weightDecimalStrings.size()-1]);
-        Utils.setNumberPicker(weightDecimalPicker,sd,0);
+        String sd[] = weightDecimalStrings.toArray(new String[weightDecimalStrings.size() - 1]);
+        Utils.setNumberPicker(weightDecimalPicker, sd, 0);
 
         weightPicker.setOnValueChangedListener(this);
         weightDecimalPicker.setOnValueChangedListener(this);
