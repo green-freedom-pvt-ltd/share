@@ -197,7 +197,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             {
                 mImpact.setText(((int) leaderboard.getAmount()) + "");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    mImpact.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.smc_bowl_nav_black, 0);
+                    mImpact.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.smc_bowl_leaderboard_black, 0);
                     mImpact.setCompoundDrawablePadding(10);
                 }
             }else {

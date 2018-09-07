@@ -4,52 +4,52 @@
 
     <item
         android:id="@+id/nav_item_home"
-        android:icon="@drawable/svg_ic_home_black"
+        android:icon="@drawable/nav_icon_home"
         android:title="Home" />
 
     <item
         android:id="@+id/nav_item_profile"
-        android:icon="@drawable/svg_ic_face_black_24_px"
+        android:icon="@drawable/nav_icon_profile"
         android:title="Profile" />
 
     <item
         android:id="@+id/nav_item_login"
-        android:icon="@drawable/svg_ic_face_black_24_px"
+        android:icon="@drawable/nav_icon_profile"
         android:title="@string/login" />
     <item
         android:id="@+id/nav_item_impact_league"
-        android:icon="@drawable/ic_cup"
+        android:icon="@drawable/nav_icon_impact_league"
         android:visible="false"
         android:title="@string/impact_league" />
     <item
         android:id="@+id/nav_item_leaderboard"
-        android:icon="@drawable/ic_stars_black_24dp"
+        android:icon="@drawable/nav_icon_leaderboard"
         android:visible="false"
         android:title="@string/leaderboard" />
 
     <item
         android:id="@+id/nav_item_feed"
-        android:icon="@drawable/ic_public_black"
+        android:icon="@drawable/nav_icon_feed"
         android:title="@string/title_feed" />
 
     <item
         android:id="@+id/nav_item_help"
-        android:icon="@drawable/svg_ic_help_black"
+        android:icon="@drawable/nav_icon_help_center"
         android:title="@string/help_center" />
 
     <item
         android:id="@+id/nav_item_share"
-        android:icon="@drawable/ic_share_black_24dp"
+        android:icon="@drawable/nav_icon_share"
         android:title="@string/share_camel_case" />
 
     <item
         android:id="@+id/nav_item_settings"
-        android:icon="@drawable/svg_ic_settings_applications_black"
+        android:icon="@drawable/nav_icon_settings"
         android:title="@string/action_settings" />
 
     <item
         android:id="@+id/nav_item_how_it_works"
-        android:icon="@drawable/how_it_works"
+        android:icon="@drawable/nav_icon_how_it_works"
         android:title="@string/action_how_it_works" />
 
 

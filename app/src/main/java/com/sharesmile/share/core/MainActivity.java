@@ -415,9 +415,9 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         if (ReferProgram.isReferProgramActive()) {
             shareMenu.setTitle(getResources().getString(R.string.share_a_meal_challenge_nav_text));
             if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_NAV_NOTI, true)) {
-                shareMenu.setIcon(R.drawable.smc_bowl);
+                shareMenu.setIcon(R.drawable.nav_icon_smc);
             } else {
-                shareMenu.setIcon(R.drawable.smc_bowl);
+                shareMenu.setIcon(R.drawable.nav_icon_smc);
             }
         } else {
             shareMenu.setTitle(getResources().getString(R.string.share_camel_case));
