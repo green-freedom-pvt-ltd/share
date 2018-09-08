@@ -2109,6 +2109,8 @@ public class Utils {
                 case 3:
                     starImageView.setImageResource(R.drawable.star_3);
                     break;
+                default:
+                    starImageView.setImageResource(0);
             }
             starImageView.setVisibility(View.VISIBLE);
         }

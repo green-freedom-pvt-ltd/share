@@ -381,10 +381,18 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
                 Level level = Utils.getLevel(lifeTimeImpact);
-                levelDist.setText(UnitsManager.formatRupeeToMyCurrency(lifeTimeImpact) + "/" + UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
                 levelNum.setText("Level " + level.getLevel());
-                float progressPercent =
+                /*levelDist.setText(UnitsManager.formatRupeeToMyCurrency(lifeTimeImpact) + "/" +
+                        UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
+                        float progressPercent =
                         ((float) (lifeTimeImpact - level.getMinImpact())) / (level.getMaxImpact() - level.getMinImpact());
+                        */
+                float progress = lifeTimeImpact - level.getMinImpact();
+                float max = level.getMaxImpact() - level.getMinImpact();
+                levelDist.setText(UnitsManager.formatRupeeToMyCurrency(progress) + "/" +
+                        UnitsManager.formatRupeeToMyCurrency(max));
+                float progressPercent = progress / max;
+
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) levelProgressBar.getLayoutParams();
                 params.weight = progressPercent;
                 levelProgressBar.setLayoutParams(params);
