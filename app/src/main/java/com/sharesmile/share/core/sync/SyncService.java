@@ -82,10 +82,6 @@ import Models.MessageList;
 import Models.TeamLeaderBoard;
 import okhttp3.Response;
 
-import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
-import static com.sharesmile.share.core.Constants.BADGE_TYPE_CHANGEMAKER;
-import static com.sharesmile.share.core.Constants.BADGE_TYPE_MARATHON;
-import static com.sharesmile.share.core.Constants.BADGE_TYPE_STREAK;
 import static com.sharesmile.share.core.Constants.PREF_LAST_TIME_FEED_WAS_SEEN;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_FRAUD_DATA;
 import static com.sharesmile.share.core.sync.TaskConstants.PUSH_USER_FEEDBACK;
@@ -413,8 +409,8 @@ public class SyncService extends GcmTaskService {
             badgeDb.setDescription3(badge.getDescription3());
             badgeDb.setDescription_inprogress(badge.getDescriptionInProgress());
             badgeDb.setShare_badge_content(badge.getShareBadgeContent());
-//            badgeDb.setBadgeParameter(badge.getBadgeParameter());
-            //TODO hack
+            badgeDb.setBadgeParameter(badge.getBadgeParameter());
+           /* //TODO hack
             switch (badge.getType()) {
                 case BADGE_TYPE_CAUSE:
                     switch ((int) badge.getBadgeParameter()) {
@@ -454,7 +450,7 @@ public class SyncService extends GcmTaskService {
                 case BADGE_TYPE_MARATHON:
                     badgeDb.setBadgeParameter(badge.getBadgeParameter() / 10);
                     break;
-            }
+            }*/
 
 
             badgeDb.setBadgeParameterCheck(badge.getBadgeParameterCheck());

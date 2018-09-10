@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -393,7 +395,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     public void updateNavigationMenu() {
-//        mNavigationView.setItemIconTintList(null);
+        mNavigationView.setItemIconTintList(null);
         Menu menu = mNavigationView.getMenu();
         MenuItem loginMenu = menu.findItem(R.id.nav_item_login);
         MenuItem profileMenu = menu.findItem(R.id.nav_item_profile);
@@ -413,15 +415,20 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
         MenuItem shareMenu = menu.findItem(R.id.nav_item_share);
         if (ReferProgram.isReferProgramActive()) {
-            shareMenu.setTitle(getResources().getString(R.string.share_a_meal_challenge_nav_text));
             if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_NAV_NOTI, true)) {
-                shareMenu.setIcon(R.drawable.nav_icon_smc);
+                shareMenu.setIcon(R.drawable.nav_icon_smc_noti);
+                SpannableString s = new SpannableString(getResources().getString(R.string.share_a_meal_challenge_nav_text));
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#ff3900")), 0, s.length(), 0);
+                shareMenu.setTitle(s);
             } else {
                 shareMenu.setIcon(R.drawable.nav_icon_smc);
+                SpannableString s = new SpannableString(getResources().getString(R.string.share_a_meal_challenge_nav_text));
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#4a4a4a")), 0, s.length(), 0);
+                shareMenu.setTitle(s);
             }
         } else {
             shareMenu.setTitle(getResources().getString(R.string.share_camel_case));
-            shareMenu.setIcon(R.drawable.ic_share_black_24dp);
+            shareMenu.setIcon(R.drawable.nav_icon_share);
         }
 
         for (int i = 0; i < menu.size(); i++) {
