@@ -1393,7 +1393,7 @@ public class Utils {
         return cms + "";
     }
 
-    public static void setBadgeForCategory(CauseData causeData, String type, int paramDone) {
+    public static synchronized void setBadgeForCategory(CauseData causeData, String type, int paramDone) {
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             boolean categoryCompleted = true;
@@ -1942,7 +1942,7 @@ public class Utils {
 
     }
 
-    public static void checkStreak(boolean b) {
+    public static synchronized void checkStreak(boolean b) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         // just to change the format from dd/MM/yyyy to dd-MM-yyyy
         if(userDetails.getStreakCurrentDate().length()>0)
@@ -1996,6 +1996,23 @@ public class Utils {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                             sendStreak = true;
+                           /* if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES))
+                            {
+                                AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+                                List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().
+                                        where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_STREAK),
+                                                AchievedBadgeDao.Properties.CategoryStatus.eq(false)).list();
+                                for(int i=0;i<achievedBadges.size();i++)
+                                {
+                                    AchievedBadge achievedBadge = achievedBadges.get(i);
+                                    if(achievedBadge.getBadgeIdAchieved()>0)
+                                    {
+                                        achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                                        achievedBadgeDao.update(achievedBadge);
+                                    }
+                                }
+
+                            }*/
                         } else if (dayCount == 1) {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);

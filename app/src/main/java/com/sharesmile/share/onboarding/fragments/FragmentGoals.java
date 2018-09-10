@@ -104,12 +104,13 @@ public class FragmentGoals extends BaseFragment {
         TextView goalName = view.findViewById(R.id.goal_name);
         userDetails.setStreakGoalID(((Goal)goalName.getTag()).getId());
         userDetails.setStreakGoalDistance(((Goal)goalName.getTag()).getValue());
-
-        userDetails.setStreakRunProgress(0);
-        userDetails.setStreakCount(0);
-        userDetails.setStreakMaxCount(0);
-        userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
-        userDetails.setStreakAdded(false);
+        if (userDetails.getStreakCount() == 0) {
+            userDetails.setStreakRunProgress(0);
+            userDetails.setStreakCount(0);
+            userDetails.setStreakMaxCount(0);
+            userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+            userDetails.setStreakAdded(false);
+        }
         MainApplication.getInstance().setUserDetails(userDetails);
     }
 

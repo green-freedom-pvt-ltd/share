@@ -866,7 +866,7 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private static int uploadAchievement() {
+    private synchronized static int uploadAchievement() {
         if (!MainApplication.isLogin()) {
             // Can't sync a non logged in User
             return GcmNetworkManager.RESULT_FAILURE;
@@ -1518,7 +1518,7 @@ public class SyncService extends GcmTaskService {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                builder.put("jsonArray:" + i, jsonObject.getString("cause_title") + " " + jsonObject.getDouble("parameter_completed"));
+                builder.put("jsonArray:" + i, jsonObject.getString("badge_type") + "," + jsonObject.getString("cause_title") + "," + jsonObject.getDouble("parameter_completed"));
             }
 
             builder.buildAndDispatch();
