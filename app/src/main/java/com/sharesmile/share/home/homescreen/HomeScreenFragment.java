@@ -6,6 +6,7 @@ package com.sharesmile.share.home.homescreen;
 
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -90,6 +91,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     SomethingIsCookingDialog somethingIsCookingDialog;
     private CausePageAdapter mAdapter;
     private ShowOverlayRunnable showOverlayRunnable;
+    FragmentInterface mListener;
 
     @Nullable
     @Override
@@ -158,6 +160,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
         shareCode.setText(MainApplication.getInstance().getUserDetails().getMyReferCode());
+        mListener.updateNavigationMenu();
     }
 
     private void prepareOnboardingOverlays() {
@@ -300,6 +303,17 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         mContentView.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mListener = (FragmentInterface) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

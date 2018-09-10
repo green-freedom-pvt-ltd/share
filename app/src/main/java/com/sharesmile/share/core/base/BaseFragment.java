@@ -89,4 +89,8 @@ public class BaseFragment extends Fragment {
         return getClass().getCanonicalName();
     }
 
+    public interface FragmentInterface {
+        public void updateNavigationMenu();
+    }
+
 }

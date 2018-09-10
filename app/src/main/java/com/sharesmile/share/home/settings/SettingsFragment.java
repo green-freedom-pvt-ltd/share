@@ -23,19 +23,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.utils.Utils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -374,10 +371,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 }
                 break;
         }
-    }
-
-    public interface FragmentInterface {
-        public void updateNavigationMenu();
     }
 
     class CurrencyAdapter extends ArrayAdapter<CurrencySpinnerItem>{
