@@ -910,6 +910,7 @@ public class SyncService extends GcmTaskService {
                     }
                     jsonArray.put(jsonObject);
                 }
+                Logger.d(TAG, "Request for uploadAchievement:" + jsonArray);
                 JsonObject responseObject = NetworkDataProvider.doPostCall(Urls.getAchievementUrl(), jsonArray.toString(),
                         JsonObject.class);
                 JSONObject response = new JSONObject(responseObject.toString());
