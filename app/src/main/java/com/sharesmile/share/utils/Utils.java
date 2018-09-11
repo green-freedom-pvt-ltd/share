@@ -1316,6 +1316,7 @@ public class Utils {
                         .put("reminder_time", time)
                         .buildAndDispatch();
             }
+            SyncHelper.oneTimeUploadUserData();
         }
 
     }
@@ -1399,7 +1400,7 @@ public class Utils {
         return cms + "";
     }
 
-    public static void setBadgeForCategory(CauseData causeData, String type, int paramDone) {
+    public static synchronized void setBadgeForCategory(CauseData causeData, String type, int paramDone) {
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             boolean categoryCompleted = true;
@@ -1422,8 +1423,10 @@ public class Utils {
                 achievedBadge = achievedBadges.get(0);
                 if (categoryCompleted) {
                     if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
-                            (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK))))
+                            (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)))) {
                         achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                        achievedBadge.setIsSync(false);
+                    }
                 } else {
                     achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
                 }
@@ -1445,8 +1448,10 @@ public class Utils {
 
                     achievedBadge.setUserId(MainApplication.getInstance().getUserDetails().getUserId());
                     achievedBadge.setParamDone(paramDone);
-                    if (categoryCompleted)
+                    if (categoryCompleted) {
                         achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                        achievedBadge.setIsSync(false);
+                    }
                     else
                         achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
                     if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)) {
@@ -1454,9 +1459,11 @@ public class Utils {
                             achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
                         }
                     }
+
                 }
             }
             if (achievedBadge != null) {
+
                 if (type.equals(Constants.BADGE_TYPE_STREAK)) {
                     achievedBadge.setParamDone(paramDone);
                 }
@@ -1497,7 +1504,11 @@ public class Utils {
             if (achievedBadges.size() > 0) {
                 return -1;
             }
-        } else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+            achievedBadges = achievedBadgeDao.queryBuilder()
+                    .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
+                            AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                            AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
+        }else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.CauseId.eq(mCauseData.getId()),
@@ -1846,12 +1857,22 @@ public class Utils {
         BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
         List<Badge> badges = badgeDao.queryBuilder().list();
         if (badges != null && badges.size() > 0 &&
-                SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
+                SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,
+                        false))
         {
             checkAchievedBadgeData(b);
-        } else if (badges == null || badges.size() == 0)
-        {
+            AnalyticsEvent.create(Event.ACHIEVEMENTS_COUNT)
+                    .put("size", MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao()
+                            .queryBuilder().list().size())
+                    .put("method", "checkBadgeData")
+                    .put("class", "Utils")
+                    .put("boolean", b)
+                    .buildAndDispatch();
+        } else if (!(badges != null && badges.size() != 0)) {
             SyncHelper.syncBadgesData();
+        } else if (!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,
+                false)) {
+            SyncHelper.getAchievedBadged();
         }
     }
 
@@ -1869,6 +1890,12 @@ public class Utils {
                             AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_COMPLETED),
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
             if(achievedBadges.size()==0) {
+
+                achievedBadges = achievedBadgeDao.queryBuilder()
+                        .where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_CHANGEMAKER),
+                                AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS),
+                                AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+
                 BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
                 List<Badge> badges = badgeDao.queryBuilder().where(BadgeDao.Properties.Type.eq(Constants.BADGE_TYPE_CHANGEMAKER))
                         .orderAsc(BadgeDao.Properties.NoOfStars).limit(1).list();
@@ -1886,9 +1913,14 @@ public class Utils {
                     achievedBadge.setBadgeType(Constants.BADGE_TYPE_CHANGEMAKER);
                     achievedBadge.setCategory(0);
                     achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
-                    achievedBadge.setParamDone(0.1);
+                    achievedBadge.setParamDone(badge.getBadgeParameter());
                     achievedBadge.setUserId(MainApplication.getInstance().getUserID());
-                    achievedBadgeDao.insertOrReplace(achievedBadge);
+                    if (achievedBadges.size() > 0) {
+                        achievedBadge.setId(achievedBadges.get(0).getId());
+                        achievedBadgeDao.update(achievedBadge);
+                    } else {
+                        achievedBadgeDao.insertOrReplace(achievedBadge);
+                    }
                 }
             }
         }
@@ -1908,15 +1940,17 @@ public class Utils {
             if(!causeIds.contains(achievedBadge.getCauseId()))
             {
                 achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                achievedBadge.setIsSync(false);
                 achievedBadgeDao.update(achievedBadge);
             }
         }
         Utils.checkStreak(b);
+        SyncHelper.uploadAchievement();
         /*}*/
 
     }
 
-    public static void checkStreak(boolean b) {
+    public static synchronized void checkStreak(boolean b) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         // just to change the format from dd/MM/yyyy to dd-MM-yyyy
         if(userDetails.getStreakCurrentDate().length()>0)
@@ -1970,6 +2004,23 @@ public class Utils {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
                             sendStreak = true;
+                           /* if(SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES))
+                            {
+                                AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
+                                List<AchievedBadge> achievedBadges = achievedBadgeDao.queryBuilder().
+                                        where(AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_STREAK),
+                                                AchievedBadgeDao.Properties.CategoryStatus.eq(false)).list();
+                                for(int i=0;i<achievedBadges.size();i++)
+                                {
+                                    AchievedBadge achievedBadge = achievedBadges.get(i);
+                                    if(achievedBadge.getBadgeIdAchieved()>0)
+                                    {
+                                        achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
+                                        achievedBadgeDao.update(achievedBadge);
+                                    }
+                                }
+
+                            }*/
                         } else if (dayCount == 1) {
                             userDetails.setStreakAdded(false);
                             userDetails.setStreakRunProgress(0);
@@ -2083,6 +2134,8 @@ public class Utils {
                 case 3:
                     starImageView.setImageResource(R.drawable.star_3);
                     break;
+                default:
+                    starImageView.setImageResource(0);
             }
             starImageView.setVisibility(View.VISIBLE);
         }

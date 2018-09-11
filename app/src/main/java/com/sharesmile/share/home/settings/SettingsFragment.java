@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -32,6 +33,7 @@ import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.LoginActivity;
+import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -320,6 +322,14 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mListener.updateNavigationMenu();
         updateSettingItems();
         Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
+
+        Loader<CharityOverview> loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
+        // If the Loader was null, initialize it. Else, restart it.
+        if (loader == null) {
+//            getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
+        } else {
+            loader.onContentChanged();
+        }
 
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

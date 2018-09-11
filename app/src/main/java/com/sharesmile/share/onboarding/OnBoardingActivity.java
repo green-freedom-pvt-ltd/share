@@ -235,12 +235,10 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
                     if (continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
                         replaceFragment(new FragmentSetReminder(), true);
                         AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_YES_ASK_REMINDER_VALUE_SELECT_CONTINUE).buildAndDispatch();
-                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_ASK_REMINDER_CONTINUE).buildAndDispatch();
                     } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
                         Utils.setReminderTime("", this);
                         replaceFragment(new FragmentThankYou(), true);
                         AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_NO_ASK_REMINDER_VALUE_SELECT_CONTINUE).buildAndDispatch();
-                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_ASK_REMINDER_CONTINUE).buildAndDispatch();
                     }
                 } else if (fragment instanceof FragmentSetReminder) {
                     replaceFragment(new FragmentThankYou(), true);

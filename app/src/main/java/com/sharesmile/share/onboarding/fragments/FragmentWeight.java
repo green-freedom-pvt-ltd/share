@@ -1,6 +1,5 @@
 package com.sharesmile.share.onboarding.fragments;
 
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
 import com.sharesmile.share.R;
-import com.sharesmile.share.User;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.login.UserDetails;
@@ -17,7 +15,6 @@ import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.utils.Utils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -36,6 +33,7 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
 
     ArrayList<String> weightStrings;
     ArrayList<String> weightDecimalStrings;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,9 +45,9 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        commonActions = ((OnBoardingActivity)getActivity());
-        commonActions.setExplainText(getContext().getResources().getString(R.string.whats_your_current_weight),getContext().getResources().getString(R.string.weight_required_for));
-        commonActions.setBackAndContinue(TAG,getResources().getString(R.string.continue_txt));
+        commonActions = ((OnBoardingActivity) getActivity());
+        commonActions.setExplainText(getContext().getResources().getString(R.string.whats_your_current_weight), getContext().getResources().getString(R.string.weight_required_for));
+        commonActions.setBackAndContinue(TAG, getResources().getString(R.string.continue_txt));
         setWeights();
         setData();
     }
@@ -57,52 +55,47 @@ public class FragmentWeight extends BaseFragment implements NumberPicker.OnValue
     private void setData() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
         float userWeight = userDetails.getBodyWeight();
-        if(weightStrings.contains(((int)userWeight)+""))
-        {
-            weightPicker.setValue(weightStrings.indexOf(((int)userWeight)+""));
+        if (userWeight > 0) {
+            if (weightStrings.contains(((int) userWeight) + "")) {
+                weightPicker.setValue(weightStrings.indexOf(((int) userWeight) + ""));
+            }
+            int decimal = (int) ((userWeight * 10) % ((int) userWeight));
+            weightDecimalPicker.setValue(decimal);
         }
-        int decimal = (int) ((userWeight*10)%((int)userWeight));
-        weightDecimalPicker.setValue(decimal);
+        setUserWeight(userDetails);
+
+    }
+
+    private void setUserWeight(UserDetails userDetails) {
+        float w = weightPicker.getValue() + 40;
+        float wd = weightDecimalPicker.getValue() / 10.0f;
+
+        userDetails.setBodyWeight(w + wd);
+        MainApplication.getInstance().setUserDetails(userDetails);
     }
 
     private void setWeights() {
         weightStrings = new ArrayList<>();
-        for(int i=40;i<=150;i++)
-        {
-            weightStrings.add(i+"");
+        for (int i = 40; i <= 150; i++) {
+            weightStrings.add(i + "");
         }
-        String s[] = weightStrings.toArray(new String[weightStrings.size()-1]);
-        Utils.setNumberPicker(weightPicker,s,s.length/2);
+        String s[] = weightStrings.toArray(new String[weightStrings.size() - 1]);
+        Utils.setNumberPicker(weightPicker, s, s.length / 2);
 
         weightDecimalStrings = new ArrayList<>();
-        for(int i=0;i<=9;i++)
-        {
-            weightDecimalStrings.add(i+"");
+        for (int i = 0; i <= 9; i++) {
+            weightDecimalStrings.add(i + "");
         }
-        String sd[] = weightDecimalStrings.toArray(new String[weightDecimalStrings.size()-1]);
-        Utils.setNumberPicker(weightDecimalPicker,sd,0);
+        String sd[] = weightDecimalStrings.toArray(new String[weightDecimalStrings.size() - 1]);
+        Utils.setNumberPicker(weightDecimalPicker, sd, 0);
 
         weightPicker.setOnValueChangedListener(this);
         weightDecimalPicker.setOnValueChangedListener(this);
     }
 
-    private void changeDividerColor(NumberPicker picker, int color) {
-        try {
-            Field mField = NumberPicker.class.getDeclaredField("mSelectionDivider");
-            mField.setAccessible(true);
-            ColorDrawable colorDrawable = new ColorDrawable(color);
-            mField.set(picker, colorDrawable);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        float w = weightPicker.getValue()+40;
-        float wd = weightDecimalPicker.getValue()/10.0f;
-
-        userDetails.setBodyWeight(w+wd);
-        MainApplication.getInstance().setUserDetails(userDetails);
+        setUserWeight(userDetails);
     }
 }

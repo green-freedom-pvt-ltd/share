@@ -4,17 +4,12 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
@@ -214,9 +209,14 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
             continueTv.setVisibility(View.INVISIBLE);
             tellYourFriends.setOnClickListener(AchieviedBadgeFragment.this);
         } else {
+
             closeIv.setVisibility(View.INVISIBLE);
             continueTv.setVisibility(View.VISIBLE);
             if (TAG.equalsIgnoreCase(Constants.TITLE_TYPE_CAUSE)) {
+                AnalyticsEvent.create(Event.ON_LOAD_ACHIEVED_TITLE_POST_WORKOUT)
+                        .put("title_id", badgeId)
+                        .put("title_name", badgeTitle.getText().toString())
+                        .buildAndDispatch();
                 Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.zoom_in);
 
                 animation.setAnimationListener(new Animation.AnimationListener() {
@@ -240,6 +240,10 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
 
             } else {
+                AnalyticsEvent.create(Event.ON_LOAD_ACHIEVED_BADGE_POST_WORKOUT)
+                        .put("badge_id", badgeId)
+                        .put("badge_name", badgeTitle.getText().toString())
+                        .buildAndDispatch();
                 animation = ObjectAnimator.ofFloat(badgeLayout, "rotationY", 0.0f, 720f);
                 animation.setDuration(2200);
                 animation.setRepeatCount(0);

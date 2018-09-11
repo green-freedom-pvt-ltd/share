@@ -870,7 +870,7 @@ public class SyncService extends GcmTaskService {
         }
     }
 
-    private static int uploadAchievement() {
+    private synchronized static int uploadAchievement() {
         if (!MainApplication.isLogin()) {
             // Can't sync a non logged in User
             return GcmNetworkManager.RESULT_FAILURE;
@@ -1522,7 +1522,14 @@ public class SyncService extends GcmTaskService {
             JSONArray jsonArray = new JSONArray(responseString);
             AchievedBadgeDao achievedBadgeDao = MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao();
             BadgeDao badgeDao = MainApplication.getInstance().getDbWrapper().getBadgeDao();
+            AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.RESPONSE_OF_ACHIEVEMENTS);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
 
+                builder.put("jsonArray:" + i, jsonObject.getString("badge_type") + "," + jsonObject.getString("cause_title") + "," + jsonObject.getDouble("parameter_completed"));
+            }
+
+            builder.buildAndDispatch();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -1562,16 +1569,38 @@ public class SyncService extends GcmTaskService {
                 }
 
                 achievedBadge.setIsSync(true);
-                List<AchievedBadge> achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
+                List<AchievedBadge> achievedBadgeListFromDb = null;
+                if (achievedBadge.getServerId() > 0)
+                    achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
                         .where(AchievedBadgeDao.Properties.ServerId.eq(achievedBadge.getServerId()),
                                 AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
-                if (achievedBadgeListFromDb.size() > 0) {
+
+                if (!(achievedBadgeListFromDb != null && achievedBadgeListFromDb.size() > 0)) {
+                    if (achievedBadge.getBadgeType().equals(Constants.BADGE_TYPE_CAUSE)) {
+                        achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
+                                .where(AchievedBadgeDao.Properties.CauseId.eq(achievedBadge.getCauseId())
+                                        , AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+                    } else if (achievedBadge.getBadgeType().equals(Constants.BADGE_TYPE_STREAK) &&
+                            achievedBadge.getCategoryStatus().equals(Constants.BADGE_IN_PROGRESS)) {
+                        achievedBadgeListFromDb = achievedBadgeDao.queryBuilder()
+                                .where(AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
+                                        AchievedBadgeDao.Properties.BadgeType.eq(Constants.BADGE_TYPE_STREAK),
+                                        AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS))
+                                .list();
+
+                    }
+                }
+                if (achievedBadgeListFromDb != null && achievedBadgeListFromDb.size() > 0) {
                     achievedBadge.setId(achievedBadgeListFromDb.get(0).getId());
                     achievedBadgeDao.update(achievedBadge);
                 } else {
                     achievedBadgeDao.insert(achievedBadge);
                 }
             }
+            AnalyticsEvent.create(Event.ACHIEVEMENTS_COUNT)
+                    .put("size", achievedBadgeDao.queryBuilder().list().size())
+                    .put("method", "getAchievedBadgeData")
+                    .put("class", "SyncService").buildAndDispatch();
 
             result = ExpoBackoffTask.RESULT_SUCCESS;
 

@@ -321,16 +321,26 @@ public class WorkoutService extends Service implements
             }
             SyncHelper.uploadStreak();
             AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
-
-            achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CHANGEMAKER, mCauseData));
-            achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_MARATHON, mCauseData));
-            achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(), Constants.BADGE_TYPE_STREAK, mCauseData));
-            achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CAUSE, mCauseData));
-            SyncHelper.uploadAchievement();
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
+                achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CHANGEMAKER, mCauseData));
+                achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_MARATHON, mCauseData));
+                achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(), Constants.BADGE_TYPE_STREAK, mCauseData));
+                achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CAUSE, mCauseData));
+                AnalyticsEvent.create(Event.ACHIEVEMENTS_COUNT)
+                        .put("size", MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao()
+                                .queryBuilder().list().size())
+                        .put("method", "stopWorkout")
+                        .put("class", TAG)
+                        .buildAndDispatch();
+                SyncHelper.uploadAchievement();
+            }
             SyncHelper.uploadStreak();
-            long titleId = giveTitle();
-            if(titleId>0) {
-                achievedBadgesData.getTitleIds().add(titleId);
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,
+                    false)) {
+                long titleId = giveTitle();
+                if (titleId > 0) {
+                    achievedBadgesData.getTitleIds().add(titleId);
+                }
             }
             JSONObject jsonObject = new JSONObject();
             try {
