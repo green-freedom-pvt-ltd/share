@@ -30,8 +30,8 @@ public class SMC0Fragment extends BaseFragment {
     TextView poweredByTv;
     @BindView(R.id.share_a_meal_desc)
     TextView shareAMealDesc;
-    @BindView(R.id.share_a_meal_total_meals)
-    TextView shareAMealTotalMeals;
+    @BindView(R.id.share_a_meal_total_meals_layout)
+    LinearLayout shareAMealTotalMealsLayout;
     @BindView(R.id.bacha_plate)
     ImageView bachaPlate;
 
@@ -65,7 +65,7 @@ public class SMC0Fragment extends BaseFragment {
     private void init() {
         titleLayout.setVisibility(View.GONE);
         poweredByTv.setVisibility(View.GONE);
-        shareAMealTotalMeals.setVisibility(View.GONE);
+        shareAMealTotalMealsLayout.setVisibility(View.GONE);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1);
         bachaPlate.setLayoutParams(layoutParams);
         Typeface myTypeface = FontCache.get("fonts/Lato-Bold.ttf", getContext());

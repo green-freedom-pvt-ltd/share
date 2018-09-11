@@ -107,7 +107,7 @@ public class FragmentBirthday extends BaseFragment implements NumberPicker.OnVal
 
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        if(numberPicker.getId() == monthPicker.getId()) {
+        if (numberPicker.getId() == monthPicker.getId()) {
             setDatePicker();
         }
         saveData();

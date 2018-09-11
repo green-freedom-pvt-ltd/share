@@ -1508,7 +1508,7 @@ public class Utils {
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()),
                             AchievedBadgeDao.Properties.CategoryStatus.eq(Constants.BADGE_IN_PROGRESS)).list();
-        }else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
+        } else if (badgeType.equalsIgnoreCase(Constants.BADGE_TYPE_CAUSE)) {
             achievedBadges = achievedBadgeDao.queryBuilder()
                     .where(AchievedBadgeDao.Properties.BadgeType.eq(badgeType),
                             AchievedBadgeDao.Properties.CauseId.eq(mCauseData.getId()),

@@ -45,16 +45,14 @@ import static com.sharesmile.share.core.application.MainApplication.getContext;
 public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = "LeaderBoardAdapter";
-
-    private Parent mParent;
-    private List<BaseLeaderBoardItem> itemList;
-    private Context mContext;
-
     int headerOffSet = 0;
     int noOfUnsyncWorkout = 0;
     boolean showUnsync = false;
     boolean showMeals = false;
     Activity activity;
+    private Parent mParent;
+    private List<BaseLeaderBoardItem> itemList;
+    private Context mContext;
 
     public LeaderBoardAdapter(Context context, Parent parent, List<Workout> mWorkoutList, boolean showMeals, Activity activity) {
 
@@ -64,16 +62,16 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.activity = activity;
         headerOffSet = (mParent != null && mParent.toShowBanner() > 0) ? 1 : 0;
         Logger.d(TAG, "LeaderBoardAdapter, setting headeroffset as " + headerOffSet);
-        noOfUnsyncWorkout = mWorkoutList!=null?mWorkoutList.size():0;
+        noOfUnsyncWorkout = mWorkoutList != null ? mWorkoutList.size() : 0;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == LeaderBoardItem.BANNER_HEADER){
+        if (viewType == LeaderBoardItem.BANNER_HEADER) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.leaderboard_banner_container, parent, false);
             return new BannerHeaderViewHolder(view);
-        }else if (viewType == LeaderBoardItem.ROW_ITEM){
+        } else if (viewType == LeaderBoardItem.ROW_ITEM) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.leaderboard_list_item, parent, false);
             return new LeaderBoardViewHolder(view);
@@ -81,7 +79,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.leaderboard_banner_container, parent, false);
             return new SMCBannerHeaderViewHolder(view);
-        }else {
+        } else {
             throw new IllegalStateException("Invalid LeaderBoardItem viewtype: " + viewType);
         }
     }
@@ -89,18 +87,18 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
         int type = getItemViewType(i);
-        if (type == LeaderBoardItem.BANNER_HEADER){
+        if (type == LeaderBoardItem.BANNER_HEADER) {
             LeagueBoard leagueBoard = mParent.getBannerData();
-            BannerHeaderViewHolder headerViewHolder =  (BannerHeaderViewHolder) viewHolder;
+            BannerHeaderViewHolder headerViewHolder = (BannerHeaderViewHolder) viewHolder;
             headerViewHolder.bindData(leagueBoard);
-        }else if (type == LeaderBoardItem.ROW_ITEM){
+        } else if (type == LeaderBoardItem.ROW_ITEM) {
             LeaderBoardViewHolder rowItemViewHolder = (LeaderBoardViewHolder) viewHolder;
             int position = i - headerOffSet;
             rowItemViewHolder.bindData(itemList.get(position), itemList.get(position).getRanking());
         } else if (type == LeaderBoardItem.BANNER_HEADER_SMC) {
             SMCBannerHeaderViewHolder headerViewHolder = (SMCBannerHeaderViewHolder) viewHolder;
             headerViewHolder.bindData();
-        }else {
+        } else {
             throw new IllegalStateException("Invalid LeaderBoardItem viewtype: " + type);
         }
     }
@@ -113,8 +111,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemViewType(int position) {
 //        Logger.d(TAG, "getItemViewType for position: " + position + ", headerOffset = " + headerOffSet);
-        if (headerOffSet > 0){
-            if (position == 0){
+        if (headerOffSet > 0) {
+            if (position == 0) {
                 if (mParent.toShowBanner() == 1)
                     return LeaderBoardItem.BANNER_HEADER;
                 else return LeaderBoardItem.BANNER_HEADER_SMC;
@@ -129,16 +127,30 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
-    public int getHeaderOffSet(){
+    public int getHeaderOffSet() {
         return headerOffSet;
     }
 
-    public LeaderBoardViewHolder createMyViewHolder(View myListItem){
+    public LeaderBoardViewHolder createMyViewHolder(View myListItem) {
         return new LeaderBoardViewHolder(myListItem);
     }
 
     public void setShowUnsync(boolean b) {
         showUnsync = b;
+    }
+
+    public interface Parent {
+        void onItemClick(long id);
+
+        int getMyId();
+
+        boolean toShowLogo();
+
+        int toShowBanner();
+
+        LeagueBoard getBannerData();
+
+        void enableDisableSwipeRefresh(boolean enable);
     }
 
     public class LeaderBoardViewHolder extends RecyclerView.ViewHolder {
@@ -154,6 +166,9 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @BindView(R.id.tv_list_item_impact)
         TextView mImpact;
 
+        @BindView(R.id.smc_bowl_iv)
+        ImageView smcBowl;
+
         @BindView(R.id.container_list_item)
         CardView container;
 
@@ -168,23 +183,20 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ButterKnife.bind(this, itemView);
             if (mParent.toShowLogo()) {
                 mProfileImage.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 mProfileImage.setVisibility(View.GONE);
             }
         }
 
         public void bindData(final BaseLeaderBoardItem leaderboard, int rank) {
-            if(showUnsync && itemList.indexOf(leaderboard)==0 && headerOffSet == 0 && noOfUnsyncWorkout>0)
-            {
-                if(noOfUnsyncWorkout==1) {
+            if (showUnsync && itemList.indexOf(leaderboard) == 0 && headerOffSet == 0 && noOfUnsyncWorkout > 0) {
+                if (noOfUnsyncWorkout == 1) {
                     notSync.setText(noOfUnsyncWorkout + " workout not yet synced!");
-                }else
-                {
+                } else {
                     notSync.setText(noOfUnsyncWorkout + " workouts not yet synced!");
                 }
                 containerShowUnsync.setVisibility(View.VISIBLE);
-            }else
-            {
+            } else {
                 containerShowUnsync.setVisibility(View.GONE);
             }
             mleaderBoard.setText(String.valueOf(rank));
@@ -193,21 +205,29 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     ContextCompat.getDrawable(mleaderBoard.getContext(), R.drawable.placeholder_profile));
 
             mProfileName.setText(leaderboard.getName());
-            if(showMeals)
-            {
+
+
+            final int id = mParent.getMyId();
+            if (showMeals) {
                 mImpact.setText(((int) leaderboard.getAmount()) + "");
+                smcBowl.setVisibility(View.VISIBLE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    mImpact.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.smc_bowl_leaderboard_black, 0);
-                    mImpact.setCompoundDrawablePadding(10);
+                    if (id == leaderboard.getId())
+                        smcBowl.setImageResource(R.drawable.smc_bowl_leaderboard_white);
+                    else {
+                        smcBowl.setImageResource(R.drawable.smc_bowl_leaderboard_black);
+                    }
                 }
-            }else {
+            } else {
+                smcBowl.setVisibility(View.GONE);
                 mImpact.setText(UnitsManager.formatRupeeToMyCurrency(leaderboard.getAmount()));
             }
 
-            final int id = mParent.getMyId();
-
             if (id == leaderboard.getId()) {
-                container.setCardBackgroundColor(mContext.getResources().getColor(R.color.bright_sky_blue));
+                if (showMeals)
+                    container.setCardBackgroundColor(mContext.getResources().getColor(R.color.clr_328f6c));
+                else
+                    container.setCardBackgroundColor(mContext.getResources().getColor(R.color.bright_sky_blue));
                 container.setCardElevation(3f);
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.white));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.white));
@@ -217,7 +237,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 mleaderBoard.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mProfileName.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
                 mImpact.setTextColor(mContext.getResources().getColor(R.color.greyish_brown_two));
-                if(mParent.toShowLogo()) container.setCardElevation(3f);
+                if (mParent.toShowLogo()) container.setCardElevation(3f);
                 else container.setCardElevation(.5f);
                 container.setOnClickListener(null);
             }
@@ -230,18 +250,18 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             });
         }
 
-        public void show(){
+        public void show() {
             Logger.d(TAG, "show");
             container.setVisibility(View.VISIBLE);
             container.requestLayout();
         }
 
-        public void hide(){
+        public void hide() {
             Logger.d(TAG, "hide");
             container.setVisibility(View.GONE);
         }
 
-        public boolean isVisible(){
+        public boolean isVisible() {
             return container.getVisibility() == View.VISIBLE && container.getHeight() > 0;
         }
 
@@ -255,10 +275,10 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @BindView(R.id.banner_carousel_indicator_holder)
         LinearLayout carouselIndicatorsHolder;
-
+        Timer timer;
         private int currentPageIndex;
         private List<ImageView> indicators = new ArrayList<>();
-        Timer timer;
+
         public SMCBannerHeaderViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -361,7 +381,8 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }, 5000, 7500);
         }
     }
-    public class BannerHeaderViewHolder extends RecyclerView.ViewHolder{
+
+    public class BannerHeaderViewHolder extends RecyclerView.ViewHolder {
 
         LeagueBoardBannerPagerAdapter bannerPagerAdapter;
 
@@ -380,7 +401,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             initBanner();
         }
 
-        private void initBanner(){
+        private void initBanner() {
             Logger.d(TAG, "initBanner");
             bannerPagerAdapter = new LeagueBoardBannerPagerAdapter();
             bannerViewPager.setAdapter(bannerPagerAdapter);
@@ -393,13 +414,13 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onPageSelected(int position) {
                     //Position is the index of the newPage on screen
-                    if (position < currentPageIndex){
+                    if (position < currentPageIndex) {
                         // User moved to left
                         AnalyticsEvent.create(Event.ON_SWIPE_LEAGEBOARD_BANNER)
                                 .put("direction", "left")
                                 .buildAndDispatch();
 
-                    }else if (position > currentPageIndex) {
+                    } else if (position > currentPageIndex) {
                         // User moved to right
                         AnalyticsEvent.create(Event.ON_SWIPE_LEAGEBOARD_BANNER)
                                 .put("direction", "right")
@@ -411,26 +432,26 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
-                    mParent.enableDisableSwipeRefresh( state == ViewPager.SCROLL_STATE_IDLE );
+                    mParent.enableDisableSwipeRefresh(state == ViewPager.SCROLL_STATE_IDLE);
                 }
             });
             addIndicators(2, currentPageIndex);
         }
 
-        private void addIndicators(int numPages, int displayImageIndex){
-            Logger.d(TAG, "addIndicators, numpages = "+ numPages+", displayImageIndex = " + displayImageIndex);
+        private void addIndicators(int numPages, int displayImageIndex) {
+            Logger.d(TAG, "addIndicators, numpages = " + numPages + ", displayImageIndex = " + displayImageIndex);
             if (Utils.isCollectionFilled(indicators) && indicators.size() == numPages) {
                 // Indicators already added, no need to add again.
                 Logger.d(TAG, "no need to add indicators again");
                 return;
-            }else{
+            } else {
                 carouselIndicatorsHolder.removeAllViews();
                 indicators = new ArrayList<>();
-                for(int i=0; i < numPages; i++){
+                for (int i = 0; i < numPages; i++) {
                     View indicatorContainer = LayoutInflater.from(getContext()).inflate(R.layout.carousel_indicator,
                             carouselIndicatorsHolder, false);
                     indicators.add((ImageView) indicatorContainer.findViewById(R.id.iv_indicator_circle));
-                    if (i == displayImageIndex){
+                    if (i == displayImageIndex) {
                         indicators.get(i).setSelected(true);
                     }
                     carouselIndicatorsHolder.addView(indicatorContainer);
@@ -438,32 +459,22 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
         }
 
-        private void setSelectedPage(int newPosition){
+        private void setSelectedPage(int newPosition) {
             int prevIndex = currentPageIndex;
             // Setting newPosition as current page
             currentPageIndex = newPosition;
-            if (indicators != null){
+            if (indicators != null) {
                 indicators.get(prevIndex).setSelected(false);
                 indicators.get(currentPageIndex).setSelected(true);
             }
         }
 
-        public void bindData(LeagueBoard leagueBoard){
+        public void bindData(LeagueBoard leagueBoard) {
             // Sets data for banner
-            if (leagueBoard != null){
+            if (leagueBoard != null) {
                 bannerPagerAdapter.setData(leagueBoard);
                 mParent.enableDisableSwipeRefresh(true);
             }
         }
-    }
-
-    public interface Parent {
-        void onItemClick(long id);
-        int getMyId();
-        boolean toShowLogo();
-
-        int toShowBanner();
-        LeagueBoard getBannerData();
-        void enableDisableSwipeRefresh(boolean enable);
     }
 }

@@ -53,7 +53,7 @@
             android:id="@+id/share_code_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/refer_code_bg_blue">
+            android:background="@drawable/refer_code_green_bg">
 
             <com.sharesmile.share.views.LBTextView
                 android:id="@+id/share_code"
@@ -64,13 +64,13 @@
                 android:paddingRight="30dp"
                 android:paddingTop="12dp"
                 android:text="NIKHI98564"
-                android:textColor="@color/bright_sky_blue"
+                android:textColor="@color/clr_328f6c"
                 android:textSize="12.3sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="@drawable/refer_code_share_blue_bg"
+                android:background="@drawable/refer_code_share_green_bg"
                 android:padding="10dp"
                 app:srcCompat="@drawable/ic_share_white_24px" />
         </LinearLayout>

@@ -341,20 +341,22 @@ public class WorkoutService extends Service implements
                 if (titleId > 0) {
                     achievedBadgesData.getTitleIds().add(titleId);
                 }
-            }
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put(Constants.TITLE_TYPE_CAUSE,titleId);
-                jsonObject.put(Constants.BADGE_TYPE_MARATHON,achievedBadgesData.getMarathonBadgeAchieved());
-                jsonObject.put(Constants.BADGE_TYPE_CAUSE,achievedBadgesData.getCauseBadgeAchieved());
-                jsonObject.put(Constants.BADGE_TYPE_STREAK,achievedBadgesData.getStreakBadgeAchieved());
-                jsonObject.put(Constants.BADGE_TYPE_CHANGEMAKER,achievedBadgesData.getCauseBadgeAchieved());
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(Constants.TITLE_TYPE_CAUSE, titleId);
+                    jsonObject.put(Constants.BADGE_TYPE_MARATHON, achievedBadgesData.getMarathonBadgeAchieved());
+                    jsonObject.put(Constants.BADGE_TYPE_CAUSE, achievedBadgesData.getCauseBadgeAchieved());
+                    jsonObject.put(Constants.BADGE_TYPE_STREAK, achievedBadgesData.getStreakBadgeAchieved());
+                    jsonObject.put(Constants.BADGE_TYPE_CHANGEMAKER, achievedBadgesData.getCauseBadgeAchieved());
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                SharedPrefsManager.getInstance().setString(Constants.PREF_NOTIFICATION_BADGE_NOT_SEEN, jsonObject.toString());
+                showAutoNotificationAfterBadgeWon();
             }
-            SharedPrefsManager.getInstance().setString(Constants.PREF_NOTIFICATION_BADGE_NOT_SEEN,jsonObject.toString());
-            showAutoNotificationAfterBadgeWon();
             handleWorkoutResult(result, achievedBadgesData);
 
             stopTimer();

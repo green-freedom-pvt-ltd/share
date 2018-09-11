@@ -59,6 +59,14 @@
             android:textColor="@color/greyish_brown_two"
             tools:text="5 KM" />
 
+        <ImageView
+            android:id="@+id/smc_bowl_iv"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/smc_bowl_leaderboard_black"
+            android:layout_gravity="center"
+            android:layout_marginRight="5dp" />
+
     </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

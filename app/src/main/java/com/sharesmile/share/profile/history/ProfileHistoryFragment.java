@@ -15,25 +15,24 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.Workout;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.base.IFragmentController;
-import com.sharesmile.share.core.sync.SyncService;
-import com.sharesmile.share.helpcenter.category.leveltwo.PastWorkoutIssueFragment;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.helpcenter.category.FeedbackCategory;
+import com.sharesmile.share.helpcenter.category.leveltwo.PastWorkoutIssueFragment;
 import com.sharesmile.share.network.NetworkUtils;
 import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.tracking.workout.data.model.Run;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,9 +44,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-
-import butterknife.BindView;
 
 /**
  * Created by apurvgandhwani on 3/29/2016.
@@ -202,9 +198,9 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         swipeRefreshLayout.setRefreshing(false);
         Loader<CharityOverview> loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
         // If the Loader was null, initialize it. Else, restart it.
-        if(loader==null){
+        if (loader == null) {
 //            getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
-        }else{
+        } else {
             loader.onContentChanged();
         }
     }
