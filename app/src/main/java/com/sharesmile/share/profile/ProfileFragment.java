@@ -119,14 +119,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
     @BindView(R.id.tv_profile_name_2)
     TextView name2;
 
-    @BindView(R.id.tv_level)
-    TextView levelDist;
-
     @BindView(R.id.tv_level_num)
     TextView levelNum;
-
-    @BindView(R.id.level_progress_bar)
-    View levelProgressBar;
 
     @BindView(R.id.stats_sharable_container)
     View sharableContainer;
@@ -381,13 +375,13 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
                 Level level = Utils.getLevel(lifeTimeImpact);
-                levelNum.setText("Level " + level.getLevel());
+                levelNum.setText("LEVEL " + level.getLevel());
                 /*levelDist.setText(UnitsManager.formatRupeeToMyCurrency(lifeTimeImpact) + "/" +
                         UnitsManager.formatRupeeToMyCurrency(level.getMaxImpact()));
                         float progressPercent =
                         ((float) (lifeTimeImpact - level.getMinImpact())) / (level.getMaxImpact() - level.getMinImpact());
                         */
-                float progress = lifeTimeImpact - level.getMinImpact();
+                /*float progress = lifeTimeImpact - level.getMinImpact();
                 float max = level.getMaxImpact() - level.getMinImpact();
                 levelDist.setText(UnitsManager.formatRupeeToMyCurrency(progress) + "/" +
                         UnitsManager.formatRupeeToMyCurrency(max));
@@ -395,7 +389,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
 
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) levelProgressBar.getLayoutParams();
                 params.weight = progressPercent;
-                levelProgressBar.setLayoutParams(params);
+                levelProgressBar.setLayoutParams(params);*/
 
 //            viewPager.setAdapter(new ProfileStatsViewAdapter(getChildFragmentManager()));
                 if (SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN) > 0) {

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,265 +28,148 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
                     android:background="@color/white"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingBottom="15dp"
+                    android:paddingBottom="25dp"
                     android:paddingTop="25dp">
 
+                    <com.sharesmile.share.views.CircularImageView
+                        android:id="@+id/img_profile_stats"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="11dp"
+                        android:scaleType="fitCenter" />
+
+                    <com.sharesmile.share.views.LBKTextView
+                        android:id="@+id/tv_profile_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dp"
+                        android:maxLines="2"
+                        android:textColor="@color/black_64"
+                        android:textSize="20sp"
+                        tools:text="Ankit Maheshwari" />
+
+                    <com.sharesmile.share.views.LBTextView
+                        android:id="@+id/tv_profile_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:maxLines="2"
+                        android:textColor="@color/black_64"
+                        android:textSize="12sp"
+                        tools:text="EDUCATION MASTER, CAPTAIN PLANET"
+
+                        />
+
+                    <com.sharesmile.share.views.MSBTextView
+                        android:id="@+id/tv_impact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="\u20B9 657"
+                        android:textColor="@color/orange"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="13dp"
-                        android:layout_marginRight="13dp">
-
-                        <android.support.constraint.ConstraintLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <com.sharesmile.share.views.CircularImageView
-                                android:id="@+id/img_profile_stats"
-                                android:layout_width="75dp"
-                                android:layout_height="75dp"
-                                android:layout_centerInParent="true"
-                                android:layout_marginBottom="8dp"
-                                android:scaleType="fitCenter"
-                                android:src="@drawable/placeholder_profile"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent" />
-
-                            <ImageView
-                                android:id="@+id/imageView2"
-                                android:layout_width="96dp"
-                                android:layout_height="24dp"
-                                android:layout_alignParentBottom="true"
-                                android:src="@drawable/max_streak_bg"
-                                app:layout_constraintBottom_toBottomOf="parent" />
-
-                            <TextView
-                                android:id="@+id/tv_level_num"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentBottom="true"
-                                android:layout_alignParentTop="true"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginRight="8dp"
-                                android:layout_marginStart="8dp"
-                                android:fontFamily="@font/lato_bold"
-                                android:letterSpacing="0.01"
-                                android:textColor="@color/white"
-                                android:textSize="11sp"
-                                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-                                app:layout_constraintEnd_toEndOf="@+id/imageView2"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="@+id/imageView2"
-                                app:layout_constraintVertical_bias="0.3"
-                                tools:text="LEVEL  7 " />
-                        </android.support.constraint.ConstraintLayout>
+                        android:layout_marginTop="20dp"
+                        android:gravity="center"
+                        android:weightSum="1">
 
                         <LinearLayout
-                            android:layout_marginLeft="12dp"
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <com.sharesmile.share.views.LBKTextView
-                                android:id="@+id/tv_profile_name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:maxLines="2"
-                                android:textColor="@color/black_a3"
-                                android:textSize="20sp"
-                                tools:text="Ankit Maheshwari" />
+                            android:layout_width="0dip"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.25"
+                            android:gravity="center">
 
                             <com.sharesmile.share.views.LBTextView
-                                android:id="@+id/tv_profile_title"
+                                android:id="@+id/tv_streak"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:maxLines="1"
-                                android:textColor="@color/black_a5"
-                                android:textSize="12sp"
-                                tools:text="EDUCATION MASTER"
+                                android:drawableLeft="@drawable/streak_icon"
+                                android:drawablePadding="5dp"
+                                android:gravity="center"
+                                android:padding="5dp"
+                                android:textColor="@color/streak_orange"
+                                android:textSize="18sp"
+                                tools:text="18" />
+                        </LinearLayout>
 
-                                />
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.01"
+                            android:background="@color/grey_f2"></LinearLayout>
 
-                            <TextView
-                                android:id="@+id/user_bio_tv"
-                                android:layout_width="match_parent"
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.74"
+                            android:gravity="center"
+                            android:weightSum="1">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="11sp"
-                                android:textColor="@color/black_64"
-                                android:maxLength="140"
-                                android:gravity="bottom"
-                                android:text="@string/def_about_me" />
+                                android:layout_weight="0.8"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <com.sharesmile.share.views.LBTextView
+                                        android:id="@+id/tv_level_num"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:text="Level 3"
+                                        android:textColor="@color/black_54"
+                                        android:textSize="11sp" />
+
+                                    <com.sharesmile.share.views.LRTextView
+                                        android:id="@+id/tv_level"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:layout_alignParentRight="true"
+                                        android:text="500km"
+                                        android:textColor="@color/black_53"
+                                        android:textSize="9sp" />
+                                </RelativeLayout>
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="7dp"
+                                    android:layout_marginTop="3dp">
+
+                                    <RelativeLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/rounded_rectangle_grey"></RelativeLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal"
+                                        android:weightSum="1">
+
+                                        <View
+                                            android:id="@+id/level_progress_bar"
+                                            android:layout_width="0dp"
+                                            android:layout_height="match_parent"
+                                            android:layout_weight="0.1"
+                                            android:background="@drawable/rounded_rectangle_blue_green_gradient"></View>
+
+                                    </LinearLayout>
+                                </FrameLayout>
+                            </LinearLayout>
 
                         </LinearLayout>
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="22dp"
-                        android:layout_marginRight="22dp"
-                        android:layout_marginTop="15dp">
-
-                        <com.sharesmile.share.views.MSBTextView
-                            android:id="@+id/tv_impact"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="\u20B9 657"
-                            android:textColor="@color/clr_6e"
-                            android:textSize="30sp"
-                            android:textStyle="bold"
-                            android:layout_weight="1"
-                            android:maxLines="1" />
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="5dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:id="@+id/total_workouts_tv"
-                                android:textColor="@color/black_57"
-                                tools:text="1563"
-                                android:fontFamily="@font/lato_bold"
-                                android:gravity="bottom" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="10sp"
-                                android:textColor="@color/black_5e"
-                                android:text="@string/profile_workouts"
-                                android:fontFamily="@font/lato_regular"
-                                android:gravity="top" />
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="25dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:id="@+id/total_distance_tv"
-                                android:textColor="@color/black_57"
-                                tools:text="1563"
-                                android:fontFamily="@font/lato_bold"
-                                android:gravity="bottom" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="10sp"
-                                android:textColor="@color/black_5e"
-                                android:text="@string/profile_distance"
-                                android:fontFamily="@font/lato_regular"
-                                android:gravity="top" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="13dp"
-                        android:layout_marginBottom="13dp"
-                        android:layout_marginLeft="24dp"
-                        android:layout_marginRight="24dp"
-                        android:background="@color/grey_f2" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:layout_marginRight="24dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/shoe_streak_icon" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="16sp"
-                                    android:id="@+id/tv_streak"
-                                    android:textColor="@color/black_57"
-                                    tools:text="63"
-                                    android:fontFamily="@font/lato_bold"
-                                    android:gravity="top" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/black_5e"
-                                    android:text="@string/profile_streak"
-                                    android:fontFamily="@font/lato_regular"
-                                    android:gravity="top"
-                                    android:layout_marginTop="-2dp" />
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_alignParentRight="true"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/shoe_streak_icon" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="16sp"
-                                    android:id="@+id/tv_max_streak"
-                                    android:textColor="@color/black_57"
-                                    tools:text="63"
-                                    android:fontFamily="@font/lato_bold"
-                                    android:gravity="top" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/black_5e"
-                                    android:text="@string/profile_max_streak"
-                                    android:fontFamily="@font/lato_regular"
-                                    android:gravity="top"
-                                    android:layout_marginTop="-2dp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </RelativeLayout>
                 </LinearLayout>
 
                 <LinearLayout
@@ -310,24 +192,34 @@
                             android:layout_height="wrap_content"
                             android:text="@string/profile_stats_achievements" />
 
+                        <com.sharesmile.share.views.LBTextView
+                            android:id="@+id/see_in_progress_badges"
+                            style="@style/profile_stats_header_right"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="@string/profile_stats_achievements_in_progress" />
                     </RelativeLayout>
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rv_achievements"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="19dp"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginLeft="23dp"
-                        android:layout_marginRight="23dp"
-                        android:orientation="horizontal"
-                        tools:listitem="@layout/rv_achievements_row_item"
-                        />
-                    <include layout="@layout/rv_achievements_row_item"
-                        android:visibility="invisible"
-                        />
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rv_achievements"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="19dp"
+                            android:layout_marginTop="30dp"
+                            android:layout_marginLeft="23dp"
+                            android:layout_marginRight="23dp"
+                            android:orientation="horizontal"
+                            tools:listitem="@layout/rv_achievements_row_item" />
+
+                        <include
+                            layout="@layout/rv_achievements_row_item"
+                            android:visibility="invisible" />
+
                         <ProgressBar
                             android:id="@+id/progress_bar"
                             android:layout_centerInParent="true"
@@ -335,43 +227,6 @@
                             android:layout_height="wrap_content" />
 
                     </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginLeft="24dp"
-                        android:layout_marginRight="24dp"
-                        android:background="@color/grey_f2" />
-
-                    <LinearLayout
-                        android:id="@+id/see_in_progress_badges"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="6dp"
-                        android:background="@color/white"
-                        android:gravity="center_vertical"
-                        android:padding="25dp">
-
-                        <com.sharesmile.share.views.LBTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:text="@string/in_progress"
-                            android:textAllCaps="true"
-                            android:textColor="@color/clr_32"
-                            android:textSize="12sp" />
-
-                        <com.sharesmile.share.views.LBTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text=">"
-                            android:textAllCaps="true"
-                            android:textColor="@color/clr_32"
-                            android:textSize="18sp" />
-                    </LinearLayout>
-
                 </LinearLayout>
             </LinearLayout>
 
@@ -502,8 +357,7 @@
                                 android:text="@string/profile_stats_kms"
                                 android:textColor="@color/clr_a0"
                                 android:textSize="12sp"
-                                android:id="@+id/tv_stats_kms_unit"
-                                />
+                                android:id="@+id/tv_stats_kms_unit" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -560,8 +414,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp"
                 android:background="@color/white"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -576,24 +429,27 @@
                         android:layout_height="wrap_content"
                         android:text="@string/profile_stats_charity_overview" />
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_charity_overview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="27dp"
-                    android:layout_marginTop="34dp" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_charity_overview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="27dp"
+                        android:layout_marginTop="34dp" />
+
                     <ProgressBar
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:id="@+id/charity_overview_progressbar"
-                        />
-                    <include layout="@layout/rv_charity_overview_profile_row"
-                        android:visibility="invisible"
-                        />
+                        android:id="@+id/charity_overview_progressbar" />
+
+                    <include
+                        layout="@layout/rv_charity_overview_profile_row"
+                        android:visibility="invisible" />
                 </RelativeLayout>
             </LinearLayout>
 

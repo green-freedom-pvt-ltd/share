@@ -56,8 +56,11 @@
     <color name="black_50">#7f000000</color>
     <color name="black_57">#91000000</color>
     <color name="black_64">#a4000000</color>
+    <color name="black_a3">#a3000000</color>
+    <color name="black_a5">#a5000000</color>
     <color name="black_53">#88000000</color>
     <color name="black_80">#cd000000</color>
+    <color name="black_5e">#5e000000</color>
     <color name="black_four">#141414</color>
     <color name="dark_blue">#55acee</color>
     <color name="denim_blue">#3c55a2</color>
@@ -110,4 +113,5 @@
 
     <color name="clr_12916c">#12916c</color>
     <color name="clr_328f6c">#328f6c</color>
+    <color name="clr_6e">#6e6e6e</color>
 </resources>
