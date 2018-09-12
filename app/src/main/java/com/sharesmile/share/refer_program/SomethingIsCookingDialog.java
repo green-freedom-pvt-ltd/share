@@ -18,6 +18,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 
@@ -52,10 +53,17 @@ public class SomethingIsCookingDialog extends Dialog {
     TextView somethingIsCookingDesc;
     @BindView(R.id.share_layout)
     LinearLayout shareLayout;
+    ReferrerDetails referrerDetails;
 
     public SomethingIsCookingDialog(@NonNull Context context, int userType) {
         super(context);
         this.userType = userType;
+    }
+
+    public SomethingIsCookingDialog(@NonNull Context context, int userType, ReferrerDetails referrerDetails) {
+        super(context);
+        this.userType = userType;
+        this.referrerDetails = referrerDetails;
     }
 
     protected SomethingIsCookingDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
@@ -73,6 +81,7 @@ public class SomethingIsCookingDialog extends Dialog {
     private void init() {
         continueTv.setVisibility(View.GONE);
         smcButtonsLayout.setVisibility(View.VISIBLE);
+
         String profilePic1Url = "";
         if (MainApplication.getInstance().getUserDetails().getProfilePicture() != null &&
                 MainApplication.getInstance().getUserDetails().getProfilePicture().length() > 0) {
@@ -82,19 +91,30 @@ public class SomethingIsCookingDialog extends Dialog {
         }
         ShareImageLoader.getInstance().loadImage(profilePic1Url, profilePic1,
                 ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
-        ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePic(), profilePic2,
-                ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
 
         if (userType == Constants.USER_NEW)//new user
         {
             somethingIsCookingDesc.setText
                     (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_new_user)
                             , MainApplication.getInstance().getUserDetails().getReferrerDetails().getReferalName()));
+
+            ShareImageLoader.getInstance().loadImage(MainApplication.getInstance().getUserDetails().getReferrerProfilePic(), profilePic2,
+                    ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+
         } else //old user
         {
+            profilePic1Url = "";
+            if (referrerDetails.getReferrerProfilePicture() != null &&
+                    referrerDetails.getReferrerProfilePicture().length() > 0) {
+                profilePic1Url = Urls.getImpactProfileS3BucketUrl() + referrerDetails.getReferrerProfilePicture();
+            } else {
+                profilePic1Url = referrerDetails.getReferrerSocialThumb();
+            }
             somethingIsCookingDesc.setText
                     (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_old_user)
-                            , MainApplication.getInstance().getUserDetails().getReferrerDetails().getReferalName()));
+                            , referrerDetails.getReferalName()));
+            ShareImageLoader.getInstance().loadImage(profilePic1Url, profilePic2,
+                    ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         }
     }
 

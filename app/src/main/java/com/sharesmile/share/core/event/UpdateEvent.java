@@ -5,6 +5,7 @@ import android.content.Intent;
 import com.google.gson.JsonObject;
 import com.sharesmile.share.core.Response;
 import com.sharesmile.share.core.cause.model.CauseList;
+import com.sharesmile.share.refer_program.model.ReferrerDetails;
 
 import Models.CampaignList;
 
@@ -193,6 +194,14 @@ public class UpdateEvent {
 
     public static class OnKonfettiFinish {
         public OnKonfettiFinish() {
+        }
+    }
+
+    public static class OnReferrerSuccessful {
+        public ReferrerDetails referrerDetails;
+
+        public OnReferrerSuccessful(ReferrerDetails referrerDetails) {
+            this.referrerDetails = referrerDetails;
         }
     }
 

@@ -90,6 +90,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        Utils.getFcmToken();
         SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
         setContentView(R.layout.activity_onboarding);
         ButterKnife.bind(this);

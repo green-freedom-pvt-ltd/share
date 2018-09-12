@@ -156,6 +156,7 @@ public class Constants {
     public static final String PREF_SMC_PROGRAMS = "pref_smc_programs";
     public static final String PREF_SMC_NAV_NOTI = "pref_smc_nav_noti";
     public static final String PREF_SMC_PERIODIC_POP_UP_SHOWN = "pref_smc_periodic_pop_up_shown";
+    public static final String PREF_SMC_NOTI_USER_DETAILS = "pref_smc_noti_user_details";
 
 
     //notification

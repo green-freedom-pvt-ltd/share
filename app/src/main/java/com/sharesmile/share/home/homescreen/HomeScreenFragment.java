@@ -301,6 +301,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     private void hideProgressDialog() {
         mProgressBar.setVisibility(View.GONE);
         mContentView.setVisibility(View.VISIBLE);
+        Utils.showSMCNotificationDialog(true);
     }
 
     @Override
@@ -464,9 +465,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             shareCodeLayout.setVisibility(View.GONE);
         }
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
-        hideProgressDialog();
+
         Utils.checkBadgeData(false);
-        showSMCDialog();
+        hideProgressDialog();
     }
 
     private void showSMCDialog() {
@@ -537,4 +538,14 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnReferrerSuccessful onReferrerSuccessful) {
+        if (onReferrerSuccessful.referrerDetails != null) {
+            SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(),
+                    Constants.USER_OLD, onReferrerSuccessful.referrerDetails);
+            somethingIsCookingDialog.show();
+        } else {
+            showSMCDialog();
+        }
+    }
 }
