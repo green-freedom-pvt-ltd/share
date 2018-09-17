@@ -7,13 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
@@ -28,24 +26,23 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.SharedPrefsManager;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.network.NameValuePair;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.network.BasicNameValuePair;
 import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.JsonHelper;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.network.NameValuePair;
-import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.utils.Utils;
-
 
 import org.json.JSONObject;
 
@@ -60,7 +57,6 @@ import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Request;
 import okhttp3.Response;
 
 /**
@@ -315,14 +311,15 @@ public class LoginImpl {
     }
 
     public void performGoogleLogin() {
-        mGoogleApiClient.clearDefaultAccountAndReconnect();
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        if (activityWeakReference != null) {
-            activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
-        } else {
-            fragmentWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.clearDefaultAccountAndReconnect();
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            if (activityWeakReference != null) {
+                activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+            } else {
+                fragmentWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+            }
         }
-
     }
 
     public void performFbLogin() {
