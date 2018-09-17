@@ -157,6 +157,7 @@ public class Constants {
     public static final String PREF_SMC_NAV_NOTI = "pref_smc_nav_noti";
     public static final String PREF_SMC_PERIODIC_POP_UP_SHOWN = "pref_smc_periodic_pop_up_shown";
     public static final String PREF_SMC_NOTI_USER_DETAILS = "pref_smc_noti_user_details";
+    public static final String PREF_SMC_NOTI_FCM_INVITEE_DETAILS = "pref_smc_noti_fcm_invitee_details";
 
 
     //notification
@@ -303,6 +304,11 @@ public class Constants {
     public static final String PREF_CHARITY_OVERVIEW = "charity_overview";
     public static final String PREF_ACHIEVED_BADGES_OPEN = "achieved_badge_open";
     public static final String ARG_FORWARD_TOPROFILE = "forward";
+
+    public static final String SMC_NOTI_INVITEE_USER_ID = "invitee_user_id";
+    public static final String SMC_NOTI_INVITEE_NAME = "invitee_name";
+    public static final String SMC_NOTI_INVITEE_SOCIAL_THUMB = "invitee_social_thumb";
+    public static final String SMC_NOTI_INVITEE_PROFILE_PICTURE = "invitee_profile_picture";
 
     public final static int LOADER_CHARITY_OVERVIEW = 100;
     public final static int LOADER_MY_STATS_GRAPH = 101;

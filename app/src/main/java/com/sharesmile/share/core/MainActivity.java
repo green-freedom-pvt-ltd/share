@@ -76,7 +76,6 @@ import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.profile.streak.StreakGoalFragment;
 import com.sharesmile.share.refer_program.ReferProgramFragment;
-import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
 import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
@@ -107,6 +106,9 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 import static com.sharesmile.share.core.Constants.REQUEST_IMAGE_CAPTURE;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEE_NAME;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEE_PROFILE_PICTURE;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEE_SOCIAL_THUMB;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.AUTO_NOTIFICATION_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
@@ -166,7 +168,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         } else {
             Logger.d(TAG, "render MainActivity UI");
             // Normal launch of MainActivity, render its layout
-            EventBus.getDefault().register(this);
+            if (!EventBus.getDefault().isRegistered(this))
+                EventBus.getDefault().register(this);
             ButterKnife.bind(this);
             mDrawerLayout = findViewById(R.id.drawerLayout);
             mNavigationView = findViewById(R.id.drawer_navigation);
@@ -334,14 +337,13 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                         }
                     }
                 }
-            } else if (bundle.containsKey("invitee_user_id")) {
+            } else if (bundle.containsKey(Constants.SMC_NOTI_INVITEE_USER_ID)) {
                 ReferrerDetails referrerDetails = new ReferrerDetails();
-                referrerDetails.setReferalId(bundle.getInt("invitee_user_id"));
-                referrerDetails.setReferalName(bundle.getString("invitee_name"));
-                referrerDetails.setReferrerSocialThumb(bundle.getString("invitee_social_thumb"));
-                referrerDetails.setReferrerProfilePicture(bundle.getString("invitee_profile_picture"));
+                referrerDetails.setReferalId(bundle.getInt(Constants.SMC_NOTI_INVITEE_USER_ID));
+                referrerDetails.setReferalName(bundle.getString(SMC_NOTI_INVITEE_NAME));
+                referrerDetails.setReferrerSocialThumb(bundle.getString(SMC_NOTI_INVITEE_SOCIAL_THUMB));
+                referrerDetails.setReferrerProfilePicture(bundle.getString(SMC_NOTI_INVITEE_PROFILE_PICTURE));
                 SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_NOTI_USER_DETAILS, new Gson().toJson(referrerDetails).toString());
-                Logger.d(TAG, "TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
         }
     }
@@ -732,8 +734,23 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     }
 
+    @Override
+    protected void onResume() {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
+        super.onPause();
+    }
+
     public void onDestroy() {
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -742,13 +759,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         showPromoModal(campaignDataUpdated.getCampaign());
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UpdateEvent.OnReferrerSuccessful onReferrerSuccessful) {
-        SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(),
-                Constants.USER_OLD, onReferrerSuccessful.referrerDetails);
-        somethingIsCookingDialog.show();
-        Logger.d(TAG, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TESTING");
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(LeagueBoardDataUpdated dataUpdated) {

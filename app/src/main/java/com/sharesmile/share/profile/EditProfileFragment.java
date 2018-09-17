@@ -894,7 +894,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Logger.d(TAG,"onActivityResult : TESTING");
         super.onActivityResult(requestCode, resultCode, data);
         Logger.d(TAG,"onActivityResult : "+requestCode+","+resultCode+","+data);
         if (requestCode == 100) {
@@ -952,7 +951,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
             @Override
             public void onStateChanged(int id, TransferState state) {
-                System.out.println("TESTING : " + state.name());
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
 

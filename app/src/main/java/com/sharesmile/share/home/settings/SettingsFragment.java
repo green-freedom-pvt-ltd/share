@@ -36,6 +36,8 @@ import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.utils.Utils;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -165,7 +167,14 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
         super.onDestroyView();
         if (materialShowcaseView != null && materialShowcaseView.isActivated()){
             materialShowcaseView.hide();

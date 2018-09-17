@@ -5,7 +5,13 @@ import android.support.v7.app.ActionBar
 import android.view.MenuItem
 import base.BaseActivity2
 import com.sharesmile.share.R
+import com.sharesmile.share.core.Constants
+import com.sharesmile.share.core.event.UpdateEvent
+import com.sharesmile.share.refer_program.SomethingIsCookingDialog
 import fragments.LeagueCodeFragment
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class ImpactLeagueActivity : BaseActivity2() {
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -17,6 +23,7 @@ class ImpactLeagueActivity : BaseActivity2() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_impact_league)
         loadInitFragment(savedInstanceState)
+        EventBus.getDefault().register(this)
     }
 
     private fun loadInitFragment(savedInstanceState: Bundle?) {
@@ -45,6 +52,20 @@ class ImpactLeagueActivity : BaseActivity2() {
 
     override fun getName(): String {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onDestroy() {
+        EventBus.getDefault().unregister(this)
+        super.onDestroy()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEvent(onReferrerSuccessful: UpdateEvent.OnReferrerSuccessful) {
+        if (onReferrerSuccessful.referrerDetails != null) {
+            val somethingIsCookingDialog = SomethingIsCookingDialog(this,
+                    Constants.USER_OLD, onReferrerSuccessful.referrerDetails)
+            somethingIsCookingDialog.show()
+        }
     }
 
 

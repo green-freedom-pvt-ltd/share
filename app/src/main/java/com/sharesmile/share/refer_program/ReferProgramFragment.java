@@ -20,6 +20,8 @@ import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.utils.Utils;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -60,13 +62,13 @@ public class ReferProgramFragment extends BaseFragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_share_n_feed, null);
         ButterKnife.bind(this, v);
-//        EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);
         return v;
     }
 
     @Override
     public void onDestroyView() {
-//        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 

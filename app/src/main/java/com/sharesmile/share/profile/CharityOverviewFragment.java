@@ -2,8 +2,6 @@ package com.sharesmile.share.profile;
 
 import android.app.LoaderManager;
 import android.content.Loader;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +25,8 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.profile.adapter.CharityCauseDetailsAdapter;
 import com.sharesmile.share.profile.model.CategoryStats;
 import com.sharesmile.share.profile.model.CharityOverview;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -63,6 +63,7 @@ public class CharityOverviewFragment extends BaseFragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().register(this);
         Bundle bundle = getArguments();
         int position = bundle.getInt("position");
         getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, new LoaderManager.LoaderCallbacks<CharityOverview>() {
@@ -134,4 +135,9 @@ public class CharityOverviewFragment extends BaseFragment{
         setToolbarTitle(categoryStats.getCategoryName());
     }
 
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
+    }
 }

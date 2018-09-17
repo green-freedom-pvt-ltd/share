@@ -8,14 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
 import com.sharesmile.share.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -56,6 +58,18 @@ public class HowItWorksFragment extends BaseFragment {
         ButterKnife.bind(this, view);
         init();
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
     private void init(){

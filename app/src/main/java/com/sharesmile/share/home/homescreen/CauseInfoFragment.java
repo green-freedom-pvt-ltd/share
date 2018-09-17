@@ -9,17 +9,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.cause.model.CauseData;
-import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.MLTextView;
 import com.sharesmile.share.views.MRTextView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,6 +81,7 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cause_info, null);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this, view);
         init();
         setHasOptionsMenu(true);
@@ -146,6 +149,10 @@ public class CauseInfoFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
+    }
 }
 

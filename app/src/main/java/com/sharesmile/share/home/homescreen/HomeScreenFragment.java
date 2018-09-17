@@ -97,7 +97,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mAdapter = new CausePageAdapter(getChildFragmentManager());
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.bind(this, view);
         shareCodeLayout.setOnClickListener(this);
@@ -212,6 +213,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     @Override
     public void onPause() {
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         super.onPause();
         if (showOverlayRunnable != null) {
             showOverlayRunnable.cancel();
@@ -231,6 +234,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     @Override
     public void onResume() {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
         super.onResume();
         refreshFeedBadgeIndicator();
     }
@@ -416,9 +421,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+
     @Override
     public void onDestroyView() {
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 

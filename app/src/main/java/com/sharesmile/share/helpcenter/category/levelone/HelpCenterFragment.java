@@ -2,21 +2,25 @@ package com.sharesmile.share.helpcenter.category.levelone;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.View;
 
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.helpcenter.category.BaseFeedbackCategoryFragment;
 import com.sharesmile.share.helpcenter.category.FeedbackCategory;
-import com.sharesmile.share.helpcenter.levelthree.qna.model.FeedbackQna;
+import com.sharesmile.share.helpcenter.category.leveltwo.OtherIssueFragment;
 import com.sharesmile.share.helpcenter.levelthree.qna.FeedbackQnaFragment;
+import com.sharesmile.share.helpcenter.levelthree.qna.model.FeedbackQna;
 import com.sharesmile.share.helpcenter.levelthree.resolution.FeedbackResolution;
 import com.sharesmile.share.helpcenter.levelthree.resolution.FeedbackResolutionFactory;
 import com.sharesmile.share.helpcenter.levelthree.resolution.FeedbackResolutionFragment;
-import com.sharesmile.share.helpcenter.category.leveltwo.OtherIssueFragment;
 import com.sharesmile.share.profile.history.ProfileHistoryFragment;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -35,6 +39,18 @@ public class HelpCenterFragment extends BaseFeedbackCategoryFragment {
         HelpCenterFragment fragment = new HelpCenterFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
     @Override
