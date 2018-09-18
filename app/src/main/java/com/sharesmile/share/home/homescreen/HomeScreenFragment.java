@@ -306,7 +306,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     private void hideProgressDialog() {
         mProgressBar.setVisibility(View.GONE);
         mContentView.setVisibility(View.VISIBLE);
-        Utils.showSMCNotificationDialog(true);
+        Utils.sendSMCNotificationDialogEvent(true);
     }
 
     @Override
@@ -492,7 +492,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             long noOfDaysPassed = ReferProgram.noOfDaysPassed();
             if ((noOfDaysPassed == 1 ||
                     noOfDaysPassed % 5 == 0) &&
-                    !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false)) {
+                    !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false)
+                    && ReferProgram.isReferProgramActive()) {
                 SMCDialog smcDialog = new SMCDialog(getContext());
                 smcDialog.show();
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, true);
@@ -548,9 +549,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnReferrerSuccessful onReferrerSuccessful) {
         if (onReferrerSuccessful.referrerDetails != null) {
-            SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(),
-                    Constants.USER_OLD, onReferrerSuccessful.referrerDetails);
-            somethingIsCookingDialog.show();
+            Utils.showSMCNotificationDialog(getContext(), onReferrerSuccessful.referrerDetails);
         } else {
             showSMCDialog();
         }

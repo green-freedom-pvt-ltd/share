@@ -10,8 +10,8 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -102,9 +102,7 @@ public class BaseFragment extends Fragment {
             if (WorkoutSingleton.getInstance().isWorkoutActive()) {
                 SharedPrefsManager.getInstance().setObject(Constants.PREF_SMC_NOTI_FCM_INVITEE_DETAILS, onReferrerSuccessful.referrerDetails);
             } else {
-                SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(getContext(),
-                        Constants.USER_OLD, onReferrerSuccessful.referrerDetails);
-                somethingIsCookingDialog.show();
+                Utils.showSMCNotificationDialog(getContext(), onReferrerSuccessful.referrerDetails);
             }
         }
     }

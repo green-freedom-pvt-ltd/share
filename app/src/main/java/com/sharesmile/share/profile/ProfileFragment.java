@@ -428,6 +428,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
                 setAchivements();
                 EventBus.getDefault().post(new UpdateEvent.OnReferrerSuccessful(SharedPrefsManager.getInstance().getObject(Constants.PREF_SMC_NOTI_FCM_INVITEE_DETAILS, ReferrerDetails.class)));
+                SharedPrefsManager.getInstance().setObject(Constants.PREF_SMC_NOTI_FCM_INVITEE_DETAILS, null);
             }
             ShareImageLoader.getInstance().setUseMemoryCache(true);
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {

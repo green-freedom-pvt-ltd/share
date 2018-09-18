@@ -18,9 +18,12 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,6 +125,7 @@ public class SomethingIsCookingDialog extends Dialog {
     public void onCLick(View view) {
         switch (view.getId()) {
             case R.id.close:
+                EventBus.getDefault().post(new UpdateEvent.OnKonfettiFinish());
                 dismiss();
                 break;
             case R.id.btn_share_more_meals:

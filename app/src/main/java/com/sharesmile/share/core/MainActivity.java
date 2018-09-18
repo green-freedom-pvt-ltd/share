@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -29,6 +31,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -94,6 +97,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -139,6 +144,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Utils.getFcmToken();
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                String value = getIntent().getExtras().getString(key);
+                Log.d(TAG, "TESTING!!!!!!!!!!!!!!! Key: " + key + " Value: " + value);
+            }
+        }
         Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
 //        Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
         Boolean isReminderDisable = getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
@@ -674,8 +685,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void share() {
-        replaceFragment(new ReferProgramFragment(), true);
-        /*AssetManager assetManager = getAssets();
+        if (!ReferProgram.isReferProgramActive()) {
+            AssetManager assetManager = getAssets();
         InputStream istr;
         Bitmap bitmap = null;
         try {
@@ -685,7 +696,10 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             // handle exception
         }
         Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
-                getString(R.string.share_msg));*/
+                getString(R.string.share_msg));
+        } else {
+            replaceFragment(new ReferProgramFragment(), true);
+        }
     }
 
     public void showHome() {

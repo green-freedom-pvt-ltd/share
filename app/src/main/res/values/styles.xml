@@ -173,4 +173,33 @@
         <item name="android:textSize">13sp</item> <!-- menu item text size-->
         <!--<item name="android:listPreferredItemHeightSmall">40dp</item>&lt;!&ndash; menu item height&ndash;&gt;-->
     </style>
+
+    <style name="TrackerActivity" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/white</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="KonfettiActivity" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">#00000000</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionMenuTextAppearance">@style/MyActionBar.MenuTextStyle</item>
+        <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
+        <item name="android:itemTextAppearance">@style/myCustomMenuTextApearance</item>
+        <item name="MaterialTapTargetPromptTheme">@style/MaterialTapTargetPromptTheme</item>
+    </style>
+
+    <style name="SMCDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/SMCDialogAnimation</item>
+    </style>
+
+    <style name="SMCDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/zoom_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_animation_1s</item>
+    </style>
 </resources>

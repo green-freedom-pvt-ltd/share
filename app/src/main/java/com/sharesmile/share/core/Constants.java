@@ -309,6 +309,7 @@ public class Constants {
     public static final String SMC_NOTI_INVITEE_NAME = "invitee_name";
     public static final String SMC_NOTI_INVITEE_SOCIAL_THUMB = "invitee_social_thumb";
     public static final String SMC_NOTI_INVITEE_PROFILE_PICTURE = "invitee_profile_picture";
+    public static final String SMC_NOTI_INVITEES_JSON = "invitee_json";
 
     public final static int LOADER_CHARITY_OVERVIEW = 100;
     public final static int LOADER_MY_STATS_GRAPH = 101;

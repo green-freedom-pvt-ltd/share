@@ -97,6 +97,7 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
+import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
 import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.models.WorkoutData;
@@ -109,6 +110,8 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -133,6 +136,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import Models.Level;
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.FullscreenPromptBackground;
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.CirclePromptFocal;
@@ -142,6 +148,7 @@ import static com.sharesmile.share.core.Constants.BADGE_TYPE_CAUSE;
 import static com.sharesmile.share.core.Constants.PREF_PENDING_WORKOUT_LOCATION_DATA_QUEUE_PREFIX;
 import static com.sharesmile.share.core.Constants.PREF_SHOWN_ONBOARDING;
 import static com.sharesmile.share.core.Constants.PREF_STREAK_UPLOADED_FIRST_TIME;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEES_JSON;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_CADENCE;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_SPEED;
 import static com.sharesmile.share.core.Constants.USER_PROP_AVG_STRIDE_LENGTH;
@@ -2261,7 +2268,7 @@ public class Utils {
         }
     }
 
-    public static void showSMCNotificationDialog(boolean b) {
+    public static void sendSMCNotificationDialogEvent(boolean b) {
         ReferrerDetails referrerDetails = new Gson().fromJson(
                 SharedPrefsManager.getInstance().getString(Constants.PREF_SMC_NOTI_USER_DETAILS),
                 ReferrerDetails.class);
@@ -2269,7 +2276,51 @@ public class Utils {
             SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_NOTI_USER_DETAILS, "");
             EventBus.getDefault().post(new UpdateEvent.OnReferrerSuccessful(referrerDetails));
         } else if (b) {
-            EventBus.getDefault().post(new UpdateEvent.OnReferrerSuccessful(null));
+            ReferrerDetails referrerDetailsObj = null;
+            try {
+                JSONObject jsonObject = new JSONObject(SharedPrefsManager.getInstance().getString(SMC_NOTI_INVITEES_JSON, "{}"));
+                SharedPrefsManager.getInstance().setString(SMC_NOTI_INVITEES_JSON, "{}");
+                Iterator<String> stringIterator = jsonObject.keys();
+                int count = 0;
+                while (stringIterator.hasNext()) {
+                    ReferrerDetails referrer =
+                            new Gson().fromJson(jsonObject.getString(stringIterator.next()).toString(),
+                                    ReferrerDetails.class);
+                    if (referrer != null) {
+                        referrerDetailsObj = referrer;
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            EventBus.getDefault().post(new UpdateEvent.OnReferrerSuccessful(referrerDetailsObj));
         }
+    }
+
+    public static void showSMCNotificationDialog(Context context, ReferrerDetails referrerDetails) {
+        SomethingIsCookingDialog somethingIsCookingDialog = new SomethingIsCookingDialog(context,
+                Constants.USER_OLD, referrerDetails);
+        somethingIsCookingDialog.getWindow().getAttributes().windowAnimations = R.style.SMCDialogAnimation;
+        somethingIsCookingDialog.show();
+        Intent intent = new Intent(context, ConfettiOverlayActivity.class);
+        context.startActivity(intent);
+    }
+
+    public static void startKonfetti(KonfettiView viewKonfetti, Resources resources) {
+        viewKonfetti.build()
+                .addColors(resources.getColor(R.color.bright_blue),
+                        resources.getColor(R.color.light_blue),
+                        resources.getColor(R.color.light_green),
+                        resources.getColor(R.color.medium_bright_blue),
+                        resources.getColor(R.color.pale_bright_blue))
+                .setDirection(0.0, 359.0)
+                .setSpeed(1f, 5f)
+                .setFadeOutEnabled(true)
+                .setTimeToLive(2000L)
+                .addShapes(Shape.RECT, Shape.CIRCLE)
+                .addSizes(new Size(12, 5))
+                .setPosition(-50f, 1000f, -50f, -50f)
+                .streamFor(300, 1000L);
     }
 }

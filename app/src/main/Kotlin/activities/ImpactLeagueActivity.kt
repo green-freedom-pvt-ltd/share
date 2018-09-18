@@ -5,9 +5,8 @@ import android.support.v7.app.ActionBar
 import android.view.MenuItem
 import base.BaseActivity2
 import com.sharesmile.share.R
-import com.sharesmile.share.core.Constants
 import com.sharesmile.share.core.event.UpdateEvent
-import com.sharesmile.share.refer_program.SomethingIsCookingDialog
+import com.sharesmile.share.utils.Utils
 import fragments.LeagueCodeFragment
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -62,9 +61,7 @@ class ImpactLeagueActivity : BaseActivity2() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(onReferrerSuccessful: UpdateEvent.OnReferrerSuccessful) {
         if (onReferrerSuccessful.referrerDetails != null) {
-            val somethingIsCookingDialog = SomethingIsCookingDialog(this,
-                    Constants.USER_OLD, onReferrerSuccessful.referrerDetails)
-            somethingIsCookingDialog.show()
+            Utils.showSMCNotificationDialog(this, onReferrerSuccessful.referrerDetails)
         }
     }
 
