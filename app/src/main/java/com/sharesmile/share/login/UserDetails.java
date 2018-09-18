@@ -5,6 +5,7 @@ import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.utils.Utils;
 
 /**
@@ -93,6 +94,8 @@ public class UserDetails implements UnObfuscable {
 
     @SerializedName("meals_shared")
     private int mealsShared;
+    @SerializedName("fcm_token")
+    private String fcmToken;
 
 
     public boolean isStreakAdded() {
@@ -431,6 +434,14 @@ public class UserDetails implements UnObfuscable {
         this.newUser = newUser;
     }
 
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
     public String getReferrerProfilePic() {
         if (referrerDetails != null) {
             if (referrerDetails.getReferrerProfilePicture().length() > 0) {
@@ -440,49 +451,6 @@ public class UserDetails implements UnObfuscable {
             }
         } else {
             return "";
-        }
-    }
-
-    public class ReferrerDetails {
-        @SerializedName("referrer_user_id")
-        private int referalId;
-        @SerializedName("referrer_name")
-        private String referalName;
-        @SerializedName("referrer_social_thumb")
-        private String referrerSocialThumb;
-        @SerializedName("referrer_profile_picture")
-        private String referrerProfilePicture;
-
-        public int getReferalId() {
-            return referalId;
-        }
-
-        public void setReferalId(int referalId) {
-            this.referalId = referalId;
-        }
-
-        public String getReferalName() {
-            return referalName;
-        }
-
-        public void setReferalName(String referalName) {
-            this.referalName = referalName;
-        }
-
-        public String getReferrerSocialThumb() {
-            return referrerSocialThumb;
-        }
-
-        public void setReferrerSocialThumb(String referrerSocialThumb) {
-            this.referrerSocialThumb = referrerSocialThumb;
-        }
-
-        public String getReferrerProfilePicture() {
-            return referrerProfilePicture;
-        }
-
-        public void setReferrerProfilePicture(String referrerProfilePicture) {
-            this.referrerProfilePicture = referrerProfilePicture;
         }
     }
 }

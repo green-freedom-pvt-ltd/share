@@ -793,6 +793,7 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("user_id", user_id);
             jsonObject.put("goal", prev.getStreakGoalID());
             jsonObject.put("reminder_time", Utils.getReminderTime().getTimeInMillis());
+            jsonObject.put("fcm_token", prev.getFcmToken());
             if (prev.getTitle1() > 0)
                 jsonObject.put("achieved_title_1", prev.getTitle1());
             if (prev.getTitle2() > 0)

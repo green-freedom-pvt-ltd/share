@@ -238,7 +238,7 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         showRunNotification(getContext().getResources().getString(R.string.app_name), notificationId, notifText, args);
     }
 
-    private static int getNotificationIcon() {
+    public static int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
         return useWhiteIcon ? R.mipmap.ic_notification_small : R.mipmap.ic_launcher;
     }

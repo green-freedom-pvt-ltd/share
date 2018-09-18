@@ -5,13 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
-import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
 import com.sharesmile.share.R;
-import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.core.Logger;
-
-import org.greenrobot.eventbus.EventBus;
+import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -37,6 +33,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public static final int WORKOUT_TRACK_NOTIFICATION_ID = 102;
     public static final int REMINDER_NOTIFICATION_ID = 103;
     public static final int AUTO_NOTIFICATION_ID = 104;
+    public static final int SMC_FCM_NOTIFICATION_ID = 105;
 
     public static final String NOTIFICATION_ID = "notification_id";
 

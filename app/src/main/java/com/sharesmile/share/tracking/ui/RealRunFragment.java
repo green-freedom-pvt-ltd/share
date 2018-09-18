@@ -235,24 +235,26 @@ public class RealRunFragment extends RunFragment {
     @Override
     public void showUpdate(float speed, float distanceCoveredMeters, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCoveredMeters, elapsedTimeInSecs);
-        float distanceOnDisplayInMeters = 0f;
-        try {
-            float numberOnDisplay = Float.parseFloat(distanceTextView.getText().toString());
-            distanceOnDisplayInMeters = UnitsManager.isImperial() ? 1609.34f*numberOnDisplay
-                    : 1000*numberOnDisplay;
-        }catch (NumberFormatException nfe){
-            String message = "NumberFormatException while parsing distanceTextView on display: " + nfe.getMessage();
-            Logger.e(TAG, message);
-            Crashlytics.log(message);
-            nfe.printStackTrace();
-        }
-        if (distanceCoveredMeters < distanceOnDisplayInMeters || distanceCoveredMeters - distanceOnDisplayInMeters >= 1){
-            // Only when the delta is greater than 0.001 km we show the update
-            String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCoveredMeters);
-            distanceTextView.setText(distanceString);
-            int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
-            impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
-            setCaloriesInTextView();
+        if (isVisible()) {
+            float distanceOnDisplayInMeters = 0f;
+            try {
+                float numberOnDisplay = Float.parseFloat(distanceTextView.getText().toString());
+                distanceOnDisplayInMeters = UnitsManager.isImperial() ? 1609.34f * numberOnDisplay
+                        : 1000 * numberOnDisplay;
+            } catch (NumberFormatException nfe) {
+                String message = "NumberFormatException while parsing distanceTextView on display: " + nfe.getMessage();
+                Logger.e(TAG, message);
+                Crashlytics.log(message);
+                nfe.printStackTrace();
+            }
+            if (distanceCoveredMeters < distanceOnDisplayInMeters || distanceCoveredMeters - distanceOnDisplayInMeters >= 1) {
+                // Only when the delta is greater than 0.001 km we show the update
+                String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCoveredMeters);
+                distanceTextView.setText(distanceString);
+                int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
+                impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
+                setCaloriesInTextView();
+            }
         }
     }
 
@@ -310,14 +312,16 @@ public class RealRunFragment extends RunFragment {
     }
 
     private void setPauseResumeButton(boolean paused){
-        if (paused){
-            pauseResumeTextView.setText(R.string.resume);
-            pauseResumeIcon.setImageResource(R.drawable.ic_play_arrow_black_50_24px);
-            impact.setTextColor(ContextCompat.getColor(getContext(), R.color.black_38));
-        }else {
-            pauseResumeTextView.setText(R.string.pause);
-            pauseResumeIcon.setImageResource(R.drawable.ic_pause_black_50_24px);
-            impact.setTextColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+        if (isVisible()) {
+            if (paused) {
+                pauseResumeTextView.setText(R.string.resume);
+                pauseResumeIcon.setImageResource(R.drawable.ic_play_arrow_black_50_24px);
+                impact.setTextColor(ContextCompat.getColor(getContext(), R.color.black_38));
+            } else {
+                pauseResumeTextView.setText(R.string.pause);
+                pauseResumeIcon.setImageResource(R.drawable.ic_pause_black_50_24px);
+                impact.setTextColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+            }
         }
     }
 
@@ -391,11 +395,13 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
-        float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
-        if (mCauseData.getMinDistance() > (totalDistance)) {
-            showMinDistanceDialog();
-        } else {
-            showRunEndDialog();
+        if (mCauseData != null) {
+            float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
+            if (mCauseData.getMinDistance() > (totalDistance)) {
+                showMinDistanceDialog();
+            } else {
+                showRunEndDialog();
+            }
         }
     }
 

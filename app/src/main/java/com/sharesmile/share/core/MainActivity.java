@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -29,6 +31,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,10 +47,7 @@ import android.widget.Toast;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
+import com.google.gson.Gson;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.AchievedTitle;
@@ -80,6 +80,7 @@ import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.profile.streak.StreakGoalFragment;
 import com.sharesmile.share.refer_program.ReferProgramFragment;
 import com.sharesmile.share.refer_program.model.ReferProgram;
+import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
 import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
 import com.sharesmile.share.tracking.ui.TrackerActivity;
@@ -96,8 +97,12 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import Models.CampaignList;
 import butterknife.ButterKnife;
@@ -106,6 +111,9 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt;
 import static com.sharesmile.share.core.Constants.NAVIGATION_DRAWER;
 import static com.sharesmile.share.core.Constants.REQUEST_CODE_LOGIN;
 import static com.sharesmile.share.core.Constants.REQUEST_IMAGE_CAPTURE;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEE_NAME;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEE_PROFILE_PICTURE;
+import static com.sharesmile.share.core.Constants.SMC_NOTI_INVITEE_SOCIAL_THUMB;
 import static com.sharesmile.share.core.application.MainApplication.getContext;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.AUTO_NOTIFICATION_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.REMINDER_NOTIFICATION_ID;
@@ -135,7 +143,13 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        getFcmToken();
+        Utils.getFcmToken();
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                String value = getIntent().getExtras().getString(key);
+                Log.d(TAG, "TESTING!!!!!!!!!!!!!!! Key: " + key + " Value: " + value);
+            }
+        }
         Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
 //        Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
         Boolean isReminderDisable = getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);
@@ -165,7 +179,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         } else {
             Logger.d(TAG, "render MainActivity UI");
             // Normal launch of MainActivity, render its layout
-            EventBus.getDefault().register(this);
+            if (!EventBus.getDefault().isRegistered(this))
+                EventBus.getDefault().register(this);
             ButterKnife.bind(this);
             mDrawerLayout = findViewById(R.id.drawerLayout);
             mNavigationView = findViewById(R.id.drawer_navigation);
@@ -222,20 +237,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             connectAWSS3();
             Utils.setAutoNotification(getContext());
         }
-    }
-
-    private void getFcmToken() {
-        Logger.d(TAG, "getFcmToken");
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-            @Override
-            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if (!task.isSuccessful()) {
-                    return;
-                }
-                String fcmToken = task.getResult().getToken();
-                Logger.d(TAG, "fcmToken : " + fcmToken);
-            }
-        });
     }
 
     private void connectAWSS3() {
@@ -314,34 +315,46 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "handleNotificationIntent");
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            String screen = bundle.getString(NotificationConsts.KEY_SCREEN);
-            Logger.d(TAG, "handleNotificationIntent, screen: " + screen);
-            if (!TextUtils.isEmpty(screen)) {
-                if (screen.equals(NotificationConsts.Screen.MESSAGE_CENTER)) {
-                    showMessageCenter();
-                } else if (screen.equals(NotificationConsts.Screen.PROFILE)) {
-                    if (!MainApplication.isLogin()) {
-                        showLoginActivity();
-                    } else {
-                        Bundle bundle1 = new Bundle();
-                        bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE, true);
-                        ProfileFragment profileFragment = new ProfileFragment();
-                        profileFragment.setArguments(bundle1);
-                        replaceFragment(profileFragment, true);
-                    }
-                } else if (screen.equals(NotificationConsts.Screen.LEADERBOARD)) {
-                    if (!MainApplication.isLogin()) {
-                        showLoginActivity();
-                    } else {
-                        showLeaderBoard();
-                    }
-                } else if (screen.equals(NotificationConsts.Screen.IMPACT_LEAGUE)) {
-                    if (!MainApplication.isLogin()) {
-                        showLoginActivity();
-                    } else {
-                        showImpactLeague();
+            Set<String> strings = bundle.keySet();
+            Iterator<String> stringIterator = strings.iterator();
+            System.out.println("strings : " + strings.size());
+            if (bundle.containsKey(NotificationConsts.KEY_SCREEN)) {
+                String screen = bundle.getString(NotificationConsts.KEY_SCREEN);
+                Logger.d(TAG, "handleNotificationIntent, screen: " + screen);
+                if (!TextUtils.isEmpty(screen)) {
+                    if (screen.equals(NotificationConsts.Screen.MESSAGE_CENTER)) {
+                        showMessageCenter();
+                    } else if (screen.equals(NotificationConsts.Screen.PROFILE)) {
+                        if (!MainApplication.isLogin()) {
+                            showLoginActivity();
+                        } else {
+                            Bundle bundle1 = new Bundle();
+                            bundle1.putBoolean(Constants.ARG_FORWARD_TOPROFILE, true);
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            profileFragment.setArguments(bundle1);
+                            replaceFragment(profileFragment, true);
+                        }
+                    } else if (screen.equals(NotificationConsts.Screen.LEADERBOARD)) {
+                        if (!MainApplication.isLogin()) {
+                            showLoginActivity();
+                        } else {
+                            showLeaderBoard();
+                        }
+                    } else if (screen.equals(NotificationConsts.Screen.IMPACT_LEAGUE)) {
+                        if (!MainApplication.isLogin()) {
+                            showLoginActivity();
+                        } else {
+                            showImpactLeague();
+                        }
                     }
                 }
+            } else if (bundle.containsKey(Constants.SMC_NOTI_INVITEE_USER_ID)) {
+                ReferrerDetails referrerDetails = new ReferrerDetails();
+                referrerDetails.setReferalId(bundle.getInt(Constants.SMC_NOTI_INVITEE_USER_ID));
+                referrerDetails.setReferalName(bundle.getString(SMC_NOTI_INVITEE_NAME));
+                referrerDetails.setReferrerSocialThumb(bundle.getString(SMC_NOTI_INVITEE_SOCIAL_THUMB));
+                referrerDetails.setReferrerProfilePicture(bundle.getString(SMC_NOTI_INVITEE_PROFILE_PICTURE));
+                SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_NOTI_USER_DETAILS, new Gson().toJson(referrerDetails).toString());
             }
         }
     }
@@ -672,8 +685,8 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void share() {
-        replaceFragment(new ReferProgramFragment(), true);
-        /*AssetManager assetManager = getAssets();
+        if (!ReferProgram.isReferProgramActive()) {
+            AssetManager assetManager = getAssets();
         InputStream istr;
         Bitmap bitmap = null;
         try {
@@ -683,7 +696,10 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
             // handle exception
         }
         Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
-                getString(R.string.share_msg));*/
+                getString(R.string.share_msg));
+        } else {
+            replaceFragment(new ReferProgramFragment(), true);
+        }
     }
 
     public void showHome() {
@@ -732,8 +748,23 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
 
     }
 
+    @Override
+    protected void onResume() {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
+        super.onPause();
+    }
+
     public void onDestroy() {
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -741,6 +772,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     public void onEvent(UpdateEvent.CampaignDataUpdated campaignDataUpdated) {
         showPromoModal(campaignDataUpdated.getCampaign());
     }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(LeagueBoardDataUpdated dataUpdated) {

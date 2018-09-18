@@ -21,6 +21,8 @@ import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.profile.badges.adapter.InProgressBadgeAdapter;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,7 +54,7 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchieved
 
     @Override
     public void onDestroyView() {
-//        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 
@@ -60,6 +62,7 @@ public class InProgressBadgeFragment extends BaseFragment implements SeeAchieved
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initUi();
+        EventBus.getDefault().register(this);
     }
 
 

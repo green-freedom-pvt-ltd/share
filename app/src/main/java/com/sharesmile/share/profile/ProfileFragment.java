@@ -71,6 +71,7 @@ import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.profile.stats.BarChartDataSet;
 import com.sharesmile.share.profile.stats.BarChartEntry;
 import com.sharesmile.share.profile.streak.StreakFragment;
+import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.utils.Utils;
 import com.sharesmile.share.views.CircularImageView;
 
@@ -420,6 +421,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 prepareStreakOnboardingOverlays();
                 if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false))
                 setAchivements();
+                EventBus.getDefault().post(new UpdateEvent.OnReferrerSuccessful(SharedPrefsManager.getInstance().getObject(Constants.PREF_SMC_NOTI_FCM_INVITEE_DETAILS, ReferrerDetails.class)));
+                SharedPrefsManager.getInstance().setObject(Constants.PREF_SMC_NOTI_FCM_INVITEE_DETAILS, null);
             }
             ShareImageLoader.getInstance().setUseMemoryCache(true);
         } else if (NetworkUtils.isNetworkConnected(MainApplication.getContext())) {

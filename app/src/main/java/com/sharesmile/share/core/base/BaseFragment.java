@@ -9,6 +9,12 @@ import android.view.View;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.utils.Utils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Created by ankitmaheshwari1 on 11/01/16.
@@ -31,7 +37,7 @@ public class BaseFragment extends Fragment {
         this.controller = null;
     }
 
-    public void setToolbarTitle(String title){
+    public void setToolbarTitle(String title) {
         Logger.d(TAG, "setToolbarTitle: " + title);
         getFragmentController().updateToolBar(title, true);
     }
@@ -43,7 +49,7 @@ public class BaseFragment extends Fragment {
         SharedPrefsManager.getInstance().setInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + getName(), ++launchCount);
     }
 
-    public int getScreenLaunchCount(){
+    public int getScreenLaunchCount() {
         return SharedPrefsManager.getInstance().getInt(Constants.PREF_SCREEN_LAUNCH_COUNT_PREFIX + getName());
     }
 
@@ -53,20 +59,20 @@ public class BaseFragment extends Fragment {
     }
 
 
-    public boolean isAttachedToActivity(){
+    public boolean isAttachedToActivity() {
         return controller != null;
     }
 
-    public IFragmentController getFragmentController(){
+    public IFragmentController getFragmentController() {
         return controller;
     }
 
     /**
-     Override this method if you want your fragment to receive a back press callback.
-
-     @return true if your fragment consumes the back press event,
-     false if the back press should be handled by the activity. Returns false
-     by default.
+     * Override this method if you want your fragment to receive a back press callback.
+     *
+     * @return true if your fragment consumes the back press event,
+     * false if the back press should be handled by the activity. Returns false
+     * by default.
      */
     protected boolean handleBackPress() {
         return false;
@@ -75,18 +81,30 @@ public class BaseFragment extends Fragment {
     /**
      * Ask activity to trigger back button behaviour
      * Child fragment can override it and use it as needed
+     *
      * @return true if back behaviour has been honoured, false otherwise
      */
-    protected boolean goBack(){
-        if (isAttachedToActivity()){
+    protected boolean goBack() {
+        if (isAttachedToActivity()) {
             getFragmentController().goBack();
             return true;
         }
         return false;
     }
 
-    public String getName(){
+    public String getName() {
         return getClass().getCanonicalName();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnReferrerSuccessful onReferrerSuccessful) {
+        if (onReferrerSuccessful.referrerDetails != null) {
+            if (WorkoutSingleton.getInstance().isWorkoutActive()) {
+                SharedPrefsManager.getInstance().setObject(Constants.PREF_SMC_NOTI_FCM_INVITEE_DETAILS, onReferrerSuccessful.referrerDetails);
+            } else {
+                Utils.showSMCNotificationDialog(getContext(), onReferrerSuccessful.referrerDetails);
+            }
+        }
     }
 
     public interface FragmentInterface {

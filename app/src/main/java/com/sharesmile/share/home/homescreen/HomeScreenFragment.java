@@ -97,7 +97,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mAdapter = new CausePageAdapter(getChildFragmentManager());
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.bind(this, view);
         shareCodeLayout.setOnClickListener(this);
@@ -212,6 +213,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     @Override
     public void onPause() {
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         super.onPause();
         if (showOverlayRunnable != null) {
             showOverlayRunnable.cancel();
@@ -231,6 +234,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 
     @Override
     public void onResume() {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
         super.onResume();
         refreshFeedBadgeIndicator();
     }
@@ -301,6 +306,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     private void hideProgressDialog() {
         mProgressBar.setVisibility(View.GONE);
         mContentView.setVisibility(View.VISIBLE);
+        Utils.sendSMCNotificationDialogEvent(true);
     }
 
     @Override
@@ -415,9 +421,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+
     @Override
     public void onDestroyView() {
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 
@@ -464,9 +472,9 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             shareCodeLayout.setVisibility(View.GONE);
         }
         AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
-        hideProgressDialog();
+
         Utils.checkBadgeData(false);
-        showSMCDialog();
+        hideProgressDialog();
     }
 
     private void showSMCDialog() {
@@ -484,7 +492,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             long noOfDaysPassed = ReferProgram.noOfDaysPassed();
             if ((noOfDaysPassed == 1 ||
                     noOfDaysPassed % 5 == 0) &&
-                    !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false)) {
+                    !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false)
+                    && ReferProgram.isReferProgramActive()) {
                 SMCDialog smcDialog = new SMCDialog(getContext());
                 smcDialog.show();
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, true);
@@ -537,4 +546,12 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnReferrerSuccessful onReferrerSuccessful) {
+        if (onReferrerSuccessful.referrerDetails != null) {
+            Utils.showSMCNotificationDialog(getContext(), onReferrerSuccessful.referrerDetails);
+        } else {
+            showSMCDialog();
+        }
+    }
 }

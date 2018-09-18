@@ -36,6 +36,7 @@ import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.utils.Utils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -120,7 +121,8 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
 
     @Override
     public void onDestroyView() {
-//        EventBus.getDefault().unregister(this);
+        if (from == 0)
+            EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 
@@ -135,6 +137,9 @@ public class AchieviedBadgeFragment extends BaseFragment implements View.OnClick
             from = bundle.getInt("FROM", -1);
         initUi();
         startPostponedEnterTransition();
+        if (from == 0) {
+            EventBus.getDefault().register(this);
+        }
 
     }
 

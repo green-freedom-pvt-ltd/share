@@ -46,8 +46,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nl.dionsegijn.konfetti.KonfettiView;
-import nl.dionsegijn.konfetti.models.Shape;
-import nl.dionsegijn.konfetti.models.Size;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 
@@ -90,6 +88,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        Utils.getFcmToken();
         SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
         setContentView(R.layout.activity_onboarding);
         ButterKnife.bind(this);
@@ -367,20 +366,7 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_CONFETTI, true);
         if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SHOW_CONFETTI, true)) {
             viewKonfetti.setVisibility(View.VISIBLE);
-            viewKonfetti.build()
-                    .addColors(getResources().getColor(R.color.bright_blue),
-                            getResources().getColor(R.color.light_blue),
-                            getResources().getColor(R.color.light_green),
-                            getResources().getColor(R.color.medium_bright_blue),
-                            getResources().getColor(R.color.pale_bright_blue))
-                    .setDirection(0.0, 359.0)
-                    .setSpeed(1f, 5f)
-                    .setFadeOutEnabled(true)
-                    .setTimeToLive(2000L)
-                    .addShapes(Shape.RECT, Shape.CIRCLE)
-                    .addSizes(new Size(12, 5))
-                    .setPosition(-50f, 1000f, -50f, -50f)
-                    .streamFor(300, 1000L);
+            Utils.startKonfetti(viewKonfetti, getResources());
             SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_CONFETTI, false);
         }
     }
