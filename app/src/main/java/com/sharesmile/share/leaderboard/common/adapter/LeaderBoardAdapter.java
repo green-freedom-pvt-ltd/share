@@ -178,6 +178,9 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @BindView(R.id.not_sync_tv)
         TextView notSync;
 
+        @BindView(R.id.user_layout)
+        LinearLayout userLayout;
+
         public LeaderBoardViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -248,6 +251,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     mParent.onItemClick(leaderboard.getId());
                 }
             });
+
         }
 
         public void show() {

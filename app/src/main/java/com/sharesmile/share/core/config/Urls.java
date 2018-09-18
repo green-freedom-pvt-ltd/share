@@ -12,7 +12,7 @@ public class Urls {
 
     private static final String BASE_URL = "http://dev.impactrun.com";
     private static final String NODE_BASE_URL = "http://ec2-13-127-245-226.ap-south-1.compute.amazonaws.com:8000";//SMC temp
-    //    private static final String NODE_BASE_URL = "http://139.59.243.245:8000";//staging
+    //        private static final String NODE_BASE_URL = "http://139.59.243.245:8000";//staging
 //    private static final String NODE_BASE_URL = "http://192.168.201.66:8000";//local
 //    private static final String NODE_BASE_URL = "http://api.impactrun.com";//live
     private static final String APP_VERSION = "/app/v0";
@@ -26,6 +26,7 @@ public class Urls {
     private static final String UPDATE_RUN_URL = "/updaterun/";
 
     private static final String LOGIN_URL = "/users/";
+    private static final String PUBLIC_PROFILE_URL = "/publicprofile?user_id=";
     private static final String FEEDBACK_URL = "/userFeedback/";
     private static final String FAQ_URL = "/faq";
     private static final String MESSAGE_URL = "/messageCenter";
@@ -115,6 +116,11 @@ public class Urls {
 
     public static String getLoginUrl() {
         String url = getNodeBaseUrl() + LOGIN_URL;
+        return url;
+    }
+
+    public static String getPublicProfileUrl(long id) {
+        String url = getNodeBaseUrl() + PUBLIC_PROFILE_URL + id;
         return url;
     }
 

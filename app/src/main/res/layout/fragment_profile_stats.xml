@@ -87,10 +87,10 @@
                         </android.support.constraint.ConstraintLayout>
 
                         <LinearLayout
-                            android:layout_marginLeft="12dp"
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="12dp"
+                            android:orientation="vertical">
 
                             <com.sharesmile.share.views.LBKTextView
                                 android:id="@+id/tv_profile_name"
@@ -117,11 +117,11 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:textSize="11sp"
-                                android:textColor="@color/black_64"
-                                android:maxLength="140"
                                 android:gravity="bottom"
-                                android:text="@string/def_about_me" />
+                                android:maxLength="140"
+                                android:text="@string/def_about_me"
+                                android:textColor="@color/black_64"
+                                android:textSize="11sp" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -133,81 +133,98 @@
                         android:layout_marginRight="22dp"
                         android:layout_marginTop="15dp">
 
-                        <com.sharesmile.share.views.MSBTextView
+                        <com.sharesmile.share.views.LBTextView
                             android:id="@+id/tv_impact"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:maxLines="1"
                             android:text="\u20B9 657"
                             android:textColor="@color/clr_6e"
-                            android:textSize="30sp"
-                            android:textStyle="bold"
-                            android:layout_weight="1"
-                            android:maxLines="1" />
+                            android:textSize="30sp" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="5dp">
+                            android:layout_marginLeft="5dp"
+                            android:orientation="vertical">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
                                 android:id="@+id/total_workouts_tv"
-                                android:textColor="@color/black_57"
-                                tools:text="1563"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:fontFamily="@font/lato_bold"
-                                android:gravity="bottom" />
+                                android:gravity="bottom"
+                                android:textColor="@color/black_57"
+                                android:textSize="16sp"
+                                tools:text="1563" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="10sp"
-                                android:textColor="@color/black_5e"
-                                android:text="@string/profile_workouts"
                                 android:fontFamily="@font/lato_regular"
-                                android:gravity="top" />
+                                android:gravity="top"
+                                android:text="@string/profile_workouts"
+                                android:textColor="@color/black_5e"
+                                android:textSize="10sp" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="25dp">
+                            android:layout_marginLeft="25dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/total_distance_tv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/lato_bold"
+                                    android:gravity="bottom"
+                                    android:textColor="@color/black_57"
+                                    android:textSize="16sp"
+                                    tools:text="1563" />
+
+                                <TextView
+                                    android:id="@+id/total_distance_unit_tv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="2dp"
+                                    android:fontFamily="@font/lato_bold"
+                                    android:gravity="bottom"
+                                    android:text="km"
+                                    android:textColor="@color/black_37"
+                                    android:textSize="11.4sp" />
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:id="@+id/total_distance_tv"
-                                android:textColor="@color/black_57"
-                                tools:text="1563"
-                                android:fontFamily="@font/lato_bold"
-                                android:gravity="bottom" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="10sp"
-                                android:textColor="@color/black_5e"
-                                android:text="@string/profile_distance"
                                 android:fontFamily="@font/lato_regular"
-                                android:gravity="top" />
+                                android:gravity="top"
+                                android:text="@string/profile_distance"
+                                android:textColor="@color/black_5e"
+                                android:textSize="10sp" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginTop="13dp"
                         android:layout_marginBottom="13dp"
                         android:layout_marginLeft="24dp"
                         android:layout_marginRight="24dp"
+                        android:layout_marginTop="13dp"
                         android:background="@color/grey_f2" />
 
                     <RelativeLayout
+                        android:id="@+id/streak_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="24dp"
@@ -225,35 +242,35 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="16sp"
                                     android:id="@+id/tv_streak"
-                                    android:textColor="@color/black_57"
-                                    tools:text="63"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
                                     android:fontFamily="@font/lato_bold"
-                                    android:gravity="top" />
+                                    android:gravity="top"
+                                    android:textColor="@color/black_57"
+                                    android:textSize="16sp"
+                                    tools:text="63" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/black_5e"
-                                    android:text="@string/profile_streak"
+                                    android:layout_marginTop="-2dp"
                                     android:fontFamily="@font/lato_regular"
                                     android:gravity="top"
-                                    android:layout_marginTop="-2dp" />
+                                    android:text="@string/profile_streak"
+                                    android:textColor="@color/black_5e"
+                                    android:textSize="10sp" />
                             </LinearLayout>
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_alignParentRight="true"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true">
 
                             <ImageView
                                 android:layout_width="wrap_content"
@@ -263,34 +280,35 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="16sp"
                                     android:id="@+id/tv_max_streak"
-                                    android:textColor="@color/black_57"
-                                    tools:text="63"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
                                     android:fontFamily="@font/lato_bold"
-                                    android:gravity="top" />
+                                    android:gravity="top"
+                                    android:textColor="@color/black_57"
+                                    android:textSize="16sp"
+                                    tools:text="63" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/black_5e"
-                                    android:text="@string/profile_max_streak"
+                                    android:layout_marginTop="-2dp"
                                     android:fontFamily="@font/lato_regular"
                                     android:gravity="top"
-                                    android:layout_marginTop="-2dp" />
+                                    android:text="@string/profile_max_streak"
+                                    android:textColor="@color/black_5e"
+                                    android:textSize="10sp" />
                             </LinearLayout>
                         </LinearLayout>
                     </RelativeLayout>
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/achievements_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
@@ -311,28 +329,30 @@
                             android:text="@string/profile_stats_achievements" />
 
                     </RelativeLayout>
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rv_achievements"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="19dp"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginLeft="23dp"
-                        android:layout_marginRight="23dp"
-                        android:orientation="horizontal"
-                        tools:listitem="@layout/rv_achievements_row_item"
-                        />
-                    <include layout="@layout/rv_achievements_row_item"
-                        android:visibility="invisible"
-                        />
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rv_achievements"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="19dp"
+                            android:layout_marginLeft="23dp"
+                            android:layout_marginRight="23dp"
+                            android:layout_marginTop="30dp"
+                            android:orientation="horizontal" />
+
+                        <include
+                            layout="@layout/rv_achievements_row_item"
+                            android:visibility="invisible" />
+
                         <ProgressBar
                             android:id="@+id/progress_bar"
-                            android:layout_centerInParent="true"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true" />
 
                     </RelativeLayout>
 
@@ -376,6 +396,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/my_stats_layout"
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
                 android:layout_marginBottom="6dp"
@@ -497,13 +518,12 @@
                                 android:textSize="20sp" />
 
                             <com.sharesmile.share.views.LBTextView
+                                android:id="@+id/tv_stats_kms_unit"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/profile_stats_kms"
                                 android:textColor="@color/clr_a0"
-                                android:textSize="12sp"
-                                android:id="@+id/tv_stats_kms_unit"
-                                />
+                                android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -556,12 +576,12 @@
 
 
             <LinearLayout
+                android:id="@+id/charity_overview_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp"
                 android:background="@color/white"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -576,24 +596,27 @@
                         android:layout_height="wrap_content"
                         android:text="@string/profile_stats_charity_overview" />
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_charity_overview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="27dp"
-                    android:layout_marginTop="34dp" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_charity_overview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="27dp"
+                        android:layout_marginTop="34dp" />
+
                     <ProgressBar
+                        android:id="@+id/charity_overview_progressbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:id="@+id/charity_overview_progressbar"
-                        />
-                    <include layout="@layout/rv_charity_overview_profile_row"
-                        android:visibility="invisible"
-                        />
+                        android:layout_centerInParent="true" />
+
+                    <include
+                        layout="@layout/rv_charity_overview_profile_row"
+                        android:visibility="invisible" />
                 </RelativeLayout>
             </LinearLayout>
 

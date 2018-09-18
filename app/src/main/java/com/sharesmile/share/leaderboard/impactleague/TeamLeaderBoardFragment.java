@@ -3,12 +3,13 @@ package com.sharesmile.share.leaderboard.impactleague;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.sharesmile.share.R;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueDataEvent;
 import com.sharesmile.share.leaderboard.impactleague.event.TeamLeaderBoardDataFetched;
-import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.R;
+import com.sharesmile.share.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +113,7 @@ public class TeamLeaderBoardFragment extends BaseLeagueFragment {
 
     @Override
     public void onItemClick(long id) {
-        // Nothing to do here
+        Utils.showProfile(id, getFragmentController());
     }
 
     @Override

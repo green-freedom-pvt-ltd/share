@@ -26,6 +26,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -83,6 +84,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.IFragmentController;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.config.ClientConfig;
@@ -97,6 +99,7 @@ import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.profile.BodyWeightChangedEvent;
+import com.sharesmile.share.profile.ProfileFragment;
 import com.sharesmile.share.refer_program.SomethingIsCookingDialog;
 import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
@@ -228,6 +231,10 @@ public class Utils {
      */
     public static String formatWithOneDecimal(double distance) {
         return getDecimalFormat("0.0").format(distance);
+    }
+
+    public static String formatWithTwoDecimal(double distance) {
+        return getDecimalFormat("0.00").format(distance);
     }
 
     public static String formatCalories(double calories) {
@@ -887,7 +894,7 @@ public class Utils {
         return a + b * speed + c * Math.pow(speed, 2) + d * Math.pow(speed, 3);
     }
 
-    public static final Level getLevel(int impactInRupees) {
+    public static final Level getLevel(double impactInRupees) {
         Iterator<Map.Entry<Integer, Level>> iter = Constants.LEVELS_MAP.entrySet().iterator();
         Level result = null;
         while (iter.hasNext()) {
@@ -2322,5 +2329,13 @@ public class Utils {
                 .addSizes(new Size(12, 5))
                 .setPosition(-50f, 1000f, -50f, -50f)
                 .streamFor(300, 1000L);
+    }
+
+    public static void showProfile(long id, IFragmentController fragmentController) {
+        Bundle bundle = new Bundle();
+        bundle.putLong("user_id", id);
+        ProfileFragment profileFragment = new ProfileFragment();
+        profileFragment.setArguments(bundle);
+        fragmentController.replaceFragment(profileFragment, true);
     }
 }

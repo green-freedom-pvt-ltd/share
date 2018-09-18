@@ -126,7 +126,7 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
 
     @Override
     public void onItemClick(long id) {
-        // No action on click
+        Utils.showProfile(id, getFragmentController());
     }
 
     @Override

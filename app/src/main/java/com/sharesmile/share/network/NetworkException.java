@@ -40,6 +40,10 @@ public class NetworkException extends Exception {
         return failureType;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
     public static class Builder {
 
         private String errorMessage;

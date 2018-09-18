@@ -9,15 +9,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.sharesmile.share.leaderboard.common.BaseLeaderBoardFragment;
-import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
-import com.sharesmile.share.leaderboard.global.model.LeaderBoardData;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.leaderboard.common.BaseLeaderBoardFragment;
+import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
+import com.sharesmile.share.leaderboard.global.model.LeaderBoardData;
+import com.sharesmile.share.leaderboard.global.model.LeaderBoardList;
+import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -213,6 +214,7 @@ public class GlobalLeaderBoardFragment extends BaseLeaderBoardFragment implement
     @Override
     public void onItemClick(long id) {
         // No action on click
+        Utils.showProfile(id, getFragmentController());
     }
 
     @Override
