@@ -1431,12 +1431,19 @@ public class Utils {
             if (achievedBadges.size() > 0) {
                 achievedBadge = achievedBadges.get(0);
                 if (categoryCompleted) {
-                    if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
+                    if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) &&
+                            achievedBadge.getParamDone() != 0 &&
+                            achievedBadge.getBadgeIdAchieved() > 0) ||
                             (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)))) {
                         achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                         achievedBadge.setIsSync(false);
                     }
+                    if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)) {
+                        achievedBadge.setParamDone(paramDone);
+                        achievedBadge.setIsSync(false);
+                    }
                 } else {
+
                     achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
                 }
             } else if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || !categoryCompleted) {

@@ -986,7 +986,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     public void onEvent(UpdateEvent.OnGetTitle onGetTitle) {
         if (onGetTitle.result == ExpoBackoffTask.RESULT_SUCCESS) {
             //Pull historical run data;
-            Utils.checkBadgeData(false);
+            Utils.checkBadgeData(true);
 
             if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_CHARITY_OVERVIEW_DATA_LOAD, true))
                 SyncHelper.getCharityOverview();
