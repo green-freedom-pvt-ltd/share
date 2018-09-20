@@ -390,8 +390,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                         */
                 float progress = lifeTimeImpact - level.getMinImpact();
                 float max = level.getMaxImpact() - level.getMinImpact();
-                levelDist.setText(UnitsManager.formatRupeeToMyCurrency(progress).substring(1) + "/" +
-                        UnitsManager.formatRupeeToMyCurrency(max).substring(1));
+                levelDist.setText(UnitsManager.formatRupeeToMyCurrency(progress) + "/" +
+                        UnitsManager.formatRupeeToMyCurrency(max));
                 float progressPercent = progress / max;
 
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) levelProgressBar.getLayoutParams();

@@ -115,7 +115,12 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         Logger.d(TAG, "init");
         mHistoryAdapter = new HistoryAdapter(this, isRunSelection);
         mRecyclerView.setAdapter(mHistoryAdapter);
-        linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext()) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -126,27 +131,27 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
         mRecyclerView.setLayoutManager(linearLayoutManager);
         if (isRunSelection) {
             selectIssueContainer.setVisibility(View.VISIBLE);
-            swipeRefreshLayout.setEnabled(false);
         } else {
             selectIssueContainer.setVisibility(View.GONE);
-            swipeRefreshLayout.setEnabled(true);
-            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    swipeRefreshLayout.setRefreshing(true);
-                    if (NetworkUtils.isNetworkConnected(getContext())) {
-                        if (containerShowUnsync.getVisibility() == View.VISIBLE)
-                            SyncHelper.uploadPendingWorkout();
-                        else
-                            SyncHelper.forceRefreshEntireWorkoutHistory();
-                    } else {
-                        MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                }
-            });
-            swipeRefreshLayout.setColorSchemeResources(new int[]{R.color.sky_blue, R.color.sky_blue_dark});
+
         }
+        swipeRefreshLayout.setEnabled(true);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                if (NetworkUtils.isNetworkConnected(getContext())) {
+                    if (containerShowUnsync.getVisibility() == View.VISIBLE)
+                        SyncHelper.uploadPendingWorkout();
+                    else
+                        SyncHelper.forceRefreshEntireWorkoutHistory();
+                } else {
+                    MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(new int[]{R.color.sky_blue, R.color.sky_blue_dark});
         fetchRunDataFromDb();
         setUnsyncLayout();
 
