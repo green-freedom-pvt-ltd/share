@@ -55,9 +55,14 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Utils.setAutoNotification(getContext());
-        if (WorkoutSingleton.getInstance().isWorkoutActive() || !Utils.isAppForground(context)) {
+        if (WorkoutSingleton.getInstance().isWorkoutActive() ||
+                !Utils.isAppForground(context)) {
             return;
         }
+        //todo comment auto notification
+        if (true)
+            return;
+
         Logger.d(TAG, "In " + TAG);
         NotificationSubClass notificationSubClass = checkForNotification();
         if (notificationSubClass != null) {

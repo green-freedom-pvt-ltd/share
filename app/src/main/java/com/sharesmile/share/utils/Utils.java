@@ -1337,6 +1337,8 @@ public class Utils {
         PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         alarmManager.cancel(alarmPendingIntent);
+        AnalyticsEvent.create(Event.ON_SET_REMINDER_CANCEL)
+                .buildAndDispatch();
     }
 
     public static Calendar getReminderTime() {

@@ -14,7 +14,9 @@ import android.support.v4.content.ContextCompat;
 
 import com.crashlytics.android.Crashlytics;
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
@@ -27,7 +29,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(WorkoutSingleton.getInstance().isWorkoutActive())
+        if (WorkoutSingleton.getInstance().isWorkoutActive() ||
+                !SharedPrefsManager.getInstance().getBoolean(Constants.REMINDER_SET, false))
         {
             return;
         }
