@@ -113,14 +113,7 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
 
     private void init() {
         Logger.d(TAG, "init");
-        mHistoryAdapter = new HistoryAdapter(this, isRunSelection);
-        mRecyclerView.setAdapter(mHistoryAdapter);
-        linearLayoutManager = new LinearLayoutManager(getContext()) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
+        linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -129,6 +122,9 @@ public class ProfileHistoryFragment extends BaseFragment implements HistoryAdapt
             }
         });
         mRecyclerView.setLayoutManager(linearLayoutManager);
+        mHistoryAdapter = new HistoryAdapter(this, isRunSelection);
+        mRecyclerView.setAdapter(mHistoryAdapter);
+
         if (isRunSelection) {
             selectIssueContainer.setVisibility(View.VISIBLE);
         } else {
