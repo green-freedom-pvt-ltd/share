@@ -15,7 +15,7 @@ public class Urls {
     //        private static final String NODE_BASE_URL = "http://139.59.243.245:8000";//staging
 //    private static final String NODE_BASE_URL = "http://192.168.201.66:8000";//local
 //    private static final String NODE_BASE_URL = "http://api.impactrun.com";//live
-    private static final String APP_VERSION = "/app/v0";
+    private static final String APP_VERSION = "/app/v1"; // changed from v0->v1 on 25/09/2018
     private static final String CAUSE_LIST_URL = "/causes";
     private static final String RUN_URL = "/runs";
 

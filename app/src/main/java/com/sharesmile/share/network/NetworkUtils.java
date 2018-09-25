@@ -155,21 +155,7 @@ public class NetworkUtils {
 
     public static <T> T parseSuccessResponse(com.sharesmile.share.core.Response serverResponse, Type typeOfT) throws NetworkException {
         Gson gson = new Gson();
-        switch (serverResponse.getCode()) {
-            case Constants.SUCCESS_GET:
-                return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
-            case Constants.SUCCESS_POST:
-                return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
-
-        }
-        try{
-            return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
-        }catch(JsonSyntaxException jse){
-            String message = "JsonSyntaxException while parsing response string to " + typeOfT.toString()
-                    + ", responseString: " + serverResponse.getResponse();
-            Logger.e(TAG, message, jse);
-            throw new NetworkException.Builder().cause(jse).httpStatusCode(serverResponse.getCode()).errorMessage(message).build();
-        }
+        return gson.fromJson(serverResponse.getResponse().toString(), typeOfT);
     }
 
     private static NetworkException convertResponseToException(Response response, com.sharesmile.share.core.Response serverResponse) {

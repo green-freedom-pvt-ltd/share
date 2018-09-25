@@ -1344,6 +1344,8 @@ public class Utils {
         PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         alarmManager.cancel(alarmPendingIntent);
+        AnalyticsEvent.create(Event.ON_SET_REMINDER_CANCEL)
+                .buildAndDispatch();
     }
 
     public static Calendar getReminderTime() {
@@ -1438,12 +1440,19 @@ public class Utils {
             if (achievedBadges.size() > 0) {
                 achievedBadge = achievedBadges.get(0);
                 if (categoryCompleted) {
-                    if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) && achievedBadge.getParamDone() != 0) ||
+                    if (((type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) &&
+                            achievedBadge.getParamDone() != 0 &&
+                            achievedBadge.getBadgeIdAchieved() > 0) ||
                             (!type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)))) {
                         achievedBadge.setCategoryStatus(Constants.BADGE_COMPLETED);
                         achievedBadge.setIsSync(false);
                     }
+                    if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK)) {
+                        achievedBadge.setParamDone(paramDone);
+                        achievedBadge.setIsSync(false);
+                    }
                 } else {
+
                     achievedBadge.setCategoryStatus(Constants.BADGE_IN_PROGRESS);
                 }
             } else if (type.equalsIgnoreCase(Constants.BADGE_TYPE_STREAK) || !categoryCompleted) {
