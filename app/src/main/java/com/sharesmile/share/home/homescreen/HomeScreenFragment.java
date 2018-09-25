@@ -360,7 +360,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     // handle exception
                 }
                 Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
-                        String.format(getString(R.string.smc_share_more_meals) + MainApplication.getInstance().getUserDetails().getMyReferCode()));
+                        String.format(getString(R.string.smc_share_more_meals), MainApplication.getInstance().getUserDetails().getMyReferCode()));
                 break;
             case R.id.bt_home_feed:
                 getFragmentController().performOperation(IFragmentController.SHOW_MESSAGE_CENTER, null);

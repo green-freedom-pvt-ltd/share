@@ -36,19 +36,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/something_is_cooking"
             android:textSize="28sp"
             android:textColor="@color/white"
-            android:layout_marginRight="11dp"
-            android:layout_marginLeft="11dp"
             android:layout_marginBottom="12dp"
             android:gravity="center"
             android:fontFamily="@font/austhina_brush_calligraphy_scratch"
             android:letterSpacing="0.01"
             android:lineSpacingExtra="10sp"
-
             />
 
         <TextView

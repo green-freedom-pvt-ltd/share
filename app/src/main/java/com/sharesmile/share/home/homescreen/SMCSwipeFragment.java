@@ -15,9 +15,15 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.refer_program.ReferProgramFragment;
 import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.views.FontCache;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,7 +68,14 @@ public class SMCSwipeFragment extends BaseFragment {
         View view = inflater.inflate(
                 R.layout.smc_card, container, false);
         ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
     @Override
@@ -109,5 +122,11 @@ public class SMCSwipeFragment extends BaseFragment {
 
     private void showShareScreenFragment() {
         getFragmentController().replaceFragment(ReferProgramFragment.getInstance(1), true);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnMealAdded onMealAdded) {
+        UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+        shareATotalMeals.setText(getResources().getString(R.string.total_meals_by_you) + " " + MainApplication.getInstance().getUserDetails().getMealsShared());
     }
 }

@@ -165,7 +165,7 @@ public class ReferProgram implements UnObfuscable {
             } else {
                 SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_PROGRAMS, null);
             }
-            EventBus.getDefault().post(new UpdateEvent.OnGetStreak(ExpoBackoffTask.RESULT_SUCCESS));
+            EventBus.getDefault().post(new UpdateEvent.OnGetStreak(-1));
         } catch (NetworkException e) {
             e.printStackTrace();
         }

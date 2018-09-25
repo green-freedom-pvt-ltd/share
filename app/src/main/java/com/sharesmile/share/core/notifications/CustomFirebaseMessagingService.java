@@ -23,6 +23,7 @@ import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.refer_program.model.ReferrerDetails;
 import com.sharesmile.share.utils.Utils;
 
@@ -75,7 +76,10 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                         SharedPrefsManager.getInstance().setString(Constants.SMC_NOTI_INVITEES_JSON, jsonObject.toString());
                     }
                     Logger.d(TAG, referrerDetails.getReferalId() + "," + referrerDetails.getReferalName());
-
+                    UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+                    userDetails.setMealsShared(userDetails.getMealsShared() + 1);
+                    MainApplication.getInstance().setUserDetails(userDetails);
+                    EventBus.getDefault().post(new UpdateEvent.OnMealAdded());
                 } else {
                     // Handle for Clevertap:
                     NotificationInfo info = CleverTapAPI.getNotificationInfo(extras);
@@ -112,8 +116,8 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
             }
 
             mBuilder
-                    .setContentTitle("Layo")
-                    .setContentText("bappu")
+                    .setContentTitle("Invite Successful")
+                    .setContentText("You friend," + referrerDetails.getReferalName() + " has joined Impact")
                     .setSmallIcon(getNotificationIcon())
                     .setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue))
                     .setLargeIcon(getLargeIcon(getContext()))
@@ -122,8 +126,7 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
                     .setVisibility(1)
                     .setSound(Uri.parse("android.resource://"
                             + getContext().getPackageName() + "/" + R.raw.slow_spring_board))
-                    .setVibrate(new long[]{0, 100, 200, 300})
-            ;
+                    .setVibrate(new long[]{0, 100, 200, 300});
 
 
 //            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {

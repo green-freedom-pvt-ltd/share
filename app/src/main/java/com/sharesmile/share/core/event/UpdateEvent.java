@@ -197,6 +197,11 @@ public class UpdateEvent {
         }
     }
 
+    public static class OnMealAdded {
+        public OnMealAdded() {
+        }
+    }
+
     public static class OnReferrerSuccessful {
         public ReferrerDetails referrerDetails;
 

@@ -5,6 +5,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -429,6 +430,8 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 noWorkoutLayout.setVisibility(View.GONE);
                 ShareImageLoader.getInstance().loadImage(url, imageView,
                         ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
+                imageView.setBorderWidth(5);
+                imageView.setBorderColor(Color.parseColor("#f39c13"));
                 // Name of user
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
