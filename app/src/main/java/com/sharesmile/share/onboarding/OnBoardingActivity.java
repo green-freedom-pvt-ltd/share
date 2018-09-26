@@ -200,6 +200,8 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName());
         if (fragment instanceof FragmentGender) {
             replaceFragment(new FragmentWelcome(), true);
+        } else if (fragment instanceof FragmentWelcome) {
+            finish();
         } else {
             super.onBackPressed();
         }

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Response;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
@@ -28,6 +29,7 @@ import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.onboarding.CommonActions;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -102,6 +104,11 @@ public class FragmentWelcome extends BaseFragment {
                 referralCode.setText("");
                 referralCode.setHint(getResources().getString(R.string.have_a_referral_code));
                 referralCodeTil.setHint("");
+                String code = SharedPrefsManager.getInstance().getString(Constants.PREF_REFERRAL_CODE, "");
+                if (code.length() > 0) {
+                    referralCode.setText(code);
+                    SharedPrefsManager.getInstance().setString(Constants.PREF_REFERRAL_CODE, "");
+                }
             }
         } else {
             referralCodeLayout.setVisibility(View.GONE);
@@ -137,15 +144,17 @@ public class FragmentWelcome extends BaseFragment {
 
     private void verifyCode() {
         String referCodeString = referralCode.getText().toString();
-        if (referCodeString.length() != 5) {
-            progressBar.setVisibility(View.GONE);
-            submitReferral.setVisibility(View.VISIBLE);
-            MainApplication.showToast("Invalid code, please enter valid code.");
+        if (!(referCodeString.length() == 5 || referCodeString.length() == 10)) {
+            JsonObject jsonElement = new JsonObject();
+            jsonElement.addProperty("msg", "Invalid code, please enter valid code.");
+            Response response = new Response();
+            response.setErrors(jsonElement);
+            EventBus.getDefault().post(new UpdateEvent.OnErrorResponse(response));
         } else {
             JSONObject requestObject = new JSONObject();
             try {
                 requestObject.put("refer_code_used", referCodeString);
-                requestObject.put("referral_program_id", 2);
+                requestObject.put("referral_program_id", ReferProgram.getReferProgramDetails().getId());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -208,5 +217,18 @@ public class FragmentWelcome extends BaseFragment {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnErrorResponse onErrorResponse) {
+        try {
+            JSONObject error = new JSONObject(onErrorResponse.response.getErrors().toString());
+            if (error.has("msg")) {
+                MainApplication.showToast(error.getString("msg"));
+                progressBar.setVisibility(View.GONE);
+                submitReferral.setVisibility(View.VISIBLE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+    }
 }

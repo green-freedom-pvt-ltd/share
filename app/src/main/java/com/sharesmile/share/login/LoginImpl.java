@@ -251,6 +251,7 @@ public class LoginImpl {
                 if(goal.getId() == userDetails.getStreakGoalID())
                 {
                     userDetails.setStreakGoalDistance(goal.getValue());
+
                     break;
                 }
             }

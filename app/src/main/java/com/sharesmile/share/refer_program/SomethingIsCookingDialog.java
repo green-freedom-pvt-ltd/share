@@ -106,17 +106,17 @@ public class SomethingIsCookingDialog extends Dialog {
 
         } else //old user
         {
-            profilePic1Url = "";
+            String profilePic2Url = "";
             if (referrerDetails.getReferrerProfilePicture() != null &&
                     referrerDetails.getReferrerProfilePicture().length() > 0) {
-                profilePic1Url = Urls.getImpactProfileS3BucketUrl() + referrerDetails.getReferrerProfilePicture();
+                profilePic2Url = Urls.getImpactProfileS3BucketUrl() + referrerDetails.getReferrerProfilePicture();
             } else {
-                profilePic1Url = referrerDetails.getReferrerSocialThumb();
+                profilePic2Url = referrerDetails.getReferrerSocialThumb();
             }
             somethingIsCookingDesc.setText
                     (String.format(getContext().getResources().getString(R.string.something_is_cooking_description_old_user)
                             , referrerDetails.getReferalName()));
-            ShareImageLoader.getInstance().loadImage(profilePic1Url, profilePic2,
+            ShareImageLoader.getInstance().loadImage(profilePic2Url, profilePic2,
                     ContextCompat.getDrawable(getContext(), R.drawable.placeholder_profile));
         }
     }

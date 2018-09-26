@@ -280,7 +280,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
         if (publicUserProfile != null) {
             PublicUserProfile.UserProfile userProfile = publicUserProfile.getUserProfile();
             String url = userProfile.getProfilePicture();
-            if (url.length() == 0) {
+            if (url != null && url.length() == 0) {
                 url = userProfile.getSocialThumb();
             } else {
                 url = Urls.getImpactProfileS3BucketUrl() + url;
@@ -575,6 +575,16 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
         }
     }
 
+    /*@OnClick(R.id.imageView)
+    public void openProfilePic()
+    {
+        getFragmentManager()
+                .beginTransaction()
+                .addSharedElement(imageView, ViewCompat.getTransitionName(imageView))
+                .addToBackStack(TAG)
+                .replace(R.id.content, new ViewProfilePicture())
+                .commit();
+    }*/
     @OnClick(R.id.btn_lets_run)
     void letsGo() {
         goBack();

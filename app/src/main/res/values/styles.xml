@@ -10,6 +10,7 @@
         <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
         <item name="android:itemTextAppearance">@style/myCustomMenuTextApearance</item>
         <item name="MaterialTapTargetPromptTheme">@style/MaterialTapTargetPromptTheme</item>
+
     </style>
 
     <style name="MaterialTapTargetPromptTheme">

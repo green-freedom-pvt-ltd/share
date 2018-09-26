@@ -540,7 +540,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     public void onEvent(UpdateEvent.OnGetStreak onGetStreak) {
         if (onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS) {
             render();
-        } else {
+        } else if (onGetStreak.result != -1) {
 //            showHideProgress(false,null);
             MainApplication.showToast(getResources().getString(R.string.some_error));
         }
