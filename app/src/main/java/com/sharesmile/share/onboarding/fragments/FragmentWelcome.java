@@ -86,7 +86,7 @@ public class FragmentWelcome extends BaseFragment {
 
     private void init() {
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if (userDetails.isNewUser()) {
+        if (userDetails != null && userDetails.isNewUser()) {
             boolean b = userDetails.getReferCodeUsed() != null &&
                     userDetails.getReferCodeUsed().length() > 0;
             if (b) {
