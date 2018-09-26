@@ -143,6 +143,14 @@ public class UpdateEvent {
         }
     }
 
+    public static class OnGetReferProgramDetails {
+        public int result;
+
+        public OnGetReferProgramDetails(int result) {
+            this.result = result;
+        }
+    }
+
     public static class OnGetCause{
         public int result;
         public OnGetCause(int result) {

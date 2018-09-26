@@ -539,10 +539,21 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnGetStreak onGetStreak) {
         if (onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS) {
-            render();
+            if (ReferProgram.getReferProgramDetails() == null) {
+                ReferProgram.syncDetails();
+            } else {
+                EventBus.getDefault().post(new UpdateEvent.OnGetReferProgramDetails(onGetStreak.result));
+            }
         } else if (onGetStreak.result != -1) {
 //            showHideProgress(false,null);
             MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetReferProgramDetails onGetReferProgramDetails) {
+        if (onGetReferProgramDetails.result == ExpoBackoffTask.RESULT_SUCCESS) {
+            render();
         }
     }
 

@@ -181,18 +181,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
     {
         if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS) {
-
-            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
-            SyncHelper.forceRefreshEntireWorkoutHistory();
-            onLoginSuccess();
-
-        } else if (onGetStreak.result == -1) {
             if (ReferProgram.getReferProgramDetails() == null) {
                 ReferProgram.syncDetails();
+            } else {
+                EventBus.getDefault().post(new UpdateEvent.OnGetReferProgramDetails(onGetStreak.result));
             }
-        }else {
+        } else {
             MainApplication.showToast(getResources().getString(R.string.login_error));
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetReferProgramDetails onGetReferProgramDetails) {
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+        SyncHelper.forceRefreshEntireWorkoutHistory();
+        onLoginSuccess();
     }
 
 }
