@@ -14,7 +14,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.NavigationView;
@@ -30,7 +29,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,17 +44,11 @@ import android.widget.Toast;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.sharesmile.share.AchievedBadge;
 import com.sharesmile.share.AchievedBadgeDao;
 import com.sharesmile.share.AchievedTitle;
 import com.sharesmile.share.AchievedTitleDao;
 import com.sharesmile.share.BuildConfig;
-import com.sharesmile.share.LeaderBoard;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
@@ -70,17 +62,17 @@ import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.notifications.NotificationConsts;
 import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.home.homescreen.HomeScreenFragment;
+import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.home.howitworks.HowItWorksFragment;
 import com.sharesmile.share.home.settings.SettingsFragment;
-import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.LeagueBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
 import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
 import com.sharesmile.share.profile.ProfileFragment;
-import com.sharesmile.share.home.homescreen.OnboardingOverlay;
 import com.sharesmile.share.profile.streak.StreakGoalFragment;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
 import com.sharesmile.share.tracking.event.ResumeWorkoutEvent;
@@ -95,12 +87,10 @@ import com.squareup.picasso.Target;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import Models.CampaignList;
@@ -952,3 +942,12 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
     }
 }
+
+
+
+
+
+
+
+
+

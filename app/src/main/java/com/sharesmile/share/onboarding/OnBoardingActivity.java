@@ -4,28 +4,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.sharesmile.share.R;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
 import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.base.PermissionCallback;
-import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.onboarding.fragments.FragmentAskReminder;
 import com.sharesmile.share.onboarding.fragments.FragmentBirthday;
 import com.sharesmile.share.onboarding.fragments.FragmentGender;
@@ -35,19 +28,11 @@ import com.sharesmile.share.onboarding.fragments.FragmentSetReminder;
 import com.sharesmile.share.onboarding.fragments.FragmentThankYou;
 import com.sharesmile.share.onboarding.fragments.FragmentWeight;
 import com.sharesmile.share.onboarding.fragments.FragmentWelcome;
-import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Utils;
-
-
-import java.io.IOException;
-import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 
@@ -71,8 +56,6 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
 
     @BindView(R.id.level_progress_bar)
     View levelProgressBar;
-
-    boolean gettingUserData = false;
 
     private static final String TAG = "OnBoardingActivity";
 
@@ -177,40 +160,43 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
 
     private void continueAction(Fragment fragment) {
         if (fragment instanceof FragmentWelcome || fragment == null) {
-            if (MainApplication.getInstance().getUserDetails() != null) {
-                replaceFragment(new FragmentGender(), true);
-            } else {
-                MainApplication.showToast("Loading Details, Please make sure you are connected to the internet");
-                if(!gettingUserData) {
-                    getUserDetails();
-                }
-            }
+            replaceFragment(new FragmentGender(), true);
+            AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_WELCOME_CONTINUE).buildAndDispatch();
         } else {
             if (continueTv.getCurrentTextColor() == getResources().getColor(R.color.white_10)) {
                 MainApplication.showToast(getResources().getString(R.string.select_an_option));
             } else {
                 if (fragment instanceof FragmentGender) {
                     replaceFragment(new FragmentWeight(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_GENDER_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentWeight) {
                     replaceFragment(new FragmentHeight(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_WEIGHT_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentHeight) {
                     replaceFragment(new FragmentBirthday(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_HEIGHT_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentBirthday) {
                     replaceFragment(new FragmentGoals(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_BIRTHDAY_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentGoals) {
                     replaceFragment(new FragmentAskReminder(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_GOAL_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentAskReminder) {
                     String continueText = continueTv.getText().toString();
                     if (continueText.equalsIgnoreCase(getResources().getString(R.string.set_reminder))) {
                         replaceFragment(new FragmentSetReminder(), true);
+                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_YES_ASK_REMINDER_VALUE_SELECT_CONTINUE).buildAndDispatch();
                     } else if (continueText.equalsIgnoreCase(getResources().getString(R.string.continue_txt))) {
                         Utils.setReminderTime("", this);
                         replaceFragment(new FragmentThankYou(), true);
+                        AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_NO_ASK_REMINDER_VALUE_SELECT_CONTINUE).buildAndDispatch();
                     }
                 } else if (fragment instanceof FragmentSetReminder) {
                     replaceFragment(new FragmentThankYou(), true);
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_SET_REMINDER_CONTINUE).buildAndDispatch();
                 } else if (fragment instanceof FragmentThankYou) {
                     SyncHelper.oneTimeUploadUserData();
+                    AnalyticsEvent.create(Event.ON_CLICK_ONBOARDING_THANK_YOU_CONTINUE).buildAndDispatch();
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -221,63 +207,6 @@ public class OnBoardingActivity extends BaseActivity implements CommonActions {
         }
 
 
-    }
-
-    private boolean getUserDetails() {
-        NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(), new HashMap<String, String>(), new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.i(TAG, "Login error, Api failed");
-                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainApplication.showToast("Could not fetch details, try again");
-                        /*mListener.showHideProgress(false, null);*/
-                    }
-                });
-//                sendLoginFailureEvent(-1, "Request Failed", isFbLogin);
-                gettingUserData = false;
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) {
-                String responseString = null;
-                try {
-                    responseString = response.body().string();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Logger.d("LoginImpl", "onResponse: " + responseString);
-                JsonArray array = JsonHelper.StringToJsonArray(responseString);
-                if (array == null) {
-                    Crashlytics.logException(new Throwable("Login Response error. Server response : " + responseString));
-                    MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            MainApplication.showToast("Could not fetch details, try again");
-                            /*mListener.showHideProgress(false, null);*/
-                        }
-                    });
-                    /*sendLoginFailureEvent(response.code(), responseString, isFbLogin);*/
-                    return;
-                }
-
-                final JsonObject element = array.get(0).getAsJsonObject();
-                Log.i("LoginImpl", "element: " + element.toString());
-                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Gson gson = new Gson();
-                        UserDetails userDetails = gson.fromJson(element, UserDetails.class);
-                        MainApplication.getInstance().setUserDetails(userDetails);
-                        replaceFragment(new FragmentGender(), true);
-                    }
-                });
-                gettingUserData = false;
-
-            }
-        });
-        return false;
     }
 
     @Override

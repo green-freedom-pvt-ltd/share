@@ -17,7 +17,6 @@ import com.sharesmile.share.R;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.ShareImageLoader;
 import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.core.config.Urls;
 import com.sharesmile.share.home.settings.UnitsManager;
 import com.sharesmile.share.utils.Utils;
 
@@ -91,9 +90,13 @@ public class InProgressBadgeAdapter extends RecyclerView.Adapter<InProgressBadge
                 {
                     achievementAmount.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (achievedBadge.getParamDone()*1000)) + " "+UnitsManager.getDistanceLabel()+"/ "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) (badge.getBadgeParameter()*1000))+" "+UnitsManager.getDistanceLabel());
                 }
-                ShareImageLoader.getInstance().loadImage(badge.getImageUrl(),badgeImageView,
+                String url = badge.getImageUrl();
+                if (badge.getNoOfStars() == 1) {
+                    url = url.replace(".png", "_bnw.png");
+                }
+                ShareImageLoader.getInstance().loadImage(url, badgeImageView,
                         ContextCompat.getDrawable(context,R.drawable.badge_image));
-                Utils.setStarImage(badge.getNoOfStars(),starImageView,badge.getType());
+                Utils.setStarImage(badge.getNoOfStars() - 1, starImageView, badge.getType());
                 float weight = ((float) (achievedBadge.getParamDone()/ badge.getBadgeParameter()));
                 ((LinearLayout.LayoutParams)levelProgressBar.getLayoutParams()).weight = weight>1?1:weight;
                 achievementBadgeDescription.setText(badge.getDescription_inprogress());

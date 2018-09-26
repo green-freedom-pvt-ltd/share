@@ -11,11 +11,9 @@ import com.sharesmile.share.DaoMaster;
 import com.sharesmile.share.DaoSession;
 import com.sharesmile.share.LeaderBoardDao;
 import com.sharesmile.share.TitleDao;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.UserDao;
 import com.sharesmile.share.WorkoutDao;
-
-import io.smooch.core.c.m;
+import com.sharesmile.share.core.application.MainApplication;
 
 /**
  * Created by Shine on 07/05/16.
@@ -124,6 +122,11 @@ public class DbWrapper {
     public void clearAll() {
         getWorkoutDao().deleteAll();
         getUserdao().deleteAll();
+        getBadgeDao().deleteAll();
+        getAchievedBadgeDao().deleteAll();
+        getAchievedTitleDao().deleteAll();
+        getLeaderBoardDao().deleteAll();
+        getCategoryDao().deleteAll();
         mDaoSession.clear();
     }
 }

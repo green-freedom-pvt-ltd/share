@@ -175,7 +175,7 @@ public class StreakFragment extends BaseFragment {
             streakDistance.setText(UnitsManager.formatToMyDistanceUnitWithTwoDecimal((float) distanceDiff*1000)+" "+UnitsManager.getDistanceLabel()+" left. Let's Go!");
         }
 
-        double progress;
+        double progress = 0;
         if(distanceDiff<=0 || userDetails.isStreakAdded())
             progress = 360;
         else
@@ -235,7 +235,7 @@ public class StreakFragment extends BaseFragment {
                 getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.BADGE_TYPE_MARATHON);
             }else if(achievedBadgesData.getTitleIds().size()>0)
             {
-                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData,Constants.BADGE_TYPE_MARATHON), true,Constants.TITLE_TYPE_CAUSE);
+                getFragmentController().replaceFragment(AchieviedBadgeFragment.newInstance(achievedBadgesData, Constants.TITLE_TYPE_CAUSE), true, Constants.TITLE_TYPE_CAUSE);
             }else
             {
                 openHomeActivityAndFinish();

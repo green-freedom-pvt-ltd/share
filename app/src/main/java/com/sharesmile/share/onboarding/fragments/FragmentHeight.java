@@ -72,6 +72,11 @@ public class FragmentHeight extends BaseFragment {
         }
         }
         heightUnitPicker.setValue(heightUnit);
+        height = Integer.parseInt(cmsArray[heightPicker.getValue()]);
+        heightUnit = heightUnitPicker.getValue();
+        userDetails.setBodyHeight(height);
+        userDetails.setBodyHeightUnit(heightUnit);
+        MainApplication.getInstance().setUserDetails(userDetails);
     }
 
     private void setPicker() {

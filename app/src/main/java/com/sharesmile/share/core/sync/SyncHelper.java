@@ -9,16 +9,16 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.gson.Gson;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
-import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.tracking.workout.data.model.FraudData;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.helpcenter.model.UserFeedback;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.helpcenter.model.UserFeedback;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.tracking.workout.data.model.FraudData;
 
 import java.util.List;
 
@@ -178,7 +178,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 1)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
-                .setUpdateCurrent(true)
+                .setUpdateCurrent(false)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
@@ -203,7 +203,7 @@ public class SyncHelper {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
                 .setTag(TaskConstants.UPLOAD_ACHIEVEMENT_BADGE)
-                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setExecutionWindow(0L, 5) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
                 .setUpdateCurrent(true)
@@ -270,7 +270,7 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 5)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
-                .setUpdateCurrent(true)
+                .setUpdateCurrent(false)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
