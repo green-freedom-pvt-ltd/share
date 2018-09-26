@@ -115,4 +115,6 @@
     <color name="clr_12916c">#12916c</color>
     <color name="clr_328f6c">#328f6c</color>
     <color name="clr_6e">#6e6e6e</color>
+
+    <color name="dialog_background_scrim">#99323232</color>
 </resources>

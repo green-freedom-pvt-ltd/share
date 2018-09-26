@@ -61,4 +61,6 @@
     <dimen name="cardview_corner_radius">2dp</dimen>
 
     <dimen tools:override="true" name="design_navigation_icon_padding">20dp</dimen>
+
+    <dimen name="dialog_corners">4dp</dimen>
 </resources>

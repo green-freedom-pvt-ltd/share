@@ -1,6 +1,8 @@
 package com.sharesmile.share.profile;
 
+import android.app.ActivityOptions;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -276,10 +278,11 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
         }
     }
 
+    String url;
     private void initPublicProfile(PublicUserProfile publicUserProfile, String errorMessage) {
         if (publicUserProfile != null) {
             PublicUserProfile.UserProfile userProfile = publicUserProfile.getUserProfile();
-            String url = userProfile.getProfilePicture();
+            url = userProfile.getProfilePicture();
             if (url != null && url.length() == 0) {
                 url = userProfile.getSocialThumb();
             } else {
@@ -405,7 +408,6 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
         statsKmsUnit.setText(UnitsManager.getDistanceLabel());
         if (isWorkoutDataUpToDate) {
             hideProgressDialog();
-            String url;
             if (TextUtils.isEmpty(MainApplication.getInstance().getUserDetails().getProfilePicture())) {
                 url = MainApplication.getInstance().getUserDetails().getSocialThumb();
             } else {
@@ -575,16 +577,20 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
         }
     }
 
-    /*@OnClick(R.id.imageView)
+    @OnClick(R.id.img_profile_stats)
     public void openProfilePic()
     {
-        getFragmentManager()
+        Intent intent = new Intent(getActivity(), ViewProfilePicture.class);
+        intent.putExtra("img", url);
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), imageView, "profile");
+        startActivityForResult(intent, 100, options.toBundle());
+        /*getFragmentManager()
                 .beginTransaction()
                 .addSharedElement(imageView, ViewCompat.getTransitionName(imageView))
                 .addToBackStack(TAG)
                 .replace(R.id.content, new ViewProfilePicture())
-                .commit();
-    }*/
+                .commit();*/
+    }
     @OnClick(R.id.btn_lets_run)
     void letsGo() {
         goBack();

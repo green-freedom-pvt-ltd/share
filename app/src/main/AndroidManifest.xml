@@ -312,7 +312,9 @@
         <activity
             android:name=".utils.ConfettiOverlayActivity"
             android:theme="@style/KonfettiActivity" />
-
+        <activity
+            android:name=".profile.ViewProfilePicture"
+            android:theme="@style/AppTheme.Dialog"></activity>
     </application>
 
 </manifest>

@@ -203,4 +203,11 @@
         <item name="android:windowEnterAnimation">@anim/zoom_in</item>
         <item name="android:windowExitAnimation">@anim/fade_out_animation_1s</item>
     </style>
+
+    <style name="AppTheme.Dialog" parent="AppTheme.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/dialog_background_scrim</item>
+        <!--<item name="android:windowAnimationStyle">@null</item>-->
+        <!--<item name="android:windowContentTransitions">true</item>-->
+    </style>
 </resources>

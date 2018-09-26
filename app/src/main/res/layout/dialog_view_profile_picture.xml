@@ -11,5 +11,5 @@
         android:layout_height="200dp"
         android:id="@+id/profile_pic"
         android:transitionName="profile"
-        android:src="@drawable/run_tracker_bg" />
+        android:src="@drawable/placeholder_profile" />
 </LinearLayout>
