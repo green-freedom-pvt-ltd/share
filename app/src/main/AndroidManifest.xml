@@ -311,10 +311,7 @@
 
         <activity
             android:name=".utils.ConfettiOverlayActivity"
-            android:theme="@style/KonfettiActivity">
-
-
-        </activity>
+            android:theme="@style/KonfettiActivity" />
 
     </application>
 
