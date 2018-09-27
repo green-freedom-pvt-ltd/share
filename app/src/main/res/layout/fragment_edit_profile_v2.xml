@@ -162,10 +162,10 @@
                 style="@style/edit_profile_text_style_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TITLE 2" />
+                android:text="BIO" />
 
             <com.sharesmile.share.views.LRTextView
-                android:id="@+id/tv_edit_profile_title_2_error"
+                android:id="@+id/tv_edit_profile_bio_error"
                 style="@style/edit_profile_error_text_style_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -173,33 +173,27 @@
         </LinearLayout>
     <LinearLayout
         android:paddingBottom="13dp"
-        android:id="@+id/profile_title2_layout"
+        android:id="@+id/profile_bio_layout"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <com.sharesmile.share.views.LRTextView
-            android:id="@+id/et_profile_title2"
+
+        <com.sharesmile.share.views.LREditText
+            android:id="@+id/et_profile_bio_et"
             style="@style/edit_profile_text_style_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="false"
-            android:cursorVisible="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
+            android:background="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textFilter|textNoSuggestions|textVisiblePassword"
+            android:maxLength="140"
             />
 
-        <Spinner
-            android:id="@+id/spinner_profile_title2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:dropDownWidth="match_parent"
-            android:background="@null" />
     </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-
             android:background="#c0c0c0" />
 
         <LinearLayout

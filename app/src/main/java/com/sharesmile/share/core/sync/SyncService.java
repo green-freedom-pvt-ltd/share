@@ -796,8 +796,6 @@ public class SyncService extends GcmTaskService {
             jsonObject.put("fcm_token", prev.getFcmToken());
             if (prev.getTitle1() > 0)
                 jsonObject.put("achieved_title_1", prev.getTitle1());
-            if (prev.getTitle2() > 0)
-                jsonObject.put("achieved_title_2", prev.getTitle2());
 
             Logger.d(TAG, "Syncing user with data " + jsonObject.toString());
 

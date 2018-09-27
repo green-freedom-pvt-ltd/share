@@ -2092,30 +2092,14 @@ public class Utils {
                 .where(TitleDao.Properties.CategoryId.eq(achievedTitle.getCategoryId()))
                 .orderAsc(TitleDao.Properties.GoalNStars).list();
         int title1 = userDetails.getTitle1();
-        int title2 = userDetails.getTitle2();
 
         if (userDetails.getTitle1() == 0) {
             userDetails.setTitle1(achievedTitle.getTitleId());
         } else {
-            boolean b = true;
             for (int i = 0; i < titles.size(); i++) {
                 if (titles.get(i).getTitleId() == title1) {
                     userDetails.setTitle1(achievedTitle.getTitleId());
-                    b = false;
                     break;
-                }
-            }
-
-            if (b && title1 != achievedTitle.getTitleId()) {
-                if (userDetails.getTitle2() == 0) {
-                    userDetails.setTitle2(achievedTitle.getTitleId());
-                } else {
-                    for (int i = 0; i < titles.size(); i++) {
-                        if (titles.get(i).getTitleId() == title2) {
-                            userDetails.setTitle2(achievedTitle.getTitleId());
-                            break;
-                        }
-                    }
                 }
             }
 

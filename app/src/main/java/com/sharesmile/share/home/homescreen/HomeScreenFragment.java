@@ -536,7 +536,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         animator.start();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+  /*  @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnGetStreak onGetStreak) {
         if (onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS) {
             if (ReferProgram.getReferProgramDetails() == null) {
@@ -548,7 +548,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
 //            showHideProgress(false,null);
             MainApplication.showToast(getResources().getString(R.string.some_error));
         }
-    }
+    }*/
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnGetReferProgramDetails onGetReferProgramDetails) {

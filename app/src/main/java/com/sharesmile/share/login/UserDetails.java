@@ -89,13 +89,14 @@ public class UserDetails implements UnObfuscable {
 
     @SerializedName("achieved_title_1")
     private int title1;
-    @SerializedName("achieved_title_2")
-    private int title2;
 
     @SerializedName("meals_shared")
     private int mealsShared;
     @SerializedName("fcm_token")
     private String fcmToken;
+
+    @SerializedName("bio")
+    private String bio;
 
 
     public boolean isStreakAdded() {
@@ -382,14 +383,6 @@ public class UserDetails implements UnObfuscable {
         this.title1 = title1;
     }
 
-    public int getTitle2() {
-        return title2;
-    }
-
-    public void setTitle2(int title2) {
-        this.title2 = title2;
-    }
-
     public String getMyReferCode() {
         return myReferCode;
     }
@@ -452,5 +445,15 @@ public class UserDetails implements UnObfuscable {
         } else {
             return "";
         }
+    }
+
+    public String getBio() {
+        if (bio == null)
+            bio = "";
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 }

@@ -484,7 +484,13 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
      * @return MemberDetails object if user is logged in, NULL otherwise
      */
     public UserDetails getUserDetails(){
-        return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
+        UserDetails userDetails = SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
+        if (userDetails != null && userDetails.getBio().length() > 0) {
+
+        } else if (userDetails != null) {
+            userDetails.setBio(getResources().getString(R.string.def_about_me));
+        }
+        return userDetails;
     }
 
     public String getGoalDetails(){

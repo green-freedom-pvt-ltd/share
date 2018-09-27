@@ -22,7 +22,6 @@ import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.ExpoBackoffTask;
 import com.sharesmile.share.core.event.UpdateEvent;
 import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.refer_program.model.ReferProgram;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -181,11 +180,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
     {
         if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS) {
-            if (ReferProgram.getReferProgramDetails() == null) {
-                ReferProgram.syncDetails();
-            } else {
-                EventBus.getDefault().post(new UpdateEvent.OnGetReferProgramDetails(onGetStreak.result));
-            }
+            SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
+            SyncHelper.forceRefreshEntireWorkoutHistory();
+            onLoginSuccess();
         } else {
             MainApplication.showToast(getResources().getString(R.string.login_error));
         }
@@ -193,9 +190,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.OnGetReferProgramDetails onGetReferProgramDetails) {
-        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_IS_LOGIN, true);
-        SyncHelper.forceRefreshEntireWorkoutHistory();
-        onLoginSuccess();
+        if (!MainApplication.isLogin())
+            return;
+        if (onGetReferProgramDetails.result == ExpoBackoffTask.RESULT_SUCCESS) {
+            SyncHelper.getStreak();
+        } else {
+            MainApplication.showToast(getResources().getString(R.string.login_error));
+        }
     }
 
 }

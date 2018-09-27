@@ -41,6 +41,7 @@ import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
 import com.sharesmile.share.profile.streak.model.Goal;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.utils.JsonHelper;
 import com.sharesmile.share.utils.Utils;
 
@@ -272,7 +273,12 @@ public class LoginImpl {
             Utils.setOnboardingShown();
         }
         SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_TOKEN, true);
-        SyncHelper.getStreak();
+        if (ReferProgram.getReferProgramDetails() == null) {
+            ReferProgram.syncDetails();
+        } else {
+            SyncHelper.getStreak();
+        }
+
         //show Toast confirmation
         String medium = isFbLogin ? "fb" : "google";
         AnalyticsEvent.create(Event.ON_LOGIN_SUCCESS)

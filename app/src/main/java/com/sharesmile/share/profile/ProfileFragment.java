@@ -434,7 +434,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 imageView.setBorderColor(Color.parseColor("#f39c13"));
                 // Name of user
                 name.setText(MainApplication.getInstance().getUserDetails().getFullName());
-                name.setText(MainApplication.getInstance().getUserDetails().getFullName());
+                userBioTv.setText(MainApplication.getInstance().getUserDetails().getBio());
                 Level level = Utils.getLevel(lifeTimeImpact);
                 levelNum.setText("LEVEL " + level.getLevel());
                 if (SharedPrefsManager.getInstance().getInt(Constants.PREF_TOTAL_RUN) > 0) {
@@ -550,14 +550,6 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
         String title = "";
         if (userDetails.getTitle1() > 0) {
             title += getTitle(userDetails.getTitle1());
-        }
-
-        if (userDetails.getTitle2() > 0) {
-            if (title.length() > 0) {
-                title += ", " + getTitle(userDetails.getTitle2());
-            } else {
-                title += getTitle(userDetails.getTitle2());
-            }
         }
         profileTitle.setText(title);
     }

@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -84,7 +85,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by apurvgandhwani on 3/29/2016.
  */
 public class EditProfileFragment extends BaseFragment implements DatePickerDialog.OnDateSetListener,
-        View.OnClickListener, TextWatcher, SaveData {
+        View.OnClickListener, SaveData {
 
     private static final String TAG = "EditProfileFragment";
 
@@ -133,12 +134,10 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @BindView(R.id.tv_edit_profile_title_1_error)
     TextView profileTitle1Error;
 
-    @BindView(R.id.et_profile_title2)
-    TextView profileTitle2;
-    @BindView(R.id.spinner_profile_title2)
-    Spinner spinnerProfileTitle2;
-    @BindView(R.id.tv_edit_profile_title_2_error)
-    TextView profileTitle2Error;
+    @BindView(R.id.et_profile_bio_et)
+    EditText profileBio;
+    @BindView(R.id.tv_edit_profile_bio_error)
+    TextView profileBioError;
 
 
     @BindView(R.id.rb_share_male)
@@ -159,24 +158,20 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @BindView(R.id.progress_bar)
     RelativeLayout progressBar;
 
-    @BindView(R.id.profile_title2_layout)
-    LinearLayout layoutProfileTitle2;
     @BindView(R.id.profile_title1_layout)
     LinearLayout layoutProfileTitle1;
 
     File tempPhotoFile;
     File photoFile;
-    private String profilePicUrl;
-
     int gender = -1;
-
-    private UserDetails userDetails;
     EditProfileImageDialog editProfileImageDialog;
     boolean isImageLoaded = false;
-
     List<AchievedTitle> achievedTitles;
-    int pos1=-1,pos2=-1;
-
+    int pos1 = -1;
+    private String profilePicUrl;
+    private UserDetails userDetails;
+    private AlertDialog discardChangesDialog;
+    private boolean isEdited = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -202,7 +197,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setBioFilters();
         init();
+    }
+
+    private void setBioFilters() {
+        profileBio.setHorizontallyScrolling(false);
+        profileBio.setMaxLines(Integer.MAX_VALUE);
+        profileBio.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//        InputFilter[] filterArray = new InputFilter[1];
+//        filterArray[0] = new InputFilter.LengthFilter(140);
+//        profileBio.setFilters(filterArray);
     }
 
     @Override
@@ -252,7 +257,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         mBirthday.setOnClickListener(this);
         bodyWeightKgs.setOnClickListener(this);
         layoutProfileTitle1.setOnClickListener(this);
-        layoutProfileTitle2.setOnClickListener(this);
         getTitleInList();
         setSpinner();
         fillUserDetails();
@@ -262,19 +266,16 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     private void setSpinner() {
         //TODO : Check for toString() method in AchievedTitle
-        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter1 = new ArrayAdapter<AchievedTitle>(getContext(),R.layout.spinner_row_item,achievedTitles);
+        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter1 = new ArrayAdapter<AchievedTitle>(getContext(), R.layout.spinner_row_item, achievedTitles);
         spinnerProfileTitle1.setAdapter(achievedTitleArrayAdapter1);
         spinnerProfileTitle1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(userDetails.getTitle1()>0) {
-                    if (position == pos2) {
-                        MainApplication.showToast("Title 1 & 2 cannot be same");
-                    } else {
-                        long titleId = achievedTitles.get(position).getId();
-                        pos1 = position;
-                        profileTitle1.setText(achievedTitles.get(position).getTitle());
-                    }
+                if (userDetails.getTitle1() > 0) {
+
+                    long titleId = achievedTitles.get(position).getId();
+                    pos1 = position;
+                    profileTitle1.setText(achievedTitles.get(position).getTitle());
                     setMenuColor();
                 }
             }
@@ -284,52 +285,18 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
             }
         });
-        ArrayAdapter<AchievedTitle> achievedTitleArrayAdapter2 = new ArrayAdapter<AchievedTitle>(getContext(),R.layout.spinner_row_item,achievedTitles);
-        spinnerProfileTitle2.setAdapter(achievedTitleArrayAdapter2);
-        spinnerProfileTitle2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(userDetails.getTitle2()>0) {
-                    if (position == pos1) {
-                        MainApplication.showToast("Title 1 & 2 cannot be same");
-                    } else {
-                        long titleId = achievedTitles.get(position).getId();
-                        pos2 = position;
-                        profileTitle2.setText(achievedTitles.get(position).getTitle());
-                    }
-                    setMenuColor();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        for(int i=0;i<achievedTitles.size();i++)
-        {
+        for (int i = 0; i < achievedTitles.size(); i++) {
             AchievedTitle achievedTitle = achievedTitles.get(i);
 
-            if(achievedTitle.getTitleId() == userDetails.getTitle1())
-            {
+            if (achievedTitle.getTitleId() == userDetails.getTitle1()) {
                 spinnerProfileTitle1.setSelection(i);
                 pos1 = i;
-            }else if(achievedTitle.getTitleId() == userDetails.getTitle2())
-            {
-                spinnerProfileTitle2.setSelection(i);
-                pos2 = i;
+                break;
             }
 
         }
-        if(pos1==-1)
-        {
+        if (pos1 == -1) {
             profileTitle1.setText("");
-        }
-
-        if(pos2==-1)
-        {
-            profileTitle2.setText("");
         }
     }
 
@@ -345,11 +312,12 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     }
 
     private void setTextWatcher() {
-        mFirstName.addTextChangedListener(this);
-        mLastName.addTextChangedListener(this);
-        mNumber.addTextChangedListener(this);
-        bodyWeightKgs.addTextChangedListener(this);
-        mBirthday.addTextChangedListener(this);
+        mFirstName.addTextChangedListener(new GenericTextChangeListner(mFirstName));
+        mLastName.addTextChangedListener(new GenericTextChangeListner(mLastName));
+        mNumber.addTextChangedListener(new GenericTextChangeListner(mNumber));
+        bodyWeightKgs.addTextChangedListener(new GenericTextChangeListner(bodyWeightKgs));
+        mBirthday.addTextChangedListener(new GenericTextChangeListner(mBirthday));
+        profileBio.addTextChangedListener(new GenericTextChangeListner(profileBio));
     }
 
     private void fillUserDetails() {
@@ -365,25 +333,17 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             mLastName.setText(userDetails.getLastName());
         }
 
-        if(userDetails.getTitle1()>0 || userDetails.getTitle2()>0)
-        {
-            for(int i=0;i<achievedTitles.size();i++)
-            {
-                if(userDetails.getTitle1()>0)
-                {
-                    if(achievedTitles.get(i).getTitleId() == userDetails.getTitle1())
-                    {
+        if (!TextUtils.isEmpty(userDetails.getBio())) {
+            profileBio.setText(userDetails.getBio());
+        }
+
+        if (userDetails.getTitle1() > 0) {
+            for (int i = 0; i < achievedTitles.size(); i++) {
+                if (userDetails.getTitle1() > 0) {
+                    if (achievedTitles.get(i).getTitleId() == userDetails.getTitle1()) {
                         pos1 = i;
                         profileTitle1.setText(achievedTitles.get(i).getTitle());
-                    }
-                }
-
-                if(userDetails.getTitle2()>0)
-                {
-                    if(achievedTitles.get(i).getTitleId() == userDetails.getTitle2())
-                    {
-                        pos2 = i;
-                        profileTitle2.setText(achievedTitles.get(i).getTitle());
+                        break;
                     }
                 }
             }
@@ -453,17 +413,25 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         boolean validDetails = true;
         if (mFirstName.getText().toString().isEmpty()) {
             // Name not valid
-            mFirstNameError.setText("*Please enter a valid first name");
+            mFirstNameError.setText("*Please enter your first name");
             validDetails = false;
         } else {
             mFirstNameError.setText("");
         }
         if (mLastName.getText().toString().isEmpty()) {
             // Name not valid
-            mLastNameError.setText("*Please enter a valid last name");
+            mLastNameError.setText("*Please enter your last name");
             validDetails = false;
         } else {
             mLastNameError.setText("");
+        }
+
+        if (profileBio.getText().toString().isEmpty()) {
+            // Bio not valid
+            profileBioError.setText("*Your bio cannot be blank");
+            validDetails = false;
+        } else {
+            profileBioError.setText("");
         }
         if (!validatePhoneNumber(mNumber.getText().toString())) {
             mNumberError.setText("*Please enter a valid number");
@@ -488,6 +456,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             b = false;
         }
         if (!mLastName.getText().toString().equals(userDetails.getLastName())) {
+            b = false;
+        }
+        if (!profileBio.getText().toString().equals(userDetails.getBio() == null ? "" : userDetails.getBio())) {
             b = false;
         }
         if (!mEmail.getText().toString().equals(userDetails.getEmail() == null ? "" : userDetails.getEmail())) {
@@ -521,11 +492,8 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (!userDetails.getGenderUser().toLowerCase().startsWith(gender)) {
             b = false;
         }
-        if(achievedTitles.size()>=3)
-        {
-            if(userDetails.getTitle1()!=achievedTitles.get(pos1).getTitleId() ||
-                    userDetails.getTitle2()!=achievedTitles.get(pos2).getTitleId())
-            {
+        if (achievedTitles.size() >= 2) {
+            if (userDetails.getTitle1() != achievedTitles.get(pos1).getTitleId()) {
                 b = false;
             }
         }
@@ -560,19 +528,19 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         AnalyticsEvent.Builder builder = AnalyticsEvent.create(Event.ON_PROFILE_DETAILS_EDIT);
         StringBuilder fullNameBuilder = new StringBuilder();
         if (!TextUtils.isEmpty(profilePicUrl)) {
-            userDetails.setProfilePicture(profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis());
-            builder.put("profile_pic_url", profilePicUrl+"?version="+ Calendar.getInstance().getTimeInMillis());
+            userDetails.setProfilePicture(profilePicUrl + "?version=" + Calendar.getInstance().getTimeInMillis());
+            builder.put("profile_pic_url", profilePicUrl + "?version=" + Calendar.getInstance().getTimeInMillis());
         }
 
-        if (!TextUtils.isEmpty(mFirstName.getText())) {
-            userDetails.setFirstName(mFirstName.getText().toString());
-            fullNameBuilder.append(mFirstName.getText().toString());
+        if (!TextUtils.isEmpty(mFirstName.getText().toString().trim())) {
+            userDetails.setFirstName(mFirstName.getText().toString().trim());
+            fullNameBuilder.append(mFirstName.getText().toString().trim());
         }
 
-        if (!TextUtils.isEmpty(mLastName.getText())) {
-            userDetails.setLastName(mLastName.getText().toString());
+        if (!TextUtils.isEmpty(mLastName.getText().toString().trim())) {
+            userDetails.setLastName(mLastName.getText().toString().trim());
             fullNameBuilder.append(" ");
-            fullNameBuilder.append(mLastName.getText().toString());
+            fullNameBuilder.append(mLastName.getText().toString().trim());
         }
 
         String fullName = fullNameBuilder.toString();
@@ -583,21 +551,23 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
         }
 
+        if (!TextUtils.isEmpty(profileBio.getText().toString().trim())) {
+            userDetails.setBio(profileBio.getText().toString().trim());
+            builder.put("user_bio", mBirthday.getText().toString().trim());
+        }
 
-        if (!TextUtils.isEmpty(mBirthday.getText().toString())) {
-            Logger.d(TAG, "Setting User Birthday as " + mBirthday.getText().toString());
+        if (!TextUtils.isEmpty(mBirthday.getText().toString().trim())) {
+            Logger.d(TAG, "Setting User Birthday as " + mBirthday.getText().toString().trim());
             userDetails.setBirthday(mBirthday.getText().toString());
-            builder
-                    .put("user_birthday", mBirthday.getText().toString());
+            builder.put("user_birthday", mBirthday.getText().toString().trim());
 
         }
 
-        if (!TextUtils.isEmpty(mNumber.getText())) {
-            if (Utils.isValidInternationalPhoneNumber(mNumber.getText().toString())) {
-                userDetails.setPhoneNumber(mNumber.getText().toString());
-                Analytics.getInstance().setUserPhone(mNumber.getText().toString());
-                builder
-                        .put("user_phone_num", mNumber.getText().toString());
+        if (!TextUtils.isEmpty(mNumber.getText().toString().trim())) {
+            if (Utils.isValidInternationalPhoneNumber(mNumber.getText().toString().trim())) {
+                userDetails.setPhoneNumber(mNumber.getText().toString().trim());
+                Analytics.getInstance().setUserPhone(mNumber.getText().toString().trim());
+                builder.put("user_phone_num", mNumber.getText().toString().trim());
 
             }
         }
@@ -607,8 +577,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 float bodyWeightEntered = Float.parseFloat(bodyWeightKgs.getText().toString());
                 userDetails.setBodyWeight(bodyWeightEntered);
                 Analytics.getInstance().setUserProperty("body_weight", bodyWeightEntered);
-                builder
-                        .put("body_weight", bodyWeightEntered);
+                builder.put("body_weight", bodyWeightEntered);
 
             } catch (Exception e) {
                 Logger.e("EditProfileFragment", "Exception while parsing body weight: " + e.getMessage());
@@ -620,27 +589,19 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         if (gender == 0) {
             userDetails.setGenderUser("f");
             Analytics.getInstance().setUserGender("F");
-            builder.put("gender","f");
+            builder.put("gender", "f");
         } else if (gender == 1) {
             userDetails.setGenderUser("m");
             Analytics.getInstance().setUserGender("M");
-            builder.put("gender","m");
+            builder.put("gender", "m");
         }
 
 
-        if(pos1!=-1)
-        {
+        if (pos1 != -1) {
             userDetails.setTitle1(achievedTitles.get(pos1).getTitleId());
-            Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE1,achievedTitles.get(pos1).getTitleId()+"");
-            builder.put("title_1_id",achievedTitles.get(pos1).getTitleId());
-            builder.put("title_1_name",achievedTitles.get(pos1).getTitle());
-        }
-        if(pos2!=-1)
-        {
-            userDetails.setTitle2(achievedTitles.get(pos2).getTitleId());
-            Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE2,achievedTitles.get(pos2).getTitleId()+"");
-            builder.put("title_2_id",achievedTitles.get(pos2).getTitleId());
-            builder.put("title_2_name",achievedTitles.get(pos2).getTitle());
+            Analytics.getInstance().setUserTitle(Constants.USER_PROP_TITLE1, achievedTitles.get(pos1).getTitleId() + "");
+            builder.put("title_1_id", achievedTitles.get(pos1).getTitleId());
+            builder.put("title_1_name", achievedTitles.get(pos1).getTitle());
         }
         builder.buildAndDispatch();
         MainApplication.getInstance().setUserDetails(userDetails);
@@ -688,21 +649,10 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 EditWeight editWeight = new EditWeight(getContext(), this, userDetails);
                 editWeight.show();
                 break;
-            case R.id.profile_title1_layout :
-                if(userDetails.getTitle1()>0)
-                {
+            case R.id.profile_title1_layout:
+                if (userDetails.getTitle1() > 0) {
                     spinnerProfileTitle1.performClick();
-                }else
-                {
-                    MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title) + " title");
-                }
-                break;
-            case R.id.profile_title2_layout :
-                if(userDetails.getTitle2()>0)
-                {
-                    spinnerProfileTitle2.performClick();
-                }else
-                {
+                } else {
                     MainApplication.showToast(getResources().getString(R.string.charity_overview_title_header_earn_stars_to_get_title) + " title");
                 }
                 break;
@@ -730,8 +680,6 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         super.onDestroyView();
     }
 
-    private AlertDialog discardChangesDialog;
-
     public AlertDialog showDiscardChangesDialog() {
         Logger.d(TAG, "showDiscardChangesDialog");
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -755,24 +703,38 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
         return discardChangesDialog;
     }
 
-    private boolean isEdited = false;
+    class GenericTextChangeListner implements TextWatcher {
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        View view;
 
+        public GenericTextChangeListner(View view) {
+            this.view = view;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            setMenuColor();
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // Some text is changed
+            Logger.i(TAG, "afterTextChanged: " + s.toString());
+            isEdited = true;
+           /* if(view.getId() == R.id.et_profile_bio_et) {
+                if (s.length() >= 140)
+                {
+                    s.delete(140, s.length());
+                }
+            }*/
+        }
     }
 
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        setMenuColor();
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        // Some text is changed
-        Logger.i(TAG, "afterTextChanged: " + s.toString());
-        isEdited = true;
-    }
 
     @Override
     public void saveDetails(UserDetails userDetails) {
@@ -846,7 +808,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                 Uri photoURI = FileProvider.getUriForFile(getContext(), Utils.getFileProvider(getContext()), tempPhotoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 takePictureIntent.setClipData(ClipData.newRawUri("", photoURI));
-                takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 getActivity().startActivityForResult(takePictureIntent, Constants.REQUEST_IMAGE_CAPTURE);
             }
         }
@@ -854,7 +816,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     private void dispatchGetPictureFromGalleryIntent() {
 //        Intent intent = new Intent();
-        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         /*intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);*/
         getActivity().startActivityForResult(Intent.createChooser(intent, "Select Picture"), Constants.REQUEST_IMAGE_CAPTURE);
@@ -871,7 +833,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.ImageCapture imageCapture) {
-        if(imageCapture.getResultCode() == RESULT_OK) {
+        if (imageCapture.getResultCode() == RESULT_OK) {
             if (imageCapture.getData() == null) {
 //                Picasso.with(getContext()).load(tempPhotoFile).into(imgProfile);
             } else {
@@ -895,7 +857,7 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Logger.d(TAG,"onActivityResult : "+requestCode+","+resultCode+","+data);
+        Logger.d(TAG, "onActivityResult : " + requestCode + "," + resultCode + "," + data);
         if (requestCode == 100) {
             if (data.hasExtra("imagePath")) {
                 String imagePath = data.getStringExtra("imagePath");
@@ -903,10 +865,9 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
                     photoFile = new File(imagePath);
                     isImageLoaded = true;
                 } else {
-                    if (photoFile!=null && !photoFile.exists()) {
+                    if (photoFile != null && !photoFile.exists()) {
                         photoFile = null;
-                    }else if(photoFile!=null)
-                    {
+                    } else if (photoFile != null) {
                         isImageLoaded = true;
                     }
                 }
@@ -923,8 +884,8 @@ public class EditProfileFragment extends BaseFragment implements DatePickerDialo
             path = Utils.getRealPathFromURI_API19(getContext(), uri);
         }*/
         Uri selectedImage = data.getData();
-        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-        Cursor cursor = getContext().getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContext().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
         cursor.moveToFirst();
         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
         path = cursor.getString(columnIndex);

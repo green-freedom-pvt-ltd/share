@@ -50,7 +50,7 @@ private static final String APP_VERSION = "/app/v1"; // changed from v0->v1 on 2
     private static final String LEAGUE_REGISTRATION_URL = "/employeetoteam/";
     private static final String LEAGUEBOARD_URL = "/teamboard/";
     private static final String TEAMLEADERBOARD_URL = "/teamleaderboard/";
-    private static final String SERVER_TIME_URL = "/servertime/";
+    private static final String SERVER_TIME_URL = "/servertime";
 
     private static final String VERIFY_REFERRAL_CODE = "/verify-referral-code";
     private static final String REFERRAL_LEADERBOARD = "/referral-leaderboard?";

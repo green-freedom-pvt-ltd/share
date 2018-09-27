@@ -246,7 +246,6 @@ public class Constants {
     public final static String USER_PROP_TEAM_CODE="TeamCode";
     public final static String USER_PROP_AGE="Age";
     public final static String USER_PROP_TITLE1="Title1";
-    public final static String USER_PROP_TITLE2="Title2";
 
     public static final String USER_PROP_LIFETIME_DISTANCE = "LifeTimeDistance";
     public static final String USER_PROP_LIFETIME_STEPS = "LifeTimeSteps";
