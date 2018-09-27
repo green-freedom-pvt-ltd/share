@@ -6,6 +6,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.common.BaseLeaderBoardFragment;
@@ -152,6 +154,7 @@ public class ReferLeaderBoardFragment extends BaseLeaderBoardFragment{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPrefsManager.getInstance().setString(Constants.PREF_SHOW_SMC_LEADERBOARD_SMC_SCREEN, Constants.SHOW_SMC_SCREEN);
         getFragmentController().replaceFragment(new ReferProgramFragment(), true);
         return true;
     }

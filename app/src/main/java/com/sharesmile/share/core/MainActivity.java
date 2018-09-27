@@ -72,6 +72,7 @@ import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.global.GlobalLeaderBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.LeagueBoardFragment;
 import com.sharesmile.share.leaderboard.impactleague.event.LeagueBoardDataUpdated;
+import com.sharesmile.share.leaderboard.referprogram.ReferLeaderBoardFragment;
 import com.sharesmile.share.login.LoginActivity;
 import com.sharesmile.share.login.UserDetails;
 import com.sharesmile.share.onboarding.OnBoardingActivity;
@@ -449,7 +450,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void loadInitialFragment() {
-        addFragment(new HomeScreenFragment(), false);
+        replaceFragment(new HomeScreenFragment(), true);
         boolean showProfile = getIntent().getBooleanExtra(Constants.BUNDLE_SHOW_RUN_STATS, false);
         if (showProfile && MainApplication.isLogin()) {
             Bundle bundle1 = new Bundle();
@@ -461,7 +462,7 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
     }
 
     private void loadSettingsFragmentWithOverlay() {
-        addFragment(new HomeScreenFragment(), false);
+        replaceFragment(new HomeScreenFragment(), true);
         replaceFragment(SettingsFragment.newInstance(true), true);
     }
 
@@ -537,13 +538,16 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         }
         Utils.setStausBarColor(getWindow(), R.color.bright_sky_blue);
         hideKeyboard(null);
+        /*int i = getFragmentManager().getBackStackEntryCount();
         if (getFragmentManager().getBackStackEntryCount() == 1) {
             ActivityCompat.finishAffinity(this);
-        } else {
+        } else {*/
             FragmentManager fragmentManager = getSupportFragmentManager();
             if (fragmentManager.getBackStackEntryCount() > 0) {
                 Fragment fragment = fragmentManager.findFragmentByTag(fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1).getName());
-                if (fragment instanceof StreakGoalFragment) {
+                if (fragment instanceof HomeScreenFragment) {
+                    ActivityCompat.finishAffinity(this);
+                } else if (fragment instanceof StreakGoalFragment) {
                     StreakGoalFragment streakGoalFragment = (StreakGoalFragment) fragment;
                     if (streakGoalFragment.goals.get(streakGoalFragment.streakGoalAdapter.getPosition()).getId() != MainApplication.getInstance().getUserDetails().getStreakGoalID()) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -571,13 +575,17 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
                                     ((ProfileFragment) fragment).materialTapTargetPrompt.getState() == MaterialTapTargetPrompt.STATE_FINISHED))) {
                         getSupportFragmentManager().popBackStack();
                     }
+                } else if (fragment instanceof ReferLeaderBoardFragment) {
+                    replaceFragment(new HomeScreenFragment(), true);
+                } else if (fragment instanceof ReferProgramFragment) {
+                    replaceFragment(new HomeScreenFragment(), true);
                 } else {
                     super.onBackPressed();
                 }
             } else {
                 super.onBackPressed();
             }
-        }
+//        }
     }
 
 
@@ -689,7 +697,11 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Utils.share(getContext(), Utils.getLocalBitmapUri(bitmap, getContext()),
                 getString(R.string.share_msg));
         } else {
-            replaceFragment(new ReferProgramFragment(), true);
+            if (SharedPrefsManager.getInstance().getString(Constants.PREF_SHOW_SMC_LEADERBOARD_SMC_SCREEN, Constants.SHOW_SMC_SCREEN).equals(Constants.SHOW_SMC_SCREEN)) {
+                replaceFragment(new ReferProgramFragment(), true);
+            } else {
+                replaceFragment(new ReferLeaderBoardFragment(), true);
+            }
         }
     }
 

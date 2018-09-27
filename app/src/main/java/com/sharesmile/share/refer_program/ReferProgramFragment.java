@@ -152,13 +152,15 @@ public class ReferProgramFragment extends BaseFragment{
         Runnable update = new Runnable() {
             @Override
             public void run() {
-                int position = 0;
-                if (currentPageIndex == 1) {
-                    position = 0;
-                } else {
-                    position = 1;
+                if (isVisible()) {
+                    int position = 0;
+                    if (currentPageIndex == 1) {
+                        position = 0;
+                    } else {
+                        position = 1;
+                    }
+                    smcViewpager.setCurrentItem(position, true);
                 }
-                smcViewpager.setCurrentItem(position, true);
             }
         };
         timer = new Timer();
@@ -194,6 +196,7 @@ public class ReferProgramFragment extends BaseFragment{
                 break;
             case R.id.smc_leaderboard:
                 timer.cancel();
+                SharedPrefsManager.getInstance().setString(Constants.PREF_SHOW_SMC_LEADERBOARD_SMC_SCREEN, Constants.SHOW_SMC_LEADERBOARD_SCREEN);
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_LEADERBOARD_NOTI, false);
                 getFragmentController().replaceFragment(ReferLeaderBoardFragment.getInstance(), true);
                 break;
