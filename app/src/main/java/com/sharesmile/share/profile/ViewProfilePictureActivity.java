@@ -20,11 +20,7 @@ import com.sharesmile.share.morph.MorphFabToDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by ankitmaheshwari on 4/28/17.
- */
-
-public class ViewProfilePicture extends AppCompatActivity {
+public class ViewProfilePictureActivity extends AppCompatActivity {
 
     @BindView(R.id.profile_pic)
     ImageView imageView;

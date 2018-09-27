@@ -68,7 +68,7 @@ public class MorphFabToDialog extends ChangeBounds {
         if (view.getWidth() <= 0 || view.getHeight() <= 0) {
             return;
         }
-        transitionValues.values.put(PROPERTY_COLOR, ContextCompat.getColor(view.getContext(), R.color.colorPrimaryDark));
+        transitionValues.values.put(PROPERTY_COLOR, ContextCompat.getColor(view.getContext(), R.color.black_18));
         transitionValues.values.put(PROPERTY_CORNER_RADIUS, view.getHeight() / 2);//view.getHeight() / 2
     }
 
@@ -79,7 +79,7 @@ public class MorphFabToDialog extends ChangeBounds {
         if (view.getWidth() <= 0 || view.getHeight() <= 0) {
             return;
         }
-        transitionValues.values.put(PROPERTY_COLOR, ContextCompat.getColor(view.getContext(), R.color.colorPrimaryDark));
+        transitionValues.values.put(PROPERTY_COLOR, ContextCompat.getColor(view.getContext(), R.color.black_18));
         transitionValues.values.put(PROPERTY_CORNER_RADIUS, view.getResources().getDimensionPixelSize(R.dimen.dialog_corners));
     }
 

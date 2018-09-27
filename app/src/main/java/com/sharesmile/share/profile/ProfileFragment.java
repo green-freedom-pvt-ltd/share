@@ -580,7 +580,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
     @OnClick(R.id.img_profile_stats)
     public void openProfilePic()
     {
-        Intent intent = new Intent(getActivity(), ViewProfilePicture.class);
+        Intent intent = new Intent(getActivity(), ViewProfilePictureActivity.class);
         intent.putExtra("img", url);
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), imageView, "profile");
         startActivityForResult(intent, 100, options.toBundle());
@@ -588,7 +588,7 @@ public class ProfileFragment extends BaseFragment implements SeeAchievedBadge,
                 .beginTransaction()
                 .addSharedElement(imageView, ViewCompat.getTransitionName(imageView))
                 .addToBackStack(TAG)
-                .replace(R.id.content, new ViewProfilePicture())
+                .replace(R.id.content, new ViewProfilePictureActivity())
                 .commit();*/
     }
     @OnClick(R.id.btn_lets_run)
