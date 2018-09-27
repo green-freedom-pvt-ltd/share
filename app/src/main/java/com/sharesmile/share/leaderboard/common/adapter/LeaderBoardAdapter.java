@@ -53,6 +53,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Parent mParent;
     private List<BaseLeaderBoardItem> itemList;
     private Context mContext;
+    int bannerScroll;
 
     public LeaderBoardAdapter(Context context, Parent parent, List<Workout> mWorkoutList, boolean showMeals, Activity activity) {
 
@@ -315,7 +316,11 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 .buildAndDispatch();
                     }*/
                     // Setting newImage as current image
+                    bannerScroll++;
+                    timer.cancel();
                     setSelectedPage(position);
+                    if (bannerScroll < 2)
+                        autoSroll();
                 }
 
                 @Override
@@ -381,6 +386,7 @@ public class LeaderBoardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void run() {
                     handler.post(update);
+                    timer.cancel();
                 }
             }, 5000, 7500);
         }

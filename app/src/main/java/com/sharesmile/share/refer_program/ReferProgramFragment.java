@@ -1,6 +1,7 @@
 package com.sharesmile.share.refer_program;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -21,6 +22,9 @@ import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,8 +83,10 @@ public class ReferProgramFragment extends BaseFragment{
         init();
         Bundle bundle = getArguments();
         if (bundle != null && bundle.containsKey("position")) {
+            bannerScroll = 1;
             smcViewpager.setCurrentItem(1);
         }
+        autoSroll();
         Utils.setStausBarColor(getActivity().getWindow(), R.color.clr_328f6c);
     }
 
@@ -102,7 +108,12 @@ public class ReferProgramFragment extends BaseFragment{
 
             @Override
             public void onPageSelected(int position) {
+                bannerScroll++;
+                if (timer != null)
+                    timer.cancel();
                 setIndicator(position);
+                if (bannerScroll < 2)
+                    autoSroll();
             }
 
             @Override
@@ -112,6 +123,51 @@ public class ReferProgramFragment extends BaseFragment{
         });
         setIndicator(0);
         poweredByTv.setText(getResources().getString(R.string.powered_by) + " " + ReferProgram.getReferProgramDetails().getSponsoredBy());
+    }
+
+    int currentPageIndex = 0;
+    Timer timer;
+    int bannerScroll = 0;
+
+    /* private void setSelectedPage(int newPosition) {
+         int prevIndex = currentPageIndex;
+         // Setting newPosition as current page
+         currentPageIndex = newPosition;
+         if (indicators != null) {
+             indicators.get(prevIndex).setSelected(false);
+             indicators.get(currentPageIndex).setSelected(true);
+         }
+     }*/
+    public void autoSroll() {
+        int delay;
+        int period;
+        if (currentPageIndex == 0) {
+            delay = 7000;
+            period = 75000;
+        } else {
+            delay = 18000;
+            period = 20000;
+        }
+        Handler handler = new Handler();
+        Runnable update = new Runnable() {
+            @Override
+            public void run() {
+                int position = 0;
+                if (currentPageIndex == 1) {
+                    position = 0;
+                } else {
+                    position = 1;
+                }
+                smcViewpager.setCurrentItem(position, true);
+            }
+        };
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(update);
+            }
+        }, delay, period);
     }
 
     private void setIndicator(int position) {
@@ -126,6 +182,7 @@ public class ReferProgramFragment extends BaseFragment{
             }
             dotIndicator.addView(imageView);
         }
+        currentPageIndex = position;
     }
 
 
@@ -136,6 +193,7 @@ public class ReferProgramFragment extends BaseFragment{
                 getFragmentController().goBack();
                 break;
             case R.id.smc_leaderboard:
+                timer.cancel();
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SHOW_SMC_LEADERBOARD_NOTI, false);
                 getFragmentController().replaceFragment(ReferLeaderBoardFragment.getInstance(), true);
                 break;

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.refer_program.model.ReferProgram;
 import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
@@ -24,6 +25,12 @@ public class SMCDialog extends Dialog {
 
     @BindView(R.id.share_code)
     TextView shareCode;
+
+    @BindView(R.id.share_a_meal_desc)
+    TextView shareAMealDesc;
+
+    @BindView(R.id.share_a_meal_total_meals)
+    TextView shareAMealTotalMeals;
 
     public SMCDialog(@NonNull Context context) {
         super(context);
@@ -48,6 +55,8 @@ public class SMCDialog extends Dialog {
 
     private void init() {
         shareCode.setText(MainApplication.getInstance().getUserDetails().getMyReferCode());
+        shareAMealTotalMeals.setText(getContext().getResources().getString(R.string.total_meals_by_you) + MainApplication.getInstance().getUserDetails().getMealsShared());
+        shareAMealDesc.setText(String.format(getContext().getResources().getString(R.string.share_a_meal_challenge_description), ReferProgram.getReferProgramDetails().getSponsoredBy(), ReferProgram.noOfDaysPending()));
     }
 
     @OnClick(R.id.share_code)
