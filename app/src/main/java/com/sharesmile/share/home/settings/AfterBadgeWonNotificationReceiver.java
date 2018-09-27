@@ -39,9 +39,12 @@ public class AfterBadgeWonNotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (WorkoutSingleton.getInstance().isWorkoutActive()) {
+        if (WorkoutSingleton.getInstance().isWorkoutActive() || !MainApplication.isLogin()) {
             return;
         }
+        //todo comment auto notification
+        if (true)
+            return;
         Logger.d(TAG, "In " + TAG);
         NotificationTextSubClass notificationTextSubClass = checkForNotification();
         SharedPrefsManager.getInstance().setString(Constants.PREF_NOTIFICATION_BADGE_NOT_SEEN,new JSONObject().toString());

@@ -326,6 +326,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     private void performLogout(){
         Logger.i("SettingsFragment", "Clearing all preferences and DB");
+        Utils.cancelReminderTime(getContext());
         MainApplication.getInstance().getDbWrapper().clearAll();
         SharedPrefsManager.getInstance().clearPrefs();
         mListener.updateNavigationMenu();

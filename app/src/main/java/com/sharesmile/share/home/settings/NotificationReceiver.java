@@ -56,7 +56,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Utils.setAutoNotification(getContext());
         if (WorkoutSingleton.getInstance().isWorkoutActive() ||
-                !Utils.isAppForground(context)) {
+                !Utils.isAppForground(context) || !MainApplication.isLogin()) {
             return;
         }
         //todo comment auto notification
