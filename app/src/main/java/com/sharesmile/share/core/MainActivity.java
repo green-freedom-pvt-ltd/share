@@ -31,7 +31,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -144,12 +143,6 @@ public class MainActivity extends ToolbarActivity implements NavigationView.OnNa
         Logger.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Utils.getFcmToken();
-        if (getIntent().getExtras() != null) {
-            for (String key : getIntent().getExtras().keySet()) {
-                String value = getIntent().getExtras().getString(key);
-                Log.d(TAG, "TESTING!!!!!!!!!!!!!!! Key: " + key + " Value: " + value);
-            }
-        }
         Boolean userLogin = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
 //        Boolean isLoginSkip = SharedPrefsManager.getInstance().getBoolean(Constants.PREF_LOGIN_SKIP, false);
         Boolean isReminderDisable = getIntent().getBooleanExtra(Constants.PREF_IS_REMINDER_DISABLE, false);

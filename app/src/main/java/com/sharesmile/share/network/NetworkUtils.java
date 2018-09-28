@@ -6,6 +6,8 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
@@ -252,7 +254,9 @@ public class NetworkUtils {
 
         Gson gson = new Gson();
         String responseString = getStringResponse(response);
-        return gson.fromJson(responseString, com.sharesmile.share.core.Response.class);
+        JsonParser parser = new JsonParser();
+        JsonObject o = parser.parse(responseString).getAsJsonObject();
+        return gson.fromJson(o, com.sharesmile.share.core.Response.class);
 
     }
 
