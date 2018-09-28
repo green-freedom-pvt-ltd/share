@@ -203,4 +203,13 @@
         <item name="android:windowEnterAnimation">@anim/zoom_in</item>
         <item name="android:windowExitAnimation">@anim/fade_out_animation_1s</item>
     </style>
+
+    <style name="SMC2Dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/SMCDialogAnimation</item>
+    </style>
+
+    <style name="SMC2DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_slide_up</item>
+        <item name="android:windowExitAnimation">@anim/dialog_slide_down</item>
+    </style>
 </resources>

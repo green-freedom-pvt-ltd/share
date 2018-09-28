@@ -495,6 +495,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     !SharedPrefsManager.getInstance().getBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, false)
                     && ReferProgram.isReferProgramActive()) {
                 SMCDialog smcDialog = new SMCDialog(getContext());
+                smcDialog.getWindow().getAttributes().windowAnimations = R.style.SMC2DialogAnimation;
                 smcDialog.show();
                 SharedPrefsManager.getInstance().setBoolean(Constants.PREF_SMC_PERIODIC_POP_UP_SHOWN, true);
                 smcDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
