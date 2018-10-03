@@ -33,7 +33,7 @@ public class ReferProgram implements UnObfuscable {
     @SerializedName("end_date")
     private String endDate;
     @SerializedName("is_active")
-    private String isActive;
+    private boolean isActive;
     @SerializedName("banner_image")
     private String bannerImage;
     @SerializedName("referal_category")
@@ -81,11 +81,11 @@ public class ReferProgram implements UnObfuscable {
         this.endDate = endDate;
     }
 
-    public String getIsActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(String isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -160,10 +160,14 @@ public class ReferProgram implements UnObfuscable {
             List<ReferProgram> referPrograms = NetworkDataProvider.doGetCall(Urls.getReferProgramsUrl(),
                     new TypeToken<List<ReferProgram>>() {
                     }.getType());
-            if (referPrograms.size() > 0) {
-                SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_PROGRAMS, new Gson().toJson(referPrograms.get(0), ReferProgram.class));
-            } else {
-                SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_PROGRAMS, null);
+            int pos = -1;
+            for (ReferProgram referProgram : referPrograms) {
+                if (referProgram.getIsActive()) {
+                    SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_PROGRAMS, new Gson().toJson(referProgram, ReferProgram.class));
+                    break;
+                } else {
+                    SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_PROGRAMS, null);
+                }
             }
             EventBus.getDefault().post(new UpdateEvent.OnGetReferProgramDetails(ExpoBackoffTask.RESULT_SUCCESS));
         } catch (NetworkException e) {
