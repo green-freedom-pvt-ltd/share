@@ -4,7 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.base.UnObfuscable;
 
-public class Response implements UnObfuscable {
+import java.io.Serializable;
+
+public class Response implements UnObfuscable, Serializable {
     @SerializedName("code")
     private int code;
     @SerializedName("status")

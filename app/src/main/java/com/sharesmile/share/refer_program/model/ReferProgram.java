@@ -15,6 +15,7 @@ import com.sharesmile.share.network.NetworkException;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.sharesmile.share.core.Constants.PREF_SMC_PROGRAMS;
 
-public class ReferProgram implements UnObfuscable {
+public class ReferProgram implements UnObfuscable, Serializable {
     @SerializedName("id")
     private int id;
     @SerializedName("program_name")

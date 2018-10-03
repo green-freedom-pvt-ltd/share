@@ -3,11 +3,13 @@ package com.sharesmile.share.core.timekeeping;
 import com.google.gson.annotations.SerializedName;
 import com.sharesmile.share.core.base.UnObfuscable;
 
+import java.io.Serializable;
+
 /**
  * Created by ankitmaheshwari on 6/9/17.
  */
 
-public class ServerTimeResponse implements UnObfuscable {
+public class ServerTimeResponse implements UnObfuscable, Serializable {
 
     @SerializedName("time_epoch")
     private long timeEpoch;
