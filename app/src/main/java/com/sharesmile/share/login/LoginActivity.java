@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         initUi();
-
+        MainApplication.showToast("TEST : " + SharedPrefsManager.getInstance().getString(Constants.PREF_REFERRAL_CODE).split("utm_campaign%3D")[1]);
     }
 
 

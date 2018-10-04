@@ -160,7 +160,6 @@ public class ReferProgram implements UnObfuscable {
             List<ReferProgram> referPrograms = NetworkDataProvider.doGetCall(Urls.getReferProgramsUrl(),
                     new TypeToken<List<ReferProgram>>() {
                     }.getType());
-            int pos = -1;
             for (ReferProgram referProgram : referPrograms) {
                 if (referProgram.getIsActive()) {
                     SharedPrefsManager.getInstance().setString(Constants.PREF_SMC_PROGRAMS, new Gson().toJson(referProgram, ReferProgram.class));
