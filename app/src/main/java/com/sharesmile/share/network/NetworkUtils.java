@@ -258,9 +258,9 @@ public class NetworkUtils {
 
     public static NetworkException wrapIOException(Request request, IOException ioe){
         String requestUrl = request.url().toString();
-        String method = request.method();
+//        String method = request.method();
         return new NetworkException.Builder().cause(ioe).failureType(FailureType.REQUEST_FAILURE)
-                                             .errorMessage(method + " request failed for URL: " +
+                .errorMessage(/*method*/  " request failed for URL: " +
                                                 requestUrl).build();
     }
 
