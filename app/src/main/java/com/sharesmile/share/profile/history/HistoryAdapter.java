@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sharesmile.share.R;
@@ -114,18 +115,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         ImageView mIndicator;
 
         @BindView(R.id.content_view)
-        CardView mCard;
-
+        LinearLayout mCard;
         public RunHistoryDetailsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            if (Build.VERSION.SDK_INT >= 21){
-                if (isRunSelection){
-                    mCard.setElevation(Utils.convertDpToPixel(MainApplication.getContext(), 4));
-                }else {
-                    mCard.setElevation(Utils.convertDpToPixel(MainApplication.getContext(), 1));
-                }
-            }
         }
 
         public void bindData(final Workout workout) {
@@ -154,11 +147,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             if (workout.getIsValidRun()) {
                 mIndicator.setVisibility(View.GONE);
-                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.white));
+                mCard.setBackgroundColor(itemView.getResources().getColor(R.color.white));
                 mImpact.setPaintFlags(mImpact.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 mIndicator.setVisibility(View.VISIBLE);
-                mCard.setCardBackgroundColor(itemView.getResources().getColor(R.color.very_light_grey));
+                mCard.setBackgroundColor(itemView.getResources().getColor(R.color.very_light_grey));
                 mImpact.setPaintFlags(mImpact.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }
             mCard.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +160,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     onWorkoutClicked(workout);
                 }
             });
+            if(workout.getIs_sync()) {
+                mIndicator.setVisibility(View.GONE);
+            }else
+            {
+                mIndicator.setVisibility(View.VISIBLE);
+                mIndicator.setImageResource(R.drawable.ic_sync_problem);
+            }
         }
 
         private void onWorkoutClicked(Workout workout){
@@ -175,7 +175,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mInterface.onSelectWorkoutWithIssue(Utils.convertWorkoutToRun(workout));
                 }
             }else {
-                if (workout.getIsValidRun()){
+                if(!workout.getIs_sync())
+                {
+                 mInterface.showNotSyncDialog(workout);
+                }else if (workout.getIsValidRun()){
                     if (workout.getCalories() == null || workout.getCalories() <= 0){
                         mInterface.showCaloriesNotAvailableRationale();
                     }
@@ -216,5 +219,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void showFlaggedRunDialog(Run invalidRun);
         void showCaloriesNotAvailableRationale();
         void onSelectWorkoutWithIssue(Run selectedWorkout);
+        void showNotSyncDialog(Workout workout);
     }
 }

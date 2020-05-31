@@ -6,12 +6,15 @@ package com.sharesmile.share.home.homescreen;
 
 
 import android.animation.ValueAnimator;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,26 +24,48 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.sharesmile.share.core.cause.CauseDataStore;
-import com.sharesmile.share.core.event.UpdateEvent;
-import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.AchievedBadge;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
+import com.sharesmile.share.Badge;
+import com.sharesmile.share.BadgeDao;
 import com.sharesmile.share.R;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.base.IFragmentController;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.network.NetworkUtils;
-import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.core.base.ExpoBackoffTask;
+import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.cause.CauseDataStore;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.event.UpdateEvent;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.network.NetworkUtils;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.utils.DateUtil;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -148,8 +173,12 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         Logger.d(TAG, "onViewCreated");
         getFragmentController().hideToolbar();
         render();
-        prepareOnboardingOverlays();
+        DrawerLayout drawerLayout = (getActivity().findViewById(R.id.drawerLayout));
+        if(drawerLayout!=null)
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
+
+
 
     private void prepareOnboardingOverlays(){
 
@@ -174,9 +203,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         } else {
             checkAndScheduleMaterialTapOverlays(screenLaunchCount, workoutCount);
         }
-
     }
-
     private void checkAndScheduleMaterialTapOverlays(int screenLaunchCount, long workoutCount){
         if (OnboardingOverlay.LETS_GO.isEligibleForDisplay(screenLaunchCount, workoutCount)){
             scheduleOverlay(OnboardingOverlay.LETS_GO, mRunButton, true);
@@ -237,10 +264,22 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
      */
     private boolean render() {
         Logger.d(TAG, "render");
-        if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
+       /* if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_BADGES,false)){
+            showProgressDialog();
+            SyncHelper.syncBadgesData();
+        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES,false))
+        {
+            showProgressDialog();
+            SyncHelper.getAchievedBadged();
+        }else if(!SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,false))
+        {
+            showProgressDialog();
+            SyncHelper.getAchievedTitle();
+        }else*/ if (CauseDataStore.getInstance().getCausesToShow().isEmpty()){
             // Data not fetched in DataStore
             Logger.d(TAG, "render: Data not fetched in CauseDataStore");
             showProgressDialog();
+
             if (!NetworkUtils.isNetworkConnected(getContext())){
                 Snackbar.make(mContentView, "No connection", Snackbar.LENGTH_INDEFINITE)
                         .setAction(getString(R.string.retry), new View.OnClickListener() {
@@ -279,6 +318,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
             // But return true so that the client can invoke a call to fetch fresh data
             return true;
         }
+//        return true;
     }
 
     private void showProgressDialog() {
@@ -295,6 +335,7 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_lets_run:
+
                 CauseData causeData = mAdapter.getItemAtPosition(viewPager.getCurrentItem());
                 if (causeData.isCompleted()){
                     Utils.shareImageWithMessage(getContext(), causeData.getCauseCompletedImage(),
@@ -302,8 +343,11 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     AnalyticsEvent.create(Event.ON_CLICK_CAUSE_COMPLETED_SHARE)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
+                            .put("cause_id",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
+                            .put("cause_name",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
                             .buildAndDispatch();
                 } else {
+//                    Utils.checkStreak();
                     // If it is not completed then it must be an active on going cause
                     CauseDataStore.getInstance().registerCauseSelection(causeData);
                     getFragmentController().performOperation(IFragmentController.START_RUN, causeData);
@@ -311,6 +355,8 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
                     AnalyticsEvent.create(Event.ON_CLICK_LETS_GO)
                             .addBundle(causeData.getCauseBundle())
                             .put("cause_index", viewPager.getCurrentItem())
+                            .put("cause_id",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getId())
+                            .put("cause_name",mAdapter.getItemAtPosition(viewPager.getCurrentItem()).getTitle())
                             .buildAndDispatch();
                 }
                 break;
@@ -334,10 +380,18 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(UpdateEvent.CauseDataUpdated causeDataUpdated) {
         Logger.d(TAG, "onEvent: CauseDataUpdated");
-        if (isVisible()){
+        if (isVisible()) {
             render();
         }
     }
+
+    /*@Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.BadgeUpdated badgeUpdated) {
+        Logger.d(TAG, "onEvent: BadgeUpdated");
+        if (isVisible()){
+            checkBadgeData();
+        }
+    }*/
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -389,8 +443,10 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         mAdapter.setData(causes);
         setLetsRunButton(causes.get(viewPager.getCurrentItem()).isCompleted());
         mRunButton.setVisibility(View.VISIBLE);
+        AnalyticsEvent.create(Event.ON_LOAD_CAUSE_SCREEN).buildAndDispatch();
         hideProgressDialog();
-
+        prepareOnboardingOverlays();
+        Utils.checkBadgeData(false);
     }
 
     public CauseData getCurrentCause(){
@@ -414,4 +470,18 @@ public class HomeScreenFragment extends BaseFragment implements View.OnClickList
         });
         animator.start();
     }
+
+    @Subscribe(threadMode =  ThreadMode.MAIN)
+    public void onEvent(UpdateEvent.OnGetStreak onGetStreak)
+    {
+        if(onGetStreak.result == ExpoBackoffTask.RESULT_SUCCESS)
+        {
+            render();
+        }else
+        {
+//            showHideProgress(false,null);
+            MainApplication.showToast(getResources().getString(R.string.some_error));
+        }
+    }
+
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorPrimaryDark"/>
+    <stroke android:width="@dimen/my_stats_bg_padding_stroke_width" android:color="@color/colorPrimaryDark" />
+    <corners
+        android:bottomRightRadius="@dimen/my_stats_bg_round_corner"
+        android:topRightRadius="@dimen/my_stats_bg_round_corner"
+        />
+    <padding android:left="@dimen/my_stats_bg_padding_left_right" android:top="@dimen/my_stats_bg_padding_top_bottom"
+        android:right="@dimen/my_stats_bg_padding_left_right" android:bottom="@dimen/my_stats_bg_padding_top_bottom" />
+</shape>

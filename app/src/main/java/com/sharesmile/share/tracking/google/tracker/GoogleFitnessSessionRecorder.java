@@ -79,6 +79,7 @@ public class GoogleFitnessSessionRecorder implements GoogleApiHelper.Listener, G
     private void subscribeToFitnessData(){
 
         subscribeToDataType(DataType.TYPE_STEP_COUNT_DELTA);
+        //TODO : Add location Permission
         subscribeToDataType(DataType.TYPE_DISTANCE_DELTA);
         subscribeToDataType(DataType.TYPE_CALORIES_EXPENDED);
 

@@ -2,31 +2,59 @@ package com.sharesmile.share.tracking.workout.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
+import com.sharesmile.share.AchievedBadgeDao;
+import com.sharesmile.share.AchievedTitle;
+import com.sharesmile.share.AchievedTitleDao;
+import com.sharesmile.share.Category;
+import com.sharesmile.share.CategoryDao;
+import com.sharesmile.share.R;
+import com.sharesmile.share.Title;
+import com.sharesmile.share.TitleDao;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
+import com.sharesmile.share.analytics.events.AnalyticsEvent;
+import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.analytics.events.Properties;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.MainActivity;
-import com.sharesmile.share.tracking.workout.tracker.RunTracker;
-import com.sharesmile.share.tracking.workout.tracker.Tracker;
-import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.TTS;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.core.config.Config;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.sync.SyncService;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
+import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.event.GpsStateChangeEvent;
 import com.sharesmile.share.tracking.event.MockLocationDetected;
 import com.sharesmile.share.tracking.event.PauseWorkoutEvent;
@@ -36,55 +64,39 @@ import com.sharesmile.share.tracking.event.UpdateUiOnMockLocation;
 import com.sharesmile.share.tracking.event.UpdateUiOnWorkoutPauseEvent;
 import com.sharesmile.share.tracking.event.UpdateUiOnWorkoutResumeEvent;
 import com.sharesmile.share.tracking.event.UsainBoltForceExit;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.core.application.MainApplication;
-import com.sharesmile.share.R;
-import com.sharesmile.share.Workout;
-import com.sharesmile.share.WorkoutDao;
-import com.sharesmile.share.analytics.events.AnalyticsEvent;
-import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.config.ClientConfig;
-import com.sharesmile.share.core.config.Config;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.notifications.NotificationActionReceiver;
-import com.sharesmile.share.core.TTS;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.core.sync.SyncService;
-import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
 import com.sharesmile.share.tracking.google.tracker.GoogleFitTracker;
-import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
 import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.tracking.models.WorkoutBatch;
 import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.cause.model.CauseData;
-import com.sharesmile.share.tracking.workout.data.model.FraudData;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.core.sync.SyncHelper;
 import com.sharesmile.share.tracking.stepcount.AndroidStepCounter;
+import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
 import com.sharesmile.share.tracking.stepcount.StepCounter;
 import com.sharesmile.share.tracking.vigilance.VigilanceTimer;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.workout.data.WorkoutDataStore;
+import com.sharesmile.share.tracking.workout.data.model.FraudData;
+import com.sharesmile.share.tracking.workout.tracker.RunTracker;
+import com.sharesmile.share.tracking.workout.tracker.Tracker;
 import com.sharesmile.share.utils.CircularQueue;
 import com.sharesmile.share.utils.DateUtil;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.sharesmile.share.core.application.MainApplication.getContext;
-import static com.sharesmile.share.core.config.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_GPS_DISABLED;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USAIN_BOLT;
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED_NOTIFICATION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
+import static com.sharesmile.share.core.application.MainApplication.getContext;
+import static com.sharesmile.share.core.config.Config.WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_BAD_GPS_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_DISABLE_MOCK_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_GPS_INACTIVE_ID;
@@ -92,10 +104,10 @@ import static com.sharesmile.share.core.notifications.NotificationActionReceiver
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_FORCE_EXIT_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_NOTIFICATION_USAIN_BOLT_ID;
 import static com.sharesmile.share.core.notifications.NotificationActionReceiver.WORKOUT_TRACK_NOTIFICATION_ID;
+import static com.sharesmile.share.tracking.ui.RunFragment.NOTIFICATION_TIMER_TICK;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_BAD;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_INACTIVE;
 import static com.sharesmile.share.tracking.workout.WorkoutSingleton.GPS_STATE_OK;
-import static com.sharesmile.share.tracking.ui.RunFragment.NOTIFICATION_TIMER_TICK;
 
 //import com.squareup.leakcanary.RefWatcher;
 
@@ -151,7 +163,7 @@ public class WorkoutService extends Service implements
 
     private void startTracking() {
         Logger.d(TAG, "startTracking");
-        if (backgroundExecutorService == null){
+        if (backgroundExecutorService == null) {
             return;
         }
         if (tracker == null) {
@@ -160,11 +172,11 @@ public class WorkoutService extends Service implements
             googleFitTracker.start();
             ActivityDetector.getInstance().startActivityDetection();
         }
-        synchronized (this){
+        synchronized (this) {
             acceptedLocationFix = null;
             beginningLocationsRotatingQueue = null;
         }
-        if (vigilanceTimer == null){
+        if (vigilanceTimer == null) {
             vigilanceTimer = new VigilanceTimer(this, backgroundExecutorService);
         }
         makeForegroundAndSticky();
@@ -172,30 +184,31 @@ public class WorkoutService extends Service implements
                 .buildAndDispatch();
     }
 
-    private void sendWorkoutResultBroadcast(WorkoutData result){
+    private void sendWorkoutResultBroadcast(WorkoutData result, AchievedBadgesData achievedBadgesData) {
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                 Constants.BROADCAST_WORKOUT_RESULT_CODE);
         bundle.putParcelable(Constants.KEY_WORKOUT_RESULT, result);
+        bundle.putParcelable(Constants.KEY_WORKOUT_ACHIEVED_RESULT, achievedBadgesData);
         Intent intent = new Intent(Constants.WORKOUT_SERVICE_BROADCAST_ACTION);
         intent.putExtras(bundle);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
-    private void updateGoogleFitDetailsInSyncedWorkout(WorkoutData data){
+    private void updateGoogleFitDetailsInSyncedWorkout(WorkoutData data) {
         WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         Workout storedWorkout = mWorkoutDao.queryBuilder()
                 .where(WorkoutDao.Properties.WorkoutId.eq(data.getWorkoutId()))
                 .unique();
 
         storedWorkout.setEstimatedSteps(data.getEstimatedSteps());
-        storedWorkout.setEstimatedDistance((double)data.getEstimatedDistance());
-        storedWorkout.setEstimatedCalories((double)data.getEstimatedCalories());
+        storedWorkout.setEstimatedDistance((double) data.getEstimatedDistance());
+        storedWorkout.setEstimatedCalories((double) data.getEstimatedCalories());
 
         mWorkoutDao.insertOrReplace(storedWorkout);
     }
 
-    private void persistWorkoutInDb(WorkoutData data){
+    private void persistWorkoutInDb(WorkoutData data) {
 
         WorkoutDao workoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
         Workout workout = new Workout();
@@ -203,7 +216,7 @@ public class WorkoutService extends Service implements
         workout.setIsValidRun(!data.isAutoFlagged());
         workout.setAvgSpeed(data.getAvgSpeed());
         workout.setDistance(data.getDistance() / 1000); // in Kms
-        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime()));
+        workout.setElapsedTime(Utils.secondsToHHMMSS((int) data.getElapsedTime(),true));
         int rupees = Utils.convertDistanceToRupees(mCauseData.getConversionRate(), data.getDistance());
         workout.setRunAmount((float) rupees);
         workout.setRecordedTime(data.getRecordedTime());
@@ -213,11 +226,11 @@ public class WorkoutService extends Service implements
         workout.setDate(new Date(data.getBeginTimeStamp()));
         workout.setIs_sync(false);
         workout.setWorkoutId(data.getWorkoutId());
-        if (data.getStartPoint() != null){
+        if (data.getStartPoint() != null) {
             workout.setStartPointLatitude(data.getStartPoint().latitude);
             workout.setStartPointLongitude(data.getStartPoint().longitude);
         }
-        if (data.getLatestPoint() != null){
+        if (data.getLatestPoint() != null) {
             workout.setEndPointLatitude(data.getLatestPoint().latitude);
             workout.setEndPointLongitude(data.getLatestPoint().longitude);
         }
@@ -234,7 +247,7 @@ public class WorkoutService extends Service implements
         workout.setShouldSyncLocationData(true);
         workout.setUsainBoltCount(data.getUsainBoltCount());
         workout.setGoogleFitStepCount(data.getGoogleFitSteps());
-        workout.setGoogleFitDistance((double)data.getGoogleFitDistance());
+        workout.setGoogleFitDistance((double) data.getGoogleFitDistance());
 
         workoutDao.insertOrReplace(workout);
 
@@ -249,7 +262,7 @@ public class WorkoutService extends Service implements
         if (!currentlyTracking) {
             currentlyTracking = true;
             Logger.d(TAG, "startWorkout");
-            WorkoutServiceRetainerAlarm.setRepeatingAlarm(this);
+//            WorkoutServiceRetainerAlarm.setRepeatingAlarm(this);
             GoogleLocationTracker.getInstance().registerForWorkout(this);
             handler.removeCallbacks(handleGpsInactivityRunnable);
             handler.postDelayed(handleGpsInactivityRunnable, ClientConfig.getInstance().GPS_INACTIVITY_NOTIFICATION_DELAY);
@@ -274,7 +287,7 @@ public class WorkoutService extends Service implements
         if (currentlyTracking) {
             handler.removeCallbacks(handleGpsInactivityRunnable);
 
-            if (WorkoutSingleton.getInstance().getDataStore() != null){
+            if (WorkoutSingleton.getInstance().getDataStore() != null) {
                 AnalyticsEvent.create(Event.ON_WORKOUT_END)
                         .addBundle(getWorkoutBundle())
                         .put("bolt_count", WorkoutSingleton.getInstance().getDataStore().getUsainBoltCount())
@@ -283,17 +296,53 @@ public class WorkoutService extends Service implements
                         .buildAndDispatch();
             }
 
-            if (tracker != null){
+            if (tracker != null) {
                 tracker.endRun();
             }
-
             WorkoutData result = WorkoutSingleton.getInstance().endWorkout();
-            handleWorkoutResult(result);
+            //Calculate Streak
+            double distanceCovered = 0;
+            try {
+                distanceCovered = Double.parseDouble(Utils.formatToKmsWithTwoDecimal(result.getDistance()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            UserDetails userDetails = MainApplication.getInstance().getUserDetails();
+            if (distanceCovered >= 0.1) {
+//                userDetails.setStreakCurrentDate(Utils.getCurrentDateDDMMYYYY());
+                userDetails.addStreakRunProgress(distanceCovered);
+                userDetails.addStreakCount();
+                MainApplication.getInstance().setUserDetails(userDetails);
+            }
+            SyncHelper.uploadStreak();
+            AchievedBadgesData achievedBadgesData = new AchievedBadgesData();
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_BADGES, false)) {
+                achievedBadgesData.setChangeMakerBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CHANGEMAKER, mCauseData));
+                achievedBadgesData.setMarathonBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_MARATHON, mCauseData));
+                achievedBadgesData.setStreakBadgeAchieved(Utils.checkAchievedBadge(MainApplication.getInstance().getUserDetails().getStreakCount(), Constants.BADGE_TYPE_STREAK, mCauseData));
+                achievedBadgesData.setCauseBadgeAchieved(Utils.checkAchievedBadge(distanceCovered, Constants.BADGE_TYPE_CAUSE, mCauseData));
+                AnalyticsEvent.create(Event.ACHIEVEMENTS_COUNT)
+                        .put("size", MainApplication.getInstance().getDbWrapper().getAchievedBadgeDao()
+                                .queryBuilder().list().size())
+                        .put("method", "stopWorkout")
+                        .put("class", TAG)
+                        .buildAndDispatch();
+                SyncHelper.uploadAchievement();
+            }
+            SyncHelper.uploadStreak();
+            if (SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_ACHIEVED_TITLE,
+                    false)) {
+                long titleId = giveTitle();
+                if (titleId > 0) {
+                    achievedBadgesData.getTitleIds().add(titleId);
+                }
+            }
+            handleWorkoutResult(result, achievedBadgesData);
 
             stopTimer();
             GoogleLocationTracker.getInstance().unregisterWorkout(this);
             currentlyTracking = false;
-            WorkoutServiceRetainerAlarm.cancelAlarm(this);
+//            WorkoutServiceRetainerAlarm.cancelAlarm(this);
             if (stepCounter != null) {
                 stepCounter.stop();
             }
@@ -304,23 +353,117 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void handleWorkoutResult(final WorkoutData result){
+    private long giveTitle() {
+        long returnId = 0;
+        List<Category> categories = MainApplication.getInstance().getDbWrapper()
+                .getCategoryDao().queryBuilder()
+                .where(CategoryDao.Properties.CategoryName.eq(mCauseData.getCategory())).list();
+        if (categories.size() > 0) {
+            int categoryId = categories.get(0).getCategoryId();
+            List<Title> titles = MainApplication.getInstance().getDbWrapper().getTitleDao().queryBuilder()
+                    .where(TitleDao.Properties.CategoryId.eq(categoryId))
+                    .orderAsc(TitleDao.Properties.GoalNStars).list();
 
-        if (result.isMockLocationDetected()){
-            EventBus.getDefault().post(new UpdateUiOnMockLocation());
+            /*List<AchievedBadge> achievedBadges = MainApplication.getInstance().getDbWrapper()
+                    .getAchievedBadgeDao().queryBuilder()
+                    .where(AchievedTitleDao.Properties.CategoryName.eq(mCauseData.getCategory()),
+                            AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID()))
+                    .list();
+            for(int i=0;i<achievedBadges.size();i++)
+            {
+                starCount += achievedBadges.get(i).getNoOfStarAchieved();
+            }*/
+            SQLiteDatabase database = MainApplication.getInstance().getDbWrapper().getDaoSession().getDatabase();
+            // Calculate amount_raised in interval
+            Cursor cursor = database.rawQuery("SELECT "
+                    + " SUM(" + AchievedBadgeDao.Properties.NoOfStarAchieved.columnName + ") AS no_of_stars"
+                    + " FROM " + AchievedBadgeDao.TABLENAME + " where "
+                    + AchievedBadgeDao.Properties.CauseName.columnName + " is '" + mCauseData.getTitle().replace("'","''") +
+                    "' and " + AchievedBadgeDao.Properties.UserId.columnName + " is "
+                    + MainApplication.getInstance().getUserID()+
+                    " and "+AchievedBadgeDao.Properties.BadgeType.columnName+" is '"+Constants.BADGE_TYPE_CAUSE+"'", new String[]{});
+            cursor.moveToFirst();
+
+            int starCount = cursor.getInt(cursor.getColumnIndex("no_of_stars"));
+
+            AchievedTitleDao achievedTitleDao = MainApplication.getInstance().getDbWrapper()
+                    .getAchievedTitleDao();
+            List<AchievedTitle> achievedTitles = achievedTitleDao.queryBuilder()
+                    .where(AchievedTitleDao.Properties.CategoryName.eq(mCauseData.getCategory())
+                            , AchievedTitleDao.Properties.UserId.eq(MainApplication.getInstance().getUserID())).list();
+            AchievedTitle achievedTitle = null;
+            if (achievedTitles.size() > 0) {
+                achievedTitle = achievedTitles.get(0);
+            }
+
+            int titlePos = -1;
+            int achievedTitlePos = -1;
+
+            for (int i = 0; i < titles.size(); i++) {
+                if (achievedTitle != null && achievedTitle.getTitleId() == titles.get(i).getTitleId()) {
+                    titlePos = i;
+                }
+                if (starCount >= titles.get(i).getGoalNStars()) {
+                    achievedTitlePos = i;
+                }
+            }
+            if (achievedTitle == null) {
+                if (achievedTitlePos > -1) {
+                    achievedTitle = getAchievedTitle(titles.get(achievedTitlePos));
+                }
+            } else if (achievedTitlePos > -1) {
+                if (titlePos < achievedTitlePos) {
+                    long id = achievedTitle.getId();
+                    achievedTitle = getAchievedTitle(titles.get(achievedTitlePos));
+                    achievedTitle.setId(id);
+                }
+            }
+            if (achievedTitle != null) {
+                returnId = achievedTitle.getTitleId();
+                if (achievedTitle.getId()!=null && achievedTitle.getId() > 0) {
+                    achievedTitleDao.update(achievedTitle);
+                } else {
+                    achievedTitleDao.insert(achievedTitle);
+                }
+                Utils.saveTitleIdToUserDetails(achievedTitle);
+                SyncHelper.uploadAchievementTitle();
+                SyncHelper.oneTimeUploadUserData();
+            }
+            if(titlePos==achievedTitlePos)
+                returnId = 0;
         }
-        else if (result.hasConsecutiveUsainBolts()){
-            if (result.isAutoFlagged()){
+
+        return returnId;
+    }
+
+    private AchievedTitle getAchievedTitle(Title title) {
+        AchievedTitle achievedTitle = new AchievedTitle();
+        achievedTitle.setUserId(MainApplication.getInstance().getUserID());
+        achievedTitle.setTitleId(title.getTitleId());
+        achievedTitle.setTitle(title.getTitle());
+        achievedTitle.setCategoryName(title.getCategory());
+        achievedTitle.setCategoryId(title.getCategoryId());
+        achievedTitle.setAchievedTime(new Date(ServerTimeKeeper.getInstance().getServerTimeAtSystemTime(Calendar.getInstance().getTimeInMillis())));
+        achievedTitle.setBadgeType(title.getBadgeType());
+        achievedTitle.setIsSync(false);
+        return achievedTitle;
+    }
+
+    private void handleWorkoutResult(final WorkoutData result, AchievedBadgesData achievedBadgesData) {
+        if (result.isMockLocationDetected()) {
+            EventBus.getDefault().post(new UpdateUiOnMockLocation());
+        } else if (result.hasConsecutiveUsainBolts()) {
+            if (result.isAutoFlagged()) {
                 EventBus.getDefault().post(new UsainBoltForceExit(true));
-            }else {
+            } else {
                 EventBus.getDefault().post(new UsainBoltForceExit(false));
             }
-        }else if (result.isAutoFlagged()){
+        } else if (result.isAutoFlagged()) {
             EventBus.getDefault().post(new UpdateUiOnAutoFlagWorkout(result.getAvgSpeed(),
                     Math.round(result.getRecordedTime())));
         }
 
-        sendWorkoutResultBroadcast(result);
+        sendWorkoutResultBroadcast(result, achievedBadgesData);
         // Do not perform activity detection until the next 24 hours, unless user starts workout
         ActivityDetector.getInstance().stopActivityDetection();
 
@@ -346,19 +489,19 @@ public class WorkoutService extends Service implements
                     readGoogleFitHistoryAndTriggerSync(result.copy());
                 }
             }).start();
-        }else {
+        } else {
             // Delete the files in which location data of all the batches of this workout was stored
-            for (int i=0; i< result.getBatches().size(); i++) {
+            for (int i = 0; i < result.getBatches().size(); i++) {
                 WorkoutBatch batch = result.getBatches().get(i);
-                if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())){
+                if (MainApplication.getContext().deleteFile(batch.getLocationDataFileName())) {
                     Logger.d(TAG, batch.getLocationDataFileName() + " was successfully deleted");
                 }
             }
         }
     }
 
-    private void readGoogleFitHistoryAndTriggerSync(WorkoutData result){
-        if (googleFitTracker != null){
+    private void readGoogleFitHistoryAndTriggerSync(WorkoutData result) {
+        if (googleFitTracker != null) {
             // Synchronously read estimated data and update the WorkoutData result object
             googleFitTracker.readAndStop(result);
             updateGoogleFitDetailsInSyncedWorkout(result);
@@ -369,7 +512,7 @@ public class WorkoutService extends Service implements
     }
 
 
-    public Properties getWorkoutBundle(){
+    public Properties getWorkoutBundle() {
         return WorkoutSingleton.getInstance().getWorkoutBundle();
     }
 
@@ -421,10 +564,10 @@ public class WorkoutService extends Service implements
     public void stepCounterReady() {
         Logger.d(TAG, "stepCounterReady");
         currentlyProcessingSteps = true;
-        if (isKitkatWithStepSensor(getApplicationContext())){
+        if (isKitkatWithStepSensor(getApplicationContext())) {
             SharedPrefsManager.getInstance().setString(Constants.PREF_TYPE_STEP_COUNTER,
                     StepCounter.TYPE_SENSOR_SERVICE);
-        }else {
+        } else {
             SharedPrefsManager.getInstance().setString(Constants.PREF_TYPE_STEP_COUNTER,
                     StepCounter.TYPE_GOOGLE_FIT);
         }
@@ -435,7 +578,7 @@ public class WorkoutService extends Service implements
     public void onStepCount(int deltaSteps) {
         if (tracker != null && tracker.isActive()) {
             tracker.feedSteps(deltaSteps);
-            if (stepCounter.getMovingAverageOfStepsPerSec() > 1){
+            if (stepCounter.getMovingAverageOfStepsPerSec() > 1) {
                 // User is stepping with average cadence of 1 step per sec for the past few (StepCounter.STEP_COUNT_READING_VALID_INTERVAL) secs
                 // Lets notify the ActivityDetector about it
                 ActivityDetector.getInstance().persistentMovementDetectedFromOutside();
@@ -446,8 +589,8 @@ public class WorkoutService extends Service implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MockLocationDetected mockLocationDetected) {
         Logger.d(TAG, "onEvent: MockLocationDetected");
-        try{
-            if (!WorkoutSingleton.getInstance().isMockLocationEnabled()){
+        try {
+            if (!WorkoutSingleton.getInstance().isMockLocationEnabled()) {
                 WorkoutSingleton.getInstance().mockLocationDetected();
                 pushFraudDataOnServer();
                 Logger.d(TAG, "MockLocation detected, Will readAndStop workout");
@@ -457,7 +600,7 @@ public class WorkoutService extends Service implements
                         WORKOUT_NOTIFICATION_DISABLE_MOCK_ID,
                         getString(R.string.notification_disable_mock_location));
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             Logger.e(TAG, "Problem while handling MockLocationDetected event: " + e.getMessage());
             e.printStackTrace();
         }
@@ -471,21 +614,21 @@ public class WorkoutService extends Service implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ResumeWorkoutEvent resumeWorkoutEvent) {
-        if (resume()){
+        if (resume()) {
             EventBus.getDefault().post(new UpdateUiOnWorkoutResumeEvent());
         }
     }
 
     @Override
     public void onGoogleFitStepCount(int deltaSteps) {
-        if (WorkoutSingleton.getInstance().getDataStore() != null){
+        if (WorkoutSingleton.getInstance().getDataStore() != null) {
             WorkoutSingleton.getInstance().getDataStore().addGoogleFitSteps(deltaSteps);
         }
     }
 
     @Override
     public void onGoogleFitDistanceUpdate(float deltaDistance) {
-        if (WorkoutSingleton.getInstance().getDataStore() != null){
+        if (WorkoutSingleton.getInstance().getDataStore() != null) {
             WorkoutSingleton.getInstance().getDataStore().addGoogleFitDistance(deltaDistance);
         }
     }
@@ -500,6 +643,7 @@ public class WorkoutService extends Service implements
             // Return this instance of LocalService so clients can call public methods
             return WorkoutService.this;
         }
+
     }
 
     @Override
@@ -516,18 +660,18 @@ public class WorkoutService extends Service implements
 
     @Override
     public synchronized void onLocationChanged(Location location) {
-        if (location == null){
+        if (location == null) {
             return;
         }
         Logger.i(TAG, "onLocationChanged with \n" + location.toString());
         cancelGpsInactiveNotification();
         handler.removeCallbacks(handleGpsInactivityRunnable);
         handler.postDelayed(handleGpsInactivityRunnable, ClientConfig.getInstance().GPS_INACTIVITY_NOTIFICATION_DELAY);
-        if(tracker != null && tracker.isRunning()) {
-            if (!ActivityDetector.getInstance().isStill()){
+        if (tracker != null && tracker.isRunning()) {
+            if (!ActivityDetector.getInstance().isStill()) {
                 // Process GPS fix only when the device is not Still
-                if (acceptedLocationFix == null){
-                    if (beginningLocationsRotatingQueue == null){
+                if (acceptedLocationFix == null) {
+                    if (beginningLocationsRotatingQueue == null) {
                         Logger.d(TAG, "Hunt for first accepted location begins");
                         beginningLocationsRotatingQueue = new CircularQueue<>(WORKOUT_BEGINNING_LOCATION_CIRCULAR_QUEUE_MAX_SIZE);
                         beginningLocationsRotatingQueue.add(location);
@@ -537,12 +681,12 @@ public class WorkoutService extends Service implements
                     } else {
                         // First fill
                         beginningLocationsRotatingQueue.add(location);
-                        if (beginningLocationsRotatingQueue.isFull()){
+                        if (beginningLocationsRotatingQueue.isFull()) {
                             Logger.d(TAG, "Rotating queue is full, will check if we can " +
                                     "accept the oldest location: "
                                     + beginningLocationsRotatingQueue.peekOldest().toString());
                             // Check if oldest location is a fit
-                            if (isOldestLocationAccepted()){
+                            if (isOldestLocationAccepted()) {
                                 Logger.d(TAG, "Oldest location accepted, will feed to tracker");
                                 acceptedLocationFix = beginningLocationsRotatingQueue.peekOldest();
                                 tracker.feedLocation(acceptedLocationFix);
@@ -551,23 +695,23 @@ public class WorkoutService extends Service implements
                     }
                 } else {
                     // Spike filter check
-                    if (!checkForSpike(acceptedLocationFix, location)){
+                    if (!checkForSpike(acceptedLocationFix, location)) {
                         tracker.feedLocation(location);
                         acceptedLocationFix = location;
                     }
                 }
-            }else {
+            } else {
                 Logger.d(TAG, "Will ignore the GPS fix because the device is STILL");
             }
         }
 
     }
 
-    private boolean isOldestLocationAccepted(){
-        synchronized (beginningLocationsRotatingQueue){
+    private boolean isOldestLocationAccepted() {
+        synchronized (beginningLocationsRotatingQueue) {
             Location oldest = beginningLocationsRotatingQueue.peekOldest();
-            for (int i=1; i<beginningLocationsRotatingQueue.getMaxSize(); i++){
-                if (checkForSpike(oldest, beginningLocationsRotatingQueue.getElemAtPosition(i))){
+            for (int i = 1; i < beginningLocationsRotatingQueue.getMaxSize(); i++) {
+                if (checkForSpike(oldest, beginningLocationsRotatingQueue.getElemAtPosition(i))) {
                     // There is a spike, must discard Oldest
                     return false;
                 }
@@ -578,28 +722,29 @@ public class WorkoutService extends Service implements
 
     /**
      * Simple spike filter which detects whether given couple of subsequent location fixes is having spike
+     *
      * @param loc1
      * @param loc2
      * @return
      */
-    public boolean checkForSpike(Location loc1, Location loc2){
+    public boolean checkForSpike(Location loc1, Location loc2) {
 
         float deltaDistance = loc1.distanceTo(loc2);
 
         // If distance is less than 35 meters then we will not perform spike filter check
-        if (deltaDistance < Config.PRIMARY_SPIKE_FILTER_CHECK_WAIVER_DISTANCE){
+        if (deltaDistance < Config.PRIMARY_SPIKE_FILTER_CHECK_WAIVER_DISTANCE) {
             return false;
         }
 
         long firstLocationTime = loc1.getTime();
-        if (LocationManager.NETWORK_PROVIDER.equals(loc1.getProvider())){
+        if (LocationManager.NETWORK_PROVIDER.equals(loc1.getProvider())) {
             // Location returned by NETWORK_PROVIDER
             // Converting it into servertime as timestamp returned by location object is system time stamp
             firstLocationTime = ServerTimeKeeper.getInstance()
                     .getServerTimeAtSystemTime(firstLocationTime);
         }
         long secondLocationTime = loc2.getTime();
-        if (LocationManager.NETWORK_PROVIDER.equals(loc2.getProvider())){
+        if (LocationManager.NETWORK_PROVIDER.equals(loc2.getProvider())) {
             // Location returned by NETWORK_PROVIDER
             // Converting it into servertime as timestamp returned by location object is system time stamp
             secondLocationTime = ServerTimeKeeper.getInstance()
@@ -622,12 +767,12 @@ public class WorkoutService extends Service implements
 
         // If recentGpsSpeed is above USAIN_BOLT_GPS_SPEED_LIMIT (21 km/hr) then user must be in a vehicle
         if (ActivityDetector.getInstance().isIsInVehicle()
-                || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT){
+                || recentGpsSpeed > ClientConfig.getInstance().USAIN_BOLT_GPS_SPEED_LIMIT) {
             spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_IN_VEHICLE;
             thresholdApplied = "in_vehicle";
-        }else {
-            if ( ActivityDetector.getInstance().isOnFoot() ||
-                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)){
+        } else {
+            if (ActivityDetector.getInstance().isOnFoot() ||
+                    (isCountingSteps() && stepCounter != null && stepCounter.getMovingAverageOfStepsPerSec() >= ClientConfig.getInstance().MIN_CADENCE_FOR_WALK)) {
                 // Can make a safe assumption that the person is on foot
                 spikeFilterSpeedThreshold = ClientConfig.getInstance().SPIKE_FILTER_SPEED_THRESHOLD_ON_FOOT;
                 thresholdApplied = "on_foot";
@@ -639,13 +784,13 @@ public class WorkoutService extends Service implements
 
         // If speed is greater than threshold, then it is considered as GPS spike
 
-        if (deltaSpeed > spikeFilterSpeedThreshold){
+        if (deltaSpeed > spikeFilterSpeedThreshold) {
             Logger.e(TAG, "Detected GPS spike, between locations loc1:\n" + loc1.toString()
-                        + "\n, loc2:\n" + loc2.toString()
-                        + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
+                    + "\n, loc2:\n" + loc2.toString()
+                    + "\n Spike distance = " + deltaDistance + " meters in " + deltaTime + " seconds");
             tracker.incrementGpsSpike();
             return true;
-        }else {
+        } else {
             return false;
         }
 
@@ -667,7 +812,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public void onGpsEnabled() {
-        if (tracker != null && tracker.isPaused()){
+        if (tracker != null && tracker.isPaused()) {
             Logger.i(TAG, "onGpsEnabled: Gps enabled while workout was ongoing, user can resume the workout now");
             // User can resume the workout now, if it was paused because of disabled GPS.
             resume();
@@ -680,7 +825,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public void onGpsDisabled() {
-        if (tracker != null && tracker.isRunning()){
+        if (tracker != null && tracker.isRunning()) {
             Logger.i(TAG, "onGpsDisabled: Gps disabled while workout was ongoing, will pause the workout");
             // Pause workout
             Bundle bundle = new Bundle();
@@ -710,8 +855,16 @@ public class WorkoutService extends Service implements
         sendBroadcast(bundle);
         updateStickyNotification();
         float totalDistanceKmsTwoDecimal = Float.parseFloat(Utils.formatToKmsWithTwoDecimal(totalDistance));
-        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= ClientConfig.getInstance().MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT){
+        if (Math.abs(totalDistanceKmsTwoDecimal - distanceInKmsOnLastUpdateEvent) >= ClientConfig.getInstance().MIN_DISPLACEMENT_FOR_WORKOUT_UPDATE_EVENT) {
             // Send event only when the distance counter increment by 100 meters
+            int batLevel = -1;
+            boolean batterySaver = false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+                batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                batterySaver = powerManager.isPowerSaveMode();
+            }
             AnalyticsEvent.create(Event.ON_WORKOUT_UPDATE)
                     .addBundle(getWorkoutBundle())
                     .put("delta_distance", deltaDistance) // in meters
@@ -719,14 +872,17 @@ public class WorkoutService extends Service implements
                     .put("delta_speed", deltaSpeed) // in km/hrs
                     .put("activity", ActivityDetector.getInstance().getCurrentActivity())
                     .put("recent_speed", getCurrentSpeed())
+                    .put("bat_level", batLevel)
+                    .put("battery_saver_on", batterySaver)
+                    .put("android_os", Build.VERSION.SDK_INT)
                     .buildAndDispatch();
             distanceInKmsOnLastUpdateEvent = totalDistanceKmsTwoDecimal;
             cancelWorkoutNotification(WORKOUT_NOTIFICATION_STILL_ID);
-            if (tracker != null){
+            if (tracker != null) {
                 tracker.incrementNumUpdateEvents();
             }
         }
-        if (totalDistanceKmsTwoDecimal > Config.MIN_DISTANCE_FOR_FEEDBACK_POPUP){
+        if (totalDistanceKmsTwoDecimal > Config.MIN_DISTANCE_FOR_FEEDBACK_POPUP) {
             WorkoutSingleton.getInstance().setToShowFeedbackDialog(true);
         }
     }
@@ -750,7 +906,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public float getMovingAverageOfStepsPerSec() {
-        if (stepCounter != null){
+        if (stepCounter != null) {
             return stepCounter.getMovingAverageOfStepsPerSec();
         }
         return -1;
@@ -797,7 +953,7 @@ public class WorkoutService extends Service implements
                     .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                     .buildAndDispatch();
         }
-        if (stepCounter != null ){
+        if (stepCounter != null) {
             stepCounter.pause();
         }
         updateStickyNotification();
@@ -807,13 +963,13 @@ public class WorkoutService extends Service implements
     @Override
     public boolean resume() {
         Logger.i(TAG, "resume");
-        if (GoogleLocationTracker.getInstance().isFetchingLocation()){
+        if (GoogleLocationTracker.getInstance().isFetchingLocation()) {
             Logger.d(TAG, "resume: LocationFetching going on");
             if (vigilanceTimer != null) {
                 vigilanceTimer.resumeTimer();
             }
             if (tracker != null && !tracker.isRunning()) {
-                synchronized (this){
+                synchronized (this) {
                     acceptedLocationFix = null;
                     beginningLocationsRotatingQueue = null;
                 }
@@ -826,20 +982,20 @@ public class WorkoutService extends Service implements
                         .put("num_update_events", WorkoutSingleton.getInstance().getDataStore().getNumUpdateEvents())
                         .buildAndDispatch();
             }
-            if (stepCounter != null){
+            if (stepCounter != null) {
                 stepCounter.resume();
             }
             updateStickyNotification();
             cancelAllWorkoutNotifications();
             return true;
-        }else {
+        } else {
             Logger.d(TAG, "resume: need to initiate location fetching");
             GoogleLocationTracker.getInstance().startLocationTracking(true);
             return false;
         }
     }
 
-    private void cancelAllWorkoutNotifications(){
+    private void cancelAllWorkoutNotifications() {
         Logger.d(TAG, "cancelAllWorkoutNotifications");
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         cancelGpsInactiveNotification();
@@ -850,7 +1006,7 @@ public class WorkoutService extends Service implements
         manager.cancel(WORKOUT_NOTIFICATION_DISABLE_MOCK_ID);
     }
 
-    public static void cancelWorkoutNotification(int notificationId){
+    public static void cancelWorkoutNotification(int notificationId) {
         Logger.d(TAG, "cancelWorkoutNotification with id = " + notificationId);
         NotificationManager manager = (NotificationManager) MainApplication.getContext()
                 .getSystemService(NOTIFICATION_SERVICE);
@@ -872,13 +1028,13 @@ public class WorkoutService extends Service implements
         WorkoutSingleton.getInstance().incrementUsainBoltsCounter();
         pushFraudDataOnServer();
 
-        if (!WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()){
+        if (!WorkoutSingleton.getInstance().hasConsecutiveUsainBolts()) {
             pause(PAUSE_REASON_USAIN_BOLT);
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.KEY_PAUSE_WORKOUT_PROBLEM, problem);
             bundle.putInt(Constants.WORKOUT_SERVICE_BROADCAST_CATEGORY,
                     Constants.BROADCAST_PAUSE_WORKOUT_CODE);
-            if (!TextUtils.isEmpty(distReductionString)){
+            if (!TextUtils.isEmpty(distReductionString)) {
                 bundle.putString(Constants.KEY_USAIN_BOLT_DISTANCE_REDUCED, distReductionString);
             }
             sendBroadcast(bundle);
@@ -888,7 +1044,7 @@ public class WorkoutService extends Service implements
                     getString(R.string.notification_usain_bolt),
                     getString(R.string.notification_action_stop)
             );
-        }else {
+        } else {
             // Force stop workout, show notif, And blocking exit popup on UI
             stopWorkout();
             MainApplication.showRunNotification(getString(R.string.notification_usain_bolt_force_exit_title),
@@ -897,10 +1053,10 @@ public class WorkoutService extends Service implements
         }
     }
 
-    private void pushFraudDataOnServer(){
+    private void pushFraudDataOnServer() {
         Logger.d(TAG, "pushFraudDataOnServer");
         UserDetails userDetails = MainApplication.getInstance().getUserDetails();
-        if (userDetails == null){
+        if (userDetails == null) {
             Logger.e(TAG, "Can't push fraud data as MemberDetails are not present");
             return;
         }
@@ -931,7 +1087,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public float getTotalDistanceCoveredInMeters() {
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             return tracker.getTotalDistanceCovered();
         }
         return 0;
@@ -939,7 +1095,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public long getWorkoutElapsedTimeInSecs() {
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             long elapsedTime = tracker.getElapsedTimeInSecs();
             return elapsedTime;
         }
@@ -948,7 +1104,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public int getTotalStepsInWorkout() {
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             return tracker.getTotalSteps();
         }
         return 0;
@@ -956,7 +1112,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public float getCurrentSpeed() {
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             return tracker.getCurrentSpeed();
         }
         return 0;
@@ -964,7 +1120,7 @@ public class WorkoutService extends Service implements
 
     @Override
     public float getAvgSpeed() {
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             return tracker.getAvgSpeed();
         }
         return 0;
@@ -986,11 +1142,11 @@ public class WorkoutService extends Service implements
     private void updateStickyNotification() {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (tracker != null && tracker.isActive()){
+        if (tracker != null && tracker.isActive()) {
             // This try catch bug is to avoid crash due to runtimeexception
-            try{
+            try {
                 mNotificationManager.notify(WORKOUT_TRACK_NOTIFICATION_ID, getForegroundNotificationBuilder().build());
-            }catch (RuntimeException rte){
+            } catch (RuntimeException rte) {
                 rte.printStackTrace();
                 Crashlytics.logException(rte);
                 Logger.e(TAG, "RuntimeException while updating sticky notification");
@@ -1006,13 +1162,13 @@ public class WorkoutService extends Service implements
         String pauseResumeAction, pauseResumeLabel, contentTitle;
         int pauseResumeIntent;
         int pauseResumeDrawable;
-        if (tracker.isRunning()){
+        if (tracker.isRunning()) {
             pauseResumeAction = getString(R.string.notification_action_pause);
             pauseResumeLabel = getString(R.string.pause);
             contentTitle = getString(R.string.impact_with_sponsor, mCauseData.getSponsor().getName());
             pauseResumeIntent = MainActivity.INTENT_PAUSE_RUN;
             pauseResumeDrawable = R.drawable.ic_pause_black_24px;
-        }else {
+        } else {
             pauseResumeAction = getString(R.string.notification_action_resume);
             pauseResumeLabel = getString(R.string.resume);
             contentTitle = getString(R.string.paused);
@@ -1023,14 +1179,22 @@ public class WorkoutService extends Service implements
         pauseResumeIntent.setAction(pauseResumeAction);
         PendingIntent pendingIntentPauseResume = PendingIntent.getBroadcast(getContext(), 100, pauseResumeIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);*/
+        NotificationCompat.Builder mBuilder =null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mBuilder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.channel_description_workout),
+                    getContext().getString(R.string.channel_name_workout), false);
+        }else
+        {
+            mBuilder = new NotificationCompat.Builder(this);
+        }
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setContentTitle(contentTitle)
+
+            mBuilder.setContentTitle(contentTitle)
                         .setContentText(amountString
                                 + ((getWorkoutElapsedTimeInSecs() >= 60)
-                                        ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
-                                        : "")
+                                ? " raised in " + Utils.secondsToHoursAndMins((int) getWorkoutElapsedTimeInSecs())
+                                +" with "+UnitsManager.formatToMyDistanceUnitWithTwoDecimal(getTotalDistanceCoveredInMeters())+" "+UnitsManager.getDistanceLabel()
+                                : "")
                         )
                         .setSmallIcon(getNotificationIcon())
                         .setColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue))
@@ -1039,9 +1203,9 @@ public class WorkoutService extends Service implements
                         .setOngoing(true)
                         .setVisibility(1);
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
-            mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel , MainApplication.getInstance().createNotificationActionIntent(pauseResumeIntent,pauseResumeAction))
-                    .addAction(R.drawable.ic_stop_black_24px, "Stop" , MainApplication.getInstance().createNotificationActionIntent(MainActivity.INTENT_STOP_RUN,getString(R.string.notification_action_stop)));
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            mBuilder.addAction(pauseResumeDrawable, pauseResumeLabel, MainApplication.getInstance().createNotificationActionIntent(pauseResumeIntent, pauseResumeAction))
+                    .addAction(R.drawable.ic_stop_black_24px, "Stop", MainApplication.getInstance().createNotificationActionIntent(MainActivity.INTENT_STOP_RUN, getString(R.string.notification_action_stop)));
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1054,14 +1218,14 @@ public class WorkoutService extends Service implements
 
     private Bitmap largeIcon;
 
-    private Bitmap getLargeIcon(){
-        if (largeIcon == null){
+    private Bitmap getLargeIcon() {
+        if (largeIcon == null) {
             largeIcon = BitmapFactory.decodeResource(getBaseContext().getResources(), R.mipmap.ic_launcher);
         }
         return largeIcon;
     }
 
-    private void stopTimer(){
+    private void stopTimer() {
         handler.removeCallbacks(notificationUpdateTimer);
     }
 
@@ -1074,20 +1238,20 @@ public class WorkoutService extends Service implements
         }
     };
 
-    private void playVoiceUpdate(){
+    private void playVoiceUpdate() {
         WorkoutDataStore dataStore = WorkoutSingleton.getInstance().getDataStore();
         if (dataStore != null
                 && !SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_VOICE_UPDATES)
-                && dataStore.isWorkoutRunning()){
+                && dataStore.isWorkoutRunning()) {
             int nextVoiceUpdateAt = dataStore.getNextVoiceUpdateScheduledAt();
             Logger.d(TAG, "nextVoiceUpdateAt = " + nextVoiceUpdateAt);
-            if (dataStore.getElapsedTime() >= nextVoiceUpdateAt){
+            if (dataStore.getElapsedTime() >= nextVoiceUpdateAt) {
                 final String toSpeak = getVoiceUpdateMessage();
 
                 textToSpeech = new TTS(getApplicationContext(), new TTS.InitCallback() {
                     @Override
                     public void initSuccess(TTS tts) {
-                        if (WorkoutSingleton.getInstance().getDataStore() != null){
+                        if (WorkoutSingleton.getInstance().getDataStore() != null) {
                             textToSpeech.queueSpeech(toSpeak);
                             WorkoutSingleton.getInstance().getDataStore().updateAfterVoiceUpdate();
                         }
@@ -1109,7 +1273,7 @@ public class WorkoutService extends Service implements
         return getString(R.string.impact_voice_update_text,
                 UnitsManager.impactToVoice(rupees),
                 UnitsManager.distanceToVoice(distance),
-                Utils.secondsToVoiceUpdate((int)getWorkoutElapsedTimeInSecs()));
+                Utils.secondsToVoiceUpdate((int) getWorkoutElapsedTimeInSecs()));
 
     }
 
@@ -1124,14 +1288,14 @@ public class WorkoutService extends Service implements
             // GoogleLocationTracker has not sent GPS fix since a long time, need to notify the user about it
             // But will do it only when user is on the move on foot
             Logger.d(TAG, "Not receiving GPS updates for quite sometime now");
-            if ( ActivityDetector.getInstance().isOnFoot()
-                    || stepCounter.getMovingAverageOfStepsPerSec() > ClientConfig.getInstance().MIN_CADENCE_FOR_WALK){
+            if (ActivityDetector.getInstance().isOnFoot()
+                    || stepCounter.getMovingAverageOfStepsPerSec() > ClientConfig.getInstance().MIN_CADENCE_FOR_WALK) {
                 notifyUserAboutGpsInactivity();
             }
         }
     };
 
-    public void notifyUserAboutGpsInactivity(){
+    public void notifyUserAboutGpsInactivity() {
         MainApplication.showRunNotification(
                 getString(R.string.notification_gps_inactivity_title),
                 WORKOUT_NOTIFICATION_GPS_INACTIVE_ID,
@@ -1147,7 +1311,7 @@ public class WorkoutService extends Service implements
     }
 
     @Override
-    public void notifyUserAboutBadGps(){
+    public void notifyUserAboutBadGps() {
         MainApplication.showRunNotification(
                 getString(R.string.notification_bad_gps_title),
                 WORKOUT_NOTIFICATION_BAD_GPS_ID,
@@ -1165,15 +1329,15 @@ public class WorkoutService extends Service implements
     @Override
     public void cancelBadGpsNotification() {
         cancelWorkoutNotification(WORKOUT_NOTIFICATION_BAD_GPS_ID);
-        if (WorkoutSingleton.getInstance().getGpsState() == GPS_STATE_BAD){
+        if (WorkoutSingleton.getInstance().getGpsState() == GPS_STATE_BAD) {
             WorkoutSingleton.getInstance().setGpsState(GPS_STATE_OK);
             EventBus.getDefault().post(new GpsStateChangeEvent());
         }
     }
 
-    public void cancelGpsInactiveNotification(){
+    public void cancelGpsInactiveNotification() {
         cancelWorkoutNotification(WORKOUT_NOTIFICATION_GPS_INACTIVE_ID);
-        if (WorkoutSingleton.getInstance().getGpsState() == GPS_STATE_INACTIVE){
+        if (WorkoutSingleton.getInstance().getGpsState() == GPS_STATE_INACTIVE) {
             WorkoutSingleton.getInstance().setGpsState(GPS_STATE_OK);
             EventBus.getDefault().post(new GpsStateChangeEvent());
         }

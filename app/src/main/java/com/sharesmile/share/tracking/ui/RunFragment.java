@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.event.GpsStateChangeEvent;
 import com.sharesmile.share.tracking.event.UpdateUiOnAutoFlagWorkout;
 import com.sharesmile.share.tracking.event.UpdateUiOnMockLocation;
@@ -91,7 +92,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
 
     public abstract void updateTimeView(String newTime);
 
-    public abstract void onWorkoutResult(WorkoutData data);
+    public abstract void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData);
 
     public void showUpdate(float speed, float distanceCovered, int elapsedTimeInSecs){
         Logger.d(TAG, "showUpdate: distanceCovered = " + distanceCovered
@@ -112,7 +113,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         handler.removeCallbacks(timer);
         handler.postDelayed(timer, TIMER_TICK);
         isTimerRunning = true;
-        updateTimeView(Utils.secondsToHHMMSS(initialSecs));
+        updateTimeView(Utils.secondsToHHMMSS(initialSecs,false));
     }
 
     protected abstract void onEndRun();
@@ -330,7 +331,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         myActivity.continuedRun();
         if (!isRunning()){
             // If the run is in paused state then don't start timer
-            updateTimeView(Utils.secondsToHHMMSS(elapsedTImeInSecs));
+            updateTimeView(Utils.secondsToHHMMSS(elapsedTImeInSecs,false));
         }else {
             // Workout is in running state
             startTimer(elapsedTImeInSecs);
@@ -364,7 +365,7 @@ public abstract class RunFragment extends BaseFragment implements View.OnClickLi
         public void run() {
             if (isAttachedToActivity()){
                 int elapsedTimeInSecs = (int) myActivity.getElapsedTimeInSecs();
-                updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs));
+                updateTimeView(Utils.secondsToHHMMSS(elapsedTimeInSecs,false));
             }
             handler.postDelayed(this, TIMER_TICK);
         }

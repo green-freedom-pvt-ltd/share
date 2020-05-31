@@ -4,7 +4,7 @@
     android:id="@+id/activity_impact_league"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="?actionBarSize"
+    android:paddingTop="?android:attr/actionBarSize"
     tools:context="activities.ImpactLeagueActivity">
 
 

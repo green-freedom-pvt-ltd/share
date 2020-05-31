@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.sharesmile.share.R;
 import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.config.Config;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
 import com.sharesmile.share.tracking.models.WorkoutData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.utils.Utils;
@@ -87,7 +88,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
     }
 
     @Override
-    public void onWorkoutResult(WorkoutData data) {
+    public void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData) {
         workoutData = data;
         Logger.d(TAG, "onWorkoutResult:\n " + workoutData);
         liveDataContainer.setVisibility(View.GONE);
@@ -95,7 +96,7 @@ public class TestRunFragment extends RunFragment implements View.OnClickListener
 
         String distance = String.format("%1$,.2f", (workoutData.getDistance() / 1000)) + " km";
         String avgSpeed = String.format("%1$,.2f", workoutData.getAvgSpeed() * 3.6) + " km/hr";
-        String time = Utils.secondsToHHMMSS((int) workoutData.getElapsedTime());
+        String time = Utils.secondsToHHMMSS((int) workoutData.getElapsedTime(),false);
         totalDistanceView.setText(distance);
         avgSpeedView.setText(avgSpeed);
         totalTimeView.setText(time);

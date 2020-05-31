@@ -153,9 +153,6 @@
                             </FrameLayout>
                         </LinearLayout>
                     </LinearLayout>
-
-
-
                 </LinearLayout>
                 <LinearLayout
                     android:orientation="vertical"
@@ -189,7 +186,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="50dp"
                         android:layout_marginBottom="19dp"
-                        tools:listitem="@layout/row_achievements"
+                        tools:listitem="@layout/rv_achievements_row_item"
                         android:orientation="horizontal"
                         />
                 </LinearLayout>
@@ -325,7 +322,10 @@
                     android:id="@+id/bt_see_runs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="25dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
                     android:background="@color/white"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="6dp"
@@ -335,7 +335,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="12sp"
-                        android:text="@string/see_workouts"
+                        android:text="@string/workout_history"
                         android:layout_gravity="center"
                         android:textAllCaps="true"
                         android:textColor="@color/clr_32"

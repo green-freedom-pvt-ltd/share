@@ -1,152 +1,571 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/grey_f2">
 
-    <LinearLayout
-        android:id="@+id/ll_profile_stats"
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/workout_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/stats_sharable_container"
+            android:id="@+id/ll_profile_stats"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="445"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/stats_sharable_container"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:layout_weight="100">
-
-                <com.sharesmile.share.views.CircularImageView
-                    android:id="@+id/img_profile_stats"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:scaleType="fitCenter"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_toRightOf="@id/img_profile_stats"
-                    android:paddingLeft="13dp"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingBottom="25dp"
+                    android:paddingTop="25dp">
+
+                    <com.sharesmile.share.views.CircularImageView
+                        android:id="@+id/img_profile_stats"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="11dp"
+                        android:scaleType="fitCenter" />
+
+                    <com.sharesmile.share.views.LBKTextView
+                        android:id="@+id/tv_profile_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dp"
+                        android:maxLines="2"
+                        android:textColor="@color/black_64"
+                        android:textSize="20sp"
+                        tools:text="Ankit Maheshwari" />
+
+                    <com.sharesmile.share.views.LBTextView
+                        android:id="@+id/tv_profile_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:maxLines="2"
+                        android:textColor="@color/black_64"
+                        android:textSize="12sp"
+                        tools:text="EDUCATION MASTER, CAPTAIN PLANET"
+
+                        />
 
                     <com.sharesmile.share.views.MSBTextView
-                        android:id="@+id/tv_profile_name"
+                        android:id="@+id/tv_impact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="\u20B9 657"
+                        android:textColor="@color/orange"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="17.5sp"
-                        android:maxLines="2"
-                        android:textColor="@color/black_54"
-                        android:text="Ankit Maheshwari"/>
+                        android:layout_marginTop="20dp"
+                        android:gravity="center"
+                        android:weightSum="1">
+
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.25"
+                            android:gravity="center">
+
+                            <com.sharesmile.share.views.LBTextView
+                                android:id="@+id/tv_streak"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableLeft="@drawable/streak_icon"
+                                android:drawablePadding="5dp"
+                                android:gravity="center"
+                                android:padding="5dp"
+                                android:textColor="@color/streak_orange"
+                                android:textSize="18sp"
+                                tools:text="18" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.01"
+                            android:background="@color/grey_f2"></LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.74"
+                            android:gravity="center"
+                            android:weightSum="1">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.8"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <com.sharesmile.share.views.LBTextView
+                                        android:id="@+id/tv_level_num"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:text="Level 3"
+                                        android:textColor="@color/black_54"
+                                        android:textSize="11sp" />
+
+                                    <com.sharesmile.share.views.LRTextView
+                                        android:id="@+id/tv_level"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:layout_alignParentRight="true"
+                                        android:text="500km"
+                                        android:textColor="@color/black_53"
+                                        android:textSize="9sp" />
+                                </RelativeLayout>
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="7dp"
+                                    android:layout_marginTop="3dp">
+
+                                    <RelativeLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/rounded_rectangle_grey"></RelativeLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal"
+                                        android:weightSum="1">
+
+                                        <View
+                                            android:id="@+id/level_progress_bar"
+                                            android:layout_width="0dp"
+                                            android:layout_height="match_parent"
+                                            android:layout_weight="0.1"
+                                            android:background="@drawable/rounded_rectangle_blue_green_gradient"></View>
+
+                                    </LinearLayout>
+                                </FrameLayout>
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/white"
+                    android:orientation="vertical">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp">
+                        android:layout_marginLeft="25dp"
+                        android:layout_marginRight="23dp"
+                        android:layout_marginTop="45dp">
 
                         <com.sharesmile.share.views.LBTextView
-                            android:id="@+id/tv_level_min"
+                            style="@style/profile_stats_header"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="8sp"
-                            android:text="250km"
-                            android:layout_alignParentLeft="true"
-                            android:textColor="@color/black_50"/>
+                            android:text="@string/profile_stats_achievements" />
 
                         <com.sharesmile.share.views.LBTextView
-                            android:id="@+id/tv_level_max"
+                            android:id="@+id/see_in_progress_badges"
+                            style="@style/profile_stats_header_right"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="8sp"
-                            android:text="500km"
-                            android:layout_alignParentRight="true"
-                            android:textColor="@color/black_50"/>
+                            android:padding="5dp"
+                            android:text="@string/profile_stats_achievements_in_progress" />
                     </RelativeLayout>
-
-                    <FrameLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="7dp"
-                        android:layout_marginTop="2dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/rounded_rectangle_grey">
-                        </RelativeLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal"
-                            android:weightSum="1">
-
-                            <View
-                                android:id="@+id/level_progress_bar"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/rounded_rectangle_blue_green_gradient"
-                                android:layout_weight="0.1">
-                            </View>
-
-                        </LinearLayout>
-
-                    </FrameLayout>
-
-                    <com.sharesmile.share.views.MSBTextView
-                        android:id="@+id/tv_level_num"
+                        android:layout_height="wrap_content">
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_achievements"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="10sp"
-                        android:text="Level 3"
-                        android:layout_marginTop="3.5dp"
-                        android:textColor="@color/black_54"/>
+                        android:layout_marginBottom="19dp"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginLeft="23dp"
+                        android:layout_marginRight="23dp"
+                        android:orientation="horizontal"
+                        tools:listitem="@layout/rv_achievements_row_item"
+                        />
+                    <include layout="@layout/rv_achievements_row_item"
+                        android:visibility="invisible"
+                        />
+                        <ProgressBar
+                            android:id="@+id/progress_bar"
+                            android:layout_centerInParent="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginBottom="6dp"
+                android:background="@color/white"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginTop="47dp">
+
+                    <com.sharesmile.share.views.LBTextView
+                        style="@style/profile_stats_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_stats_my_stats" />
+
+                    <LinearLayout
+                        android:id="@+id/stats_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical">
+
+                        <com.sharesmile.share.views.LBTextView
+                            android:id="@+id/tv_my_stats_daily"
+                            style="@style/profile_stats_header_right"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_my_stats_daily"
+                            android:text="@string/profile_stats_daily"
+                            android:textColor="@color/colorPrimaryDark" />
+
+                        <com.sharesmile.share.views.LBTextView
+                            android:id="@+id/tv_my_stats_weekly"
+                            style="@style/profile_stats_header_right"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_my_stats_weekly"
+                            android:text="@string/profile_stats_weekly"
+                            android:textColor="@color/colorPrimaryDark" />
+
+                        <com.sharesmile.share.views.LBTextView
+                            android:id="@+id/tv_my_stats_monthly"
+                            style="@style/profile_stats_header_right"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_my_stats_monthly"
+                            android:text="@string/profile_stats_monthly"
+                            android:textColor="@color/colorPrimaryDark" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
-            </RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/overlay_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/stats_view_pager"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="24dp"
+                        android:gravity="center_vertical"
+
+                        >
+
+                        <com.sharesmile.share.views.MSBTextView
+                            android:id="@+id/tv_stats_impact"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="\u20B9 0"
+                            android:textColor="@color/clr_0288aa"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="40dp"
+                            android:gravity="right"
+                            android:orientation="vertical">
+
+                            <com.sharesmile.share.views.LBTextView
+                                android:id="@+id/tv_stats_workout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/black_57"
+                                android:textSize="20sp" />
+
+                            <com.sharesmile.share.views.LBTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/profile_stats_workouts"
+                                android:textColor="@color/clr_a0"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:orientation="vertical">
+
+                            <com.sharesmile.share.views.LBTextView
+                                android:id="@+id/tv_stats_kms"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/black_57"
+                                android:textSize="20sp" />
+
+                            <com.sharesmile.share.views.LBTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/profile_stats_kms"
+                                android:textColor="@color/clr_a0"
+                                android:textSize="12sp"
+                                android:id="@+id/tv_stats_kms_unit"
+                                />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/graph_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ProgressBar
+                            android:id="@+id/progress_bar_stats_graph"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true" />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_daily"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/tv_last_week"
+                            android:layout_marginBottom="29dp"
+                            android:layout_marginTop="12dp"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:visibility="invisible" />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_weekly"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/tv_last_week"
+                            android:layout_marginBottom="29dp"
+                            android:layout_marginTop="12dp"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:visibility="invisible" />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_monthly"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/tv_last_week"
+                            android:layout_marginBottom="29dp"
+                            android:layout_marginTop="12dp"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:visibility="invisible" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="345">
-            </android.support.v4.view.ViewPager>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:background="@color/white"
+                android:orientation="vertical"
+                >
 
-        </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="23dp"
+                    android:layout_marginTop="45dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="70">
+                    <com.sharesmile.share.views.LBTextView
+                        style="@style/profile_stats_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_stats_charity_overview" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_charity_overview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="27dp"
+                    android:layout_marginTop="34dp" />
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/charity_overview_progressbar"
+                        />
+                    <include layout="@layout/rv_charity_overview_profile_row"
+                        android:visibility="invisible"
+                        />
+                </RelativeLayout>
+            </LinearLayout>
 
-            <android.support.v7.widget.CardView
+            <LinearLayout
                 android:id="@+id/bt_see_runs"
-                android:layout_width="280dp"
-                android:layout_height="44dp"
-                android:layout_centerInParent="true"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="3dp">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:padding="25dp">
 
-                <com.sharesmile.share.views.MSBTextView
+                <com.sharesmile.share.views.LBTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:text="@string/see_workouts"
                     android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="@string/workout_history"
                     android:textAllCaps="true"
-                    android:textColor="@color/black_57"/>
-            </android.support.v7.widget.CardView>
+                    android:textColor="@color/clr_32"
+                    android:textSize="12sp" />
 
-        </RelativeLayout>
+                <com.sharesmile.share.views.LBTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text=">"
+                    android:textAllCaps="true"
+                    android:textColor="@color/clr_32"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/no_workout_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.sharesmile.share.views.CircularImageView
+            android:id="@+id/img_profile_stats_2"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="11dp"
+            android:layout_marginTop="25dp"
+            android:scaleType="fitCenter" />
+
+        <com.sharesmile.share.views.LBKTextView
+            android:id="@+id/tv_profile_name_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            android:maxLines="2"
+            android:textColor="@color/black_64"
+            android:textSize="20sp"
+            tools:text="Ankit Maheshwari" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/no_workout_profile" />
+        </LinearLayout>
+
+        <com.sharesmile.share.views.LBTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:text="@string/no_workout_profile_txt"
+            android:textColor="@color/clr_5d"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <LinearLayout
+                android:id="@+id/btn_lets_run"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="52dp"
+                android:layout_marginRight="52dp"
+                android:background="@drawable/rounded_corner"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.sharesmile.share.views.MSBTextView
+                    android:id="@+id/tv_lets_run"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/let_go"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/iv_lets_run"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="8dp"
+                    android:src="@drawable/lets_go_icon" />
+
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <ProgressBar
@@ -155,5 +574,5 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 </FrameLayout>

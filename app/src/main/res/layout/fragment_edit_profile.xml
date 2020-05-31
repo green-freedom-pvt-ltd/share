@@ -112,14 +112,57 @@
             android:id="@+id/et_body_weight_kg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="9dp"
             android:inputType="number"
-            style="@style/edit_profile_text_style_value"/>
+            style="@style/edit_profile_text_style_value"
+            android:focusableInTouchMode="false"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="13dp"
+            android:layout_marginTop="8dp"
+            android:background="#c0c0c0" />
+
+        <com.sharesmile.share.views.MLTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Body Height"
+            style="@style/edit_profile_text_style_label" />
+        <LinearLayout
+            android:id="@+id/lt_body_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            >
+            <EditText
+                android:focusableInTouchMode="false"
+                android:id="@+id/et_body_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:inputType="number"
+                style="@style/edit_profile_text_style_value"/>
+            <EditText
+                android:focusableInTouchMode="false"
+                android:id="@+id/et_body_height_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:inputType="number"
+                style="@style/edit_profile_text_style_value"
+                android:layout_marginLeft="3dp"
+                />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
             android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
@@ -133,14 +176,16 @@
             android:id="@+id/et_profile_general_birthday"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:hint="DD-MM-YYYY "
+            android:layout_marginTop="9dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:hint="DD-MM-YYYY"
             style="@style/edit_profile_text_style_value" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="13dp"
+            android:layout_marginTop="8dp"
             android:background="#c0c0c0" />
 
         <com.sharesmile.share.views.MLTextView
@@ -154,19 +199,22 @@
             android:id="@+id/gender_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
-            <RadioButton
+            <com.sharesmile.share.views.LBTextView
                 android:id="@+id/rb_share_male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
                 android:text="Male"
-                android:textColor="@color/greyish_brown_two"/>
+                android:textColor="@color/greyish_brown_two"
+                android:drawableLeft="@drawable/radio_unselected"
+                android:drawablePadding="10dp"
+                />
 
-            <RadioButton
+            <com.sharesmile.share.views.LBTextView
                 android:id="@+id/rb_share_female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -174,7 +222,10 @@
                 android:layout_toRightOf="@+id/rb_share_male"
                 android:checked="false"
                 android:text="Female"
-                android:textColor="@color/greyish_brown_two"/>
+                android:textColor="@color/greyish_brown_two"
+                android:drawableLeft="@drawable/radio_unselected"
+                android:drawablePadding="10dp"
+                />
         </RadioGroup>
 
 

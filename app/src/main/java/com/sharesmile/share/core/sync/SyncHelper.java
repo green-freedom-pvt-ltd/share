@@ -9,16 +9,16 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.gson.Gson;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.User;
 import com.sharesmile.share.UserDao;
-import com.sharesmile.share.core.config.ClientConfig;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.tracking.workout.data.model.FraudData;
-import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.helpcenter.model.UserFeedback;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.ClientConfig;
+import com.sharesmile.share.helpcenter.model.UserFeedback;
+import com.sharesmile.share.login.UserDetails;
+import com.sharesmile.share.tracking.workout.data.model.FraudData;
 
 import java.util.List;
 
@@ -133,7 +133,98 @@ public class SyncHelper {
             }
         }
     }
+    public static void getCharityOverview() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_CHARITY_OVERVIEW)
+                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setUpdateCurrent(true)
+                .build();
 
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
+    public static void getAchievedBadged() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_ACHIEVEMENT_BADGE)
+                .setExecutionWindow(0L, 5) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+    public static void getAchievedTitle() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_ACHIEVEMENT_TITLE)
+                .setExecutionWindow(0L, 5) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+    public static void getStreak() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_STREAK)
+                .setExecutionWindow(0L, 1)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setUpdateCurrent(false)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
+
+    public static void uploadStreak() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_STREAK)
+                .setExecutionWindow(0L, 200)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setUpdateCurrent(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+    public static void uploadAchievement() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_ACHIEVEMENT_BADGE)
+                .setExecutionWindow(0L, 5) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setUpdateCurrent(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+    public static void uploadAchievementTitle() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_ACHIEVEMENT_TITLE)
+                .setExecutionWindow(0L, 100)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setUpdateCurrent(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
     public static void oneTimeUploadUserData() {
         OneoffTask task = new OneoffTask.Builder()
                 .setService(SyncService.class)
@@ -141,6 +232,45 @@ public class SyncHelper {
                 .setExecutionWindow(0L, 300) // Within 5 mins
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                 .setPersisted(true)
+                .setUpdateCurrent(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+
+    public static void uploadPendingWorkout() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.UPLOAD_PENDING_WORKOUT)
+                .setExecutionWindow(0L, 300) // Within 5 mins
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+    public static void syncCauseData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_CAUSE_DATA)
+                .setExecutionWindow(0L, 5)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .build();
+
+        GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());
+        mGcmNetworkManager.schedule(task);
+    }
+    public static void syncBadgesData() {
+        OneoffTask task = new OneoffTask.Builder()
+                .setService(SyncService.class)
+                .setTag(TaskConstants.SYNC_BADGE_DATA)
+                .setExecutionWindow(0L, 5)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setPersisted(true)
+                .setUpdateCurrent(false)
                 .build();
 
         GcmNetworkManager mGcmNetworkManager = GcmNetworkManager.getInstance(MainApplication.getContext());

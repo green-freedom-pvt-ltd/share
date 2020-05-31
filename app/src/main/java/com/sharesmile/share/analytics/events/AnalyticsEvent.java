@@ -3,8 +3,8 @@ package com.sharesmile.share.analytics.events;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.analytics.Analytics;
+import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.UnObfuscable;
 import com.sharesmile.share.utils.Utils;
 
@@ -27,6 +27,7 @@ public class AnalyticsEvent implements UnObfuscable {
     public static final String CATEGORY_SYNC = "SYNC";
     public static final String CATEGORY_LEAGUE = "LEAGUE";
     public static final String CATEGORY_FEEDBACK = "FEEDBACK";
+    public static final String CATEGORY_RESPONSE = "RESPONSE";
 
     private Properties eventProperties;
 

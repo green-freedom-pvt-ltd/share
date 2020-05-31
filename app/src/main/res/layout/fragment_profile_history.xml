@@ -1,33 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/grey_f2"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/container_select_workout"
         android:layout_width="match_parent"
         android:layout_height="63dp"
-        android:gravity="center"
         android:background="@color/white"
-        android:elevation="3dp"
+        android:gravity="center"
         android:visibility="gone">
 
         <com.sharesmile.share.views.MRTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/black_64"
             android:gravity="center"
-            android:text="@string/select_workout_with_issue"/>
+            android:text="@string/select_workout_with_issue"
+            android:textColor="@color/black_64"
+            android:textSize="16sp" />
 
     </LinearLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/lv_profile_history"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/container_select_workout"/>
+        android:layout_height="wrap_content">
+    <ScrollView
+        android:layout_below="@+id/container_select_workout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include layout="@layout/not_sync_layout"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/lv_profile_history"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                />
+        </LinearLayout>
+    </ScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/progress_bar"

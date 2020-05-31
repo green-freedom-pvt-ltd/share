@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -9,82 +8,159 @@
     card_view:cardCornerRadius="5dp">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingRight="16dp"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
         >
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:src="@drawable/ic_close_black_24dp"
-            />
+
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <ProgressBar
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:indeterminateDrawable="@drawable/progress_gradient_bg"
-            android:max="360"
-            />
-            <LinearLayout
-                android:layout_centerInParent="true"
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                app:srcCompat="@drawable/ic_arrow_back" />
+
+            <ImageView
+                android:id="@+id/iv_close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                >
-                <com.sharesmile.share.views.LBTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="58sp"
-                    android:text="15"
-                    android:textColor="@color/clr_5d"
-                    />
-                <com.sharesmile.share.views.LBTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Days Streak"
-                    android:textSize="20sp"
-                    android:textColor="@color/clr_5d"
-                    />
-            </LinearLayout>
+                android:layout_alignParentRight="true"
+                app:srcCompat="@drawable/ic_close_black_24dp" />
         </RelativeLayout>
-        <com.sharesmile.share.views.LBTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1km left, Let's Go"
-            android:textSize="18sp"
-            android:textColor="@color/clr_5d"
-            />
-        <com.sharesmile.share.views.LBTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="BEST 20"
-            android:textSize="18sp"
-            android:textColor="#ff9414"
-            />
-        <com.sharesmile.share.views.MSBButton
+
+        <LinearLayout
+            android:id="@+id/sharable_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_corner"
-            android:text="@string/tell_your_friends"
-            android:textColor="@color/white"
-            android:padding="14sp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="60dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            />
-        <com.sharesmile.share.views.LBTextView
+                <ProgressBar
+                    android:id="@+id/streak_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:max="360"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/progress_gradient_bg"
+                    android:secondaryProgress="360" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <com.sharesmile.share.views.LBTextView
+                        android:id="@+id/tv_streak_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/clr_5d"
+                        android:textSize="58sp" />
+
+                    <com.sharesmile.share.views.LBITextView
+                        android:id="@+id/tv_streak_count_days"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:text="Days Streak"
+                        android:textColor="@color/clr_5d"
+                        android:textSize="20sp" />
+
+                    <LinearLayout
+                        android:id="@+id/lt_streak_goal_icons"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"></LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="0.2"
+                >
+
+                <com.sharesmile.share.views.LBTextView
+                    android:id="@+id/tv_streak_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1km left, Let's Go"
+                    android:textColor="@color/clr_5d"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <com.sharesmile.share.views.LBTextView
+                    android:id="@+id/tv_streak_best"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/max_streak_bg"
+                    android:gravity="center|top"
+                    android:paddingTop="5dp"
+                    android:text="BEST 20"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="EDIT GOAL"
-            android:textColor="@color/bright_sky_blue"
-            android:textSize="14sp"
-            />
+            android:gravity="center">
+
+            <com.sharesmile.share.views.MSBButton
+                android:id="@+id/btn_tell_your_friends"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp"
+                android:background="@drawable/rounded_corner"
+                android:padding="14sp"
+                android:text="@string/tell_your_friends"
+                android:textColor="@color/white"
+
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            >
+
+            <com.sharesmile.share.views.LBTextView
+                android:id="@+id/tv_edit_goal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EDIT GOAL"
+                android:textColor="@color/bright_sky_blue"
+                android:textSize="14sp"
+                android:padding="5dp"
+
+                />
+        </LinearLayout>
 
     </LinearLayout>
 

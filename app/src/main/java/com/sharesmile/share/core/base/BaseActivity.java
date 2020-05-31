@@ -16,8 +16,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
@@ -82,15 +84,47 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
         if (!getSupportFragmentManager().isDestroyed()) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction
-                    .add(getFrameLayoutId(), fragmentToBeLoaded, fragmentToBeLoaded.getName());
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+            if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {
+                fragmentTransaction
+                        .add(getFrameLayoutId(), fragmentToBeLoaded, fragmentToBeLoaded.getName());
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(fragmentToBeLoaded.getName(),0);
             }
-            if (allowStateLoss) {
-                fragmentTransaction.commitAllowingStateLoss();
-            } else {
-                fragmentTransaction.commit();
+        } else {
+            Logger.e(getName(), "addFragmen: Actvity Destroyed, won't perform FT to load" +
+                    " Fragment " + fragmentToBeLoaded.getName());
+        }
+    }
+
+    @Override
+    public void addFragment(BaseFragment fragmentToBeLoaded, boolean addToBackStack,String tag) {
+        boolean allowStateLoss = true;
+
+        if (!getSupportFragmentManager().isDestroyed()) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {
+                fragmentTransaction
+                        .add(getFrameLayoutId(), fragmentToBeLoaded, tag);
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(fragmentToBeLoaded.getName(),0);
             }
         } else {
             Logger.e(getName(), "addFragmen: Actvity Destroyed, won't perform FT to load" +
@@ -122,19 +156,51 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
 
         if (!getSupportFragmentManager().isDestroyed()) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(getFrameLayoutId(), fragmentToBeLoaded,
-                    fragmentToBeLoaded.getName());
-            if (addToBackStack) {
-                fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
-            }
-            if (allowStateLoss) {
-                fragmentTransaction.commitAllowingStateLoss();
-            } else {
-                fragmentTransaction.commit();
+            if(getSupportFragmentManager().findFragmentByTag(fragmentToBeLoaded.getName())==null) {
+                fragmentTransaction.replace(getFrameLayoutId(), fragmentToBeLoaded,
+                        fragmentToBeLoaded.getName());
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(fragmentToBeLoaded.getName());
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(fragmentToBeLoaded.getName(),0);
             }
         } else {
             Logger.e(getName(), "replaceFragment: Actvity Destroyed, won't perform FT to load" +
                     " Fragment " + fragmentToBeLoaded.getName());
+        }
+    }
+
+    @Override
+    public void replaceFragment(BaseFragment fragmentToBeLoaded, boolean addToBackStack,String tag) {
+        boolean allowStateLoss = true;
+
+        if (!getSupportFragmentManager().isDestroyed()) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            if(getSupportFragmentManager().findFragmentByTag(tag)==null) {
+                fragmentTransaction.replace(getFrameLayoutId(), fragmentToBeLoaded,
+                        tag);
+                if (addToBackStack) {
+                    fragmentTransaction.addToBackStack(tag);
+                }
+                if (allowStateLoss) {
+                    fragmentTransaction.commitAllowingStateLoss();
+                } else {
+                    fragmentTransaction.commit();
+                }
+            }else
+            {
+                getSupportFragmentManager().popBackStack(tag,0);
+            }
+        } else {
+            Logger.e(tag, "replaceFragment: Actvity Destroyed, won't perform FT to load" +
+                    " Fragment " + tag);
         }
     }
 
@@ -317,6 +383,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IFragmen
     private void showTrackingActivity() {
         Logger.d(TAG, "showTrackingActivity: Will start TrackerActivity with causeData: " + mCauseData.getTitle());
         Intent intent = new Intent(this, TrackerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(BUNDLE_CAUSE_DATA, mCauseData);
         startActivity(intent);
     }

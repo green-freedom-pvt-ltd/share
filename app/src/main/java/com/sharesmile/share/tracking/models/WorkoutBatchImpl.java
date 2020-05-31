@@ -252,7 +252,7 @@ public class WorkoutBatchImpl implements WorkoutBatch {
 	public boolean wasInVehicle() {
 		return wasInVehicle;
 	}
-
+//TODO : check for getservertimeatsystemtime
 	private void setElapsedTime(){
 		if (isRunning){
 			elapsedTime = (DateUtil.getServerTimeInMillis() - startTimeStamp) / 1000;

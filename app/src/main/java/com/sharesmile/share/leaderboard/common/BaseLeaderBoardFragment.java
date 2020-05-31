@@ -14,9 +14,12 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.sharesmile.share.R;
+import com.sharesmile.share.Workout;
+import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.leaderboard.common.adapter.LeaderBoardAdapter;
 import com.sharesmile.share.leaderboard.common.model.BaseLeaderBoardItem;
 import com.sharesmile.share.network.NetworkUtils;
@@ -72,7 +75,9 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
     }
 
     protected void init() {
-        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this);
+        WorkoutDao mWorkoutDao = MainApplication.getInstance().getDbWrapper().getWorkoutDao();
+        List<Workout> mWorkoutList = mWorkoutDao.queryBuilder().where(WorkoutDao.Properties.CauseId.eq(false)).list();
+        mLeaderBoardAdapter = new LeaderBoardAdapter(getContext(), this,mWorkoutList);
         mLayoutManager = new LinearLayoutManager(getContext());
         fetchData();
         mRecyclerView.setAdapter(mLeaderBoardAdapter);
@@ -90,7 +95,7 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                boolean scrollUp = false;
+                    boolean scrollUp = false;
                 if (dy > 0){
                     // Scroll Up (finger move up), Move down
                     scrollUp = true;
@@ -117,15 +122,13 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
                 if (NetworkUtils.isNetworkConnected(getContext())){
                     refreshItems();
                 }else {
-                    MainApplication.showToast("Please connect to Internet");
+                    MainApplication.showToast(getResources().getString(R.string.connect_to_internet));
                     hideProgressDialog();
                 }
             }
         });
-        mswipeRefresh.setColorSchemeResources(R.color.sky_blue);
-
+        mswipeRefresh.setColorSchemeResources(new int[]{R.color.sky_blue,R.color.sky_blue_dark});
         selfRankHolder =  mLeaderBoardAdapter.createMyViewHolder(selfRankItem);
-
     }
 
     @Override
@@ -150,8 +153,9 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
 
     protected abstract void fetchData();
 
-    public void render(List<BaseLeaderBoardItem> list, final int myPosition){
+    public void render(List<BaseLeaderBoardItem> list, final int myPosition,int teamId){
         Logger.d(TAG, "render");
+        int myTeamId = LeaderBoardDataStore.getInstance().getMyTeamId();
         if (list == null || list.isEmpty()){
             MainApplication.showToast(R.string.nothing_to_display);
             return;
@@ -161,6 +165,10 @@ public abstract class BaseLeaderBoardFragment extends BaseFragment implements Le
         this.mleaderBoardList = list;
         this.myLeaderBoardItemPosition = myPosition;
 
+        if(myTeamId == teamId)
+        mLeaderBoardAdapter.setShowUnsync(true);
+        else
+            mLeaderBoardAdapter.setShowUnsync(false);
         mLeaderBoardAdapter.setData(list);
 
         mRecyclerView.post(new Runnable() {

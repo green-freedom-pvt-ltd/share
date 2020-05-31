@@ -20,34 +20,40 @@ import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.onesignal.OneSignal;
 import com.sharesmile.share.R;
-import com.sharesmile.share.tracking.ui.TrackerActivity;
 import com.sharesmile.share.WorkoutDao;
 import com.sharesmile.share.analytics.Analytics;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.SharedPrefsManager;
 import com.sharesmile.share.core.cause.CauseDataStore;
 import com.sharesmile.share.core.config.ClientConfig;
-import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.db.DbWrapper;
 import com.sharesmile.share.core.notifications.NotificationActionReceiver;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
-import com.sharesmile.share.tracking.workout.service.WorkoutService;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
-import com.sharesmile.share.tracking.location.GoogleLocationTracker;
 import com.sharesmile.share.core.notifications.OneSignalNotificationHandler;
-import com.sharesmile.share.core.MainActivity;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
+import com.sharesmile.share.db.DbWrapper;
+import com.sharesmile.share.helpcenter.levelthree.qna.model.Qna;
 import com.sharesmile.share.home.howitworks.model.HowItWorksResponse;
 import com.sharesmile.share.home.howitworks.model.HowItWorksRowItem;
-import com.sharesmile.share.helpcenter.levelthree.qna.model.Qna;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.leaderboard.LeaderBoardDataStore;
 import com.sharesmile.share.login.UserDetails;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.core.timekeeping.ServerTimeKeeper;
-import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.profile.streak.model.Goal;
+import com.sharesmile.share.tracking.activityrecognition.ActivityDetector;
+import com.sharesmile.share.tracking.location.GoogleLocationTracker;
+import com.sharesmile.share.tracking.ui.TrackerActivity;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.workout.service.WorkoutService;
+import com.sharesmile.share.utils.Utils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +66,7 @@ import io.smooch.core.SmoochCallback;
 
 import static com.sharesmile.share.core.Constants.PREF_APP_VERSION;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
+import static com.sharesmile.share.core.Constants.PREF_GOAL_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_LAST_ACTIVITY_DETECTION_STOPPED_TIMESTAMP;
 import static com.sharesmile.share.core.Constants.PREF_USER_DETAILS;
 import static com.sharesmile.share.core.Constants.PREF_USER_ID;
@@ -157,7 +164,14 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             }
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
+        NotificationCompat.Builder builder =null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = Utils.createChannelForNotification(getContext(), getContext().getString(R.string.channel_description_workout)
+                    , getContext().getString(R.string.channel_name_workout), true);
+        }else
+        {
+            builder = new NotificationCompat.Builder(getContext());
+        }
 
         long[] vibratePattern;
         if (notificationId == WORKOUT_NOTIFICATION_WALK_ENGAGEMENT){
@@ -471,11 +485,63 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
         return SharedPrefsManager.getInstance().getObject(PREF_USER_DETAILS, UserDetails.class);
     }
 
+    public String getGoalDetails(){
+        String s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        if(s.length()<=2)
+        {
+            setGoalDetails(null);
+        }
+        s = SharedPrefsManager.getInstance().getString(PREF_GOAL_DETAILS, "[]");
+        return s;
+    }
+
     public float getBodyWeight(){
         if (isLogin() && getUserDetails() != null){
             return getUserDetails().getBodyWeight();
         }
         return 0;
+    }
+
+    public void setGoalDetails(JSONArray goalDetails) {
+        goalDetails = new JSONArray();
+        ArrayList<Goal> goals  = new ArrayList<>();
+        Goal goal = new Goal();
+        goal.setId(1);
+        goal.setName("Casual");
+        goal.setIconCount(0);
+        goal.setValue(1);
+        goals.add(goal);
+
+        goal = new Goal();
+        goal.setId(2);
+        goal.setName("Regular");
+        goal.setIconCount(1);
+        goal.setValue(3);
+        goals.add(goal);
+
+        goal = new Goal();
+        goal.setId(3);
+        goal.setName("Serious");
+        goal.setIconCount(2);
+        goal.setValue(7);
+        goals.add(goal);
+
+        goal = new Goal();
+        goal.setId(4);
+        goal.setName("Insane");
+        goal.setIconCount(3);
+        goal.setValue(10);
+        goals.add(goal);
+
+        try {
+            goalDetails = new JSONArray(new Gson().toJson(
+                    goals,
+                    new TypeToken<ArrayList<Goal>>() {}.getType()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Logger.d(TAG, "setGoalDetails as: " + goalDetails);
+        SharedPrefsManager.getInstance().setString(PREF_GOAL_DETAILS, goalDetails.toString());
     }
 
     public void setBodyWeight(float bodyWeight){
@@ -493,6 +559,17 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
     public void setUserDetails(UserDetails details){
 
         UserDetails oldDetails = getUserDetails();
+        if(!(details.getStreakCurrentDate()!=null && details.getStreakCurrentDate().length()>0) &&
+                (oldDetails!=null && oldDetails.getStreakCurrentDate()!=null && oldDetails.getStreakCurrentDate().length()>0))
+        {
+            details.setStreakGoalDistance(oldDetails.getStreakGoalDistance());
+            details.setStreakGoalID(oldDetails.getStreakGoalID());
+            details.setStreakMaxCount(oldDetails.getStreakMaxCount());
+            details.setStreakCount(oldDetails.getStreakCount());
+            details.setStreakCurrentDate(oldDetails.getStreakCurrentDate());
+            details.setStreakRunProgress(oldDetails.getStreakRunProgress());
+            details.setStreakAdded(oldDetails.isStreakAdded());
+        }
         Gson gson = new Gson();
         Logger.d(TAG, "setUserDetails as: " + gson.toJson(details));
         SharedPrefsManager.getInstance().setObject(PREF_USER_DETAILS, details);
@@ -511,8 +588,6 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
             prefsManager.setString(Constants.PREF_USER_EMAIL, details.getEmail());
             Analytics.getInstance().setUserEmail(details.getEmail());
         }
-
-        prefsManager.setBoolean(Constants.PREF_IS_LOGIN, true);
 
         prefsManager.setInt(Constants.PREF_USER_ID, details.getUserId());
         Analytics.getInstance().setUserId(details.getUserId());
@@ -541,6 +616,9 @@ public class MainApplication extends MultiDexApplication implements AppLifecycle
 
     public static boolean isLogin() {
         return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_IS_LOGIN, false);
+    }
+    public static boolean isTokenAvailable() {
+        return SharedPrefsManager.getInstance().getBoolean(Constants.PREF_GOT_TOKEN, false);
     }
 
     public void setModelShown() {

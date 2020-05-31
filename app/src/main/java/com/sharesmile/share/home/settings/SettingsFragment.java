@@ -1,8 +1,11 @@
 package com.sharesmile.share.home.settings;
 
 import android.app.Activity;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -18,28 +21,37 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.BaseFragment;
 import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.BaseFragment;
+import com.sharesmile.share.login.LoginActivity;
+import com.sharesmile.share.profile.model.CharityOverview;
 import com.sharesmile.share.utils.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_ALERTS;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_GPS_UPDATES;
 import static com.sharesmile.share.core.Constants.PREF_DISABLE_VOICE_UPDATES;
+import static com.sharesmile.share.core.Constants.REMINDER_SET;
 
 
 /**
@@ -78,6 +90,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     @BindView(R.id.gps_speed_updates)
     Switch gpsSpeedUpdates;
 
+    @BindView(R.id.tv_set_reminder)
+    TextView setReminder;
+
+    @BindView(R.id.tv_reminder_time)
+    TextView reminderTime;
+
     MaterialShowcaseView materialShowcaseView;
 
     private static final String SHOW_REMINDER_OVERLAY = "show_reminder_overlay";
@@ -104,11 +122,11 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         mTos.setOnClickListener(this);
         mRate.setOnClickListener(this);
         mLogout.setOnClickListener(this);
-        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
-            notifToggle.setChecked(false);
-        }else {
-            notifToggle.setChecked(true);
-        }
+//        if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_ALERTS, false)){
+            notifToggle.setChecked(SharedPrefsManager.getInstance().getBoolean(REMINDER_SET, false));
+//        }else {
+//            notifToggle.setChecked(true);
+//        }
         if (SharedPrefsManager.getInstance().getBoolean(PREF_DISABLE_GPS_UPDATES, true)){
             gpsSpeedUpdates.setChecked(false);
         }else {
@@ -123,7 +141,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         appVersionText.setText("App Version " + Utils.getAppVersion());
         setCurrencySpinner();
         setMeasurementSpinner();
-
+        setReminderTimeTv();
         if (showReminderOverlay){
             SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
             notifToggle.setChecked(false);
@@ -305,6 +323,20 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         updateSettingItems();
         Toast.makeText(getContext(),"Logout",Toast.LENGTH_SHORT).show();
 
+        Loader<CharityOverview> loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
+        // If the Loader was null, initialize it. Else, restart it.
+        if (loader == null) {
+//            getActivity().getLoaderManager().initLoader(Constants.LOADER_CHARITY_OVERVIEW, null, this);
+        } else {
+            loader.onContentChanged();
+        }
+
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_FIRST_TIME_USER, false);
+        startActivity(intent);
+        getActivity().finish();
+
     }
 
     @Override
@@ -325,10 +357,15 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                         .buildAndDispatch();
                 if (isChecked){
                     // Enabled Alerts and Reminders
-                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+//                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, false);
+
+                    setReminder();
+
                 }else {
                     // Disable Alerts and Reminders
-                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
+                    Utils.cancelReminderTime(getContext());
+                    setReminderTimeTv();
+//                    SharedPrefsManager.getInstance().setBoolean(PREF_DISABLE_ALERTS, true);
                 }
                 break;
             case R.id.notif_voice_updates:
@@ -398,6 +435,47 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         @Override
         public String toString() {
             return label + " " + code ;
+        }
+    }
+
+    @OnClick(R.id.reminder_layout)
+    void setReminder()
+    {
+        if(notifToggle.isChecked()) {
+            Calendar calendar = Utils.getReminderTime();
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                    Utils.setReminderTime(hour + ":" + minute, getContext());
+                    setReminderTimeTv();
+
+                }
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
+            timePickerDialog.show();
+            timePickerDialog.setCancelable(false);
+            timePickerDialog.setCanceledOnTouchOutside(false);
+            timePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                        notifToggle.setChecked(SharedPrefsManager.getInstance().getBoolean(Constants.REMINDER_SET,true));
+                }
+            });
+        }
+    }
+
+    private void setReminderTimeTv() {
+        Calendar calendar1 = Utils.getReminderTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
+        Date date = new Date();
+        date.setTime(calendar1.getTimeInMillis());
+        reminderTime.setText(simpleDateFormat.format(date));
+        if(notifToggle.isChecked())
+        {
+            reminderTime.setTextColor(getResources().getColor(R.color.greyish_brown_two));
+        }else
+        {
+            reminderTime.setTextColor(getResources().getColor(R.color.black_18));
         }
     }
 }

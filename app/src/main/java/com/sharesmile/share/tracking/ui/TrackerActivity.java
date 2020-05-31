@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -25,23 +26,25 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.Properties;
-import com.sharesmile.share.core.base.BaseActivity;
 import com.sharesmile.share.core.Constants;
-import com.sharesmile.share.core.base.PermissionCallback;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
-import com.sharesmile.share.tracking.workout.service.WorkoutService;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.cause.model.CauseData;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.base.BaseActivity;
+import com.sharesmile.share.core.base.PermissionCallback;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
+import com.sharesmile.share.tracking.models.WorkoutData;
+import com.sharesmile.share.tracking.stepcount.GoogleFitStepCounter;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
+import com.sharesmile.share.tracking.workout.service.WorkoutService;
 import com.sharesmile.share.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import static com.sharesmile.share.core.Constants.PAUSE_REASON_USER_CLICKED;
 
@@ -196,7 +199,7 @@ public class TrackerActivity extends BaseActivity {
                 == PackageManager.PERMISSION_GRANTED) {
             // All required permissions available
             Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM");
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM", Locale.ENGLISH);
             String month = sdf.format(cal.getTime());
 
             int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
@@ -327,7 +330,12 @@ public class TrackerActivity extends BaseActivity {
     public void invokeWorkoutService() {
         Log.d(TAG, "invokeWorkoutService");
         Intent intent = new Intent(this, WorkoutService.class);
-        startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
+
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE
                 | Context.BIND_IMPORTANT);
     }
@@ -385,8 +393,9 @@ public class TrackerActivity extends BaseActivity {
                     case Constants.BROADCAST_WORKOUT_RESULT_CODE:
                         Logger.i(TAG, "onReceive of workoutServiceReceiver,  BROADCAST_WORKOUT_RESULT_CODE");
                         WorkoutData result = bundle.getParcelable(Constants.KEY_WORKOUT_RESULT);
+                        AchievedBadgesData achievedBadgesData = bundle.getParcelable(Constants.KEY_WORKOUT_ACHIEVED_RESULT);
                         if (runFragment != null) {
-                            runFragment.onWorkoutResult(result);
+                            runFragment.onWorkoutResult(result,achievedBadgesData);
                         }
                         break;
 
@@ -443,7 +452,7 @@ public class TrackerActivity extends BaseActivity {
                                         errorMessage = getString(R.string.rfac_too_slow_message);
                                         break;
                                     case Constants.PROBELM_NOT_MOVING:
-                                        errorMessage = getString(R.string.rfac_lazy_ass_message);
+                                        errorMessage = getString(R.string.notification_standing_still_title);
                                         break;
                                     case Constants.PROBLEM_GPS_DISABLED:
                                         errorMessage = getString(R.string.rfac_gps_disabled_message);

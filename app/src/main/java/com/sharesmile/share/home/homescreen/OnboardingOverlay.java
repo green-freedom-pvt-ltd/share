@@ -15,7 +15,9 @@ public enum OnboardingOverlay {
     DRAWER(3, 3000, 5, "pref_did_use_hamburger"),
     FEED(7, 3000, 5, "pref_did_use_feed"),
     OVERALL_IMAPACT(10, 3000, 5, "pref_did_see_impact_so_far"),
-    HELP_CENTER(8, 250, 5, "pref_did_use_help_center");
+    HELP_CENTER(8, 250, 5, "pref_did_use_help_center"),
+    STREAK_COUNT(3, 0, 0, "pref_did_open_streak"),
+    MY_STATS(4, 0, 1, "pref_did_see_my_stats");
 
     private int minLaunchCount;
     private int delayInMillis;
@@ -45,8 +47,8 @@ public enum OnboardingOverlay {
         return didUsePrefKey;
     }
 
-    public String getTitle(){
-        switch (this){
+    public String getTitle() {
+        switch (this) {
             case SWIPE_CAUSE:
                 return MainApplication.getContext().getString(R.string.swipe_cause_onboarding_title);
             case LETS_GO:
@@ -59,13 +61,17 @@ public enum OnboardingOverlay {
                 return MainApplication.getContext().getString(R.string.overall_impact_onboarding_title);
             case HELP_CENTER:
                 return MainApplication.getContext().getString(R.string.help_center_onboarding_title);
+            case STREAK_COUNT:
+                return MainApplication.getContext().getString(R.string.streak_count_onboarding_title);
+            case MY_STATS:
+                return MainApplication.getContext().getString(R.string.my_stats_onboarding_title);
             default:
                 return null;
         }
     }
 
-    public String getDescription(){
-        switch (this){
+    public String getDescription() {
+        switch (this) {
             case SWIPE_CAUSE:
                 return MainApplication.getContext().getString(R.string.swipe_cause_onboarding_description);
             case LETS_GO:
@@ -78,18 +84,23 @@ public enum OnboardingOverlay {
                 return MainApplication.getContext().getString(R.string.overall_impact_onboarding_description);
             case HELP_CENTER:
                 return MainApplication.getContext().getString(R.string.help_center_onboarding_description);
+            case STREAK_COUNT:
+                return MainApplication.getContext().getString(R.string.streak_count_onboarding_description);
+            case MY_STATS:
+                return MainApplication.getContext().getString(R.string.my_stats_onboarding_description);
             default:
                 return null;
         }
     }
 
-    public boolean isEligibleForDisplay(int screenLaunchCount, long workoutCount){
-        return  !SharedPrefsManager.getInstance().getBoolean(getDidUsePrefKey())
-                    && screenLaunchCount >= getMinLaunchCount()
-                    && workoutCount <= getMaxWorkoutCount();
+    public boolean isEligibleForDisplay(int screenLaunchCount, long workoutCount) {
+        boolean b = SharedPrefsManager.getInstance().getBoolean(getDidUsePrefKey());
+        return !b
+                && screenLaunchCount >= getMinLaunchCount()
+                && workoutCount <= getMaxWorkoutCount();
     }
 
-    public void registerUseOfOverlay(){
+    public void registerUseOfOverlay() {
         SharedPrefsManager.getInstance().setBoolean(getDidUsePrefKey(), true);
     }
 }

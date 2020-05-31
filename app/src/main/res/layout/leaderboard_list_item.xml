@@ -5,7 +5,12 @@
     android:id="@+id/container_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <include layout="@layout/not_sync_layout"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="68dp"
@@ -55,5 +60,5 @@
             tools:text="5 KM" />
 
     </LinearLayout>
-
+    </LinearLayout>
 </android.support.v7.widget.CardView>

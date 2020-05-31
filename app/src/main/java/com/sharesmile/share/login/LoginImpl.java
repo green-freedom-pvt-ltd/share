@@ -7,13 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
@@ -27,22 +25,24 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.sharesmile.share.core.application.MainApplication;
+import com.google.gson.reflect.TypeToken;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
+import com.sharesmile.share.core.Constants;
+import com.sharesmile.share.core.Logger;
+import com.sharesmile.share.core.SharedPrefsManager;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.config.Urls;
+import com.sharesmile.share.core.sync.SyncHelper;
+import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.network.NameValuePair;
 import com.sharesmile.share.network.NetworkAsyncCallback;
 import com.sharesmile.share.network.NetworkDataProvider;
 import com.sharesmile.share.network.NetworkException;
-import com.sharesmile.share.core.sync.SyncHelper;
-import com.sharesmile.share.network.BasicNameValuePair;
+import com.sharesmile.share.profile.streak.model.Goal;
 import com.sharesmile.share.utils.JsonHelper;
-import com.sharesmile.share.core.Logger;
-import com.sharesmile.share.network.NameValuePair;
-import com.sharesmile.share.core.config.Urls;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.sharesmile.share.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -50,9 +50,14 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by Shine on 19/05/16.
@@ -105,7 +110,7 @@ public class LoginImpl {
     private void initializeFbLogin() {
         Context context = getContext();
         if (context != null) {
-            FacebookSdk.sdkInitialize(context.getApplicationContext());
+//            FacebookSdk.sdkInitialize(context.getApplicationContext());
             callbackManager = CallbackManager.Factory.create();
             LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                 @Override
@@ -159,7 +164,7 @@ public class LoginImpl {
 
         NetworkDataProvider.doGetCallAsync(Urls.getLoginUrl(), header, new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 Log.i(TAG, "Login error, Api failed");
                 MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                     @Override
@@ -171,11 +176,36 @@ public class LoginImpl {
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call,Response response) throws IOException {
                 String responseString = response.body().string();
                 Logger.d("LoginImpl", "onResponse: " + responseString);
-                JsonArray array = JsonHelper.StringToJsonArray(responseString);
-                if (array == null) {
+                try {
+                    JsonArray array = JsonHelper.StringToJsonArray(responseString);
+                    if (array == null) {
+                        Crashlytics.logException(new Throwable("Login Response error. Server response : " + responseString));
+                        MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mListener.showHideProgress(false, null);
+                            }
+                        });
+                        sendLoginFailureEvent(response.code(), responseString, isFbLogin);
+                        return;
+                    }
+
+                    final JsonObject element = array.get(0).getAsJsonObject();
+                    Log.i("LoginImpl", "element: " + element.toString());
+                    MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            userLoginSuccess(element, isFbLogin);
+                        }
+                    });
+
+                }catch (Exception e)
+                {
+                    JsonObject jsonObject = JsonHelper.StringToJsonObject(responseString);
+                    MainApplication.showToast(jsonObject.get("error").getAsString());
                     Crashlytics.logException(new Throwable("Login Response error. Server response : " + responseString));
                     MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
                         @Override
@@ -184,18 +214,7 @@ public class LoginImpl {
                         }
                     });
                     sendLoginFailureEvent(response.code(), responseString, isFbLogin);
-                    return;
                 }
-
-                final JsonObject element = array.get(0).getAsJsonObject();
-                Log.i("LoginImpl", "element: " + element.toString());
-                MainApplication.getInstance().getMainThreadHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        userLoginSuccess(element, isFbLogin);
-                    }
-                });
-
             }
         });
 
@@ -212,12 +231,37 @@ public class LoginImpl {
     }
 
     private void userLoginSuccess(JsonObject response, final boolean isFbLogin) {
-
-
         Gson gson = new Gson();
         UserDetails userDetails = gson.fromJson(response, UserDetails.class);
-        MainApplication.getInstance().setUserDetails(userDetails);
+        if(userDetails.getStreakGoalID()>0 && !(userDetails.getStreakGoalDistance()>0))
+        {
+            ArrayList<Goal> goals = new Gson().fromJson(MainApplication.getInstance().getGoalDetails(), new TypeToken<List<Goal>>(){}.getType());
+            for(Goal goal:goals)
+            {
+                if(goal.getId() == userDetails.getStreakGoalID())
+                {
+                    userDetails.setStreakGoalDistance(goal.getValue());
+                    break;
+                }
+            }
+        }
 
+        if(response.has("reminder_time") && !response.get("reminder_time").isJsonNull() && response.get("reminder_time").getAsDouble()>0) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis((long) response.get("reminder_time").getAsDouble());
+            Utils.setReminderTime(calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE),getContext());
+        }else
+        {
+            Utils.setReminderTime("",getContext());
+        }
+            MainApplication.getInstance().setUserDetails(userDetails);
+
+        if(userDetails.getBodyHeight()>0)
+        {
+            Utils.setOnboardingShown();
+        }
+        SharedPrefsManager.getInstance().setBoolean(Constants.PREF_GOT_TOKEN, true);
+        SyncHelper.getStreak();
         //show Toast confirmation
         Toast.makeText(MainApplication.getContext(), "Logged in as " + userDetails.getFirstName(), Toast.LENGTH_SHORT).show();
 
@@ -229,12 +273,6 @@ public class LoginImpl {
                 .put("is_sign_up_user", userDetails.isSignUp())
                 .put("medium", medium)
                 .buildAndDispatch();
-
-        //Pull historical run data;
-        SyncHelper.forceRefreshEntireWorkoutHistory();
-
-        mListener.onLoginSuccess();
-
     }
 
 
@@ -273,13 +311,15 @@ public class LoginImpl {
     }
 
     public void performGoogleLogin() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        if (activityWeakReference != null) {
-            activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
-        } else {
-            fragmentWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.clearDefaultAccountAndReconnect();
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            if (activityWeakReference != null) {
+                activityWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+            } else {
+                fragmentWeakReference.get().startActivityForResult(signInIntent, REQUEST_GOOGLE_SIGN_IN);
+            }
         }
-
     }
 
     public void performFbLogin() {

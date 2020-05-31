@@ -1,10 +1,13 @@
 package com.sharesmile.share.tracking.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -14,19 +17,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.sharesmile.share.core.application.MainApplication;
 import com.sharesmile.share.R;
 import com.sharesmile.share.analytics.events.AnalyticsEvent;
 import com.sharesmile.share.analytics.events.Event;
-import com.sharesmile.share.core.base.IFragmentController;
-import com.sharesmile.share.home.settings.UnitsManager;
-import com.sharesmile.share.tracking.share.ShareFragment;
-import com.sharesmile.share.tracking.workout.WorkoutSingleton;
-import com.sharesmile.share.tracking.models.Calorie;
-import com.sharesmile.share.tracking.models.WorkoutData;
-import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.core.Constants;
 import com.sharesmile.share.core.Logger;
 import com.sharesmile.share.core.ShareImageLoader;
+import com.sharesmile.share.core.application.MainApplication;
+import com.sharesmile.share.core.base.IFragmentController;
+import com.sharesmile.share.core.cause.model.CauseData;
+import com.sharesmile.share.home.settings.UnitsManager;
+import com.sharesmile.share.profile.badges.model.AchievedBadgesData;
+import com.sharesmile.share.tracking.models.Calorie;
+import com.sharesmile.share.tracking.models.WorkoutData;
+import com.sharesmile.share.tracking.share.ShareFragment;
+import com.sharesmile.share.tracking.workout.WorkoutSingleton;
 import com.sharesmile.share.utils.Utils;
 
 import butterknife.BindView;
@@ -96,10 +101,10 @@ public class RealRunFragment extends RunFragment {
     @Override
     protected void populateViews(View baseView) {
         ButterKnife.bind(this, baseView);
-        time = (TextView) baseView.findViewById(R.id.tv_run_progress_timer);
-        distanceTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance);
-        distanceUnitTextView = (TextView) baseView.findViewById(R.id.tv_run_progress_distance_unit);
-        impact = (TextView) baseView.findViewById(R.id.tv_run_progress_impact);
+        time = baseView.findViewById(R.id.tv_run_progress_timer);
+        distanceTextView = baseView.findViewById(R.id.tv_run_progress_distance);
+        distanceUnitTextView = baseView.findViewById(R.id.tv_run_progress_distance_unit);
+        impact = baseView.findViewById(R.id.tv_run_progress_impact);
         pauseButton = baseView.findViewById(R.id.btn_pause);
         stopButton = baseView.findViewById(R.id.btn_stop);
         pauseButton.setOnClickListener(this);
@@ -177,14 +182,16 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void updateTimeView(String newTime) {
-        time.setText(newTime);
-        if (newTime.length() > 5) {
-            mTimerIndicator.setText("HR:MIN:SEC");
+        if (isVisible()) {
+            time.setText(newTime);
+            if (newTime.length() > 5) {
+                mTimerIndicator.setText("HR:MIN:SEC");
+            }
         }
     }
 
     @Override
-    public void onWorkoutResult(WorkoutData data) {
+    public void onWorkoutResult(WorkoutData data, AchievedBadgesData achievedBadgesData) {
         //Workout completed and results obtained, time to show the next Fragment
         Logger.d(TAG, "onWorkoutResult");
         if (isAttachedToActivity()) {
@@ -203,12 +210,12 @@ public class RealRunFragment extends RunFragment {
                 return;
             }
 
-            exitRun(data);
+            exitRun(data,achievedBadgesData);
 
         }
     }
 
-    protected void exitRun(WorkoutData data){
+    protected void exitRun(WorkoutData data, AchievedBadgesData achievedBadgesData){
         Logger.d(TAG, "exit");
         if (mCauseData.getMinDistance() > (data.getDistance())
                 && !data.isMockLocationDetected()) {
@@ -216,30 +223,38 @@ public class RealRunFragment extends RunFragment {
             stopTimer();
             return;
         }
-        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData), false);
+        Loader statsLoader= getActivity().getLoaderManager().getLoader(Constants.LOADER_MY_STATS_GRAPH);
+        if(statsLoader!=null)
+            statsLoader.onContentChanged();
+        Loader  loader = getActivity().getLoaderManager().getLoader(Constants.LOADER_CHARITY_OVERVIEW);
+        if(loader!=null)
+            loader.onContentChanged();
+        getFragmentController().replaceFragment(ShareFragment.newInstance(data, mCauseData,achievedBadgesData), false);
     }
 
     @Override
     public void showUpdate(float speed, float distanceCoveredMeters, int elapsedTimeInSecs) {
         super.showUpdate(speed, distanceCoveredMeters, elapsedTimeInSecs);
-        float distanceOnDisplayInMeters = 0f;
-        try {
-            float numberOnDisplay = Float.parseFloat(distanceTextView.getText().toString());
-            distanceOnDisplayInMeters = UnitsManager.isImperial() ? 1609.34f*numberOnDisplay
-                    : 1000*numberOnDisplay;
-        }catch (NumberFormatException nfe){
-            String message = "NumberFormatException while parsing distanceTextView on display: " + nfe.getMessage();
-            Logger.e(TAG, message);
-            Crashlytics.log(message);
-            nfe.printStackTrace();
-        }
-        if (distanceCoveredMeters < distanceOnDisplayInMeters || distanceCoveredMeters - distanceOnDisplayInMeters >= 1){
-            // Only when the delta is greater than 0.001 km we show the update
-            String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCoveredMeters);
-            distanceTextView.setText(distanceString);
-            int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
-            impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
-            setCaloriesInTextView();
+        if (isVisible()) {
+            float distanceOnDisplayInMeters = 0f;
+            try {
+                float numberOnDisplay = Float.parseFloat(distanceTextView.getText().toString());
+                distanceOnDisplayInMeters = UnitsManager.isImperial() ? 1609.34f * numberOnDisplay
+                        : 1000 * numberOnDisplay;
+            } catch (NumberFormatException nfe) {
+                String message = "NumberFormatException while parsing distanceTextView on display: " + nfe.getMessage();
+                Logger.e(TAG, message);
+                Crashlytics.log(message);
+                nfe.printStackTrace();
+            }
+            if (distanceCoveredMeters < distanceOnDisplayInMeters || distanceCoveredMeters - distanceOnDisplayInMeters >= 1) {
+                // Only when the delta is greater than 0.001 km we show the update
+                String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(distanceCoveredMeters);
+                distanceTextView.setText(distanceString);
+                int rupees = Utils.convertDistanceToRupees(getConversionFactor(), distanceCoveredMeters);
+                impact.setText(UnitsManager.formatRupeeToMyCurrency(rupees));
+                setCaloriesInTextView();
+            }
         }
     }
 
@@ -264,7 +279,7 @@ public class RealRunFragment extends RunFragment {
     public void refreshWorkoutData(){
         Logger.d(TAG, "refreshWorkoutData");
         if (isAttachedToActivity()){
-            updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs()));
+            updateTimeView(Utils.secondsToHHMMSS((int) WorkoutSingleton.getInstance().getElapsedTimeInSecs(),false));
             float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
             String distanceString = UnitsManager.formatToMyDistanceUnitWithTwoDecimal(totalDistance);
             distanceTextView.setText(distanceString);
@@ -297,14 +312,16 @@ public class RealRunFragment extends RunFragment {
     }
 
     private void setPauseResumeButton(boolean paused){
-        if (paused){
-            pauseResumeTextView.setText(R.string.resume);
-            pauseResumeIcon.setImageResource(R.drawable.ic_play_arrow_black_50_24px);
-            impact.setTextColor(ContextCompat.getColor(getContext(), R.color.black_38));
-        }else {
-            pauseResumeTextView.setText(R.string.pause);
-            pauseResumeIcon.setImageResource(R.drawable.ic_pause_black_50_24px);
-            impact.setTextColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+        if (isVisible()) {
+            if (paused) {
+                pauseResumeTextView.setText(R.string.resume);
+                pauseResumeIcon.setImageResource(R.drawable.ic_play_arrow_black_50_24px);
+                impact.setTextColor(ContextCompat.getColor(getContext(), R.color.black_38));
+            } else {
+                pauseResumeTextView.setText(R.string.pause);
+                pauseResumeIcon.setImageResource(R.drawable.ic_pause_black_50_24px);
+                impact.setTextColor(ContextCompat.getColor(getContext(), R.color.bright_sky_blue));
+            }
         }
     }
 
@@ -378,11 +395,13 @@ public class RealRunFragment extends RunFragment {
 
     @Override
     public void showStopDialog() {
-        float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
-        if (mCauseData.getMinDistance() > (totalDistance)) {
-            showMinDistanceDialog();
-        } else {
-            showRunEndDialog();
+        if (mCauseData != null) {
+            float totalDistance = WorkoutSingleton.getInstance().getTotalDistanceInMeters();
+            if (mCauseData.getMinDistance() > (totalDistance)) {
+                showMinDistanceDialog();
+            } else {
+                showRunEndDialog();
+            }
         }
     }
 
@@ -447,7 +466,7 @@ public class RealRunFragment extends RunFragment {
     private void showErrorDialog(String msg) {
         if (isAttachedToActivity() && !getActivity().isFinishing()){
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-            View view = getLayoutInflater(null).inflate(R.layout.alert_dialog_title, null);
+            View view = ((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.alert_dialog_title, null);
             view.setBackgroundColor(getResources().getColor(R.color.neon_red));
             TextView titleView = (TextView) view.findViewById(R.id.title);
             titleView.setText(getString(R.string.something_not_right));
@@ -458,7 +477,6 @@ public class RealRunFragment extends RunFragment {
                     if (isAttachedToActivity()){
                         resumeRun();
                     }
-
                 }
             });
             alertDialog.setPositiveButton(getString(R.string.finish), new DialogInterface.OnClickListener() {
@@ -468,7 +486,7 @@ public class RealRunFragment extends RunFragment {
                     }
                 }
             });
-
+            if(isVisible())
             alertDialog.show();
         }
     }

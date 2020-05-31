@@ -33,11 +33,11 @@ class MessageCenterAdapter(listener: MessageInterface) : RecyclerView.Adapter<Me
         notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(holder: MessageHolder?, position: Int) {
+    override fun onBindViewHolder(holder: MessageHolder, position: Int) {
         holder?.bindData(mList.get(position));
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MessageHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder {
         return MessageHolder(LayoutInflater.from(parent?.context).inflate(R.layout.item_message_center, parent, false));
     }
 

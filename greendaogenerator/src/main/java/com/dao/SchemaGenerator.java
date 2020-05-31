@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.greenrobot.daogenerator.DaoGenerator;
-import sun.rmi.runtime.Log;
 
 public class SchemaGenerator {
 
@@ -39,17 +38,18 @@ public class SchemaGenerator {
         versions.add(new Version12(false));
         versions.add(new Version13(false));
         versions.add(new Version14(false));
-        versions.add(new Version15(true));
+        versions.add(new Version15(false));
+        versions.add(new Version16(true));
 
         validateSchemas(versions);
-        toFileForceExists("../../Share/app/src/main/java-gen");
+        toFileForceExists("../share/app/src/main/java-gen");
 
         for (SchemaVersion version : versions) {
             // NB: Test output creates stubs, we have an established testing
             // standard which should be followed in preference to generating
             // these stubs.
             new DaoGenerator().generateAll(version.getSchema(),
-                    "../../Share/app/src/main/java-gen");
+                    "../share/app/src/main/java-gen");
         }
     }
 
@@ -86,7 +86,6 @@ public class SchemaGenerator {
 
     protected static File toFileForceExists(String filename) throws IOException {
         File file = new File(filename);
-        Log.getLog("path : ", file.getCanonicalPath(), 1);
         if (!file.exists()) {
             throw new IOException(filename
                     + " does not exist. This check is to prevent accidental file generation into a wrong path.");

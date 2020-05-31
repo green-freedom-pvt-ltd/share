@@ -8,13 +8,14 @@ import android.telephony.TelephonyManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sharesmile.share.core.Logger;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  Contains static methods to make POST and GET requests to REST API endpoints
@@ -129,7 +130,7 @@ public class NetworkUtils {
     }
 
     private static NetworkException convertResponseToException(Response response) {
-        String requestUrl = response.request().urlString();
+        String requestUrl = response.request().url().toString();
         String method = response.request().method();
         int responseCode = response.code();
         String messageFromServer = response.message();
@@ -167,7 +168,7 @@ public class NetworkUtils {
             }
         } else {
             //response obtained from OkHttp is null
-            String why = "Null Response obtained from URL: " + response.request().urlString();
+            String why = "Null Response obtained from URL: " + response.request().url();
             throw new NetworkException.Builder().errorMessage(why).failureType(FailureType.RESPONSE_FAILURE)
                                                 .build();
         }
@@ -185,14 +186,14 @@ public class NetworkUtils {
             }
         } else {
             //response obtained from OkHttp is null
-            String why = "Null Response obtained from URL: " + response.request().urlString();
+            String why = "Null Response obtained from URL: " + response.request().url();
             throw new NetworkException.Builder().errorMessage(why).failureType(FailureType.RESPONSE_FAILURE)
                     .build();
         }
     }
 
     public static NetworkException wrapIOException(Request request, IOException ioe){
-        String requestUrl = request.urlString();
+        String requestUrl = request.url().toString();
         String method = request.method();
         return new NetworkException.Builder().cause(ioe).failureType(FailureType.REQUEST_FAILURE)
                                              .errorMessage(method + " request failed for URL: " +

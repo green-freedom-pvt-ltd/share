@@ -128,7 +128,9 @@ public class JsonHelper {
             JsonElement element;
             try {
                 element = new JsonParser().parse(arrStr);
+                if(element.isJsonArray())
                 return element.getAsJsonArray();
+                else return null;
             }catch (JsonSyntaxException e){
                 return null;
             }
